@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenClaw FAQ & トラブルシューティング</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8;
+            color: #333;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            color: #003366;
+            font-size: 32px;
+            margin-bottom: 10px;
+            border-bottom: 4px solid #17a2b8;
+            padding-bottom: 15px;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 40px;
+        }
+
+        h2 {
+            color: #17a2b8;
+            font-size: 24px;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-left: 15px;
+            border-left: 5px solid #17a2b8;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .nav-links a {
+            display: inline-block;
+            padding: 9px 18px;
+            background: #17a2b8;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 13px;
+            transition: background 0.2s;
+        }
+
+        .nav-links a:hover { background: #117a8b; }
+
+        .faq-item {
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            margin: 18px 0;
+            overflow: hidden;
+        }
+
+        .faq-q {
+            background: #f8f9fa;
+            padding: 18px 22px;
+            font-weight: bold;
+            font-size: 16px;
+            color: #003366;
+            cursor: pointer;
+            border-left: 5px solid #17a2b8;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .faq-q-icon {
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .faq-a {
+            padding: 20px 22px 20px 55px;
+            border-top: 1px solid #e0e0e0;
+            background: white;
+        }
+
+        .error-card {
+            background: #fff5f5;
+            border: 1px solid #f5c6cb;
+            border-radius: 10px;
+            padding: 18px 22px;
+            margin: 15px 0;
+        }
+
+        .error-title {
+            font-weight: bold;
+            color: #721c24;
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+
+        .fix-card {
+            background: #f0fff4;
+            border: 1px solid #c3e6cb;
+            border-radius: 10px;
+            padding: 18px 22px;
+            margin: 15px 0;
+        }
+
+        .fix-title {
+            font-weight: bold;
+            color: #155724;
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            border-radius: 8px;
+            padding: 14px 18px;
+            margin: 10px 0;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            overflow-x: auto;
+        }
+
+        .code-block .c { color: #6a9955; }
+        .code-block .s { color: #ce9178; }
+
+        .tip-box {
+            background: #e8f4fd;
+            border: 1px solid #bee5eb;
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin: 12px 0;
+            font-size: 0.92em;
+        }
+
+        .warn-box {
+            background: #fff3cd;
+            border: 1px solid #ffeeba;
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin: 12px 0;
+            font-size: 0.92em;
+        }
+
+        .category-label {
+            display: inline-block;
+            padding: 3px 12px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>❓ FAQ & トラブルシューティング</h1>
+        <p class="subtitle">よくある質問と詰まりやすいポイントの解決策 — 実際の事例ベース</p>
+
+        <div class="nav-links">
+            <a href="index.html">🏠 トップ</a>
+            <a href="setup.html">🔧 セットアップ</a>
+            <a href="security.html">🔐 セキュリティ</a>
+            <a href="recipes.html">📋 レシピ集</a>
+            <a href="glossary.html">📖 用語集</a>
+        </div>
+
+        <!-- Quick Index -->
+        <div style="background:#f8f9fa; border-radius:12px; padding:20px 25px; margin-bottom:30px;">
+            <div style="font-weight:bold; color:#003366; margin-bottom:12px;">🗂️ カテゴリ別インデックス</div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; font-size:0.92em;">
+                <div>📦 <a href="#install" style="color:#17a2b8;">インストール・起動</a>（5問）</div>
+                <div>🔑 <a href="#api" style="color:#17a2b8;">APIキー・LLM接続</a>（4問）</div>
+                <div>⚙️ <a href="#skill" style="color:#17a2b8;">Skill作成・動作</a>（5問）</div>
+                <div>💰 <a href="#cost" style="color:#17a2b8;">コスト・課金</a>（3問）</div>
+                <div>🔐 <a href="#security-faq" style="color:#17a2b8;">セキュリティ</a>（3問）</div>
+                <div>🔮 <a href="#future" style="color:#17a2b8;">今後・応用</a>（3問）</div>
+            </div>
+        </div>
+
+        <!-- ===== Section 1: インストール ===== -->
+        <h2 id="install">📦 インストール・起動</h2>
+
+        <div class="faq-item">
+            <div class="faq-q">
+                <span class="faq-q-icon">Q</span>
+                <span>インストールしたが <code>openclaw: command not found</code> と出る</span>
+            </div>
+            <div class="faq-a">
+                <span class="category-label" style="background:#f8d7da;color:#721c24;">🔴 よくあるエラー</span>
+                <p>PATHが通っていない可能性があります。以下を順番に試してください。</p>
+                <div class="code-block">
+<span class="c"># 1. インストール先を確認</span>
+pip show openclaw | grep Location
+
+<span class="c"># 2. PATHにPythonのbinディレクトリを追加</span>
+<span class="c"># ~/.bashrc または ~/.zshrc に追記:</span>
+export PATH="$HOME/.local/bin:$PATH"
+
+<span class="c"># 3. 設定を反映</span>
+source ~/.bashrc   <span class="c"># または source ~/.zshrc</span>
+
+<span class="c"># 4. 再確認</span>
+which openclaw
+                </div>
+                <div class="tip-box">💡 <strong>Mac + zsh の場合：</strong> <code>~/.zshrc</code> を編集してください。<code>~/.bashrc</code> では反映されないことがあります。</div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-q">
+                <span class="faq-q-icon">Q</span>
+                <span>Dockerで起動するとすぐ終了する</span>
+            </div>
+            <div class="faq-a">
+                <p>APIキーが正しく設定されていないことが多い原因です。ログを確認します。</p>
+                <div class="code-block">
+<span class="c"># ログを確認（終了したコンテナのログも見られる）</span>
+docker logs openclaw
+
+<span class="c"># よくあるエラーメッセージ例:</span>
+<span class="s">Error: ANTHROPIC_API_KEY is not set</span>
+<span class="s">Error: config.yaml not found at /root/.openclaw/config.yaml</span>
+
+<span class="c"># 対処: 環境変数を正しく渡す</span>
+docker run -d \
+  -v ~/.openclaw:/root/.openclaw \
+  -e ANTHROPIC_API_KEY="sk-ant-api..." \
+  --name openclaw \
+  ghcr.io/openclaw/openclaw:latest
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-q">
+                <span class="faq-q-icon">Q</span>
+                <span>Windowsでインストールしようとするとエラーになる</span>
+            </div>
+            <div class="faq-a">
+                <p>WindowsではWSL2（Windows Subsystem for Linux）を使うのが最も安定します。</p>
+                <div class="code-block">
+<span class="c"># 1. PowerShellを管理者で実行してWSL2をインストール</span>
+wsl --install
+
+<span class="c"># 2. 再起動後、Ubuntu を開いて通常通りインストール</span>
+sudo apt update && sudo apt install python3-pip
+pip install openclaw
+                </div>
+                <div class="warn-box">⚠️ PowerShellでのネイティブ動作は非推奨。WSL2環境で動かすことを強く推奨します。</div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-q">
+                <span class="faq-q-icon">Q</span>
+                <span><code>ModuleNotFoundError</code> が大量に出る</span>
+            </div>
+            <div class="faq-a">
+                <p>依存関係のインストールが不完全です。仮想環境を使うと解決することが多いです。</p>
+                <div class="code-block">
+<span class="c"># venvを使う方法</span>
+python3 -m venv ~/.venv/openclaw
+source ~/.venv/openclaw/bin/activate
+pip install -r requirements.txt
+openclaw start
+
+<span class="c"># または uvx（高速・依存関係自動解決）</span>
+pip install uvx
+uvx openclaw
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-q">
+                <span class="faq-q-icon">Q</span>
+                <span>起動はするが Telegram/Discord ボットが反応しない</span>
+            </div>
+            <div class="faq-a">
+                <p>ボットトークンの設定ミスか、ボットへのアクセス権限の問題です。</p>
+                <div class="code-block">
+<span class="c"># よくある原因チェックリスト:</span>
+<span class="c"># □ config.yaml の messaging.token が正しいか確認</span>
+<span class="c"># □ Telegramの場合: ボットに /start を送ったか</span>
+<span class="c"># □ Discordの場合: ボットをサーバーに招待したか</span>
+
+<span class="c"># 接続テスト</span>
+openclaw test --messaging
+
+<span class="c"># ログでエラーを確認</span>
+openclaw logs --filter messaging
+                </div>
+                <div class="tip-box">💡 <strong>Telegramの場合：</strong> @BotFather で発行したトークンの先頭に余分なスペースが入っていないか確認してください。コピペミスが多い原因です。</div>
+            </div>
+        </div>
+
+        <!-- ===== Section 2: API ===== -->
+        <h2 id="api">🔑 APIキー・LLM接続</h2>
+
+        <div class="faq-item">
+            <div class="faq-q">
+                <span class="faq-q-icon">Q</span>
+                <span><code>AuthenticationError: Invalid API Key</code> が出る</span>
+            </div>
+            <div class="faq-a">
+                <span class="category-label" style="background:#f8d7da;color:#721c24;">🔴 よくあるエラー</span>
+                <div class="code-block">
+<span class="c"># APIキーの確認方法（Anthropicの場合）</span>
+curl -s https://api.anthropic.com/v1/messages \
+  -H "x-api-key: YOUR_KEY" \
+  -H "anthropic-version: 2023-06-01" \
+  -H "content-type: application/json" \
+  -d '{"model":"claude-haiku-4-5-20251001","max_tokens":10,"messages":[{"role":"user","content":"hi"}]}'
+
+<span class="c"># 正常なら応答が返る。エラーなら以下を確認:</span>
+<span class="c"># 1. キーが "sk-ant-api03-..." で始まるか</span>
+<span class="c"># 2. キーの前後に余分なスペース・改行がないか</span>
+<span class="c"># 3. Anthropicコンソールでキーが有効か確認</span>
+<span class="c"># 4. アカウントに支払い情報が登録されているか</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-q">
+                <span class="faq-q-icon">Q</span>
+                <span>途中でレスポンスが止まる・タイムアウトする</span>
+            </div>
+            <div class="faq-a">
+                <p>APIのレートリミットに達しているか、ネットワーク問題の可能性があります。</p>
+                <div class="code-block">
+<span class="c"># config.yaml でタイムアウトとリトライを設定</span>
+llm:
+  timeout: 60          <span class="c"># タイムアウト秒数（デフォルト30）</span>
+  max_retries: 3       <span class="c"># リトライ回数</span>
+  retry_delay: 5       <span class="c"># リトライ間隔（秒）</span>
+
+<span class="c"># レートリミットエラーの場合は「低速モード」を試す</span>
+requests_per_minute: 10   <span class="c"># デフォルトは制限なし</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-q">
+                <span class="faq-q-icon">Q</span>
+                <span>DeepSeekを設定したが接続できない</span>
+            </div>
+            <div class="faq-a">
+                <div class="code-block">
+<span class="c"># DeepSeek の設定例（config.yaml）</span>
+llm:
+  provider: <span class="s">deepseek</span>
+  model: <span class="s">deepseek-chat</span>           <span class="c"># DeepSeek V3</span>
+  api_key: <span class="s">sk-xxxxxxxxxxxxxxxx</span>
+  base_url: <span class="s">https://api.deepseek.com</span>  <span class="c"># 必須</span>
+
+<span class="c"># DeepSeek R1（推論モデル）の場合</span>
+  model: <span class="s">deepseek-reasoner</span>
+                </div>
+                <div class="warn-box">⚠️ DeepSeekは中国からのアクセスが多い時間帯（日本時間の午前中）に応答が遅くなることがあります。繰り返しタイムアウトする場合はその時間帯を避けるか、ClaudeやOpenAIに切り替えてください。</div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-q">
+                <span class="faq-q-icon">Q</span>
+                <span>SkillごとにLLMを変えるにはどうすればいい？</span>
+            </div>
+            <div class="faq-a">
+                <p>config.yaml で Skill 別にモデルを指定できます。</p>
+                <div class="code-block">
+<span class="c"># config.yaml — デフォルトと個別上書きの例</span>
+llm:
+  default:
+    provider: deepseek
+    model: deepseek-chat
+    api_key: <span class="s">sk-xxx</span>
+
+  overrides:
+    document-analysis:        <span class="c"># 重要な文書処理はClaude</span>
+      provider: anthropic
+      model: claude-sonnet-4-6
+      api_key: <span class="s">sk-ant-xxx</span>
+
+    image-analyzer:           <span class="c"># 画像処理はGPT-4o</span>
+      provider: openai
+      model: gpt-4o
+      api_key: <span class="s">sk-openai-xxx</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== Section 3: Skill ===== -->
+        <h2 id="skill">⚙️ Skill作成・動作</h2>
+
+        <div class="faq-item">
+            <div class="faq-q">
+                <span class="faq-q-icon">Q</span>
+                <span>SKILL.mdを作ったのにSkillが認識されない</span>
+            </div>
+            <div class="faq-a">
+                <span class="category-label" style="background:#f8d7da;color:#721c24;">🔴 よくあるエラー</span>
+                <div class="code-block">
+<span class="c"># よくある原因と対処</span>
+
+<span class="c"># 1. ディレクトリ構造が正しいか確認</span>
+ls ~/.openclaw/skills/my-skill/
+<span class="c"># → SKILL.md が存在するか確認</span>
+
+<span class="c"># 2. ファイル名は正確に SKILL.md（大文字）か</span>
+<span class="c"># × skill.md, Skill.md, SKILL.txt は認識されない</span>
+
+<span class="c"># 3. 再起動してSkillを再読み込み</span>
+openclaw restart
+
+<span class="c"># 4. Skill一覧で認識されているか確認</span>
+openclaw skills list
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-q">
+                <span class="faq-q-icon">Q</span>
+                <span>Skillが意図しないタイミングで実行される</span>
+            </div>
+            <div class="faq-a">
+                <p>トリガー条件が広すぎるのが原因です。SKILL.mdのトリガー条件をより具体的にします。</p>
+                <div class="code-block">
+<span class="c">## トリガー条件（良い例と悪い例）</span>
+
+<span class="c"># ❌ 悪い例（広すぎる）</span>
+## トリガー条件
+ユーザーがメッセージを送った時
+
+<span class="c"># ✅ 良い例（具体的）</span>
+## トリガー条件
+以下のフレーズを含むメッセージのみ実行する:
+- 「メール整理して」で始まるメッセージ
+- 「inbox」という単語を含むメッセージ
+- 毎日09:00のスケジュール実行
+
+以下の場合は実行しない:
+- 通常の会話・質問
+- 他のSkillのトリガー条件と重複する場合
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-q">
+                <span class="faq-q-icon">Q</span>
+                <span>Skillが途中で止まる・エラーで終了する</span>
+            </div>
+            <div class="faq-a">
+                <div class="code-block">
+<span class="c"># エラーログを確認</span>
+openclaw logs --skill my-skill --tail 50
+
+<span class="c"># よくある原因:</span>
+<span class="c"># 1. ツールの権限エラー（email_readの認証切れなど）</span>
+<span class="c"># 2. web_fetch でアクセスできないURLへのアクセス</span>
+<span class="c"># 3. file_write で書き込み権限がないディレクトリ</span>
+<span class="c"># 4. レートリミット到達</span>
+
+<span class="c"># SKILL.md にエラーハンドリングを追記する</span>
+                </div>
+                <div class="tip-box">💡 <strong>SKILL.md に追記すると改善：</strong><br>
+                「エラーが発生した場合は、詳細なエラーメッセージとともにユーザーに報告し、処理を中断してください。自動リトライはしないでください。」
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-q">
+                <span class="faq-q-icon">Q</span>
+                <span>日本語のメッセージに対する応答の精度が低い</span>
+            </div>
+            <div class="faq-a">
+                <p>SKILL.mdとシステムプロンプトに日本語指定を明示すると大幅に改善します。</p>
+                <div class="code-block">
+<span class="c">## 言語設定（SKILL.md の冒頭に追記）</span>
+このSkillはすべて日本語で動作します。
+- ユーザーへの返答は必ず日本語で行う
+- 敬語（丁寧語）を使用する
+- 専門用語は必要に応じて英語を括弧で補足する
+
+<span class="c">## config.yaml でグローバルに設定する場合</span>
+system_prompt: |
+  あなたは日本語で動作するアシスタントです。
+  すべての応答を日本語で行い、自然な敬語を使用してください。
+                </div>
+                <div class="tip-box">💡 <strong>LLM選択も影響：</strong> DeepSeekは日本語品質がClaudeより若干低いことがあります。日本語精度を重視する場合はClaudeを試してください。</div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-q">
+                <span class="faq-q-icon">Q</span>
+                <span>複数のSkillが競合して意図しない動作をする</span>
+            </div>
+            <div class="faq-a">
+                <p>トリガー条件が重複しているか、Skillの優先度が設定されていない可能性があります。</p>
+                <div class="code-block">
+<span class="c"># config.yaml でSkillの優先度を設定</span>
+skills:
+  priority:
+    - task-manager       <span class="c"># 最優先（1番目に評価）</span>
+    - email-sorter
+    - news-summary
+    - catch-all          <span class="c"># デフォルト（最後に評価）</span>
+
+<span class="c"># SKILL.md で「このSkillが担当しないケース」を明示</span>
+## 実行しない条件
+以下のメッセージはこのSkillで処理しない:
+- 「タスク」を含む → task-manager Skillに委任
+- 「メール」を含む → email-sorter Skillに委任
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== Section 4: コスト ===== -->
+        <h2 id="cost">💰 コスト・課金</h2>
+
+        <div class="faq-item">
+            <div class="faq-q">
+                <span class="faq-q-icon">Q</span>
+                <span>予想以上のAPI料金が発生した。どうすれば防げたか？</span>
+            </div>
+            <div class="faq-a">
+                <span class="category-label" style="background:#f8d7da;color:#721c24;">🔴 重大な事故</span>
+                <p>$1,100超の請求事例はコスト上限未設定が原因でした。以下の設定で必ず防止してください。</p>
+                <div class="code-block">
+<span class="c"># config.yaml の必須コスト設定</span>
+limits:
+  monthly_budget: 20     <span class="c"># $20/月 で強制停止</span>
+  daily_budget: 5        <span class="c"># $5/日 で強制停止</span>
+  alert_at_percent: 80   <span class="c"># 80%到達でTelegramに警告</span>
+
+<span class="c"># 各LLMプロバイダーでも個別に上限を設定（二重防止）</span>
+<span class="c"># Anthropicコンソール: Usage Limits → Hard limit を$25に設定</span>
+<span class="c"># OpenAIコンソール: Usage limits → Hard limit を$25に設定</span>
+                </div>
+                <div class="warn-box">⚠️ <strong>コスト確認コマンド：</strong><br>
+                <code>openclaw cost status</code> で現在の使用額を即座に確認できます。週1回は確認する習慣を。
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-q">
+                <span class="faq-q-icon">Q</span>
+                <span>コストを抑えながら性能を維持するには？</span>
+            </div>
+            <div class="faq-a">
+                <ul style="list-style:none; padding:0;">
+                    <li style="padding-left:25px; position:relative; margin-bottom:12px;">
+                        <span style="position:absolute;left:0;color:#17a2b8;font-weight:bold;">✔</span>
+                        <strong>タスク別モデル使い分け：</strong> 定型処理はGPT-4o mini（$0.15/1M）、高品質が必要な文書作成はClaude Sonnet
+                    </li>
+                    <li style="padding-left:25px; position:relative; margin-bottom:12px;">
+                        <span style="position:absolute;left:0;color:#17a2b8;font-weight:bold;">✔</span>
+                        <strong>プロンプトキャッシュを活用：</strong> AnthropicのPrompt Caching機能で繰り返しのシステムプロンプトを90%割引
+                    </li>
+                    <li style="padding-left:25px; position:relative; margin-bottom:12px;">
+                        <span style="position:absolute;left:0;color:#17a2b8;font-weight:bold;">✔</span>
+                        <strong>Skillのデバッグはminiモデルで：</strong> 新Skillのテストは最安値モデルで。動作確認後に本番モデルに切り替える
+                    </li>
+                    <li style="padding-left:25px; position:relative; margin-bottom:12px;">
+                        <span style="position:absolute;left:0;color:#17a2b8;font-weight:bold;">✔</span>
+                        <strong>スケジュール実行を夜間に：</strong> リアルタイム性が不要な処理は深夜に実行して日中のレートリミットを回避
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-q">
+                <span class="faq-q-icon">Q</span>
+                <span>無料でOpenClawを使う方法はある？</span>
+            </div>
+            <div class="faq-a">
+                <p>完全無料は難しいですが、コストを最小化する方法はあります。</p>
+                <ul style="list-style:none; padding:0;">
+                    <li style="padding-left:25px; position:relative; margin-bottom:10px;">
+                        <span style="position:absolute;left:0;color:#17a2b8;font-weight:bold;">✔</span>
+                        <strong>Anthropic：</strong> 新規登録で一部の無料クレジットあり（金額・期間は変動）
+                    </li>
+                    <li style="padding-left:25px; position:relative; margin-bottom:10px;">
+                        <span style="position:absolute;left:0;color:#17a2b8;font-weight:bold;">✔</span>
+                        <strong>Zhipu AutoGLM：</strong> 学生向け無料プランあり
+                    </li>
+                    <li style="padding-left:25px; position:relative; margin-bottom:10px;">
+                        <span style="position:absolute;left:0;color:#17a2b8;font-weight:bold;">✔</span>
+                        <strong>OpenRouter：</strong> 一部のモデルは無料枠あり（制限付き）
+                    </li>
+                    <li style="padding-left:25px; position:relative; margin-bottom:10px;">
+                        <span style="position:absolute;left:0;color:#17a2b8;font-weight:bold;">✔</span>
+                        <strong>Ollama：</strong> ローカルLLM（Llama3等）を使えばAPIコストゼロ。ただしGPU必要で性能は劣る
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- ===== Section 5: セキュリティ ===== -->
+        <h2 id="security-faq">🔐 セキュリティ</h2>
+
+        <div class="faq-item">
+            <div class="faq-q">
+                <span class="faq-q-icon">Q</span>
+                <span>インストールしたSkillが安全かどうか確認する方法は？</span>
+            </div>
+            <div class="faq-a">
+                <div class="code-block">
+<span class="c"># Skillの安全確認チェックリスト</span>
+
+<span class="c"># 1. SKILL.md を必ず読む（ソースコードを確認）</span>
+cat ~/.openclaw/skills/suspicious-skill/SKILL.md
+
+<span class="c"># 2. 使用ツールを確認（不審な権限がないか）</span>
+<span class="c"># 危険なツールの例:</span>
+<span class="c"># - system_exec (任意コマンド実行) ← 要注意</span>
+<span class="c"># - file_delete (ファイル削除)</span>
+<span class="c"># - email_send (勝手にメール送信)</span>
+<span class="c"># - network_request (外部への通信)</span>
+
+<span class="c"># 3. GitHubでSkillのコミット履歴を確認</span>
+<span class="c"># 最近の更新で何かが変わっていないか</span>
+
+<span class="c"># 4. コミュニティの評価・レビューを確認</span>
+<span class="c"># OpenClaw公式のSkillレジストリで評価確認</span>
+                </div>
+                <div class="warn-box">⚠️ ClawHavoc攻撃では「便利そうなSkill」に偽装した悪意あるコードが配布されました。公式リポジトリ外のSkillは特に慎重に。</div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-q">
+                <span class="faq-q-icon">Q</span>
+                <span>OpenClawに業務データ・個人情報を処理させても大丈夫？</span>
+            </div>
+            <div class="faq-a">
+                <p>LLMプロバイダーによって異なります。</p>
+                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-top:12px;">
+                    <div style="padding:15px; background:#fef0e6; border-radius:10px; text-align:center;">
+                        <div style="font-size:1.5em;">🍊</div>
+                        <div style="font-weight:bold; color:#cc785c; margin:5px 0;">Claude</div>
+                        <div style="font-size:0.85em; color:#555;">業務利用可（API経由のデータはトレーニングに使用しない旨を明示）</div>
+                    </div>
+                    <div style="padding:15px; background:#e8fff4; border-radius:10px; text-align:center;">
+                        <div style="font-size:1.5em;">🟢</div>
+                        <div style="font-weight:bold; color:#10a37f; margin:5px 0;">GPT-4o</div>
+                        <div style="font-size:0.85em; color:#555;">Enterprise契約でデータ保護。通常APIはプライバシーポリシー要確認</div>
+                    </div>
+                    <div style="padding:15px; background:#fff5f5; border-radius:10px; text-align:center;">
+                        <div style="font-size:1.5em;">🔵</div>
+                        <div style="font-weight:bold; color:#721c24; margin:5px 0;">DeepSeek</div>
+                        <div style="font-size:0.85em; color:#555;">中国企業。機密情報・個人情報の処理は避けること</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-q">
+                <span class="faq-q-icon">Q</span>
+                <span>エージェントが意図しないメールを送信してしまった場合は？</span>
+            </div>
+            <div class="faq-a">
+                <div class="error-card">
+                    <div class="error-title">🚨 緊急対処手順</div>
+                    <ol style="margin:0; padding-left:20px;">
+                        <li>即座に OpenClaw を停止: <code>openclaw stop</code></li>
+                        <li>送信されたメールの内容・送信先をログで確認</li>
+                        <li>必要に応じて相手先に「誤送信」を連絡</li>
+                        <li>メールの内容に機密情報が含まれていれば情報セキュリティ担当に報告</li>
+                    </ol>
+                </div>
+                <div class="fix-card">
+                    <div class="fix-title">🛡️ 再発防止：SKILL.mdに必須ルールを追記</div>
+                    <div class="code-block">
+<span class="c">## 重要ルール（全Skillに追記を推奨）</span>
+メールの送信・削除・転送は、必ず事前にユーザーに
+送信内容・宛先を提示して承認を得てから実行する。
+承認なしに外部へメールを送信することは禁止。
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== Section 6: 今後・応用 ===== -->
+        <h2 id="future">🔮 今後・応用</h2>
+
+        <div class="faq-item">
+            <div class="faq-q">
+                <span class="faq-q-icon">Q</span>
+                <span>OpenAIにPeter Steinberger氏が移籍した後、OpenClawはどうなる？</span>
+            </div>
+            <div class="faq-a">
+                <p>2026年2月14日の発表では、OpenClawはオープンソース財団に移管されることが決定されています。</p>
+                <ul style="list-style:none; padding:0;">
+                    <li style="padding-left:25px; position:relative; margin-bottom:10px;">
+                        <span style="position:absolute;left:0;color:#17a2b8;font-weight:bold;">✔</span>
+                        <strong>継続的な開発：</strong> オープンソース財団管理のもとコミュニティドリブンの開発が続く
+                    </li>
+                    <li style="padding-left:25px; position:relative; margin-bottom:10px;">
+                        <span style="position:absolute;left:0;color:#17a2b8;font-weight:bold;">✔</span>
+                        <strong>OpenAIとの連携強化：</strong> GPTシリーズとの統合がより深まる可能性
+                    </li>
+                    <li style="padding-left:25px; position:relative; margin-bottom:10px;">
+                        <span style="position:absolute;left:0;color:#17a2b8;font-weight:bold;">✔</span>
+                        <strong>競合の加速：</strong> Tencent・ByteDance等の中国テック大手の参入で開発競争が激化
+                    </li>
+                    <li style="padding-left:25px; position:relative; margin-bottom:10px;">
+                        <span style="position:absolute;left:0;color:#17a2b8;font-weight:bold;">✔</span>
+                        <strong>スキルが無駄にならない：</strong> SKILL.mdの記述方法は他のエージェントフレームワークにも応用可能
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-q">
+                <span class="faq-q-icon">Q</span>
+                <span>OpenClawのスキルアップが、将来どんな仕事に役立つ？</span>
+            </div>
+            <div class="faq-a">
+                <ul style="list-style:none; padding:0;">
+                    <li style="padding-left:25px; position:relative; margin-bottom:12px;">
+                        <span style="position:absolute;left:0;color:#17a2b8;font-weight:bold;">✔</span>
+                        <strong>プロンプトエンジニアリング力：</strong> SKILL.mdの設計はLLMへの指示設計そのもの。あらゆるAIツールに応用できる
+                    </li>
+                    <li style="padding-left:25px; position:relative; margin-bottom:12px;">
+                        <span style="position:absolute;left:0;color:#17a2b8;font-weight:bold;">✔</span>
+                        <strong>AIシステム設計力：</strong> トリガー・ツール・エラーハンドリングの設計はエージェント開発の基礎
+                    </li>
+                    <li style="padding-left:25px; position:relative; margin-bottom:12px;">
+                        <span style="position:absolute;left:0;color:#17a2b8;font-weight:bold;">✔</span>
+                        <strong>自動化・効率化の実績：</strong> 「AIエージェントで〇〇を自動化した」という具体的実績は希少価値が高い
+                    </li>
+                    <li style="padding-left:25px; position:relative; margin-bottom:12px;">
+                        <span style="position:absolute;left:0;color:#17a2b8;font-weight:bold;">✔</span>
+                        <strong>マルチエージェント理解：</strong> CrewAI・LangChainへの移行が容易になる。企業のAI導入を主導できる
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-q">
+                <span class="faq-q-icon">Q</span>
+                <span>このサイトは今後どうやって更新していけばいい？</span>
+            </div>
+            <div class="faq-a">
+                <p>自律型AIの動きは速いです。以下のソースを定期チェックすることを推奨します。</p>
+                <ul style="list-style:none; padding:0;">
+                    <li style="padding-left:25px; position:relative; margin-bottom:10px;">
+                        <span style="position:absolute;left:0;color:#17a2b8;font-weight:bold;">✔</span>
+                        <strong>GitHub openclaw/openclaw：</strong> リリースノートとIssueで最新の変更を追う
+                    </li>
+                    <li style="padding-left:25px; position:relative; margin-bottom:10px;">
+                        <span style="position:absolute;left:0;color:#17a2b8;font-weight:bold;">✔</span>
+                        <strong>The Decoder / TechCrunch：</strong> AIエージェント関連ニュースの英語一次情報
+                    </li>
+                    <li style="padding-left:25px; position:relative; margin-bottom:10px;">
+                        <span style="position:absolute;left:0;color:#17a2b8;font-weight:bold;">✔</span>
+                        <strong>X（Twitter）：</strong> #OpenClaw #AIAgent タグ。Peter Steinberger氏のアカウント
+                    </li>
+                    <li style="padding-left:25px; position:relative; margin-bottom:10px;">
+                        <span style="position:absolute;left:0;color:#17a2b8;font-weight:bold;">✔</span>
+                        <strong>Moltbook：</strong> AIエージェントのコミュニティで最新の実験事例を収集
+                    </li>
+                </ul>
+                <div class="tip-box">💡 <strong>活用提案：</strong> ニュース要約Skillを作って、OpenClaw関連ニュースを自動で毎日届けてもらいましょう。このサイトのコンテンツを自動更新するエージェントを組むのが最終目標です。</div>
+            </div>
+        </div>
+
+        <a href="index.html" style="display:inline-block; margin-top:40px; color:#666; text-decoration:none;">← トップへ戻る</a>
+    </div>
+</body>
+</html>

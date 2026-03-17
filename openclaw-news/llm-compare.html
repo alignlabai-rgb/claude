@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenClaw × LLM比較 — Claude vs DeepSeek vs GPT-4o</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8;
+            color: #333;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            color: #003366;
+            font-size: 32px;
+            margin-bottom: 10px;
+            border-bottom: 4px solid #6f42c1;
+            padding-bottom: 15px;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 40px;
+        }
+
+        h2 {
+            color: #6f42c1;
+            font-size: 24px;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-left: 15px;
+            border-left: 5px solid #6f42c1;
+        }
+
+        h3 {
+            color: #333;
+            font-size: 20px;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            padding-left: 25px;
+            position: relative;
+            margin-bottom: 12px;
+        }
+
+        li:before {
+            content: "✔";
+            color: #6f42c1;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        .impact-box {
+            background-color: #f0ebff;
+            border: 1px solid #d4c4f5;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+
+        .impact-title {
+            color: #4a235a;
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .nav-links a {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #6f42c1;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .nav-links a:hover {
+            background: #4a235a;
+        }
+
+        .compare-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.95em;
+        }
+
+        .compare-table th {
+            padding: 14px 12px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .compare-table td {
+            padding: 14px 12px;
+            border-bottom: 1px solid #e0e0e0;
+            vertical-align: middle;
+        }
+
+        .compare-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .compare-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .col-label {
+            font-weight: bold;
+            color: #333;
+            text-align: left;
+            background: #f8f9fa;
+        }
+
+        .col-claude { background: #fef0e6; }
+        .col-deepseek { background: #e8f4ff; }
+        .col-gpt4o { background: #f0fff0; }
+        .col-gpt4omini { background: #fff9e6; }
+
+        .th-claude { background: #cc785c; color: white; }
+        .th-deepseek { background: #1a73e8; color: white; }
+        .th-gpt4o { background: #10a37f; color: white; }
+        .th-gpt4omini { background: #f0a500; color: white; }
+
+        .star-rating {
+            color: #f0a500;
+            font-size: 1.1em;
+        }
+
+        .badge-best {
+            display: inline-block;
+            padding: 2px 8px;
+            background: #28a745;
+            color: white;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+
+        .badge-warn {
+            display: inline-block;
+            padding: 2px 8px;
+            background: #ffc107;
+            color: #333;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+
+        .badge-bad {
+            display: inline-block;
+            padding: 2px 8px;
+            background: #dc3545;
+            color: white;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+
+        .llm-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+
+        .llm-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .llm-icon {
+            font-size: 40px;
+        }
+
+        .llm-name {
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .llm-tagline {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .usecase-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin: 15px 0;
+        }
+
+        .usecase-item {
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.85em;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🤖 OpenClaw × LLM比較</h1>
+        <p class="subtitle">Claude vs DeepSeek vs GPT-4o — どのLLMをOpenClawと組み合わせるべきか？</p>
+
+        <div class="nav-links">
+            <a href="index.html">🏠 トップへ</a>
+            <a href="setup.html">🔧 セットアップ</a>
+            <a href="security.html">🔐 セキュリティ</a>
+            <a href="usecases.html">🚀 活用事例</a>
+        </div>
+
+        <!-- Hero -->
+        <div style="background: linear-gradient(135deg, #2d1b69 0%, #6f42c1 60%, #9b59b6 100%); padding: 40px 30px; border-radius: 20px; color: white; margin-bottom: 40px; text-align: center;">
+            <h2 style="color: white; border: none; font-size: 1.8em; margin: 0 0 10px 0;">LLM選びがエージェント性能を決める</h2>
+            <p style="color: #e0d0ff; margin: 0;">OpenClawはLLMのAPIを呼び出して動作する。LLMの種類で性能・コスト・プライバシーが大きく変わる。</p>
+            <div style="display: flex; justify-content: center; gap: 25px; flex-wrap: wrap; margin-top: 25px;">
+                <div style="background: rgba(255,255,255,0.15); border-radius: 10px; padding: 12px 20px;">
+                    <div style="font-size: 1.5em;">🧠</div><div style="font-size: 0.9em; margin-top: 4px;">推論能力</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.15); border-radius: 10px; padding: 12px 20px;">
+                    <div style="font-size: 1.5em;">💰</div><div style="font-size: 0.9em; margin-top: 4px;">コスト</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.15); border-radius: 10px; padding: 12px 20px;">
+                    <div style="font-size: 1.5em;">🇯🇵</div><div style="font-size: 0.9em; margin-top: 4px;">日本語品質</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.15); border-radius: 10px; padding: 12px 20px;">
+                    <div style="font-size: 1.5em;">🔒</div><div style="font-size: 0.9em; margin-top: 4px;">プライバシー</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.15); border-radius: 10px; padding: 12px 20px;">
+                    <div style="font-size: 1.5em;">⚡</div><div style="font-size: 0.9em; margin-top: 4px;">速度</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Comparison Table -->
+        <h2>1. 総合比較表</h2>
+
+        <div style="overflow-x: auto;">
+        <table class="compare-table">
+            <thead>
+                <tr>
+                    <th class="col-label" style="width: 20%; text-align: left;">評価項目</th>
+                    <th class="th-claude" style="width: 20%;">🍊 Claude<br><small>Sonnet 4.6</small></th>
+                    <th class="th-deepseek" style="width: 20%;">🔵 DeepSeek<br><small>V3</small></th>
+                    <th class="th-gpt4o" style="width: 20%;">🟢 GPT-4o<br><small>2024-11</small></th>
+                    <th class="th-gpt4omini" style="width: 20%;">🟡 GPT-4o mini<br><small>2024-07</small></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="col-label">💰 コスト<br><small style="color:#888;">入力/1Mトークン</small></td>
+                    <td class="col-claude" style="text-align:center;">$3.00<span class="badge-warn">中</span></td>
+                    <td class="col-deepseek" style="text-align:center;">$0.27<span class="badge-best">最安</span></td>
+                    <td class="col-gpt4o" style="text-align:center;">$2.50<span class="badge-warn">中</span></td>
+                    <td class="col-gpt4omini" style="text-align:center;">$0.15<span class="badge-best">格安</span></td>
+                </tr>
+                <tr>
+                    <td class="col-label">🧠 推論能力<br><small style="color:#888;">複雑タスク処理</small></td>
+                    <td class="col-claude" style="text-align:center;"><span class="star-rating">★★★★★</span><span class="badge-best">最高</span></td>
+                    <td class="col-deepseek" style="text-align:center;"><span class="star-rating">★★★★☆</span></td>
+                    <td class="col-gpt4o" style="text-align:center;"><span class="star-rating">★★★★★</span><span class="badge-best">最高</span></td>
+                    <td class="col-gpt4omini" style="text-align:center;"><span class="star-rating">★★★☆☆</span></td>
+                </tr>
+                <tr>
+                    <td class="col-label">🇯🇵 日本語品質<br><small style="color:#888;">自然さ・正確さ</small></td>
+                    <td class="col-claude" style="text-align:center;"><span class="star-rating">★★★★★</span><span class="badge-best">最高</span></td>
+                    <td class="col-deepseek" style="text-align:center;"><span class="star-rating">★★★★☆</span></td>
+                    <td class="col-gpt4o" style="text-align:center;"><span class="star-rating">★★★★★</span><span class="badge-best">最高</span></td>
+                    <td class="col-gpt4omini" style="text-align:center;"><span class="star-rating">★★★★☆</span></td>
+                </tr>
+                <tr>
+                    <td class="col-label">⚡ 応答速度<br><small style="color:#888;">タスク実行の速さ</small></td>
+                    <td class="col-claude" style="text-align:center;"><span class="star-rating">★★★★☆</span></td>
+                    <td class="col-deepseek" style="text-align:center;"><span class="star-rating">★★★★★</span><span class="badge-best">最速</span></td>
+                    <td class="col-gpt4o" style="text-align:center;"><span class="star-rating">★★★★☆</span></td>
+                    <td class="col-gpt4omini" style="text-align:center;"><span class="star-rating">★★★★★</span><span class="badge-best">最速</span></td>
+                </tr>
+                <tr>
+                    <td class="col-label">🔒 プライバシー<br><small style="color:#888;">データの取り扱い</small></td>
+                    <td class="col-claude" style="text-align:center;"><span class="star-rating">★★★★★</span><span class="badge-best">最高</span></td>
+                    <td class="col-deepseek" style="text-align:center;"><span class="star-rating">★★☆☆☆</span><span class="badge-bad">中国企業</span></td>
+                    <td class="col-gpt4o" style="text-align:center;"><span class="star-rating">★★★★☆</span></td>
+                    <td class="col-gpt4omini" style="text-align:center;"><span class="star-rating">★★★★☆</span></td>
+                </tr>
+                <tr>
+                    <td class="col-label">📏 コンテキスト長<br><small style="color:#888;">一度に処理できる量</small></td>
+                    <td class="col-claude" style="text-align:center;">200K tokens<span class="badge-best">最大</span></td>
+                    <td class="col-deepseek" style="text-align:center;">128K tokens</td>
+                    <td class="col-gpt4o" style="text-align:center;">128K tokens</td>
+                    <td class="col-gpt4omini" style="text-align:center;">128K tokens</td>
+                </tr>
+                <tr>
+                    <td class="col-label">🛠️ ツール呼び出し<br><small style="color:#888;">Skill実行の精度</small></td>
+                    <td class="col-claude" style="text-align:center;"><span class="star-rating">★★★★★</span><span class="badge-best">最高</span></td>
+                    <td class="col-deepseek" style="text-align:center;"><span class="star-rating">★★★★☆</span></td>
+                    <td class="col-gpt4o" style="text-align:center;"><span class="star-rating">★★★★★</span><span class="badge-best">最高</span></td>
+                    <td class="col-gpt4omini" style="text-align:center;"><span class="star-rating">★★★☆☆</span></td>
+                </tr>
+                <tr>
+                    <td class="col-label">🧩 指示遵守性<br><small style="color:#888;">SKILL.mdの遵守</small></td>
+                    <td class="col-claude" style="text-align:center;"><span class="star-rating">★★★★★</span><span class="badge-best">最高</span></td>
+                    <td class="col-deepseek" style="text-align:center;"><span class="star-rating">★★★★☆</span></td>
+                    <td class="col-gpt4o" style="text-align:center;"><span class="star-rating">★★★★☆</span></td>
+                    <td class="col-gpt4omini" style="text-align:center;"><span class="star-rating">★★★☆☆</span></td>
+                </tr>
+                <tr>
+                    <td class="col-label">🌐 API安定性<br><small style="color:#888;">ダウンタイム・安定性</small></td>
+                    <td class="col-claude" style="text-align:center;"><span class="star-rating">★★★★☆</span></td>
+                    <td class="col-deepseek" style="text-align:center;"><span class="star-rating">★★★☆☆</span><span class="badge-warn">高負荷時不安定</span></td>
+                    <td class="col-gpt4o" style="text-align:center;"><span class="star-rating">★★★★★</span><span class="badge-best">最高</span></td>
+                    <td class="col-gpt4omini" style="text-align:center;"><span class="star-rating">★★★★★</span><span class="badge-best">最高</span></td>
+                </tr>
+            </tbody>
+        </table>
+        </div>
+
+        <!-- Individual LLM Analysis -->
+        <h2>2. 各LLMの詳細分析</h2>
+
+        <!-- Claude -->
+        <div class="llm-card" style="border-top: 5px solid #cc785c;">
+            <div class="llm-header">
+                <div class="llm-icon">🍊</div>
+                <div>
+                    <div class="llm-name" style="color: #cc785c;">Claude Sonnet 4.6（Anthropic）</div>
+                    <div class="llm-tagline">OpenClaw開発者も推奨。指示遵守と日本語品質が群を抜く</div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                <div style="padding: 15px; background: #fef0e6; border-radius: 8px;">
+                    <div style="font-weight: bold; color: #cc785c; margin-bottom: 8px;">✅ 強み</div>
+                    <ul style="margin: 0;">
+                        <li>SKILL.mdの指示をほぼ完全に遵守。意図しない動作が最も少ない</li>
+                        <li>200Kトークンのコンテキスト長。長大なメール履歴や文書も一括処理</li>
+                        <li>日本語の自然さがトップクラス。敬語・ビジネス文書の作成も得意</li>
+                        <li>安全性への取り組みが業界最高水準（Constitutional AI）</li>
+                    </ul>
+                </div>
+                <div style="padding: 15px; background: #fff5f0; border-radius: 8px;">
+                    <div style="font-weight: bold; color: #856404; margin-bottom: 8px;">⚠️ 弱み</div>
+                    <ul style="margin: 0;">
+                        <li>コストが中程度（DeepSeekの約11倍）</li>
+                        <li>APIのレートリミットが厳しく、高頻度タスクで詰まることがある</li>
+                        <li>時々「安全上の理由」で正当なタスクを断ることがある</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="usecase-grid">
+                <div class="usecase-item" style="background: #d4edda; color: #155724;">📝 文書作成・要約</div>
+                <div class="usecase-item" style="background: #d4edda; color: #155724;">📧 メールの高度な分類・返信</div>
+                <div class="usecase-item" style="background: #d4edda; color: #155724;">🧠 複雑な意思決定支援</div>
+                <div class="usecase-item" style="background: #d4edda; color: #155724;">📊 長文レポート分析</div>
+                <div class="usecase-item" style="background: #fff3cd; color: #856404;">💰 コスト重視タスクには不向き</div>
+            </div>
+
+            <div style="margin-top: 15px; padding: 12px 15px; background: #fef0e6; border-radius: 8px; font-size: 0.9em;">
+                <strong>👤 こんな人に最適：</strong> 日本語での高品質な文書処理・複雑なビジネスタスクを自動化したい人。コストより品質を重視する場合。
+            </div>
+        </div>
+
+        <!-- DeepSeek -->
+        <div class="llm-card" style="border-top: 5px solid #1a73e8;">
+            <div class="llm-header">
+                <div class="llm-icon">🔵</div>
+                <div>
+                    <div class="llm-name" style="color: #1a73e8;">DeepSeek V3（DeepSeek AI）</div>
+                    <div class="llm-tagline">コスト効率ナンバーワン。試験運用・大量処理に最適。プライバシーに注意</div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                <div style="padding: 15px; background: #e8f4ff; border-radius: 8px;">
+                    <div style="font-weight: bold; color: #1a73e8; margin-bottom: 8px;">✅ 強み</div>
+                    <ul style="margin: 0;">
+                        <li>Claude比で約1/11のコスト。試行錯誤・大量処理に圧倒的有利</li>
+                        <li>推論能力はGPT-4oに匹敵するレベルに到達（2026年初頭）</li>
+                        <li>コーディングタスクに特に強い（HumanEval等のベンチマークでトップクラス）</li>
+                        <li>応答速度が速い</li>
+                    </ul>
+                </div>
+                <div style="padding: 15px; background: #fff5f0; border-radius: 8px;">
+                    <div style="font-weight: bold; color: #856404; margin-bottom: 8px;">⚠️ 弱み・注意点</div>
+                    <ul style="margin: 0;">
+                        <li><strong>中国企業のサービス。</strong> 機密情報・個人情報は送らないこと</li>
+                        <li>高負荷時（特に中国の昼間）にAPIが不安定になることがある</li>
+                        <li>SKILL.mdの複雑な指示の遵守精度がClaudeより若干低い</li>
+                        <li>政治・社会的に敏感なトピックに制限あり</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div style="padding: 15px; background: #fff3cd; border-radius: 8px; margin-bottom: 15px;">
+                <strong>🔴 プライバシー注意：</strong> DeepSeekは中国企業（深セン市）が運営。APIを通じて送信したデータは中国のサーバーを経由する可能性がある。業務データ・個人情報の処理には使用しないこと。
+            </div>
+
+            <div class="usecase-grid">
+                <div class="usecase-item" style="background: #d4edda; color: #155724;">🧪 プロトタイプ・試験運用</div>
+                <div class="usecase-item" style="background: #d4edda; color: #155724;">💻 コード生成・レビュー</div>
+                <div class="usecase-item" style="background: #d4edda; color: #155724;">📰 公開情報の大量処理</div>
+                <div class="usecase-item" style="background: #ffcccc; color: #721c24;">🔒 機密情報の処理はNG</div>
+                <div class="usecase-item" style="background: #ffcccc; color: #721c24;">🏢 業務データの処理はNG</div>
+            </div>
+
+            <div style="margin-top: 15px; padding: 12px 15px; background: #e8f4ff; border-radius: 8px; font-size: 0.9em;">
+                <strong>👤 こんな人に最適：</strong> まずOpenClawを試してみたい・低コストで大量のスキルを実験したい人。公開情報の処理に限定する場合。
+            </div>
+        </div>
+
+        <!-- GPT-4o -->
+        <div class="llm-card" style="border-top: 5px solid #10a37f;">
+            <div class="llm-header">
+                <div class="llm-icon">🟢</div>
+                <div>
+                    <div class="llm-name" style="color: #10a37f;">GPT-4o（OpenAI）</div>
+                    <div class="llm-tagline">API安定性トップ。マルチモーダル対応。エンタープライズに信頼性高い</div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                <div style="padding: 15px; background: #e8fff4; border-radius: 8px;">
+                    <div style="font-weight: bold; color: #10a37f; margin-bottom: 8px;">✅ 強み</div>
+                    <ul style="margin: 0;">
+                        <li>API安定性・稼働率が業界最高水準。24時間365日の自律エージェントに最適</li>
+                        <li>画像・音声・テキストのマルチモーダル対応。スクリーンショット分析も可能</li>
+                        <li>OpenAIのエコシステムとの統合が豊富（DALL-E、Whisper等）</li>
+                        <li>Function Calling（ツール呼び出し）の精度が高く、Skillとの相性が良い</li>
+                    </ul>
+                </div>
+                <div style="padding: 15px; background: #fff5f0; border-radius: 8px;">
+                    <div style="font-weight: bold; color: #856404; margin-bottom: 8px;">⚠️ 弱み</div>
+                    <ul style="margin: 0;">
+                        <li>コストがやや高め（DeepSeekの約9倍）</li>
+                        <li>コンテキスト長がClaudeの半分（128K）</li>
+                        <li>Claudeと比べると指示の微細なニュアンス遵守がやや劣る</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="usecase-grid">
+                <div class="usecase-item" style="background: #d4edda; color: #155724;">🖼️ 画像・スクショ分析</div>
+                <div class="usecase-item" style="background: #d4edda; color: #155724;">🏢 エンタープライズ用途</div>
+                <div class="usecase-item" style="background: #d4edda; color: #155724;">🔄 24時間連続稼働</div>
+                <div class="usecase-item" style="background: #d4edda; color: #155724;">🔗 OpenAIエコシステム活用</div>
+            </div>
+
+            <div style="margin-top: 15px; padding: 12px 15px; background: #e8fff4; border-radius: 8px; font-size: 0.9em;">
+                <strong>👤 こんな人に最適：</strong> 安定性を最優先にしたい・マルチモーダル機能を活用したい・すでにOpenAIエコシステムを使っている人。
+            </div>
+        </div>
+
+        <!-- GPT-4o mini -->
+        <div class="llm-card" style="border-top: 5px solid #f0a500;">
+            <div class="llm-header">
+                <div class="llm-icon">🟡</div>
+                <div>
+                    <div class="llm-name" style="color: #f0a500;">GPT-4o mini（OpenAI）</div>
+                    <div class="llm-tagline">日常の定型タスクに最適なコスパ最強モデル</div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                <div style="padding: 15px; background: #fff9e6; border-radius: 8px;">
+                    <div style="font-weight: bold; color: #f0a500; margin-bottom: 8px;">✅ 強み</div>
+                    <ul style="margin: 0;">
+                        <li>主要モデル中最安値クラス（$0.15/1Mトークン）</li>
+                        <li>応答速度が最速クラス</li>
+                        <li>API安定性はGPT-4oと同等</li>
+                        <li>定型・反復タスクには十分な性能</li>
+                    </ul>
+                </div>
+                <div style="padding: 15px; background: #fff5f0; border-radius: 8px;">
+                    <div style="font-weight: bold; color: #856404; margin-bottom: 8px;">⚠️ 弱み</div>
+                    <ul style="margin: 0;">
+                        <li>複雑な推論・多段階タスクで精度が落ちる</li>
+                        <li>SKILL.mdの細かい指示を取りこぼすことがある</li>
+                        <li>長い文章の要約精度がやや劣る</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="usecase-grid">
+                <div class="usecase-item" style="background: #d4edda; color: #155724;">📅 カレンダー管理</div>
+                <div class="usecase-item" style="background: #d4edda; color: #155724;">📬 簡単なメール分類</div>
+                <div class="usecase-item" style="background: #d4edda; color: #155724;">⏰ リマインダー設定</div>
+                <div class="usecase-item" style="background: #d4edda; color: #155724;">🔔 アラート通知</div>
+                <div class="usecase-item" style="background: #ffcccc; color: #721c24;">🧠 複雑な推論は不向き</div>
+            </div>
+
+            <div style="margin-top: 15px; padding: 12px 15px; background: #fff9e6; border-radius: 8px; font-size: 0.9em;">
+                <strong>👤 こんな人に最適：</strong> 毎日動く定型自動化を低コストで実現したい人。メール分類・リマインダー・シンプルなデータ収集など。
+            </div>
+        </div>
+
+        <!-- Recommended Strategy -->
+        <h2>3. おすすめの使い分け戦略</h2>
+
+        <div class="impact-box">
+            <div class="impact-title">🎯 タスク別LLM選択ガイド</div>
+            <table style="width:100%; border-collapse: collapse;">
+                <tr style="background: #4a235a; color: white;">
+                    <th style="padding: 10px; text-align: left;">タスクの種類</th>
+                    <th style="padding: 10px; text-align: left;">推奨LLM</th>
+                    <th style="padding: 10px; text-align: left;">理由</th>
+                </tr>
+                <tr style="border-bottom: 1px solid #d4c4f5;">
+                    <td style="padding: 10px;">📝 高品質な文書作成・要約</td>
+                    <td style="padding: 10px; font-weight: bold; color: #cc785c;">Claude Sonnet</td>
+                    <td style="padding: 10px; font-size: 0.9em;">日本語品質・指示遵守が最高</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #d4c4f5; background: #faf8ff;">
+                    <td style="padding: 10px;">🧪 新しいSkillの試験運用</td>
+                    <td style="padding: 10px; font-weight: bold; color: #1a73e8;">DeepSeek V3</td>
+                    <td style="padding: 10px; font-size: 0.9em;">コスト1/11。失敗してもダメージ小</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #d4c4f5;">
+                    <td style="padding: 10px;">🖼️ 画像・スクリーンショット分析</td>
+                    <td style="padding: 10px; font-weight: bold; color: #10a37f;">GPT-4o</td>
+                    <td style="padding: 10px; font-size: 0.9em;">マルチモーダル対応が必須</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #d4c4f5; background: #faf8ff;">
+                    <td style="padding: 10px;">📅 毎日の定型自動化</td>
+                    <td style="padding: 10px; font-weight: bold; color: #f0a500;">GPT-4o mini</td>
+                    <td style="padding: 10px; font-size: 0.9em;">最安値×高安定性の組み合わせ</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #d4c4f5;">
+                    <td style="padding: 10px;">🔒 機密情報を含むタスク</td>
+                    <td style="padding: 10px; font-weight: bold; color: #cc785c;">Claude Sonnet</td>
+                    <td style="padding: 10px; font-size: 0.9em;">Anthropicのプライバシーポリシーが最も厳格</td>
+                </tr>
+                <tr style="background: #faf8ff;">
+                    <td style="padding: 10px;">💻 コード生成・デバッグ</td>
+                    <td style="padding: 10px; font-weight: bold; color: #1a73e8;">DeepSeek V3</td>
+                    <td style="padding: 10px; font-size: 0.9em;">コーディングベンチマークでトップクラス×低コスト</td>
+                </tr>
+            </table>
+        </div>
+
+        <h3>💡 プロのテクニック：タスクでLLMを使い分ける設定</h3>
+        <div style="background: #1e1e1e; color: #d4d4d4; border-radius: 10px; padding: 20px; margin: 15px 0; font-family: monospace; font-size: 14px; line-height: 1.6;">
+<span style="color:#6a9955"># ~/.openclaw/config.yaml でSkillごとにLLMを変える</span>
+skills:
+  email-sorter:
+    llm: <span style="color:#ce9178">gpt-4o-mini</span>    <span style="color:#6a9955"># 定型タスクは安価なモデルで</span>
+
+  document-analysis:
+    llm: <span style="color:#ce9178">claude-sonnet-4-6</span>  <span style="color:#6a9955"># 複雑な分析は高性能モデルで</span>
+
+  code-review:
+    llm: <span style="color:#ce9178">deepseek-v3</span>    <span style="color:#6a9955"># コードは低コストで十分</span>
+
+  image-analyzer:
+    llm: <span style="color:#ce9178">gpt-4o</span>          <span style="color:#6a9955"># 画像処理はGPT-4oのみ対応</span>
+        </div>
+
+        <div style="text-align: center; margin-top: 40px; padding: 25px; background: linear-gradient(135deg, #f0ebff, #e8f4ff); border-radius: 12px;">
+            <p style="font-size: 1.1em; font-weight: bold; color: #4a235a; margin: 0 0 8px 0;">🚀 まず試すなら</p>
+            <p style="margin: 0; color: #555;"><strong>DeepSeek V3で低コストに動作確認 → Claude Sonnetで品質を磨く</strong><br>この2段階アプローチが最もコスト効率よくスキルを開発できる</p>
+        </div>
+
+        <a href="index.html" style="display: inline-block; margin-top: 40px; color: #666; text-decoration: none;">← トップへ戻る</a>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenClaw セットアップガイド & Skill作成入門</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8;
+            color: #333;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            color: #003366;
+            font-size: 32px;
+            margin-bottom: 10px;
+            border-bottom: 4px solid #28a745;
+            padding-bottom: 15px;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 40px;
+        }
+
+        h2 {
+            color: #28a745;
+            font-size: 24px;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-left: 15px;
+            border-left: 5px solid #28a745;
+        }
+
+        h3 {
+            color: #333;
+            font-size: 20px;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            padding-left: 25px;
+            position: relative;
+            margin-bottom: 12px;
+        }
+
+        li:before {
+            content: "✔";
+            color: #28a745;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        .impact-box {
+            background-color: #e8f5e9;
+            border: 1px solid #a5d6a7;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+
+        .impact-title {
+            color: #1b5e20;
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .risk-box {
+            background-color: #fff3cd;
+            border: 1px solid #ffeeba;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+
+        .risk-title {
+            color: #856404;
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .nav-links a {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .nav-links a:hover {
+            background: #1e7e34;
+        }
+
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            border-radius: 10px;
+            padding: 20px 25px;
+            margin: 15px 0;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .code-block .comment {
+            color: #6a9955;
+        }
+
+        .code-block .keyword {
+            color: #569cd6;
+        }
+
+        .code-block .string {
+            color: #ce9178;
+        }
+
+        .step-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            background: #28a745;
+            color: white;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+
+        .step-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #003366;
+            margin-bottom: 10px;
+        }
+
+        .os-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .os-tab {
+            padding: 6px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: bold;
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        .skill-file {
+            background: #f0f8ff;
+            border: 1px solid #bee3f8;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        .skill-file-title {
+            font-weight: bold;
+            color: #004085;
+            margin-bottom: 10px;
+            font-size: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🔧 OpenClaw セットアップガイド & Skill作成入門</h1>
+        <p class="subtitle">インストールから最初のSkill作成まで — 実際に触れることが最速の理解</p>
+
+        <div class="nav-links">
+            <a href="index.html">🏠 トップへ</a>
+            <a href="security.html">🔐 セキュリティ・コスト管理</a>
+            <a href="llm-compare.html">🤖 LLM比較</a>
+            <a href="usecases.html">🚀 活用事例</a>
+            <a href="china.html">🇨🇳 中国での普及</a>
+            <a href="ecosystem.html">🌐 エコシステム</a>
+        </div>
+
+        <!-- Hero -->
+        <div style="background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 50%, #388e3c 100%); padding: 40px 30px; border-radius: 20px; color: white; margin-bottom: 40px;">
+            <div style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 20px;">
+                <div style="flex: 1; min-width: 200px; background: rgba(255,255,255,0.12); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; padding: 20px; text-align: center;">
+                    <div style="font-size: 36px; margin-bottom: 8px;">📦</div>
+                    <div style="font-weight: bold; margin-bottom: 4px;">ステップ1</div>
+                    <div style="font-size: 0.9em; color: #c8e6c9;">インストール</div>
+                </div>
+                <div style="flex: 0; display: flex; align-items: center; color: #a5d6a7; font-size: 1.5em;">→</div>
+                <div style="flex: 1; min-width: 200px; background: rgba(255,255,255,0.12); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; padding: 20px; text-align: center;">
+                    <div style="font-size: 36px; margin-bottom: 8px;">🔑</div>
+                    <div style="font-weight: bold; margin-bottom: 4px;">ステップ2</div>
+                    <div style="font-size: 0.9em; color: #c8e6c9;">API設定</div>
+                </div>
+                <div style="flex: 0; display: flex; align-items: center; color: #a5d6a7; font-size: 1.5em;">→</div>
+                <div style="flex: 1; min-width: 200px; background: rgba(255,255,255,0.12); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; padding: 20px; text-align: center;">
+                    <div style="font-size: 36px; margin-bottom: 8px;">💬</div>
+                    <div style="font-weight: bold; margin-bottom: 4px;">ステップ3</div>
+                    <div style="font-size: 0.9em; color: #c8e6c9;">メッセージ接続</div>
+                </div>
+                <div style="flex: 0; display: flex; align-items: center; color: #a5d6a7; font-size: 1.5em;">→</div>
+                <div style="flex: 1; min-width: 200px; background: rgba(255,255,255,0.15); backdrop-filter: blur(8px); border: 2px solid rgba(255,215,0,0.6); border-radius: 12px; padding: 20px; text-align: center;">
+                    <div style="font-size: 36px; margin-bottom: 8px;">⚙️</div>
+                    <div style="font-weight: bold; margin-bottom: 4px;">ステップ4</div>
+                    <div style="font-size: 0.9em; color: #ffd700;">Skill作成</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Prerequisites -->
+        <h2>事前準備：必要なもの</h2>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin: 20px 0;">
+            <div style="padding: 20px; background: #f8f9fa; border-radius: 10px; border-left: 4px solid #28a745;">
+                <div style="font-size: 28px; margin-bottom: 8px;">🖥️</div>
+                <div style="font-weight: bold; margin-bottom: 6px;">PC / Mac / Linux</div>
+                <div style="font-size: 0.9em; color: #555;">Windows 10/11、macOS 12+、Ubuntu 20.04+ いずれも対応</div>
+            </div>
+            <div style="padding: 20px; background: #f8f9fa; border-radius: 10px; border-left: 4px solid #28a745;">
+                <div style="font-size: 28px; margin-bottom: 8px;">🔑</div>
+                <div style="font-weight: bold; margin-bottom: 6px;">LLMのAPIキー</div>
+                <div style="font-size: 0.9em; color: #555;">Anthropic（Claude）/ OpenAI / DeepSeek いずれか1つ</div>
+            </div>
+            <div style="padding: 20px; background: #f8f9fa; border-radius: 10px; border-left: 4px solid #28a745;">
+                <div style="font-size: 28px; margin-bottom: 8px;">💬</div>
+                <div style="font-weight: bold; margin-bottom: 6px;">メッセージングアプリ</div>
+                <div style="font-size: 0.9em; color: #555;">Telegram（最も簡単）/ Discord / Signal / WhatsApp</div>
+            </div>
+            <div style="padding: 20px; background: #f8f9fa; border-radius: 10px; border-left: 4px solid #17a2b8;">
+                <div style="font-size: 28px; margin-bottom: 8px;">🐳</div>
+                <div style="font-weight: bold; margin-bottom: 6px;">Docker（任意）</div>
+                <div style="font-size: 0.9em; color: #555;">標準インストールに推奨。なくても動くが環境分離のために推奨</div>
+            </div>
+        </div>
+
+        <!-- Step 1: Installation -->
+        <h2>ステップ1：インストール</h2>
+
+        <h3>方法A：標準インストール（推奨）</h3>
+
+        <div class="step-card">
+            <div class="step-number">1</div>
+            <div class="step-title">OpenClawリポジトリをクローン</div>
+            <div class="os-tabs">
+                <span class="os-tab">🪟 Windows</span>
+                <span class="os-tab">🍎 macOS</span>
+                <span class="os-tab">🐧 Linux</span>
+            </div>
+            <div class="code-block">
+<span class="comment"># GitHubからクローン</span>
+git clone https://github.com/openclaw/openclaw.git
+cd openclaw
+
+<span class="comment"># Pythonの依存関係をインストール</span>
+pip install -r requirements.txt
+
+<span class="comment"># または uvx（高速）を使う場合</span>
+uvx openclaw
+            </div>
+        </div>
+
+        <div class="step-card">
+            <div class="step-number">2</div>
+            <div class="step-title">Dockerを使う場合（環境分離・推奨）</div>
+            <div class="code-block">
+<span class="comment"># Docker経由で起動（依存関係を自動解決）</span>
+docker run -d \
+  -v ~/.openclaw:/root/.openclaw \
+  -e ANTHROPIC_API_KEY=<span class="string">your_key_here</span> \
+  --name openclaw \
+  ghcr.io/openclaw/openclaw:latest
+
+<span class="comment"># ログを確認</span>
+docker logs openclaw -f
+            </div>
+        </div>
+
+        <h3>方法B：Nanobot（軽量版・Docker不要）</h3>
+        <div class="impact-box">
+            <div class="impact-title">💡 Nanobotとは</div>
+            <p>OpenClawの軽量代替。Pythonコード4,000行のシンプル設計で、Raspberry Piでも動作。Docker不要でインストールが簡単。OpenClawに慣れる前の入門としても最適。</p>
+            <div class="code-block">
+<span class="comment"># Nanobotをインストール</span>
+pip install nanobot
+
+<span class="comment"># 起動</span>
+nanobot start --llm claude --api-key <span class="string">your_key_here</span>
+            </div>
+        </div>
+
+        <!-- Step 2: API Key Setup -->
+        <h2>ステップ2：APIキーの設定</h2>
+
+        <div class="step-card">
+            <div class="step-number">1</div>
+            <div class="step-title">設定ファイルを作成</div>
+            <p>OpenClawは <code>~/.openclaw/config.yaml</code> で設定を管理します。</p>
+            <div class="code-block">
+<span class="comment"># 設定ディレクトリを作成</span>
+mkdir -p ~/.openclaw
+
+<span class="comment"># 設定ファイルを作成（以下をコピーして編集）</span>
+cat > ~/.openclaw/config.yaml << EOF
+llm:
+  provider: <span class="string">anthropic</span>   <span class="comment"># anthropic / openai / deepseek</span>
+  model: <span class="string">claude-sonnet-4-6</span>
+  api_key: <span class="string">YOUR_API_KEY_HERE</span>
+
+<span class="comment"># コスト上限を必ず設定！（月額ドル）</span>
+limits:
+  monthly_budget: <span class="string">20</span>
+  daily_budget: <span class="string">5</span>
+
+messaging:
+  provider: <span class="string">telegram</span>   <span class="comment"># telegram / discord / signal</span>
+  token: <span class="string">YOUR_BOT_TOKEN</span>
+EOF
+            </div>
+            <div class="risk-box" style="margin-top: 15px;">
+                <div class="risk-title">⚠️ 重要：コスト上限を必ず設定すること</div>
+                <p>デフォルトではコスト上限がありません。自律実行が意図せず多くのAPIを消費し、一夜で$1,100（約17万円）の請求が発生した事例があります。<code>monthly_budget</code> と <code>daily_budget</code> は必ず設定してください。</p>
+            </div>
+        </div>
+
+        <!-- Step 3: Messaging Setup -->
+        <h2>ステップ3：Telegramボット接続（最も簡単）</h2>
+
+        <div class="step-card">
+            <div class="step-number">1</div>
+            <div class="step-title">BotFatherでボットを作成</div>
+            <ol style="list-style: decimal; padding-left: 20px;">
+                <li style="padding-left: 0; margin-bottom: 8px;">Telegramで <strong>@BotFather</strong> を開く</li>
+                <li style="padding-left: 0; margin-bottom: 8px;"><code>/newbot</code> を送信</li>
+                <li style="padding-left: 0; margin-bottom: 8px;">ボット名を入力（例：<code>MyOpenClaw</code>）</li>
+                <li style="padding-left: 0; margin-bottom: 8px;">ユーザー名を入力（例：<code>my_openclaw_bot</code>）</li>
+                <li style="padding-left: 0; margin-bottom: 8px;">発行された <strong>APIトークン</strong>（<code>123456789:ABC...</code>）をコピー</li>
+            </ol>
+        </div>
+
+        <div class="step-card">
+            <div class="step-number">2</div>
+            <div class="step-title">設定ファイルにトークンを追加して起動</div>
+            <div class="code-block">
+<span class="comment"># config.yaml の messaging.token に貼り付け</span>
+messaging:
+  provider: telegram
+  token: <span class="string">123456789:ABCdefGHIjklMNOpqrsTUVwxyz</span>
+
+<span class="comment"># OpenClawを起動</span>
+openclaw start
+
+<span class="comment"># Telegramでボットを開いて、試しに送信</span>
+<span class="string">→ 「今日のTo-Doリストを作って」</span>
+<span class="string">→ 「明日の天気を調べて教えて」</span>
+            </div>
+        </div>
+
+        <div class="impact-box">
+            <div class="impact-title">✅ 動作確認：最初に試すコマンド</div>
+            <ul>
+                <li>「現在の時刻と今日の日付を教えて」（基本動作確認）</li>
+                <li>「Googleで『OpenClaw 最新情報』を検索して要約して」（ウェブ検索）</li>
+                <li>「このメッセージを10分後にリマインドして」（スケジュール管理）</li>
+                <li>「今日の作業ログを ~/notes/today.md に書いて」（ファイル操作）</li>
+            </ul>
+        </div>
+
+        <!-- Step 4: Skill Creation -->
+        <h2>ステップ4：Skillを自作する — 核心の理解</h2>
+
+        <p>OpenClawの真の力は「Skillシステム」にあります。自分でSkillを作れると、<strong>どんなタスクでも自動化できる</strong>ようになります。</p>
+
+        <h3>Skillの基本構造</h3>
+        <p>各Skillは以下の構造を持つディレクトリです：</p>
+
+        <div class="code-block">
+skills/
+└── my-skill/
+    ├── <span class="keyword">SKILL.md</span>       <span class="comment"># 必須：スキルの説明・使い方・ツール定義</span>
+    ├── main.py        <span class="comment"># 任意：Pythonスクリプト</span>
+    ├── config.yaml    <span class="comment"># 任意：設定ファイル</span>
+    └── README.md      <span class="comment"># 任意：ドキュメント</span>
+        </div>
+
+        <h3>SKILL.mdの書き方</h3>
+        <p><code>SKILL.md</code> がSkillの「脳」です。LLMがこのファイルを読んで、いつ・どうやってSkillを使うかを判断します。</p>
+
+        <div class="skill-file">
+            <div class="skill-file-title">📄 SKILL.md の基本テンプレート</div>
+            <div class="code-block">
+# スキル名: 日経ニュース要約
+
+## 概要
+日本経済新聞のRSSフィードから最新ニュースを取得し、
+重要トピックを3行で要約してSlackに送信するスキル。
+
+## トリガー条件
+以下のメッセージを受け取った時に起動する:
+- 「今日のニュースを教えて」
+- 「経済ニュースを要約して」
+- 「日経チェック」
+
+## 使用ツール
+- web_search: ニュースの取得
+- file_write: ログの保存
+- message_send: 要約の送信
+
+## 実行手順
+1. 日経電子版のRSSフィード(https://www.nikkei.com/rss/...) を取得
+2. 上位5件のタイトルと要約を抽出
+3. 各記事を3行以内で日本語要約
+4. 「📰 本日のニュース要約」としてメッセージ送信
+5. 実行ログを ~/notes/news_log.md に追記
+
+## 出力フォーマット
+📰 **本日の主要ニュース（{日付}）**
+
+1. **{見出し}**
+   {3行要約}
+
+2. **{見出し}**
+   {3行要約}
+
+...
+            </div>
+        </div>
+
+        <h3>実践：実際に使えるSkillを3つ作ってみよう</h3>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 20px 0;">
+            <div class="step-card">
+                <div style="font-size: 32px; margin-bottom: 10px;">📧</div>
+                <div class="step-title">Skill例1：メール日次レポート</div>
+                <p style="font-size: 0.9em; color: #555;">毎朝9時にGmailの未読メールを確認し、重要度別に分類して要約をTelegramで送信。</p>
+                <div class="code-block" style="font-size: 12px;">
+<span class="comment"># SKILL.md のトリガー設定例</span>
+## スケジュール
+- 毎日 09:00 に自動実行
+- 「メール確認して」で即時実行
+                </div>
+            </div>
+
+            <div class="step-card">
+                <div style="font-size: 32px; margin-bottom: 10px;">📊</div>
+                <div class="step-title">Skill例2：為替・市場モニター</div>
+                <p style="font-size: 0.9em; color: #555;">USD/JPYが設定レートを超えたらアラート。週次で主要指数のサマリーを作成。</p>
+                <div class="code-block" style="font-size: 12px;">
+<span class="comment"># SKILL.md のトリガー設定例</span>
+## トリガー条件
+- USD/JPY が 150円を超えた時
+- 毎週金曜 18:00（週次レポート）
+                </div>
+            </div>
+
+            <div class="step-card">
+                <div style="font-size: 32px; margin-bottom: 10px;">📝</div>
+                <div class="step-title">Skill例3：学習メモ整理</div>
+                <p style="font-size: 0.9em; color: #555;">「メモ：{内容}」と送るだけで自動分類・タグ付けしてObsidianノートに追記。</p>
+                <div class="code-block" style="font-size: 12px;">
+<span class="comment"># SKILL.md のトリガー設定例</span>
+## トリガー条件
+- 「メモ：」で始まるメッセージ
+- 「ノート保存：」で始まるメッセージ
+                </div>
+            </div>
+        </div>
+
+        <h3>Skillをデプロイする</h3>
+        <div class="code-block">
+<span class="comment"># Skillディレクトリをに配置する場所</span>
+
+<span class="comment"># 1. ワークスペースSkill（特定プロジェクト専用、最優先）</span>
+./workspace/skills/my-skill/SKILL.md
+
+<span class="comment"># 2. グローバルSkill（全ワークスペースで共有）</span>
+~/.openclaw/skills/my-skill/SKILL.md
+
+<span class="comment"># 3. 再起動してSkillを読み込み</span>
+openclaw restart
+
+<span class="comment"># 4. Skill一覧を確認</span>
+openclaw skills list
+        </div>
+
+        <div class="impact-box">
+            <div class="impact-title">🎯 Skill作成のコツ</div>
+            <ul>
+                <li><strong>SKILL.mdは具体的に書く：</strong> 「いつ実行するか」「どのデータを取得するか」「どんな形式で出力するか」を明確に。曖昧だとLLMが意図しない動作をする</li>
+                <li><strong>最初は小さく作る：</strong> 複雑なSkillより、1つのことだけをする単純なSkillから始める</li>
+                <li><strong>ログを必ず取る：</strong> <code>file_write</code> でログを残すと、何が起きたか追跡できる</li>
+                <li><strong>テストメッセージを用意する：</strong> SKILL.mdにテストコマンド例を書いておくと開発がスムーズ</li>
+                <li><strong>エラーハンドリングを明示：</strong> 「失敗した場合は〇〇してください」と書いておく</li>
+            </ul>
+        </div>
+
+        <h2>次のステップ</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin: 20px 0;">
+            <a href="security.html" style="text-decoration: none; padding: 20px; background: #fff3cd; border-radius: 10px; border: 1px solid #ffeeba; display: block;">
+                <div style="font-size: 28px; margin-bottom: 8px;">🔐</div>
+                <div style="font-weight: bold; color: #856404; margin-bottom: 5px;">セキュリティ設定</div>
+                <div style="font-size: 0.85em; color: #666;">コスト上限とセキュリティチェックリストを確認する</div>
+            </a>
+            <a href="llm-compare.html" style="text-decoration: none; padding: 20px; background: #e8f4fd; border-radius: 10px; border: 1px solid #b8daff; display: block;">
+                <div style="font-size: 28px; margin-bottom: 8px;">🤖</div>
+                <div style="font-weight: bold; color: #004085; margin-bottom: 5px;">LLM選び</div>
+                <div style="font-size: 0.85em; color: #666;">Claude vs DeepSeek vs GPT-4o どれが自分に合うか確認する</div>
+            </a>
+        </div>
+
+        <a href="index.html" style="display: inline-block; margin-top: 40px; color: #666; text-decoration: none;">← トップへ戻る</a>
+    </div>
+</body>
+
+</html>

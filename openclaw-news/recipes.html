@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenClaw Skillレシピ集 — すぐ使えるSKILL.mdテンプレート12選</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8;
+            color: #333;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            color: #003366;
+            font-size: 32px;
+            margin-bottom: 10px;
+            border-bottom: 4px solid #e67e22;
+            padding-bottom: 15px;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 40px;
+        }
+
+        h2 {
+            color: #e67e22;
+            font-size: 24px;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-left: 15px;
+            border-left: 5px solid #e67e22;
+        }
+
+        h3 {
+            color: #333;
+            font-size: 20px;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            padding-left: 25px;
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        li:before {
+            content: "✔";
+            color: #e67e22;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .nav-links a {
+            display: inline-block;
+            padding: 9px 18px;
+            background: #e67e22;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 13px;
+            transition: background 0.2s;
+        }
+
+        .nav-links a:hover { background: #ca6f1e; }
+
+        .recipe-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 14px;
+            padding: 28px;
+            margin: 22px 0;
+            transition: box-shadow 0.2s;
+        }
+
+        .recipe-card:hover {
+            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+        }
+
+        .recipe-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .recipe-icon {
+            font-size: 42px;
+            flex-shrink: 0;
+        }
+
+        .recipe-title {
+            font-size: 19px;
+            font-weight: bold;
+            color: #003366;
+            margin-bottom: 4px;
+        }
+
+        .recipe-meta {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 5px;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .tag-difficulty-easy { background: #d4edda; color: #155724; }
+        .tag-difficulty-mid  { background: #fff3cd; color: #856404; }
+        .tag-difficulty-hard { background: #f8d7da; color: #721c24; }
+        .tag-llm { background: #e2d9f3; color: #4a235a; }
+        .tag-time { background: #d1ecf1; color: #0c5460; }
+
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            border-radius: 10px;
+            padding: 18px 22px;
+            margin: 12px 0;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13px;
+            line-height: 1.65;
+            overflow-x: auto;
+        }
+
+        .code-block .c  { color: #6a9955; }  /* comment */
+        .code-block .s  { color: #ce9178; }  /* string */
+        .code-block .k  { color: #569cd6; }  /* keyword */
+        .code-block .h  { color: #c586c0; }  /* heading */
+
+        .tip-box {
+            background: #fff9e6;
+            border: 1px solid #ffd54f;
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin: 12px 0;
+            font-size: 0.9em;
+        }
+
+        .impact-box {
+            background-color: #fef3e6;
+            border: 1px solid #f5cba7;
+            border-radius: 10px;
+            padding: 22px;
+            margin: 22px 0;
+        }
+
+        .impact-title {
+            color: #784212;
+            font-weight: bold;
+            font-size: 17px;
+            margin-bottom: 10px;
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 40px 0 5px;
+        }
+
+        .category-icon {
+            font-size: 30px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>📋 Skillレシピ集</h1>
+        <p class="subtitle">コピーして即使える SKILL.md テンプレート12選 — 難易度・推奨LLM付き</p>
+
+        <div class="nav-links">
+            <a href="index.html">🏠 トップ</a>
+            <a href="setup.html">🔧 セットアップ</a>
+            <a href="security.html">🔐 セキュリティ</a>
+            <a href="llm-compare.html">🤖 LLM比較</a>
+            <a href="faq.html">❓ FAQ</a>
+            <a href="glossary.html">📖 用語集</a>
+        </div>
+
+        <!-- Hero -->
+        <div style="background: linear-gradient(135deg, #7d3c11 0%, #ca6f1e 50%, #e67e22 100%); padding: 35px 30px; border-radius: 20px; color: white; margin-bottom: 40px;">
+            <h2 style="color:white; border:none; margin:0 0 10px; font-size:1.7em;">SKILL.md をコピーして使う</h2>
+            <p style="color:#fdebd0; margin:0 0 20px;">以下のテンプレートを <code>~/.openclaw/skills/{スキル名}/SKILL.md</code> に保存するだけで動きます。</p>
+            <div style="display:flex; gap:20px; flex-wrap:wrap;">
+                <div style="background:rgba(0,0,0,0.25); border-radius:10px; padding:12px 18px; text-align:center;">
+                    <div style="font-size:1.6em; font-weight:bold;">12</div>
+                    <div style="font-size:0.85em;">レシピ収録</div>
+                </div>
+                <div style="background:rgba(0,0,0,0.25); border-radius:10px; padding:12px 18px; text-align:center;">
+                    <div style="font-size:1.6em; font-weight:bold;">3</div>
+                    <div style="font-size:0.85em;">難易度レベル</div>
+                </div>
+                <div style="background:rgba(0,0,0,0.25); border-radius:10px; padding:12px 18px; text-align:center;">
+                    <div style="font-size:1.6em; font-weight:bold;">4</div>
+                    <div style="font-size:0.85em;">カテゴリ</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Index -->
+        <div style="background:#f8f9fa; border-radius:12px; padding:20px 25px; margin-bottom:30px;">
+            <div style="font-weight:bold; color:#003366; margin-bottom:12px;">📑 目次</div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; font-size:0.92em;">
+                <div>📧 <a href="#email" style="color:#e67e22;">1. 日次メールトリアージ</a></div>
+                <div>📅 <a href="#calendar" style="color:#e67e22;">2. 会議スケジューラー</a></div>
+                <div>📰 <a href="#news" style="color:#e67e22;">3. ニュース要約配信</a></div>
+                <div>💹 <a href="#fx" style="color:#e67e22;">4. 為替・株価アラート</a></div>
+                <div>📝 <a href="#memo" style="color:#e67e22;">5. 学習メモ自動整理</a></div>
+                <div>🛒 <a href="#price" style="color:#e67e22;">6. 価格追跡・比較</a></div>
+                <div>📊 <a href="#report" style="color:#e67e22;">7. 週次レポート自動生成</a></div>
+                <div>🔍 <a href="#research" style="color:#e67e22;">8. リサーチ・情報収集</a></div>
+                <div>💻 <a href="#code" style="color:#e67e22;">9. コードレビュー補助</a></div>
+                <div>🌐 <a href="#translate" style="color:#e67e22;">10. 多言語翻訳・要約</a></div>
+                <div>📂 <a href="#file" style="color:#e67e22;">11. ファイル整理自動化</a></div>
+                <div>🎯 <a href="#taskmaster" style="color:#e67e22;">12. タスク管理マスター</a></div>
+            </div>
+        </div>
+
+        <!-- ===== CATEGORY 1: 情報管理 ===== -->
+        <h2>📬 情報管理・コミュニケーション</h2>
+
+        <!-- Recipe 1 -->
+        <div class="recipe-card" id="email" style="border-left:5px solid #007bff;">
+            <div class="recipe-header">
+                <div class="recipe-icon">📧</div>
+                <div>
+                    <div class="recipe-title">1. 日次メールトリアージ</div>
+                    <div class="recipe-meta">
+                        <span class="tag tag-difficulty-easy">🟢 初級</span>
+                        <span class="tag tag-llm">Claude Haiku or GPT-4o mini</span>
+                        <span class="tag tag-time">⏰ 毎朝9:00自動実行</span>
+                    </div>
+                    <div style="font-size:0.9em; color:#555;">受信トレイを自動で整理し、重要メールだけを朝に通知する</div>
+                </div>
+            </div>
+            <div class="code-block">
+<span class="h"># スキル名: 日次メールトリアージ</span>
+
+<span class="c">## 概要</span>
+毎朝9:00に受信トレイを確認し、重要度別に分類して
+Telegramに日次サマリーを送信する。
+
+<span class="c">## スケジュール</span>
+- 毎日 09:00 に自動実行
+- 「メール確認」「inbox」と送ると即時実行
+
+<span class="c">## 使用ツール</span>
+- email_read: メールの読み取り（送信はしない）
+- message_send: Telegramへの通知送信
+
+<span class="c">## 実行手順</span>
+1. 未読メール一覧を取得する
+2. 各メールを以下の優先度で分類:
+   - 🔴 要対応（24時間以内の返信が必要なもの）
+   - 🟡 要確認（今週中に確認が必要なもの）
+   - 🟢 情報共有（読むだけでOKなもの）
+   - ⚫ スパム・ニュースレター
+3. スパムはアーカイブし、他は優先度タグを付与
+4. 以下のフォーマットでサマリーをTelegramに送信
+
+<span class="c">## 出力フォーマット</span>
+📬 **メールサマリー（{日付}）** 未読{N}件
+
+🔴 **要対応** ({N}件)
+- {送信者}: {件名} — {20文字以内の内容要約}
+
+🟡 **要確認** ({N}件)
+- {送信者}: {件名}
+
+🟢 **情報共有** ({N}件)
+- {送信者}: {件名}
+
+⚫ スパム{N}件をアーカイブしました
+
+<span class="c">## 注意事項</span>
+- メールの送信・削除は行わない。読み取りと分類のみ
+- 個人情報・機密情報が含まれるメールは要約を省略し
+  「[要確認]機密情報を含む可能性があります」と表示
+            </div>
+            <div class="tip-box">💡 <strong>カスタマイズポイント：</strong> 「🔴要対応」の判定条件を変えると精度が上がります。例：「上司・重要顧客からのメール」「返信が必要な動詞が含まれるメール」など。
+            </div>
+        </div>
+
+        <!-- Recipe 2 -->
+        <div class="recipe-card" id="calendar" style="border-left:5px solid #6f42c1;">
+            <div class="recipe-header">
+                <div class="recipe-icon">📅</div>
+                <div>
+                    <div class="recipe-title">2. 会議スケジューラー</div>
+                    <div class="recipe-meta">
+                        <span class="tag tag-difficulty-easy">🟢 初級</span>
+                        <span class="tag tag-llm">GPT-4o mini</span>
+                        <span class="tag tag-time">⏰ トリガー実行</span>
+                    </div>
+                    <div style="font-size:0.9em; color:#555;">「〇〇さんと来週1時間打ち合わせを入れて」で自動調整</div>
+                </div>
+            </div>
+            <div class="code-block">
+<span class="h"># スキル名: 会議スケジューラー</span>
+
+<span class="c">## 概要</span>
+自然言語で会議の調整依頼を受け付け、カレンダーを確認して
+空き時間を提案し、承認を得てから予定を登録する。
+
+<span class="c">## トリガー条件</span>
+以下のパターンを含むメッセージ:
+- 「〜と打ち合わせ」「〜と会議」「ミーティングを設定」
+- 「〜さんとスケジュール調整」「空き時間を確認」
+
+<span class="c">## 実行手順</span>
+1. メッセージから以下を抽出:
+   - 相手の名前・メールアドレス
+   - 希望日程・時間帯・所要時間
+   - 会議の目的（任意）
+2. 自分のカレンダーで空き時間を3候補取得
+3. 候補をユーザーに提示して選択を求める（自動送信しない）
+4. ユーザーが承認したら相手にメールで候補を送信
+5. 相手が確定したらカレンダーに登録し通知
+
+<span class="c">## 重要ルール</span>
+- ステップ3の提示後、必ずユーザーの承認を待つこと
+- 相手へのメール送信前に必ず文面をユーザーに確認する
+- 既存の予定を変更・削除しない
+            </div>
+        </div>
+
+        <!-- ===== CATEGORY 2: 情報収集・モニタリング ===== -->
+        <h2>📡 情報収集・モニタリング</h2>
+
+        <!-- Recipe 3 -->
+        <div class="recipe-card" id="news" style="border-left:5px solid #28a745;">
+            <div class="recipe-header">
+                <div class="recipe-icon">📰</div>
+                <div>
+                    <div class="recipe-title">3. ニュース要約配信（テーマ指定版）</div>
+                    <div class="recipe-meta">
+                        <span class="tag tag-difficulty-easy">🟢 初級</span>
+                        <span class="tag tag-llm">Claude Haiku</span>
+                        <span class="tag tag-time">⏰ 毎朝8:00 & 夕方18:00</span>
+                    </div>
+                    <div style="font-size:0.9em; color:#555;">AIエージェント・金融など指定テーマの最新ニュースを自動配信</div>
+                </div>
+            </div>
+            <div class="code-block">
+<span class="h"># スキル名: テーマ別ニュース配信</span>
+
+<span class="c">## 概要</span>
+指定テーマに関するニュースを複数ソースから収集・要約し、
+1日2回Telegramに配信する。
+
+<span class="c">## スケジュール</span>
+- 毎日 08:00（朝版）と 18:00（夕版）に自動実行
+- 「ニュース」「news」と送ると即時実行
+
+<span class="c">## 監視テーマ（カスタマイズ可能）</span>
+- AIエージェント・OpenClaw関連
+- 生成AI・LLM の最新動向
+- 日本の金融・フィンテック動向
+- 為替・マーケット動向
+
+<span class="c">## 検索ソース</span>
+- Google News（各テーマでキーワード検索）
+- TechCrunch Japan / The Decoder
+- 日経電子版 RSS
+
+<span class="c">## 実行手順</span>
+1. 各テーマで直近24時間のニュースを検索
+2. 重複・古いニュースを除外
+3. 各テーマの上位2件を選択
+4. 各記事を以下の形式で要約（3行以内）:
+   - 何が起きたか（1行）
+   - なぜ重要か（1行）
+   - 今後の注目点（1行）
+5. フォーマット通りに送信
+
+<span class="c">## 出力フォーマット</span>
+🗞️ **AI・テックニュース（{時刻}版）**
+
+🤖 **AIエージェント**
+1. [{見出し}]({URL})
+   {3行要約}
+
+💹 **金融・マーケット**
+2. [{見出し}]({URL})
+   {3行要約}
+
+━━━━━━━━━━━━━━
+⏭️ 次回配信: {次の配信時刻}
+            </div>
+        </div>
+
+        <!-- Recipe 4 -->
+        <div class="recipe-card" id="fx" style="border-left:5px solid #ffc107;">
+            <div class="recipe-header">
+                <div class="recipe-icon">💹</div>
+                <div>
+                    <div class="recipe-title">4. 為替・株価アラート</div>
+                    <div class="recipe-meta">
+                        <span class="tag tag-difficulty-mid">🟡 中級</span>
+                        <span class="tag tag-llm">GPT-4o mini</span>
+                        <span class="tag tag-time">⏰ 1時間ごとに監視</span>
+                    </div>
+                    <div style="font-size:0.9em; color:#555;">設定したレートを超えたら即アラート。週次サマリーも自動生成</div>
+                </div>
+            </div>
+            <div class="code-block">
+<span class="h"># スキル名: 為替・株価アラート</span>
+
+<span class="c">## 概要</span>
+設定した金融指標を定期監視し、閾値を超えたらアラート。
+週次でマーケットサマリーを生成する。
+
+<span class="c">## スケジュール</span>
+- 平日9:00〜18:00 の間、1時間ごとに監視
+- 毎週金曜 18:30 に週次サマリーを送信
+
+<span class="c">## 監視対象（カスタマイズ可）</span>
+- USD/JPY: 150.00円を超えたらアラート（上限）
+- USD/JPY: 140.00円を下回ったらアラート（下限）
+- 日経225: 前日比±2%でアラート
+- BTC/JPY: 前日比±5%でアラート
+
+<span class="c">## データソース</span>
+- web_search でリアルタイムレートを取得
+  （例: "USD JPY 現在レート site:xe.com"）
+
+<span class="c">## アラートフォーマット</span>
+⚠️ **為替アラート**
+USD/JPY が **{レート}** に到達しました
+（設定閾値: {閾値}）
+変動率: 前日比 {変動率}%
+時刻: {時刻}
+
+<span class="c">## 週次サマリーフォーマット</span>
+📊 **週次マーケットサマリー（{週}）**
+| 指標 | 週初 | 週末 | 変動 |
+|------|------|------|------|
+| USD/JPY | {値} | {値} | {変動} |
+| 日経225 | {値} | {値} | {変動} |
+
+今週の注目イベント: {要約}
+来週の注目点: {要約}
+
+<span class="c">## 注意</span>
+- データ取得はウェブ検索のみ（証券APIへの直接アクセスなし）
+- 投資判断を促す表現は使わない
+            </div>
+        </div>
+
+        <!-- ===== CATEGORY 3: 学習・知識管理 ===== -->
+        <h2>📚 学習・知識管理</h2>
+
+        <!-- Recipe 5 -->
+        <div class="recipe-card" id="memo" style="border-left:5px solid #17a2b8;">
+            <div class="recipe-header">
+                <div class="recipe-icon">📝</div>
+                <div>
+                    <div class="recipe-title">5. 学習メモ自動整理（Obsidian連携）</div>
+                    <div class="recipe-meta">
+                        <span class="tag tag-difficulty-easy">🟢 初級</span>
+                        <span class="tag tag-llm">Claude Haiku</span>
+                        <span class="tag tag-time">⏰ トリガー実行</span>
+                    </div>
+                    <div style="font-size:0.9em; color:#555;">「メモ：〇〇」と送るだけで自動分類・タグ付けしてMarkdownに保存</div>
+                </div>
+            </div>
+            <div class="code-block">
+<span class="h"># スキル名: 学習メモ整理</span>
+
+<span class="c">## 概要</span>
+メッセージで送られた学習メモを自動的に分類・タグ付けして
+Markdownファイルに整理保存する。Obsidian形式に対応。
+
+<span class="c">## トリガー条件</span>
+- 「メモ：」または「memo:」で始まるメッセージ
+- 「保存：」「note:」「覚書：」で始まるメッセージ
+
+<span class="c">## 実行手順</span>
+1. メッセージからメモ内容を抽出
+2. 内容を分析して以下を自動判定:
+   - カテゴリ: AI/テック/金融/語学/その他
+   - タグ: 内容から3〜5個のキーワードタグ
+   - 重要度: 高/中/低
+3. 以下のフォーマットで ~/notes/YYYYMM.md に追記
+4. 完了メッセージを返信
+
+<span class="c">## 保存フォーマット（Obsidian対応）</span>
+---
+date: {YYYY-MM-DD HH:mm}
+category: {カテゴリ}
+tags: [{タグ1}, {タグ2}, {タグ3}]
+importance: {高/中/低}
+---
+
+## {メモタイトル（内容から自動生成）}
+
+{メモ本文}
+
+**AIによる補足**:
+{関連する背景知識・補足情報を1〜2文で追加}
+
+---
+
+<span class="c">## 保存先</span>
+~/notes/memos/{YYYYMM}/notes.md
+（月別に自動分類）
+            </div>
+            <div class="tip-box">💡 <strong>発展形：</strong> 週1回「今月のメモを振り返って、学習の弱点を分析して」とメッセージするだけで学習レポートを自動生成できます。
+            </div>
+        </div>
+
+        <!-- Recipe 6 -->
+        <div class="recipe-card" id="price" style="border-left:5px solid #e74c3c;">
+            <div class="recipe-header">
+                <div class="recipe-icon">🛒</div>
+                <div>
+                    <div class="recipe-title">6. 商品価格追跡・最安値アラート</div>
+                    <div class="recipe-meta">
+                        <span class="tag tag-difficulty-mid">🟡 中級</span>
+                        <span class="tag tag-llm">GPT-4o mini</span>
+                        <span class="tag tag-time">⏰ 1日2回監視</span>
+                    </div>
+                    <div style="font-size:0.9em; color:#555;">気になる商品の価格を監視して最安値になったら即通知</div>
+                </div>
+            </div>
+            <div class="code-block">
+<span class="h"># スキル名: 価格追跡アラート</span>
+
+<span class="c">## 概要</span>
+指定した商品の価格をAmazon・楽天等で定期監視し、
+目標価格に達したらアラートを送信する。
+
+<span class="c">## トリガー条件（登録）</span>
+「追跡: {商品名} 目標価格: {金額}円」のメッセージで登録
+
+<span class="c">## スケジュール（監視）</span>
+毎日 09:00 と 21:00 に登録商品を自動チェック
+
+<span class="c">## 実行手順</span>
+1. 登録リスト（~/tracking/products.json）を読み込み
+2. 各商品をウェブ検索で現在価格を取得
+   - Amazon, 楽天, ヨドバシ, ビックカメラ等
+3. 目標価格以下の場合はアラートを送信
+4. 価格履歴を~/tracking/history.json に記録
+
+<span class="c">## 登録フォーマット（products.json）</span>
+{
+  "products": [
+    {
+      "name": "Sony WH-1000XM5",
+      "target_price": 35000,
+      "currency": "JPY",
+      "registered": "2026-03-14"
+    }
+  ]
+}
+
+<span class="c">## アラートフォーマット</span>
+🎉 **価格アラート！**
+「{商品名}」が目標価格に到達しました
+
+現在価格: **{価格}円**（目標: {目標}円）
+販売店: {店舗名}
+リンク: {URL}
+前回確認時: {前回価格}円（{変動率}% 下落）
+            </div>
+        </div>
+
+        <!-- ===== CATEGORY 4: 業務効率化 ===== -->
+        <h2>🏢 業務効率化・レポート</h2>
+
+        <!-- Recipe 7 -->
+        <div class="recipe-card" id="report" style="border-left:5px solid #8e44ad;">
+            <div class="recipe-header">
+                <div class="recipe-icon">📊</div>
+                <div>
+                    <div class="recipe-title">7. 週次業務レポート自動生成</div>
+                    <div class="recipe-meta">
+                        <span class="tag tag-difficulty-mid">🟡 中級</span>
+                        <span class="tag tag-llm">Claude Sonnet</span>
+                        <span class="tag tag-time">⏰ 毎週金曜17:00</span>
+                    </div>
+                    <div style="font-size:0.9em; color:#555;">今週のメモ・メール・カレンダーを集約して週次レポートを自動作成</div>
+                </div>
+            </div>
+            <div class="code-block">
+<span class="h"># スキル名: 週次業務レポート生成</span>
+
+<span class="c">## 概要</span>
+毎週金曜日に今週の活動を自動集約し、
+構造化された週次レポートを生成する。
+
+<span class="c">## スケジュール</span>
+毎週金曜日 17:00 に自動実行
+
+<span class="c">## データ収集元</span>
+- ~/notes/memos/ : 今週のメモ（学習メモSkillのデータ）
+- カレンダー: 今週の会議・イベント一覧
+- タスクリスト: 完了・未完了タスク
+
+<span class="c">## 実行手順</span>
+1. 今週（月〜金）のデータを各ソースから収集
+2. 以下の観点で内容を分析・構造化:
+   - 今週の主要な成果・完了タスク
+   - 学んだこと・気づき
+   - 未完了・持越しタスク
+   - 来週の優先事項
+3. レポートを ~/reports/weekly/{YYYY-WW}.md に保存
+4. Telegramにサマリーを送信
+
+<span class="c">## 出力フォーマット</span>
+# 週次レポート {YYYY年 第W週}（{日付範囲}）
+
+## ✅ 今週の成果
+- {完了した主要タスク・プロジェクト}
+
+## 📚 学んだこと・気づき
+- {今週のメモから抽出した学習内容}
+
+## ⏳ 持越しタスク
+- {未完了タスクと理由}
+
+## 🎯 来週の優先事項
+1. {最重要タスク}
+2. {次点タスク}
+
+## 📈 今週の統計
+- 会議数: {N}件 / 合計{H}時間
+- 完了タスク: {N}件
+- 学習メモ: {N}件
+            </div>
+        </div>
+
+        <!-- Recipe 8 -->
+        <div class="recipe-card" id="research" style="border-left:5px solid #27ae60;">
+            <div class="recipe-header">
+                <div class="recipe-icon">🔍</div>
+                <div>
+                    <div class="recipe-title">8. 深掘りリサーチ（マルチソース調査）</div>
+                    <div class="recipe-meta">
+                        <span class="tag tag-difficulty-mid">🟡 中級</span>
+                        <span class="tag tag-llm">Claude Sonnet</span>
+                        <span class="tag tag-time">⏰ トリガー実行</span>
+                    </div>
+                    <div style="font-size:0.9em; color:#555;">「〇〇を調べてレポートにまとめて」で複数ソースから包括的なレポート作成</div>
+                </div>
+            </div>
+            <div class="code-block">
+<span class="h"># スキル名: 深掘りリサーチ</span>
+
+<span class="c">## 概要</span>
+指定されたトピックを複数の情報ソースから調査し、
+構造化されたリサーチレポートを作成する。
+
+<span class="c">## トリガー条件</span>
+- 「調べて：{トピック}」
+- 「リサーチ：{トピック}」
+- 「{トピック} についてまとめて」
+
+<span class="c">## 実行手順</span>
+1. トピックを分解して3〜5の調査観点を特定
+2. 各観点について10件以上のウェブ検索を実行
+3. 以下の品質基準でソースを評価・選別:
+   - 最新性（直近1年以内を優先）
+   - 信頼性（公式サイト・主要メディアを優先）
+   - 多様性（視点が偏らないよう複数ソースから）
+4. 情報を統合してレポートを生成
+5. ~/research/{日付}_{トピック}.md に保存
+6. Telegramにレポートの要約版を送信（全文はファイル参照）
+
+<span class="c">## レポート構成</span>
+# {トピック} リサーチレポート
+調査日: {日付} | 調査ソース数: {N}件
+
+## エグゼクティブサマリー（3〜5行）
+
+## 1. 概要・定義
+
+## 2. 現状・最新動向
+
+## 3. 主要プレイヤー・事例
+
+## 4. 課題・リスク
+
+## 5. 今後の展望
+
+## 参考ソース
+- [{タイトル}]({URL}) — {一言コメント}
+
+<span class="c">## 注意</span>
+調査結果をそのまま事実として断言しない。
+「〜と報告されている」「〜とされる」等の表現を使う。
+            </div>
+        </div>
+
+        <!-- ===== CATEGORY 4: 開発・技術 ===== -->
+        <h2>💻 開発・技術支援</h2>
+
+        <!-- Recipe 9 -->
+        <div class="recipe-card" id="code" style="border-left:5px solid #343a40;">
+            <div class="recipe-header">
+                <div class="recipe-icon">💻</div>
+                <div>
+                    <div class="recipe-title">9. GitHubコードレビュー補助</div>
+                    <div class="recipe-meta">
+                        <span class="tag tag-difficulty-hard">🔴 上級</span>
+                        <span class="tag tag-llm">Claude Sonnet or DeepSeek V3</span>
+                        <span class="tag tag-time">⏰ Push時・手動実行</span>
+                    </div>
+                    <div style="font-size:0.9em; color:#555;">PRのdiffを自動取得してコードレビューコメントを生成</div>
+                </div>
+            </div>
+            <div class="code-block">
+<span class="h"># スキル名: コードレビュー補助</span>
+
+<span class="c">## 概要</span>
+GitHubのPRのdiffを取得し、コードの問題点・改善案を
+構造化されたレビューとしてまとめる。
+
+<span class="c">## トリガー条件</span>
+- 「レビュー：{PR URL}」
+- 「{GitHub PR URL} をレビューして」
+
+<span class="c">## 実行手順</span>
+1. PR URLからリポジトリ名・PR番号を抽出
+2. GitHub CLI または API でdiffを取得
+3. 以下の観点でコードを分析:
+   - バグ・セキュリティ上の問題
+   - パフォーマンス上の問題
+   - 可読性・命名規則
+   - テストカバレッジ
+   - ドキュメント不足
+4. 問題を重大度別（Critical/Warning/Suggestion）に分類
+5. 各問題に具体的な改善案を付与
+
+<span class="c">## 出力フォーマット</span>
+## 🔍 コードレビュー: {PR名}
+
+**総評**: {2〜3行のサマリー}
+重大度: 🔴{N}件 / 🟡{N}件 / 💡{N}件
+
+---
+### 🔴 Critical（必須修正）
+**{ファイル名}:{行番号}**
+問題: {問題の説明}
+修正案:
+```{言語}
+{修正後コードの例}
+```
+
+### 🟡 Warning（修正推奨）
+...
+
+### 💡 Suggestion（改善提案）
+...
+
+<span class="c">## 注意</span>
+- 最終判断は人間が行う。あくまで補助ツール
+- 機密コードの取り扱いに注意
+            </div>
+        </div>
+
+        <!-- Recipe 10 -->
+        <div class="recipe-card" id="translate" style="border-left:5px solid #2980b9;">
+            <div class="recipe-header">
+                <div class="recipe-icon">🌐</div>
+                <div>
+                    <div class="recipe-title">10. 多言語翻訳・要約</div>
+                    <div class="recipe-meta">
+                        <span class="tag tag-difficulty-easy">🟢 初級</span>
+                        <span class="tag tag-llm">Claude Haiku or DeepSeek V3</span>
+                        <span class="tag tag-time">⏰ トリガー実行</span>
+                    </div>
+                    <div style="font-size:0.9em; color:#555;">URLを貼るだけで英語・中国語記事を日本語要約</div>
+                </div>
+            </div>
+            <div class="code-block">
+<span class="h"># スキル名: 多言語翻訳・要約</span>
+
+<span class="c">## 概要</span>
+URLまたはテキストを受け取り、自動で言語を検出して
+日本語の要約と翻訳を生成する。
+
+<span class="c">## トリガー条件</span>
+- URLが含まれるメッセージ（自動検出）
+- 「翻訳：{テキスト}」
+- 「要約：{URL}」
+
+<span class="c">## 実行手順</span>
+1. URLの場合はページ内容を取得（web_fetch）
+2. 原文の言語を自動検出
+3. 以下を生成:
+   a. 3行エグゼクティブサマリー（日本語）
+   b. 主要ポイント5つ（箇条書き）
+   c. 原文の重要段落の日本語訳
+4. 結果を送信
+
+<span class="c">## 出力フォーマット</span>
+🌐 **翻訳・要約**
+原文言語: {英語/中国語/etc.}
+ソース: {タイトル or "直接入力"}
+
+**📋 3行サマリー**
+{1行目}
+{2行目}
+{3行目}
+
+**🔑 主要ポイント**
+1. {ポイント}
+2. {ポイント}
+3. {ポイント}
+
+**📄 詳細翻訳**
+{重要段落の翻訳}
+            </div>
+        </div>
+
+        <!-- Recipe 11 -->
+        <div class="recipe-card" id="file" style="border-left:5px solid #e67e22;">
+            <div class="recipe-header">
+                <div class="recipe-icon">📂</div>
+                <div>
+                    <div class="recipe-title">11. ダウンロードフォルダ自動整理</div>
+                    <div class="recipe-meta">
+                        <span class="tag tag-difficulty-mid">🟡 中級</span>
+                        <span class="tag tag-llm">GPT-4o mini</span>
+                        <span class="tag tag-time">⏰ 毎週日曜22:00</span>
+                    </div>
+                    <div style="font-size:0.9em; color:#555;">散らかったDownloadsフォルダを自動分類・整理</div>
+                </div>
+            </div>
+            <div class="code-block">
+<span class="h"># スキル名: ダウンロードフォルダ整理</span>
+
+<span class="c">## 概要</span>
+~/Downloads フォルダを定期スキャンし、
+ファイルを種類・日付ごとに自動分類して整理する。
+
+<span class="c">## スケジュール</span>
+毎週日曜日 22:00 に自動実行
+（「整理して」「downloads整理」で即時実行も可）
+
+<span class="c">## 分類ルール</span>
+- 📄 PDF → ~/Documents/PDFs/{YYYY-MM}/
+- 🖼️ 画像（jpg/png/gif等）→ ~/Pictures/{YYYY-MM}/
+- 📊 表計算（xlsx/csv）→ ~/Documents/Spreadsheets/
+- 📝 ドキュメント（docx/pptx）→ ~/Documents/Docs/{YYYY-MM}/
+- 💻 インストーラー（dmg/exe/pkg）→ ~/Downloads/Installers/
+- 📦 アーカイブ（zip/tar.gz）→ ~/Downloads/Archives/
+- 30日以上未アクセスの不明ファイル → ~/Downloads/Old/
+
+<span class="c">## 実行手順</span>
+1. ~/Downloads の全ファイルをスキャン
+2. 拡張子と作成日でファイルを分類
+3. 実行前に移動計画をユーザーに提示（承認制）
+4. 承認後にファイルを移動
+5. 整理サマリーをTelegramに報告
+
+<span class="c">## 重要ルール</span>
+- ファイルの削除は行わない（移動のみ）
+- 移動前に必ず計画をユーザーに確認する
+- 元のファイル名は変更しない
+            </div>
+        </div>
+
+        <!-- Recipe 12 -->
+        <div class="recipe-card" id="taskmaster" style="border-left:5px solid #c0392b;">
+            <div class="recipe-header">
+                <div class="recipe-icon">🎯</div>
+                <div>
+                    <div class="recipe-title">12. タスク管理マスター（Skill連携版）</div>
+                    <div class="recipe-meta">
+                        <span class="tag tag-difficulty-hard">🔴 上級</span>
+                        <span class="tag tag-llm">Claude Sonnet</span>
+                        <span class="tag tag-time">⏰ 常時稼働</span>
+                    </div>
+                    <div style="font-size:0.9em; color:#555;">タスクの記録・優先度付け・リマインダーを一元管理する中核Skill</div>
+                </div>
+            </div>
+            <div class="code-block">
+<span class="h"># スキル名: タスク管理マスター</span>
+
+<span class="c">## 概要</span>
+タスクの追加・更新・完了・リマインダーを一元管理する。
+他のSkillからも呼び出し可能な中核タスクマネージャー。
+
+<span class="c">## トリガー条件</span>
+- 「タスク追加：{内容}」→ タスク登録
+- 「タスク一覧」「今日やること」→ 一覧表示
+- 「{タスク名}完了」→ 完了マーク
+- 「リマインド：{日時} に {内容}」→ リマインダー設定
+- 「優先度変更：{タスク名} を {高/中/低}」→ 優先度更新
+
+<span class="c">## データ保存先</span>
+~/tasks/tasks.json （JSONで構造化保存）
+
+<span class="c">## タスクデータ構造</span>
+{
+  "id": "uuid",
+  "title": "タスク名",
+  "priority": "high/medium/low",
+  "due": "YYYY-MM-DD HH:mm",
+  "status": "todo/in_progress/done",
+  "tags": ["仕事", "学習"],
+  "created": "ISO8601",
+  "reminder": "YYYY-MM-DD HH:mm"
+}
+
+<span class="c">## 一覧表示フォーマット</span>
+📋 **タスク一覧**（{N}件）
+
+🔴 **高優先度**
+- [ ] {タスク名}（期限: {日付}）
+
+🟡 **中優先度**
+- [ ] {タスク名}
+
+🟢 **低優先度 / 期限なし**
+- [ ] {タスク名}
+
+✅ **本日完了** ({N}件)
+
+<span class="c">## 他Skillからの呼び出し例</span>
+週次レポートSkillは本Skillのデータを参照して
+完了タスク数・未完了タスクを自動集計する。
+            </div>
+        </div>
+
+        <!-- Tips Summary -->
+        <div class="impact-box" style="margin-top:40px;">
+            <div class="impact-title">🚀 レシピをより使いこなすための3原則</div>
+            <ul>
+                <li><strong>まず1つだけ動かす：</strong> 全部入れようとせず、自分が毎日使う1つのSkillだけ試す。1週間使えたら次を追加する。</li>
+                <li><strong>DeepSeekで試してClaudeで仕上げる：</strong> 初期テストはDeepSeek（低コスト）で動作確認し、品質が出るようになったらClaudeに切り替える。</li>
+                <li><strong>SKILL.mdをブログ感覚で育てる：</strong> 動かしながら「ここが不満」と感じたらSKILL.mdをその場で修正。積み重ねが精度を上げる。</li>
+            </ul>
+        </div>
+
+        <a href="index.html" style="display:inline-block; margin-top:40px; color:#666; text-decoration:none;">← トップへ戻る</a>
+    </div>
+</body>
+</html>
