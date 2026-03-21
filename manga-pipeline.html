@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI漫画制作パイプライン — AI Creator Hub</title>
+  <meta name="description" content="ストーリーからコマ構成・キャラクター生成・セリフ配置まで一気通貫で漫画化するAIパイプライン">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">AI Creator Hub</div>
+  <ul class="nav-links">
+    <li><a href="index.html">ホーム</a></li>
+    <li><a href="video-pipeline.html">動画制作</a></li>
+    <li><a href="manga-pipeline.html" class="active">漫画制作</a></li>
+    <li><a href="evaluation.html">評価システム</a></li>
+    <li><a href="monetization.html">マネタイズ</a></li>
+    <li><a href="openclaw.html">OpenClaw連携</a></li>
+  </ul>
+  <div class="nav-hamburger"><span></span><span></span><span></span></div>
+</nav>
+
+<div class="page-hero">
+  <div class="section-label">AI漫画制作パイプライン</div>
+  <h1>ストーリーを読み込み<br><span style="background: linear-gradient(135deg,#00D4FF,#6C3CE1); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">漫画を自動生成</span></h1>
+  <p>コマ割りからキャラクター生成・セリフ・効果線まで、AIが一貫したスタイルで漫画を制作</p>
+</div>
+
+<!-- Key Challenge -->
+<section class="section">
+  <div class="section-inner">
+    <div class="two-col">
+      <div>
+        <div class="section-label">最重要課題</div>
+        <h2 class="section-title">キャラクターの<br>一貫性をどう保つか</h2>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+          AI漫画制作で最大の課題は「同じキャラクターを複数コマにわたって一貫して描くこと」。
+          毎回異なる顔になってしまうと漫画として成立しません。
+        </p>
+        <ul class="checklist">
+          <li>LoRAモデルでキャラを事前学習</li>
+          <li>シード値・プロンプトの徹底管理</li>
+          <li>IP-Adapter でリファレンス画像を維持</li>
+          <li>キャラ設定シートをプロンプトに常時注入</li>
+          <li>差分のみ生成して顔パーツを固定</li>
+        </ul>
+      </div>
+      <div>
+        <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem;">
+          <h3 style="margin-bottom: 1.25rem; font-size: 1rem;">キャラクター設定管理</h3>
+          <div class="code-block">
+<span class="cm"># キャラ設定YAML例</span>
+<span class="fn">character</span>:
+  <span class="fn">name</span>: <span class="str">"主人公 田中ヒロ"</span>
+  <span class="fn">lora_model</span>: <span class="str">"hiro_v3.safetensors"</span>
+  <span class="fn">seed</span>: <span class="num">42</span>
+  <span class="fn">base_prompt</span>: <span class="str">"anime boy, black short hair,
+    blue eyes, school uniform,
+    detailed, consistent style"</span>
+  <span class="fn">negative_prompt</span>: <span class="str">"deformed,
+    inconsistent, bad anatomy"</span>
+  <span class="fn">lora_weight</span>: <span class="num">0.85</span>
+  <span class="fn">ip_adapter_image</span>: <span class="str">"ref/hiro_face.png"</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Pipeline -->
+<section class="section" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-label">制作フロー</div>
+    <h2 class="section-title">6ステップで完成漫画へ</h2>
+
+    <div style="display: flex; flex-direction: column; gap: 1.5rem; margin-top: 2rem;">
+
+      <div class="card" style="display: grid; grid-template-columns: 60px 1fr; gap: 1.5rem; align-items: start;">
+        <div class="step-num" style="margin: 0;">1</div>
+        <div>
+          <h3>ストーリー構造化</h3>
+          <p>ネタ文章をシーン・セリフ・感情・カメラアングルに構造化。LLMが漫画的な「間」や「演出」を考慮した構成に変換。</p>
+          <div class="code-block">
+<span class="cm">// 構造化出力例</span>
+{
+  <span class="str">"scene"</span>: <span class="num">3</span>,
+  <span class="str">"panels"</span>: [
+    {
+      <span class="str">"angle"</span>: <span class="str">"close-up"</span>,
+      <span class="str">"emotion"</span>: <span class="str">"surprise"</span>,
+      <span class="str">"dialogue"</span>: <span class="str">"えっ、本当に？"</span>,
+      <span class="str">"sfx"</span>: <span class="str">"ドキッ"</span>
+    }
+  ]
+}</div>
+        </div>
+      </div>
+
+      <div class="card" style="display: grid; grid-template-columns: 60px 1fr; gap: 1.5rem; align-items: start;">
+        <div class="step-num" style="margin: 0;">2</div>
+        <div>
+          <h3>コマ割り設計</h3>
+          <p>ページあたりのコマ数・サイズ・配置をAIが自動設計。テンション高い場面は大ゴマ、説明場面は小ゴマを自動判断。見開きや見せ場コマも自動挿入。</p>
+          <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <span class="tag tag-purple">GPT-4o (構成判断)</span>
+            <span class="tag tag-cyan">カスタムレイアウトエンジン</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="display: grid; grid-template-columns: 60px 1fr; gap: 1.5rem; align-items: start;">
+        <div class="step-num" style="margin: 0;">3</div>
+        <div>
+          <h3>キャラクター・背景生成</h3>
+          <p>LoRA + IP-Adapterで一貫したキャラを生成。背景はControlNet + 深度マップで遠近感を保持。白黒漫画風・カラー漫画風の切り替えも対応。</p>
+          <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <span class="tag tag-cyan">Stable Diffusion XL</span>
+            <span class="tag tag-cyan">ControlNet</span>
+            <span class="tag tag-cyan">IP-Adapter</span>
+            <span class="tag tag-orange">ComfyUI</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="display: grid; grid-template-columns: 60px 1fr; gap: 1.5rem; align-items: start;">
+        <div class="step-num" style="margin: 0;">4</div>
+        <div>
+          <h3>吹き出し・セリフ配置</h3>
+          <p>セリフの長さ・感情に合わせた吹き出し形状を自動選択（通常・叫び・思考・ナレーション）。フォント・サイズ・配置をコマ内の空白スペースに最適化。</p>
+          <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <span class="tag tag-green">Pillow (Python)</span>
+            <span class="tag tag-green">カスタム吹き出しSVG</span>
+            <span class="tag tag-purple">自動レイアウト調整</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="display: grid; grid-template-columns: 60px 1fr; gap: 1.5rem; align-items: start;">
+        <div class="step-num" style="margin: 0;">5</div>
+        <div>
+          <h3>効果線・トーン追加</h3>
+          <p>スピード線・集中線・背景トーン（スクリーントーン）を自動追加。シーンの感情に合わせた効果を自動判断して適用。</p>
+          <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <span class="tag tag-orange">カスタムComfyUIノード</span>
+            <span class="tag tag-orange">OpenCV (線処理)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="display: grid; grid-template-columns: 60px 1fr; gap: 1.5rem; align-items: start;">
+        <div class="step-num" style="margin: 0;">6</div>
+        <div>
+          <h3>ページ結合・出力</h3>
+          <p>全コマをページにレイアウトし、PDF・CBZ・Web閲覧用HTMLとして出力。電子書籍配信用のメタデータも自動生成。評価システムへ送付。</p>
+          <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <span class="tag tag-green">PDF出力</span>
+            <span class="tag tag-green">Kindle MOBI/EPUB</span>
+            <span class="tag tag-green">Web漫画HTML</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Genre Presets -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label">ジャンルプリセット</div>
+    <h2 class="section-title">ジャンル別スタイル自動切替</h2>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon purple">⚔️</div>
+        <h3>少年バトル系</h3>
+        <p>躍動感あるアクション構図・大ゴマ多用・効果線強め。見開きクライマックスシーンを自動検知して挿入。</p>
+        <div style="margin-top: 0.75rem;"><span class="tag tag-purple">LoRA: shonen_action_v2</span></div>
+      </div>
+      <div class="card">
+        <div class="card-icon cyan">💕</div>
+        <h3>ラブコメ・日常系</h3>
+        <p>柔らかい線・丸みのある吹き出し・表情のアップ多用。恥ずかしい場面の「赤面エフェクト」を自動追加。</p>
+        <div style="margin-top: 0.75rem;"><span class="tag tag-cyan">LoRA: romcom_soft_v1</span></div>
+      </div>
+      <div class="card">
+        <div class="card-icon orange">🔍</div>
+        <h3>ミステリー・サスペンス</h3>
+        <p>暗めのトーン・斜めアングル多用・ナレーションボックス活用。緊張感を演出するコマ割りパターンを適用。</p>
+        <div style="margin-top: 0.75rem;"><span class="tag tag-orange">LoRA: mystery_dark_v1</span></div>
+      </div>
+      <div class="card">
+        <div class="card-icon green">📚</div>
+        <h3>解説・教育漫画</h3>
+        <p>わかりやすい図解・矢印・ポイントボックスを自動挿入。キャラクターが説明役を務める構成に最適化。</p>
+        <div style="margin-top: 0.75rem;"><span class="tag tag-green">LoRA: educational_v2</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Technical Stack -->
+<section class="section" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-label">技術スタック詳細</div>
+    <h2 class="section-title">ComfyUIワークフロー構成</h2>
+    <div class="two-col">
+      <div>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">ComfyUIをバックエンドとして使用し、各生成ノードをAPIで制御。キャラクター別にLoRAを管理し、シーンごとに自動切替。</p>
+        <ul class="checklist">
+          <li>ComfyUI APIでバッチ生成を自動化</li>
+          <li>キャラ×感情×角度のプロンプトマトリクス管理</li>
+          <li>ControlNet Cannyで線画の一貫性を確保</li>
+          <li>ADetailerで顔の品質を自動修正</li>
+          <li>生成失敗時の自動リトライ機能</li>
+        </ul>
+      </div>
+      <div>
+        <div class="code-block">
+<span class="cm"># ComfyUI API呼び出し例</span>
+<span class="kw">import</span> requests
+
+<span class="fn">def</span> <span class="fn">generate_panel</span>(character, scene):
+    workflow = {
+        <span class="str">"prompt"</span>: {
+            <span class="str">"4"</span>: {  <span class="cm"># KSampler</span>
+                <span class="str">"seed"</span>: character[<span class="str">"seed"</span>],
+                <span class="str">"steps"</span>: <span class="num">25</span>,
+                <span class="str">"cfg"</span>: <span class="num">7.0</span>
+            },
+            <span class="str">"6"</span>: {  <span class="cm"># CLIP Text Encode</span>
+                <span class="str">"text"</span>: build_prompt(
+                    character, scene
+                )
+            }
+        }
+    }
+    <span class="kw">return</span> requests.<span class="fn">post</span>(
+        <span class="str">"http://localhost:8188/prompt"</span>,
+        json=workflow
+    )</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">AI Creator Hub</div>
+    <nav>
+      <a href="index.html">ホーム</a>
+      <a href="video-pipeline.html">動画制作</a>
+      <a href="manga-pipeline.html">漫画制作</a>
+      <a href="evaluation.html">評価システム</a>
+      <a href="monetization.html">マネタイズ</a>
+      <a href="openclaw.html">OpenClaw連携</a>
+    </nav>
+    <p>AI Creator Hub — AIでコンテンツをつくり、稼ぐ</p>
+  </div>
+</footer>
+
+<script src="main.js"></script>
+</body>
+</html>

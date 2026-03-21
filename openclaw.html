@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenClaw連携 — AI Creator Hub</title>
+  <meta name="description" content="OpenClawをオーケストレーターとして活用し全AIツールを統合管理するシステム設計">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">AI Creator Hub</div>
+  <ul class="nav-links">
+    <li><a href="index.html">ホーム</a></li>
+    <li><a href="video-pipeline.html">動画制作</a></li>
+    <li><a href="manga-pipeline.html">漫画制作</a></li>
+    <li><a href="evaluation.html">評価システム</a></li>
+    <li><a href="monetization.html">マネタイズ</a></li>
+    <li><a href="openclaw.html" class="active">OpenClaw連携</a></li>
+  </ul>
+  <div class="nav-hamburger"><span></span><span></span><span></span></div>
+</nav>
+
+<div class="page-hero">
+  <div class="section-label">OpenClaw連携</div>
+  <h1>OpenClawが全パイプラインを<br><span style="background: linear-gradient(135deg,#6C3CE1,#FF6B6B); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">一元オーケストレーション</span></h1>
+  <p>各AIツールのAPIをOpenClawで統合し、ネタ入力から収益化まで一本のワークフローで制御</p>
+</div>
+
+<!-- Role of OpenClaw -->
+<section class="section">
+  <div class="section-inner">
+    <div class="two-col">
+      <div>
+        <div class="section-label">OpenClawの役割</div>
+        <h2 class="section-title">AIツール群の<br>指揮者として機能</h2>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+          OpenClawはワークフロー定義に従い、複数のAIツール・APIを順序立てて呼び出す
+          オーケストレーションレイヤーとして機能します。
+          各ツールのAPI差異を吸収し、エラー処理・リトライ・進捗管理を一元化。
+        </p>
+        <ul class="checklist">
+          <li>ワークフローのYAML/JSON定義で管理</li>
+          <li>並列・直列の実行フロー制御</li>
+          <li>各ステップの成功/失敗に応じた分岐処理</li>
+          <li>実行ログ・コスト追跡・アラート機能</li>
+          <li>ヒューマンインザループ（人間確認ポイント）の挿入</li>
+        </ul>
+      </div>
+      <div>
+        <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem;">
+          <h3 style="margin-bottom: 1rem; font-size: 0.95rem; color: var(--text-muted);">OpenClawが管理するツール群</h3>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+            <div style="background: var(--bg3); border-radius: 8px; padding: 0.75rem; font-size: 0.85rem;">
+              <div style="color: var(--accent); font-weight: 700; margin-bottom: 0.25rem;">LLM</div>
+              <div style="color: var(--text-muted);">GPT-4o, Claude 3.5</div>
+            </div>
+            <div style="background: var(--bg3); border-radius: 8px; padding: 0.75rem; font-size: 0.85rem;">
+              <div style="color: var(--accent); font-weight: 700; margin-bottom: 0.25rem;">画像生成</div>
+              <div style="color: var(--text-muted);">SD XL, Midjourney</div>
+            </div>
+            <div style="background: var(--bg3); border-radius: 8px; padding: 0.75rem; font-size: 0.85rem;">
+              <div style="color: var(--accent); font-weight: 700; margin-bottom: 0.25rem;">動画生成</div>
+              <div style="color: var(--text-muted);">RunwayML, Kling</div>
+            </div>
+            <div style="background: var(--bg3); border-radius: 8px; padding: 0.75rem; font-size: 0.85rem;">
+              <div style="color: var(--accent); font-weight: 700; margin-bottom: 0.25rem;">音声合成</div>
+              <div style="color: var(--text-muted);">ElevenLabs, VOICEVOX</div>
+            </div>
+            <div style="background: var(--bg3); border-radius: 8px; padding: 0.75rem; font-size: 0.85rem;">
+              <div style="color: var(--accent); font-weight: 700; margin-bottom: 0.25rem;">評価AI</div>
+              <div style="color: var(--text-muted);">カスタム評価エンジン</div>
+            </div>
+            <div style="background: var(--bg3); border-radius: 8px; padding: 0.75rem; font-size: 0.85rem;">
+              <div style="color: var(--accent); font-weight: 700; margin-bottom: 0.25rem;">配信</div>
+              <div style="color: var(--text-muted);">YouTube, note, Kindle</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Workflow Definition -->
+<section class="section" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-label">ワークフロー定義</div>
+    <h2 class="section-title">動画制作ワークフロー例</h2>
+    <div class="code-block">
+<span class="cm"># openclaw_video_workflow.yaml</span>
+<span class="fn">name</span>: <span class="str">"ai_video_creator"</span>
+<span class="fn">version</span>: <span class="str">"1.0"</span>
+<span class="fn">trigger</span>:
+  <span class="fn">type</span>: <span class="str">"webhook"</span>
+  <span class="fn">endpoint</span>: <span class="str">"/api/create-video"</span>
+
+<span class="fn">steps</span>:
+  - <span class="fn">id</span>: <span class="str">"analyze_input"</span>
+    <span class="fn">tool</span>: <span class="str">"llm.claude"</span>
+    <span class="fn">prompt</span>: <span class="str">"ネタ文章のジャンル・ターゲット・トーンを分析: {{input.text}}"</span>
+    <span class="fn">output</span>: <span class="str">"content_metadata"</span>
+
+  - <span class="fn">id</span>: <span class="str">"generate_script"</span>
+    <span class="fn">tool</span>: <span class="str">"llm.gpt4o"</span>
+    <span class="fn">depends_on</span>: [<span class="str">"analyze_input"</span>]
+    <span class="fn">prompt</span>: <span class="str">"{{content_metadata}}を元にYouTube動画スクリプトを作成"</span>
+    <span class="fn">output</span>: <span class="str">"script"</span>
+
+  - <span class="fn">id</span>: <span class="str">"generate_visuals"</span>
+    <span class="fn">tool</span>: <span class="str">"image.midjourney"</span>
+    <span class="fn">depends_on</span>: [<span class="str">"generate_script"</span>]
+    <span class="fn">parallel</span>: <span class="kw">true</span>
+    <span class="fn">inputs</span>:
+      - <span class="str">"{{script.scene_descriptions}}"</span>
+    <span class="fn">output</span>: <span class="str">"scene_images"</span>
+
+  - <span class="fn">id</span>: <span class="str">"generate_voice"</span>
+    <span class="fn">tool</span>: <span class="str">"voice.elevenlabs"</span>
+    <span class="fn">depends_on</span>: [<span class="str">"generate_script"</span>]
+    <span class="fn">parallel</span>: <span class="kw">true</span>
+    <span class="fn">inputs</span>:
+      <span class="fn">text</span>: <span class="str">"{{script.narration}}"</span>
+      <span class="fn">voice_id</span>: <span class="str">"{{content_metadata.recommended_voice}}"</span>
+    <span class="fn">output</span>: <span class="str">"audio"</span>
+
+  - <span class="fn">id</span>: <span class="str">"compile_video"</span>
+    <span class="fn">tool</span>: <span class="str">"video.ffmpeg"</span>
+    <span class="fn">depends_on</span>: [<span class="str">"generate_visuals"</span>, <span class="str">"generate_voice"</span>]
+    <span class="fn">inputs</span>:
+      <span class="fn">images</span>: <span class="str">"{{scene_images}}"</span>
+      <span class="fn">audio</span>: <span class="str">"{{audio}}"</span>
+    <span class="fn">output</span>: <span class="str">"video_file"</span>
+
+  - <span class="fn">id</span>: <span class="str">"evaluate"</span>
+    <span class="fn">tool</span>: <span class="str">"custom.content_evaluator"</span>
+    <span class="fn">depends_on</span>: [<span class="str">"compile_video"</span>]
+    <span class="fn">output</span>: <span class="str">"evaluation"</span>
+
+  - <span class="fn">id</span>: <span class="str">"publish_or_improve"</span>
+    <span class="fn">type</span>: <span class="str">"condition"</span>
+    <span class="fn">depends_on</span>: [<span class="str">"evaluate"</span>]
+    <span class="fn">branches</span>:
+      - <span class="fn">condition</span>: <span class="str">"{{evaluation.score}} >= 85"</span>
+        <span class="fn">next</span>: <span class="str">"publish"</span>
+      - <span class="fn">condition</span>: <span class="str">"{{evaluation.score}} >= 70"</span>
+        <span class="fn">next</span>: <span class="str">"auto_improve"</span>
+      - <span class="fn">condition</span>: <span class="str">"default"</span>
+        <span class="fn">next</span>: <span class="str">"discard_and_retry"</span>
+
+  - <span class="fn">id</span>: <span class="str">"publish"</span>
+    <span class="fn">tool</span>: <span class="str">"publisher.youtube"</span>
+    <span class="fn">inputs</span>:
+      <span class="fn">video</span>: <span class="str">"{{video_file}}"</span>
+      <span class="fn">metadata</span>: <span class="str">"{{evaluation.optimized_metadata}}"</span>
+      <span class="fn">schedule</span>: <span class="str">"{{evaluation.optimal_publish_time}}"</span></div>
+  </div>
+</section>
+
+<!-- Integration Points -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label">連携設計</div>
+    <h2 class="section-title">OpenClawとの統合方法</h2>
+    <div class="card-grid">
+
+      <div class="card">
+        <div class="card-icon purple">🔌</div>
+        <h3>ネタ入力の受け取り</h3>
+        <p>別ラインのネタ生成システムからWebhookでネタ文章を受け取り、OpenClawのワークフローをトリガー。バッチ処理にも対応。</p>
+        <div class="code-block" style="font-size: 0.8rem; margin-top: 0.75rem;">
+POST /api/create-content
+{<span class="str">"text"</span>: <span class="str">"ネタ文章..."</span>,
+ <span class="str">"type"</span>: <span class="str">"video|manga"</span>,
+ <span class="str">"priority"</span>: <span class="str">"normal"</span>}</div>
+      </div>
+
+      <div class="card">
+        <div class="card-icon cyan">📡</div>
+        <h3>リアルタイム進捗監視</h3>
+        <p>各ステップの実行状況・コスト・エラーをリアルタイムでダッシュボードに表示。Slack/Discord通知も自動送信。</p>
+        <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <span class="tag tag-cyan">WebSocket</span>
+          <span class="tag tag-green">Slack通知</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-icon orange">💸</div>
+        <h3>APIコスト管理</h3>
+        <p>各ツールのAPI呼び出しコストをOpenClawが自動集計。月額予算の上限設定・アラート・安価な代替ツールへの自動切替も実装。</p>
+        <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <span class="tag tag-orange">コスト上限設定</span>
+          <span class="tag tag-purple">自動フォールバック</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-icon green">🔁</div>
+        <h3>エラー処理・リトライ</h3>
+        <p>API失敗・タイムアウト・品質エラーを自動検知し、設定した回数だけリトライ。解決不能な場合は人間に通知して手動介入をリクエスト。</p>
+        <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <span class="tag tag-green">指数バックオフ</span>
+          <span class="tag tag-cyan">フォールバック先</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Roadmap -->
+<section class="section" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-label">実装ロードマップ</div>
+    <h2 class="section-title">OpenClaw連携の段階的実装計画</h2>
+    <div style="display: flex; flex-direction: column; gap: 1rem;">
+
+      <div class="card" style="border-left: 4px solid #4FFFB0;">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
+          <span class="tag tag-green">Phase 1 — 完了</span>
+          <h3 style="margin: 0;">基盤構築</h3>
+        </div>
+        <p>OpenClaw環境のセットアップ。LLM呼び出しの基本ワークフロー定義。ネタ入力→スクリプト生成の最小パイプライン実装。</p>
+      </div>
+
+      <div class="card" style="border-left: 4px solid #00D4FF;">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
+          <span class="tag tag-cyan">Phase 2 — 進行中</span>
+          <h3 style="margin: 0;">コンテンツ生成統合</h3>
+        </div>
+        <p>画像生成・音声合成・動画編集ツールとの連携実装。並列実行の最適化。評価エンジンとの接続。</p>
+      </div>
+
+      <div class="card" style="border-left: 4px solid #6C3CE1;">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
+          <span class="tag tag-purple">Phase 3 — 予定</span>
+          <h3 style="margin: 0;">マネタイズ自動化</h3>
+        </div>
+        <p>配信プラットフォームAPIとの接続。自動投稿・スケジューリング実装。収益データのフィードバックループ構築。</p>
+      </div>
+
+      <div class="card" style="border-left: 4px solid #FF6B6B;">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
+          <span class="tag tag-orange">Phase 4 — 将来</span>
+          <h3 style="margin: 0;">フルオートメーション</h3>
+        </div>
+        <p>24時間365日の完全自動運用。収益データからコンテンツ戦略を自律的に最適化。新ツールの自動評価・統合機能。</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">AI Creator Hub</div>
+    <nav>
+      <a href="index.html">ホーム</a>
+      <a href="video-pipeline.html">動画制作</a>
+      <a href="manga-pipeline.html">漫画制作</a>
+      <a href="evaluation.html">評価システム</a>
+      <a href="monetization.html">マネタイズ</a>
+      <a href="openclaw.html">OpenClaw連携</a>
+    </nav>
+    <p>AI Creator Hub — AIでコンテンツをつくり、稼ぐ</p>
+  </div>
+</footer>
+
+<script src="main.js"></script>
+</body>
+</html>

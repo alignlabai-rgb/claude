@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI動画制作パイプライン — AI Creator Hub</title>
+  <meta name="description" content="ネタ文章からスクリプト生成・画像生成・音声合成・動画編集まで全自動で行うAI動画制作フロー">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">AI Creator Hub</div>
+  <ul class="nav-links">
+    <li><a href="index.html">ホーム</a></li>
+    <li><a href="video-pipeline.html" class="active">動画制作</a></li>
+    <li><a href="manga-pipeline.html">漫画制作</a></li>
+    <li><a href="evaluation.html">評価システム</a></li>
+    <li><a href="monetization.html">マネタイズ</a></li>
+    <li><a href="openclaw.html">OpenClaw連携</a></li>
+  </ul>
+  <div class="nav-hamburger"><span></span><span></span><span></span></div>
+</nav>
+
+<div class="page-hero">
+  <div class="section-label">AI動画制作パイプライン</div>
+  <h1>ネタ文章 → 完成動画を<br><span style="background: linear-gradient(135deg,#6C3CE1,#00D4FF); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">全自動で生成</span></h1>
+  <p>スクリプト生成から音声合成・画像生成・動画編集まで、全工程をAIがこなすパイプライン設計</p>
+</div>
+
+<!-- Pipeline Steps -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label">制作フロー</div>
+    <h2 class="section-title">7ステップで完成動画へ</h2>
+
+    <div style="display: flex; flex-direction: column; gap: 1.5rem; margin-top: 2rem;">
+
+      <div class="card" style="display: grid; grid-template-columns: 60px 1fr; gap: 1.5rem; align-items: start;">
+        <div class="step-num" style="margin: 0;">1</div>
+        <div>
+          <h3>ネタ文章の受け取り & 前処理</h3>
+          <p>別ラインから生成されたテキストを受け取り、ジャンル・ターゲット・トーンを自動分析。不適切コンテンツフィルタリングも同時実行。</p>
+          <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <span class="tag tag-cyan">入力: テキスト</span>
+            <span class="tag tag-purple">GPT-4o / Claude</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="display: grid; grid-template-columns: 60px 1fr; gap: 1.5rem; align-items: start;">
+        <div class="step-num" style="margin: 0;">2</div>
+        <div>
+          <h3>動画スクリプト生成</h3>
+          <p>ネタ文章をYouTube/ショート動画向けのスクリプトに変換。フック（冒頭掴み）・本編構成・CTA（行動喚起）を自動設計。字幕テキストも同時生成。</p>
+          <div style="margin-top: 0.75rem;">
+            <div class="code-block">
+<span class="cm">// スクリプト生成プロンプト例</span>
+<span class="kw">const</span> script = <span class="kw">await</span> llm.<span class="fn">generate</span>({
+  system: <span class="str">"あなたはYouTube動画脚本家です"</span>,
+  prompt: <span class="str">`以下のネタを元に動画スクリプトを作成:
+  - フック: 最初の3秒で視聴者を掴む
+  - 本編: ${targetDuration}秒の構成
+  - CTA: チャンネル登録・いいね誘導
+  ネタ: ${sourceText}`</span>
+});</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="display: grid; grid-template-columns: 60px 1fr; gap: 1.5rem; align-items: start;">
+        <div class="step-num" style="margin: 0;">3</div>
+        <div>
+          <h3>ビジュアル素材生成</h3>
+          <p>スクリプトの各シーンに対応する画像・映像をAIで生成。スタイルの一貫性を保ちながら、シーンごとに最適な構図・色調を自動選択。</p>
+          <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <span class="tag tag-cyan">Midjourney API</span>
+            <span class="tag tag-cyan">DALL-E 3</span>
+            <span class="tag tag-cyan">RunwayML Gen-3</span>
+            <span class="tag tag-orange">Kling AI</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="display: grid; grid-template-columns: 60px 1fr; gap: 1.5rem; align-items: start;">
+        <div class="step-num" style="margin: 0;">4</div>
+        <div>
+          <h3>音声合成（ナレーション）</h3>
+          <p>スクリプトをリアルな日本語音声に変換。複数の声質から自動選択し、感情・速度・イントネーションを最適化。BGM選択も自動。</p>
+          <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <span class="tag tag-orange">ElevenLabs</span>
+            <span class="tag tag-orange">VOICEVOX</span>
+            <span class="tag tag-orange">CoeFont</span>
+            <span class="tag tag-purple">Suno AI (BGM)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="display: grid; grid-template-columns: 60px 1fr; gap: 1.5rem; align-items: start;">
+        <div class="step-num" style="margin: 0;">5</div>
+        <div>
+          <h3>字幕・テロップ生成</h3>
+          <p>音声に同期した字幕を自動生成。強調ワードのハイライト・エフェクト・フォントスタイルも動画の雰囲気に合わせて自動調整。</p>
+          <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <span class="tag tag-green">Whisper (文字起こし)</span>
+            <span class="tag tag-green">FFmpeg (字幕埋め込み)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="display: grid; grid-template-columns: 60px 1fr; gap: 1.5rem; align-items: start;">
+        <div class="step-num" style="margin: 0;">6</div>
+        <div>
+          <h3>動画編集・結合</h3>
+          <p>映像・音声・字幕をFFmpegで自動合成。トランジション・カット編集・テロップアニメーションをルールベースで適用し、完成動画を生成。</p>
+          <div style="margin-top: 0.75rem;">
+            <div class="code-block">
+<span class="cm"># FFmpegによる自動合成例</span>
+ffmpeg -i <span class="str">video_scenes.mp4</span> \
+       -i <span class="str">narration.mp3</span> \
+       -i <span class="str">bgm.mp3</span> \
+       -filter_complex <span class="str">"[1:a]volume=1.0[v1];
+         [2:a]volume=0.15[v2];
+         [v1][v2]amix=inputs=2[aout]"</span> \
+       -map <span class="num">0</span>:v -map <span class="str">"[aout]"</span> \
+       -vf <span class="str">"subtitles=subs.srt"</span> \
+       output_final.mp4</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="display: grid; grid-template-columns: 60px 1fr; gap: 1.5rem; align-items: start;">
+        <div class="step-num" style="margin: 0;">7</div>
+        <div>
+          <h3>サムネイル生成</h3>
+          <p>動画の内容から最も視聴クリックされやすいサムネイルを複数パターン生成。A/Bテスト用に3〜5パターンを自動作成し評価システムへ送付。</p>
+          <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <span class="tag tag-purple">Canva API</span>
+            <span class="tag tag-cyan">DALL-E 3</span>
+            <span class="tag tag-green">出力: 評価システムへ</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Tool Comparison -->
+<section class="section" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-label">ツール比較</div>
+    <h2 class="section-title">動画生成AIツール比較</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>ツール</th>
+            <th>用途</th>
+            <th>品質</th>
+            <th>コスト</th>
+            <th>API</th>
+            <th>推奨度</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>RunwayML Gen-3</strong></td>
+            <td>テキスト/画像→動画</td>
+            <td><span class="tag tag-green">最高</span></td>
+            <td><span class="tag tag-orange">高め</span></td>
+            <td><span class="tag tag-green">あり</span></td>
+            <td>⭐⭐⭐⭐⭐</td>
+          </tr>
+          <tr>
+            <td><strong>Kling AI</strong></td>
+            <td>テキスト/画像→動画</td>
+            <td><span class="tag tag-green">高</span></td>
+            <td><span class="tag tag-cyan">中</span></td>
+            <td><span class="tag tag-green">あり</span></td>
+            <td>⭐⭐⭐⭐</td>
+          </tr>
+          <tr>
+            <td><strong>Sora (OpenAI)</strong></td>
+            <td>テキスト→動画</td>
+            <td><span class="tag tag-green">最高</span></td>
+            <td><span class="tag tag-orange">高め</span></td>
+            <td><span class="tag tag-purple">要確認</span></td>
+            <td>⭐⭐⭐⭐</td>
+          </tr>
+          <tr>
+            <td><strong>Pika Labs</strong></td>
+            <td>画像→短尺動画</td>
+            <td><span class="tag tag-cyan">中</span></td>
+            <td><span class="tag tag-green">低め</span></td>
+            <td><span class="tag tag-cyan">Beta</span></td>
+            <td>⭐⭐⭐</td>
+          </tr>
+          <tr>
+            <td><strong>ElevenLabs</strong></td>
+            <td>音声合成</td>
+            <td><span class="tag tag-green">最高</span></td>
+            <td><span class="tag tag-cyan">中</span></td>
+            <td><span class="tag tag-green">あり</span></td>
+            <td>⭐⭐⭐⭐⭐</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- Output Formats -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label">出力形式</div>
+    <h2 class="section-title">マルチフォーマット対応</h2>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon purple">📱</div>
+        <h3>ショート動画</h3>
+        <p>9:16縦型・60秒以内。YouTube Shorts、TikTok、Instagram Reels向け。冒頭3秒のフックを特に重視。</p>
+        <div style="margin-top: 0.75rem;"><span class="tag tag-purple">1080×1920</span> <span class="tag tag-cyan">〜60秒</span></div>
+      </div>
+      <div class="card">
+        <div class="card-icon cyan">🖥</div>
+        <h3>通常YouTube動画</h3>
+        <p>16:9横型・5〜15分。解説・ランキング・ストーリー系コンテンツ。広告収益に最適化した構成。</p>
+        <div style="margin-top: 0.75rem;"><span class="tag tag-cyan">1920×1080</span> <span class="tag tag-green">5〜15分</span></div>
+      </div>
+      <div class="card">
+        <div class="card-icon orange">🎙</div>
+        <h3>ポッドキャスト動画</h3>
+        <p>音声メインに波形ビジュアライザーと字幕を追加した動画形式。Spotifyや音声プラットフォームにも同時展開。</p>
+        <div style="margin-top: 0.75rem;"><span class="tag tag-orange">音声+字幕</span> <span class="tag tag-purple">10〜30分</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">AI Creator Hub</div>
+    <nav>
+      <a href="index.html">ホーム</a>
+      <a href="video-pipeline.html">動画制作</a>
+      <a href="manga-pipeline.html">漫画制作</a>
+      <a href="evaluation.html">評価システム</a>
+      <a href="monetization.html">マネタイズ</a>
+      <a href="openclaw.html">OpenClaw連携</a>
+    </nav>
+    <p>AI Creator Hub — AIでコンテンツをつくり、稼ぐ</p>
+  </div>
+</footer>
+
+<script src="main.js"></script>
+</body>
+</html>
