@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenClaw マルチエージェント協調</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8;
+            color: #333;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            color: #003366;
+            font-size: 32px;
+            margin-bottom: 10px;
+            border-bottom: 4px solid #8e44ad;
+            padding-bottom: 15px;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 40px;
+        }
+
+        h2 {
+            color: #8e44ad;
+            font-size: 24px;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-left: 15px;
+            border-left: 5px solid #8e44ad;
+        }
+
+        h3 {
+            color: #333;
+            font-size: 20px;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            padding-left: 25px;
+            position: relative;
+            margin-bottom: 12px;
+        }
+
+        li:before {
+            content: "✔";
+            color: #8e44ad;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        .impact-box {
+            background-color: #f4ecf7;
+            border: 1px solid #d2b4de;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+
+        .impact-title {
+            color: #6c3483;
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .risk-box {
+            background-color: #fff3cd;
+            border: 1px solid #ffeeba;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+
+        .risk-title {
+            color: #856404;
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 20px 0 30px 0;
+        }
+
+        .nav-links a {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #003366;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 13px;
+            transition: background 0.2s;
+        }
+
+        .nav-links a:hover {
+            background: #00509e;
+        }
+
+        .agent-card {
+            background: linear-gradient(135deg, #6c3483, #8e44ad);
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 15px 0;
+        }
+
+        .agent-card h3 {
+            color: white;
+            margin-top: 0;
+        }
+
+        .agent-card ul li:before {
+            color: #ffd700;
+        }
+
+        .flow-diagram {
+            background: #f8f9fa;
+            border: 2px solid #8e44ad;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            margin: 20px 0;
+            font-size: 15px;
+        }
+
+        .flow-arrow {
+            color: #8e44ad;
+            font-size: 24px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🤝 OpenClaw マルチエージェント協調</h1>
+        <p class="subtitle">複数のAIエージェントが協力してタスクを遂行する次世代アーキテクチャ</p>
+
+        <div class="nav-links">
+            <a href="index.html">🏠 トップ</a>
+            <a href="architecture.html">🏗️ アーキテクチャ</a>
+            <a href="roadmap.html">🗺️ ロードマップ</a>
+            <a href="enterprise.html">🏢 エンタープライズ</a>
+        </div>
+
+        <h2>1. マルチエージェントとは</h2>
+        <p>マルチエージェント協調は、単一のOpenClawインスタンスでは処理しきれない複雑なタスクを、複数の専門化されたエージェントが分担して処理する仕組みです。2026年Q3のロードマップで正式リリース予定ですが、実験的機能として既に利用可能です。</p>
+
+        <div class="impact-box">
+            <div class="impact-title">🧩 なぜマルチエージェントが必要か</div>
+            <ul>
+                <li><strong>専門性の分離：</strong> リサーチ、執筆、コーディング等を専門エージェントに分担</li>
+                <li><strong>並列処理：</strong> 独立したサブタスクを同時実行して処理速度を向上</li>
+                <li><strong>スケーラビリティ：</strong> タスク量に応じてエージェント数を動的に増減</li>
+                <li><strong>耐障害性：</strong> 1つのエージェントが失敗しても全体のワークフローは継続</li>
+            </ul>
+        </div>
+
+        <h2>2. アーキテクチャパターン</h2>
+
+        <h3>パターン1: オーケストレーター型</h3>
+        <div class="flow-diagram">
+            <strong>🧠 オーケストレーター（指揮者）</strong><br>
+            <div class="flow-arrow">↓ タスク分配 ↓</div>
+            <div style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 10px;">
+                <div style="background: #8e44ad; color: white; padding: 10px 20px; border-radius: 8px;">📧 メール担当</div>
+                <div style="background: #8e44ad; color: white; padding: 10px 20px; border-radius: 8px;">🔍 リサーチ担当</div>
+                <div style="background: #8e44ad; color: white; padding: 10px 20px; border-radius: 8px;">📝 執筆担当</div>
+            </div>
+            <div class="flow-arrow">↑ 結果返却 ↑</div>
+            <strong>🧠 オーケストレーター（統合・最終出力）</strong>
+        </div>
+        <p>1つの「指揮者」エージェントがタスクを分析し、専門エージェントに作業を割り当て、結果を統合します。最もシンプルで広く使われるパターンです。</p>
+
+        <h3>パターン2: パイプライン型</h3>
+        <div class="flow-diagram">
+            <div style="display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 15px;">
+                <div style="background: #6c3483; color: white; padding: 10px 20px; border-radius: 8px;">🔍 データ収集</div>
+                <span class="flow-arrow">→</span>
+                <div style="background: #8e44ad; color: white; padding: 10px 20px; border-radius: 8px;">📊 分析</div>
+                <span class="flow-arrow">→</span>
+                <div style="background: #a569bd; color: white; padding: 10px 20px; border-radius: 8px;">📝 レポート生成</div>
+                <span class="flow-arrow">→</span>
+                <div style="background: #bb8fce; color: white; padding: 10px 20px; border-radius: 8px;">📧 配信</div>
+            </div>
+        </div>
+        <p>各エージェントが順番に処理を行い、次のエージェントにバトンを渡すパターンです。データ処理パイプラインに最適です。</p>
+
+        <h3>パターン3: ピアツーピア型</h3>
+        <p>全エージェントが対等に通信し、協議しながらタスクを遂行するパターンです。創造的なタスク（ブレインストーミング、戦略立案）に適しています。</p>
+
+        <h2>3. 実装例：リサーチレポート自動生成</h2>
+
+        <div class="agent-card">
+            <h3>🔍 リサーチャーエージェント</h3>
+            <ul>
+                <li>Web検索、学術論文検索、ニュースソースの横断検索</li>
+                <li>情報の信頼性評価とファクトチェック</li>
+                <li>LLM: Claude Opus 4（高精度リサーチ向け）</li>
+            </ul>
+        </div>
+
+        <div class="agent-card">
+            <h3>📊 アナリストエージェント</h3>
+            <ul>
+                <li>収集データの統計分析とトレンド抽出</li>
+                <li>グラフ・チャートの自動生成</li>
+                <li>LLM: Claude Sonnet 4（バランス型）</li>
+            </ul>
+        </div>
+
+        <div class="agent-card">
+            <h3>📝 ライターエージェント</h3>
+            <ul>
+                <li>分析結果を読みやすいレポートに構成</li>
+                <li>エグゼクティブサマリーの自動生成</li>
+                <li>LLM: Claude Opus 4（高品質文章生成向け）</li>
+            </ul>
+        </div>
+
+        <h2>4. Moltbook — AIエージェントのSNS</h2>
+        <p>OpenClawエコシステムの中で最もユニークな存在が「Moltbook」です。これは人間ではなくAIエージェントが参加するSNSプラットフォームで、2026年1月のローンチ以来急速に成長しています。</p>
+
+        <div class="impact-box">
+            <div class="impact-title">🌐 Moltbookの現状（2026年3月）</div>
+            <ul>
+                <li><strong>参加エージェント数：</strong> 30,000体以上</li>
+                <li><strong>日次投稿数：</strong> 平均120,000件</li>
+                <li><strong>主な活動：</strong> 情報共有、タスク依頼、学習データの交換</li>
+                <li><strong>特徴：</strong> エージェント同士が自律的にコミュニケーションし、協力関係を構築</li>
+            </ul>
+        </div>
+
+        <h2>5. 課題と制限</h2>
+        <div class="risk-box">
+            <div class="risk-title">⚠️ マルチエージェントの現在の課題</div>
+            <ul>
+                <li><strong>コスト増加：</strong> 複数エージェントの同時実行はAPI呼び出しコストが倍増する</li>
+                <li><strong>調整オーバーヘッド：</strong> エージェント間の通信による遅延が発生</li>
+                <li><strong>デバッグの困難さ：</strong> 複数エージェントの相互作用を追跡するのが難しい</li>
+                <li><strong>セキュリティリスク：</strong> エージェント間通信の傍受・改竄のリスク</li>
+                <li><strong>実験的機能：</strong> 2026年3月時点ではまだ実験的であり、APIが変更される可能性がある</li>
+            </ul>
+        </div>
+
+        <div style="text-align: center; margin-top: 40px; padding: 20px; background: #f0f4f8; border-radius: 12px;">
+            <p style="margin: 0; color: #555;">最終更新: 2026年3月 | <a href="index.html">トップページに戻る</a></p>
+        </div>
+    </div>
+</body>
+
+</html>

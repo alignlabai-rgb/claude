@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenClaw API リファレンス</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8;
+            color: #333;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            color: #003366;
+            font-size: 32px;
+            margin-bottom: 10px;
+            border-bottom: 4px solid #16a085;
+            padding-bottom: 15px;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 40px;
+        }
+
+        h2 {
+            color: #16a085;
+            font-size: 24px;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-left: 15px;
+            border-left: 5px solid #16a085;
+        }
+
+        h3 {
+            color: #333;
+            font-size: 20px;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            padding-left: 25px;
+            position: relative;
+            margin-bottom: 12px;
+        }
+
+        li:before {
+            content: "✔";
+            color: #16a085;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        .impact-box {
+            background-color: #e8f8f5;
+            border: 1px solid #a3e4d7;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+
+        .impact-title {
+            color: #0e6655;
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 20px 0 30px 0;
+        }
+
+        .nav-links a {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #003366;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 13px;
+            transition: background 0.2s;
+        }
+
+        .nav-links a:hover {
+            background: #00509e;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        pre {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .endpoint-card {
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .endpoint-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 20px;
+            background: #f8f9fa;
+        }
+
+        .method {
+            padding: 4px 12px;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 13px;
+            color: white;
+        }
+
+        .method-get {
+            background: #27ae60;
+        }
+
+        .method-post {
+            background: #2980b9;
+        }
+
+        .method-put {
+            background: #e67e22;
+        }
+
+        .method-delete {
+            background: #e74c3c;
+        }
+
+        .endpoint-path {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            font-size: 15px;
+        }
+
+        .endpoint-body {
+            padding: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🔌 OpenClaw API リファレンス</h1>
+        <p class="subtitle">OpenClawの内部REST APIとプログラマティックアクセスの完全ガイド</p>
+
+        <div class="nav-links">
+            <a href="index.html">🏠 トップ</a>
+            <a href="architecture.html">🏗️ アーキテクチャ</a>
+            <a href="setup.html">🔧 セットアップ</a>
+            <a href="tutorial.html">📚 チュートリアル</a>
+        </div>
+
+        <h2>1. API概要</h2>
+        <p>OpenClawはローカルで動作するREST APIサーバーを内蔵しており、外部アプリケーションからプログラム的にエージェントを操作できます。デフォルトでは<code>http://localhost:3457</code>でリッスンします。</p>
+
+        <div class="impact-box">
+            <div class="impact-title">🔑 認証</div>
+            <p>APIアクセスにはベアラートークンが必要です。初回セットアップ時に自動生成されます。</p>
+            <pre>
+# ヘッダーに認証トークンを含めてリクエスト
+curl -H "Authorization: Bearer YOUR_API_TOKEN" \
+     http://localhost:3457/api/v1/status</pre>
+        </div>
+
+        <h2>2. タスク管理API</h2>
+
+        <div class="endpoint-card">
+            <div class="endpoint-header">
+                <span class="method method-post">POST</span>
+                <span class="endpoint-path">/api/v1/tasks</span>
+            </div>
+            <div class="endpoint-body">
+                <p>新しいタスクを作成・送信します。</p>
+                <pre>
+{
+  "message": "明日の会議のアジェンダを作成して",
+  "priority": "high",
+  "skill_hints": ["calendar-sync", "email-manager"],
+  "max_tokens": 4096,
+  "callback_url": "https://your-webhook.example.com/callback"
+}</pre>
+                <p><strong>レスポンス例：</strong></p>
+                <pre>
+{
+  "task_id": "task_abc123",
+  "status": "queued",
+  "created_at": "2026-03-21T10:30:00Z",
+  "estimated_completion": "2026-03-21T10:31:30Z"
+}</pre>
+            </div>
+        </div>
+
+        <div class="endpoint-card">
+            <div class="endpoint-header">
+                <span class="method method-get">GET</span>
+                <span class="endpoint-path">/api/v1/tasks/{task_id}</span>
+            </div>
+            <div class="endpoint-body">
+                <p>タスクのステータスと結果を取得します。</p>
+                <pre>
+{
+  "task_id": "task_abc123",
+  "status": "completed",
+  "result": "会議アジェンダを作成し、参加者全員にメール送信しました。",
+  "tokens_used": 2847,
+  "duration_ms": 4520
+}</pre>
+            </div>
+        </div>
+
+        <div class="endpoint-card">
+            <div class="endpoint-header">
+                <span class="method method-get">GET</span>
+                <span class="endpoint-path">/api/v1/tasks</span>
+            </div>
+            <div class="endpoint-body">
+                <p>タスク一覧を取得します。ステータスやページネーションでフィルタ可能。</p>
+                <p>クエリパラメータ：<code>?status=completed&limit=20&offset=0</code></p>
+            </div>
+        </div>
+
+        <div class="endpoint-card">
+            <div class="endpoint-header">
+                <span class="method method-delete">DELETE</span>
+                <span class="endpoint-path">/api/v1/tasks/{task_id}</span>
+            </div>
+            <div class="endpoint-body">
+                <p>実行中または待機中のタスクをキャンセルします。</p>
+            </div>
+        </div>
+
+        <h2>3. Skill管理API</h2>
+
+        <div class="endpoint-card">
+            <div class="endpoint-header">
+                <span class="method method-get">GET</span>
+                <span class="endpoint-path">/api/v1/skills</span>
+            </div>
+            <div class="endpoint-body">
+                <p>インストール済みSkillの一覧を取得。</p>
+            </div>
+        </div>
+
+        <div class="endpoint-card">
+            <div class="endpoint-header">
+                <span class="method method-post">POST</span>
+                <span class="endpoint-path">/api/v1/skills/install</span>
+            </div>
+            <div class="endpoint-body">
+                <p>マーケットプレイスからSkillをインストールします。</p>
+                <pre>
+{
+  "skill_name": "deep-research",
+  "version": "latest"
+}</pre>
+            </div>
+        </div>
+
+        <div class="endpoint-card">
+            <div class="endpoint-header">
+                <span class="method method-put">PUT</span>
+                <span class="endpoint-path">/api/v1/skills/{skill_name}/config</span>
+            </div>
+            <div class="endpoint-body">
+                <p>Skillの設定を更新します。</p>
+            </div>
+        </div>
+
+        <h2>4. システム管理API</h2>
+
+        <div class="endpoint-card">
+            <div class="endpoint-header">
+                <span class="method method-get">GET</span>
+                <span class="endpoint-path">/api/v1/status</span>
+            </div>
+            <div class="endpoint-body">
+                <p>システムステータス（稼働時間、メモリ使用量、実行中タスク数など）を取得。</p>
+            </div>
+        </div>
+
+        <div class="endpoint-card">
+            <div class="endpoint-header">
+                <span class="method method-get">GET</span>
+                <span class="endpoint-path">/api/v1/usage</span>
+            </div>
+            <div class="endpoint-body">
+                <p>API使用量統計（トークン消費量、コスト、タスク数）を取得。</p>
+            </div>
+        </div>
+
+        <h2>5. WebSocket リアルタイムAPI</h2>
+        <div class="impact-box">
+            <div class="impact-title">🔄 リアルタイム通知</div>
+            <p><code>ws://localhost:3457/ws</code>に接続することで、タスク進捗やシステムイベントをリアルタイムで受信できます。</p>
+            <ul>
+                <li><strong>task.started：</strong> タスク実行開始</li>
+                <li><strong>task.progress：</strong> タスク進捗更新</li>
+                <li><strong>task.completed：</strong> タスク完了</li>
+                <li><strong>task.failed：</strong> タスク失敗</li>
+                <li><strong>system.alert：</strong> システムアラート（コスト上限接近等）</li>
+            </ul>
+        </div>
+
+        <h2>6. レート制限</h2>
+        <ul>
+            <li><strong>デフォルト制限：</strong> 60リクエスト/分（設定で変更可能）</li>
+            <li><strong>タスク送信：</strong> 10リクエスト/分</li>
+            <li><strong>WebSocket接続：</strong> 同時5接続まで</li>
+        </ul>
+
+        <div style="text-align: center; margin-top: 40px; padding: 20px; background: #f0f4f8; border-radius: 12px;">
+            <p style="margin: 0; color: #555;">最終更新: 2026年3月 | <a href="index.html">トップページに戻る</a></p>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenClaw アーキテクチャ詳解</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8;
+            color: #333;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            color: #003366;
+            font-size: 32px;
+            margin-bottom: 10px;
+            border-bottom: 4px solid #2c3e50;
+            padding-bottom: 15px;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 40px;
+        }
+
+        h2 {
+            color: #2c3e50;
+            font-size: 24px;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-left: 15px;
+            border-left: 5px solid #2c3e50;
+        }
+
+        h3 {
+            color: #333;
+            font-size: 20px;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            padding-left: 25px;
+            position: relative;
+            margin-bottom: 12px;
+        }
+
+        li:before {
+            content: "✔";
+            color: #2c3e50;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        .impact-box {
+            background-color: #ebedef;
+            border: 1px solid #aeb6bf;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+
+        .impact-title {
+            color: #2c3e50;
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 20px 0 30px 0;
+        }
+
+        .nav-links a {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #003366;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 13px;
+            transition: background 0.2s;
+        }
+
+        .nav-links a:hover {
+            background: #00509e;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        pre {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .layer-card {
+            border: 2px solid #2c3e50;
+            border-radius: 12px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+
+        .layer-header {
+            background: #2c3e50;
+            color: white;
+            padding: 12px 20px;
+            font-weight: bold;
+        }
+
+        .layer-body {
+            padding: 20px;
+        }
+
+        .arch-diagram {
+            background: linear-gradient(135deg, #0b1a2e, #1a3a6c);
+            color: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .arch-box {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            padding: 10px 20px;
+            margin: 5px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🏗️ OpenClaw アーキテクチャ詳解</h1>
+        <p class="subtitle">内部構造・コンポーネント・データフローの技術解説</p>
+
+        <div class="nav-links">
+            <a href="index.html">🏠 トップ</a>
+            <a href="api.html">🔌 API</a>
+            <a href="multiagent.html">🤝 マルチエージェント</a>
+            <a href="setup.html">🔧 セットアップ</a>
+        </div>
+
+        <h2>1. システム全体像</h2>
+
+        <div class="arch-diagram">
+            <p style="font-size: 18px; font-weight: bold; margin-bottom: 20px;">OpenClaw System Architecture</p>
+            <div style="margin-bottom: 15px;">
+                <div class="arch-box">Signal</div>
+                <div class="arch-box">Telegram</div>
+                <div class="arch-box">Discord</div>
+                <div class="arch-box">REST API</div>
+            </div>
+            <p style="color: #aabedd;">↕ メッセージングレイヤー</p>
+            <div style="margin-bottom: 15px;">
+                <div class="arch-box">🧠 コアエンジン</div>
+            </div>
+            <p style="color: #aabedd;">↕ Skillランタイム</p>
+            <div style="margin-bottom: 15px;">
+                <div class="arch-box">Skill A</div>
+                <div class="arch-box">Skill B</div>
+                <div class="arch-box">Skill C</div>
+            </div>
+            <p style="color: #aabedd;">↕ LLMプロバイダーレイヤー</p>
+            <div>
+                <div class="arch-box">Claude API</div>
+                <div class="arch-box">OpenAI API</div>
+                <div class="arch-box">DeepSeek API</div>
+                <div class="arch-box">ローカルLLM</div>
+            </div>
+        </div>
+
+        <h2>2. コアコンポーネント</h2>
+
+        <div class="layer-card">
+            <div class="layer-header">📨 メッセージングレイヤー</div>
+            <div class="layer-body">
+                <p>ユーザーからの入力を受け取り、内部メッセージ形式に変換するアダプターパターンで実装。各メッセージングアプリごとにアダプターが存在します。</p>
+                <ul>
+                    <li><strong>signal-adapter：</strong> signal-cliをバックエンドに使用。E2E暗号化を維持</li>
+                    <li><strong>telegram-adapter：</strong> Bot API経由。Webhookモードとポーリングモードに対応</li>
+                    <li><strong>discord-adapter：</strong> Discord.js v14を使用。スラッシュコマンドに対応</li>
+                    <li><strong>api-adapter：</strong> REST API経由のプログラマティックアクセス</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="layer-card">
+            <div class="layer-header">🧠 コアエンジン</div>
+            <div class="layer-body">
+                <p>OpenClawの中核。タスクの解析、計画立案、実行管理を担当します。</p>
+                <ul>
+                    <li><strong>タスクプランナー：</strong> ユーザーの指示を分析し、実行計画を立案</li>
+                    <li><strong>Skillルーター：</strong> 適切なSkillを選択し、実行順序を決定</li>
+                    <li><strong>コンテキストマネージャー：</strong> 会話履歴とタスク状態を管理</li>
+                    <li><strong>エラーハンドラー：</strong> 失敗時のリトライ・フォールバック処理</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="layer-card">
+            <div class="layer-header">⚙️ Skillランタイム</div>
+            <div class="layer-body">
+                <p>Skillの読み込み・実行・ライフサイクル管理を行うサンドボックス環境。</p>
+                <ul>
+                    <li><strong>Skillローダー：</strong> SKILL.mdを解析し、メタデータと実行手順を抽出</li>
+                    <li><strong>サンドボックス：</strong> 各Skillを隔離された環境で実行（セキュリティ対策）</li>
+                    <li><strong>依存関係リゾルバー：</strong> Skill間の依存関係を解決し、正しい順序で実行</li>
+                    <li><strong>ツールプロキシ：</strong> 外部サービス（メール、カレンダー等）へのアクセスを仲介</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="layer-card">
+            <div class="layer-header">🤖 LLMプロバイダーレイヤー</div>
+            <div class="layer-body">
+                <p>複数のLLMプロバイダーを統一的なインターフェースで抽象化。</p>
+                <ul>
+                    <li><strong>プロバイダーアダプター：</strong> 各LLM APIの差異を吸収するアダプター群</li>
+                    <li><strong>ルーティングエンジン：</strong> タスク特性に応じて最適なLLMを自動選択</li>
+                    <li><strong>キャッシュレイヤー：</strong> 同一クエリの結果をキャッシュしてコスト削減</li>
+                    <li><strong>フォールバック：</strong> プライマリLLMが利用不可の場合のバックアップ設定</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2>3. データフロー</h2>
+        <div class="impact-box">
+            <div class="impact-title">🔄 タスク実行の流れ</div>
+            <ul>
+                <li><strong>1. 入力受信：</strong> メッセージングアダプターがユーザー入力を受信</li>
+                <li><strong>2. 前処理：</strong> 入力を正規化し、プロンプトインジェクション検出を実行</li>
+                <li><strong>3. 計画立案：</strong> コアエンジンがLLMを使って実行計画を生成</li>
+                <li><strong>4. Skill選択：</strong> Skillルーターが適切なSkillを選択</li>
+                <li><strong>5. 実行：</strong> Skillランタイムが計画に沿ってSkillを順次実行</li>
+                <li><strong>6. 結果統合：</strong> 各Skillの出力を統合して最終結果を生成</li>
+                <li><strong>7. 出力配信：</strong> メッセージングアダプターを通じてユーザーに結果を返送</li>
+            </ul>
+        </div>
+
+        <h2>4. ディレクトリ構造</h2>
+        <pre>
+~/.openclaw/
+├── config/
+│   ├── settings.json        # 全体設定
+│   ├── providers.json       # LLMプロバイダー設定
+│   └── messaging.json       # メッセージング設定
+├── skills/
+│   ├── bundled/             # バンドルSkill
+│   ├── global/              # グローバルSkill
+│   └── workspace/           # ワークスペースSkill
+├── data/
+│   ├── context.db           # コンテキスト・会話履歴
+│   ├── cache/               # LLMレスポンスキャッシュ
+│   └── tasks/               # タスク実行ログ
+├── logs/
+│   ├── app.log              # アプリケーションログ
+│   ├── security.log         # セキュリティログ
+│   └── audit.log            # 監査ログ
+└── bin/
+    └── openclaw             # 実行ファイル</pre>
+
+        <h2>5. 技術スタック</h2>
+        <ul>
+            <li><strong>言語：</strong> TypeScript（コアエンジン）、Python（一部Skill）</li>
+            <li><strong>ランタイム：</strong> Node.js 18+</li>
+            <li><strong>データベース：</strong> SQLite（ローカル）、PostgreSQL（エンタープライズ）</li>
+            <li><strong>メッセージキュー：</strong> BullMQ（Redis）</li>
+            <li><strong>API フレームワーク：</strong> Fastify</li>
+            <li><strong>WebSocket：</strong> ws ライブラリ</li>
+        </ul>
+
+        <div style="text-align: center; margin-top: 40px; padding: 20px; background: #f0f4f8; border-radius: 12px;">
+            <p style="margin: 0; color: #555;">最終更新: 2026年3月 | <a href="index.html">トップページに戻る</a></p>
+        </div>
+    </div>
+</body>
+
+</html>

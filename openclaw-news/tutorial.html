@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenClaw チュートリアル</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8;
+            color: #333;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            color: #003366;
+            font-size: 32px;
+            margin-bottom: 10px;
+            border-bottom: 4px solid #2ecc71;
+            padding-bottom: 15px;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 40px;
+        }
+
+        h2 {
+            color: #2ecc71;
+            font-size: 24px;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-left: 15px;
+            border-left: 5px solid #2ecc71;
+        }
+
+        h3 {
+            color: #333;
+            font-size: 20px;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            padding-left: 25px;
+            position: relative;
+            margin-bottom: 12px;
+        }
+
+        li:before {
+            content: "✔";
+            color: #2ecc71;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        .impact-box {
+            background-color: #eafaf1;
+            border: 1px solid #a9dfbf;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+
+        .impact-title {
+            color: #1e8449;
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 20px 0 30px 0;
+        }
+
+        .nav-links a {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #003366;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 13px;
+            transition: background 0.2s;
+        }
+
+        .nav-links a:hover {
+            background: #00509e;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        pre {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .step-box {
+            background: #f8f9fa;
+            border: 2px solid #2ecc71;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .step-number {
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            background: #2ecc71;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .tutorial-level {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .level-beginner {
+            background: #2ecc71;
+        }
+
+        .level-intermediate {
+            background: #f39c12;
+        }
+
+        .level-advanced {
+            background: #e74c3c;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>📚 OpenClaw チュートリアル</h1>
+        <p class="subtitle">初心者から上級者まで、段階的に学べる実践ガイド</p>
+
+        <div class="nav-links">
+            <a href="index.html">🏠 トップ</a>
+            <a href="setup.html">🔧 セットアップ</a>
+            <a href="recipes.html">📋 Skillレシピ集</a>
+            <a href="api.html">🔌 API</a>
+        </div>
+
+        <h2>チュートリアル1: 初めてのOpenClaw</h2>
+        <span class="tutorial-level level-beginner">初級</span>
+        <p>OpenClawをインストールし、最初のタスクを実行するまでの手順です。所要時間：約15分。</p>
+
+        <div class="step-box">
+            <div class="step-number">1</div>
+            <h3>インストール</h3>
+            <pre>
+# npmでインストール（推奨）
+npm install -g openclaw
+
+# または直接ダウンロード
+curl -fsSL https://get.openclaw.dev | bash
+
+# インストール確認
+openclaw --version</pre>
+        </div>
+
+        <div class="step-box">
+            <div class="step-number">2</div>
+            <h3>初期設定</h3>
+            <pre>
+# 対話型セットアップウィザードを起動
+openclaw init
+
+# LLMプロバイダーを選択（Claude推奨）
+# APIキーを入力
+# メッセージングアプリを選択（Signal推奨）</pre>
+        </div>
+
+        <div class="step-box">
+            <div class="step-number">3</div>
+            <h3>最初のタスク実行</h3>
+            <pre>
+# OpenClawを起動
+openclaw start
+
+# テストタスクを送信
+openclaw send "今日の天気を調べて、傘が必要かどうか教えて"
+
+# タスク実行状況を確認
+openclaw status</pre>
+        </div>
+
+        <h2>チュートリアル2: カスタムSkillの作成</h2>
+        <span class="tutorial-level level-intermediate">中級</span>
+        <p>独自のSkillを作成して、OpenClawの機能を拡張します。所要時間：約30分。</p>
+
+        <div class="step-box">
+            <div class="step-number">1</div>
+            <h3>Skillテンプレートを生成</h3>
+            <pre>
+# 新しいSkillのテンプレートを作成
+openclaw skill init daily-summary
+
+# ディレクトリ構造を確認
+ls daily-summary/
+# → SKILL.md  tools/  tests/</pre>
+        </div>
+
+        <div class="step-box">
+            <div class="step-number">2</div>
+            <h3>SKILL.mdを編集</h3>
+            <pre>
+# daily-summary/SKILL.md の内容
+
+---
+name: daily-summary
+version: 1.0.0
+description: 毎朝のデイリーサマリーを自動生成
+triggers:
+  - schedule: "0 7 * * *"  # 毎朝7時に実行
+dependencies:
+  - email-manager
+  - calendar-sync
+---
+
+# Daily Summary Skill
+
+## 目的
+毎朝、以下の情報をまとめたサマリーを生成して送信する：
+- 未読メールの要約（重要度順）
+- 今日のスケジュール
+- 天気予報
+- ニュースヘッドライン
+
+## 手順
+1. email-manager Skillで未読メールを取得
+2. calendar-sync Skillで今日の予定を取得
+3. Web検索で天気予報とニュースを取得
+4. すべての情報を構造化してサマリーを生成
+5. Signalメッセージとして送信</pre>
+        </div>
+
+        <div class="step-box">
+            <div class="step-number">3</div>
+            <h3>テスト実行</h3>
+            <pre>
+# Skillの検証
+openclaw skill validate ./daily-summary
+
+# ローカルテスト実行
+openclaw skill test ./daily-summary
+
+# ワークスペースにインストール
+openclaw skill install ./daily-summary</pre>
+        </div>
+
+        <h2>チュートリアル3: メッセージング連携</h2>
+        <span class="tutorial-level level-intermediate">中級</span>
+        <p>SignalやTelegramからOpenClawを操作する設定を行います。所要時間：約20分。</p>
+
+        <div class="impact-box">
+            <div class="impact-title">📱 対応メッセージングアプリ</div>
+            <ul>
+                <li><strong>Signal（推奨）：</strong> E2E暗号化。プライバシー最重視の場合</li>
+                <li><strong>Telegram：</strong> Bot APIが充実。グループでの共有利用に便利</li>
+                <li><strong>Discord：</strong> 開発チーム向け。チャンネル別にSkillを割り当て可能</li>
+                <li><strong>WhatsApp：</strong> Business API経由。設定がやや複雑</li>
+            </ul>
+        </div>
+
+        <div class="step-box">
+            <div class="step-number">1</div>
+            <h3>Signal連携の設定</h3>
+            <pre>
+# signal-cliのインストール
+openclaw setup messaging --provider signal
+
+# 電話番号を登録
+openclaw config set --signal-number "+81XXXXXXXXXX"
+
+# 認証コードを入力
+openclaw verify --provider signal --code 123456</pre>
+        </div>
+
+        <h2>チュートリアル4: ワークフロー自動化</h2>
+        <span class="tutorial-level level-advanced">上級</span>
+        <p>複数のSkillを連携させた自動化ワークフローを構築します。所要時間：約45分。</p>
+
+        <div class="impact-box">
+            <div class="impact-title">🔄 例：顧客問い合わせ自動対応ワークフロー</div>
+            <ul>
+                <li><strong>トリガー：</strong> 新しいメールの受信を検知</li>
+                <li><strong>分類：</strong> メール内容を分析し、カテゴリ（技術サポート/営業/一般）に分類</li>
+                <li><strong>ナレッジ検索：</strong> 社内ドキュメントDBから関連情報を検索</li>
+                <li><strong>返信下書き生成：</strong> 検索結果を基に返信文を自動生成</li>
+                <li><strong>人間レビュー：</strong> 生成された下書きをSignalで通知し、承認を待つ</li>
+                <li><strong>送信：</strong> 承認後、メールを自動送信</li>
+            </ul>
+        </div>
+
+        <h2>チュートリアル5: API経由での操作</h2>
+        <span class="tutorial-level level-advanced">上級</span>
+        <p>REST APIを使って外部アプリケーションからOpenClawを操作します。</p>
+
+        <div class="step-box">
+            <div class="step-number">1</div>
+            <h3>PythonからAPIを呼び出す</h3>
+            <pre>
+import requests
+
+API_URL = "http://localhost:3457/api/v1"
+HEADERS = {"Authorization": "Bearer YOUR_TOKEN"}
+
+# タスクを送信
+response = requests.post(
+    f"{API_URL}/tasks",
+    headers=HEADERS,
+    json={
+        "message": "来週の会議をリスケジュールして",
+        "priority": "high"
+    }
+)
+
+task_id = response.json()["task_id"]
+print(f"Task created: {task_id}")
+
+# 結果を取得
+result = requests.get(
+    f"{API_URL}/tasks/{task_id}",
+    headers=HEADERS
+)
+print(result.json())</pre>
+        </div>
+
+        <div class="impact-box">
+            <div class="impact-title">💡 次のステップ</div>
+            <ul>
+                <li><a href="recipes.html">Skillレシピ集</a>でより多くの実装例を確認</li>
+                <li><a href="api.html">APIリファレンス</a>で全エンドポイントを確認</li>
+                <li><a href="bestpractices.html">ベストプラクティス</a>で安全な運用方法を学ぶ</li>
+                <li><a href="community.html">コミュニティ</a>で他のユーザーと交流</li>
+            </ul>
+        </div>
+
+        <div style="text-align: center; margin-top: 40px; padding: 20px; background: #f0f4f8; border-radius: 12px;">
+            <p style="margin: 0; color: #555;">最終更新: 2026年3月 | <a href="index.html">トップページに戻る</a></p>
+        </div>
+    </div>
+</body>
+
+</html>
