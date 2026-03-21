@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenClaw 移行ガイド</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8;
+            color: #333;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            color: #003366;
+            font-size: 32px;
+            margin-bottom: 10px;
+            border-bottom: 4px solid #8e44ad;
+            padding-bottom: 15px;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 40px;
+        }
+
+        h2 {
+            color: #8e44ad;
+            font-size: 24px;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-left: 15px;
+            border-left: 5px solid #8e44ad;
+        }
+
+        h3 {
+            color: #333;
+            font-size: 20px;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            padding-left: 25px;
+            position: relative;
+            margin-bottom: 12px;
+        }
+
+        li:before {
+            content: "✔";
+            color: #8e44ad;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        .impact-box {
+            background-color: #f4ecf7;
+            border: 1px solid #d2b4de;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+
+        .impact-title {
+            color: #6c3483;
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .risk-box {
+            background-color: #fff3cd;
+            border: 1px solid #ffeeba;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+
+        .risk-title {
+            color: #856404;
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 20px 0 30px 0;
+        }
+
+        .nav-links a {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #003366;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 13px;
+            transition: background 0.2s;
+        }
+
+        .nav-links a:hover {
+            background: #00509e;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        pre {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .step-box {
+            background: #f8f9fa;
+            border: 2px solid #8e44ad;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .step-number {
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            background: #8e44ad;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🔄 OpenClaw 移行ガイド</h1>
+        <p class="subtitle">他のAIエージェントからOpenClawへのスムーズな移行手順</p>
+
+        <div class="nav-links">
+            <a href="index.html">🏠 トップ</a>
+            <a href="setup.html">🔧 セットアップ</a>
+            <a href="architecture.html">🏗️ アーキテクチャ</a>
+            <a href="troubleshooting.html">🔧 トラブルシューティング</a>
+        </div>
+
+        <h2>1. AutoGPTからの移行</h2>
+        <p>AutoGPTユーザーが最も多い移行パスです。基本的なワークフローの考え方は似ていますが、OpenClawのSkillsシステムがAutoGPTのプラグインシステムに相当します。</p>
+
+        <div class="step-box">
+            <div class="step-number">1</div>
+            <h3>設定ファイルのエクスポート</h3>
+            <p>AutoGPTの<code>.env</code>ファイルからAPIキーと設定を抽出します。</p>
+            <pre>
+# AutoGPTの設定をバックアップ
+cp .env autogpt_backup.env
+
+# OpenClawの設定ディレクトリを作成
+mkdir -p ~/.openclaw/config</pre>
+        </div>
+
+        <div class="step-box">
+            <div class="step-number">2</div>
+            <h3>プラグイン→Skillへの変換</h3>
+            <p>AutoGPTのプラグインをOpenClawのSkill形式に変換します。</p>
+            <pre>
+# Skill変換ツールを使用
+openclaw migrate --from autogpt --plugins-dir ./plugins
+
+# 手動変換の場合：SKILL.mdテンプレートを作成
+openclaw skill init my-converted-skill</pre>
+        </div>
+
+        <div class="step-box">
+            <div class="step-number">3</div>
+            <h3>ワークフローの移植</h3>
+            <ul>
+                <li>AutoGPTの「ゴール」→ OpenClawの「タスク定義」に対応</li>
+                <li>AutoGPTの「メモリ」→ OpenClawの「コンテキスト管理」に対応</li>
+                <li>AutoGPTの「制約」→ OpenClawの「権限設定」に対応</li>
+            </ul>
+        </div>
+
+        <h2>2. LangChainベースアプリからの移行</h2>
+        <p>LangChainで構築したカスタムエージェントからOpenClawへ移行するケースです。</p>
+
+        <div class="impact-box">
+            <div class="impact-title">🔑 主な違い</div>
+            <ul>
+                <li><strong>チェーン構造：</strong> LangChainのチェーン/パイプラインはOpenClawのSkillシーケンスに相当</li>
+                <li><strong>ツール定義：</strong> LangChainのToolクラスはSKILL.mdの宣言的記述に置き換わる</li>
+                <li><strong>メモリ管理：</strong> LangChainのMemoryクラスはOpenClawのビルトインコンテキスト管理が担当</li>
+                <li><strong>プロンプト管理：</strong> PromptTemplateはOpenClawのSkillメタデータに統合される</li>
+            </ul>
+        </div>
+
+        <h2>3. CrewAIからの移行</h2>
+        <p>CrewAIのマルチエージェント構造からOpenClawへの移行では、エージェント定義をSkillとして再構築します。</p>
+
+        <ul>
+            <li><strong>Agent定義：</strong> CrewAIの各AgentはOpenClawの専門Skillに対応させる</li>
+            <li><strong>Task定義：</strong> CrewAIのTaskはOpenClawのタスクキューに移植</li>
+            <li><strong>Process管理：</strong> CrewAIのsequential/hierarchicalプロセスはOpenClawのワークフロー定義で再現</li>
+            <li><strong>コールバック：</strong> CrewAIのコールバック機能はOpenClawのWebhookシステムに対応</li>
+        </ul>
+
+        <h2>4. データ移行チェックリスト</h2>
+        <div class="impact-box">
+            <div class="impact-title">📋 移行前の確認事項</div>
+            <ul>
+                <li><strong>APIキー：</strong> 全てのLLMプロバイダーのAPIキーを準備（Claude, OpenAI, DeepSeek等）</li>
+                <li><strong>既存データ：</strong> 会話履歴、タスクログ、設定ファイルのバックアップ</li>
+                <li><strong>外部連携：</strong> メール、カレンダー、Slack等の連携設定を記録</li>
+                <li><strong>カスタムロジック：</strong> 独自に実装した処理フローの文書化</li>
+            </ul>
+        </div>
+
+        <h2>5. バージョン間の移行</h2>
+        <p>OpenClaw自体のメジャーバージョンアップグレード手順です。</p>
+
+        <div class="risk-box">
+            <div class="risk-title">⚠️ v0.x → v1.x 移行時の注意点</div>
+            <ul>
+                <li>Skill形式が変更されているため、全Skillの更新が必要</li>
+                <li>設定ファイルのスキーマが大幅に変更 — <code>openclaw migrate-config</code>コマンドを使用</li>
+                <li>一部のバンドルSkillが削除・統合されているため、依存関係の確認が必要</li>
+                <li>認証方式が平文→暗号化に変更。既存の認証情報の再設定が必要</li>
+            </ul>
+        </div>
+
+        <h2>6. 移行後の検証</h2>
+        <ul>
+            <li><strong>機能テスト：</strong> 全Skillが正常に動作することを確認</li>
+            <li><strong>パフォーマンステスト：</strong> 移行前と同等以上のレスポンス速度を確認</li>
+            <li><strong>セキュリティ監査：</strong> 認証情報が安全に保存されていることを確認</li>
+            <li><strong>ログ確認：</strong> エラーや警告がないことを確認</li>
+        </ul>
+
+        <div style="text-align: center; margin-top: 40px; padding: 20px; background: #f0f4f8; border-radius: 12px;">
+            <p style="margin: 0; color: #555;">最終更新: 2026年3月 | <a href="index.html">トップページに戻る</a></p>
+        </div>
+    </div>
+</body>
+
+</html>

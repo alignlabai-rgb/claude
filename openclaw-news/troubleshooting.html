@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenClaw トラブルシューティング</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8;
+            color: #333;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            color: #003366;
+            font-size: 32px;
+            margin-bottom: 10px;
+            border-bottom: 4px solid #d35400;
+            padding-bottom: 15px;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 40px;
+        }
+
+        h2 {
+            color: #d35400;
+            font-size: 24px;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-left: 15px;
+            border-left: 5px solid #d35400;
+        }
+
+        h3 {
+            color: #333;
+            font-size: 20px;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            padding-left: 25px;
+            position: relative;
+            margin-bottom: 12px;
+        }
+
+        li:before {
+            content: "✔";
+            color: #d35400;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        .impact-box {
+            background-color: #fef9e7;
+            border: 1px solid #f9e79f;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+
+        .impact-title {
+            color: #7d6608;
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .risk-box {
+            background-color: #fdedec;
+            border: 1px solid #f5b7b1;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+
+        .risk-title {
+            color: #c0392b;
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 20px 0 30px 0;
+        }
+
+        .nav-links a {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #003366;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 13px;
+            transition: background 0.2s;
+        }
+
+        .nav-links a:hover {
+            background: #00509e;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        pre {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .problem-box {
+            border: 2px solid #d35400;
+            border-radius: 12px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .problem-header {
+            background: #d35400;
+            color: white;
+            padding: 12px 20px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .problem-body {
+            padding: 20px;
+        }
+
+        .solution {
+            background: #eafaf1;
+            border-left: 4px solid #27ae60;
+            padding: 15px 20px;
+            margin: 10px 0;
+            border-radius: 0 8px 8px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🔧 OpenClaw トラブルシューティング</h1>
+        <p class="subtitle">よくある問題とその解決方法</p>
+
+        <div class="nav-links">
+            <a href="index.html">🏠 トップ</a>
+            <a href="faq.html">❓ FAQ</a>
+            <a href="setup.html">🔧 セットアップ</a>
+            <a href="bestpractices.html">✅ ベストプラクティス</a>
+        </div>
+
+        <h2>1. インストール・起動の問題</h2>
+
+        <div class="problem-box">
+            <div class="problem-header">「openclaw: command not found」と表示される</div>
+            <div class="problem-body">
+                <p><strong>原因：</strong> PATHにOpenClawのインストールディレクトリが含まれていない</p>
+                <div class="solution">
+                    <strong>解決策：</strong>
+                    <pre>
+# PATHを確認
+echo $PATH
+
+# OpenClawのパスを追加（bash）
+echo 'export PATH="$HOME/.openclaw/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+
+# zshの場合
+echo 'export PATH="$HOME/.openclaw/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="problem-box">
+            <div class="problem-header">「Port 3457 already in use」エラー</div>
+            <div class="problem-body">
+                <p><strong>原因：</strong> 別のOpenClawインスタンスまたは他のプロセスがポートを使用中</p>
+                <div class="solution">
+                    <strong>解決策：</strong>
+                    <pre>
+# 使用中のプロセスを確認
+lsof -i :3457
+
+# 別のポートで起動
+openclaw start --port 3458
+
+# 既存プロセスを停止
+openclaw stop</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="problem-box">
+            <div class="problem-header">Node.jsバージョンエラー</div>
+            <div class="problem-body">
+                <p><strong>原因：</strong> OpenClawはNode.js 18以上を要求しますが、古いバージョンがインストールされている</p>
+                <div class="solution">
+                    <strong>解決策：</strong>
+                    <pre>
+# 現在のバージョンを確認
+node --version
+
+# nvmでNode.js 20をインストール
+nvm install 20
+nvm use 20</pre>
+                </div>
+            </div>
+        </div>
+
+        <h2>2. API接続の問題</h2>
+
+        <div class="problem-box">
+            <div class="problem-header">「API key invalid」エラー</div>
+            <div class="problem-body">
+                <p><strong>原因：</strong> APIキーが正しく設定されていない、または期限切れ</p>
+                <div class="solution">
+                    <strong>解決策：</strong>
+                    <pre>
+# APIキーの設定を確認
+openclaw config show
+
+# APIキーを再設定
+openclaw config set --provider claude --api-key YOUR_KEY
+
+# 接続テスト
+openclaw test-connection</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="problem-box">
+            <div class="problem-header">「Rate limit exceeded」エラー</div>
+            <div class="problem-body">
+                <p><strong>原因：</strong> LLMプロバイダーのレート制限に到達</p>
+                <div class="solution">
+                    <strong>解決策：</strong>
+                    <ul>
+                        <li>タスクの同時実行数を減らす：<code>openclaw config set --max-concurrent 3</code></li>
+                        <li>リクエスト間の遅延を増やす：<code>openclaw config set --request-delay 1000</code></li>
+                        <li>バックオフ設定を調整：<code>openclaw config set --retry-backoff exponential</code></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <h2>3. Skillの問題</h2>
+
+        <div class="problem-box">
+            <div class="problem-header">Skillが認識されない</div>
+            <div class="problem-body">
+                <p><strong>原因：</strong> SKILL.mdの形式エラー、またはSkillディレクトリのパスが正しくない</p>
+                <div class="solution">
+                    <strong>解決策：</strong>
+                    <pre>
+# Skillの検証
+openclaw skill validate ./my-skill
+
+# Skillのリロード
+openclaw skill reload
+
+# インストール済みSkill一覧を確認
+openclaw skill list</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="problem-box">
+            <div class="problem-header">Skill実行時にタイムアウト</div>
+            <div class="problem-body">
+                <p><strong>原因：</strong> 外部サービスへの接続遅延、またはタスクが複雑すぎる</p>
+                <div class="solution">
+                    <strong>解決策：</strong>
+                    <ul>
+                        <li>タイムアウト値を増やす：<code>openclaw config set --skill-timeout 120</code></li>
+                        <li>複雑なタスクは分割して実行する</li>
+                        <li>外部サービスの接続状況を確認する</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <h2>4. メッセージング連携の問題</h2>
+
+        <div class="problem-box">
+            <div class="problem-header">Signalボットが応答しない</div>
+            <div class="problem-body">
+                <p><strong>原因：</strong> signal-cliのセットアップ不備、またはSignalアカウントの認証切れ</p>
+                <div class="solution">
+                    <strong>解決策：</strong>
+                    <pre>
+# signal-cliのステータス確認
+signal-cli -u +YOUR_NUMBER receive
+
+# 再認証
+signal-cli -u +YOUR_NUMBER register
+signal-cli -u +YOUR_NUMBER verify CODE
+
+# OpenClawのSignal設定を確認
+openclaw config show --section messaging</pre>
+                </div>
+            </div>
+        </div>
+
+        <h2>5. パフォーマンスの問題</h2>
+
+        <div class="impact-box">
+            <div class="impact-title">🐌 OpenClawの動作が遅い場合</div>
+            <ul>
+                <li><strong>メモリ不足：</strong> <code>openclaw status</code>でメモリ使用量を確認。512MB以上を推奨</li>
+                <li><strong>ログ肥大化：</strong> <code>openclaw logs rotate</code>でログファイルをアーカイブ</li>
+                <li><strong>キャッシュクリア：</strong> <code>openclaw cache clear</code>で古いキャッシュを削除</li>
+                <li><strong>同時タスク数：</strong> <code>--max-concurrent</code>を下げてシステム負荷を軽減</li>
+            </ul>
+        </div>
+
+        <h2>6. セキュリティ関連の問題</h2>
+
+        <div class="risk-box">
+            <div class="risk-title">🚨 「Potential security threat detected」警告</div>
+            <ul>
+                <li>処理中のデータにプロンプトインジェクションの疑いがある場合に表示される</li>
+                <li>対処：該当タスクを停止し、入力データを確認</li>
+                <li>セキュリティログを確認：<code>openclaw logs --filter security</code></li>
+                <li>不審なSkillがインストールされていないか確認：<code>openclaw skill audit</code></li>
+            </ul>
+        </div>
+
+        <h2>7. ログの確認方法</h2>
+        <pre>
+# リアルタイムログ表示
+openclaw logs --follow
+
+# エラーのみ表示
+openclaw logs --level error
+
+# 特定の日付のログ
+openclaw logs --date 2026-03-21
+
+# JSON形式で出力（分析用）
+openclaw logs --format json > logs.json</pre>
+
+        <div style="text-align: center; margin-top: 40px; padding: 20px; background: #f0f4f8; border-radius: 12px;">
+            <p style="margin: 0; color: #555;">最終更新: 2026年3月 | <a href="index.html">トップページに戻る</a></p>
+        </div>
+    </div>
+</body>
+
+</html>
