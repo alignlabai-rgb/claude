@@ -29,8 +29,53 @@
   <p>コマ割りからキャラクター生成・セリフ・効果線まで、AIが一貫したスタイルで漫画を制作</p>
 </div>
 
-<!-- Key Challenge -->
+<!-- Role Description -->
 <section class="section">
+  <div class="section-inner">
+    <div class="two-col">
+      <div>
+        <div class="section-label">システム内での役割</div>
+        <h2 class="section-title">テキストを漫画へ変換する<br>ビジュアル制作エンジン</h2>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+          漫画パイプラインは動画制作と並列に稼働する第2の収益エンジンです。
+          同じネタ文章から漫画・電子書籍を同時生成することで、コンテンツの多角的収益化を実現します。
+          Kindle・note・Boothへの出力を担う最終ビジュアル製造ラインです。
+        </p>
+        <ul class="checklist">
+          <li><strong>入力元:</strong> ネタ生成LLM（ストーリーテキスト）</li>
+          <li><strong>出力先:</strong> 評価システム（PDF/EPUB/CBZ + メタデータ）</li>
+          <li><strong>処理時間:</strong> 8ページ漫画 約20〜40分</li>
+          <li><strong>必要GPU:</strong> VRAM 12GB以上（LoRA + ControlNet同時使用）</li>
+          <li><strong>キャラ管理:</strong> 最大10キャラのLoRAを並列管理</li>
+        </ul>
+      </div>
+      <div>
+        <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem;">
+          <h3 style="margin-bottom: 1.25rem; font-size: 1rem; color: var(--text-muted);">モジュール入出力定義</h3>
+          <div class="code-block">
+<span class="cm"># OpenClaw スキル定義 (SKILL.md 抜粋)</span>
+<span class="fn">name</span>: <span class="str">manga-pipeline</span>
+<span class="fn">version</span>: <span class="str">"1.8.0"</span>
+<span class="fn">input</span>:
+  <span class="fn">story_text</span>: <span class="fn">string</span>    <span class="cm"># ストーリー原稿</span>
+  <span class="fn">genre_preset</span>: <span class="fn">string</span>  <span class="cm"># shonen|romcom|mystery</span>
+  <span class="fn">page_count</span>: <span class="fn">int</span>      <span class="cm"># 目標ページ数</span>
+  <span class="fn">characters</span>: <span class="fn">list</span>    <span class="cm"># キャラ設定リスト</span>
+  <span class="fn">color_mode</span>: <span class="fn">string</span>  <span class="cm"># mono|color</span>
+<span class="fn">output</span>:
+  <span class="fn">pdf_path</span>: <span class="fn">string</span>     <span class="cm"># 漫画PDFパス</span>
+  <span class="fn">epub_path</span>: <span class="fn">string</span>    <span class="cm"># Kindle用EPUB</span>
+  <span class="fn">preview_images</span>: <span class="fn">list</span> <span class="cm"># サムネ用画像</span>
+  <span class="fn">metadata</span>: <span class="fn">object</span>    <span class="cm"># タイトル/説明/タグ</span>
+  <span class="fn">cost_usd</span>: <span class="fn">float</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Key Challenge -->
+<section class="section" style="background: var(--bg2);">
   <div class="section-inner">
     <div class="two-col">
       <div>
@@ -201,8 +246,74 @@
   </div>
 </section>
 
-<!-- Technical Stack -->
+<!-- Integration Design -->
 <section class="section" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-label">連携設計</div>
+    <h2 class="section-title">動画パイプラインとの<br>並列実行アーキテクチャ</h2>
+    <div class="two-col">
+      <div>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+          同じネタから動画・漫画を並列生成することで制作効率を最大化します。
+          共通の「ストーリー構造化」結果を両パイプラインで共有し、
+          APIコストと処理時間を削減します。
+        </p>
+        <div class="code-block">
+<span class="cm"># 並列生成ワークフロー (OpenClaw YAML)</span>
+<span class="fn">workflow</span>: <span class="str">dual-content-creation</span>
+<span class="fn">steps</span>:
+  - <span class="fn">name</span>: <span class="str">structure-story</span>     <span class="cm"># 共通前処理</span>
+    <span class="fn">skill</span>: <span class="str">story-analyzer</span>
+
+  - <span class="fn">name</span>: <span class="str">create-video</span>
+    <span class="fn">skill</span>: <span class="str">video-pipeline</span>
+    <span class="fn">parallel</span>: <span class="kw">true</span>
+    <span class="fn">input</span>:
+      <span class="fn">story</span>: <span class="str">"${{structure-story.output}}"</span>
+
+  - <span class="fn">name</span>: <span class="str">create-manga</span>      <span class="cm"># 同時実行</span>
+    <span class="fn">skill</span>: <span class="str">manga-pipeline</span>
+    <span class="fn">parallel</span>: <span class="kw">true</span>
+    <span class="fn">input</span>:
+      <span class="fn">story</span>: <span class="str">"${{structure-story.output}}"</span>
+
+  - <span class="fn">name</span>: <span class="str">evaluate-both</span>
+    <span class="fn">skill</span>: <span class="str">content-evaluator</span>
+    <span class="fn">depends_on</span>: [<span class="str">create-video</span>, <span class="str">create-manga</span>]</div>
+      </div>
+      <div>
+        <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--text-muted);">ComfyUI API 連携設計</h3>
+        <div class="code-block">
+<span class="cm">// キャラクター一貫性 API フロー</span>
+<span class="kw">POST</span> /api/v1/manga-pipeline/start
+{
+  <span class="str">"story_text"</span>: <span class="str">"..."</span>,
+  <span class="str">"genre_preset"</span>: <span class="str">"shonen"</span>,
+  <span class="str">"page_count"</span>: <span class="num">8</span>,
+  <span class="str">"characters"</span>: [
+    {
+      <span class="str">"name"</span>: <span class="str">"田中ヒロ"</span>,
+      <span class="str">"lora"</span>: <span class="str">"hiro_v3.safetensors"</span>,
+      <span class="str">"seed"</span>: <span class="num">42</span>
+    }
+  ],
+  <span class="str">"callback_url"</span>: <span class="str">"http://evaluator/ingest"</span>
+}
+
+<span class="cm">// ComfyUI → 漫画パイプライン webhook</span>
+<span class="kw">POST</span> /internal/comfyui/complete
+{
+  <span class="str">"job_id"</span>: <span class="str">"panel_003_scene2"</span>,
+  <span class="str">"image_b64"</span>: <span class="str">"..."</span>,
+  <span class="str">"quality_score"</span>: <span class="num">0.91</span>
+}</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Technical Stack -->
+<section class="section">
   <div class="section-inner">
     <div class="section-label">技術スタック詳細</div>
     <h2 class="section-title">ComfyUIワークフロー構成</h2>

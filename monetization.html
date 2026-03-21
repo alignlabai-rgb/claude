@@ -29,8 +29,53 @@
   <p>複数プラットフォームへの自動投稿・収益トラッキング・最適化までAIが一元管理</p>
 </div>
 
-<!-- Revenue Streams -->
+<!-- Role Description -->
 <section class="section">
+  <div class="section-inner">
+    <div class="two-col">
+      <div>
+        <div class="section-label">システム内での役割</div>
+        <h2 class="section-title">評価通過コンテンツを<br>収益に変換する最終層</h2>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+          マネタイズシステムはパイプラインの最終ステップです。
+          評価システムを通過したコンテンツを受け取り、
+          各プラットフォームのAPIを介して自動投稿・販売を行います。
+          収益データはループの起点となり、ネタ生成AIと評価システムの最適化に活用されます。
+        </p>
+        <ul class="checklist">
+          <li><strong>入力元:</strong> 評価システム（スコア85以上のコンテンツ）</li>
+          <li><strong>出力先:</strong> YouTube / note / Kindle / Booth / ファンクラブ</li>
+          <li><strong>フィードバック先:</strong> 評価システム・ネタ生成AI（収益パターン）</li>
+          <li><strong>投稿自動化:</strong> 最適時間帯を学習し完全無人実行</li>
+          <li><strong>収益集計:</strong> 全プラットフォームを統合ダッシュボードで一元管理</li>
+        </ul>
+      </div>
+      <div>
+        <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem;">
+          <h3 style="margin-bottom: 1.25rem; font-size: 1rem; color: var(--text-muted);">モジュール入出力定義</h3>
+          <div class="code-block">
+<span class="cm"># OpenClaw スキル定義 (SKILL.md 抜粋)</span>
+<span class="fn">name</span>: <span class="str">monetization-manager</span>
+<span class="fn">version</span>: <span class="str">"2.3.0"</span>
+<span class="fn">input</span>:
+  <span class="fn">content_path</span>: <span class="fn">string</span>   <span class="cm"># 動画/漫画ファイル</span>
+  <span class="fn">metadata</span>: <span class="fn">object</span>     <span class="cm"># タイトル/説明/タグ</span>
+  <span class="fn">eval_score</span>: <span class="fn">float</span>    <span class="cm"># 評価スコア</span>
+  <span class="fn">target_platforms</span>: <span class="fn">list</span>
+  <span class="fn">pricing</span>: <span class="fn">object</span>      <span class="cm"># note/Kindleの価格設定</span>
+<span class="fn">output</span>:
+  <span class="fn">publish_results</span>: <span class="fn">list</span> <span class="cm"># 各PF投稿結果</span>
+  <span class="fn">scheduled_at</span>: <span class="fn">object</span>  <span class="cm"># 予約投稿時間</span>
+  <span class="fn">revenue_tracking_id</span>: <span class="fn">string</span>
+  <span class="fn">dashboard_url</span>: <span class="fn">string</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Revenue Streams -->
+<section class="section" style="background: var(--bg2);">
   <div class="section-inner">
     <div class="section-label">収益源</div>
     <h2 class="section-title">7つの収益チャネルを並列運用</h2>
@@ -120,6 +165,62 @@
         </div>
       </div>
 
+    </div>
+  </div>
+</section>
+
+<!-- Integration Design -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label">連携設計</div>
+    <h2 class="section-title">プラットフォームAPI<br>接続アーキテクチャ</h2>
+    <div class="two-col">
+      <div>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+          各プラットフォームのAPIをOpenClaw Skillとして抽象化することで、
+          新しいプラットフォームの追加をYAML定義1つで実現します。
+          収益データのWebhookを受信し、ネタAIへのフィードバックループを形成します。
+        </p>
+        <div class="code-block">
+<span class="cm"># プラットフォーム投稿 Skill 定義 (抜粋)</span>
+<span class="fn">skills</span>:
+  youtube-upload:
+    <span class="fn">api_key_env</span>: <span class="str">YOUTUBE_API_KEY</span>
+    <span class="fn">quota_per_day</span>: <span class="num">10000</span>
+    <span class="fn">retry_on_quota</span>: <span class="str">next_day</span>
+
+  note-publish:
+    <span class="fn">session_token_env</span>: <span class="str">NOTE_SESSION</span>
+    <span class="fn">supports_scheduled</span>: <span class="kw">true</span>
+    <span class="fn">pricing_range</span>: [<span class="num">300</span>, <span class="num">3000</span>]  <span class="cm"># 円</span>
+
+  kindle-kdp:
+    <span class="fn">email_env</span>: <span class="str">KDP_EMAIL</span>
+    <span class="fn">password_env</span>: <span class="str">KDP_PASS</span>
+    <span class="fn">auto_epub_convert</span>: <span class="kw">true</span>
+    <span class="fn">review_period_days</span>: <span class="num">3</span>   <span class="cm"># 審査待ち</span></div>
+      </div>
+      <div>
+        <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--text-muted);">収益フィードバック Webhook</h3>
+        <div class="code-block">
+<span class="cm">// YouTube Analytics → OpenClaw Webhook</span>
+<span class="kw">POST</span> /api/v1/monetization/revenue-update
+{
+  <span class="str">"platform"</span>: <span class="str">"youtube"</span>,
+  <span class="str">"content_id"</span>: <span class="str">"vid_20260321_001"</span>,
+  <span class="str">"metrics"</span>: {
+    <span class="str">"views"</span>: <span class="num">12847</span>,
+    <span class="str">"revenue_jpy"</span>: <span class="num">1420</span>,
+    <span class="str">"ctr"</span>: <span class="num">0.068</span>,
+    <span class="str">"avg_view_pct"</span>: <span class="num">0.54</span>
+  },
+  <span class="str">"feedback_to_ai"</span>: {
+    <span class="str">"topic_pattern"</span>: <span class="str">"tech_news_concise"</span>,
+    <span class="str">"success_score"</span>: <span class="num">0.87</span>,
+    <span class="str">"replicate_pattern"</span>: <span class="kw">true</span>
+  }
+}</div>
+      </div>
     </div>
   </div>
 </section>

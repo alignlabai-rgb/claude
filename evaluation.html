@@ -29,8 +29,53 @@
   <p>生成した大量のコンテンツから、実際に公開・収益化すべき作品をAIが自動的に選び出す</p>
 </div>
 
-<!-- Why Evaluation -->
+<!-- Role Description -->
 <section class="section">
+  <div class="section-inner">
+    <div class="two-col">
+      <div>
+        <div class="section-label">システム内での役割</div>
+        <h2 class="section-title">品質ゲートとして<br>全コンテンツを審査</h2>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+          評価システムは動画・漫画の両パイプラインから成果物を受け取り、
+          公開可否を判定するゲートキーパーです。
+          評価結果はマネタイズシステムへ転送され、低品質コンテンツをフィルタリングします。
+          さらに評価データをネタ生成AIへフィードバックし、システム全体を自律改善します。
+        </p>
+        <ul class="checklist">
+          <li><strong>入力元:</strong> 動画パイプライン / 漫画パイプライン</li>
+          <li><strong>出力先:</strong> マネタイズシステム（合格時）/ 再生成キュー（不合格時）</li>
+          <li><strong>フィードバック先:</strong> ネタ生成AI・LLMプロンプト最適化</li>
+          <li><strong>判定速度:</strong> 1コンテンツあたり 約3〜5秒</li>
+          <li><strong>自動改善:</strong> スコア70〜84は改善指示とともに再処理</li>
+        </ul>
+      </div>
+      <div>
+        <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem;">
+          <h3 style="margin-bottom: 1.25rem; font-size: 1rem; color: var(--text-muted);">モジュール入出力定義</h3>
+          <div class="code-block">
+<span class="cm"># OpenClaw スキル定義 (SKILL.md 抜粋)</span>
+<span class="fn">name</span>: <span class="str">content-evaluator</span>
+<span class="fn">version</span>: <span class="str">"3.0.0"</span>
+<span class="fn">input</span>:
+  <span class="fn">content_type</span>: <span class="fn">string</span>  <span class="cm"># video|manga</span>
+  <span class="fn">file_path</span>: <span class="fn">string</span>    <span class="cm"># 評価対象ファイル</span>
+  <span class="fn">metadata</span>: <span class="fn">object</span>    <span class="cm"># タイトル/説明/タグ</span>
+  <span class="fn">target_platforms</span>: <span class="fn">list</span>
+<span class="fn">output</span>:
+  <span class="fn">total_score</span>: <span class="fn">float</span>   <span class="cm"># 0〜100</span>
+  <span class="fn">decision</span>: <span class="fn">string</span>    <span class="cm"># PUBLISH|IMPROVE|REVIEW|DISCARD</span>
+  <span class="fn">scores</span>: <span class="fn">object</span>      <span class="cm"># 指標別スコア</span>
+  <span class="fn">improvements</span>: <span class="fn">list</span>  <span class="cm"># 改善指示リスト</span>
+  <span class="fn">feedback_data</span>: <span class="fn">object</span> <span class="cm"># ネタAIへのフィードバック</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Why Evaluation -->
+<section class="section" style="background: var(--bg2);">
   <div class="section-inner">
     <div class="two-col">
       <div>
@@ -191,8 +236,65 @@
   </div>
 </section>
 
-<!-- Implementation -->
+<!-- Integration Design -->
 <section class="section" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-label">連携設計</div>
+    <h2 class="section-title">評価結果の<br>マルチパス転送設計</h2>
+    <div class="two-col">
+      <div>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+          評価エンジンはスコアに応じて3つの異なるパスでコンテンツを処理します。
+          合格コンテンツはマネタイズシステムへ、
+          改善可能なコンテンツはAI自動修正ループへ、
+          失敗パターンはネタ生成AIの学習データへフィードバックされます。
+        </p>
+        <div class="code-block">
+<span class="cm"># 評価後ルーティング (OpenClaw YAML)</span>
+<span class="fn">on_evaluation_complete</span>:
+  - <span class="fn">condition</span>: <span class="str">"score >= 85"</span>
+    <span class="fn">action</span>: <span class="str">forward_to_monetization</span>
+    <span class="fn">skill</span>: <span class="str">publish-scheduler</span>
+
+  - <span class="fn">condition</span>: <span class="str">"score >= 70"</span>
+    <span class="fn">action</span>: <span class="str">auto_improve</span>
+    <span class="fn">skill</span>: <span class="str">content-improver</span>
+    <span class="fn">then</span>: <span class="str">re_evaluate</span>
+
+  - <span class="fn">condition</span>: <span class="str">"score >= 55"</span>
+    <span class="fn">action</span>: <span class="str">human_review_queue</span>
+    <span class="fn">notify</span>: <span class="str">signal_message</span>
+
+  - <span class="fn">condition</span>: <span class="str">"score < 55"</span>
+    <span class="fn">action</span>: <span class="str">discard_and_feedback</span>
+    <span class="fn">skill</span>: <span class="str">failure-analyzer</span>   <span class="cm"># ネタAIへ</span></div>
+      </div>
+      <div>
+        <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--text-muted);">フィードバックAPI 設計</h3>
+        <div class="code-block">
+<span class="cm">// ネタ生成AIへのフィードバック</span>
+<span class="kw">POST</span> /api/v1/topic-ai/feedback
+{
+  <span class="str">"evaluation_id"</span>: <span class="str">"eval_20260321_001"</span>,
+  <span class="str">"decision"</span>: <span class="str">"DISCARD"</span>,
+  <span class="str">"failed_metrics"</span>: [<span class="str">"seo"</span>, <span class="str">"engagement"</span>],
+  <span class="str">"topic_pattern"</span>: {
+    <span class="str">"genre"</span>: <span class="str">"tech_news"</span>,
+    <span class="str">"keywords"</span>: [<span class="str">"AI規制"</span>, <span class="str">"政策"</span>],
+    <span class="str">"avoid_next_time"</span>: <span class="kw">true</span>
+  },
+  <span class="str">"improvement_hints"</span>: [
+    <span class="str">"より具体的な数値を含める"</span>,
+    <span class="str">"感情に訴えるフックを強化"</span>
+  ]
+}</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Implementation -->
+<section class="section">
   <div class="section-inner">
     <div class="section-label">実装例</div>
     <h2 class="section-title">評価エンジンの構成</h2>

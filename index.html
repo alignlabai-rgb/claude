@@ -165,8 +165,74 @@
   </div>
 </section>
 
-<!-- Vision -->
+<!-- System Architecture -->
 <section class="section" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-label">アーキテクチャ詳細</div>
+    <h2 class="section-title">モジュール間の<br>データフロー設計</h2>
+    <div class="two-col">
+      <div>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+          全モジュールはOpenClaw Skillとして実装されており、
+          メッセージキューを介して非同期に連携します。
+          各モジュールは独立してスケールアップ可能な設計です。
+        </p>
+        <div class="code-block">
+<span class="cm"># システム全体ワークフロー定義 (OpenClaw YAML)</span>
+<span class="fn">name</span>: <span class="str">ai-creator-hub-main</span>
+<span class="fn">trigger</span>:
+  <span class="fn">type</span>: <span class="str">message</span>          <span class="cm"># Signal/Telegramから受信</span>
+  <span class="fn">command</span>: <span class="str">"/create"</span>
+
+<span class="fn">steps</span>:
+  - <span class="fn">name</span>: <span class="str">topic-analysis</span>
+    <span class="fn">skill</span>: <span class="str">llm-analyzer</span>
+    <span class="fn">output</span>: <span class="fn">topic_data</span>
+
+  - <span class="fn">name</span>: <span class="str">content-gen</span>
+    <span class="fn">parallel</span>:
+      - <span class="fn">skill</span>: <span class="str">video-pipeline</span>
+      - <span class="fn">skill</span>: <span class="str">manga-pipeline</span>
+    <span class="fn">input</span>: <span class="str">"${{topic_data}}"</span>
+
+  - <span class="fn">name</span>: <span class="str">evaluate</span>
+    <span class="fn">skill</span>: <span class="str">content-evaluator</span>
+    <span class="fn">depends_on</span>: [<span class="str">content-gen</span>]
+
+  - <span class="fn">name</span>: <span class="str">monetize</span>
+    <span class="fn">skill</span>: <span class="str">monetization-manager</span>
+    <span class="fn">condition</span>: <span class="str">"score >= 85"</span>
+
+  - <span class="fn">name</span>: <span class="str">notify</span>
+    <span class="fn">skill</span>: <span class="str">signal-messenger</span>   <span class="cm"># 完了通知</span></div>
+      </div>
+      <div>
+        <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--text-muted);">モジュール間 API 接続早見表</h3>
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <div style="background: rgba(108,60,225,0.1); border: 1px solid rgba(108,60,225,0.3); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; color: #6C3CE1; font-weight: 700; margin-bottom: 0.35rem;">ネタAI → 動画/漫画パイプライン</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">POST /api/v1/{video|manga}-pipeline/start<br>payload: topic_text, genre, target_duration</div>
+          </div>
+          <div style="background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.3); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; color: var(--accent); font-weight: 700; margin-bottom: 0.35rem;">動画/漫画パイプライン → 評価システム</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">POST /api/v1/evaluator/ingest<br>payload: file_path, metadata, content_type</div>
+          </div>
+          <div style="background: rgba(0,220,130,0.1); border: 1px solid rgba(0,220,130,0.3); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; color: #00DC82; font-weight: 700; margin-bottom: 0.35rem;">評価システム → マネタイズ</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">POST /api/v1/monetization/publish<br>payload: content_path, score, platforms[]</div>
+          </div>
+          <div style="background: rgba(255,107,107,0.1); border: 1px solid rgba(255,107,107,0.3); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; color: #FF6B6B; font-weight: 700; margin-bottom: 0.35rem;">マネタイズ → ネタAI（フィードバック）</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">POST /api/v1/topic-ai/feedback<br>payload: revenue_metrics, success_patterns</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Vision -->
+<section class="section">
   <div class="section-inner">
     <div class="two-col">
       <div>

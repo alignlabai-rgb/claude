@@ -29,8 +29,51 @@
   <p>スクリプト生成から音声合成・画像生成・動画編集まで、全工程をAIがこなすパイプライン設計</p>
 </div>
 
-<!-- Pipeline Steps -->
+<!-- Role Description -->
 <section class="section">
+  <div class="section-inner">
+    <div class="two-col">
+      <div>
+        <div class="section-label">システム内での役割</div>
+        <h2 class="section-title">パイプラインの<br>コアエンジン</h2>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+          動画制作モジュールはAI Creator Hubのメイン収益エンジンです。
+          ネタ生成AIからテキストを受け取り、完成動画ファイルを評価システムへ渡す
+          中核パイプラインとして機能します。全ステップはOpenClawが自律制御します。
+        </p>
+        <ul class="checklist">
+          <li><strong>入力元:</strong> ネタ生成LLM（テキスト・JSON）</li>
+          <li><strong>出力先:</strong> 評価システム（動画ファイル + メタデータ）</li>
+          <li><strong>処理時間:</strong> ショート動画 約8〜15分 / 長尺動画 約45〜90分</li>
+          <li><strong>並列処理:</strong> 最大4本同時生成（GPU依存）</li>
+          <li><strong>失敗時:</strong> OpenClawが自動リトライ、3回失敗で人間へアラート</li>
+        </ul>
+      </div>
+      <div>
+        <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem;">
+          <h3 style="margin-bottom: 1.25rem; font-size: 1rem; color: var(--text-muted);">モジュール入出力定義</h3>
+          <div class="code-block">
+<span class="cm"># OpenClaw スキル定義 (SKILL.md 抜粋)</span>
+<span class="fn">name</span>: <span class="str">video-pipeline</span>
+<span class="fn">version</span>: <span class="str">"2.1.0"</span>
+<span class="fn">input</span>:
+  <span class="fn">topic_text</span>: <span class="fn">string</span>   <span class="cm"># ネタ文章</span>
+  <span class="fn">genre</span>: <span class="fn">string</span>       <span class="cm"># shorts|long|podcast</span>
+  <span class="fn">target_sec</span>: <span class="fn">int</span>    <span class="cm"># 目標尺（秒）</span>
+  <span class="fn">style_preset</span>: <span class="fn">string</span>
+<span class="fn">output</span>:
+  <span class="fn">video_path</span>: <span class="fn">string</span>  <span class="cm"># 完成動画パス</span>
+  <span class="fn">thumbnail_paths</span>: <span class="fn">list</span>
+  <span class="fn">metadata</span>: <span class="fn">object</span>   <span class="cm"># タイトル/説明/タグ</span>
+  <span class="fn">cost_usd</span>: <span class="fn">float</span>    <span class="cm"># API使用コスト</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Pipeline Steps -->
+<section class="section" style="background: var(--bg2);">
   <div class="section-inner">
     <div class="section-label">制作フロー</div>
     <h2 class="section-title">7ステップで完成動画へ</h2>
@@ -148,7 +191,7 @@ ffmpeg -i <span class="str">video_scenes.mp4</span> \
 </section>
 
 <!-- Tool Comparison -->
-<section class="section" style="background: var(--bg2);">
+<section class="section">
   <div class="section-inner">
     <div class="section-label">ツール比較</div>
     <h2 class="section-title">動画生成AIツール比較</h2>
@@ -207,6 +250,67 @@ ffmpeg -i <span class="str">video_scenes.mp4</span> \
           </tr>
         </tbody>
       </table>
+    </div>
+  </div>
+</section>
+
+<!-- Integration Design -->
+<section class="section" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-label">連携設計</div>
+    <h2 class="section-title">他モジュールとの<br>データフロー設計</h2>
+    <div class="two-col">
+      <div>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+          動画パイプラインはOpenClaw Skillとして実装され、前後のモジュールとメッセージキューで非同期連携します。
+          各ステップの進捗はOpenClawダッシュボードでリアルタイム確認できます。
+        </p>
+        <div class="code-block">
+<span class="cm"># OpenClaw ワークフロー定義 (抜粋)</span>
+<span class="fn">workflow</span>: <span class="str">video-creation</span>
+<span class="fn">steps</span>:
+  - <span class="fn">name</span>: <span class="str">script-gen</span>
+    <span class="fn">skill</span>: <span class="str">llm-writer</span>
+    <span class="fn">on_error</span>: <span class="str">retry(3)</span>
+
+  - <span class="fn">name</span>: <span class="str">visual-gen</span>
+    <span class="fn">skill</span>: <span class="str">image-pipeline</span>
+    <span class="fn">parallel</span>: <span class="kw">true</span>   <span class="cm"># 音声合成と並列実行</span>
+
+  - <span class="fn">name</span>: <span class="str">voice-gen</span>
+    <span class="fn">skill</span>: <span class="str">elevenlabs-tts</span>
+    <span class="fn">parallel</span>: <span class="kw">true</span>
+
+  - <span class="fn">name</span>: <span class="str">compose</span>
+    <span class="fn">skill</span>: <span class="str">ffmpeg-composer</span>
+    <span class="fn">depends_on</span>: [<span class="str">visual-gen</span>, <span class="str">voice-gen</span>]
+
+  - <span class="fn">name</span>: <span class="str">evaluate</span>
+    <span class="fn">skill</span>: <span class="str">content-evaluator</span>  <span class="cm"># → 評価システムへ</span></div>
+      </div>
+      <div>
+        <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--text-muted);">API エンドポイント設計</h3>
+        <div class="code-block">
+<span class="cm">// 動画パイプライン起動 API</span>
+<span class="kw">POST</span> /api/v1/video-pipeline/start
+{
+  <span class="str">"topic_text"</span>: <span class="str">"最新AIニュース解説"</span>,
+  <span class="str">"genre"</span>: <span class="str">"shorts"</span>,
+  <span class="str">"target_sec"</span>: <span class="num">58</span>,
+  <span class="str">"style_preset"</span>: <span class="str">"news_modern"</span>,
+  <span class="str">"callback_url"</span>: <span class="str">"http://evaluator/ingest"</span>
+}
+
+<span class="cm">// 進捗確認 API</span>
+<span class="kw">GET</span> /api/v1/video-pipeline/{job_id}/status
+<span class="cm">// レスポンス</span>
+{
+  <span class="str">"status"</span>: <span class="str">"composing"</span>,  <span class="cm">// step 6/7</span>
+  <span class="str">"progress"</span>: <span class="num">84</span>,
+  <span class="str">"eta_sec"</span>: <span class="num">127</span>,
+  <span class="str">"cost_so_far_usd"</span>: <span class="num">0.43</span>
+}</div>
+      </div>
     </div>
   </div>
 </section>
