@@ -315,8 +315,54 @@ ffmpeg -i <span class="str">video_scenes.mp4</span> \
   </div>
 </section>
 
-<!-- Output Formats -->
+<!-- Cost & Infrastructure -->
 <section class="section">
+  <div class="section-inner">
+    <div class="section-label">コスト &amp; インフラ要件</div>
+    <h2 class="section-title">動画1本あたりのAPI コスト内訳</h2>
+    <div class="two-col">
+      <div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>ステップ</th><th>ツール</th><th>ショート(〜60s)</th><th>長尺(5〜15min)</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>スクリプト生成</td><td>GPT-4o / Claude</td><td>¥10〜25</td><td>¥25〜60</td></tr>
+              <tr><td>ビジュアル生成</td><td>Midjourney / DALL-E 3</td><td>¥30〜80</td><td>¥120〜350</td></tr>
+              <tr><td>動画クリップ</td><td>RunwayML Gen-3</td><td>¥50〜150</td><td>¥300〜800</td></tr>
+              <tr><td>音声合成</td><td>ElevenLabs</td><td>¥15〜40</td><td>¥60〜150</td></tr>
+              <tr><td>BGM生成</td><td>Suno AI</td><td>¥5〜15</td><td>¥5〜15</td></tr>
+              <tr><td>FFmpeg合成</td><td>自前サーバー</td><td>¥0〜2</td><td>¥0〜5</td></tr>
+              <tr style="font-weight: 700;"><td colspan="2">合計</td><td>¥110〜312</td><td>¥510〜1,380</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.82rem; margin-top: 0.75rem;">※ RunwayML超過時はKling AIへ自動フォールバック（コスト約40%削減、品質は微減）</p>
+      </div>
+      <div>
+        <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--text-muted);">インフラ要件</h3>
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; color: var(--accent); font-weight: 700; margin-bottom: 0.35rem;">FFmpeg合成サーバー</div>
+            <div style="font-size: 0.82rem; color: var(--text-muted);">CPU: 8コア以上 / RAM: 16GB以上 / SSD: 500GB（一時ファイル保存用）。クラウドならGCP n2-standard-8が適合。</div>
+          </div>
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; color: #FF9E00; font-weight: 700; margin-bottom: 0.35rem;">並列4本処理時のボトルネック</div>
+            <div style="font-size: 0.82rem; color: var(--text-muted);">最大4本並列はRunwayML APIの同時リクエスト上限（Proプラン）による制限。追加クレジットで8本並列も可能。</div>
+          </div>
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; color: #4FFFB0; font-weight: 700; margin-bottom: 0.35rem;">ストレージ設計</div>
+            <div style="font-size: 0.82rem; color: var(--text-muted);">生成中ファイルはローカルSSD → 完成後はS3/GCSへ移動。評価通過後のみ長期保存。未通過は48時間後に自動削除。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Output Formats -->
+<section class="section" style="background: var(--bg2);">
   <div class="section-inner">
     <div class="section-label">出力形式</div>
     <h2 class="section-title">マルチフォーマット対応</h2>

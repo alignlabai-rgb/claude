@@ -452,6 +452,111 @@ skills/
   </div>
 </section>
 
+<!-- Feedback Loop -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label">自律改善ループ</div>
+    <h2 class="section-title">収益データがシステム全体を<br>自律的に進化させる</h2>
+    <p style="color: var(--text-muted); margin-bottom: 2rem; max-width: 700px;">
+      公開コンテンツの収益・再生数・エンゲージメントデータをOpenClawが自動収集し、
+      ネタ生成AI・評価閾値・生成パラメータへ反映します。
+      人間が何もしなくても、システムが週次で「何が売れるか」を学習し続けます。
+    </p>
+
+    <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 2.5rem; margin-bottom: 2rem;">
+      <div class="pipeline">
+        <div class="pipeline-step">
+          <div class="step-num">1</div>
+          <h4>収益データ収集</h4>
+          <p>YouTube Analytics・note・Kindle APIから再生数・収益・CTRを毎日自動取得</p>
+        </div>
+        <div class="pipeline-step">
+          <div class="step-num">2</div>
+          <h4>パターン分析</h4>
+          <p>上位20%の「ヒット作」と下位20%の「外れ作」の共通点をLLMで抽出</p>
+        </div>
+        <div class="pipeline-step">
+          <div class="step-num">3</div>
+          <h4>ネタAI更新</h4>
+          <p>売れるジャンル・キーワード・トーンのスコアを更新。外れパターンは生成頻度を下げる</p>
+        </div>
+        <div class="pipeline-step">
+          <div class="step-num">4</div>
+          <h4>評価閾値調整</h4>
+          <p>予測スコアと実収益のズレを補正。過剰な破棄・過剰な公開を自動チューニング</p>
+        </div>
+        <div class="pipeline-step">
+          <div class="step-num">5</div>
+          <h4>生成パラメータ最適化</h4>
+          <p>スタイルプリセット・プロンプトテンプレートをヒット作に近づくよう自動更新</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div>
+        <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--text-muted);">ネタAI — フィードバック受信仕様</h3>
+        <div class="code-block">
+<span class="cm"># ネタAI Skill (topic-generator) の</span>
+<span class="cm"># フィードバック受信エンドポイント</span>
+<span class="fn">name</span>: <span class="str">topic-generator</span>
+<span class="fn">version</span>: <span class="str">"1.5.0"</span>
+
+<span class="fn">feedback_input</span>:  <span class="cm"># 週次で自動受信</span>
+  <span class="fn">hit_patterns</span>:
+    - <span class="fn">genre</span>: <span class="str">"tech_news_concise"</span>
+      <span class="fn">avg_revenue_jpy</span>: <span class="num">2840</span>
+      <span class="fn">avg_views</span>: <span class="num">18500</span>
+      <span class="fn">weight_boost</span>: <span class="num">1.4</span>   <span class="cm"># 生成確率+40%</span>
+  <span class="fn">miss_patterns</span>:
+    - <span class="fn">genre</span>: <span class="str">"policy_abstract"</span>
+      <span class="fn">avg_revenue_jpy</span>: <span class="num">180</span>
+      <span class="fn">weight_penalty</span>: <span class="num">0.3</span>  <span class="cm"># 生成確率-70%</span>
+  <span class="fn">keyword_scores</span>:      <span class="cm"># キーワード別スコア更新</span>
+    <span class="str">"AI活用"</span>: <span class="num">0.92</span>
+    <span class="str">"規制動向"</span>: <span class="num">0.31</span>
+  <span class="fn">updated_at</span>: <span class="str">"2026-03-21"</span>
+
+<span class="fn">generation_policy</span>:
+  <span class="fn">use_weighted_sampling</span>: <span class="kw">true</span>
+  <span class="fn">recalculate_weekly</span>: <span class="kw">true</span>
+  <span class="fn">min_diversity_ratio</span>: <span class="num">0.2</span>  <span class="cm"># 多様性担保</span></div>
+      </div>
+      <div>
+        <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--text-muted);">フィードバックループ スケジューラー</h3>
+        <div class="code-block">
+<span class="cm"># weekly_feedback_workflow.yaml</span>
+<span class="fn">name</span>: <span class="str">weekly-learning-loop</span>
+<span class="fn">trigger</span>:
+  <span class="fn">type</span>: <span class="str">schedule</span>
+  <span class="fn">cron</span>: <span class="str">"0 4 * * 1"</span>   <span class="cm"># 毎週月曜4時</span>
+
+<span class="fn">steps</span>:
+  - <span class="fn">skill</span>: <span class="str">analytics-collector</span>
+    <span class="fn">collect_days</span>: <span class="num">7</span>
+    <span class="fn">platforms</span>: [<span class="str">youtube</span>, <span class="str">note</span>, <span class="str">kindle</span>]
+
+  - <span class="fn">skill</span>: <span class="str">pattern-analyzer</span>  <span class="cm"># LLM分析</span>
+    <span class="fn">top_n</span>: <span class="num">5</span>            <span class="cm"># 上位5作品を分析</span>
+    <span class="fn">bottom_n</span>: <span class="num">5</span>         <span class="cm"># 下位5作品を分析</span>
+
+  - <span class="fn">skill</span>: <span class="str">topic-generator</span>   <span class="cm"># ネタAI更新</span>
+    <span class="fn">action</span>: <span class="str">update_weights</span>
+
+  - <span class="fn">skill</span>: <span class="str">evaluation-tuner</span>   <span class="cm"># 評価閾値補正</span>
+    <span class="fn">action</span>: <span class="str">recalibrate</span>
+
+  - <span class="fn">skill</span>: <span class="str">signal-messenger</span>   <span class="cm"># 週次レポート送信</span>
+    <span class="fn">template</span>: <span class="str">weekly_report</span></div>
+        <div style="background: rgba(0,220,130,0.08); border: 1px solid rgba(0,220,130,0.3); border-radius: 12px; padding: 1rem; margin-top: 1rem;">
+          <div style="font-size: 0.8rem; color: #4FFFB0; font-weight: 700; margin-bottom: 0.35rem;">学習サイクル効果</div>
+          <div style="font-size: 0.82rem; color: var(--text-muted);">運用開始4週間後に評価通過率が平均+12%改善。8週間後にはヒット率（スコア90+）が初期比1.8倍に向上する傾向（設計値）。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- Roadmap -->
 <section class="section" style="background: var(--bg2);">
   <div class="section-inner">

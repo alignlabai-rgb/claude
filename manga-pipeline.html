@@ -212,8 +212,79 @@
   </div>
 </section>
 
-<!-- Genre Presets -->
+<!-- LoRA Training & Consistency Metrics -->
 <section class="section">
+  <div class="section-inner">
+    <div class="section-label">LoRA準備フロー &amp; 一貫性達成率</div>
+    <h2 class="section-title">キャラクターLoRAを<br>パイプラインに組み込む</h2>
+    <div class="two-col">
+      <div>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+          LoRAは漫画生成前に1回だけ学習・登録します。
+          登録済みLoRAはOpenClawが管理し、ジャンル・キャラクターに応じて自動選択します。
+          学習データの品質が一貫性に直結するため、準備プロセスが重要です。
+        </p>
+        <h4 style="margin-bottom: 0.75rem; font-size: 0.95rem;">LoRA準備の4ステップ</h4>
+        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 0.875rem; display: flex; gap: 0.875rem; align-items: flex-start;">
+            <div class="step-num" style="margin: 0; min-width: 36px; height: 36px; font-size: 0.85rem;">1</div>
+            <div><strong>参照画像収集</strong><br><span style="font-size: 0.82rem; color: var(--text-muted);">キャラクター設定画20〜50枚（正面・斜め・表情バリエーション）をMidjourneyで生成</span></div>
+          </div>
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 0.875rem; display: flex; gap: 0.875rem; align-items: flex-start;">
+            <div class="step-num" style="margin: 0; min-width: 36px; height: 36px; font-size: 0.85rem;">2</div>
+            <div><strong>LoRA学習（Kohya SS）</strong><br><span style="font-size: 0.82rem; color: var(--text-muted);">SDXL上でステップ数2000〜3000、学習率1e-4。RunPodのA100で約20〜40分・費用約¥300〜600</span></div>
+          </div>
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 0.875rem; display: flex; gap: 0.875rem; align-items: flex-start;">
+            <div class="step-num" style="margin: 0; min-width: 36px; height: 36px; font-size: 0.85rem;">3</div>
+            <div><strong>品質テスト &amp; シード確定</strong><br><span style="font-size: 0.82rem; color: var(--text-muted);">10シードでテスト生成。最も安定するシードをキャラ設定に固定登録</span></div>
+          </div>
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 0.875rem; display: flex; gap: 0.875rem; align-items: flex-start;">
+            <div class="step-num" style="margin: 0; min-width: 36px; height: 36px; font-size: 0.85rem;">4</div>
+            <div><strong>OpenClawへ登録</strong><br><span style="font-size: 0.82rem; color: var(--text-muted);">SKILL.md のキャラクターリストに追加。以降は自動でロードされ人間の操作不要</span></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <h4 style="margin-bottom: 1rem; font-size: 0.95rem; color: var(--text-muted);">技術別 一貫性達成率（設計目標値）</h4>
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.35rem;">
+              <span>LoRA単体</span><span style="color: var(--accent);">65〜75%</span>
+            </div>
+            <div style="background: var(--bg3); border-radius: 4px; height: 8px;"><div style="background: var(--accent); width: 70%; height: 100%; border-radius: 4px;"></div></div>
+          </div>
+          <div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.35rem;">
+              <span>LoRA + シード固定</span><span style="color: var(--accent);">80〜87%</span>
+            </div>
+            <div style="background: var(--bg3); border-radius: 4px; height: 8px;"><div style="background: var(--accent); width: 83%; height: 100%; border-radius: 4px;"></div></div>
+          </div>
+          <div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.35rem;">
+              <span>LoRA + IP-Adapter</span><span style="color: #4FFFB0;">88〜93%</span>
+            </div>
+            <div style="background: var(--bg3); border-radius: 4px; height: 8px;"><div style="background: #4FFFB0; width: 90%; height: 100%; border-radius: 4px;"></div></div>
+          </div>
+          <div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.35rem;">
+              <span>LoRA + IP-Adapter + ControlNet Canny</span><span style="color: #4FFFB0;">93〜97%</span>
+            </div>
+            <div style="background: var(--bg3); border-radius: 4px; height: 8px;"><div style="background: #4FFFB0; width: 95%; height: 100%; border-radius: 4px;"></div></div>
+          </div>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.82rem; margin-top: 1rem;">※ 一貫性 = 同一キャラクターを人間が見て「同一人物」と判定できる割合。測定はCLIP特徴量コサイン類似度0.85以上を基準として算出（設計目標値）。</p>
+
+        <div style="background: rgba(255,158,0,0.1); border: 1px solid rgba(255,158,0,0.3); border-radius: 12px; padding: 1rem; margin-top: 1rem;">
+          <div style="font-size: 0.8rem; color: #FF9E00; font-weight: 700; margin-bottom: 0.35rem;">複数キャラ同フレームの対策</div>
+          <div style="font-size: 0.82rem; color: var(--text-muted);">キャラAのLoRA重み0.7 + キャラBのLoRA重み0.5で合成。衣装・髪色の差が大きいほど成功率が向上。類似キャラの同時登場は避けるか、手動レビュー対象とする。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Genre Presets -->
+<section class="section" style="background: var(--bg2);">
   <div class="section-inner">
     <div class="section-label">ジャンルプリセット</div>
     <h2 class="section-title">ジャンル別スタイル自動切替</h2>
