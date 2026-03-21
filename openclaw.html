@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenClaw連携 — AI Creator Hub</title>
+  <meta name="description" content="OpenClawをオーケストレーターとして活用し全AIツールを統合管理するシステム設計">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">AI Creator Hub</div>
+  <ul class="nav-links">
+    <li><a href="index.html">ホーム</a></li>
+    <li><a href="video-pipeline.html">動画制作</a></li>
+    <li><a href="manga-pipeline.html">漫画制作</a></li>
+    <li><a href="evaluation.html">評価システム</a></li>
+    <li><a href="monetization.html">マネタイズ</a></li>
+    <li><a href="openclaw.html" class="active">OpenClaw連携</a></li>
+    <li><a href="openclaw-news/index.html" style="color: #4FFFB0;">🦞 OpenClaw情報</a></li>
+  </ul>
+  <div class="nav-hamburger"><span></span><span></span><span></span></div>
+</nav>
+
+<div class="page-hero">
+  <div class="section-label">OpenClaw連携</div>
+  <h1>OpenClawが全パイプラインを<br><span style="background: linear-gradient(135deg,#6C3CE1,#FF6B6B); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">一元オーケストレーション</span></h1>
+  <p>各AIツールのAPIをOpenClawで統合し、ネタ入力から収益化まで一本のワークフローで制御</p>
+</div>
+
+<!-- Role of OpenClaw -->
+<section class="section">
+  <div class="section-inner">
+    <div class="two-col">
+      <div>
+        <div class="section-label">OpenClawの役割</div>
+        <h2 class="section-title">AIツール群の<br>指揮者として機能</h2>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+          OpenClawはワークフロー定義に従い、複数のAIツール・APIを順序立てて呼び出す
+          オーケストレーションレイヤーとして機能します。
+          各ツールのAPI差異を吸収し、エラー処理・リトライ・進捗管理を一元化。
+        </p>
+        <ul class="checklist">
+          <li>ワークフローのYAML/JSON定義で管理</li>
+          <li>並列・直列の実行フロー制御</li>
+          <li>各ステップの成功/失敗に応じた分岐処理</li>
+          <li>実行ログ・コスト追跡・アラート機能</li>
+          <li>ヒューマンインザループ（人間確認ポイント）の挿入</li>
+        </ul>
+      </div>
+      <div>
+        <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem;">
+          <h3 style="margin-bottom: 1rem; font-size: 0.95rem; color: var(--text-muted);">OpenClawが管理するツール群</h3>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+            <div style="background: var(--bg3); border-radius: 8px; padding: 0.75rem; font-size: 0.85rem;">
+              <div style="color: var(--accent); font-weight: 700; margin-bottom: 0.25rem;">LLM</div>
+              <div style="color: var(--text-muted);">GPT-5.4, Claude Sonnet 4.6, Gemini 3.1 Pro, Grok 4.20</div>
+            </div>
+            <div style="background: var(--bg3); border-radius: 8px; padding: 0.75rem; font-size: 0.85rem;">
+              <div style="color: var(--accent); font-weight: 700; margin-bottom: 0.25rem;">画像生成</div>
+              <div style="color: var(--text-muted);">SD XL, Midjourney</div>
+            </div>
+            <div style="background: var(--bg3); border-radius: 8px; padding: 0.75rem; font-size: 0.85rem;">
+              <div style="color: var(--accent); font-weight: 700; margin-bottom: 0.25rem;">動画生成</div>
+              <div style="color: var(--text-muted);">RunwayML, Kling</div>
+            </div>
+            <div style="background: var(--bg3); border-radius: 8px; padding: 0.75rem; font-size: 0.85rem;">
+              <div style="color: var(--accent); font-weight: 700; margin-bottom: 0.25rem;">音声合成</div>
+              <div style="color: var(--text-muted);">ElevenLabs, VOICEVOX</div>
+            </div>
+            <div style="background: var(--bg3); border-radius: 8px; padding: 0.75rem; font-size: 0.85rem;">
+              <div style="color: var(--accent); font-weight: 700; margin-bottom: 0.25rem;">評価AI</div>
+              <div style="color: var(--text-muted);">カスタム評価エンジン</div>
+            </div>
+            <div style="background: var(--bg3); border-radius: 8px; padding: 0.75rem; font-size: 0.85rem;">
+              <div style="color: var(--accent); font-weight: 700; margin-bottom: 0.25rem;">配信</div>
+              <div style="color: var(--text-muted);">YouTube, note, Kindle</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Signal Trigger -->
+<section class="section" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-label">ユーザーインターフェース</div>
+    <h2 class="section-title">Signalメッセージで<br>全パイプラインをトリガー</h2>
+    <div class="two-col">
+      <div>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+          ユーザーはSignalアプリからテキストを送るだけで全自動制作が始まります。
+          OpenClawがSignal Botとして常駐し、コマンドを解析してワークフローを起動。
+          進捗・完了・エラーを全てSignalで返信します。
+        </p>
+        <ul class="checklist">
+          <li><strong>/create video</strong> ネタ文章 → 動画生成を起動</li>
+          <li><strong>/create manga</strong> ネタ文章 → 漫画生成を起動</li>
+          <li><strong>/create both</strong> ネタ文章 → 動画+漫画を並列生成</li>
+          <li><strong>/status</strong> 全ジョブの進捗を確認</li>
+          <li><strong>/revenue today</strong> 当日の収益サマリーを取得</li>
+        </ul>
+      </div>
+      <div>
+        <div class="code-block">
+<span class="cm"># Signal Bot ハンドラー (OpenClaw Skill)</span>
+<span class="kw">name</span>: signal-bot-handler
+<span class="kw">trigger</span>:
+  <span class="kw">type</span>: signal_message
+  <span class="kw">allowed_senders</span>:
+    - <span class="str">"${{env.OWNER_SIGNAL_NUMBER}}"</span>
+
+<span class="kw">on_message</span>:
+  - <span class="kw">match</span>: <span class="str">"/create both (.+)"</span>
+    <span class="kw">workflow</span>: <span class="str">dual-content-creation</span>
+    <span class="kw">input_map</span>:
+      <span class="kw">topic_text</span>: <span class="str">"$1"</span>
+    <span class="kw">reply</span>: <span class="str">"動画+漫画の並列生成を開始しました 🚀"</span>
+
+  - <span class="kw">match</span>: <span class="str">"/status"</span>
+    <span class="kw">workflow</span>: <span class="str">job-status-report</span>
+    <span class="kw">reply_template</span>: <span class="str">"実行中: {{running}} | 完了: {{done}} | エラー: {{errors}}"</span>
+
+  - <span class="kw">match</span>: <span class="str">"/revenue today"</span>
+    <span class="kw">workflow</span>: <span class="str">revenue-summary</span>
+    <span class="kw">reply_template</span>: <span class="str">"本日収益: ¥{{total_jpy}} ({{platform_breakdown}})"</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Skill Registration -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label">Skill登録・管理</div>
+    <h2 class="section-title">各モジュールを<br>OpenClaw Skillとして登録</h2>
+    <div class="two-col">
+      <div>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+          AI Creator Hubの各モジュールはOpenClaw Skillとして定義されます。
+          SKILL.mdファイル1つで入出力・エラー処理・コスト上限を宣言的に管理。
+          新しいモジュール追加はファイルを置くだけで自動認識されます。
+        </p>
+        <div class="code-block">
+<span class="cm"># skills/ ディレクトリ構成</span>
+skills/
+├── video-pipeline/
+│   ├── <span class="str">SKILL.md</span>       <span class="cm"># Skill定義</span>
+│   ├── <span class="str">main.py</span>        <span class="cm"># エントリーポイント</span>
+│   └── <span class="str">requirements.txt</span>
+├── manga-pipeline/
+│   ├── <span class="str">SKILL.md</span>
+│   └── <span class="str">main.py</span>
+├── content-evaluator/
+│   ├── <span class="str">SKILL.md</span>
+│   └── <span class="str">evaluator.py</span>
+├── monetization-manager/
+│   ├── <span class="str">SKILL.md</span>
+│   └── <span class="str">publisher.py</span>
+└── signal-bot-handler/
+    ├── <span class="str">SKILL.md</span>
+    └── <span class="str">bot.py</span></div>
+      </div>
+      <div>
+        <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--text-muted);">SKILL.md 標準フォーマット</h3>
+        <div class="code-block">
+<span class="cm"># SKILL.md — 全Skillの共通フォーマット</span>
+<span class="fn">name</span>: <span class="str">video-pipeline</span>
+<span class="fn">description</span>: <span class="str">"ネタ文章から動画を自動生成"</span>
+<span class="fn">version</span>: <span class="str">"2.1.0"</span>
+<span class="fn">author</span>: <span class="str">"AI Creator Hub"</span>
+
+<span class="fn">cost_limits</span>:
+  <span class="fn">per_run_usd</span>: <span class="num">2.00</span>     <span class="cm"># 1回あたり上限</span>
+  <span class="fn">per_day_usd</span>: <span class="num">30.00</span>    <span class="cm"># 日次上限</span>
+  <span class="fn">on_exceed</span>: <span class="str">abort_notify</span> <span class="cm"># 超過時: 中断+通知</span>
+
+<span class="fn">retry_policy</span>:
+  <span class="fn">max_attempts</span>: <span class="num">3</span>
+  <span class="fn">backoff</span>: <span class="str">exponential</span>  <span class="cm"># 2s→4s→8s</span>
+  <span class="fn">on_final_failure</span>: <span class="str">human_alert</span>
+
+<span class="fn">timeout_sec</span>: <span class="num">5400</span>    <span class="cm"># 90分タイムアウト</span>
+
+<span class="fn">input</span>:  <span class="cm"># ... (各Skill固有)</span>
+<span class="fn">output</span>: <span class="cm"># ... (各Skill固有)</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Workflow Definition -->
+<section class="section" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-label">ワークフロー定義</div>
+    <h2 class="section-title">動画+漫画 デュアル<br>並列ワークフロー例</h2>
+    <div class="two-col">
+      <div>
+        <p style="color: var(--text-muted); margin-bottom: 1rem;">同じネタから動画と漫画を並列生成するメインワークフロー。共通前処理を1回だけ実行してコストを削減。</p>
+        <div class="code-block">
+<span class="cm"># dual_content_workflow.yaml</span>
+<span class="fn">name</span>: <span class="str">"dual-content-creation"</span>
+<span class="fn">version</span>: <span class="str">"2.0"</span>
+<span class="fn">trigger</span>:
+  <span class="fn">type</span>: <span class="str">"signal_command"</span>
+  <span class="fn">command</span>: <span class="str">"/create both"</span>
+
+<span class="fn">steps</span>:
+  - <span class="fn">id</span>: <span class="str">"analyze"</span>
+    <span class="fn">skill</span>: <span class="str">"llm.claude"</span>     <span class="cm"># 共通前処理</span>
+    <span class="fn">prompt</span>: <span class="str">"ジャンル・ターゲット・トーンを分析: {{input.topic_text}}"</span>
+    <span class="fn">output</span>: <span class="str">"topic_data"</span>
+
+  - <span class="fn">id</span>: <span class="str">"gen_video"</span>          <span class="cm"># 並列A</span>
+    <span class="fn">skill</span>: <span class="str">"video-pipeline"</span>
+    <span class="fn">parallel_group</span>: <span class="str">"content_gen"</span>
+    <span class="fn">depends_on</span>: [<span class="str">"analyze"</span>]
+    <span class="fn">input</span>:
+      <span class="fn">topic_text</span>: <span class="str">"{{topic_data.structured}}"</span>
+      <span class="fn">genre</span>: <span class="str">"{{topic_data.genre}}"</span>
+
+  - <span class="fn">id</span>: <span class="str">"gen_manga"</span>          <span class="cm"># 並列B</span>
+    <span class="fn">skill</span>: <span class="str">"manga-pipeline"</span>
+    <span class="fn">parallel_group</span>: <span class="str">"content_gen"</span>
+    <span class="fn">depends_on</span>: [<span class="str">"analyze"</span>]
+    <span class="fn">input</span>:
+      <span class="fn">story_text</span>: <span class="str">"{{topic_data.structured}}"</span>
+      <span class="fn">genre_preset</span>: <span class="str">"{{topic_data.genre}}"</span>
+
+  - <span class="fn">id</span>: <span class="str">"evaluate_all"</span>       <span class="cm"># 両方完了後</span>
+    <span class="fn">skill</span>: <span class="str">"content-evaluator"</span>
+    <span class="fn">depends_on</span>: [<span class="str">"gen_video"</span>, <span class="str">"gen_manga"</span>]
+    <span class="fn">input</span>:
+      <span class="fn">contents</span>: [<span class="str">"{{gen_video.output}}"</span>, <span class="str">"{{gen_manga.output}}"</span>]
+
+  - <span class="fn">id</span>: <span class="str">"route"</span>
+    <span class="fn">type</span>: <span class="str">"condition_branch"</span>
+    <span class="fn">depends_on</span>: [<span class="str">"evaluate_all"</span>]
+    <span class="fn">branches</span>:
+      - <span class="fn">condition</span>: <span class="str">"score >= 85"</span>
+        <span class="fn">next</span>: <span class="str">"publish"</span>
+      - <span class="fn">condition</span>: <span class="str">"score >= 70"</span>
+        <span class="fn">next</span>: <span class="str">"auto_improve"</span>
+      - <span class="fn">condition</span>: <span class="str">"score >= 55"</span>
+        <span class="fn">next</span>: <span class="str">"human_review"</span>   <span class="cm"># HITL</span>
+      - <span class="fn">condition</span>: <span class="str">"default"</span>
+        <span class="fn">next</span>: <span class="str">"discard_retry"</span></div>
+      </div>
+      <div>
+        <h3 style="margin-bottom: 0.75rem; font-size: 1rem; color: var(--text-muted);">単体動画ワークフロー（詳細）</h3>
+        <div class="code-block">
+<span class="cm"># video_only_workflow.yaml (内部)</span>
+<span class="fn">id</span>: <span class="str">"generate_visuals"</span>
+<span class="fn">skill</span>: <span class="str">"image.midjourney"</span>
+<span class="fn">parallel_group</span>: <span class="str">"av_gen"</span>   <span class="cm"># 音声と並列</span>
+<span class="fn">inputs</span>:
+  - <span class="str">"{{script.scene_descriptions}}"</span>
+<span class="fn">output</span>: <span class="str">"scene_images"</span>
+
+<span class="fn">id</span>: <span class="str">"generate_voice"</span>
+<span class="fn">skill</span>: <span class="str">"voice.elevenlabs"</span>
+<span class="fn">parallel_group</span>: <span class="str">"av_gen"</span>   <span class="cm"># 画像生成と並列</span>
+<span class="fn">inputs</span>:
+  <span class="fn">text</span>: <span class="str">"{{script.narration}}"</span>
+  <span class="fn">voice_id</span>: <span class="str">"{{topic_data.voice}}"</span>
+<span class="fn">output</span>: <span class="str">"audio"</span>
+
+<span class="fn">id</span>: <span class="str">"compile_video"</span>
+<span class="fn">skill</span>: <span class="str">"video.ffmpeg"</span>
+<span class="fn">depends_on</span>: [<span class="str">"generate_visuals"</span>, <span class="str">"generate_voice"</span>]
+<span class="fn">inputs</span>:
+  <span class="fn">images</span>: <span class="str">"{{scene_images}}"</span>
+  <span class="fn">audio</span>: <span class="str">"{{audio}}"</span>
+  <span class="fn">subs</span>: <span class="str">"{{script.subtitles}}"</span>
+<span class="fn">output</span>: <span class="str">"video_file"</span>
+
+<span class="fn">id</span>: <span class="str">"publish"</span>
+<span class="fn">skill</span>: <span class="str">"publisher.youtube"</span>
+<span class="fn">inputs</span>:
+  <span class="fn">video</span>: <span class="str">"{{video_file}}"</span>
+  <span class="fn">metadata</span>: <span class="str">"{{evaluation.optimized_metadata}}"</span>
+  <span class="fn">schedule</span>: <span class="str">"{{evaluation.optimal_publish_time}}"</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HITL -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label">Human-in-the-Loop</div>
+    <h2 class="section-title">人間確認ポイントの<br>設計パターン</h2>
+    <div class="two-col">
+      <div>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+          スコア55〜69のグレーゾーンや重要な判断を要する場合、
+          OpenClawがSignalで確認メッセージを送り、人間の返答を待ってから処理を続行します。
+          タイムアウトした場合のデフォルト動作も設定可能。
+        </p>
+        <div class="code-block">
+<span class="cm"># HITL ステップ定義 (YAML)</span>
+<span class="fn">id</span>: <span class="str">"human_review"</span>
+<span class="fn">type</span>: <span class="str">"human_in_the_loop"</span>
+<span class="fn">channel</span>: <span class="str">"signal"</span>
+<span class="fn">message_template</span>: |
+  <span class="str">⚠️ 人間レビューが必要です
+  コンテンツID: {{content_id}}
+  スコア: {{score}} / 100
+  問題点: {{issues}}
+
+  👉 返信してください:
+  [y] 公開する
+  [n] 破棄する
+  [e] 自動改善して再評価</span>
+
+<span class="fn">timeout_minutes</span>: <span class="num">60</span>
+<span class="fn">on_timeout</span>: <span class="str">"discard"</span>     <span class="cm"># 未返信は破棄</span>
+<span class="fn">response_map</span>:
+  <span class="str">"y"</span>: <span class="str">"publish"</span>
+  <span class="str">"n"</span>: <span class="str">"discard_retry"</span>
+  <span class="str">"e"</span>: <span class="str">"auto_improve"</span></div>
+      </div>
+      <div>
+        <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--text-muted);">HITLが発動するシナリオ</h3>
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <div style="background: rgba(255,158,0,0.1); border: 1px solid rgba(255,158,0,0.3); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; color: #FF9E00; font-weight: 700; margin-bottom: 0.35rem;">グレーゾーン判定（スコア 55〜69）</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">AIが自信を持って判断できない場合。Signalで3択通知。</div>
+          </div>
+          <div style="background: rgba(255,107,107,0.1); border: 1px solid rgba(255,107,107,0.3); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; color: #FF6B6B; font-weight: 700; margin-bottom: 0.35rem;">3回リトライ失敗</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">APIエラーが解消しない場合。詳細ログとともに通知。</div>
+          </div>
+          <div style="background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.3); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; color: var(--accent); font-weight: 700; margin-bottom: 0.35rem;">コスト上限超過リスク</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">予想コストが制限の80%を超えた場合に事前確認。</div>
+          </div>
+          <div style="background: rgba(108,60,225,0.1); border: 1px solid rgba(108,60,225,0.3); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; color: #6C3CE1; font-weight: 700; margin-bottom: 0.35rem;">安全性フラグ検知</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">著作権・規約違反の疑いがある場合は必ず人間確認。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Cost Management -->
+<section class="section" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-label">APIコスト管理</div>
+    <h2 class="section-title">全ツールのコストを<br>リアルタイムで一元管理</h2>
+    <div class="two-col">
+      <div>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+          各APIの呼び出しコストをOpenClawが自動集計・記録します。
+          1ジョブあたり・1日あたりの上限を設定し、超過リスク時は自動で安価な代替ツールへフォールバック。
+          月次コストレポートをSignalで自動送信します。
+        </p>
+        <ul class="checklist">
+          <li>1ジョブのコストをリアルタイム積算</li>
+          <li>RunwayML高負荷時 → Kling AIへ自動切替</li>
+          <li>ElevenLabs超過時 → VOICEVOXへフォールバック</li>
+          <li>日次・月次コストレポートをSignal送信</li>
+          <li>ツール別・ジャンル別のROI分析</li>
+        </ul>
+      </div>
+      <div>
+        <div class="code-block">
+<span class="cm"># コスト管理設定 (openclaw_config.yaml)</span>
+<span class="fn">cost_management</span>:
+  <span class="fn">budgets</span>:
+    <span class="fn">per_job_usd</span>: <span class="num">2.00</span>
+    <span class="fn">per_day_usd</span>: <span class="num">30.00</span>
+    <span class="fn">per_month_usd</span>: <span class="num">600.00</span>
+
+  <span class="fn">fallbacks</span>:
+    <span class="str">"image.midjourney"</span>: <span class="str">"image.dalle3"</span>
+    <span class="str">"video.runwayml"</span>: <span class="str">"video.kling"</span>
+    <span class="str">"voice.elevenlabs"</span>: <span class="str">"voice.voicevox"</span>
+    <span class="str">"llm.gpt4o"</span>: <span class="str">"llm.claude-haiku"</span>
+
+  <span class="fn">alerts</span>:
+    <span class="fn">channel</span>: <span class="str">"signal"</span>
+    <span class="fn">thresholds</span>:
+      <span class="fn">job_80pct</span>: <span class="str">"warn_and_confirm"</span>  <span class="cm"># HITL</span>
+      <span class="fn">day_90pct</span>: <span class="str">"pause_new_jobs"</span>
+      <span class="fn">month_100pct</span>: <span class="str">"full_stop"</span>
+
+  <span class="fn">reporting</span>:
+    <span class="fn">daily_summary</span>: <span class="str">"08:00 JST"</span>
+    <span class="fn">monthly_report</span>: <span class="str">"1st 09:00 JST"</span>
+    <span class="fn">include_roi</span>: <span class="kw">true</span>  <span class="cm"># 収益 ÷ APIコスト</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Monitoring & Logging -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label">監視・ログ設計</div>
+    <h2 class="section-title">全パイプラインを<br>一元モニタリング</h2>
+    <div class="card-grid">
+
+      <div class="card">
+        <div class="card-icon purple">📡</div>
+        <h3>リアルタイム進捗監視</h3>
+        <p>各ジョブのステップ進捗をWebSocketでリアルタイム配信。OpenClawダッシュボードで全ジョブの状態を一覧表示。</p>
+        <div class="code-block" style="font-size: 0.8rem; margin-top: 0.75rem;">
+<span class="cm">// WebSocket イベント例</span>
+{<span class="str">"job_id"</span>: <span class="str">"vid_001"</span>,
+ <span class="str">"step"</span>: <span class="str">"voice-gen"</span>,
+ <span class="str">"progress"</span>: <span class="num">67</span>,
+ <span class="str">"cost_so_far"</span>: <span class="num">0.84</span>}</div>
+      </div>
+
+      <div class="card">
+        <div class="card-icon cyan">🗂</div>
+        <h3>構造化ログ管理</h3>
+        <p>全ステップの入出力・コスト・所要時間を構造化JSONで記録。失敗パターン分析・パフォーマンス最適化の基礎データとして活用。</p>
+        <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <span class="tag tag-cyan">JSON Lines形式</span>
+          <span class="tag tag-purple">30日間保存</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-icon orange">🔁</div>
+        <h3>エラー処理・リトライ</h3>
+        <p>API失敗・タイムアウトを自動検知し指数バックオフでリトライ（2s→4s→8s）。3回失敗でSignal通知 + 代替ツールへ切替。</p>
+        <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <span class="tag tag-orange">指数バックオフ</span>
+          <span class="tag tag-green">自動フォールバック</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-icon green">📊</div>
+        <h3>パフォーマンス分析</h3>
+        <p>ジョブあたりの平均所要時間・コスト・成功率をトラッキング。ボトルネックのステップを特定し、並列化・キャッシュで自動最適化。</p>
+        <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <span class="tag tag-green">P95レイテンシ追跡</span>
+          <span class="tag tag-cyan">週次レポート</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Feedback Loop -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label">自律改善ループ</div>
+    <h2 class="section-title">収益データがシステム全体を<br>自律的に進化させる</h2>
+    <p style="color: var(--text-muted); margin-bottom: 2rem; max-width: 700px;">
+      公開コンテンツの収益・再生数・エンゲージメントデータをOpenClawが自動収集し、
+      ネタ生成AI・評価閾値・生成パラメータへ反映します。
+      人間が何もしなくても、システムが週次で「何が売れるか」を学習し続けます。
+    </p>
+
+    <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 2.5rem; margin-bottom: 2rem;">
+      <div class="pipeline">
+        <div class="pipeline-step">
+          <div class="step-num">1</div>
+          <h4>収益データ収集</h4>
+          <p>YouTube Analytics・note・Kindle APIから再生数・収益・CTRを毎日自動取得</p>
+        </div>
+        <div class="pipeline-step">
+          <div class="step-num">2</div>
+          <h4>パターン分析</h4>
+          <p>上位20%の「ヒット作」と下位20%の「外れ作」の共通点をLLMで抽出</p>
+        </div>
+        <div class="pipeline-step">
+          <div class="step-num">3</div>
+          <h4>ネタAI更新</h4>
+          <p>売れるジャンル・キーワード・トーンのスコアを更新。外れパターンは生成頻度を下げる</p>
+        </div>
+        <div class="pipeline-step">
+          <div class="step-num">4</div>
+          <h4>評価閾値調整</h4>
+          <p>予測スコアと実収益のズレを補正。過剰な破棄・過剰な公開を自動チューニング</p>
+        </div>
+        <div class="pipeline-step">
+          <div class="step-num">5</div>
+          <h4>生成パラメータ最適化</h4>
+          <p>スタイルプリセット・プロンプトテンプレートをヒット作に近づくよう自動更新</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div>
+        <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--text-muted);">ネタAI — フィードバック受信仕様</h3>
+        <div class="code-block">
+<span class="cm"># ネタAI Skill (topic-generator) の</span>
+<span class="cm"># フィードバック受信エンドポイント</span>
+<span class="fn">name</span>: <span class="str">topic-generator</span>
+<span class="fn">version</span>: <span class="str">"1.5.0"</span>
+
+<span class="fn">feedback_input</span>:  <span class="cm"># 週次で自動受信</span>
+  <span class="fn">hit_patterns</span>:
+    - <span class="fn">genre</span>: <span class="str">"tech_news_concise"</span>
+      <span class="fn">avg_revenue_jpy</span>: <span class="num">2840</span>
+      <span class="fn">avg_views</span>: <span class="num">18500</span>
+      <span class="fn">weight_boost</span>: <span class="num">1.4</span>   <span class="cm"># 生成確率+40%</span>
+  <span class="fn">miss_patterns</span>:
+    - <span class="fn">genre</span>: <span class="str">"policy_abstract"</span>
+      <span class="fn">avg_revenue_jpy</span>: <span class="num">180</span>
+      <span class="fn">weight_penalty</span>: <span class="num">0.3</span>  <span class="cm"># 生成確率-70%</span>
+  <span class="fn">keyword_scores</span>:      <span class="cm"># キーワード別スコア更新</span>
+    <span class="str">"AI活用"</span>: <span class="num">0.92</span>
+    <span class="str">"規制動向"</span>: <span class="num">0.31</span>
+  <span class="fn">updated_at</span>: <span class="str">"2026-03-21"</span>
+
+<span class="fn">generation_policy</span>:
+  <span class="fn">use_weighted_sampling</span>: <span class="kw">true</span>
+  <span class="fn">recalculate_weekly</span>: <span class="kw">true</span>
+  <span class="fn">min_diversity_ratio</span>: <span class="num">0.2</span>  <span class="cm"># 多様性担保</span></div>
+      </div>
+      <div>
+        <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--text-muted);">フィードバックループ スケジューラー</h3>
+        <div class="code-block">
+<span class="cm"># weekly_feedback_workflow.yaml</span>
+<span class="fn">name</span>: <span class="str">weekly-learning-loop</span>
+<span class="fn">trigger</span>:
+  <span class="fn">type</span>: <span class="str">schedule</span>
+  <span class="fn">cron</span>: <span class="str">"0 4 * * 1"</span>   <span class="cm"># 毎週月曜4時</span>
+
+<span class="fn">steps</span>:
+  - <span class="fn">skill</span>: <span class="str">analytics-collector</span>
+    <span class="fn">collect_days</span>: <span class="num">7</span>
+    <span class="fn">platforms</span>: [<span class="str">youtube</span>, <span class="str">note</span>, <span class="str">kindle</span>]
+
+  - <span class="fn">skill</span>: <span class="str">pattern-analyzer</span>  <span class="cm"># LLM分析</span>
+    <span class="fn">top_n</span>: <span class="num">5</span>            <span class="cm"># 上位5作品を分析</span>
+    <span class="fn">bottom_n</span>: <span class="num">5</span>         <span class="cm"># 下位5作品を分析</span>
+
+  - <span class="fn">skill</span>: <span class="str">topic-generator</span>   <span class="cm"># ネタAI更新</span>
+    <span class="fn">action</span>: <span class="str">update_weights</span>
+
+  - <span class="fn">skill</span>: <span class="str">evaluation-tuner</span>   <span class="cm"># 評価閾値補正</span>
+    <span class="fn">action</span>: <span class="str">recalibrate</span>
+
+  - <span class="fn">skill</span>: <span class="str">signal-messenger</span>   <span class="cm"># 週次レポート送信</span>
+    <span class="fn">template</span>: <span class="str">weekly_report</span></div>
+        <div style="background: rgba(0,220,130,0.08); border: 1px solid rgba(0,220,130,0.3); border-radius: 12px; padding: 1rem; margin-top: 1rem;">
+          <div style="font-size: 0.8rem; color: #4FFFB0; font-weight: 700; margin-bottom: 0.35rem;">学習サイクル効果</div>
+          <div style="font-size: 0.82rem; color: var(--text-muted);">運用開始4週間後に評価通過率が平均+12%改善。8週間後にはヒット率（スコア90+）が初期比1.8倍に向上する傾向（設計値）。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Roadmap -->
+<section class="section" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-label">実装ロードマップ</div>
+    <h2 class="section-title">OpenClaw連携の段階的実装計画</h2>
+    <div style="display: flex; flex-direction: column; gap: 1rem;">
+
+      <div class="card" style="border-left: 4px solid #4FFFB0;">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
+          <span class="tag tag-green">Phase 1 — 完了</span>
+          <h3 style="margin: 0;">基盤構築</h3>
+        </div>
+        <p>OpenClaw環境のセットアップ。LLM呼び出しの基本ワークフロー定義。ネタ入力→スクリプト生成の最小パイプライン実装。</p>
+      </div>
+
+      <div class="card" style="border-left: 4px solid #00D4FF;">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
+          <span class="tag tag-cyan">Phase 2 — 進行中</span>
+          <h3 style="margin: 0;">コンテンツ生成統合</h3>
+        </div>
+        <p>画像生成・音声合成・動画編集ツールとの連携実装。並列実行の最適化。評価エンジンとの接続。</p>
+      </div>
+
+      <div class="card" style="border-left: 4px solid #6C3CE1;">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
+          <span class="tag tag-purple">Phase 3 — 予定</span>
+          <h3 style="margin: 0;">マネタイズ自動化</h3>
+        </div>
+        <p>配信プラットフォームAPIとの接続。自動投稿・スケジューリング実装。収益データのフィードバックループ構築。</p>
+      </div>
+
+      <div class="card" style="border-left: 4px solid #FF6B6B;">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
+          <span class="tag tag-orange">Phase 4 — 将来</span>
+          <h3 style="margin: 0;">フルオートメーション</h3>
+        </div>
+        <p>24時間365日の完全自動運用。収益データからコンテンツ戦略を自律的に最適化。新ツールの自動評価・統合機能。</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- 座組シミュレーション -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label">座組シミュレーション</div>
+    <h2 class="section-title">サブスク4本 × Pico/OpenClaw<br><span style="background: linear-gradient(135deg,#4FFFB0,#00D4FF); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">3パターン構成比較</span></h2>
+    <p style="color: var(--text-muted); max-width: 640px; margin: 0 auto 2.5rem;">
+      ChatGPT・Claude・Gemini各$20 + Grok $30 = 月$90（≒¥13,500）のサブスク資産を最大活用。
+      PicoClaw（軽量）またはOpenClaw（フル機能）をローカルPCまたはVPSに配置する3通りのパターンを比較します。
+    </p>
+
+    <!-- サブスク資産カード -->
+    <div class="card" style="margin-bottom: 2rem; background: linear-gradient(135deg, rgba(108,60,225,0.12), rgba(0,212,255,0.08)); border: 1px solid rgba(108,60,225,0.4);">
+      <div class="section-label" style="margin-bottom: 1rem;">保有サブスク資産（月額固定 $90 / ¥13,500）</div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem;">
+        <div style="background: var(--bg3); border-radius: 10px; padding: 1rem; text-align: center;">
+          <div style="font-size: 1.5rem; margin-bottom: 0.25rem;">🤖</div>
+          <div style="font-weight: 700; margin-bottom: 0.25rem;">ChatGPT Pro</div>
+          <div style="color: var(--accent); font-size: 0.85rem;">$20/月</div>
+          <div style="color: var(--text-muted); font-size: 0.78rem; margin-top: 0.4rem;">GPT-5.4<br>無制限利用</div>
+        </div>
+        <div style="background: var(--bg3); border-radius: 10px; padding: 1rem; text-align: center;">
+          <div style="font-size: 1.5rem; margin-bottom: 0.25rem;">🧠</div>
+          <div style="font-weight: 700; margin-bottom: 0.25rem;">Claude Pro</div>
+          <div style="color: var(--accent); font-size: 0.85rem;">$20/月</div>
+          <div style="color: var(--text-muted); font-size: 0.78rem; margin-top: 0.4rem;">Sonnet 4.6・Haiku 4.5<br>Projects利用可</div>
+        </div>
+        <div style="background: var(--bg3); border-radius: 10px; padding: 1rem; text-align: center;">
+          <div style="font-size: 1.5rem; margin-bottom: 0.25rem;">✨</div>
+          <div style="font-weight: 700; margin-bottom: 0.25rem;">Gemini Advanced</div>
+          <div style="color: var(--accent); font-size: 0.85rem;">$20/月</div>
+          <div style="color: var(--text-muted); font-size: 0.78rem; margin-top: 0.4rem;">Gemini 3.1 Pro<br>Python連携済み</div>
+        </div>
+        <div style="background: var(--bg3); border-radius: 10px; padding: 1rem; text-align: center;">
+          <div style="font-size: 1.5rem; margin-bottom: 0.25rem;">⚡</div>
+          <div style="font-weight: 700; margin-bottom: 0.25rem;">Grok Pro</div>
+          <div style="color: var(--accent); font-size: 0.85rem;">$30/月</div>
+          <div style="color: var(--text-muted); font-size: 0.78rem; margin-top: 0.4rem;">Grok 4.20<br>リアルタイム情報</div>
+        </div>
+      </div>
+      <div style="margin-top: 1rem; padding: 0.75rem; background: rgba(79,255,176,0.08); border-radius: 8px; font-size: 0.85rem; color: var(--text-muted);">
+        ★ PicoClaw/OpenClaw は <strong style="color: #4FFFB0;">サブスク経由のWebブラウザ操作</strong>（Geminiは既存Pythonスクリプト活用）または <strong style="color: #4FFFB0;">公式API（従量課金）</strong> どちらにも対応。サブスク内に収まれば追加LLMコストはゼロ。
+      </div>
+    </div>
+
+    <!-- 3パターン比較 -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem;">
+
+      <!-- Tier A -->
+      <div class="card" style="border-top: 4px solid #4FFFB0; position: relative;">
+        <div class="tag tag-green" style="margin-bottom: 1rem;">Tier A — エントリー</div>
+        <h3 style="margin-bottom: 0.25rem;">ローカルPC + PicoClaw</h3>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.25rem;">既存PCにPicoClawをインストール。Gemini Python連携を軸に最小コストで始動。PC起動中のみ稼働。</p>
+        <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; font-size: 0.88rem;">
+            <span style="color: var(--text-muted);">LLMサブスク</span><span style="color: #4FFFB0;">¥13,500</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 0.88rem;">
+            <span style="color: var(--text-muted);">PicoClaw（無料/OSS）</span><span style="color: #4FFFB0;">¥0</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 0.88rem;">
+            <span style="color: var(--text-muted);">API追加費用</span><span style="color: #4FFFB0;">¥0〜1,500</span>
+          </div>
+          <div style="border-top: 1px solid var(--border); padding-top: 0.5rem; display: flex; justify-content: space-between; font-weight: 700;">
+            <span>月額合計</span><span style="color: #4FFFB0;">¥13,500〜15,000</span>
+          </div>
+        </div>
+        <ul style="font-size: 0.83rem; color: var(--text-muted); padding-left: 1.2rem; margin-bottom: 1rem;">
+          <li>推奨スペック: RAM 8GB以上、Windows/Mac/Linux</li>
+          <li>Gemini Python連携 → OpenClaw Skillとして登録</li>
+          <li>月産コンテンツ目安: <strong style="color: var(--text);">20〜40本</strong></li>
+          <li>PC電源OFF時はワークフロー停止</li>
+        </ul>
+        <div style="background: rgba(79,255,176,0.1); border-radius: 8px; padding: 0.75rem; font-size: 0.82rem; color: #4FFFB0;">
+          ✔ まず試すならこれ。追加コスト最小。
+        </div>
+      </div>
+
+      <!-- Tier B -->
+      <div class="card" style="border-top: 4px solid #00D4FF; position: relative;">
+        <div class="tag tag-cyan" style="margin-bottom: 1rem;">Tier B — スタンダード ★推奨</div>
+        <h3 style="margin-bottom: 0.25rem;">ローカルPC + OpenClaw + API補完</h3>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.25rem;">サブスクを優先使用し、レート上限到達時のみAPIに自動フォールバック。並列処理・評価ループもフル稼働。</p>
+        <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; font-size: 0.88rem;">
+            <span style="color: var(--text-muted);">LLMサブスク</span><span style="color: #00D4FF;">¥13,500</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 0.88rem;">
+            <span style="color: var(--text-muted);">OpenClaw（OSS）</span><span style="color: #00D4FF;">¥0</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 0.88rem;">
+            <span style="color: var(--text-muted);">API補完（overflow）</span><span style="color: #00D4FF;">¥3,000〜8,000</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 0.88rem;">
+            <span style="color: var(--text-muted);">RunwayML/ElevenLabs等</span><span style="color: #00D4FF;">¥4,000〜10,000</span>
+          </div>
+          <div style="border-top: 1px solid var(--border); padding-top: 0.5rem; display: flex; justify-content: space-between; font-weight: 700;">
+            <span>月額合計</span><span style="color: #00D4FF;">¥20,500〜31,500</span>
+          </div>
+        </div>
+        <ul style="font-size: 0.83rem; color: var(--text-muted); padding-left: 1.2rem; margin-bottom: 1rem;">
+          <li>推奨スペック: RAM 16GB以上、SSD 256GB以上</li>
+          <li>4モデル ローテーション（コスト均等化）</li>
+          <li>月産コンテンツ目安: <strong style="color: var(--text);">60〜120本</strong></li>
+          <li>PC稼働時間 = 稼働時間（スリープ時は停止）</li>
+        </ul>
+        <div style="background: rgba(0,212,255,0.1); border-radius: 8px; padding: 0.75rem; font-size: 0.82rem; color: #00D4FF;">
+          ✔ コスト対効果が最も高い。まず目指すべき構成。
+        </div>
+      </div>
+
+      <!-- Tier C -->
+      <div class="card" style="border-top: 4px solid #FF6B6B; position: relative;">
+        <div class="tag tag-orange" style="margin-bottom: 1rem;">Tier C — フル自動化</div>
+        <h3 style="margin-bottom: 0.25rem;">VPS + OpenClaw + API</h3>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.25rem;">VPSにOpenClawを常駐。PCの電源に依存せず24時間365日完全自動稼働。スケール上限は実質なし。</p>
+        <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; font-size: 0.88rem;">
+            <span style="color: var(--text-muted);">LLMサブスク</span><span style="color: #FF6B6B;">¥13,500</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 0.88rem;">
+            <span style="color: var(--text-muted);">VPS費用</span><span style="color: #FF6B6B;">¥880〜2,200</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 0.88rem;">
+            <span style="color: var(--text-muted);">API（LLM overflow）</span><span style="color: #FF6B6B;">¥5,000〜15,000</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 0.88rem;">
+            <span style="color: var(--text-muted);">動画・音声生成API</span><span style="color: #FF6B6B;">¥8,000〜20,000</span>
+          </div>
+          <div style="border-top: 1px solid var(--border); padding-top: 0.5rem; display: flex; justify-content: space-between; font-weight: 700;">
+            <span>月額合計</span><span style="color: #FF6B6B;">¥27,380〜50,700</span>
+          </div>
+        </div>
+        <ul style="font-size: 0.83rem; color: var(--text-muted); padding-left: 1.2rem; margin-bottom: 1rem;">
+          <li>VPS: さくらVPS / ConoHa / DigitalOcean</li>
+          <li>24時間稼働でスケジュール実行可能</li>
+          <li>月産コンテンツ目安: <strong style="color: var(--text);">150〜300本以上</strong></li>
+          <li>収益が¥50,000超えたら移行を推奨</li>
+        </ul>
+        <div style="background: rgba(255,107,107,0.1); border-radius: 8px; padding: 0.75rem; font-size: 0.82rem; color: #FF6B6B;">
+          ✔ 収益化軌道に乗ったら移行。ROI最大化フェーズ。
+        </div>
+      </div>
+    </div>
+
+    <!-- VPS/VPCコスト詳細表 -->
+    <div class="section-label" style="margin-bottom: 1rem;">VPS / VPCコスト詳細（Tier C 参考）</div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+      <div>
+        <h3 style="font-size: 1rem; margin-bottom: 0.75rem; color: var(--text-muted);">オーケストレーション用 VPS（CPU・軽量）</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>サービス</th><th>スペック</th><th>月額</th><th>用途</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>さくらVPS</td><td>2GB RAM / 2vCPU / SSD 50GB</td><td>¥880</td><td>OpenClaw常駐（最安）</td></tr>
+              <tr><td>ConoHa VPS</td><td>4GB RAM / 3vCPU / SSD 100GB</td><td>¥1,320</td><td>FFmpeg処理込み</td></tr>
+              <tr><td>DigitalOcean</td><td>2GB RAM / 1vCPU / SSD 50GB</td><td>$6（¥900）</td><td>グローバル低遅延</td></tr>
+              <tr><td>Vultr</td><td>4GB RAM / 2vCPU / SSD 80GB</td><td>$12（¥1,800）</td><td>日本リージョン有</td></tr>
+              <tr><td>AWS EC2 t3.small</td><td>2GB RAM / 2vCPU</td><td>¥2,000〜2,500</td><td>AWS他サービス連携時</td></tr>
+              <tr><td>GCP e2-medium</td><td>4GB RAM / 2vCPU</td><td>¥1,800〜2,200</td><td>Gemini API統合時</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 0.5rem;">※ OpenClaw常駐のみなら2GB RAM で十分。FFmpegをVPS側で処理する場合は4GB以上推奨。</p>
+      </div>
+      <div>
+        <h3 style="font-size: 1rem; margin-bottom: 0.75rem; color: var(--text-muted);">LLM API 従量コスト目安（overflow分）</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>モデル</th><th>input</th><th>output</th><th>1本あたり目安</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Claude Sonnet 4.6</td><td>$3/M tok</td><td>$15/M tok</td><td>¥3〜15</td></tr>
+              <tr><td>Claude Haiku 4.5</td><td>$0.8/M tok</td><td>$4/M tok</td><td>¥1〜5</td></tr>
+              <tr><td>Gemini 3.1 Flash-Lite</td><td>$0.075/M tok</td><td>$0.30/M tok</td><td>¥1〜3</td></tr>
+              <tr><td>Gemini 3.1 Pro</td><td>$1.25/M tok</td><td>$5/M tok</td><td>¥3〜12</td></tr>
+              <tr><td>GPT-5.4 (API)</td><td>$75/M tok</td><td>$150/M tok</td><td>¥100〜300</td></tr>
+              <tr style="font-size: 0.82rem;"><td colspan="3" style="color: var(--text-muted);">★ APIはGemini Flash / Claude Haiku で最安化</td><td>—</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 0.5rem;">※ GPT-5.4 API は高額なので、overflow時は Gemini/Haiku に自動フォールバックする設計が鉄則。</p>
+      </div>
+    </div>
+
+    <!-- Pico vs OpenClaw 比較 -->
+    <div style="margin-top: 2rem;">
+      <div class="section-label" style="margin-bottom: 1rem;">PicoClaw vs OpenClaw — どちらを選ぶか</div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+        <div class="card" style="border-left: 4px solid #4FFFB0;">
+          <h3 style="margin-bottom: 0.75rem;">🦐 PicoClaw（軽量版）</h3>
+          <ul class="checklist" style="font-size: 0.85rem;">
+            <li>低スペックPC・Raspberry Pi でも動作</li>
+            <li>YAML不要の簡易ワークフロー定義</li>
+            <li>Gemini Python連携との親和性が高い</li>
+            <li>単一パイプライン向け（並列実行は限定的）</li>
+            <li>セットアップ時間: 30分〜1時間</li>
+          </ul>
+          <div style="margin-top: 0.75rem; font-size: 0.83rem; color: var(--text-muted);">→ まず始めるならPicoClaw。Tier A の中核。</div>
+        </div>
+        <div class="card" style="border-left: 4px solid #00D4FF;">
+          <h3 style="margin-bottom: 0.75rem;">🦞 OpenClaw（フル機能）</h3>
+          <ul class="checklist" style="font-size: 0.85rem;">
+            <li>並列・条件分岐・リトライ処理をフルサポート</li>
+            <li>WebダッシュボードでJob状態をリアルタイム監視</li>
+            <li>Skill レジストリで全AIツールを一元管理</li>
+            <li>コスト追跡・アラート機能内蔵</li>
+            <li>VPS常駐で24/7稼働（Tier B・C の中核）</li>
+          </ul>
+          <div style="margin-top: 0.75rem; font-size: 0.83rem; color: var(--text-muted);">→ スケール時はOpenClawに移行。Tier B・C で真価発揮。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ROIサマリー -->
+    <div style="margin-top: 2rem;">
+      <div class="section-label" style="margin-bottom: 1rem;">月次ROIサマリー（3Tier比較）</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Tier</th><th>月額固定費</th><th>月産本数目安</th><th>想定月収</th><th>概算利益</th><th>推奨移行タイミング</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="tag tag-green">A</span> ローカル + PicoClaw</td>
+              <td>¥13,500〜15,000</td>
+              <td>20〜40本</td>
+              <td>¥15,000〜60,000</td>
+              <td style="color: #4FFFB0;">¥0〜45,000</td>
+              <td>まずここから開始</td>
+            </tr>
+            <tr>
+              <td><span class="tag tag-cyan">B</span> ローカル + OpenClaw</td>
+              <td>¥20,500〜31,500</td>
+              <td>60〜120本</td>
+              <td>¥40,000〜150,000</td>
+              <td style="color: #4FFFB0;">¥8,500〜128,500</td>
+              <td>収益¥30,000超で移行</td>
+            </tr>
+            <tr>
+              <td><span class="tag tag-orange">C</span> VPS + OpenClaw</td>
+              <td>¥27,380〜50,700</td>
+              <td>150〜300本以上</td>
+              <td>¥100,000〜400,000+</td>
+              <td style="color: #4FFFB0;">¥49,300〜349,000+</td>
+              <td>収益¥50,000超で移行</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="color: var(--text-muted); font-size: 0.82rem; margin-top: 0.75rem;">
+        ※ 想定月収はYouTube広告収益 + note/Kindle/Booth の合算。評価通過率65%・平均再生単価¥0.3/回を仮定。<br>
+        ※ サブスク $90 は全Tierの固定費に含まれるため、追加LLMコストはAPI overflow分のみ。<br>
+        ※ GPT-5.4 API は高額なので overflow時は Gemini 3.1 Flash-Lite または Claude Haiku 4.5 に自動フォールバック推奨。
+      </p>
+    </div>
+
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">AI Creator Hub</div>
+    <nav>
+      <a href="index.html">ホーム</a>
+      <a href="video-pipeline.html">動画制作</a>
+      <a href="manga-pipeline.html">漫画制作</a>
+      <a href="evaluation.html">評価システム</a>
+      <a href="monetization.html">マネタイズ</a>
+      <a href="openclaw.html">OpenClaw連携</a>
+    </nav>
+    <p>AI Creator Hub — AIでコンテンツをつくり、稼ぐ</p>
+  </div>
+</footer>
+
+<script src="main.js"></script>
+</body>
+</html>
