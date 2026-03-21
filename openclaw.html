@@ -84,126 +84,367 @@
   </div>
 </section>
 
+<!-- Signal Trigger -->
+<section class="section" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-label">ユーザーインターフェース</div>
+    <h2 class="section-title">Signalメッセージで<br>全パイプラインをトリガー</h2>
+    <div class="two-col">
+      <div>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+          ユーザーはSignalアプリからテキストを送るだけで全自動制作が始まります。
+          OpenClawがSignal Botとして常駐し、コマンドを解析してワークフローを起動。
+          進捗・完了・エラーを全てSignalで返信します。
+        </p>
+        <ul class="checklist">
+          <li><strong>/create video</strong> ネタ文章 → 動画生成を起動</li>
+          <li><strong>/create manga</strong> ネタ文章 → 漫画生成を起動</li>
+          <li><strong>/create both</strong> ネタ文章 → 動画+漫画を並列生成</li>
+          <li><strong>/status</strong> 全ジョブの進捗を確認</li>
+          <li><strong>/revenue today</strong> 当日の収益サマリーを取得</li>
+        </ul>
+      </div>
+      <div>
+        <div class="code-block">
+<span class="cm"># Signal Bot ハンドラー (OpenClaw Skill)</span>
+<span class="kw">name</span>: signal-bot-handler
+<span class="kw">trigger</span>:
+  <span class="kw">type</span>: signal_message
+  <span class="kw">allowed_senders</span>:
+    - <span class="str">"${{env.OWNER_SIGNAL_NUMBER}}"</span>
+
+<span class="kw">on_message</span>:
+  - <span class="kw">match</span>: <span class="str">"/create both (.+)"</span>
+    <span class="kw">workflow</span>: <span class="str">dual-content-creation</span>
+    <span class="kw">input_map</span>:
+      <span class="kw">topic_text</span>: <span class="str">"$1"</span>
+    <span class="kw">reply</span>: <span class="str">"動画+漫画の並列生成を開始しました 🚀"</span>
+
+  - <span class="kw">match</span>: <span class="str">"/status"</span>
+    <span class="kw">workflow</span>: <span class="str">job-status-report</span>
+    <span class="kw">reply_template</span>: <span class="str">"実行中: {{running}} | 完了: {{done}} | エラー: {{errors}}"</span>
+
+  - <span class="kw">match</span>: <span class="str">"/revenue today"</span>
+    <span class="kw">workflow</span>: <span class="str">revenue-summary</span>
+    <span class="kw">reply_template</span>: <span class="str">"本日収益: ¥{{total_jpy}} ({{platform_breakdown}})"</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Skill Registration -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label">Skill登録・管理</div>
+    <h2 class="section-title">各モジュールを<br>OpenClaw Skillとして登録</h2>
+    <div class="two-col">
+      <div>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+          AI Creator Hubの各モジュールはOpenClaw Skillとして定義されます。
+          SKILL.mdファイル1つで入出力・エラー処理・コスト上限を宣言的に管理。
+          新しいモジュール追加はファイルを置くだけで自動認識されます。
+        </p>
+        <div class="code-block">
+<span class="cm"># skills/ ディレクトリ構成</span>
+skills/
+├── video-pipeline/
+│   ├── <span class="str">SKILL.md</span>       <span class="cm"># Skill定義</span>
+│   ├── <span class="str">main.py</span>        <span class="cm"># エントリーポイント</span>
+│   └── <span class="str">requirements.txt</span>
+├── manga-pipeline/
+│   ├── <span class="str">SKILL.md</span>
+│   └── <span class="str">main.py</span>
+├── content-evaluator/
+│   ├── <span class="str">SKILL.md</span>
+│   └── <span class="str">evaluator.py</span>
+├── monetization-manager/
+│   ├── <span class="str">SKILL.md</span>
+│   └── <span class="str">publisher.py</span>
+└── signal-bot-handler/
+    ├── <span class="str">SKILL.md</span>
+    └── <span class="str">bot.py</span></div>
+      </div>
+      <div>
+        <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--text-muted);">SKILL.md 標準フォーマット</h3>
+        <div class="code-block">
+<span class="cm"># SKILL.md — 全Skillの共通フォーマット</span>
+<span class="fn">name</span>: <span class="str">video-pipeline</span>
+<span class="fn">description</span>: <span class="str">"ネタ文章から動画を自動生成"</span>
+<span class="fn">version</span>: <span class="str">"2.1.0"</span>
+<span class="fn">author</span>: <span class="str">"AI Creator Hub"</span>
+
+<span class="fn">cost_limits</span>:
+  <span class="fn">per_run_usd</span>: <span class="num">2.00</span>     <span class="cm"># 1回あたり上限</span>
+  <span class="fn">per_day_usd</span>: <span class="num">30.00</span>    <span class="cm"># 日次上限</span>
+  <span class="fn">on_exceed</span>: <span class="str">abort_notify</span> <span class="cm"># 超過時: 中断+通知</span>
+
+<span class="fn">retry_policy</span>:
+  <span class="fn">max_attempts</span>: <span class="num">3</span>
+  <span class="fn">backoff</span>: <span class="str">exponential</span>  <span class="cm"># 2s→4s→8s</span>
+  <span class="fn">on_final_failure</span>: <span class="str">human_alert</span>
+
+<span class="fn">timeout_sec</span>: <span class="num">5400</span>    <span class="cm"># 90分タイムアウト</span>
+
+<span class="fn">input</span>:  <span class="cm"># ... (各Skill固有)</span>
+<span class="fn">output</span>: <span class="cm"># ... (各Skill固有)</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- Workflow Definition -->
 <section class="section" style="background: var(--bg2);">
   <div class="section-inner">
     <div class="section-label">ワークフロー定義</div>
-    <h2 class="section-title">動画制作ワークフロー例</h2>
-    <div class="code-block">
-<span class="cm"># openclaw_video_workflow.yaml</span>
-<span class="fn">name</span>: <span class="str">"ai_video_creator"</span>
-<span class="fn">version</span>: <span class="str">"1.0"</span>
+    <h2 class="section-title">動画+漫画 デュアル<br>並列ワークフロー例</h2>
+    <div class="two-col">
+      <div>
+        <p style="color: var(--text-muted); margin-bottom: 1rem;">同じネタから動画と漫画を並列生成するメインワークフロー。共通前処理を1回だけ実行してコストを削減。</p>
+        <div class="code-block">
+<span class="cm"># dual_content_workflow.yaml</span>
+<span class="fn">name</span>: <span class="str">"dual-content-creation"</span>
+<span class="fn">version</span>: <span class="str">"2.0"</span>
 <span class="fn">trigger</span>:
-  <span class="fn">type</span>: <span class="str">"webhook"</span>
-  <span class="fn">endpoint</span>: <span class="str">"/api/create-video"</span>
+  <span class="fn">type</span>: <span class="str">"signal_command"</span>
+  <span class="fn">command</span>: <span class="str">"/create both"</span>
 
 <span class="fn">steps</span>:
-  - <span class="fn">id</span>: <span class="str">"analyze_input"</span>
-    <span class="fn">tool</span>: <span class="str">"llm.claude"</span>
-    <span class="fn">prompt</span>: <span class="str">"ネタ文章のジャンル・ターゲット・トーンを分析: {{input.text}}"</span>
-    <span class="fn">output</span>: <span class="str">"content_metadata"</span>
+  - <span class="fn">id</span>: <span class="str">"analyze"</span>
+    <span class="fn">skill</span>: <span class="str">"llm.claude"</span>     <span class="cm"># 共通前処理</span>
+    <span class="fn">prompt</span>: <span class="str">"ジャンル・ターゲット・トーンを分析: {{input.topic_text}}"</span>
+    <span class="fn">output</span>: <span class="str">"topic_data"</span>
 
-  - <span class="fn">id</span>: <span class="str">"generate_script"</span>
-    <span class="fn">tool</span>: <span class="str">"llm.gpt4o"</span>
-    <span class="fn">depends_on</span>: [<span class="str">"analyze_input"</span>]
-    <span class="fn">prompt</span>: <span class="str">"{{content_metadata}}を元にYouTube動画スクリプトを作成"</span>
-    <span class="fn">output</span>: <span class="str">"script"</span>
+  - <span class="fn">id</span>: <span class="str">"gen_video"</span>          <span class="cm"># 並列A</span>
+    <span class="fn">skill</span>: <span class="str">"video-pipeline"</span>
+    <span class="fn">parallel_group</span>: <span class="str">"content_gen"</span>
+    <span class="fn">depends_on</span>: [<span class="str">"analyze"</span>]
+    <span class="fn">input</span>:
+      <span class="fn">topic_text</span>: <span class="str">"{{topic_data.structured}}"</span>
+      <span class="fn">genre</span>: <span class="str">"{{topic_data.genre}}"</span>
 
-  - <span class="fn">id</span>: <span class="str">"generate_visuals"</span>
-    <span class="fn">tool</span>: <span class="str">"image.midjourney"</span>
-    <span class="fn">depends_on</span>: [<span class="str">"generate_script"</span>]
-    <span class="fn">parallel</span>: <span class="kw">true</span>
-    <span class="fn">inputs</span>:
-      - <span class="str">"{{script.scene_descriptions}}"</span>
-    <span class="fn">output</span>: <span class="str">"scene_images"</span>
+  - <span class="fn">id</span>: <span class="str">"gen_manga"</span>          <span class="cm"># 並列B</span>
+    <span class="fn">skill</span>: <span class="str">"manga-pipeline"</span>
+    <span class="fn">parallel_group</span>: <span class="str">"content_gen"</span>
+    <span class="fn">depends_on</span>: [<span class="str">"analyze"</span>]
+    <span class="fn">input</span>:
+      <span class="fn">story_text</span>: <span class="str">"{{topic_data.structured}}"</span>
+      <span class="fn">genre_preset</span>: <span class="str">"{{topic_data.genre}}"</span>
 
-  - <span class="fn">id</span>: <span class="str">"generate_voice"</span>
-    <span class="fn">tool</span>: <span class="str">"voice.elevenlabs"</span>
-    <span class="fn">depends_on</span>: [<span class="str">"generate_script"</span>]
-    <span class="fn">parallel</span>: <span class="kw">true</span>
-    <span class="fn">inputs</span>:
-      <span class="fn">text</span>: <span class="str">"{{script.narration}}"</span>
-      <span class="fn">voice_id</span>: <span class="str">"{{content_metadata.recommended_voice}}"</span>
-    <span class="fn">output</span>: <span class="str">"audio"</span>
+  - <span class="fn">id</span>: <span class="str">"evaluate_all"</span>       <span class="cm"># 両方完了後</span>
+    <span class="fn">skill</span>: <span class="str">"content-evaluator"</span>
+    <span class="fn">depends_on</span>: [<span class="str">"gen_video"</span>, <span class="str">"gen_manga"</span>]
+    <span class="fn">input</span>:
+      <span class="fn">contents</span>: [<span class="str">"{{gen_video.output}}"</span>, <span class="str">"{{gen_manga.output}}"</span>]
 
-  - <span class="fn">id</span>: <span class="str">"compile_video"</span>
-    <span class="fn">tool</span>: <span class="str">"video.ffmpeg"</span>
-    <span class="fn">depends_on</span>: [<span class="str">"generate_visuals"</span>, <span class="str">"generate_voice"</span>]
-    <span class="fn">inputs</span>:
-      <span class="fn">images</span>: <span class="str">"{{scene_images}}"</span>
-      <span class="fn">audio</span>: <span class="str">"{{audio}}"</span>
-    <span class="fn">output</span>: <span class="str">"video_file"</span>
-
-  - <span class="fn">id</span>: <span class="str">"evaluate"</span>
-    <span class="fn">tool</span>: <span class="str">"custom.content_evaluator"</span>
-    <span class="fn">depends_on</span>: [<span class="str">"compile_video"</span>]
-    <span class="fn">output</span>: <span class="str">"evaluation"</span>
-
-  - <span class="fn">id</span>: <span class="str">"publish_or_improve"</span>
-    <span class="fn">type</span>: <span class="str">"condition"</span>
-    <span class="fn">depends_on</span>: [<span class="str">"evaluate"</span>]
+  - <span class="fn">id</span>: <span class="str">"route"</span>
+    <span class="fn">type</span>: <span class="str">"condition_branch"</span>
+    <span class="fn">depends_on</span>: [<span class="str">"evaluate_all"</span>]
     <span class="fn">branches</span>:
-      - <span class="fn">condition</span>: <span class="str">"{{evaluation.score}} >= 85"</span>
+      - <span class="fn">condition</span>: <span class="str">"score >= 85"</span>
         <span class="fn">next</span>: <span class="str">"publish"</span>
-      - <span class="fn">condition</span>: <span class="str">"{{evaluation.score}} >= 70"</span>
+      - <span class="fn">condition</span>: <span class="str">"score >= 70"</span>
         <span class="fn">next</span>: <span class="str">"auto_improve"</span>
+      - <span class="fn">condition</span>: <span class="str">"score >= 55"</span>
+        <span class="fn">next</span>: <span class="str">"human_review"</span>   <span class="cm"># HITL</span>
       - <span class="fn">condition</span>: <span class="str">"default"</span>
-        <span class="fn">next</span>: <span class="str">"discard_and_retry"</span>
+        <span class="fn">next</span>: <span class="str">"discard_retry"</span></div>
+      </div>
+      <div>
+        <h3 style="margin-bottom: 0.75rem; font-size: 1rem; color: var(--text-muted);">単体動画ワークフロー（詳細）</h3>
+        <div class="code-block">
+<span class="cm"># video_only_workflow.yaml (内部)</span>
+<span class="fn">id</span>: <span class="str">"generate_visuals"</span>
+<span class="fn">skill</span>: <span class="str">"image.midjourney"</span>
+<span class="fn">parallel_group</span>: <span class="str">"av_gen"</span>   <span class="cm"># 音声と並列</span>
+<span class="fn">inputs</span>:
+  - <span class="str">"{{script.scene_descriptions}}"</span>
+<span class="fn">output</span>: <span class="str">"scene_images"</span>
 
-  - <span class="fn">id</span>: <span class="str">"publish"</span>
-    <span class="fn">tool</span>: <span class="str">"publisher.youtube"</span>
-    <span class="fn">inputs</span>:
-      <span class="fn">video</span>: <span class="str">"{{video_file}}"</span>
-      <span class="fn">metadata</span>: <span class="str">"{{evaluation.optimized_metadata}}"</span>
-      <span class="fn">schedule</span>: <span class="str">"{{evaluation.optimal_publish_time}}"</span></div>
+<span class="fn">id</span>: <span class="str">"generate_voice"</span>
+<span class="fn">skill</span>: <span class="str">"voice.elevenlabs"</span>
+<span class="fn">parallel_group</span>: <span class="str">"av_gen"</span>   <span class="cm"># 画像生成と並列</span>
+<span class="fn">inputs</span>:
+  <span class="fn">text</span>: <span class="str">"{{script.narration}}"</span>
+  <span class="fn">voice_id</span>: <span class="str">"{{topic_data.voice}}"</span>
+<span class="fn">output</span>: <span class="str">"audio"</span>
+
+<span class="fn">id</span>: <span class="str">"compile_video"</span>
+<span class="fn">skill</span>: <span class="str">"video.ffmpeg"</span>
+<span class="fn">depends_on</span>: [<span class="str">"generate_visuals"</span>, <span class="str">"generate_voice"</span>]
+<span class="fn">inputs</span>:
+  <span class="fn">images</span>: <span class="str">"{{scene_images}}"</span>
+  <span class="fn">audio</span>: <span class="str">"{{audio}}"</span>
+  <span class="fn">subs</span>: <span class="str">"{{script.subtitles}}"</span>
+<span class="fn">output</span>: <span class="str">"video_file"</span>
+
+<span class="fn">id</span>: <span class="str">"publish"</span>
+<span class="fn">skill</span>: <span class="str">"publisher.youtube"</span>
+<span class="fn">inputs</span>:
+  <span class="fn">video</span>: <span class="str">"{{video_file}}"</span>
+  <span class="fn">metadata</span>: <span class="str">"{{evaluation.optimized_metadata}}"</span>
+  <span class="fn">schedule</span>: <span class="str">"{{evaluation.optimal_publish_time}}"</span></div>
+      </div>
+    </div>
   </div>
 </section>
 
-<!-- Integration Points -->
+<!-- HITL -->
 <section class="section">
   <div class="section-inner">
-    <div class="section-label">連携設計</div>
-    <h2 class="section-title">OpenClawとの統合方法</h2>
+    <div class="section-label">Human-in-the-Loop</div>
+    <h2 class="section-title">人間確認ポイントの<br>設計パターン</h2>
+    <div class="two-col">
+      <div>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+          スコア55〜69のグレーゾーンや重要な判断を要する場合、
+          OpenClawがSignalで確認メッセージを送り、人間の返答を待ってから処理を続行します。
+          タイムアウトした場合のデフォルト動作も設定可能。
+        </p>
+        <div class="code-block">
+<span class="cm"># HITL ステップ定義 (YAML)</span>
+<span class="fn">id</span>: <span class="str">"human_review"</span>
+<span class="fn">type</span>: <span class="str">"human_in_the_loop"</span>
+<span class="fn">channel</span>: <span class="str">"signal"</span>
+<span class="fn">message_template</span>: |
+  <span class="str">⚠️ 人間レビューが必要です
+  コンテンツID: {{content_id}}
+  スコア: {{score}} / 100
+  問題点: {{issues}}
+
+  👉 返信してください:
+  [y] 公開する
+  [n] 破棄する
+  [e] 自動改善して再評価</span>
+
+<span class="fn">timeout_minutes</span>: <span class="num">60</span>
+<span class="fn">on_timeout</span>: <span class="str">"discard"</span>     <span class="cm"># 未返信は破棄</span>
+<span class="fn">response_map</span>:
+  <span class="str">"y"</span>: <span class="str">"publish"</span>
+  <span class="str">"n"</span>: <span class="str">"discard_retry"</span>
+  <span class="str">"e"</span>: <span class="str">"auto_improve"</span></div>
+      </div>
+      <div>
+        <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--text-muted);">HITLが発動するシナリオ</h3>
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <div style="background: rgba(255,158,0,0.1); border: 1px solid rgba(255,158,0,0.3); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; color: #FF9E00; font-weight: 700; margin-bottom: 0.35rem;">グレーゾーン判定（スコア 55〜69）</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">AIが自信を持って判断できない場合。Signalで3択通知。</div>
+          </div>
+          <div style="background: rgba(255,107,107,0.1); border: 1px solid rgba(255,107,107,0.3); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; color: #FF6B6B; font-weight: 700; margin-bottom: 0.35rem;">3回リトライ失敗</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">APIエラーが解消しない場合。詳細ログとともに通知。</div>
+          </div>
+          <div style="background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.3); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; color: var(--accent); font-weight: 700; margin-bottom: 0.35rem;">コスト上限超過リスク</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">予想コストが制限の80%を超えた場合に事前確認。</div>
+          </div>
+          <div style="background: rgba(108,60,225,0.1); border: 1px solid rgba(108,60,225,0.3); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; color: #6C3CE1; font-weight: 700; margin-bottom: 0.35rem;">安全性フラグ検知</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">著作権・規約違反の疑いがある場合は必ず人間確認。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Cost Management -->
+<section class="section" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-label">APIコスト管理</div>
+    <h2 class="section-title">全ツールのコストを<br>リアルタイムで一元管理</h2>
+    <div class="two-col">
+      <div>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+          各APIの呼び出しコストをOpenClawが自動集計・記録します。
+          1ジョブあたり・1日あたりの上限を設定し、超過リスク時は自動で安価な代替ツールへフォールバック。
+          月次コストレポートをSignalで自動送信します。
+        </p>
+        <ul class="checklist">
+          <li>1ジョブのコストをリアルタイム積算</li>
+          <li>RunwayML高負荷時 → Kling AIへ自動切替</li>
+          <li>ElevenLabs超過時 → VOICEVOXへフォールバック</li>
+          <li>日次・月次コストレポートをSignal送信</li>
+          <li>ツール別・ジャンル別のROI分析</li>
+        </ul>
+      </div>
+      <div>
+        <div class="code-block">
+<span class="cm"># コスト管理設定 (openclaw_config.yaml)</span>
+<span class="fn">cost_management</span>:
+  <span class="fn">budgets</span>:
+    <span class="fn">per_job_usd</span>: <span class="num">2.00</span>
+    <span class="fn">per_day_usd</span>: <span class="num">30.00</span>
+    <span class="fn">per_month_usd</span>: <span class="num">600.00</span>
+
+  <span class="fn">fallbacks</span>:
+    <span class="str">"image.midjourney"</span>: <span class="str">"image.dalle3"</span>
+    <span class="str">"video.runwayml"</span>: <span class="str">"video.kling"</span>
+    <span class="str">"voice.elevenlabs"</span>: <span class="str">"voice.voicevox"</span>
+    <span class="str">"llm.gpt4o"</span>: <span class="str">"llm.claude-haiku"</span>
+
+  <span class="fn">alerts</span>:
+    <span class="fn">channel</span>: <span class="str">"signal"</span>
+    <span class="fn">thresholds</span>:
+      <span class="fn">job_80pct</span>: <span class="str">"warn_and_confirm"</span>  <span class="cm"># HITL</span>
+      <span class="fn">day_90pct</span>: <span class="str">"pause_new_jobs"</span>
+      <span class="fn">month_100pct</span>: <span class="str">"full_stop"</span>
+
+  <span class="fn">reporting</span>:
+    <span class="fn">daily_summary</span>: <span class="str">"08:00 JST"</span>
+    <span class="fn">monthly_report</span>: <span class="str">"1st 09:00 JST"</span>
+    <span class="fn">include_roi</span>: <span class="kw">true</span>  <span class="cm"># 収益 ÷ APIコスト</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Monitoring & Logging -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label">監視・ログ設計</div>
+    <h2 class="section-title">全パイプラインを<br>一元モニタリング</h2>
     <div class="card-grid">
 
       <div class="card">
-        <div class="card-icon purple">🔌</div>
-        <h3>ネタ入力の受け取り</h3>
-        <p>別ラインのネタ生成システムからWebhookでネタ文章を受け取り、OpenClawのワークフローをトリガー。バッチ処理にも対応。</p>
-        <div class="code-block" style="font-size: 0.8rem; margin-top: 0.75rem;">
-POST /api/create-content
-{<span class="str">"text"</span>: <span class="str">"ネタ文章..."</span>,
- <span class="str">"type"</span>: <span class="str">"video|manga"</span>,
- <span class="str">"priority"</span>: <span class="str">"normal"</span>}</div>
-      </div>
-
-      <div class="card">
-        <div class="card-icon cyan">📡</div>
+        <div class="card-icon purple">📡</div>
         <h3>リアルタイム進捗監視</h3>
-        <p>各ステップの実行状況・コスト・エラーをリアルタイムでダッシュボードに表示。Slack/Discord通知も自動送信。</p>
+        <p>各ジョブのステップ進捗をWebSocketでリアルタイム配信。OpenClawダッシュボードで全ジョブの状態を一覧表示。</p>
+        <div class="code-block" style="font-size: 0.8rem; margin-top: 0.75rem;">
+<span class="cm">// WebSocket イベント例</span>
+{<span class="str">"job_id"</span>: <span class="str">"vid_001"</span>,
+ <span class="str">"step"</span>: <span class="str">"voice-gen"</span>,
+ <span class="str">"progress"</span>: <span class="num">67</span>,
+ <span class="str">"cost_so_far"</span>: <span class="num">0.84</span>}</div>
+      </div>
+
+      <div class="card">
+        <div class="card-icon cyan">🗂</div>
+        <h3>構造化ログ管理</h3>
+        <p>全ステップの入出力・コスト・所要時間を構造化JSONで記録。失敗パターン分析・パフォーマンス最適化の基礎データとして活用。</p>
         <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
-          <span class="tag tag-cyan">WebSocket</span>
-          <span class="tag tag-green">Slack通知</span>
+          <span class="tag tag-cyan">JSON Lines形式</span>
+          <span class="tag tag-purple">30日間保存</span>
         </div>
       </div>
 
       <div class="card">
-        <div class="card-icon orange">💸</div>
-        <h3>APIコスト管理</h3>
-        <p>各ツールのAPI呼び出しコストをOpenClawが自動集計。月額予算の上限設定・アラート・安価な代替ツールへの自動切替も実装。</p>
-        <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
-          <span class="tag tag-orange">コスト上限設定</span>
-          <span class="tag tag-purple">自動フォールバック</span>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-icon green">🔁</div>
+        <div class="card-icon orange">🔁</div>
         <h3>エラー処理・リトライ</h3>
-        <p>API失敗・タイムアウト・品質エラーを自動検知し、設定した回数だけリトライ。解決不能な場合は人間に通知して手動介入をリクエスト。</p>
+        <p>API失敗・タイムアウトを自動検知し指数バックオフでリトライ（2s→4s→8s）。3回失敗でSignal通知 + 代替ツールへ切替。</p>
         <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
-          <span class="tag tag-green">指数バックオフ</span>
-          <span class="tag tag-cyan">フォールバック先</span>
+          <span class="tag tag-orange">指数バックオフ</span>
+          <span class="tag tag-green">自動フォールバック</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-icon green">📊</div>
+        <h3>パフォーマンス分析</h3>
+        <p>ジョブあたりの平均所要時間・コスト・成功率をトラッキング。ボトルネックのステップを特定し、並列化・キャッシュで自動最適化。</p>
+        <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <span class="tag tag-green">P95レイテンシ追跡</span>
+          <span class="tag tag-cyan">週次レポート</span>
         </div>
       </div>
 
