@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cursor Editor | Knowledge Base</title>
+    <style>
+        :root {
+            --bg: #0b1220;
+            --panel: #151b2b;
+            --muted: #8b949e;
+            --text: #c9d1d9;
+            --accent: #58a6ff;
+            /* VS Code Blue-ish but modern */
+            --accent-2: #d2a8ff;
+            /* Purple for AI */
+            --border: rgba(255, 255, 255, 0.1);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            --radius: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Segoe UI", "SF Pro Display", system-ui, sans-serif;
+            color: var(--text);
+            background: var(--bg);
+            padding: 32px 20px 64px;
+            line-height: 1.6;
+        }
+
+        .shell {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        header.hero {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header.hero::after {
+            content: "";
+            position: absolute;
+            right: -50px;
+            top: -50px;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(210, 168, 255, 0.15), transparent 70%);
+            pointer-events: none;
+        }
+
+        .eyebrow {
+            font-family: monospace;
+            color: var(--accent-2);
+            font-size: 0.9em;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        h1 {
+            margin: 0 0 16px;
+            font-size: 36px;
+            color: #fff;
+            letter-spacing: -0.5px;
+        }
+
+        .lead {
+            margin: 0 0 20px;
+            font-size: 18px;
+            color: var(--muted);
+            max-width: 700px;
+        }
+
+        .back {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            border-color: var(--muted);
+        }
+
+        h2 {
+            margin: 0 0 12px;
+            font-size: 20px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        h2::before {
+            content: "";
+            width: 4px;
+            height: 1em;
+            background: var(--accent-2);
+            border-radius: 2px;
+        }
+
+        p {
+            margin: 0 0 16px;
+            color: var(--text);
+            font-size: 15px;
+        }
+
+        ul {
+            margin: 0;
+            padding-left: 20px;
+            color: var(--muted);
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .key {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9em;
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="shell">
+        <header class="hero">
+            <span class="eyebrow">ENVIRONMENT / EDITOR</span>
+            <h1>Cursor</h1>
+            <p class="lead">VS Codeのフォーク版でありながら、AIネイティブに再設計されたエディタ。コード補完を超えた「コード生成」体験。</p>
+            <a class="back" href="../index.html">← Workbenchへ戻る</a>
+        </header>
+
+        <section class="grid">
+            <article class="card">
+                <h2>なぜ Cursor なのか？</h2>
+                <p>VS Codeの拡張機能としてAIを入れるのではなく、エディタ自体がAIを前提に作られています。</p>
+                <ul>
+                    <li><strong>VS Code完全互換</strong>: 設定や拡張機能をそのまま引き継げます。</li>
+                    <li><strong>Codebase Indexing</strong>: プロジェクト全体を理解し、的確な提案を行います。</li>
+                    <li><strong>Composer</strong>: 複数ファイルを同時に編集・生成する強力な機能。</li>
+                </ul>
+            </article>
+
+            <article class="card">
+                <h2>必須ショートカット</h2>
+                <ul>
+                    <li><span class="key">Cmd</span> + <span class="key">K</span> : エディタ内でAIに指示（「この関数をリファクタリングして」）。</li>
+                    <li><span class="key">Cmd</span> + <span class="key">L</span> : チャットパネルを開く（「このコードの意味は？」）。</li>
+                    <li><span class="key">Cmd</span> + <span class="key">I</span> : Composer (Beta)
+                        を起動。複数ファイルにまたがる変更を一括指示。</li>
+                    <li><span class="key">Tab</span> : AI提案の確定（Copilotより強力なオートコンプリート）。</li>
+                </ul>
+            </article>
+        </section>
+
+        <section class="card">
+            <h2>Vibe Coding との関係</h2>
+            <p>「1行ずつ書く」時代は終わりました。Cursorを使えば、あなたは「何を作りたいか」を自然言語で記述し、<span class="key">Tab</span> キーでそれを承認する指揮者になります。</p>
+            <p>特に <strong>Composer</strong> 機能は、Vibe Codingの「全体感を伝えて細部を任せる」スタイルと完全に合致します。</p>
+        </section>
+    </div>
+</body>
+
+</html>

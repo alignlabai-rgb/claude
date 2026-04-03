@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude (The Sage) | Tech Workbench</title>
+    <style>
+        :root {
+            --bg: #0b1220;
+            --panel: #101418;
+            --muted: #94a3b8;
+            --text: #e2e8f0;
+            --accent: #d97757;
+            /* Claude Orange */
+            --accent-grad: linear-gradient(135deg, #d97757, #ffccaa);
+            --border: rgba(217, 119, 87, 0.2);
+            --radius: 16px;
+            --font-mono: "SF Mono", "Consolas", monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Segoe UI", "SF Pro Display", system-ui, sans-serif;
+            color: var(--text);
+            background: var(--bg);
+            padding: 32px 20px 64px;
+            line-height: 1.7;
+        }
+
+        .shell {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        header.hero {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 48px 40px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        header.hero::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--accent-grad);
+        }
+
+        header.hero::after {
+            content: "";
+            position: absolute;
+            right: -100px;
+            bottom: -100px;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(217, 119, 87, 0.1), transparent 70%);
+            pointer-events: none;
+        }
+
+        .meta-tag {
+            display: inline-block;
+            background: rgba(217, 119, 87, 0.15);
+            color: #ffbba3;
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(217, 119, 87, 0.3);
+        }
+
+        .last-updated {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--muted);
+            opacity: 0.7;
+            margin-top: 8px;
+            display: block;
+        }
+
+        .eyebrow {
+            font-size: 0.9em;
+            margin-bottom: 12px;
+            display: block;
+            color: var(--accent);
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        h1 {
+            margin: 0 0 16px;
+            font-size: 48px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            line-height: 1.1;
+            background: linear-gradient(to right, #fff, #ffdfcf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .lead {
+            margin: 0 0 32px;
+            font-size: 20px;
+            color: var(--muted);
+            max-width: 760px;
+            font-weight: 300;
+        }
+
+        .back {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        .back:hover {
+            opacity: 1;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 32px;
+            transition: transform 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        h2 {
+            margin: 0 0 20px;
+            font-size: 24px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+        }
+
+        h2::before {
+            content: "";
+            width: 4px;
+            height: 24px;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+
+        h3 {
+            margin: 24px 0 12px;
+            font-size: 18px;
+            color: #fff;
+            font-weight: 600;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 8px;
+        }
+
+        p {
+            margin: 0 0 16px;
+            color: var(--muted);
+            font-size: 16px;
+        }
+
+        ul {
+            margin: 0 0 24px;
+            padding-left: 24px;
+            color: var(--muted);
+        }
+
+        li {
+            margin-bottom: 12px;
+        }
+
+        li strong {
+            color: var(--text);
+        }
+
+        .spec-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .spec-item {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .spec-label {
+            display: block;
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--muted);
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .spec-value {
+            display: block;
+            font-size: 16px;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .feature-box {
+            background: rgba(217, 119, 87, 0.05);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px dashed var(--border);
+            margin-top: 16px;
+        }
+
+        .feature-title {
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 8px;
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="shell">
+        <header class="hero">
+            <div class="meta-tag">INTELLIGENCE / ANTHROPIC</div>
+            <span class="eyebrow">The Sage (賢者)</span>
+            <h1>Claude</h1>
+            <p class="lead">最も人間に寄り添い、深い洞察を提供する賢者。最新の「Claude 4.6」はAdaptive
+                Thinkingと1Mトークンコンテキストにより、複雑な知的労働のパートナーとして完成の域に達しました。</p>
+            <span class="last-updated">Last Updated: 2026.02.11</span>
+            <br>
+            <a class="back" href="../index.html">← Workbenchへ戻る</a>
+        </header>
+
+        <section class="grid">
+            <article class="card">
+                <h2>Core Specs</h2>
+                <div class="spec-grid">
+                    <div class="spec-item">
+                        <span class="spec-label">Latest Model</span>
+                        <span class="spec-value">Claude 4.6 Opus</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Key Feature</span>
+                        <span class="spec-value">Adaptive Thinking</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Context Window</span>
+                        <span class="spec-value">1,000,000 Tokens (Beta)</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Output</span>
+                        <span class="spec-value">128K Output Tokens</span>
+                    </div>
+                </div>
+                <p>Claudeは常に「Constitutional AI」としての安全性と、文学的・哲学的な表現力を重視してきました。4.6ではその質を維持したまま、思考の柔軟性と処理容量が飛躍的に向上しています。
+                </p>
+            </article>
+
+            <article class="card">
+                <h2>Adaptive Thinking</h2>
+                <p>タスクの難易度に応じて、Claudeが自ら「どれくらい深く考えるか」を調整する機能です。</p>
+                <div class="feature-box">
+                    <span class="feature-title">Dynamic Effort Adjustment</span>
+                    思考のプロセスをLow, Medium, High, Maxのレベルで制御可能。<br>
+                    簡単な要約なら「サクッと処理（Low）」し、複雑な法的文書の分析やアーキテクチャ設計では「熟考（Max）」モードに入ります。これにより、コストと質の最適なバランスを自動（または手動）で決定できます。
+                </div>
+            </article>
+        </section>
+
+        <section class="card">
+            <h2>Context Compaction & Long Horizon</h2>
+            <p>Claude 4.6の真価は、長期間にわたるプロジェクトや、膨大な資料を読み込むタスクで発揮されます。</p>
+            <div class="grid">
+                <div>
+                    <h3>1 Million Context (Beta)</h3>
+                    <p>100万トークン（書籍にして数十冊分）の情報を一度に保持できます。これは、企業の全規定集や、大規模なレガシーコードの全容を理解させるのに十分な容量です。</p>
+                </div>
+                <div>
+                    <h3>Context Compaction</h3>
+                    <p>会話が長くなっても、過去の重要な文脈を自動的に要約・圧縮（Compaction）して保持する機能により、「以前の話を忘れる」ことが激減しました。エージェントとして長時間稼働させる際の安定性が劇的に向上しています。
+                    </p>
+                </div>
+                <div>
+                    <h3>128K Output</h3>
+                    <p>出力制限が大幅に緩和され、途中で切れることなく長大なレポートや、完全なコードモジュールを一気に出力できるようになりました。</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="grid">
+            <article class="card">
+                <h2>Why use for Vibe Coding?</h2>
+                <p>Vibe Codingにおいて、Claudeは**「相談役・レビュアー」**として無類の強さを誇ります。</p>
+                <ul>
+                    <li><strong>コードレビュー</strong>: 「なぜこのコードが動かないのか」だけでなく、「どう設計すればより美しくなるか」という思想的なアドバイスをくれます。</li>
+                    <li><strong>要件定義の深掘り</strong>: ユーザーの曖昧な「作りたいもの」に対し、「それはつまり、こういうUXを提供したいということですか？」と本質を突く問いを投げかけてくれます。
+                    </li>
+                    <li><strong>Computer Use</strong>: GUI操作を伴うタスクにおいて、画面を見てボタンを押すといった人間的な操作を最も安定して行えます。</li>
+                </ul>
+            </article>
+
+            <article class="card">
+                <h2>Comparison</h2>
+                <ul>
+                    <li><strong>vs ChatGPT</strong>: 実装スピードではGPT-5.3が勝りますが、長文の読解精度や、微妙なニュアンスの理解においてはClaude
+                        4.6が「賢者」として一日の長があります。</li>
+                    <li><strong>vs Gemini</strong>:
+                        GeminiはGoogleツールとの統合という強みがありますが、純粋な自然言語処理能力や文脈理解の安定感ではClaudeが好まれる傾向にあります。</li>
+                </ul>
+            </article>
+        </section>
+    </div>
+</body>
+
+</html>

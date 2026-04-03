@@ -1,0 +1,608 @@
+﻿<!doctype html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WindowsからMacへ | 動的ショートカット&操作マップ</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --panel: #0f172a;
+      --muted: #c8d3e3;
+      --text: #e9edf5;
+      --accent: #3dd8c5;
+      --accent-2: #f7b733;
+      --border: rgba(255, 255, 255, 0.08);
+      --shadow: 0 18px 48px rgba(0, 0, 0, 0.35);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", "SF Pro Display", "Noto Sans JP", system-ui, -apple-system, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 18% 18%, rgba(61, 216, 197, 0.18), transparent 32%),
+        radial-gradient(circle at 80% 0%, rgba(247, 183, 51, 0.2), transparent 32%),
+        linear-gradient(145deg, #0b1220 0%, #0c1526 50%, #0a1020 100%);
+      padding: 32px 20px 64px;
+      line-height: 1.6;
+    }
+
+    .shell {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    header.hero {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 26px 28px 20px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    header.hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, rgba(61, 216, 197, 0.12), rgba(247, 183, 51, 0.12));
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    header.hero>* {
+      position: relative;
+      z-index: 1;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(61, 216, 197, 0.14);
+      color: var(--accent);
+      font-size: 13px;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    h1 {
+      margin: 10px 0 8px;
+      font-size: 32px;
+      letter-spacing: 0.3px;
+    }
+
+    .lead {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .chip {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 6px 10px;
+      border-radius: 10px;
+      font-size: 13px;
+    }
+
+    .controls {
+      margin-top: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .pill {
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-weight: 600;
+    }
+
+    .pill.active {
+      background: rgba(61, 216, 197, 0.18);
+      border-color: rgba(61, 216, 197, 0.6);
+      color: var(--accent);
+    }
+
+    .search {
+      position: relative;
+      flex: 1;
+      min-width: 220px;
+    }
+
+    .search input {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.04);
+      padding: 10px 12px 10px 38px;
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    .search::before {
+      content: "🔍";
+      position: absolute;
+      left: 12px;
+      top: 10px;
+      opacity: 0.7;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 18px 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .card h2 {
+      margin: 0 0 8px;
+      font-size: 20px;
+    }
+
+    .card p {
+      margin: 0 0 8px;
+      color: var(--muted);
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 8px;
+      background: rgba(247, 183, 51, 0.18);
+      color: var(--accent-2);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      text-transform: uppercase;
+    }
+
+    .table-card table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    .table-card th,
+    .table-card td {
+      border-bottom: 1px solid var(--border);
+      padding: 10px 8px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .table-card th {
+      color: var(--accent);
+      font-size: 13px;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+    }
+
+    .table-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 6px 0 10px;
+      color: var(--muted);
+      font-size: 13px;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .count {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .toggle {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 18px;
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 18px;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 16px;
+      color: var(--muted);
+    }
+
+    li {
+      margin-bottom: 6px;
+    }
+
+    strong {
+      color: var(--text);
+    }
+
+    .note {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 8px;
+    }
+
+    .kbd {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--text);
+      margin-right: 6px;
+    }
+
+    .accordion .item {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 12px 8px;
+      background: rgba(255, 255, 255, 0.04);
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: border-color 0.15s ease;
+    }
+
+    .accordion .item:hover {
+      border-color: rgba(61, 216, 197, 0.4);
+    }
+
+    .accordion .head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .accordion .title {
+      font-weight: 700;
+    }
+
+    .accordion .chevron {
+      transition: transform 0.2s ease;
+    }
+
+    .accordion .body {
+      margin-top: 8px;
+      display: none;
+      color: var(--muted);
+    }
+
+    .accordion .item.open .body {
+      display: block;
+    }
+
+    .accordion .item.open .chevron {
+      transform: rotate(90deg);
+    }
+
+    .tips {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+    }
+
+    .tip {
+      padding: 12px;
+      border-radius: 12px;
+      background: rgba(61, 216, 197, 0.08);
+      border: 1px solid rgba(61, 216, 197, 0.3);
+      color: var(--muted);
+    }
+
+    .tip strong {
+      color: var(--accent);
+    }
+
+    .back {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    @media (max-width:640px) {
+      body {
+        padding: 22px 16px 48px;
+      }
+
+      h1 {
+        font-size: 26px;
+      }
+
+      .card {
+        padding: 16px;
+      }
+
+      .table-card table {
+        font-size: 13px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+    <header class="hero">
+      <div class="eyebrow">Windows → Mac インタラクティブガイド</div>
+      <h1>初めてのMac 操作マップ</h1>
+      <p class="lead">Windowsで慣れた操作を、Macでどう置き換えるか。ショートカット検索、カテゴリ絞り込み、シナリオ別の手順で“迷うポイント”をすぐ解決します。</p>
+      <div class="chips">
+        <span class="chip">Command = WindowsのCtrl系</span>
+        <span class="chip">Option = Alt</span>
+        <span class="chip">Control = 右クリック補助</span>
+        <span class="chip">Finder = Explorer</span>
+        <span class="chip">Spotlight = Winキー検索</span>
+      </div>
+      <div class="controls">
+        <div class="filters">
+          <button class="pill active" data-category="all">全部</button>
+          <button class="pill" data-category="edit">編集</button>
+          <button class="pill" data-category="window">ウィンドウ/デスクトップ</button>
+          <button class="pill" data-category="system">システム/スクショ</button>
+          <button class="pill" data-category="finder">Finder/ファイル</button>
+          <button class="pill" data-category="browser">ブラウザ</button>
+        </div>
+        <div class="search">
+          <input id="search" type="search" placeholder="例: コピー, Alt+Tab, スクショ..." aria-label="ショートカット検索">
+        </div>
+      </div>
+      <p class="note"><a class="back" href="../index.html">← Workbenchへ戻る</a></p>
+    </header>
+
+    <section class="card table-card" id="map">
+      <div class="tag">ショートカット対応表</div>
+      <div class="table-top">
+        <div>該当: <span class="count" id="count">0</span> 件</div>
+        <label class="toggle"><input type="checkbox" id="symbolize"> キーを記号表記（⌘ ⌥ ⌃ ⇧）</label>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Windows</th>
+            <th>Mac</th>
+            <th>メモ</th>
+          </tr>
+        </thead>
+        <tbody id="shortcut-body"></tbody>
+      </table>
+      <p class="note">フィルタや検索で絞り込み。キー表記はチェックで「Ctrl→⌃」「Command→⌘」に切替できます。</p>
+    </section>
+
+    <section class="split">
+      <article class="card accordion">
+        <div class="tag">よくあるシーン</div>
+        <h2>操作フローで理解する</h2>
+        <div class="item">
+          <div class="head">
+            <div class="title">アプリをまとめて閉じたい</div>
+            <div class="chevron">▶</div>
+          </div>
+          <div class="body">
+            <ul>
+              <li><strong>Cmd + Tab</strong>でアプリ一覧 → 対象を選択。</li>
+              <li><strong>Cmd + Q</strong>でアプリ終了。ウィンドウだけ閉じるなら<strong>Cmd + W</strong>。</li>
+              <li>タブやウィンドウを一気に閉じるなら<strong>Option + Cmd + W</strong>。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="item">
+          <div class="head">
+            <div class="title">ファイルを切り取り移動したい</div>
+            <div class="chevron">▶</div>
+          </div>
+          <div class="body">
+            <ul>
+              <li><strong>Cmd + C</strong>でコピー。</li>
+              <li>移動先で<strong>Cmd + Option + V</strong> → 実質「切り取り+貼り付け」。</li>
+              <li>親フォルダへ戻る: <strong>Cmd + ↑</strong>。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="item">
+          <div class="head">
+            <div class="title">スクショを撮り分けたい</div>
+            <div class="chevron">▶</div>
+          </div>
+          <div class="body">
+            <ul>
+              <li>範囲: <strong>Cmd + Shift + 4</strong>。</li>
+              <li>UI付きメニュー/録画: <strong>Cmd + Shift + 5</strong>（保存先も変更可）。</li>
+              <li>全画面: <strong>Cmd + Shift + 3</strong>。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="item">
+          <div class="head">
+            <div class="title">強制終了したい</div>
+            <div class="chevron">▶</div>
+          </div>
+          <div class="body">
+            <ul>
+              <li><strong>Option + Cmd + Esc</strong>で強制終了ダイアログ。</li>
+              <li>重い場合はSpotlight (<span class="kbd">Cmd</span><span class="kbd">Space</span>) →「アクティビティモニタ」。</li>
+            </ul>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="tag">トラックパッドと配列</div>
+        <h2>ジェスチャとキーの違い</h2>
+        <ul>
+          <li>右クリック: 2本指クリック（またはControl + クリック）。</li>
+          <li>Mission Control: 3本指上スワイプ。デスクトップ切替は3本指左右。</li>
+          <li>デスクトップ表示: 親指+3本指を広げるジェスチャ。</li>
+          <li><strong>Command</strong>はスペースキーの左右、<strong>Option</strong>はAlt相当、<strong>Control</strong>は右クリック補助。</li>
+          <li>Deleteはバックスペース。Forward Deleteは <strong>Fn + Delete</strong>。</li>
+        </ul>
+        <p class="note">「CmdをCtrlの代わりに押す」クセをつけると一気に慣れます。</p>
+      </article>
+    </section>
+
+    <section class="grid">
+      <article class="card">
+        <div class="tag">Finder</div>
+        <h2>ファイル操作の基本</h2>
+        <ul>
+          <li>開く: Enter（Return）。名前変更もEnterで編集モード。</li>
+          <li>新規フォルダ: <strong>Shift + Cmd + N</strong>。</li>
+          <li>パスをコピー: Control + クリック → 情報をコピー、またはTerminalにドラッグ。</li>
+          <li>サイドバー非表示/表示: <strong>Option + Cmd + S</strong>。</li>
+          <li>隠しファイル表示: <strong>Cmd + Shift + .</strong></li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <div class="tag">ウィンドウ</div>
+        <h2>並べて・切り替えて使う</h2>
+        <ul>
+          <li>アプリ切替: <strong>Cmd + Tab</strong>。同一アプリ内のウィンドウ巡回は <strong>Cmd + `</strong>。</li>
+          <li>フルスクリーン: <strong>Ctrl + Cmd + F</strong> または緑ボタン。</li>
+          <li>左右分割: 緑ボタン長押しでSplit View。</li>
+          <li>デスクトップ切替: <strong>Ctrl + → / ←</strong> または3本指左右。</li>
+          <li>Dock表示/非表示: <strong>Cmd + Option + D</strong>。</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <div class="tag">ブラウザ</div>
+        <h2>タブ操作</h2>
+        <ul>
+          <li>新規タブ: <strong>Cmd + T</strong>。タブを閉じる: <strong>Cmd + W</strong>。</li>
+          <li>閉じたタブを戻す: <strong>Shift + Cmd + T</strong>。</li>
+          <li>ページ内検索: <strong>Cmd + F</strong>。</li>
+          <li>プライベート/シークレット: <strong>Cmd + Shift + N</strong>。</li>
+          <li>アドレスバーへ: <strong>Cmd + L</strong>。</li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="card">
+      <div class="tag">クイック覚え書き</div>
+      <h2>ポイントだけ見たいとき</h2>
+      <div class="tips">
+        <div class="tip"><strong>画面ロック</strong><br>Ctrl + Cmd + Q。</div>
+        <div class="tip"><strong>スクリーンショット</strong><br>Cmd + Shift + 4（範囲）/ 5（UI）。</div>
+        <div class="tip"><strong>コピペの置き換え</strong><br>Ctrl系はほぼCmdに置換。</div>
+        <div class="tip"><strong>フルスクリーン解除</strong><br>緑ボタン、または Ctrl + Cmd + F。</div>
+        <div class="tip"><strong>切り取り移動</strong><br>コピー→ Cmd + Option + V。</div>
+        <div class="tip"><strong>強制終了</strong><br>Option + Cmd + Esc。</div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const shortcutData = [
+      { category: 'edit', win: 'Ctrl + C / V / X', mac: 'Cmd + C / V / X', note: 'コピー/貼り付け/切り取り' },
+      { category: 'edit', win: 'Ctrl + Z / Y', mac: 'Cmd + Z / Shift + Cmd + Z', note: '元に戻す/やり直す' },
+      { category: 'edit', win: 'Ctrl + A', mac: 'Cmd + A', note: '全選択' },
+      { category: 'edit', win: 'Ctrl + F', mac: 'Cmd + F', note: '検索' },
+      { category: 'edit', win: 'Ctrl + L', mac: 'Cmd + L', note: 'アドレスバーへ' },
+      { category: 'window', win: 'Alt + Tab', mac: 'Cmd + Tab', note: 'アプリ切替' },
+      { category: 'window', win: 'Win + D', mac: 'F11 または Fn + F11', note: 'デスクトップ表示' },
+      { category: 'window', win: 'Alt + F4', mac: 'Cmd + Q', note: 'アプリ終了' },
+      { category: 'window', win: 'Ctrl + W', mac: 'Cmd + W / Option + Cmd + W', note: 'タブ/ウィンドウを閉じる（後者は一括）' },
+      { category: 'window', win: 'Win + ← / →', mac: '緑ボタン長押しで分割', note: '画面分割' },
+      { category: 'window', win: 'Win + Tab', mac: 'Ctrl + ↑ (Mission Control)', note: '仮想デスクトップ確認' },
+      { category: 'system', win: 'PrtSc / Win + Shift + S', mac: 'Cmd + Shift + 4 / 5', note: 'スクリーンショット' },
+      { category: 'system', win: 'Ctrl + Shift + Esc', mac: 'Option + Cmd + Esc', note: '強制終了ダイアログ' },
+      { category: 'system', win: 'Win + L', mac: 'Ctrl + Cmd + Q', note: '画面ロック' },
+      { category: 'finder', win: 'Ctrl + N', mac: 'Shift + Cmd + N', note: '新規フォルダ' },
+      { category: 'finder', win: 'Ctrl + X → V', mac: 'Cmd + C → Cmd + Option + V', note: '切り取り移動（実質）' },
+      { category: 'finder', win: 'Backspace', mac: 'Cmd + Delete', note: 'ゴミ箱へ' },
+      { category: 'finder', win: 'Alt + ↑', mac: 'Cmd + ↑', note: '親フォルダへ' },
+      { category: 'browser', win: 'Ctrl + T', mac: 'Cmd + T', note: '新規タブ' },
+      { category: 'browser', win: 'Ctrl + Shift + T', mac: 'Shift + Cmd + T', note: '閉じたタブを戻す' },
+      { category: 'browser', win: 'Ctrl + Shift + N', mac: 'Cmd + Shift + N', note: 'プライベート/シークレット' }
+    ];
+
+    const tbody = document.getElementById('shortcut-body');
+    const countEl = document.getElementById('count');
+    const searchEl = document.getElementById('search');
+    const symbolizeEl = document.getElementById('symbolize');
+    const pills = Array.from(document.querySelectorAll('.pill'));
+
+    const symbolMap = { 'Cmd': '⌘', 'Command': '⌘', 'Option': '⌥', 'Alt': '⌥', 'Control': '⌃', 'Ctrl': '⌃', 'Shift': '⇧' };
+
+    function symbolize(text) {
+      return text.replace(/Command|Cmd|Control|Ctrl|Option|Alt|Shift/g, m => symbolMap[m] || m);
+    }
+
+    function render() {
+      const query = searchEl.value.trim().toLowerCase();
+      const active = pills.find(p => p.classList.contains('active')).dataset.category;
+      const useSymbol = symbolizeEl.checked;
+      const filtered = shortcutData.filter(item => {
+        if (active !== 'all' && item.category !== active) return false;
+        if (!query) return true;
+        const blob = `${item.win} ${item.mac} ${item.note}`.toLowerCase();
+        return blob.includes(query);
+      });
+      tbody.innerHTML = filtered.map(item => {
+        const win = useSymbol ? symbolize(item.win) : item.win;
+        const mac = useSymbol ? symbolize(item.mac) : item.mac;
+        return `<tr><td>${win}</td><td>${mac}</td><td>${item.note}</td></tr>`;
+      }).join('');
+      countEl.textContent = filtered.length;
+    }
+
+    pills.forEach(btn => {
+      btn.addEventListener('click', () => {
+        pills.forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        render();
+      });
+    });
+    searchEl.addEventListener('input', render);
+    symbolizeEl.addEventListener('change', render);
+
+    document.querySelectorAll('.accordion .item').forEach(item => {
+      item.addEventListener('click', () => item.classList.toggle('open'));
+    });
+
+    render();
+  </script>
+</body>
+
+</html>

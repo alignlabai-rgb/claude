@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Security | OpenClaw Mastery</title>
+    <style>
+        :root {
+            --bg: #1a1a1a;
+            --text: #ededed;
+            --accent: #ff4d4d;
+            /* Danger Red */
+            --safe: #00ff9d;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: sans-serif;
+            padding: 40px;
+            line-height: 1.8;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: var(--accent);
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #888;
+            font-size: 20px;
+            margin-bottom: 60px;
+            display: block;
+        }
+
+        .warning-box {
+            background: rgba(255, 77, 77, 0.1);
+            border: 1px solid var(--accent);
+            padding: 24px;
+            border-radius: 8px;
+            color: #ffcccc;
+            margin-bottom: 40px;
+        }
+
+        .warning-title {
+            font-weight: bold;
+            color: var(--accent);
+            font-size: 20px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h2 {
+            font-size: 26px;
+            margin-top: 60px;
+            color: #fff;
+            border-bottom: 1px solid #444;
+            padding-bottom: 10px;
+        }
+
+        .config-card {
+            background: #222;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .config-key {
+            font-family: monospace;
+            color: var(--safe);
+            font-size: 1.1em;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .back {
+            display: inline-block;
+            margin-bottom: 40px;
+            color: #666;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <a href="index.html" class="back">← OpenClaw Hub</a>
+
+        <h1>Sandbox & Security</h1>
+        <span class="subtitle">Containing the Autonomous Intelligence</span>
+
+        <section>
+            <div class="warning-box">
+                <div class="warning-title">⚠️ The "rm -rf /" Risk</div>
+                <p>自律型エージェントにPCの全権限を与えることは、見知らぬ他人にPCを貸すのと同じです。<br>
+                    「不要なファイルを消して」という指示を、「OSごと消去する」と解釈する可能性はゼロではありません。</p>
+            </div>
+
+            <h2>1. Docker Sandbox (推奨)</h2>
+            <p>OpenClawはデフォルトで、ローカルPCではなく<strong>Dockerコンテナ内</strong>で動作させるべきです。</p>
+            <p>プロジェクトフォルダだけをマウントし、システム領域へのアクセスを物理的に遮断します。</p>
+            <div class="config-card">
+                <span class="config-key">$ openclaw --sandbox=docker</span>
+                一時的なコンテナを立ち上げ、その中でのみコマンドを実行させます。<br>
+                万が一暴走しても、コンテナを破棄すれば全てリセットされます。
+            </div>
+
+            <h2>2. Budget Limits (予算制限)</h2>
+            <p>無限ループによる「クラウド破産」を防ぐため、ハードリミットを設定します。</p>
+
+            <div class="config-card">
+                <span class="config-key">--max-cost=5.00</span>
+                <p>APIコストが $5.00 を超えた時点で強制停止します。</p>
+            </div>
+
+            <div class="config-card">
+                <span class="config-key">--max-steps=50</span>
+                <p>ループ回数が 50回 を超えたら強制停止します。<br>
+                    （通常、50アクションで終わらないタスクは要件定義が間違っています）</p>
+            </div>
+
+            <h2>3. Human-in-the-Loop Triggers</h2>
+            <p>特定の危険な操作に対しては、「人間の承認」を必須にする設定です。</p>
+
+            <div class="config-card">
+                <span class="config-key">--require-approval="delete,deploy,commit"</span>
+                <p>ファイルを削除する、デプロイする、Gitコミットする直前で一時停止し、Operatorに「Y/N」を求めます。<br>
+                    読み取り（Read）や編集（Write）は自動で行わせつつ、不可逆な操作だけを人間が握る、最もバランスの良い設定です。</p>
+            </div>
+
+        </section>
+    </div>
+</body>
+
+</html>

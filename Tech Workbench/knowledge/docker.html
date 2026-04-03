@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Docker Essentials | Tech Workbench</title>
+    <style>
+        :root {
+            --bg-deep: #050505;
+            --bg-panel: #0a0a0a;
+            --text-main: #e0e0e0;
+            --text-muted: #888;
+            --accent: #58a6ff;
+            /* Environment Blue */
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.8;
+            padding: 40px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 40px;
+            color: var(--accent);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 20px;
+            margin-bottom: 60px;
+            display: block;
+        }
+
+        section {
+            margin-bottom: 60px;
+        }
+
+        h2 {
+            font-size: 24px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+
+        p {
+            margin-bottom: 20px;
+        }
+
+        .analogy-box {
+            background: #111;
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin: 30px 0;
+        }
+
+        .analogy-title {
+            color: var(--accent);
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .concept-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .concept-item h3 {
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .code-block {
+            background: #000;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: monospace;
+            color: #ccc;
+            border: 1px solid var(--border);
+            overflow-x: auto;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 40px;
+            color: var(--text-muted);
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Docker Essentials</h1>
+        <span class="subtitle">The Universal Shipping Container for Code</span>
+
+        <section>
+            <h2>What is Docker?</h2>
+            <p>
+                Dockerは、あなたの作ったプログラムを「どこでも動くケース」に閉じ込める技術です。<br>
+                AIエンジニアにとって、これは単なるツールではなく<strong>「自律型エージェントの檻（Cage）」</strong>として機能します。
+            </p>
+
+            <div class="analogy-box">
+                <div class="analogy-title">The Shipping Container Analogy</div>
+                <p>
+                    <strong>昔 (Before Docker):</strong><br>
+                    引っ越しのとき、家具や食器をそのままトラックに放り込んでいました。<br>
+                    「Aさんのトラックでは運べたけど、Bさんのトラックだと不安定で壊れる」という問題が起きました。<br>
+                    (＝ PCが変わると動かない "It works on my machine" 問題)
+                </p>
+                <hr style="border:0; border-top:1px solid #333; margin:20px 0;">
+                <p>
+                    <strong>今 (With Docker):</strong><br>
+                    家具も食器も空気も、全て<strong>規格化されたコンテナ</strong>に詰め込みます。<br>
+                    トラックの運転手（Windows, Mac, Linux）は、中身を気にせず「コンテナ」を運ぶだけ。<br>
+                    開ければどこでも全く同じ部屋が再現されます。
+                </p>
+            </div>
+        </section>
+
+        <section>
+            <h2>Core Concepts</h2>
+            <div class="concept-grid">
+                <div class="concept-item">
+                    <h3>🖼️ Image (設計図)</h3>
+                    <p>
+                        そのコンテナに何が入っているかの定義ファイル。<br>
+                        「Ubuntuが入っていて、Python 3.9が入っていて、このコードが入っている」という不変のデータ。
+                        CD-ROMのようなもの。
+                    </p>
+                </div>
+                <div class="concept-item">
+                    <h3>📦 Container (実体)</h3>
+                    <p>
+                        Imageから生成された、実際に動いているプロセス。<br>
+                        1つのImageから、何個でもContainerを作れる。<br>
+                        使い終わったら捨てれば、跡形もなく消える（Disposable）。
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Ideally for OpenClaw</h2>
+            <p>
+                なぜ自律型エージェント(OpenClaw)にDockerが必要なのか？<br>
+                理由は<strong>「安全性(Safety)」</strong>と<strong>「再現性(Reproducibility)」</strong>です。
+            </p>
+            <ul>
+                <li><strong>Sandbox (砂場):</strong> エージェントが暴走して `rm -rf /` (全削除) を実行しても、消えるのはコンテナの中だけ。あなたのPCは無傷です。</li>
+                <li><strong>Consistency:</strong> 「私のPCでは動いたのに、本番サーバーではエラー」という事故を、Dockerなら100%防げます。</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Basic Commands</h2>
+            <p>これだけ覚えておけば十分です。</p>
+            <div class="code-block">
+                # 1. コンテナを起動する (run)
+                # -it: インタラクティブモード
+                # --rm: 終わったら自動削除（ゴミを残さない）
+                $ docker run -it --rm python:3.9
+
+                # 2. 動いているコンテナを見る
+                $ docker ps
+
+                # 3. 全てのコンテナ（停止中含む）を見る
+                $ docker ps -a
+
+                # 4. コンテナを強制停止する
+                $ docker stop <CONTAINER_ID>
+            </div>
+        </section>
+
+        <a href="../../index.html" class="back-link">← Tech Workbench Portal</a>
+    </div>
+</body>
+
+</html>

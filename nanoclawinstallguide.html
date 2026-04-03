@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NanoClaw 完全ガイド</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+      background: #f0f2f5;
+      color: #1a1a2e;
+      line-height: 1.75;
+    }
+
+    a { color: #0b3d2e; }
+    a:hover { color: #22c55e; }
+
+    header {
+      background: linear-gradient(135deg, #0b3d2e 0%, #134e35 60%, #1a2e1e 100%);
+      color: white;
+      padding: 60px 20px 50px;
+      text-align: center;
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: 12px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    header h1 { font-size: 2.8rem; font-weight: 800; letter-spacing: -1px; margin-bottom: 12px; }
+    header h1 span { color: #22c55e; }
+    header p { font-size: 1.1rem; opacity: 0.8; max-width: 580px; margin: 0 auto 24px; }
+
+    .stats {
+      display: flex; justify-content: center; gap: 32px; flex-wrap: wrap; margin-top: 8px;
+    }
+    .stat { text-align: center; }
+    .stat .num { font-size: 1.8rem; font-weight: 800; color: #22c55e; }
+    .stat .label { font-size: 0.75rem; opacity: 0.6; text-transform: uppercase; letter-spacing: 1px; }
+
+    nav {
+      background: white;
+      border-bottom: 1px solid #e5e7eb;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 0 20px;
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 0;
+      max-width: 960px;
+      margin: 0 auto;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    nav ul::-webkit-scrollbar { display: none; }
+
+    nav li a {
+      display: block;
+      padding: 14px 16px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #6b7280;
+      text-decoration: none;
+      white-space: nowrap;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+
+    nav li a:hover { color: #0b3d2e; border-bottom-color: #22c55e; }
+
+    main { max-width: 900px; margin: 0 auto; padding: 40px 20px 80px; }
+
+    .warning {
+      background: #fff8e1;
+      border-left: 4px solid #f59e0b;
+      border-radius: 0 8px 8px 0;
+      padding: 14px 18px;
+      margin-bottom: 32px;
+      font-size: 0.9rem;
+      color: #78350f;
+    }
+
+    .section {
+      background: white;
+      border-radius: 14px;
+      padding: 36px;
+      margin-bottom: 28px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      scroll-margin-top: 60px;
+    }
+
+    .section-num {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 32px; height: 32px; background: #0b3d2e; color: white;
+      border-radius: 50%; font-size: 0.85rem; font-weight: 700;
+      margin-right: 10px; flex-shrink: 0;
+    }
+
+    .section h2 {
+      font-size: 1.4rem; font-weight: 700; margin-bottom: 22px;
+      display: flex; align-items: center; color: #0b3d2e;
+    }
+
+    .section h3 {
+      font-size: 1rem; font-weight: 700; color: #374151;
+      margin: 24px 0 10px; border-left: 3px solid #22c55e; padding-left: 10px;
+    }
+
+    p { margin-bottom: 12px; color: #4b5563; }
+
+    .req-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px; }
+    @media(max-width:560px){.req-grid{grid-template-columns:1fr;}}
+
+    .req-box {
+      background: #f9fafb; border: 1px solid #e5e7eb;
+      border-radius: 10px; padding: 16px 18px;
+    }
+    .req-box h4 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: #9ca3af; margin-bottom: 8px; }
+    .req-box ul { padding-left: 16px; }
+    .req-box li { font-size: 0.9rem; color: #374151; margin-bottom: 4px; }
+
+    .platform-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+    .platform-tag {
+      background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0;
+      border-radius: 20px; padding: 5px 14px; font-size: 0.85rem; font-weight: 500;
+    }
+
+    pre {
+      background: #0d1117; color: #e2e8f0; border-radius: 10px;
+      padding: 20px; overflow-x: auto;
+      font-family: 'SF Mono','Fira Code','Courier New',monospace;
+      font-size: 0.88rem; line-height: 1.6; margin: 12px 0;
+    }
+    pre .comment { color: #64748b; }
+    pre .cmd { color: #7dd3fc; }
+    pre .arg { color: #a5f3fc; }
+    pre .output { color: #86efac; }
+    pre .key { color: #fbbf24; }
+    pre .val { color: #a5f3fc; }
+
+    .tip {
+      background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px;
+      padding: 14px 18px; font-size: 0.9rem; color: #166534; margin-top: 16px;
+    }
+    .tip strong { color: #14532d; }
+
+    .note {
+      background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px;
+      padding: 14px 18px; font-size: 0.9rem; color: #14532d; margin-top: 16px;
+    }
+
+    .steps { counter-reset: step; }
+    .step { display: flex; gap: 16px; margin-bottom: 20px; align-items: flex-start; }
+    .step-num {
+      counter-increment: step; min-width: 28px; height: 28px;
+      background: #22c55e; color: white; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.8rem; font-weight: 700; margin-top: 2px; flex-shrink: 0;
+    }
+    .step-content { flex: 1; }
+    .step-content strong { display: block; margin-bottom: 6px; color: #111827; }
+
+    .usecase-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px; margin-top: 16px;
+    }
+    .usecase-card {
+      background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px;
+      padding: 20px;
+    }
+    .usecase-card .icon { font-size: 1.8rem; margin-bottom: 10px; }
+    .usecase-card h4 { font-size: 0.95rem; font-weight: 700; color: #111827; margin-bottom: 6px; }
+    .usecase-card p { font-size: 0.85rem; color: #6b7280; margin: 0; }
+
+    .tips-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px; margin-top: 16px;
+    }
+    .tip-item {
+      background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px;
+      padding: 16px 18px;
+    }
+    .tip-item .tip-label {
+      font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px;
+      color: #22c55e; font-weight: 700; margin-bottom: 6px;
+    }
+    .tip-item p { font-size: 0.88rem; color: #374151; margin: 0; }
+
+    .faq-item { border-bottom: 1px solid #f3f4f6; padding: 18px 0; }
+    .faq-item:last-child { border-bottom: none; }
+    .faq-q { font-weight: 700; color: #111827; margin-bottom: 8px; }
+    .faq-a { font-size: 0.9rem; color: #6b7280; }
+
+    .glossary-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+      border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden;
+      margin-top: 16px;
+    }
+    @media(max-width:600px){.glossary-grid{grid-template-columns:1fr;}}
+    .gloss-item {
+      padding: 14px 18px; border-bottom: 1px solid #e5e7eb;
+      border-right: 1px solid #e5e7eb;
+    }
+    .gloss-item:nth-child(even) { border-right: none; }
+    .gloss-item dt { font-weight: 700; color: #0b3d2e; font-size: 0.9rem; margin-bottom: 4px; }
+    .gloss-item dd { font-size: 0.85rem; color: #6b7280; }
+
+    .compare-table {
+      width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 0.88rem;
+    }
+    .compare-table th {
+      background: #0b3d2e; color: white; padding: 12px 16px; text-align: left;
+      font-weight: 600;
+    }
+    .compare-table th:first-child { border-radius: 10px 0 0 0; }
+    .compare-table th:last-child { border-radius: 0 10px 0 0; }
+    .compare-table td {
+      padding: 11px 16px; border-bottom: 1px solid #f3f4f6; color: #374151;
+    }
+    .compare-table tr:hover td { background: #f9fafb; }
+    .compare-table .yes { color: #16a34a; font-weight: 600; }
+    .compare-table .no { color: #dc2626; }
+    .compare-table .partial { color: #d97706; }
+    .compare-table tr:last-child td { border-bottom: none; }
+    .compare-table tr:last-child td:first-child { border-radius: 0 0 0 10px; }
+    .compare-table tr:last-child td:last-child { border-radius: 0 0 10px 0; }
+
+    .done-box {
+      background: linear-gradient(135deg, #0b3d2e, #134e35);
+      color: white; border-radius: 14px; padding: 36px; text-align: center;
+      margin-bottom: 28px;
+    }
+    .done-box h2 { font-size: 1.6rem; margin-bottom: 12px; }
+    .done-box p { opacity: 0.85; margin-bottom: 24px; }
+    .done-links { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .done-link {
+      background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
+      color: white; text-decoration: none; padding: 10px 22px; border-radius: 8px;
+      font-weight: 600; font-size: 0.9rem; transition: background 0.2s;
+    }
+    .done-link:hover { background: rgba(255,255,255,0.25); color: white; }
+
+    .crosslink-bar {
+      background: linear-gradient(90deg, #0f3460, #0b3d2e);
+      border-radius: 12px; padding: 18px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px; flex-wrap: wrap; margin-bottom: 28px;
+    }
+    .crosslink-bar .cl-text { color: white; font-size: 0.9rem; opacity: 0.9; }
+    .crosslink-bar .cl-title { color: white; font-weight: 700; font-size: 1rem; }
+    .cl-btn {
+      background: #e94560; color: white; text-decoration: none;
+      padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 0.88rem;
+      white-space: nowrap; transition: opacity 0.2s;
+    }
+    .cl-btn:hover { opacity: 0.85; color: white; }
+
+    .swarm-diagram {
+      background: #0d1117; border-radius: 10px; padding: 24px;
+      margin: 16px 0; font-family: 'SF Mono','Fira Code',monospace; font-size: 0.82rem;
+      color: #e2e8f0; line-height: 2;
+    }
+    .swarm-diagram .center { color: #22c55e; font-weight: 700; }
+    .swarm-diagram .agent { color: #7dd3fc; }
+    .swarm-diagram .arrow { color: #64748b; }
+
+    .security-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px; margin-top: 14px;
+    }
+    .security-card {
+      background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px;
+      padding: 18px; text-align: center;
+    }
+    .security-card .sec-icon { font-size: 1.6rem; margin-bottom: 8px; }
+    .security-card h4 { font-size: 0.88rem; font-weight: 700; color: #14532d; margin-bottom: 4px; }
+    .security-card p { font-size: 0.8rem; color: #166534; margin: 0; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="badge">完全ガイド 2025年版</div>
+  <h1>Nano<span>Claw</span></h1>
+  <p>TypeScript製・コンテナ分離型の軽量AIエージェント。セキュリティを最優先に設計された次世代フレームワーク。</p>
+  <div class="stats">
+    <div class="stat"><div class="num">~3,900</div><div class="label">行のTypeScript</div></div>
+    <div class="stat"><div class="num">5+</div><div class="label">対応メッセージアプリ</div></div>
+    <div class="stat"><div class="num">100%</div><div class="label">コンテナ分離</div></div>
+    <div class="stat"><div class="num">MIT</div><div class="label">ライセンス</div></div>
+  </div>
+</header>
+
+<nav>
+  <ul>
+    <li><a href="#what">NanoClawとは</a></li>
+    <li><a href="#compare">比較表</a></li>
+    <li><a href="#security">セキュリティ</a></li>
+    <li><a href="#requirements">要件</a></li>
+    <li><a href="#install">インストール</a></li>
+    <li><a href="#quickstart">クイックスタート</a></li>
+    <li><a href="#swarm">エージェントSwarm</a></li>
+    <li><a href="#integrations">チャット連携</a></li>
+    <li><a href="#usecases">ユースケース</a></li>
+    <li><a href="#tips">Tips</a></li>
+    <li><a href="#faq">FAQ</a></li>
+    <li><a href="#glossary">用語集</a></li>
+  </ul>
+</nav>
+
+<main>
+
+  <!-- Cross-link bar -->
+  <div class="crosslink-bar">
+    <div>
+      <div class="cl-text">超軽量版もチェック →</div>
+      <div class="cl-title">🦀 PicoClaw — &lt;10MB RAM、RISC-Vハードウェア対応</div>
+    </div>
+    <a href="picoclaw-install-guide.html" class="cl-btn">PicoClaw ガイドへ</a>
+  </div>
+
+  <!-- 1. NanoClawとは -->
+  <div class="section" id="what">
+    <h2><span class="section-num">1</span>NanoClawとは</h2>
+    <p>NanoClawは<strong>TypeScript / Node.js</strong>で構築された軽量AIエージェントフレームワークです。Anthropicの<strong>Claude Agent SDK</strong>を基盤とし、セッションごとにOSレベルのコンテナ分離を行うことで、高いセキュリティと柔軟性を実現しています。</p>
+    <p>開発元は<strong>qwibitai</strong>（GitHub: <a href="https://github.com/qwibitai/nanoclaw" target="_blank">qwibitai/nanoclaw</a>）。WhatsApp・Telegram・Slack・Discord・Gmailといった主要メッセージングプラットフォームと接続でき、複数の専門エージェントが協調する「<strong>Agent Swarm</strong>」機能も備えています。</p>
+
+    <h3>NanoClawが選ばれる3つの理由</h3>
+    <div class="security-grid">
+      <div class="security-card">
+        <div class="sec-icon">🔒</div>
+        <h4>コンテナ分離</h4>
+        <p>セッションごとにDocker / Apple Containerで完全隔離。悪意あるコードの横断実行を防止</p>
+      </div>
+      <div class="security-card">
+        <div class="sec-icon">🤖</div>
+        <h4>Agent Swarm</h4>
+        <p>役割を持った複数エージェントが協調し、複雑なタスクを並列処理</p>
+      </div>
+      <div class="security-card">
+        <div class="sec-icon">💬</div>
+        <h4>マルチプラットフォーム</h4>
+        <p>WhatsApp・Telegram・Slack・Discord・Gmailを単一インスタンスで統合</p>
+      </div>
+      <div class="security-card">
+        <div class="sec-icon">🛠️</div>
+        <h4>TypeScript製</h4>
+        <p>型安全・拡張性が高く、Claude Agent SDKと直接統合。カスタマイズも容易</p>
+      </div>
+    </div>
+
+    <div class="tip" style="margin-top:20px;">
+      <strong>💡 PicoClawとの棲み分け：</strong> 超低消費電力のハードウェア（RISC-V等）や&lt;10MB RAM環境にはPicoClawを、セキュリティ重視・複数チャットアプリ統合・Agent Swarmが必要な用途にはNanoClawを選びましょう。
+    </div>
+  </div>
+
+  <!-- 2. 比較表 -->
+  <div class="section" id="compare">
+    <h2><span class="section-num">2</span>フレームワーク比較表</h2>
+    <p>OpenClaw（従来の重量級フレームワーク）・PicoClaw・NanoClawの3つを多角的に比較します。</p>
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>比較項目</th>
+          <th>OpenClaw（従来）</th>
+          <th>PicoClaw</th>
+          <th>NanoClaw ✓</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>言語</strong></td>
+          <td>Python</td>
+          <td>Go</td>
+          <td>TypeScript / Node.js</td>
+        </tr>
+        <tr>
+          <td><strong>RAM使用量</strong></td>
+          <td>500MB〜2GB</td>
+          <td>&lt;10MB</td>
+          <td>~80〜150MB</td>
+        </tr>
+        <tr>
+          <td><strong>バイナリサイズ</strong></td>
+          <td>100MB+（依存含む）</td>
+          <td>単一バイナリ &lt;8MB</td>
+          <td>npm パッケージ群</td>
+        </tr>
+        <tr>
+          <td><strong>コンテナ分離</strong></td>
+          <td class="no">✗ なし</td>
+          <td class="no">✗ なし</td>
+          <td class="yes">✓ セッションごと</td>
+        </tr>
+        <tr>
+          <td><strong>Agent Swarm</strong></td>
+          <td class="partial">△ 限定的</td>
+          <td class="no">✗ なし</td>
+          <td class="yes">✓ ネイティブ対応</td>
+        </tr>
+        <tr>
+          <td><strong>WhatsApp対応</strong></td>
+          <td class="no">✗</td>
+          <td class="no">✗</td>
+          <td class="yes">✓</td>
+        </tr>
+        <tr>
+          <td><strong>Telegram対応</strong></td>
+          <td class="partial">△ プラグイン</td>
+          <td class="yes">✓</td>
+          <td class="yes">✓</td>
+        </tr>
+        <tr>
+          <td><strong>Slack対応</strong></td>
+          <td class="partial">△ プラグイン</td>
+          <td class="yes">✓</td>
+          <td class="yes">✓</td>
+        </tr>
+        <tr>
+          <td><strong>Discord対応</strong></td>
+          <td class="partial">△ プラグイン</td>
+          <td class="yes">✓</td>
+          <td class="yes">✓</td>
+        </tr>
+        <tr>
+          <td><strong>Gmail対応</strong></td>
+          <td class="no">✗</td>
+          <td class="no">✗</td>
+          <td class="yes">✓</td>
+        </tr>
+        <tr>
+          <td><strong>RISC-V / ARM対応</strong></td>
+          <td class="no">✗</td>
+          <td class="yes">✓ ネイティブ</td>
+          <td class="partial">△ Node.js依存</td>
+        </tr>
+        <tr>
+          <td><strong>設定ファイル</strong></td>
+          <td>YAML / JSON</td>
+          <td>TOML</td>
+          <td>コード / CLIプロンプト</td>
+        </tr>
+        <tr>
+          <td><strong>起動時間</strong></td>
+          <td>10〜30秒</td>
+          <td>&lt;1秒</td>
+          <td>2〜5秒</td>
+        </tr>
+        <tr>
+          <td><strong>ライセンス</strong></td>
+          <td>AGPL-3.0</td>
+          <td>MIT</td>
+          <td>MIT</td>
+        </tr>
+        <tr>
+          <td><strong>主な用途</strong></td>
+          <td>機能重視・既存環境</td>
+          <td>省リソース・組込み</td>
+          <td>セキュリティ・マルチAI</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 3. セキュリティアーキテクチャ -->
+  <div class="section" id="security">
+    <h2><span class="section-num">3</span>セキュリティアーキテクチャ</h2>
+    <p>NanoClawの最大の特徴は<strong>セッションごとのOSレベルコンテナ分離</strong>です。各会話セッションは独立したコンテナ内で実行され、他のセッションやホストシステムへのアクセスが制限されます。</p>
+
+    <h3>コンテナ分離の仕組み</h3>
+    <div class="swarm-diagram">
+      <div>ユーザーメッセージ (WhatsApp / Telegram / Slack)</div>
+      <div class="arrow">        ↓</div>
+      <div class="center">  NanoClaw ルーター（ホスト）</div>
+      <div class="arrow">   ┌──────┴───────┐</div>
+      <div>   ↓              ↓</div>
+      <div><span class="agent">セッション A           セッション B</span></div>
+      <div><span class="agent">┌─────────────┐    ┌─────────────┐</span></div>
+      <div><span class="agent">│ Docker/Apple│    │ Docker/Apple│</span></div>
+      <div><span class="agent">│  Container  │    │  Container  │</span></div>
+      <div><span class="agent">│  (分離環境) │    │  (分離環境) │</span></div>
+      <div><span class="agent">└─────────────┘    └─────────────┘</span></div>
+    </div>
+
+    <h3>セキュリティ機能一覧</h3>
+    <div class="security-grid">
+      <div class="security-card">
+        <div class="sec-icon">🏗️</div>
+        <h4>プロセス隔離</h4>
+        <p>各セッションが独立プロセス空間で動作。クロスセッション汚染なし</p>
+      </div>
+      <div class="security-card">
+        <div class="sec-icon">📁</div>
+        <h4>ファイルシステム分離</h4>
+        <p>コンテナごとに独立したファイルシステム。ホストへの直接書き込みを防止</p>
+      </div>
+      <div class="security-card">
+        <div class="sec-icon">🌐</div>
+        <h4>ネットワーク制御</h4>
+        <p>コンテナのネットワークアクセスを明示的なルールで制限可能</p>
+      </div>
+      <div class="security-card">
+        <div class="sec-icon">🗑️</div>
+        <h4>自動クリーンアップ</h4>
+        <p>セッション終了時にコンテナを自動削除。残留データなし</p>
+      </div>
+    </div>
+
+    <div class="note">
+      <strong>Apple Container（macOS）：</strong> macOS 15+では、DockerのかわりにApple純正のApple Containerフレームワークを利用できます。より軽量で、macOSとの統合が深く、起動が高速です。
+    </div>
+  </div>
+
+  <!-- 4. システム要件 -->
+  <div class="section" id="requirements">
+    <h2><span class="section-num">4</span>システム要件</h2>
+
+    <h3>対応OS</h3>
+    <div class="platform-grid">
+      <span class="platform-tag">macOS 13+ (Ventura以降)</span>
+      <span class="platform-tag">Ubuntu 22.04 LTS</span>
+      <span class="platform-tag">Debian 12</span>
+      <span class="platform-tag">Fedora 38+</span>
+      <span class="platform-tag">Windows WSL2</span>
+    </div>
+
+    <div class="req-grid" style="margin-top:20px;">
+      <div class="req-box">
+        <h4>必須ソフトウェア</h4>
+        <ul>
+          <li>Node.js 20.x 以上（LTS推奨）</li>
+          <li>npm 9.x 以上</li>
+          <li>Claude Code（Anthropic CLI）</li>
+          <li>Git 2.30 以上</li>
+        </ul>
+      </div>
+      <div class="req-box">
+        <h4>コンテナエンジン（いずれか）</h4>
+        <ul>
+          <li>Docker Desktop 24+ / Docker Engine</li>
+          <li>Apple Container（macOS 15+）</li>
+          <li>Podman 4.x（Linux）</li>
+        </ul>
+      </div>
+      <div class="req-box">
+        <h4>ハードウェア最小要件</h4>
+        <ul>
+          <li>RAM: 2GB以上（推奨4GB+）</li>
+          <li>ストレージ: 5GB以上</li>
+          <li>CPU: x86_64 / ARM64</li>
+        </ul>
+      </div>
+      <div class="req-box">
+        <h4>Anthropic認証情報</h4>
+        <ul>
+          <li>Anthropic API Key、または</li>
+          <li>Claude Code サブスクリプション</li>
+          <li>（どちらか一方でOK）</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="warning" style="margin-top:20px;margin-bottom:0;">
+      ⚠️ <strong>コンテナエンジンは必須です。</strong> DockerまたはApple Containerが起動していない場合、NanoClawのセッション分離機能は動作しません。事前に <code>docker info</code> で稼働確認をしてください。
+    </div>
+  </div>
+
+  <!-- 5. インストール -->
+  <div class="section" id="install">
+    <h2><span class="section-num">5</span>インストール手順</h2>
+
+    <h3>Step 1: 前提ソフトウェアのインストール</h3>
+
+    <p><strong>Node.js 20 LTS のインストール（Ubuntu / Debian）</strong></p>
+    <pre><span class="comment"># NodeSourceリポジトリを追加してNode.js 20をインストール</span>
+<span class="cmd">curl</span> <span class="arg">-fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -</span>
+<span class="cmd">sudo apt-get install</span> <span class="arg">-y nodejs</span>
+<span class="cmd">node</span> <span class="arg">--version</span>   <span class="comment"># v20.x.x と表示されること</span></pre>
+
+    <p><strong>Node.js 20 LTS のインストール（macOS）</strong></p>
+    <pre><span class="comment"># Homebrew経由でインストール</span>
+<span class="cmd">brew install</span> <span class="arg">node@20</span>
+<span class="cmd">brew link</span> <span class="arg">node@20 --force</span>
+<span class="cmd">node</span> <span class="arg">--version</span></pre>
+
+    <p><strong>Claude Code のインストール</strong></p>
+    <pre><span class="comment"># npm経由でClaude Codeをグローバルインストール</span>
+<span class="cmd">npm install</span> <span class="arg">-g @anthropic-ai/claude-code</span>
+<span class="cmd">claude</span> <span class="arg">--version</span>   <span class="comment"># バージョン番号が表示されること</span></pre>
+
+    <p><strong>Docker のインストール（Linux）</strong></p>
+    <pre><span class="comment"># Docker公式スクリプトを使用</span>
+<span class="cmd">curl</span> <span class="arg">-fsSL https://get.docker.com | sh</span>
+<span class="cmd">sudo usermod</span> <span class="arg">-aG docker $USER</span>
+<span class="cmd">newgrp docker</span>
+<span class="cmd">docker info</span>   <span class="comment"># Dockerが動作していることを確認</span></pre>
+
+    <h3>Step 2: NanoClawのクローン</h3>
+    <pre><span class="comment"># リポジトリをクローン</span>
+<span class="cmd">git clone</span> <span class="arg">https://github.com/qwibitai/nanoclaw.git</span>
+<span class="cmd">cd</span> <span class="arg">nanoclaw</span>
+
+<span class="comment"># 依存パッケージをインストール</span>
+<span class="cmd">npm install</span></pre>
+
+    <h3>Step 3: Claude Codeのセットアップ起動</h3>
+    <pre><span class="comment"># プロジェクトルートでClaude Codeを起動</span>
+<span class="cmd">claude</span>
+
+<span class="comment"># Claude Code内でNanoClawセットアップコマンドを実行</span>
+<span class="output">&gt; /setup</span>
+
+<span class="comment"># 対話形式でAPIキーや使用するプラットフォームを設定します</span>
+<span class="output">NanoClaw Setup Wizard v1.x</span>
+<span class="output">? Select your AI backend: › Claude API Key / Claude Code Subscription</span>
+<span class="output">? Choose messaging platforms: › WhatsApp, Telegram, Slack, Discord, Gmail</span>
+<span class="output">? Container engine: › Docker / Apple Container</span>
+<span class="output">✓ Setup complete! Run `npm start` to launch NanoClaw.</span></pre>
+
+    <div class="tip">
+      <strong>💡 ヒント：</strong> <code>/setup</code> コマンドはインタラクティブウィザードです。途中で誤った選択をした場合は、<code>Ctrl+C</code> でキャンセルして再実行できます。設定はコードとして保存され、後から <code>claude</code> プロンプトで編集可能です。
+    </div>
+
+    <h3>Step 4: NanoClawの起動</h3>
+    <pre><span class="comment"># NanoClawを起動</span>
+<span class="cmd">npm start</span>
+
+<span class="output">🦀 NanoClaw v1.x starting...</span>
+<span class="output">✓ Container engine: Docker (ready)</span>
+<span class="output">✓ WhatsApp: connected</span>
+<span class="output">✓ Telegram: connected</span>
+<span class="output">✓ Slack: connected</span>
+<span class="output">✓ All systems operational. Listening for messages...</span></pre>
+  </div>
+
+  <!-- 6. クイックスタート -->
+  <div class="section" id="quickstart">
+    <h2><span class="section-num">6</span>クイックスタートと動作確認</h2>
+
+    <h3>最初のメッセージを送る</h3>
+    <p>NanoClawが起動したら、接続したメッセージアプリからボットにメッセージを送信してみましょう。</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <strong>Telegramでテスト</strong>
+          NanoClawに登録したTelegramボットにメッセージを送ります。例：「こんにちは！何ができますか？」
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <strong>コンテナが自動起動</strong>
+          メッセージを受信すると、NanoClawはDockerコンテナを自動的に作成・起動します。
+          <pre><span class="output">🔵 New session: user_12345</span>
+<span class="output">→ Container created: nanoclaw-session-a3f2 (Docker)</span>
+<span class="output">→ Agent initialized in isolated environment</span></pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <strong>AIが返答</strong>
+          Claude Agent SDKがコンテナ内で動作し、安全な環境でレスポンスを生成します。
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <strong>セッション終了後にクリーンアップ</strong>
+          会話が終了すると、コンテナは自動的に停止・削除されます。
+          <pre><span class="output">✓ Session ended: user_12345</span>
+<span class="output">→ Container nanoclaw-session-a3f2 removed</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <h3>コンテナの状態を確認する</h3>
+    <pre><span class="comment"># 実行中のNanoClawコンテナを確認</span>
+<span class="cmd">docker ps</span> <span class="arg">--filter "name=nanoclaw"</span>
+
+<span class="output">CONTAINER ID   IMAGE              COMMAND        STATUS         NAMES</span>
+<span class="output">a3f2b1c9d8e7   nanoclaw-session   "node ..."     Up 2 minutes   nanoclaw-session-a3f2</span>
+
+<span class="comment"># ログをリアルタイム確認</span>
+<span class="cmd">npm run</span> <span class="arg">logs</span></pre>
+
+    <h3>プロセスマネージャーでの常駐起動（Linux）</h3>
+    <pre><span class="comment"># PM2をインストール（Node.jsプロセスマネージャー）</span>
+<span class="cmd">npm install</span> <span class="arg">-g pm2</span>
+
+<span class="comment"># NanoClawをPM2で起動</span>
+<span class="cmd">pm2 start</span> <span class="arg">npm --name "nanoclaw" -- start</span>
+<span class="cmd">pm2 save</span>
+<span class="cmd">pm2 startup</span>   <span class="comment"># システム起動時に自動起動</span>
+
+<span class="comment"># 状態確認</span>
+<span class="cmd">pm2 status</span></pre>
+  </div>
+
+  <!-- 7. Agent Swarm -->
+  <div class="section" id="swarm">
+    <h2><span class="section-num">7</span>Agent Swarm — 複数エージェント協調</h2>
+    <p>NanoClaw最大のユニーク機能が<strong>Agent Swarm</strong>です。複数の専門エージェントがチームを形成し、複雑なタスクを分散処理します。</p>
+
+    <h3>Swarmのアーキテクチャ</h3>
+    <div class="swarm-diagram">
+      <div>ユーザーリクエスト：「競合分析レポートを作成して」</div>
+      <div class="arrow">              ↓</div>
+      <div class="center">        🦀 オーケストレーター（NanoClaw）</div>
+      <div class="arrow">   ┌──────────┼──────────┐</div>
+      <div>   ↓          ↓          ↓</div>
+      <div><span class="agent">🔍 検索Agent  📊 分析Agent  📝 執筆Agent</span></div>
+      <div><span class="agent">Web検索・情報    データ整理・    レポート</span></div>
+      <div><span class="agent">収集            比較           執筆・整形</span></div>
+      <div class="arrow">   └──────────┼──────────┘</div>
+      <div class="arrow">              ↓</div>
+      <div class="output">      統合された最終レポート → ユーザーへ送信</div>
+    </div>
+
+    <h3>Swarmの設定方法</h3>
+    <p>設定ファイルは存在せず、<code>claude</code> コマンドプロンプトでエージェントの役割を定義します。</p>
+    <pre><span class="comment"># claude プロンプトでSwarm設定を追加</span>
+<span class="output">&gt; /swarm create research-team</span>
+
+<span class="output">Define agent roles for "research-team" swarm:</span>
+<span class="output">? Agent 1 role: searcher — Web search and data gathering</span>
+<span class="output">? Agent 2 role: analyst  — Data processing and comparison</span>
+<span class="output">? Agent 3 role: writer   — Report generation and formatting</span>
+<span class="output">? Orchestration strategy: sequential / parallel: parallel</span>
+
+<span class="output">✓ Swarm "research-team" created with 3 agents</span></pre>
+
+    <div class="tip">
+      <strong>💡 Swarmのベストプラクティス：</strong> エージェント数は3〜5が最適です。多すぎると調整コストが上がり、レスポンスが遅くなります。タスクの性質に応じて sequential（順次）か parallel（並列）を選択してください。
+    </div>
+
+    <h3>Swarm対応ユースケース</h3>
+    <div class="usecase-grid">
+      <div class="usecase-card">
+        <div class="icon">📰</div>
+        <h4>ニュース収集・要約</h4>
+        <p>収集Agent→要約Agent→送信Agentが連携し、カスタムニュースレターを自動生成</p>
+      </div>
+      <div class="usecase-card">
+        <div class="icon">🛒</div>
+        <h4>価格比較・購買支援</h4>
+        <p>複数ECサイトを並列検索し、最安値・レビュー比較をまとめて報告</p>
+      </div>
+      <div class="usecase-card">
+        <div class="icon">📊</div>
+        <h4>データ分析パイプライン</h4>
+        <p>データ取得・クレンジング・分析・可視化を各Agentが担当して自動化</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. チャットアプリ連携 -->
+  <div class="section" id="integrations">
+    <h2><span class="section-num">8</span>チャットアプリ連携</h2>
+
+    <h3>WhatsApp 連携</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <strong>WhatsApp Business API アカウント取得</strong>
+          Meta for Developersでアプリを作成し、WhatsApp Business APIのアクセストークンを取得します。
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <strong>Webhookを設定</strong>
+          NanoClawが稼働しているサーバーのエンドポイントをMeta Developerコンソールに登録します。
+          <pre><span class="comment"># Webhook URL例</span>
+<span class="val">https://your-server.com/webhook/whatsapp</span></pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <strong>claude プロンプトでトークン設定</strong>
+          <pre><span class="output">&gt; /config whatsapp</span>
+<span class="output">? WhatsApp Access Token: [入力]</span>
+<span class="output">? Phone Number ID: [入力]</span>
+<span class="output">✓ WhatsApp configured</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <h3>Telegram 連携</h3>
+    <pre><span class="comment"># @BotFatherでボットを作成し、トークンを取得後：</span>
+<span class="output">&gt; /config telegram</span>
+<span class="output">? Telegram Bot Token: 1234567890:ABC-xxxxxxxxxxxx</span>
+<span class="output">✓ Telegram bot configured. Send /start to your bot to test.</span></pre>
+
+    <h3>Slack 連携</h3>
+    <pre><span class="comment"># Slack Appを作成し、Bot User OAuth Tokenを取得後：</span>
+<span class="output">&gt; /config slack</span>
+<span class="output">? Slack Bot Token (xoxb-...): xoxb-xxxxxxxxxxxx</span>
+<span class="output">? Slack Signing Secret: [入力]</span>
+<span class="output">✓ Slack app configured</span></pre>
+
+    <h3>Discord 連携</h3>
+    <pre><span class="comment"># Discord Developer PortalでBotトークンを取得後：</span>
+<span class="output">&gt; /config discord</span>
+<span class="output">? Discord Bot Token: [入力]</span>
+<span class="output">? Guild ID (サーバーID): [入力]</span>
+<span class="output">✓ Discord bot configured</span></pre>
+
+    <h3>Gmail 連携</h3>
+    <pre><span class="comment"># Google Cloud ConsoleでOAuth2認証情報を作成後：</span>
+<span class="output">&gt; /config gmail</span>
+<span class="output">? Client ID: [入力]</span>
+<span class="output">? Client Secret: [入力]</span>
+<span class="output">Opening browser for OAuth2 authorization...</span>
+<span class="output">✓ Gmail connected: yourname@gmail.com</span></pre>
+
+    <div class="tip">
+      <strong>💡 複数プラットフォーム同時接続：</strong> NanoClawは全プラットフォームを同時に稼働させることができます。1つのインスタンスで全チャンネルを統合管理でき、Agent Swarmも共通で使用できます。
+    </div>
+  </div>
+
+  <!-- 9. ユースケース -->
+  <div class="section" id="usecases">
+    <h2><span class="section-num">9</span>実際の活用例</h2>
+
+    <div class="usecase-grid">
+      <div class="usecase-card">
+        <div class="icon">🏢</div>
+        <h4>企業内ナレッジベース</h4>
+        <p>Slackに接続し、社内ドキュメントを参照して社員の質問に即時回答。コンテナ分離により機密情報が安全に管理される。</p>
+      </div>
+      <div class="usecase-card">
+        <div class="icon">🛡️</div>
+        <h4>セキュリティSOCアシスタント</h4>
+        <p>セキュリティ運用チームのSlack/Teamsに統合し、アラートのトリアージと初期対応案を自動生成。各分析が分離コンテナで実行される。</p>
+      </div>
+      <div class="usecase-card">
+        <div class="icon">🌍</div>
+        <h4>多言語カスタマーサポート</h4>
+        <p>WhatsApp・Telegramを通じて世界中の顧客を多言語でサポート。Swarm機能で翻訳・回答生成・品質チェックを並列処理。</p>
+      </div>
+      <div class="usecase-card">
+        <div class="icon">📧</div>
+        <h4>メール自動処理パイプライン</h4>
+        <p>Gmailと接続し、受信メールを自動分類・要約・ドラフト返信を生成。Swarmでスクリーニング→分析→返信作成を分業。</p>
+      </div>
+      <div class="usecase-card">
+        <div class="icon">🎓</div>
+        <h4>教育プラットフォーム</h4>
+        <p>学習管理システムにDiscordボットとして統合。生徒ごとに独立したコンテナで個別学習セッションを提供。</p>
+      </div>
+      <div class="usecase-card">
+        <div class="icon">🔬</div>
+        <h4>研究データ収集・分析</h4>
+        <p>Swarmエージェントが複数の学術DBを並列検索し、関連論文の要約と比較分析を自動生成してSlackに投稿。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10. Tips -->
+  <div class="section" id="tips">
+    <h2><span class="section-num">10</span>Tips &amp; ベストプラクティス</h2>
+
+    <div class="tips-grid">
+      <div class="tip-item">
+        <div class="tip-label">💡 TIP 01</div>
+        <p><strong>Docker BuildKitを有効化：</strong> <code>DOCKER_BUILDKIT=1</code> 環境変数を設定するとコンテナビルドが最大3倍高速化されます。</p>
+      </div>
+      <div class="tip-item">
+        <div class="tip-label">💡 TIP 02</div>
+        <p><strong>コンテナイメージをキャッシュ：</strong> 初回起動後はイメージがキャッシュされます。<code>docker image prune</code> を定期実行してディスクを管理しましょう。</p>
+      </div>
+      <div class="tip-item">
+        <div class="tip-label">💡 TIP 03</div>
+        <p><strong>セッションタイムアウトを設定：</strong> 長期間応答のないセッションのコンテナは自動終了させることでリソースを節約できます。claudeプロンプトで <code>/config timeout 30m</code> と設定します。</p>
+      </div>
+      <div class="tip-item">
+        <div class="tip-label">💡 TIP 04</div>
+        <p><strong>Swarmのログを分けて管理：</strong> 各エージェントのログは <code>npm run logs -- --agent searcher</code> のようにフィルタリングできます。</p>
+      </div>
+      <div class="tip-item">
+        <div class="tip-label">💡 TIP 05</div>
+        <p><strong>ヘルスチェックを活用：</strong> <code>npm run health</code> でNanoClaw全コンポーネントの稼働状態を一括確認できます。本番環境ではcronで定期実行推奨。</p>
+      </div>
+      <div class="tip-item">
+        <div class="tip-label">💡 TIP 06</div>
+        <p><strong>APIレート制限に注意：</strong> Anthropic APIには1分あたりのリクエスト制限があります。高負荷時は <code>/config rate-limit 30</code> で同時処理数を制限します。</p>
+      </div>
+      <div class="tip-item">
+        <div class="tip-label">💡 TIP 07</div>
+        <p><strong>claude プロンプトでデバッグ：</strong> <code>/debug session [ID]</code> で特定セッションのコンテナ内ログをリアルタイム確認できます。</p>
+      </div>
+      <div class="tip-item">
+        <div class="tip-label">💡 TIP 08</div>
+        <p><strong>WhatsApp本番環境はngrokを使わない：</strong> 開発時はngrokが便利ですが、本番では固定IPまたはドメインを持つサーバーに正式デプロイしましょう。</p>
+      </div>
+      <div class="tip-item">
+        <div class="tip-label">💡 TIP 09</div>
+        <p><strong>Podmanを代替として使用：</strong> Dockerの代わりにRootless Podmanを使うとさらにセキュリティが向上します。<code>/config container-engine podman</code> で切り替え可能。</p>
+      </div>
+      <div class="tip-item">
+        <div class="tip-label">💡 TIP 10</div>
+        <p><strong>Claude Code Subscriptionを優先：</strong> Anthropic API KeyよりClaude Code Subscriptionを使う方が、レート制限が緩く、高負荷環境に適しています。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 11. FAQ -->
+  <div class="section" id="faq">
+    <h2><span class="section-num">11</span>よくある質問（FAQ）</h2>
+
+    <div class="faq-item">
+      <div class="faq-q">Q. PicoClawとどちらを選べばいいですか？</div>
+      <div class="faq-a">ハードウェアリソースが極端に限られている（RAM &lt;256MB、RISC-VやARMマイコン）場合はPicoClaw、セキュリティ・複数チャットアプリ統合・Agent Swarmが必要な場合はNanoClawを選択してください。クラウドサーバー上での運用ならNanoClawが適しています。</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Q. DockerなしでNanoClawを動かせますか？</div>
+      <div class="faq-a">コンテナ分離機能はDockerまたはApple Container（もしくはPodman）が必須です。ただし、セキュリティリスクを理解した上で開発・テスト環境のみに限定するなら、コンテナなし動作モードも存在しますが、本番環境では非推奨です。</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Q. 設定ファイルはどこにありますか？</div>
+      <div class="faq-a">NanoClawはTOMLやYAMLなどの設定ファイルを使用しません。すべての設定はClaudeプロンプト（<code>/config</code> コマンド）か、TypeScriptコードとして管理されます。これにより型安全性と柔軟性が確保されます。</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Q. コンテナはどのくらいのリソースを使いますか？</div>
+      <div class="faq-a">1セッションあたり約80〜150MBのRAMが必要です。同時接続ユーザーが多い場合はメモリに注意してください。<code>docker stats</code> コマンドでリアルタイムのリソース使用量を確認できます。</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Q. Agent Swarmのエージェント数に制限はありますか？</div>
+      <div class="faq-a">技術的な上限はありませんが、実用的には3〜7エージェントが推奨です。エージェント数が増えると調整コスト（オーケストレーションのAPI呼び出し）も増加し、応答時間が長くなります。</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Q. WhatsApp BusinessとWhatsApp個人版の違いは？</div>
+      <div class="faq-a">NanoClawが利用するWhatsApp Business APIは法人向けのものです。個人のWhatsAppアカウントには直接接続できません。Meta for Developersで申請が必要で、小規模なら無料枠内で利用可能です。</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Q. macOSでApple ContainerとDockerのどちらが良いですか？</div>
+      <div class="faq-a">macOS 15（Sequoia）以上であればApple Containerを推奨します。Apple Siliconと深く統合されており、起動速度・メモリ効率ともにDockerより優れています。macOS 14以下はDockerを使用してください。</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Q. 本番環境でのセキュリティチェックリストは？</div>
+      <div class="faq-a">①Dockerをrootlessモードで実行する、②APIキーを環境変数ではなくシークレット管理ツール（HashiCorp Vault等）で管理する、③Webhookエンドポイントに署名検証を実装する、④コンテナネットワークを最小権限で設定する、⑤定期的なコンテナイメージの更新を行う、の5点が重要です。</div>
+    </div>
+  </div>
+
+  <!-- 12. 用語集 -->
+  <div class="section" id="glossary">
+    <h2><span class="section-num">12</span>用語集</h2>
+    <dl class="glossary-grid">
+      <div class="gloss-item">
+        <dt>NanoClaw</dt>
+        <dd>TypeScript / Node.js製の軽量AIエージェントフレームワーク。セキュリティとマルチプラットフォーム統合を重視。</dd>
+      </div>
+      <div class="gloss-item">
+        <dt>Claude Agent SDK</dt>
+        <dd>AnthropicがNanoClaw等のAIエージェント構築のために提供するSDK。Claude AIとの深い統合を実現。</dd>
+      </div>
+      <div class="gloss-item">
+        <dt>Agent Swarm</dt>
+        <dd>役割を持つ複数のエージェントが協調してタスクを処理する仕組み。NanoClaw独自の機能。</dd>
+      </div>
+      <div class="gloss-item">
+        <dt>コンテナ分離</dt>
+        <dd>各セッションを独立したDockerコンテナ内で実行し、相互干渉やホストシステムへのアクセスを防ぐ技術。</dd>
+      </div>
+      <div class="gloss-item">
+        <dt>Docker</dt>
+        <dd>コンテナ仮想化プラットフォーム。NanoClawのセッション分離に使用される主要なコンテナエンジン。</dd>
+      </div>
+      <div class="gloss-item">
+        <dt>Apple Container</dt>
+        <dd>macOS 15+対応のApple製コンテナフレームワーク。Apple Silicon最適化でDockerより高速・省電力。</dd>
+      </div>
+      <div class="gloss-item">
+        <dt>Claude Code</dt>
+        <dd>Anthropicが提供するAI統合開発CLI。NanoClawのセットアップと設定に使用する。</dd>
+      </div>
+      <div class="gloss-item">
+        <dt>オーケストレーター</dt>
+        <dd>Agent Swarmにおいて各エージェントの役割分担と結果統合を管理するメインコンポーネント。</dd>
+      </div>
+      <div class="gloss-item">
+        <dt>WhatsApp Business API</dt>
+        <dd>MetaがビジネスユーザーにWhatsAppのメッセージング機能を提供するAPI。NanoClawはこれを通じてWhatsAppと通信する。</dd>
+      </div>
+      <div class="gloss-item">
+        <dt>Webhook</dt>
+        <dd>イベント発生時に外部サービスが指定URLにHTTPリクエストを送信する仕組み。チャットアプリのメッセージ受信に使用。</dd>
+      </div>
+      <div class="gloss-item">
+        <dt>PM2</dt>
+        <dd>Node.jsアプリケーション用プロセスマネージャー。NanoClawの本番環境での常駐起動に使用。</dd>
+      </div>
+      <div class="gloss-item">
+        <dt>MCP（Model Context Protocol）</dt>
+        <dd>AnthropicのオープンプロトコルでAIとツールを統合するための標準仕様。NanoClawも対応。</dd>
+      </div>
+    </dl>
+  </div>
+
+  <!-- Cross-link bar bottom -->
+  <div class="crosslink-bar">
+    <div>
+      <div class="cl-text">省リソース版も確認する →</div>
+      <div class="cl-title">🦀 PicoClaw — Go製、&lt;10MB RAM、$10ハードウェアで動く</div>
+    </div>
+    <a href="picoclaw-install-guide.html" class="cl-btn">PicoClaw ガイドへ</a>
+  </div>
+
+  <!-- Done box -->
+  <div class="done-box">
+    <h2>🎉 NanoClawの準備完了！</h2>
+    <p>セキュアなコンテナ分離とAgent Swarmで、次世代AIエージェントを体験しよう。</p>
+    <div class="done-links">
+      <a href="https://github.com/qwibitai/nanoclaw" target="_blank" class="done-link">📦 GitHub</a>
+      <a href="https://nanoclaw.dev" target="_blank" class="done-link">🌐 公式サイト</a>
+      <a href="picoclaw-install-guide.html" class="done-link">🦀 PicoClaw ガイド</a>
+    </div>
+  </div>
+
+</main>
+
+</body>
+</html>

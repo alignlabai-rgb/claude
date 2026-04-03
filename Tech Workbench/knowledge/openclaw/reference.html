@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <title>CLI Reference | OpenClaw Mastery</title>
+    <style>
+        :root {
+            --bg: #1a1a1a;
+            --text: #ededed;
+            --accent: #00ff9d;
+            --border: #333;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: "Helvetica Neue", Arial, sans-serif;
+            padding: 40px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: var(--accent);
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #888;
+            font-size: 20px;
+            margin-bottom: 60px;
+            display: block;
+        }
+
+        .cmd-section {
+            margin-bottom: 50px;
+        }
+
+        .cmd-header {
+            font-size: 24px;
+            color: #fff;
+            border-bottom: 1px solid #444;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .flag-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .flag-table th {
+            text-align: left;
+            color: #888;
+            border-bottom: 1px solid #444;
+            padding: 10px;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .flag-table td {
+            padding: 14px 10px;
+            border-bottom: 1px solid #333;
+            color: #ccc;
+            vertical-align: top;
+        }
+
+        .flag-code {
+            font-family: monospace;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        .flag-desc {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .flag-default {
+            color: #666;
+            font-size: 12px;
+            display: block;
+            margin-top: 4px;
+            font-family: monospace;
+        }
+
+        .example-box {
+            background: #111;
+            padding: 16px;
+            border-radius: 6px;
+            font-family: monospace;
+            color: #a5d6ff;
+            margin-top: 8px;
+            border: 1px solid #333;
+            white-space: pre-wrap;
+        }
+
+        .back {
+            display: inline-block;
+            margin-bottom: 40px;
+            color: #666;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <a href="index.html" class="back">← OpenClaw Hub</a>
+
+        <h1>CLI & Config Reference</h1>
+        <span class="subtitle">Complete list of commands, flags, and environment variables.</span>
+
+        <!-- COMMANDS -->
+        <div class="cmd-section">
+            <div class="cmd-header">Main Commands</div>
+            <table class="flag-table">
+                <tr>
+                    <th width="30%">Command</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td class="flag-code">openclaw run &lt;file&gt;</td>
+                    <td>
+                        指定された Spec ファイル (例: MISSION.md) を読み込み、タスクを開始します。
+                        <div class="example-box">$ openclaw run ./tasks/refactor.md</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="flag-code">openclaw repl</td>
+                    <td>
+                        対話モードで起動します。簡単なタスクや、動作確認用。
+                        <div class="example-box">$ openclaw repl</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="flag-code">openclaw doctor</td>
+                    <td>
+                        環境診断コマンド。Docker, Git, Node.js のバージョンや権限を確認します。
+                    </td>
+                </tr>
+                <tr>
+                    <td class="flag-code">openclaw version</td>
+                    <td>
+                        インストールされているバージョンを表示します。
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- FLAGS -->
+        <div class="cmd-section">
+            <div class="cmd-header">Options & Flags</div>
+            <table class="flag-table">
+                <tr>
+                    <th width="35%">Flag</th>
+                    <th>Effect</th>
+                </tr>
+                <tr>
+                    <td class="flag-code">--sandbox</td>
+                    <td>
+                        <span class="flag-desc">Dockerコンテナ内で実行します（推奨）。カレントディレクトリのみマウントされます。</span>
+                        <span class="flag-default">Default: false (Native execution)</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="flag-code">--max-steps &lt;number&gt;</td>
+                    <td>
+                        <span class="flag-desc">思考/行動ループの最大回数。無限ループ防止用。</span>
+                        <span class="flag-default">Default: 50</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="flag-code">--max-cost &lt;usd&gt;</td>
+                    <td>
+                        <span class="flag-desc">API使用料の上限（ドル）。これを超えると強制停止します。</span>
+                        <span class="flag-default">Default: 10.0</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="flag-code">--debug / -d</td>
+                    <td>
+                        <span class="flag-desc">詳細ログ（Verbose）を表示します。思考プロセスが全て見えます。</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="flag-code">--model &lt;name&gt;</td>
+                    <td>
+                        <span class="flag-desc">使用するLLMモデルを指定します。</span>
+                        <span class="flag-default">Default: gpt-4o</span>
+                        <div class="example-box">--model o1-preview</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="flag-code">--require-approval</td>
+                    <td>
+                        <span class="flag-desc">危険な操作（書き込み、コマンド実行）の前にユーザー承認を求めます。</span>
+                        <div class="example-box">--require-approval="write,exec"</div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- ENV VARS -->
+        <div class="cmd-section">
+            <div class="cmd-header">Environment Variables</div>
+            <table class="flag-table">
+                <tr>
+                    <th width="35%">Variable</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td class="flag-code">OPENAI_API_KEY</td>
+                    <td>
+                        <span class="flag-desc"><strong>[必須]</strong> OpenAIのAPIキー。</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="flag-code">OPENCLAW_HOME</td>
+                    <td>
+                        <span class="flag-desc">ログやキャッシュを保存するディレクトリ。</span>
+                        <span class="flag-default">Default: ~/.openclaw</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="flag-code">EDITOR</td>
+                    <td>
+                        <span class="flag-desc">`openclaw edit` でSpecを開く際に使用するエディタ。</span>
+                        <span class="flag-default">Default: code (VS Code)</span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+    </div>
+</body>
+
+</html>

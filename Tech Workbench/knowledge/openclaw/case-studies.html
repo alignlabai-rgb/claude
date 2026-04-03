@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Case Studies (Deep Dive) | OpenClaw Mastery</title>
+    <style>
+        :root {
+            --bg: #1a1a1a;
+            --text: #ededed;
+            --accent: #00ff9d;
+            --border: #333;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: "Helvetica Neue", Arial, sans-serif;
+            padding: 40px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: var(--accent);
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #888;
+            font-size: 20px;
+            margin-bottom: 60px;
+            display: block;
+        }
+
+        .case-wrapper {
+            margin-bottom: 100px;
+            border-left: 1px solid #333;
+            padding-left: 40px;
+            position: relative;
+        }
+
+        .case-wrapper::before {
+            content: attr(data-step);
+            position: absolute;
+            left: -18px;
+            top: 0;
+            background: var(--accent);
+            color: #000;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 36px;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .case-title {
+            font-size: 32px;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        .case-meta {
+            font-family: monospace;
+            color: #888;
+            margin-bottom: 24px;
+            font-size: 14px;
+            display: flex;
+            gap: 20px;
+        }
+
+        .meta-item {
+            color: var(--accent);
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: #666;
+            margin-top: 30px;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .text-body {
+            color: #ccc;
+            margin-bottom: 20px;
+        }
+
+        .code-block {
+            background: #111;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: "JetBrains Mono", monospace;
+            color: #a5d6ff;
+            border: 1px solid #333;
+            white-space: pre-wrap;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        .result-box {
+            background: rgba(0, 255, 157, 0.05);
+            border: 1px solid var(--accent);
+            padding: 24px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+
+        .result-title {
+            color: var(--accent);
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .back {
+            display: inline-block;
+            margin-bottom: 40px;
+            color: #666;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <a href="index.html" class="back">← OpenClaw Hub</a>
+
+        <h1>Case Studies: Deep Dive</h1>
+        <span class="subtitle">Detailed records of autonomous agent operations.</span>
+
+        <!-- CASE 01 -->
+        <div class="case-wrapper" data-step="01">
+            <div class="case-title">The Legacy Fortress Update</div>
+            <div class="case-meta">
+                <span>Target: Java Monolith</span>
+                <span class="meta-item">Saved: 40 hours</span>
+                <span class="meta-item">Cost: $18.50</span>
+            </div>
+
+            <div class="section-title">The Challenge</div>
+            <div class="text-body">
+                10年前に構築された5万行のJavaシステム。ドキュメントは紛失し、当時の開発者は全員退職済み。<br>
+                クライアントの要望は「この巨大な泥団子の中から、税金計算ロジック（TaxCalculator）だけを抜き出して、独立したAPIサーバーにしたい」。<br>
+                人間がやれば、「コードを読む」だけで2週間はかかる絶望的なタスク。
+            </div>
+
+            <div class="section-title">Agent Configuration</div>
+            <div class="code-block">
+                # MISSION.md
+                Objective: Extract `TaxCalculator` class and its dependencies to a new Spring Boot project.
+
+                Constraints:
+                - **Read-Only Mode First**: 最初はファイルを書き込まず、依存関係のリストを作ることに専念せよ。
+                - **No Refactoring**: ロジックを変えるとバグる可能性がある。変数名すら変えるな。コピーせよ。
+                - **Generate Tests**: 抽出したコードに対し、元の挙動を保証する単体テストを新規作成せよ。
+
+                Definition of Done:
+                - 新しいプロジェクトでビルドが通る (`mvn clean install`).
+                - テストカバレッジが 90% を超える。
+            </div>
+
+            <div class="section-title">Execution Process</div>
+            <div class="text-body">
+                1. <strong>Scanning</strong>: エージェントは `grep` を駆使して `TaxCalculator`
+                から呼ばれているクラスを再帰的に特定。計12個の関連クラスを発見した。<br>
+                2. <strong>Extraction</strong>: 新しいディレクトリを作成し、ファイルをコピー。しかし `UserContext`
+                という巨大なクラスへの依存が見つかり、コンパイルエラー発生。<br>
+                3. <strong>Mocking</strong>: エージェントは「全てのUserContextを持ってくるのは危険」と判断し、必要なメソッドだけを持つ Mockクラス
+                を生成して依存を断ち切った（賢い判断！）。
+            </div>
+
+            <div class="result-box">
+                <div class="result-title">🏆 Result</div>
+                人間は1行もコードを読まずに、完全に独立して動作するマイクロサービスが手に入った。<br>
+                生成されたテストコードのおかげで、今後の改修も安全に行えるようになった。
+            </div>
+        </div>
+
+
+        <!-- CASE 02 -->
+        <div class="case-wrapper" data-step="02">
+            <div class="case-title">The Resilient Market Watcher</div>
+            <div class="case-meta">
+                <span>Target: 15 EC Sites</span>
+                <span class="meta-item">Freq: Daily</span>
+                <span class="meta-item">Cost: $0.80/day</span>
+            </div>
+
+            <div class="section-title">The Challenge</div>
+            <div class="text-body">
+                ECサイト運営者の悩み。「競合他社15サイトの価格を毎日チェックしたい」。<br>
+                従来のPythonスクレイピング（BeautifulSoup）では、相手サイトのクラス名が変わるたびにエラーになり、エンジニアが毎週修正していた。<br>
+                「メンテナンスフリーな監視システム」が必要だった。
+            </div>
+
+            <div class="section-title">Agent Configuration</div>
+            <div class="code-block">
+                # MISSION.md
+                Objective: Visit the URL list, find the price of "iPhone 16", and append to `prices.csv`.
+
+                Constraints:
+                - **Use Vision**: HTML構造（class名やid）に依存するな。スクリーンショットを見て、「価格っぽい数字」を目視で探せ。
+                - **Handle Popups**: 広告ポップアップが出たら、×ボタンを押して閉じろ。
+
+                Note:
+                - ブラウザ操作には `puppeteer` を使用せよ。
+            </div>
+
+            <div class="section-title">Execution Process</div>
+            <div class="text-body">
+                1. <strong>Navigation</strong>: ブラウザを起動し、サイトAにアクセス。<br>
+                2. <strong>Visual Recognition</strong>:
+                サイトAがリニューアルされており、DOM構造が激変していた。しかしエージェントは「￥128,000」というテキストの近くにある画像を認識し、これを価格と断定。<br>
+                3. <strong>Popup Handling</strong>: 突然「メルマガ登録」のポップアップが出現。エージェントは画面中央を覆う要素を検知し、右上の小さな「×」をクリックして続行した。
+            </div>
+
+            <div class="result-box">
+                <div class="result-title">🏆 Result</div>
+                サイトのデザイン変更でスクリプトが止まることはなくなった。<br>
+                エンジニアの週1回の保守作業がゼロになり、社長は毎朝のCSVレポートを見るだけになった。
+            </div>
+        </div>
+
+
+        <!-- CASE 03 -->
+        <div class="case-wrapper" data-step="03">
+            <div class="case-title">The Content Curator</div>
+            <div class="case-meta">
+                <span>Target: Tech News RSS</span>
+                <span class="meta-item">Output: Blog Draft</span>
+                <span class="meta-item">Cost: $2.00/run</span>
+            </div>
+
+            <div class="section-title">The Challenge</div>
+            <div class="text-body">
+                技術ブログの運営者。「毎日最新のテックニュースを追いかけたいが、英語記事を読む時間が足りない」。<br>
+                TechCrunch, The Verge, Hacker News の新着記事を読み、重要度を判定し、日本語で要約記事を書きたい。
+            </div>
+
+            <div class="section-title">Agent Configuration</div>
+            <div class="code-block">
+                # MISSION.md
+                Objective: Read top 5 articles from Hacker News, summarize them in Japanese, and create
+                `drafts/YYYY-MM-DD.md`.
+
+                Constraints:
+                - **Tone**: "だ・である"調。エンジニア向けの硬派な文体で。
+                - **Relevance**: "AI", "React", "Cloud" に関係ない記事（政治など）は無視せよ。
+                - **Structure**: 各記事につき「3行要約」「技術的なポイント」「著者の主張」を記載すること。
+            </div>
+
+            <div class="section-title">Execution Process</div>
+            <div class="text-body">
+                1. <strong>Filtering</strong>: 30本の記事タイトルを取得し、キーワードで5本に絞り込み。<br>
+                2. <strong>Deep Reading</strong>: 各記事のURLにアクセスし、本文全文（Readability View）を取得。<br>
+                3. <strong>Synthesis</strong>: 専門用語（RAG, LLM, Vercelなど）の解説を補足しながら、指定されたフォーマットでMarkdownを執筆。
+            </div>
+
+            <div class="result-box">
+                <div class="result-title">🏆 Result</div>
+                運営者は朝起きると、すでに「下書き」ができている状態になった。<br>
+                あとは自分の感想を一言追記して「公開」ボタンを押すだけ。更新頻度が週1回から毎日になった。
+            </div>
+        </div>
+
+        <!-- CASE 04 -->
+        <div class="case-wrapper" data-step="04">
+            <div class="case-title">The Vue 2 to 3 Migrator</div>
+            <div class="case-meta">
+                <span>Target: 200 Components</span>
+                <span class="meta-item">Time: Overnight</span>
+                <span class="meta-item">Scale: Massive</span>
+            </div>
+
+            <div class="section-title">The Challenge</div>
+            <div class="text-body">
+                Vue.jsのバージョンアップ案件。Vue 2 (Options API) で書かれたコンポーネントが200個あり、全て Vue 3 (Composition API / Script Setup)
+                に書き換える必要がある。<br>
+                作業自体は単純だが、量が膨大で人間がやるとミスが出る。
+            </div>
+
+            <div class="section-title">Agent Configuration</div>
+            <div class="code-block">
+                # MISSION.md
+                Objective: Convert all `.vue` files in `src/components` from Options API to Script Setup.
+
+                Constraints:
+                - **One by One**: 一気にやるな。1ファイルずつ修正し、都度 `npm test` を実行せよ。
+                - **Style Guide**: 変数定義は `const` を使い、リアクティブな変数は `ref` を使え。
+                - **Commit**: 1ファイル成功するごとに `git commit` せよ。
+
+                Definition of Done:
+                - 全ファイルの変換が完了し、テストがAll Greenであること。
+            </div>
+
+            <div class="result-box">
+                <div class="result-title">🏆 Result</div>
+                エージェントは一晩かけて200ファイルを書き換えた。<br>
+                途中、複雑なMixinsを使っているファイルで詰まったが、そこだけ `// TODO: Manual check`
+                コメントを残してスキップし、他のファイルの処理を続けた（この「詰まっても止まらない」のが重要）。
+            </div>
+        </div>
+
+
+        <!-- CASE 05 -->
+        <div class="case-wrapper" data-step="05">
+            <div class="case-title">The QA Impersonator</div>
+            <div class="case-meta">
+                <span>Target: Staging Env</span>
+                <span class="meta-item">Role: User A</span>
+                <span class="meta-item">Tool: Playwright</span>
+            </div>
+
+            <div class="section-title">The Challenge</div>
+            <div class="text-body">
+                リリースのたびに「ログインできるか？」「カートに入るか？」を手動で確認するのが面倒。<br>
+                E2Eテストはあるがメンテナンスされておらず、すぐ落ちる。人間が実際にブラウザを操作するようなテストがしたい。
+            </div>
+
+            <div class="section-title">Agent Configuration</div>
+            <div class="code-block">
+                # MISSION.md
+                Objective: Log into Staging, buy "Item-X", and confirm the "Thank you" page appears.
+
+                Constraints:
+                - **Record Video**: 操作の様子を動画ファイルとして保存せよ。
+                - **Error Handling**: エラー画面が出たら、そのページのHTMLソースとスクショを保存して終了せよ。
+            </div>
+
+            <div class="result-box">
+                <div class="result-title">🏆 Result</div>
+                デプロイ完了のフックでエージェントが起動。<br>
+                ある時、「決済ボタンが画面外にはみ出して押せない」というバグを、エージェントが「ボタンが見つかりません」というエラーで検知。<br>
+                これは単体テストでは絶対に見つけられないUIバグだった。
+            </div>
+        </div>
+
+
+        <!-- CASE 06 -->
+        <div class="case-wrapper" data-step="06">
+            <div class="case-title">The Academic Assistant</div>
+            <div class="case-meta">
+                <span>Target: ArXiv API</span>
+                <span class="meta-item">Input: PDF</span>
+                <span class="meta-item">Output: Slack</span>
+            </div>
+
+            <div class="section-title">The Challenge</div>
+            <div class="text-body">
+                AI研究者。「毎日何百本も出る論文（ArXiv）の中から、自分の研究（Swarm Intelligence）に関連するものだけを見つけたい」。<br>
+                キーワード検索だけでは不十分で、中身を読んで「新規性があるか」判断してほしい。
+            </div>
+
+            <div class="section-title">Agent Configuration</div>
+            <div class="code-block">
+                # MISSION.md
+                Objective: Fetch today's AI papers from ArXiv, read the first 2 pages of PDF, and score them (1-10)
+                based on relevance to "Agentic Swarm".
+
+                Constraints:
+                - **Output**: JSON format.
+                - **Criteria**: 単なるLLMの応用は低評価。マルチエージェントの協調動作に関する新手法なら高評価。
+            </div>
+
+            <div class="result-box">
+                <div class="result-title">🏆 Result</div>
+                研究室のSlackに、毎朝「今日読むべき論文ベスト3」が届くようになった。<br>
+                要約だけでなく「なぜこれを推薦したか（この論文は○○という点で新規性がある）」という理由付きでレコメンドされるため、精読の時間が大幅に短縮された。
+            </div>
+        </div>
+
+    </div>
+</body>
+
+</html>

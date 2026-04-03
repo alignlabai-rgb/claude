@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Deep Mechanics | Claude Code Mastery</title>
+    <style>
+        :root {
+            --bg: #0b1220;
+            --text: #e9edf5;
+            --accent: #8b5cf6;
+            /* Violet */
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: "SF Mono", "Consolas", sans-serif;
+            padding: 40px;
+            line-height: 1.7;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: var(--accent);
+            font-size: 40px;
+            margin-bottom: 10px;
+            font-family: sans-serif;
+        }
+
+        .subtitle {
+            color: #888;
+            font-size: 20px;
+            margin-bottom: 60px;
+            display: block;
+            font-family: sans-serif;
+        }
+
+        h2 {
+            font-size: 24px;
+            margin-top: 60px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+            color: #fff;
+            font-family: sans-serif;
+        }
+
+        h3 {
+            font-size: 18px;
+            margin-top: 30px;
+            color: #d8b4fe;
+        }
+
+        .diagram {
+            background: #0f172a;
+            padding: 24px;
+            border-radius: 8px;
+            border: 1px solid #1e293b;
+            color: #94a3b8;
+            white-space: pre;
+            overflow-x: auto;
+            margin: 30px 0;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .keyword {
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        .tech-box {
+            border-left: 4px solid var(--accent);
+            background: rgba(139, 92, 246, 0.1);
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+
+        th,
+        td {
+            border: 1px solid #333;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background: #1a1a1a;
+            color: #fff;
+        }
+
+        .back {
+            display: inline-block;
+            margin-bottom: 40px;
+            color: #666;
+            text-decoration: none;
+            font-family: sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <a href="index.html" class="back">← Strategy Hub</a>
+
+        <h1>Deep Mechanics</h1>
+        <span class="subtitle">Physics of the AI Mind: Context, Caching & Latency</span>
+
+        <section>
+            <h2>1. The Anatomy of a Prompt</h2>
+            <p>あなたが <code>$ claude "fix bug"</code> と打った瞬間、実際にAPIに送信されるのは「たった2単語」ではありません。<br>
+                CLIはバックグラウンドで巨大なテキストの塊（Prompt Assembly）を構築しています。</p>
+
+            <div class="diagram">
+                [ SYSTEM PROMPT (Fixed) ] ─────────────────────────────┐
+                │ "You are Claude Code, a sophisticated CLI agent..." │
+                │ "Current Date: 2026-02-11" │
+                │ "OS: Windows 11 / Shell: PowerShell" │
+                └──────────────────────────────────────────────────────┘
+                ▼
+                [ LONG-TERM MEMORY (Dynamic) ] ────────────────────────┐
+                │ Project Context: "Auth Module Refactoring..." │
+                │ User Rules: "Always use TypeScript explicit types" │
+                └──────────────────────────────────────────────────────┘
+                ▼
+                [ CONVERSATION HISTORY ] ──────────────────────────────┐
+                │ User: "List files" │
+                │ Asst: [ToolUse: ls] │
+                │ Tool: "src, test, package.json..." │
+                └──────────────────────────────────────────────────────┘
+                ▼
+                [ TARGET FILES (The Heaviest Part) ] ──────────────────┐
+                │ src/app.ts (Content...) │
+                │ src/utils.ts (Content...) │
+                └──────────────────────────────────────────────────────┘
+                ▼
+                [ NEW INSTRUCTION ] ───────────────────────────────────┐
+                │ User: "fix bug" │
+                └──────────────────────────────────────────────────────┘
+            </div>
+            <p><strong>Impact:</strong> ファイルを読み込めば読み込むほど、<code>[ TARGET FILES ]</code>
+                の領域が肥大化し、レスポンス速度（TTFT）が低下し、コストが指数関数的に増大します。</p>
+
+            <h2>2. Prompt Caching (The Speed Hack)</h2>
+            <p>Claude Codeの爆速レスポンスを支えているのが <strong>Anthropic API Prompt Caching</strong> です。<br>
+                送信するプロンプトの「前半部分」が変わらなければ、API側でキャッシュされたメモリを再利用します。</p>
+
+            <div class="tech-box">
+                <strong>Cache Breakpoint Strategy</strong><br>
+                キャッシュを有効にするには「変化しないもの」を先に、「変化するもの」を後に送る必要があります。<br>
+                Claude Code CLIは、以下のように自動構成しています：
+                <ol>
+                    <li><strong>Static System Prompt</strong> (Cached: 100%)</li>
+                    <li><strong>Project Spec (.ai/CONTEXT.md)</strong> (Cached: High)</li>
+                    <li><strong>Read Files</strong> (Cached: Medium - 変更されるとキャッシュ切れ)</li>
+                    <li><strong>New Query</strong> (No Cache)</li>
+                </ol>
+                <p>※ 頻繁に書き換わるファイル（ログファイル等）を読みっぱなしにすると、キャッシュヒット率が下がり、動作が重くなります。</p>
+            </div>
+
+            <h2>3. Adaptive Thinking vs Latency</h2>
+            <p>Opus 4.6 の「思考」はタダではありません。内部的には「見えないトークン」を生成しています。</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Effort Level</th>
+                        <th>Hidden Tokens (Thinking)</th>
+                        <th>Latency (待ち時間)</th>
+                        <th>Use Case</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Low</strong> (Sonnet-like)</td>
+                        <td>~500 tokens</td>
+                        <td>1-3 sec</td>
+                        <td>単純なバグ修正、Lintエラー対応</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Medium</strong> (Default)</td>
+                        <td>2,000 - 5,000 tokens</td>
+                        <td>5-15 sec</td>
+                        <td>通常の実装、要件定義</td>
+                    </tr>
+                    <tr>
+                        <td><strong>High</strong> (Deep Thought)</td>
+                        <td>10,000+ tokens</td>
+                        <td>30-60 sec</td>
+                        <td>アーキテクチャ設計、複雑なリファクタリング</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p><code>$ claude --effort low "fix typo"</code> のように使い分けることで、無駄な待ち時間とAPIコストを削減できます。</p>
+        </section>
+    </div>
+</body>
+
+</html>

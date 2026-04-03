@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Essential Concepts | Claude Code Mastery</title>
+    <style>
+        :root {
+            --bg: #0b1220;
+            --text: #e9edf5;
+            --accent: #3b82f6;
+            /* Blue for "Concepts" */
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: "Helvetica Neue", Arial, sans-serif;
+            padding: 40px;
+            line-height: 1.8;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: var(--accent);
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #888;
+            font-size: 20px;
+            margin-bottom: 60px;
+            display: block;
+        }
+
+        .term-card {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .term-card::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: var(--accent);
+        }
+
+        .term-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .term-analogy {
+            font-size: 16px;
+            color: var(--accent);
+            font-weight: normal;
+            font-style: italic;
+        }
+
+        .term-desc {
+            color: #ccc;
+            margin-bottom: 16px;
+            font-size: 16px;
+        }
+
+        .business-impact {
+            background: rgba(59, 130, 246, 0.1);
+            padding: 16px;
+            border-radius: 8px;
+            color: #93c5fd;
+            font-size: 14px;
+        }
+
+        .business-impact strong {
+            color: #fff;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .back {
+            display: inline-block;
+            margin-bottom: 40px;
+            color: #666;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <a href="index.html" class="back">← Strategy Hub</a>
+
+        <h1>Essential Concepts</h1>
+        <span class="subtitle">The Missing Link: Technical Terms for Directors</span>
+
+        <section>
+            <p>エージェントを指揮（Direct）するために、エンジニアになる必要はありません。<br>
+                しかし、以下の4つの概念だけは「経営資源」として理解してください。</p>
+
+            <!-- Context -->
+            <div class="term-card">
+                <div class="term-title">Context (コンテキスト) <span class="term-analogy">Analogy: "短期記憶の容量"</span></div>
+                <p class="term-desc">AIが「一度に頭に入れておける情報量」のことです。Claude
+                    Codeのコンテキストウィンドウは巨大ですが、無限ではありません。古い会話や関係ないファイルを読みすぎると、新しい情報が入らなくなります。</p>
+                <div class="business-impact">
+                    <strong>💡 Business Impact</strong>
+                    「資料を全部読んで」は禁句です。AIのIQを下げる行為です。<br>
+                    必要な情報だけを厳選して渡す（Distillation）ことが、Directorの最も重要な仕事です。
+                </div>
+            </div>
+
+            <!-- Token -->
+            <div class="term-card">
+                <div class="term-title">Token (トークン) <span class="term-analogy">Analogy: "思考の通貨 / ガソリン"</span></div>
+                <p class="term-desc">AIが処理するテキストの最小単位（約0.7単語）。AIへの依頼も、AIからの返答も、すべてトークンとして課金されます。</p>
+                <div class="business-impact">
+                    <strong>💡 Business Impact</strong>
+                    「なんとなく修正して」という曖昧な指示は、大量のトークン（コスト）を浪費します。<br>
+                    明確な指示は、コスト削減に直結します。
+                </div>
+            </div>
+
+            <!-- Latency -->
+            <div class="term-card">
+                <div class="term-title">Latency (レイテンシ) <span class="term-analogy">Analogy: "思考の待ち時間"</span></div>
+                <p class="term-desc">AIが答えを出し始めるまでの時間。特に賢いモデル（Opus）が深く考える（Reasoning）とき、数十秒の沈黙が発生します。</p>
+                <div class="business-impact">
+                    <strong>💡 Business Impact</strong>
+                    「簡単なバグ修正」に数十秒待つのは無駄です。<br>
+                    タフェーズに応じてモデル（Opus vs Sonnet）を使い分ける判断力が問われます。
+                </div>
+            </div>
+
+            <!-- Agentic -->
+            <div class="term-card">
+                <div class="term-title">Agentic (エージェンティック) <span class="term-analogy">Analogy: "自律的 / 手足がある状態"</span>
+                </div>
+                <p class="term-desc">従来のChatbot（話すだけ）とは異なり、ツールを使って「自ら行動できる」状態を指します。ファイルを書き換えたり、コマンドを実行したりする権限を持ちます。</p>
+                <div class="business-impact">
+                    <strong>💡 Business Impact</strong>
+                    「答えを聞く」のではなく「仕事を任せる」ことができます。<br>
+                    ただし、権限を与えることには「セキュリティリスク」という責任が伴います。
+                </div>
+            </div>
+
+        </section>
+    </div>
+</body>
+
+</html>

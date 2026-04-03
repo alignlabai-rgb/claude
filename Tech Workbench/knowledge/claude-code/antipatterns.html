@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Anti-Patterns | Claude Code Mastery</title>
+    <style>
+        :root {
+            --bg: #0b1220;
+            --text: #e9edf5;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: sans-serif;
+            padding: 40px;
+            line-height: 1.8;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: var(--accent);
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #888;
+            font-size: 20px;
+            margin-bottom: 60px;
+            display: block;
+        }
+
+        .pattern-card {
+            border-left: 4px solid var(--danger);
+            background: rgba(239, 68, 68, 0.05);
+            padding: 30px;
+            margin-bottom: 40px;
+            border-radius: 0 12px 12px 0;
+        }
+
+        .pattern-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--danger);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .symptom-box {
+            background: #1a1010;
+            padding: 16px;
+            border-radius: 6px;
+            color: #fca5a5;
+            font-family: monospace;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+        }
+
+        .symptom-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #ff6b6b;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .solution-block {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .solution-header {
+            color: var(--accent);
+            font-weight: bold;
+            font-size: 18px;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .command-box {
+            background: #111;
+            padding: 16px;
+            border-radius: 6px;
+            border: 1px solid #333;
+            font-family: monospace;
+            color: #eee;
+        }
+
+        .back {
+            display: inline-block;
+            margin-bottom: 40px;
+            color: #666;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <a href="index.html" class="back">← Strategy Hub</a>
+
+        <h1>Anti-Patterns</h1>
+        <span class="subtitle">Detailed Failure Analysis & Exorcism Commands</span>
+
+        <section>
+
+            <!-- Pattern 1 -->
+            <div class="pattern-card">
+                <div class="pattern-title">⚠️ 1. The "Blind Fix" Loop</div>
+                <p>エージェントが「エラー内容を見ずに、当てずっぽうで修正」を繰り返し、コードを破壊する現象。</p>
+
+                <div class="symptom-box">
+                    <span class="symptom-label">Symptoms (症状)</span>
+                    > test failed: 'User' not found<br>
+                    > Claude: "Fixing..." (User.tsを修正)<br>
+                    > test failed: 'User' not found<br>
+                    > Claude: "Fixing..." (User.tsを元に戻す)<br>
+                    > test failed...
+                </div>
+
+                <div class="solution-block">
+                    <span class="solution-header">✅ The Exorcism Command</span>
+                    <p>思考停止したエージェントの頬を叩くコマンドです。「手を動かすな、ログを見ろ」と命じます。</p>
+                    <div class="command-box">
+                        $ claude "STOP WRITING CODE. You are looping.<br>
+                        1. Read the error log carefully.<br>
+                        2. Read `src/models/User.ts` (do not edit yet).<br>
+                        3. Explain WHY the error persists in 1 sentence.<br>
+                        4. Only then, propose a fix."
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pattern 2 -->
+            <div class="pattern-card">
+                <div class="pattern-title">⚠️ 2. The "Hallucinated Library" Trap</div>
+                <p>存在しない関数や、古いバージョンのAPIを自信満々に使い、"Undefined" エラーを引き起こす現象。</p>
+
+                <div class="symptom-box">
+                    <span class="symptom-label">Symptoms (症状)</span>
+                    > TypeError: supabase.auth.admin.listUsers is not a function
+                </div>
+
+                <div class="solution-block">
+                    <span class="solution-header">✅ The Reality Check</span>
+                    <p>エージェントの知識は「トレーニング時点（過去）」で止まっています。最新のライブラリ仕様を教える必要があります。</p>
+                    <div class="command-box">
+                        $ claude "It seems you are hallucinating the API.<br>
+                        Read `node_modules/@supabase/supabase-js/package.json` to check the version.<br>
+                        Then, search the web or read the newly generated `docs/supabase.md` to find the correct method
+                        name."
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pattern 3 -->
+            <div class="pattern-card">
+                <div class="pattern-title">⚠️ 3. Context Poisoning</div>
+                <p>長時間作業していると、過去の「間違った試行錯誤の履歴」がコンテキストに残り、エージェントが賢くなくなる現象。</p>
+
+                <div class="symptom-box">
+                    <span class="symptom-label">Symptoms (症状)</span>
+                    - 指示に対する反応が遅い<br>
+                    - 「前にも言ったけど」という修正を繰り返す<br>
+                    - 単純なミスが増える
+                </div>
+
+                <div class="solution-block">
+                    <span class="solution-header">✅ The Reset Button</span>
+                    <p>人間で言う「睡眠」が必要です。履歴を消去し、今の正解だけを再度読み込ませます。</p>
+                    <div class="command-box">
+                        $ /clear<br>
+                        $ claude "Resuming work. Read `.ai/CONTEXT.md` and `src/current-focus.ts` to refresh your
+                        memory."
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </div>
+</body>
+
+</html>

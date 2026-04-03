@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenAI Codex (The Operator) | Tech Workbench</title>
+    <style>
+        :root {
+            --bg: #0b1220;
+            --panel: #191919;
+            --muted: #9ca3af;
+            --text: #f3f4f6;
+            --accent: #10a37f;
+            /* OpenAI Green */
+            --accent-grad: linear-gradient(135deg, #10a37f, #5ac8fa);
+            --border: rgba(255, 255, 255, 0.1);
+            --radius: 16px;
+            --font-mono: "SF Mono", "Consolas", monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Segoe UI", "SF Pro Display", system-ui, sans-serif;
+            color: var(--text);
+            background: var(--bg);
+            padding: 32px 20px 64px;
+            line-height: 1.7;
+        }
+
+        .shell {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        header.hero {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 48px 40px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        header.hero::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--accent-grad);
+        }
+
+        .role-badge {
+            display: inline-block;
+            background: rgba(16, 163, 127, 0.15);
+            color: #5ac8fa;
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(16, 163, 127, 0.3);
+        }
+
+        h1 {
+            margin: 0 0 16px;
+            font-size: 48px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            line-height: 1.1;
+            color: #fff;
+        }
+
+        .lead {
+            margin: 0 0 32px;
+            font-size: 20px;
+            color: var(--muted);
+            max-width: 760px;
+            font-weight: 300;
+        }
+
+        .back {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        .back:hover {
+            opacity: 1;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 32px;
+            transition: transform 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        h3 {
+            margin: 0 0 12px;
+            font-size: 20px;
+            color: #fff;
+            font-weight: 700;
+        }
+
+        p {
+            margin: 0 0 16px;
+            color: var(--muted);
+            font-size: 16px;
+        }
+
+        ul {
+            margin: 0 0 24px;
+            padding-left: 24px;
+            color: var(--muted);
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .app-window {
+            background: #000;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 16px;
+            font-family: sans-serif;
+            margin-bottom: 24px;
+        }
+
+        .app-header {
+            border-bottom: 1px solid #333;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #333;
+        }
+
+        .dot.r {
+            background: #ff5f56;
+        }
+
+        .dot.y {
+            background: #ffbd2e;
+        }
+
+        .dot.g {
+            background: #27c93f;
+        }
+
+        .agent-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #111;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            border: 1px solid #222;
+        }
+
+        .agent-avatar {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #10a37f, #000);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .agent-status {
+            font-size: 12px;
+            color: #10a37f;
+            margin-left: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="shell">
+        <header class="hero">
+            <div class="role-badge">LEVEL 2 : AGENT</div>
+            <h1>OpenAI Codex App</h1>
+            <p class="lead">2026年2月にリリースされた、AIエージェントのための統合司令室（Command
+                Center）。<br>単一のチャットではなく、「Operator」と呼ばれる自律型エージェントたちを視覚的に管理・指揮するための次世代デスクトップアプリです。</p>
+            <a class="back" href="../index.html">← Workbenchへ戻る</a>
+        </header>
+
+        <div class="grid">
+            <section class="card">
+                <h3>What is "Codex App"?</h3>
+                <p>これまでのChatGPTは「対話相手」でしたが、Codex Appは「作業場」です。</p>
+                <div class="app-window">
+                    <div class="app-header">
+                        <div class="dot r"></div>
+                        <div class="dot y"></div>
+                        <div class="dot g"></div>
+                        <span style="font-size: 12px; color: #666; margin-left: 8px;">OpenAI Codex - Project: Tech
+                            Workbench</span>
+                    </div>
+                    <div class="agent-row">
+                        <div class="agent-avatar">OP</div>
+                        <div>
+                            <strong style="color: #fff; display: block; font-size: 14px;">Operator (Main)</strong>
+                            <span style="font-size: 11px; color: #888;">Refactoring /src/utils...</span>
+                        </div>
+                        <div class="agent-status">Running</div>
+                    </div>
+                    <div class="agent-row">
+                        <div class="agent-avatar">DE</div>
+                        <div>
+                            <strong style="color: #fff; display: block; font-size: 14px;">Deep Research</strong>
+                            <span style="font-size: 11px; color: #888;">Browsing documentation for API...</span>
+                        </div>
+                        <div class="agent-status">Thinking</div>
+                    </div>
+                    <div class="agent-row">
+                        <div class="agent-avatar">CA</div>
+                        <div>
+                            <strong style="color: #fff; display: block; font-size: 14px;">Canvas</strong>
+                            <span style="font-size: 11px; color: #888;">Drafting UI mockups...</span>
+                        </div>
+                        <div class="agent-status">Waiting</div>
+                    </div>
+                </div>
+                <p style="font-size: 14px;">このように、複数のエージェントが裏で動いている様子を一覧し、個別に介入したり、連携させたりすることができます。</p>
+            </section>
+
+            <section class="card">
+                <h3>Key Features</h3>
+                <ul>
+                    <li><strong>Operator Integration</strong>:
+                        PC操作権限を持つ「Operator」と深く統合されており、アプリのインストールやファイル整理、ブラウザ操作を代行させることができます。</li>
+                    <li><strong>Local Context</strong>:
+                        デスク上の全ファイル、カレンダー、メールなどをコンテキストとして認識し、「来週の会議資料を作って」といった曖昧な指示を実行に移します。</li>
+                    <li><strong>Seamless Handoff</strong>: Operatorが作ったコードを、そのままCanvasで編集し、最終的にVS
+                        Codeに書き出すといった連携がスムーズです。</li>
+                </ul>
+            </section>
+        </div>
+
+        <section class="card">
+            <h3 style="color: var(--accent);">Vibe Codingでの位置づけ</h3>
+            <p><strong>「CEO（あなた）の秘書室長」</strong></p>
+            <div style="display: flex; gap: 32px; flex-wrap: wrap;">
+                <div style="flex: 1;">
+                    <p><strong>Claude Code</strong> や <strong>GitHub Copilot</strong> が「現場のエンジニア」だとすれば、<strong>OpenAI
+                            Codex</strong> は、それらエンジニアが働きやすいように環境を整えたり、スケジュールを調整したり、外部リサーチを行う「バックオフィス兼マネージャー」の役割を果たします。
+                    </p>
+                </div>
+                <div style="flex: 1;">
+                    <ul>
+                        <li><strong>Coding</strong>: もちろんコードも書けますが、どちらかというと「プロジェクト全体の進行管理」や「雑務の自動化」に強みがあります。</li>
+                        <li><strong>PC Automation</strong>: 「Zoomを開いて」「Slackで報告して」といったOSレベルの操作ができる点が最大の特徴です。</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</body>
+
+</html>

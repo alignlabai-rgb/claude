@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mistral (The Specialist) | Tech Workbench</title>
+    <style>
+        :root {
+            --bg: #0b1220;
+            --panel: #101418;
+            --muted: #94a3b8;
+            --text: #e2e8f0;
+            --accent: #f0c05d;
+            /* Mistral Gold/Yellow */
+            --accent-grad: linear-gradient(135deg, #f0c05d, #fff);
+            --border: rgba(240, 192, 93, 0.2);
+            --radius: 16px;
+            --font-mono: "SF Mono", "Consolas", monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Segoe UI", "SF Pro Display", system-ui, sans-serif;
+            color: var(--text);
+            background: var(--bg);
+            padding: 32px 20px 64px;
+            line-height: 1.7;
+        }
+
+        .shell {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        header.hero {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 48px 40px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        header.hero::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--accent-grad);
+        }
+
+        header.hero::after {
+            content: "";
+            position: absolute;
+            right: -100px;
+            bottom: -100px;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(240, 192, 93, 0.1), transparent 70%);
+            pointer-events: none;
+        }
+
+        .meta-tag {
+            display: inline-block;
+            background: rgba(240, 192, 93, 0.15);
+            color: #ffe6a8;
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(240, 192, 93, 0.3);
+        }
+
+        .last-updated {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--muted);
+            opacity: 0.7;
+            margin-top: 8px;
+            display: block;
+        }
+
+        .eyebrow {
+            font-size: 0.9em;
+            margin-bottom: 12px;
+            display: block;
+            color: var(--accent);
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        h1 {
+            margin: 0 0 16px;
+            font-size: 48px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            line-height: 1.1;
+            background: linear-gradient(to right, #fff, #ffeebf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .lead {
+            margin: 0 0 32px;
+            font-size: 20px;
+            color: var(--muted);
+            max-width: 760px;
+            font-weight: 300;
+        }
+
+        .back {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        .back:hover {
+            opacity: 1;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 32px;
+            transition: transform 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        h2 {
+            margin: 0 0 20px;
+            font-size: 24px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+        }
+
+        h2::before {
+            content: "";
+            width: 4px;
+            height: 24px;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+
+        h3 {
+            margin: 24px 0 12px;
+            font-size: 18px;
+            color: #fff;
+            font-weight: 600;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 8px;
+        }
+
+        p {
+            margin: 0 0 16px;
+            color: var(--muted);
+            font-size: 16px;
+        }
+
+        ul {
+            margin: 0 0 24px;
+            padding-left: 24px;
+            color: var(--muted);
+        }
+
+        li {
+            margin-bottom: 12px;
+        }
+
+        li strong {
+            color: var(--text);
+        }
+
+        .spec-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .spec-item {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .spec-label {
+            display: block;
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--muted);
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .spec-value {
+            display: block;
+            font-size: 16px;
+            color: #fff;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="shell">
+        <header class="hero">
+            <div class="meta-tag">INTELLIGENCE / MISTRAL</div>
+            <span class="eyebrow">The Specialist (職人)</span>
+            <h1>Mistral</h1>
+            <p class="lead">欧州発、効率と透明性を重んじる職人肌のAI。最新の「Mistral 3」は、必要な機能だけに特化したスリムで強力なモデル群と、Open
+                Weightsの哲学でエンジニアに愛されています。</p>
+            <span class="last-updated">Last Updated: 2026.02.11</span>
+            <br>
+            <a class="back" href="../index.html">← Workbenchへ戻る</a>
+        </header>
+
+        <section class="grid">
+            <article class="card">
+                <h2>Core Specs</h2>
+                <div class="spec-grid">
+                    <div class="spec-item">
+                        <span class="spec-label">Latest Model</span>
+                        <span class="spec-value">Mistral 3 Large</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Philosophy</span>
+                        <span class="spec-value">Open Weights</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">New Feature</span>
+                        <span class="spec-value">Voxtral (Speech)</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Specialty</span>
+                        <span class="spec-value">Thinking & Coding</span>
+                    </div>
+                </div>
+                <p>Mistralのアプローチは「巨大な万能モデル」ではなく、「目的に特化した最強のツール」を提供することです。Ministral（軽量版）からMagistral（推論版）まで、用途に合わせて選べるのが魅力です。
+                </p>
+            </article>
+
+            <article class="card">
+                <h2>Specialized Models</h2>
+                <ul>
+                    <li><strong>Voxtral</strong>:
+                        2026年2月に登場した音声認識・処理モデル。OpenAIのWhisperを超える精度と速度を目指し、リアルタイム音声対話エージェントの核となります。</li>
+                    <li><strong>Codestral (Devstral)</strong>: コーディング特化モデル。80以上の言語を理解し、低レイテンシで補完を行います。VS
+                        Codeなどのエディタに組み込むのに最適です。</li>
+                    <li><strong>Magistral (Reasoning)</strong>: 推論特化モデル。数学や論理パズルの解決において、パラメータ効率の良さが光ります。</li>
+                </ul>
+            </article>
+        </section>
+
+        <section class="card">
+            <h2>Why "Open Weights"?</h2>
+            <p>Mistralは、モデルの重み（Weights）を公開することで、開発者が自社のインフラでAIを動かせるようにしています。</p>
+            <div style="display: flex; gap: 24px; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 280px;">
+                    <h3>Privacy & Control</h3>
+                    <p>外部サーバーにデータを送りたくない秘匿性の高いプロジェクトにおいて、ローカルやプライベートクラウドで動かせるMistralは唯一無二の選択肢です。</p>
+                </div>
+                <div style="flex: 1; min-width: 280px;">
+                    <h3>Fine-tuning</h3>
+                    <p>ベースモデルが公開されているため、特定のドメイン（例えば社内用語や特殊な言語）に追加学習させることが容易です。</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="grid">
+            <article class="card">
+                <h2>Why use for Vibe Coding?</h2>
+                <p>Vibe Codingにおいて、Mistralは**「ローカルPCで動く頼れる部下」**です。</p>
+                <ul>
+                    <li><strong>Ollamaとの連携</strong>: ローカル環境（Ollama等）でMistralを動かせば、ネットが繋がらない環境や、通信遅延を嫌うタスクでも爆速で応答してくれます。
+                    </li>
+                    <li><strong>コストゼロ</strong>: API費用を気にせず、無限にループを回してコードを試行錯誤させることができます。</li>
+                </ul>
+            </article>
+
+            <article class="card">
+                <h2>Comparison</h2>
+                <ul>
+                    <li><strong>vs Giants (GPT/Gemini)</strong>:
+                        総合力では劣るかもしれませんが、「特定のタスク（例えばPythonのコード補完）」に絞れば、遥かに少ないリソースで同等の結果を出します。</li>
+                    <li><strong>vs Llama (Meta)</strong>: 同じオープンモデルですが、Mistralの方が「商用利用のしやすさ」や「欧州言語への対応」で一歩リードしています。</li>
+                </ul>
+            </article>
+        </section>
+    </div>
+</body>
+
+</html>

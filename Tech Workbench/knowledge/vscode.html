@@ -1,0 +1,304 @@
+﻿<!doctype html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VS Code ガイド (プレビュー)</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --panel: #0f172a;
+      --muted: #c8d3e3;
+      --text: #e9edf5;
+      --accent: #3dd8c5;
+      --accent-2: #f7b733;
+      --border: rgba(255, 255, 255, 0.08);
+      --shadow: 0 18px 48px rgba(0, 0, 0, 0.35);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", "SF Pro Display", "Noto Sans JP", system-ui, -apple-system, sans-serif;
+      color: var(--text);
+      background: linear-gradient(145deg, #0b1220 0%, #0c1526 50%, #0a1020 100%);
+      padding: 32px 20px 64px;
+      line-height: 1.6;
+    }
+
+    .shell {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    header.hero {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 26px 18px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    header.hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, rgba(61, 216, 197, 0.12), rgba(247, 183, 51, 0.12));
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    header.hero>* {
+      position: relative;
+      z-index: 1;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(61, 216, 197, 0.14);
+      color: var(--accent);
+      font-size: 13px;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    h1 {
+      margin: 10px 0 6px;
+      font-size: 30px;
+    }
+
+    .lead {
+      margin: 0 0 10px;
+      color: var(--muted);
+    }
+
+    .back {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 16px 14px;
+      box-shadow: var(--shadow);
+    }
+
+    .card h2 {
+      margin: 0 0 6px;
+      font-size: 20px;
+    }
+
+    .card p {
+      margin: 0 0 10px;
+      color: var(--muted);
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 8px;
+      background: rgba(247, 183, 51, 0.18);
+      color: var(--accent-2);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      text-transform: uppercase;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 16px;
+      color: var(--muted);
+    }
+
+    li {
+      margin-bottom: 6px;
+    }
+
+    .table-card table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    .table-card th,
+    .table-card td {
+      border-bottom: 1px solid var(--border);
+      padding: 9px 8px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .table-card th {
+      color: var(--accent);
+      font-size: 13px;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+    }
+
+    .note {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 8px;
+    }
+
+    @media (max-width:640px) {
+      body {
+        padding: 22px 16px 48px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      .card {
+        padding: 14px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+    <header class="hero">
+      <div class="eyebrow">Preview</div>
+      <h1>VS Code 基本ガイド（プレビュー）</h1>
+      <p class="lead">エディタの開き方、ファイル移動、コマンドパレット、ターミナル、マルチカーソルなど、最初に覚えると楽になる操作をまとめました。随時拡充します。</p>
+      <a class="back" href="../index.html">← Workbenchへ戻る</a>
+    </header>
+
+    <section class="grid">
+      <article class="card">
+        <div class="tag">最初に</div>
+        <h2>最低限これだけ</h2>
+        <ul>
+          <li><strong>ファイルを開く</strong>: Cmd/Ctrl + P → ファイル名で検索。</li>
+          <li><strong>コマンドパレット</strong>: Cmd/Ctrl + Shift + P → すべての機能を検索。</li>
+          <li><strong>ターミナル</strong>: Ctrl + ` で表示/非表示。</li>
+          <li><strong>分割表示</strong>: Cmd/Ctrl + \ またはエディタ右上の分割ボタン。</li>
+          <li><strong>設定</strong>: Cmd/Ctrl + , でSettingsを開く。</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <div class="tag">マルチカーソル</div>
+        <h2>同時編集のコツ</h2>
+        <ul>
+          <li><strong>縦に追加</strong>: Alt + クリック（MacはOption）。</li>
+          <li><strong>次の一致を追加</strong>: Cmd/Ctrl + D。</li>
+          <li><strong>全部まとめて選択</strong>: Cmd/Ctrl + Shift + L。</li>
+          <li><strong>矩形選択</strong>: Alt/Option + ドラッグ。</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <div class="tag">見つける/移動する</div>
+        <h2>検索・置換</h2>
+        <ul>
+          <li><strong>現在のファイル内検索</strong>: Cmd/Ctrl + F。</li>
+          <li><strong>置換</strong>: Cmd/Ctrl + H。</li>
+          <li><strong>プロジェクト全体検索</strong>: Cmd/Ctrl + Shift + F。</li>
+          <li><strong>シンボルジャンプ</strong>: Cmd/Ctrl + Shift + O（ファイル内）/ T（ワークスペース）。</li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="card table-card">
+      <div class="tag">ショートカット</div>
+      <h2>Mac / Windows 対応表</h2>
+      <table>
+        <tr>
+          <th>やりたいこと</th>
+          <th>Mac</th>
+          <th>Windows</th>
+        </tr>
+        <tr>
+          <td>コマンドパレット</td>
+          <td>Cmd + Shift + P</td>
+          <td>Ctrl + Shift + P</td>
+        </tr>
+        <tr>
+          <td>ファイルを開く</td>
+          <td>Cmd + P</td>
+          <td>Ctrl + P</td>
+        </tr>
+        <tr>
+          <td>統合ターミナル</td>
+          <td>Ctrl + `</td>
+          <td>Ctrl + `</td>
+        </tr>
+        <tr>
+          <td>サイドバー表示切替</td>
+          <td>Cmd + B</td>
+          <td>Ctrl + B</td>
+        </tr>
+        <tr>
+          <td>分割エディタ</td>
+          <td>Cmd + \</td>
+          <td>Ctrl + \</td>
+        </tr>
+        <tr>
+          <td>行へ移動</td>
+          <td>Ctrl + G</td>
+          <td>Ctrl + G</td>
+        </tr>
+        <tr>
+          <td>コメントアウト</td>
+          <td>Cmd + /</td>
+          <td>Ctrl + /</td>
+        </tr>
+      </table>
+      <p class="note">Macでは基本的に Ctrl → Cmd に読み替えればOK。AltはOptionに相当します。</p>
+    </section>
+
+    <section class="grid">
+      <article class="card">
+        <div class="tag">環境づくり</div>
+        <h2>拡張機能の例</h2>
+        <ul>
+          <li>日本語化: <strong>Japanese Language Pack</strong></li>
+          <li>テーマ: <strong>GitHub Theme</strong> などお好みで</li>
+          <li>アイコン: <strong>VSCode Icons</strong></li>
+          <li>Lint/Format: <strong>ESLint</strong>, <strong>Prettier</strong>（プロジェクトに合わせて）</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <div class="tag">セットアップ</div>
+        <h2>最初にやる設定</h2>
+        <ul>
+          <li>自動保存: Settingsで"Auto Save"を"afterDelay"に。</li>
+          <li>フォントと行間: Editor Font Family/Line Heightを好みに調整。</li>
+          <li>ミニマップ非表示: Settingsで"Minimap"をオフにするとスッキリ。</li>
+        </ul>
+      </article>
+    </section>
+  </div>
+</body>
+
+</html>

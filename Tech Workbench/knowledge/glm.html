@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GLM (The Connector) | Tech Workbench</title>
+    <style>
+        :root {
+            --bg: #0b1220;
+            --panel: #101418;
+            --muted: #94a3b8;
+            --text: #e2e8f0;
+            --accent: #325ab4;
+            /* Zhipu Blue */
+            --accent-grad: linear-gradient(135deg, #325ab4, #6e94e6);
+            --border: rgba(50, 90, 180, 0.2);
+            --radius: 16px;
+            --font-mono: "SF Mono", "Consolas", monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Segoe UI", "SF Pro Display", system-ui, sans-serif;
+            color: var(--text);
+            background: var(--bg);
+            padding: 32px 20px 64px;
+            line-height: 1.7;
+        }
+
+        .shell {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        header.hero {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 48px 40px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        header.hero::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--accent-grad);
+        }
+
+        header.hero::after {
+            content: "";
+            position: absolute;
+            right: -100px;
+            bottom: -100px;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(50, 90, 180, 0.1), transparent 70%);
+            pointer-events: none;
+        }
+
+        .meta-tag {
+            display: inline-block;
+            background: rgba(50, 90, 180, 0.15);
+            color: #9ab4f0;
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(50, 90, 180, 0.3);
+        }
+
+        .last-updated {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--muted);
+            opacity: 0.7;
+            margin-top: 8px;
+            display: block;
+        }
+
+        .eyebrow {
+            font-size: 0.9em;
+            margin-bottom: 12px;
+            display: block;
+            color: var(--accent);
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        h1 {
+            margin: 0 0 16px;
+            font-size: 48px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            line-height: 1.1;
+            background: linear-gradient(to right, #fff, #c2d4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .lead {
+            margin: 0 0 32px;
+            font-size: 20px;
+            color: var(--muted);
+            max-width: 760px;
+            font-weight: 300;
+        }
+
+        .back {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        .back:hover {
+            opacity: 1;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 32px;
+            transition: transform 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        h2 {
+            margin: 0 0 20px;
+            font-size: 24px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+        }
+
+        h2::before {
+            content: "";
+            width: 4px;
+            height: 24px;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+
+        h3 {
+            margin: 24px 0 12px;
+            font-size: 18px;
+            color: #fff;
+            font-weight: 600;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 8px;
+        }
+
+        p {
+            margin: 0 0 16px;
+            color: var(--muted);
+            font-size: 16px;
+        }
+
+        ul {
+            margin: 0 0 24px;
+            padding-left: 24px;
+            color: var(--muted);
+        }
+
+        li {
+            margin-bottom: 12px;
+        }
+
+        li strong {
+            color: var(--text);
+        }
+
+        .spec-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .spec-item {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .spec-label {
+            display: block;
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--muted);
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .spec-value {
+            display: block;
+            font-size: 16px;
+            color: #fff;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="shell">
+        <header class="hero">
+            <div class="meta-tag">INTELLIGENCE / ZHIPU AI</div>
+            <span class="eyebrow">The Connector (連結者)</span>
+            <h1>GLM</h1>
+            <p class="lead">ツールと世界をつなぐハブ。最新の「GLM-4.7」は、エージェント機能に特化した"All Tools"モジュールを搭載し、ブラウザ操作、コード実行、画像生成をシームレスに統合します。
+            </p>
+            <span class="last-updated">Last Updated: 2026.02.11</span>
+            <br>
+            <a class="back" href="../index.html">← Workbenchへ戻る</a>
+        </header>
+
+        <section class="grid">
+            <article class="card">
+                <h2>Core Specs</h2>
+                <div class="spec-grid">
+                    <div class="spec-item">
+                        <span class="spec-label">Latest Model</span>
+                        <span class="spec-value">GLM-4.7 / GLM-5</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Key Feature</span>
+                        <span class="spec-value">"All Tools" Module</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Context</span>
+                        <span class="spec-value">128K - 200K Tokens</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Type</span>
+                        <span class="spec-value">Agentic Specialized</span>
+                    </div>
+                </div>
+                <p>Zhipu AI（智譜AI）のGLMシリーズは、清華大学の研究成果をベースにしたアカデミックな出自を持ちながら、極めて実用的な「ツール使用（Function
+                    Calling）」能力に焦点を当てて進化してきました。</p>
+            </article>
+
+            <article class="card">
+                <h2>"All Tools" & Agentic Workflow</h2>
+                <p>GLM-4.7の最大の特徴は、単一のプロンプトから自律的に複数のツールを使い分ける能力です。</p>
+                <ul>
+                    <li><strong>Autonomous Selection</strong>:
+                        ユーザーが「昨日の〇〇社の株価を調べてグラフにして」と言うだけで、自動的に「Web検索」→「データ取得」→「Pythonで描画」→「画像生成」というパイプラインを構築・実行します。</li>
+                    <li><strong>GLM-5 (Preview)</strong>:
+                        2026年春節に合わせて発表された次世代モデル。兆パラメータ級の規模を持ち、クリエイティブな執筆や、より長期的なタスク計画においてGPT-5レベルの性能を発揮すると噂されています。</li>
+                </ul>
+            </article>
+        </section>
+
+        <section class="card">
+            <h2>Mobile & Edge</h2>
+            <p>GLMシリーズのもう一つの強みは、スマートフォンやPC上で動作する軽量版（GLM-Edge / Air）の性能の高さです。</p>
+            <div style="display: flex; gap: 24px; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 280px;">
+                    <h3>On-Device AI</h3>
+                    <p>インターネット接続がない環境でも、高度な日本語・中国語の処理が可能。プライバシーを重視するローカルRAG（検索拡張生成）システムの基盤として最適です。</p>
+                </div>
+                <div style="flex: 1; min-width: 280px;">
+                    <h3>Flash Speed</h3>
+                    <p>MoEアーキテクチャを採用したGLM-4.5 Airなどは、驚異的なトークン生成速度を誇り、リアルタイム翻訳などの遅延が許されないタスクで重宝します。</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="grid">
+            <article class="card">
+                <h2>Why use for Vibe Coding?</h2>
+                <p>GLMは**「便利な道具箱（Swiss Army Knife）」**です。</p>
+                <ul>
+                    <li><strong>API連携のテスト</strong>: 「このAPIを叩いて結果を整形して」といったタスクにおいて、JSONの構造理解やパラメータの正確な挿入が得意です。</li>
+                    <li><strong>Web検索統合</strong>:
+                        独自ブラウザツールとの兼ね合いが良い為、最新ドキュメントを見ながらのコーディング支援において、幻覚（ハルシネーション）が比較的少ない傾向にあります。</li>
+                </ul>
+            </article>
+
+            <article class="card">
+                <h2>Comparison</h2>
+                <ul>
+                    <li><strong>vs ChatGPT</strong>: Function
+                        Callingの安定性において、GLM-4.7はGPT系列に匹敵する性能を見せることがあります。特にアジア圏のローカル情報を含むタスクでは有利です。</li>
+                    <li><strong>vs Yi / Qwen</strong>:
+                        Qwenが「理数系特化」なら、GLMは「ツール連携特化」。外部システムを動かすオートメーションの接着剤（Connector）として機能します。</li>
+                </ul>
+            </article>
+        </section>
+    </div>
+</body>
+
+</html>

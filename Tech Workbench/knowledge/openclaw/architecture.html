@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Architecture | OpenClaw Mastery</title>
+    <style>
+        :root {
+            --bg: #1a1a1a;
+            --text: #ededed;
+            --accent: #00ff9d;
+            --border: #333;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: sans-serif;
+            padding: 40px;
+            line-height: 1.8;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: var(--accent);
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #888;
+            font-size: 20px;
+            margin-bottom: 60px;
+            display: block;
+        }
+
+        h2 {
+            font-size: 28px;
+            margin-top: 60px;
+            border-left: 4px solid var(--accent);
+            padding-left: 16px;
+            color: #fff;
+        }
+
+        h3 {
+            font-size: 20px;
+            margin-top: 40px;
+            color: #ccc;
+        }
+
+        p {
+            color: #ccc;
+            margin-bottom: 24px;
+        }
+
+        .diagram {
+            background: #222;
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid #444;
+            font-family: "SF Mono", monospace;
+            color: #aaa;
+            white-space: pre;
+            overflow-x: auto;
+            margin: 30px 0;
+        }
+
+        .box {
+            display: inline-block;
+            border: 1px solid #666;
+            padding: 10px 20px;
+            border-radius: 4px;
+            margin: 10px;
+            background: #333;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .loop-step {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .step-num {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--accent);
+            width: 40px;
+        }
+
+        .back {
+            display: inline-block;
+            margin-bottom: 40px;
+            color: #666;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <a href="index.html" class="back">← OpenClaw Hub</a>
+
+        <h1>The Recursive Architecture</h1>
+        <span class="subtitle">Understanding the OODA Loop</span>
+
+        <section>
+            <p>OpenClaw (Official OpenAI Operator) は、単なる「チャットボット」ではありません。<br>
+                それは、目標が達成されるまで無限に自己対話を繰り返す<strong>再帰的ループ・プログラム</strong>です。</p>
+
+            <h2>The OODA Loop</h2>
+            <p>軍事戦略で用いられる OODA (Observe-Orient-Decide-Act) ループが、そのまま実装されています。</p>
+
+            <div class="diagram">
+                ┌─────────────────────────────────────────────────────────────┐
+                │ OBJECTIVE │
+                │ "このリポジトリの全テストを通るように修正せよ" │
+                └───────────────────────────┬─────────────────────────────────┘
+                │
+                ┌───────▼───────┐
+                ┌───────────────┤ 1. OBSERVE │ (環境認識)
+                │ │ 「現在のエラーログを見る」
+                │ └───────┬───────┘
+                │ │
+                │ ┌───────▼───────┐
+                │ │ 2. ORIENT │ (状況判断)
+                │ │ 「これは非同期処理のタイミング問題だ」
+                │ └───────┬───────┘
+                │ │
+                ┌──────┴───────┐ ┌───────▼───────┐
+                │ 4. ACT │◄──────┤ 3. DECIDE │ (意思決定)
+                │ ツール実行 │ │ 「wait時間を増やしてリトライしよう」
+                └──────────────┘ └───────────────┘
+                │
+                ▼
+                (New State / New Logs) ──► Loop Back to OBSERVE
+            </div>
+
+            <h3>1. Observe (観測)</h3>
+            <p>エージェントは盲目です。<code>ls</code>, <code>cat</code>, <code>browser.screenshot</code>
+                などのツールを使わない限り、世界が見えません。<br>
+                OpenClawは最初のステップで必ず「現状分析」のためのコマンドを乱射します。</p>
+
+            <h3>2. Orient (方向付け/思考)</h3>
+            <p>観測結果（ツール出力）を元に、内部で推論（Reasoning）を行います。<br>
+                「ファイルAを修正したのにエラーが変わらない...ということは、原因はファイルBにあるのでは？」といった仮説構築フェーズです。</p>
+
+            <h3>3. Decide (決定)</h3>
+            <p>仮説に基づき、次に行うべき「たった一つの行動」を決定します。<br>
+                「ファイルを全部書き換える」といった無謀な計画ではなく、検証可能な最小の一手を打ちます。</p>
+
+            <h3>4. Act (行動)</h3>
+            <p>実際にファイルシステムやブラウザに対し、副作用のある操作（Write/Click）を実行します。<br>
+                この結果が、次のループの「観測」対象となります。</p>
+
+            <h2>State Management</h2>
+            <p>この無限ループを支えているのが <strong>"Scratchpad" (思考ノート)</strong> です。<br>
+                エージェントは各ステップごとに、自分の思考過程を隠しファイル（またはメモリ上）に追記していきます。</p>
+            <div class="diagram" style="background:#111; color:#0f0;">
+                Step 15:
+                - 試したこと: src/utils.ts の修正
+                - 結果: 失敗 (Error: Timeout)
+                - 次の仮説: タイムアウト設定が短すぎる
+                - 次の行動: .env の TIMEOUT 値を確認する
+            </div>
+            <p>これにより、Operator（あなた）は後から「彼がなぜその修正をしたのか」を完全に追跡（Audit）できるのです。</p>
+
+        </section>
+    </div>
+</body>
+
+</html>

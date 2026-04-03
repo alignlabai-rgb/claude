@@ -1,0 +1,358 @@
+﻿<!doctype html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Google Anti-Gravity ガイド</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --panel: #0f172a;
+      --muted: #c8d3e3;
+      --text: #e9edf5;
+      --accent: #3dd8c5;
+      --accent-2: #f7b733;
+      --border: rgba(255, 255, 255, 0.08);
+      --shadow: 0 18px 48px rgba(0, 0, 0, 0.35);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", "SF Pro Display", "Noto Sans JP", system-ui, -apple-system, sans-serif;
+      color: var(--text);
+      background: linear-gradient(145deg, #0b1220 0%, #0c1526 50%, #0a1020 100%);
+      padding: 32px 20px 64px;
+      line-height: 1.6;
+    }
+
+    .shell {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    header.hero {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 26px 18px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    header.hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, rgba(61, 216, 197, 0.12), rgba(247, 183, 51, 0.12));
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    header.hero>* {
+      position: relative;
+      z-index: 1;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(61, 216, 197, 0.14);
+      color: var(--accent);
+      font-size: 13px;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    h1 {
+      margin: 10px 0 6px;
+      font-size: 30px;
+    }
+
+    .lead {
+      margin: 0 0 10px;
+      color: var(--muted);
+    }
+
+    .back {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 16px 14px;
+      box-shadow: var(--shadow);
+    }
+
+    .card h2 {
+      margin: 0 0 6px;
+      font-size: 20px;
+    }
+
+    .card p {
+      margin: 0 0 10px;
+      color: var(--muted);
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 8px;
+      background: rgba(247, 183, 51, 0.18);
+      color: var(--accent-2);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      text-transform: uppercase;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 16px;
+      color: var(--muted);
+    }
+
+    li {
+      margin-bottom: 6px;
+    }
+
+    .note {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 8px;
+    }
+
+    .table-card table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    .table-card th,
+    .table-card td {
+      border-bottom: 1px solid var(--border);
+      padding: 9px 8px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .table-card th {
+      color: var(--accent);
+      font-size: 13px;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+    }
+
+    .steps {
+      counter-reset: step;
+      display: grid;
+      gap: 10px;
+    }
+
+    .step {
+      position: relative;
+      padding: 12px 12px 10px 40px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .step::before {
+      counter-increment: step;
+      content: counter(step);
+      position: absolute;
+      left: 12px;
+      top: 12px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: rgba(61, 216, 197, 0.18);
+      border: 1px solid rgba(61, 216, 197, 0.5);
+      color: var(--accent);
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .chip {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 6px 9px;
+      border-radius: 10px;
+      font-size: 13px;
+    }
+
+    @media (max-width:640px) {
+      body {
+        padding: 22px 16px 48px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      .card {
+        padding: 14px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+    <header class="hero">
+      <div class="eyebrow">Overview</div>
+      <h1>Google Anti-Gravity ガイド</h1>
+      <p class="lead">Googleが提供する「エージェント・ファースト」開発環境。Mission ControlでAIエージェントを管理し、エディタやブラウザ連携、自然言語コマンドで開発を進めるプラットフォームです。
+      </p>
+      <div class="chips">
+        <span class="chip">エージェント管理</span>
+        <span class="chip">自然言語コマンド</span>
+        <span class="chip">タブ補完</span>
+        <span class="chip">Webブラウズ連携</span>
+      </div>
+      <p class="note">情報ソース: <a class="back" href="https://antigravity.google" target="_blank"
+          rel="noreferrer">公式サイト</a> / <a class="back"
+          href="https://codelabs.developers.google.com/getting-started-google-antigravity" target="_blank"
+          rel="noreferrer">公式Codelab</a> / DuckDuckGo検索結果</p>
+      <a class="back" href="../index.html">← Workbenchへ戻る</a>
+    </header>
+
+    <section class="grid">
+      <article class="card">
+        <div class="tag">特徴</div>
+        <h2>主要コンセプト</h2>
+        <ul>
+          <li><strong>Mission Control</strong>: 複数のAIエージェントを管理し、タスク計画や進行を俯瞰。</li>
+          <li><strong>Editor</strong>: タブ補完と自然言語コマンドでコード編集。コンテキストに応じて動く設定可能なエージェント。</li>
+          <li><strong>Browser</strong>: エージェントがWebブラウズして調査・取得を支援。</li>
+          <li><strong>Agent-first</strong>: オートパイロット的に計画→実装→検証→ブラウズを回せる設計。</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <div class="tag">セットアップ</div>
+        <h2>はじめ方（Codelabより）</h2>
+        <div class="steps">
+          <div class="step">公式サイトからダウンロード/インストール。</div>
+          <div class="step">サインインし、プロジェクト/ワークスペースを作成。</div>
+          <div class="step">Mission Controlでエージェントを起動し、Editor/Browserを試す。</div>
+        </div>
+        <p class="note">詳細手順はCodelab「Getting Started with Google Antigravity」に準拠。</p>
+      </article>
+
+      <article class="card">
+        <div class="tag">よくある操作</div>
+        <h2>基本フローの例</h2>
+        <ul>
+          <li>「新しいアプリを作成」と指示 → エージェントが計画とファイル雛形を生成。</li>
+          <li>自然言語で修正指示 → Editorでコード反映、必要に応じブラウズして補足。</li>
+          <li>テスト/検証の依頼 → エージェントが実行し結果を共有。</li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="card table-card">
+      <div class="tag">機能メモ</div>
+      <h2>覚えておきたいポイント</h2>
+      <table>
+        <tr>
+          <th>項目</th>
+          <th>概要</th>
+          <th>備考</th>
+        </tr>
+        <tr>
+          <td>エディタ</td>
+          <td>タブ補完＋自然言語コマンド</td>
+          <td>コンテキスト依存のエージェント操作</td>
+        </tr>
+        <tr>
+          <td>エージェント管理</td>
+          <td>Mission Controlで複数エージェントを統合管理</td>
+          <td>計画・実行・検証を俯瞰</td>
+        </tr>
+        <tr>
+          <td>ブラウザ連携</td>
+          <td>必要に応じてWeb検索・情報取得を自動化</td>
+          <td>Agent-firstの一部</td>
+        </tr>
+        <tr>
+          <td>プラットフォーム</td>
+          <td>公式はIDEとして配布</td>
+          <td>Mac/Windows/Linux対応（配布ページ記載）</td>
+        </tr>
+      </table>
+      <p class="note">ショートカットの公式一覧は未掲出。入手できたらここに追記してください。</p>
+    </section>
+
+    <section class="grid">
+      <article class="card">
+        <div class="tag">使い道</div>
+        <h2>ユースケース例</h2>
+        <ul>
+          <li>新規アプリの雛形生成と実装プラン作成。</li>
+          <li>コード修正の自然言語指示＋自動テスト実行。</li>
+          <li>リサーチ付きの改善提案（ブラウズを伴う調査）。</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <div class="tag">トラブル時</div>
+        <h2>確認ポイント</h2>
+        <ul>
+          <li>動かない場合: サインイン状態とネットワーク、プロジェクト設定を確認。</li>
+          <li>エージェント応答が弱い: プロンプトに目的・制約・例を具体的に入れる。</li>
+          <li>ブラウズ不可: ブラウザ権限やネットワーク設定を確認。</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <div class="tag">リンク</div>
+        <h2>公式リソース</h2>
+        <ul>
+          <li><a class="back" href="https://antigravity.google" target="_blank" rel="noreferrer">公式サイト</a></li>
+          <li><a class="back" href="https://codelabs.developers.google.com/getting-started-google-antigravity"
+              target="_blank" rel="noreferrer">公式Codelab</a></li>
+          <li><a class="back" href="https://en.wikipedia.org/wiki/Google_Antigravity" target="_blank"
+              rel="noreferrer">Wikipedia (Google Antigravity)</a></li>
+        </ul>
+      </article>
+    </section>
+  </div>
+</body>
+
+</html>

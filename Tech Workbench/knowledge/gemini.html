@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini 3.0 (The Architect) | Tech Workbench</title>
+    <style>
+        :root {
+            --bg: #0b1220;
+            --panel: #101418;
+            /* Deep Blue/Black */
+            --muted: #94a3b8;
+            --text: #e2e8f0;
+            --accent: #4e8cff;
+            /* Gemini Blue */
+            --accent-grad: linear-gradient(135deg, #4e8cff, #fff);
+            --border: rgba(78, 140, 255, 0.2);
+            --radius: 16px;
+            --font-mono: "SF Mono", "Consolas", monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Segoe UI", "SF Pro Display", system-ui, sans-serif;
+            color: var(--text);
+            background: var(--bg);
+            padding: 32px 20px 64px;
+            line-height: 1.7;
+        }
+
+        .shell {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        header.hero {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 48px 40px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        header.hero::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--accent-grad);
+        }
+
+        header.hero::after {
+            content: "";
+            position: absolute;
+            right: -100px;
+            bottom: -100px;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(78, 140, 255, 0.1), transparent 70%);
+            pointer-events: none;
+        }
+
+        .meta-tag {
+            display: inline-block;
+            background: rgba(78, 140, 255, 0.15);
+            color: #8bbeff;
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(78, 140, 255, 0.3);
+        }
+
+        .last-updated {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--muted);
+            opacity: 0.7;
+            margin-top: 8px;
+            display: block;
+        }
+
+        .eyebrow {
+            font-size: 0.9em;
+            margin-bottom: 12px;
+            display: block;
+            color: var(--accent);
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        h1 {
+            margin: 0 0 16px;
+            font-size: 48px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            line-height: 1.1;
+            background: linear-gradient(to right, #fff, #a5caff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .lead {
+            margin: 0 0 32px;
+            font-size: 20px;
+            color: var(--muted);
+            max-width: 760px;
+            font-weight: 300;
+        }
+
+        .back {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        .back:hover {
+            opacity: 1;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 32px;
+            transition: transform 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        h2 {
+            margin: 0 0 20px;
+            font-size: 24px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+        }
+
+        h2::before {
+            content: "";
+            width: 4px;
+            height: 24px;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+
+        h3 {
+            margin: 24px 0 12px;
+            font-size: 18px;
+            color: #fff;
+            font-weight: 600;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 8px;
+        }
+
+        p {
+            margin: 0 0 16px;
+            color: var(--muted);
+            font-size: 16px;
+        }
+
+        ul {
+            margin: 0 0 24px;
+            padding-left: 24px;
+            color: var(--muted);
+        }
+
+        li {
+            margin-bottom: 12px;
+        }
+
+        li strong {
+            color: var(--text);
+        }
+
+        .spec-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .spec-item {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .spec-label {
+            display: block;
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--muted);
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .spec-value {
+            display: block;
+            font-size: 16px;
+            color: #fff;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="shell">
+        <header class="hero">
+            <div class="meta-tag">INTELLIGENCE / GOOGLE</div>
+            <span class="eyebrow">The Architect</span>
+            <h1>Gemini 3.0</h1>
+            <p class="lead">Googleが誇る最新鋭のマルチモーダルモデル。"Deep Think"による深い推論と、ネイティブなエージェント能力を統合。Vibe
+                Codingにおいて最も信頼できる「設計者（Architect）」です。</p>
+            <span class="last-updated">Last Updated: 2026.02.11</span>
+            <br>
+            <a class="back" href="../index.html">← Workbenchへ戻る</a>
+        </header>
+
+        <section class="grid">
+            <article class="card">
+                <h2>Core Specs</h2>
+                <div class="spec-grid">
+                    <div class="spec-item">
+                        <span class="spec-label">Version</span>
+                        <span class="spec-value">3.0 Pro / Ultra</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Context Window</span>
+                        <span class="spec-value">2,000,000+ Tokens</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Key Feature</span>
+                        <span class="spec-value">Deep Think</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Multimodal</span>
+                        <span class="spec-value">Native (Audio/Video/Code)</span>
+                    </div>
+                </div>
+                <p>Gemini 2.5からの最大の進化点は「推論能力」と「自律性」です。単なるチャットボットから、複雑なタスクを計画・実行する真のパートナーへと進化しました。</p>
+            </article>
+
+            <article class="card">
+                <h2>Deep Think Capability</h2>
+                <p>OpenAIのo1/o3と同様に、回答を出力する前に「思考プロセス」を挟むことが可能です。</p>
+                <ul>
+                    <li><strong>内部思考</strong>: ユーザーに見えないところで複数の解決策をシミュレーションし、最適なパスを選び取ります。</li>
+                    <li><strong>複雑な設計</strong>:
+                        「このアプリのアーキテクチャはどうあるべきか？」といった抽象的な問いに対し、セキュリティ、スケーラビリティ、メンテ性を考慮した回答を導き出します。</li>
+                </ul>
+            </article>
+        </section>
+
+        <section class="card">
+            <h2>Native Agentic Workflow</h2>
+            <p>Gemini 3.0は、最初から「ツールを使うこと」を前提に設計されています。</p>
+            <div style="display: flex; gap: 24px; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 280px;">
+                    <h3>Google Ecosystem Integration</h3>
+                    <p>Gmail, Google Docs, Drive,
+                        Calendarとシームレスに連携。ドキュメントを読み込んで要約し、カレンダーを確認してスケジュールを調整するといった一連の流れを自然言語で指示できます。</p>
+                </div>
+                <div style="flex: 1; min-width: 280px;">
+                    <h3>Code & Execution</h3>
+                    <p>生成したコードをサンドボックス内で即座に実行し、エラーが出れば自己修正します。"Vibe Coding"においては、このサイクルが非常に強力な武器となります。</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="grid">
+            <article class="card">
+                <h2>Why use for Vibe Coding?</h2>
+                <p>Vibe Codingにおいて、Gemini 3.0は**「最初の相談相手」**として最適です。</p>
+                <ul>
+                    <li><strong>圧倒的なコンテキスト長</strong>: プロジェクト全体のファイル、大量のドキュメントを一度に読み込ませても、文脈を見失いません。</li>
+                    <li><strong>マルチモーダル理解</strong>: UIのスクリーンショットや、ホワイトボードの手書き図をそのまま貼り付けて、「これを作って」と指示できます。</li>
+                </ul>
+            </article>
+
+            <article class="card">
+                <h2>Comparison</h2>
+                <ul>
+                    <li><strong>vs ChatGPT (GPT-5.3)</strong>:
+                        GeminiはGoogleエコシステムとの連携とコンテキスト長で勝ります。ChatGPTは「個」としての創造性や会話の自然さで優れる場合があります。</li>
+                    <li><strong>vs Claude 4.6</strong>: Claudeは「人間に寄り添う」能力が高いですが、Geminiはより「システム的・構造的」なアプローチに強みがあります。
+                    </li>
+                </ul>
+            </article>
+        </section>
+    </div>
+</body>
+
+</html>

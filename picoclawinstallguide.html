@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PicoClaw 完全ガイド</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+      background: #f0f2f5;
+      color: #1a1a2e;
+      line-height: 1.75;
+    }
+
+    a { color: #0f3460; }
+    a:hover { color: #e94560; }
+
+    header {
+      background: linear-gradient(135deg, #0f3460 0%, #16213e 60%, #1a1a2e 100%);
+      color: white;
+      padding: 60px 20px 50px;
+      text-align: center;
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: 12px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    header h1 { font-size: 2.8rem; font-weight: 800; letter-spacing: -1px; margin-bottom: 12px; }
+    header h1 span { color: #e94560; }
+    header p { font-size: 1.1rem; opacity: 0.8; max-width: 560px; margin: 0 auto 24px; }
+
+    .stats {
+      display: flex; justify-content: center; gap: 32px; flex-wrap: wrap; margin-top: 8px;
+    }
+    .stat { text-align: center; }
+    .stat .num { font-size: 1.8rem; font-weight: 800; color: #e94560; }
+    .stat .label { font-size: 0.75rem; opacity: 0.6; text-transform: uppercase; letter-spacing: 1px; }
+
+    nav {
+      background: white;
+      border-bottom: 1px solid #e5e7eb;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 0 20px;
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 0;
+      max-width: 960px;
+      margin: 0 auto;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    nav ul::-webkit-scrollbar { display: none; }
+
+    nav li a {
+      display: block;
+      padding: 14px 16px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #6b7280;
+      text-decoration: none;
+      white-space: nowrap;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+
+    nav li a:hover { color: #0f3460; border-bottom-color: #e94560; }
+
+    main { max-width: 900px; margin: 0 auto; padding: 40px 20px 80px; }
+
+    .warning {
+      background: #fff8e1;
+      border-left: 4px solid #f59e0b;
+      border-radius: 0 8px 8px 0;
+      padding: 14px 18px;
+      margin-bottom: 32px;
+      font-size: 0.9rem;
+      color: #78350f;
+    }
+
+    .section {
+      background: white;
+      border-radius: 14px;
+      padding: 36px;
+      margin-bottom: 28px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      scroll-margin-top: 60px;
+    }
+
+    .section-num {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 32px; height: 32px; background: #0f3460; color: white;
+      border-radius: 50%; font-size: 0.85rem; font-weight: 700;
+      margin-right: 10px; flex-shrink: 0;
+    }
+
+    .section h2 {
+      font-size: 1.4rem; font-weight: 700; margin-bottom: 22px;
+      display: flex; align-items: center; color: #0f3460;
+    }
+
+    .section h3 {
+      font-size: 1rem; font-weight: 700; color: #374151;
+      margin: 24px 0 10px; border-left: 3px solid #e94560; padding-left: 10px;
+    }
+
+    p { margin-bottom: 12px; color: #4b5563; }
+
+    .req-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px; }
+    @media(max-width:560px){.req-grid{grid-template-columns:1fr;}}
+
+    .req-box {
+      background: #f9fafb; border: 1px solid #e5e7eb;
+      border-radius: 10px; padding: 16px 18px;
+    }
+    .req-box h4 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: #9ca3af; margin-bottom: 8px; }
+    .req-box ul { padding-left: 16px; }
+    .req-box li { font-size: 0.9rem; color: #374151; margin-bottom: 4px; }
+
+    .platform-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+    .platform-tag {
+      background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe;
+      border-radius: 20px; padding: 5px 14px; font-size: 0.85rem; font-weight: 500;
+    }
+
+    pre {
+      background: #1a1a2e; color: #e2e8f0; border-radius: 10px;
+      padding: 20px; overflow-x: auto;
+      font-family: 'SF Mono','Fira Code','Courier New',monospace;
+      font-size: 0.88rem; line-height: 1.6; margin: 12px 0;
+    }
+    pre .comment { color: #64748b; }
+    pre .cmd { color: #7dd3fc; }
+    pre .arg { color: #a5f3fc; }
+    pre .output { color: #86efac; }
+    pre .key { color: #fbbf24; }
+    pre .val { color: #a5f3fc; }
+
+    .tip {
+      background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px;
+      padding: 14px 18px; font-size: 0.9rem; color: #166534; margin-top: 16px;
+    }
+    .tip strong { color: #14532d; }
+
+    .note {
+      background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px;
+      padding: 14px 18px; font-size: 0.9rem; color: #1e40af; margin-top: 16px;
+    }
+
+    .steps { counter-reset: step; }
+    .step { display: flex; gap: 16px; margin-bottom: 20px; align-items: flex-start; }
+    .step-num {
+      counter-increment: step; min-width: 28px; height: 28px;
+      background: #e94560; color: white; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.8rem; font-weight: 700; margin-top: 2px; flex-shrink: 0;
+    }
+    .step-content { flex: 1; }
+    .step-content strong { display: block; margin-bottom: 6px; color: #111827; }
+
+    /* Use cases grid */
+    .usecase-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px; margin-top: 16px;
+    }
+    .usecase-card {
+      background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px;
+      padding: 20px; transition: box-shadow 0.2s;
+    }
+    .usecase-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+    .usecase-icon { font-size: 2rem; margin-bottom: 10px; }
+    .usecase-card h4 { font-size: 0.95rem; font-weight: 700; color: #111827; margin-bottom: 6px; }
+    .usecase-card p { font-size: 0.85rem; color: #6b7280; margin: 0; }
+
+    /* Comparison table */
+    table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 0.9rem; }
+    th {
+      background: #0f3460; color: white; padding: 12px 16px;
+      text-align: left; font-weight: 600;
+    }
+    th:first-child { border-radius: 8px 0 0 0; }
+    th:last-child { border-radius: 0 8px 0 0; }
+    td { padding: 11px 16px; border-bottom: 1px solid #f3f4f6; color: #374151; }
+    tr:nth-child(even) td { background: #f9fafb; }
+    tr:last-child td { border-bottom: none; }
+    .check { color: #16a34a; font-weight: 700; }
+    .cross { color: #dc2626; }
+
+    /* FAQ */
+    .faq-item {
+      border: 1px solid #e5e7eb; border-radius: 10px; margin-bottom: 12px; overflow: hidden;
+    }
+    .faq-q {
+      background: #f9fafb; padding: 16px 20px; font-weight: 600; color: #111827;
+      font-size: 0.95rem; cursor: pointer; display: flex; justify-content: space-between;
+      align-items: center;
+    }
+    .faq-q::after { content: "▼"; font-size: 0.7rem; color: #9ca3af; margin-left: 8px; flex-shrink: 0; }
+    .faq-a { padding: 16px 20px; color: #4b5563; font-size: 0.9rem; border-top: 1px solid #e5e7eb; }
+
+    /* Glossary */
+    .glossary-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 14px; margin-top: 16px;
+    }
+    .glossary-item {
+      background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 16px 18px;
+    }
+    .glossary-item dt {
+      font-weight: 700; color: #0f3460; font-size: 0.95rem;
+      font-family: 'SF Mono','Fira Code',monospace; margin-bottom: 6px;
+    }
+    .glossary-item dd { font-size: 0.85rem; color: #6b7280; }
+
+    /* Tips */
+    .tips-list { list-style: none; margin-top: 12px; }
+    .tips-list li {
+      padding: 14px 16px 14px 48px; position: relative;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    .tips-list li:last-child { border-bottom: none; }
+    .tips-list li::before {
+      content: attr(data-icon); position: absolute; left: 14px; top: 14px;
+      font-size: 1.2rem;
+    }
+    .tips-list li strong { display: block; font-size: 0.95rem; color: #111827; margin-bottom: 4px; }
+    .tips-list li span { font-size: 0.88rem; color: #6b7280; }
+
+    /* Provider grid */
+    .provider-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px; margin-top: 12px;
+    }
+    .provider-card {
+      background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px;
+      padding: 14px 16px; text-align: center;
+    }
+    .provider-card .name { font-weight: 700; font-size: 0.95rem; color: #111827; margin-bottom: 4px; }
+    .provider-card .note { font-size: 0.78rem; color: #6b7280; }
+
+    /* Channel tags */
+    .channel-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .channel-tag {
+      background: #fdf4ff; color: #7e22ce; border: 1px solid #e9d5ff;
+      border-radius: 20px; padding: 5px 14px; font-size: 0.85rem;
+    }
+
+    /* Workspace files */
+    .ws-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px; margin-top: 16px;
+    }
+    .ws-card {
+      background: #1a1a2e; border-radius: 10px; padding: 16px;
+    }
+    .ws-card .filename {
+      font-family: monospace; font-size: 0.85rem; color: #7dd3fc;
+      font-weight: 700; margin-bottom: 6px;
+    }
+    .ws-card .desc { font-size: 0.82rem; color: #94a3b8; }
+
+    /* Done box */
+    .done-box {
+      background: linear-gradient(135deg, #0f3460, #16213e);
+      color: white; border-radius: 14px; padding: 36px; text-align: center;
+    }
+    .done-box h2 { font-size: 1.6rem; margin-bottom: 12px; color: white; }
+    .done-box p { color: rgba(255,255,255,0.75); max-width: 500px; margin: 0 auto 20px; }
+    .done-cmd {
+      display: inline-block; background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;
+      padding: 12px 24px; font-family: monospace; font-size: 1rem;
+      color: #7dd3fc; margin-bottom: 20px;
+    }
+    .links-row { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 4px; }
+    .links-row a { color: #7dd3fc; font-size: 0.88rem; }
+
+    footer { text-align: center; padding: 20px; font-size: 0.8rem; color: #9ca3af; }
+
+    code {
+      background: #f1f5f9; color: #0f3460; padding: 2px 6px;
+      border-radius: 4px; font-family: monospace; font-size: 0.9em;
+    }
+
+    .crosslink-bar {
+      background: linear-gradient(90deg, #0b3d2e, #0f3460);
+      border-radius: 12px; padding: 18px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px; flex-wrap: wrap; margin-bottom: 28px;
+    }
+    .crosslink-bar .cl-text { color: white; font-size: 0.9rem; opacity: 0.9; }
+    .crosslink-bar .cl-title { color: white; font-weight: 700; font-size: 1rem; }
+    .cl-btn {
+      background: #22c55e; color: white; text-decoration: none;
+      padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 0.88rem;
+      white-space: nowrap; transition: opacity 0.2s;
+    }
+    .cl-btn:hover { opacity: 0.85; color: white; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="badge">オープンソース · MIT License · Go言語製</div>
+  <h1>Pico<span>Claw</span> 完全ガイド</h1>
+  <p>超軽量AIアシスタントのインストールから実践活用まで——今日中に動かせる完全版</p>
+  <div class="stats">
+    <div class="stat"><div class="num">&lt;10MB</div><div class="label">RAM使用量</div></div>
+    <div class="stat"><div class="num">&lt;1秒</div><div class="label">起動時間</div></div>
+    <div class="stat"><div class="num">$9.9〜</div><div class="label">動作ハード</div></div>
+    <div class="stat"><div class="num">12K⭐</div><div class="label">GitHub Stars（1週間）</div></div>
+    <div class="stat"><div class="num">無料</div><div class="label">OSS/MIT</div></div>
+  </div>
+</header>
+
+<nav>
+  <ul>
+    <li><a href="#what">概要</a></li>
+    <li><a href="#compare">比較</a></li>
+    <li><a href="#requirements">動作要件</a></li>
+    <li><a href="#install">インストール</a></li>
+    <li><a href="#quickstart">クイックスタート</a></li>
+    <li><a href="#config">設定詳細</a></li>
+    <li><a href="#apikey">APIキー</a></li>
+    <li><a href="#chat">チャット連携</a></li>
+    <li><a href="#usecases">実例・活用法</a></li>
+    <li><a href="#tips">Tips</a></li>
+    <li><a href="#faq">FAQ</a></li>
+    <li><a href="#glossary">用語集</a></li>
+  </ul>
+</nav>
+
+<main>
+
+  <!-- Cross-link bar -->
+  <div class="crosslink-bar">
+    <div>
+      <div class="cl-text">セキュリティ重視・複数アプリ統合版もチェック →</div>
+      <div class="cl-title">🛡️ NanoClaw — コンテナ分離・Agent Swarm・WhatsApp対応</div>
+    </div>
+    <a href="nanoclaw-install-guide.html" class="cl-btn">NanoClaw ガイドへ</a>
+  </div>
+
+  <div class="warning">
+    ⚠️ <strong>詐欺注意：</strong> PicoClawに公式トークン・コインは存在しません。pump.funなどでの販売はすべて詐欺です。公式ドメインは <strong>picoclaw.io</strong> のみです。
+  </div>
+
+  <!-- 1. WHAT IS -->
+  <div class="section" id="what">
+    <h2><span class="section-num">1</span>PicoClawとは？</h2>
+    <p>
+      PicoClawはSipeedが開発した超軽量AIアシスタントです。Go言語で書かれた単一バイナリで動作し、<strong>10MB未満のRAM</strong>と<strong>1秒以内の起動</strong>を実現。従来のOpenClaw（Python製）が約1GBのRAMを必要とするのに対し、99%のメモリ削減を達成しています。
+    </p>
+    <p>
+      コードの約95%はAIエージェント自身が生成する「自己ブートストラップ」手法で開発されました。1日で作られ、GitHubで1週間に12,000スターを獲得した話題のOSSです。
+    </p>
+
+    <h3>PicoClawでできること</h3>
+    <div class="usecase-grid">
+      <div class="usecase-card">
+        <div class="usecase-icon">🌐</div>
+        <h4>Webリサーチ＆自動まとめ</h4>
+        <p>毎朝ニュースを検索してTelegramに要約送信、定期レポート生成など。</p>
+      </div>
+      <div class="usecase-card">
+        <div class="usecase-icon">🤖</div>
+        <h4>ホームオートメーション</h4>
+        <p>センサーデータを監視して異常をアラート。Raspberry Piで常時稼働。</p>
+      </div>
+      <div class="usecase-card">
+        <div class="usecase-icon">💬</div>
+        <h4>チャットボット常駐化</h4>
+        <p>Telegram/Discord経由でどこからでもAIに話しかけられるパーソナルボット。</p>
+      </div>
+      <div class="usecase-card">
+        <div class="usecase-icon">⏰</div>
+        <h4>タスクスケジューラー</h4>
+        <p>cronで定期実行。ファイル整理、GitHubイシューチェック、メール下書きなど。</p>
+      </div>
+      <div class="usecase-card">
+        <div class="usecase-icon">📊</div>
+        <h4>データ処理・変換</h4>
+        <p>CSVの自動加工、APIからのデータ取得、レポート自動生成。</p>
+      </div>
+      <div class="usecase-card">
+        <div class="usecase-icon">🛸</div>
+        <h4>エッジAIデバイス</h4>
+        <p>$10のLicheeRV-NanoやAndroid（Termux経由）でもAIエージェントが動作。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. COMPARE -->
+  <div class="section" id="compare">
+    <h2><span class="section-num">2</span>OpenClaw vs PicoClaw 比較</h2>
+    <p>PicoClawはOpenClaw（旧称：OpenAI相当のOSS AIエージェント）の軽量代替です。</p>
+    <table>
+      <thead>
+        <tr>
+          <th>項目</th>
+          <th>OpenClaw（Python）</th>
+          <th>PicoClaw（Go）</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>RAM使用量</td><td>〜1GB</td><td><strong>&lt;10MB（99%削減）</strong></td></tr>
+        <tr><td>起動時間</td><td>数十秒</td><td><strong>&lt;1秒（400倍高速）</strong></td></tr>
+        <tr><td>ハードウェアコスト</td><td>$500以上推奨</td><td><strong>$10〜（LicheeRV-Nano）</strong></td></tr>
+        <tr><td>言語</td><td>Python</td><td>Go</td></tr>
+        <tr><td>依存関係</td><td>多数（pip）</td><td><strong>なし（単一バイナリ）</strong></td></tr>
+        <tr><td>アーキテクチャ対応</td><td>主にx86</td><td><strong>x86 / ARM64 / RISC-V</strong></td></tr>
+        <tr><td>Skillエコシステム互換</td><td>✅</td><td class="check">✅（互換あり）</td></tr>
+        <tr><td>プロダクション安定性</td><td>高</td><td>早期段階（v0.0.1）</td></tr>
+      </tbody>
+    </table>
+    <div class="note">
+      💡 <strong>どちらを選ぶ？</strong> エッジデバイス・ローコスト環境・実験用途ならPicoClaw。本番運用・安定性重視ならOpenClaw。
+    </div>
+  </div>
+
+  <!-- 3. REQUIREMENTS -->
+  <div class="section" id="requirements">
+    <h2><span class="section-num">3</span>動作要件・対応機器</h2>
+    <div class="req-grid">
+      <div class="req-box">
+        <h4>最小要件</h4>
+        <ul>
+          <li>RAM: 64MB（実使用 &lt;10MB）</li>
+          <li>CPU: シングルコア 0.6GHz〜</li>
+          <li>OS: Linux（カーネル 4.9以上）</li>
+          <li>ストレージ: 20MB</li>
+          <li>インターネット接続</li>
+        </ul>
+      </div>
+      <div class="req-box">
+        <h4>推奨環境</h4>
+        <ul>
+          <li>RAM: 256MB以上</li>
+          <li>CPU: 600MHz以上</li>
+          <li>OS: Debian / Ubuntu</li>
+          <li>ストレージ: 1GB以上</li>
+          <li>安定したネット回線</li>
+        </ul>
+      </div>
+    </div>
+    <h3>対応プラットフォーム</h3>
+    <div class="platform-grid">
+      <span class="platform-tag">🍓 Raspberry Pi Zero 2W</span>
+      <span class="platform-tag">🍓 Raspberry Pi 3/4/5</span>
+      <span class="platform-tag">⚡ LicheeRV-Nano（$9.9・RISC-V）</span>
+      <span class="platform-tag">📷 MaixCAM</span>
+      <span class="platform-tag">🖥 NanoKVM</span>
+      <span class="platform-tag">📱 Android（Termux経由）</span>
+      <span class="platform-tag">💻 x86_64 Linux PC</span>
+      <span class="platform-tag">🪟 Windows（WSL2）</span>
+      <span class="platform-tag">🔷 ARM64 全般</span>
+    </div>
+    <div class="tip">
+      <strong>💡 Windows ユーザー：</strong> WSL2（Windows Subsystem for Linux）を使えばWindowsでも動作します。Microsoft StoreからUbuntuをインストールしてください。
+    </div>
+  </div>
+
+  <!-- 4. INSTALL -->
+  <div class="section" id="install">
+    <h2><span class="section-num">4</span>インストール方法</h2>
+
+    <h3>✅ 方法①　バイナリ直接インストール（最速・5分）</h3>
+    <p>アーキテクチャを確認してから対応するコマンドを実行してください。</p>
+
+    <p><strong>x86_64（一般的なLinux PC・サーバー）</strong></p>
+    <pre><span class="comment"># バイナリをダウンロード</span>
+<span class="cmd">wget</span> https://github.com/sipeed/picoclaw/releases/latest/download/picoclaw-linux-amd64
+<span class="cmd">chmod</span> +x picoclaw-linux-amd64
+<span class="cmd">sudo mv</span> picoclaw-linux-amd64 /usr/local/bin/picoclaw
+<span class="cmd">picoclaw</span> --version</pre>
+
+    <p><strong>ARM64（Raspberry Pi 3/4/5、その他ARMボード）</strong></p>
+    <pre><span class="cmd">wget</span> https://github.com/sipeed/picoclaw/releases/latest/download/picoclaw-linux-arm64
+<span class="cmd">chmod</span> +x picoclaw-linux-arm64
+<span class="cmd">sudo mv</span> picoclaw-linux-arm64 /usr/local/bin/picoclaw
+<span class="cmd">picoclaw</span> --version</pre>
+
+    <p><strong>RISC-V 64bit（LicheeRV-Nanoなど$10ボード）</strong></p>
+    <pre><span class="cmd">wget</span> https://github.com/sipeed/picoclaw/releases/latest/download/picoclaw-linux-riscv64
+<span class="cmd">chmod</span> +x picoclaw-linux-riscv64
+<span class="cmd">sudo mv</span> picoclaw-linux-riscv64 /usr/local/bin/picoclaw
+<span class="cmd">picoclaw</span> --version</pre>
+
+    <p><strong>自分のアーキテクチャを確認する方法</strong></p>
+    <pre><span class="cmd">uname</span> -m
+<span class="output"># x86_64 → amd64 用を使用
+# aarch64 → arm64 用を使用
+# riscv64 → riscv64 用を使用</span></pre>
+
+    <h3>方法②　ソースからビルド（Go 1.21+ 必要）</h3>
+    <pre><span class="cmd">git clone</span> https://github.com/sipeed/picoclaw.git
+<span class="cmd">cd</span> picoclaw
+<span class="cmd">make</span> deps &amp;&amp; <span class="cmd">make</span> build
+<span class="cmd">./picoclaw</span> --version</pre>
+
+    <h3>方法③　Docker で起動</h3>
+    <pre><span class="cmd">docker compose</span> -f docker/docker-compose.yml --profile gateway up
+<span class="comment"># 設定ファイルを編集</span>
+<span class="cmd">vim</span> docker/data/config.json
+<span class="comment"># バックグラウンドで再起動</span>
+<span class="cmd">docker compose</span> -f docker/docker-compose.yml --profile gateway up -d</pre>
+
+    <div class="note">
+      🐋 Dockerモードでは <code>PICOCLAW_GATEWAY_HOST=0.0.0.0</code> を環境変数に設定しないとホストからアクセスできません。
+    </div>
+  </div>
+
+  <!-- 5. QUICKSTART -->
+  <div class="section" id="quickstart">
+    <h2><span class="section-num">5</span>クイックスタート</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num"></div>
+        <div class="step-content">
+          <strong>初期化</strong>
+          <pre><span class="cmd">picoclaw</span> onboard</pre>
+          <p>対話形式で設定が進みます。APIキーの設定などを行います。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num"></div>
+        <div class="step-content">
+          <strong>設定ファイルを確認・編集</strong>
+          <pre><span class="cmd">nano</span> ~/.picoclaw/config.json</pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num"></div>
+        <div class="step-content">
+          <strong>動作テスト</strong>
+          <pre><span class="cmd">picoclaw</span> agent -m <span class="arg">"こんにちは！何ができますか？"</span>
+<span class="output"># → AIが応答します</span></pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num"></div>
+        <div class="step-content">
+          <strong>Webコンソールを起動（GUI）</strong>
+          <pre><span class="cmd">picoclaw</span> gateway --port 18790
+<span class="comment"># ブラウザで http://localhost:18800 を開く</span></pre>
+          <p>ブラウザベースのUIでチャット・設定が可能になります。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num"></div>
+        <div class="step-content">
+          <strong>自動起動を設定（systemd）</strong>
+          <pre><span class="cmd">sudo nano</span> /etc/systemd/system/picoclaw.service</pre>
+          <pre>[Unit]
+Description=PicoClaw AI Agent
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/picoclaw agent
+Restart=always
+User=<span class="arg">あなたのユーザー名</span>
+Environment=HOME=/home/<span class="arg">あなたのユーザー名</span>
+
+[Install]
+WantedBy=multi-user.target</pre>
+          <pre><span class="cmd">sudo systemctl</span> daemon-reload
+<span class="cmd">sudo systemctl</span> enable --now picoclaw
+<span class="cmd">sudo systemctl</span> status picoclaw</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. CONFIG -->
+  <div class="section" id="config">
+    <h2><span class="section-num">6</span>設定詳細・ワークスペース構造</h2>
+
+    <h3>config.json の主要パラメータ</h3>
+    <pre>{
+  <span class="key">"provider"</span>: <span class="val">"anthropic"</span>,
+  <span class="key">"api_key"</span>: <span class="val">"sk-ant-xxxxxxxx"</span>,
+  <span class="key">"model"</span>: <span class="val">"claude-sonnet-4-6"</span>,
+  <span class="key">"max_tokens"</span>: <span class="val">8192</span>,
+  <span class="key">"temperature"</span>: <span class="val">0.7</span>,
+  <span class="key">"max_tool_iterations"</span>: <span class="val">20</span>,
+  <span class="key">"request_timeout"</span>: <span class="val">120</span>,
+  <span class="key">"restrict_to_workspace"</span>: <span class="val">true</span>,
+  <span class="key">"web_search"</span>: {
+    <span class="key">"enabled"</span>: <span class="val">true</span>,
+    <span class="key">"provider"</span>: <span class="val">"duckduckgo"</span>
+  }
+}</pre>
+
+    <h3>ワークスペースファイル（~/.picoclaw/workspace/）</h3>
+    <p>PicoClawの「頭脳」を構成する特殊ファイルたちです。これらを編集することでAIの振る舞いをカスタマイズできます。</p>
+    <div class="ws-grid">
+      <div class="ws-card">
+        <div class="filename">IDENTITY.md</div>
+        <div class="desc">エージェントの名前・役割・アイデンティティを定義</div>
+      </div>
+      <div class="ws-card">
+        <div class="filename">SOUL.md</div>
+        <div class="desc">性格・口調・価値観などパーソナリティ設定</div>
+      </div>
+      <div class="ws-card">
+        <div class="filename">USER.md</div>
+        <div class="desc">ユーザーの好みや背景情報（AIが学習・参照）</div>
+      </div>
+      <div class="ws-card">
+        <div class="filename">AGENTS.md</div>
+        <div class="desc">エージェントの行動ガイドライン・制約ルール</div>
+      </div>
+      <div class="ws-card">
+        <div class="filename">TOOLS.md</div>
+        <div class="desc">使用可能ツールの説明・使用条件</div>
+      </div>
+      <div class="ws-card">
+        <div class="filename">HEARTBEAT.md</div>
+        <div class="desc">30分ごとに実行される定期タスクのプロンプト</div>
+      </div>
+      <div class="ws-card">
+        <div class="filename">MEMORY.md</div>
+        <div class="desc">セッション間で持続する長期記憶</div>
+      </div>
+      <div class="ws-card">
+        <div class="filename">cron/</div>
+        <div class="desc">cronジョブの定義ファイル格納ディレクトリ</div>
+      </div>
+    </div>
+
+    <div class="tip">
+      <strong>💡 HEARTBEAT.md の活用例：</strong> ここに「毎回起動時にTodo.txtを確認してタスクを提示せよ」と書いておくと、30分ごとに自動でタスクを確認してくれます。
+    </div>
+  </div>
+
+  <!-- 7. API KEY -->
+  <div class="section" id="apikey">
+    <h2><span class="section-num">7</span>APIキーの設定</h2>
+    <p>PicoClawは自身にAIモデルを内蔵していません。外部のLLMプロバイダーのAPIキーが必要です。</p>
+
+    <div class="provider-grid">
+      <div class="provider-card">
+        <div class="name">Anthropic</div>
+        <div class="note">Claude Sonnet / Opus<br>高品質・日本語対応◎</div>
+      </div>
+      <div class="provider-card">
+        <div class="name">OpenAI</div>
+        <div class="note">GPT-4o / GPT-4<br>汎用性が高い</div>
+      </div>
+      <div class="provider-card">
+        <div class="name">Google Gemini</div>
+        <div class="note">無料枠あり<br>マルチモーダル対応</div>
+      </div>
+      <div class="provider-card">
+        <div class="name">DeepSeek</div>
+        <div class="note">低コスト<br>コーディング得意</div>
+      </div>
+      <div class="provider-card">
+        <div class="name">OpenRouter</div>
+        <div class="note">複数モデルを<br>一元管理</div>
+      </div>
+      <div class="provider-card">
+        <div class="name">Zhipu AI</div>
+        <div class="note">中国語対応<br>中国ユーザー向け</div>
+      </div>
+    </div>
+
+    <h3>おすすめの始め方</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num"></div>
+        <div class="step-content">
+          <strong>Anthropic APIキーを取得（推奨）</strong>
+          <p><a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> でアカウント作成→APIキーを発行</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num"></div>
+        <div class="step-content">
+          <strong>config.json に設定</strong>
+          <pre>{
+  <span class="key">"provider"</span>: <span class="val">"anthropic"</span>,
+  <span class="key">"api_key"</span>: <span class="val">"sk-ant-xxxxxxxx"</span>,
+  <span class="key">"model"</span>: <span class="val">"claude-sonnet-4-6"</span>
+}</pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num"></div>
+        <div class="step-content">
+          <strong>Webサーチは無料のDuckDuckGoから始める</strong>
+          <pre>{
+  <span class="key">"web_search"</span>: {
+    <span class="key">"enabled"</span>: <span class="val">true</span>,
+    <span class="key">"provider"</span>: <span class="val">"duckduckgo"</span>
+  }
+}</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. CHAT -->
+  <div class="section" id="chat">
+    <h2><span class="section-num">8</span>チャットアプリ連携</h2>
+    <div class="channel-grid">
+      <span class="channel-tag">💬 Telegram（音声文字起こしあり）</span>
+      <span class="channel-tag">🎮 Discord</span>
+      <span class="channel-tag">📱 WhatsApp（設定中）</span>
+      <span class="channel-tag">🟢 LINE</span>
+      <span class="channel-tag">🏢 WeCom（企業WeChat）</span>
+      <span class="channel-tag">🔷 Matrix</span>
+      <span class="channel-tag">🔴 DingTalk（钉钉）</span>
+      <span class="channel-tag">🐦 Feishu（飛書）</span>
+      <span class="channel-tag">🐧 QQ</span>
+    </div>
+
+    <h3>Telegram連携（最もシンプル）</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num"></div>
+        <div class="step-content">
+          <strong>BotFatherでトークン取得</strong>
+          <p>TelegramでBotFatherに <code>/newbot</code> と送信し、トークンを発行します。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num"></div>
+        <div class="step-content">
+          <strong>config.json に追加</strong>
+          <pre>{
+  <span class="key">"channels"</span>: {
+    <span class="key">"telegram"</span>: {
+      <span class="key">"enabled"</span>: <span class="val">true</span>,
+      <span class="key">"token"</span>: <span class="val">"YOUR_BOT_TOKEN"</span>
+    }
+  }
+}</pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num"></div>
+        <div class="step-content">
+          <strong>ゲートウェイを起動</strong>
+          <pre><span class="cmd">picoclaw</span> gateway --port 18790</pre>
+          <p>これでTelegramからPicoClawにメッセージを送れるようになります。</p>
+        </div>
+      </div>
+    </div>
+    <div class="warning" style="margin-top:16px; margin-bottom:0;">
+      ⚠️ Webコンソールに認証機能はありません。ポート18790/18800を外部公開しないでください。
+    </div>
+  </div>
+
+  <!-- 9. USE CASES -->
+  <div class="section" id="usecases">
+    <h2><span class="section-num">9</span>世界の実例・活用事例</h2>
+
+    <h3>🌍 コミュニティで報告されている実際の使い方</h3>
+
+    <div class="usecase-grid">
+      <div class="usecase-card">
+        <div class="usecase-icon">📰</div>
+        <h4>毎朝のニュースブリーフィング</h4>
+        <p>cronで毎朝7時にニュースを検索→要約→Telegramに送信。Raspberry Pi Zeroで24時間稼働中のユーザーが多数報告。</p>
+      </div>
+      <div class="usecase-card">
+        <div class="usecase-icon">🏠</div>
+        <h4>古いRaspberry Pi 1のAI化</h4>
+        <p>初代Raspberry Pi（2012年製）でホームオートメーション監視エージェントとして稼働。OpenClawでは動かなかった環境でも動作確認済み。</p>
+      </div>
+      <div class="usecase-card">
+        <div class="usecase-icon">📱</div>
+        <h4>古いAndroid端末のAIボット化</h4>
+        <p>Termux経由で古いAndroidスマートフォンをAIエージェントサーバーに転用。月の電気代はほぼゼロ。</p>
+      </div>
+      <div class="usecase-card">
+        <div class="usecase-icon">🌡️</div>
+        <h4>IoTセンサー監視・アラート</h4>
+        <p>温度・湿度センサーのデータを監視し、閾値超えを自動でTelegramに通知。農業や工場での活用事例あり。</p>
+      </div>
+      <div class="usecase-card">
+        <div class="usecase-icon">📂</div>
+        <h4>GitHubイシューの自動トリアージ</h4>
+        <p>cronで毎時GitHubのイシューをチェックし、ラベル付け・担当者割り当てを自動化。開発チームの工数削減に貢献。</p>
+      </div>
+      <div class="usecase-card">
+        <div class="usecase-icon">🌐</div>
+        <h4>NanoKVM経由のリモートPC管理</h4>
+        <p>NanoKVMデバイスに搭載し、外出先からAI経由で自宅PCを操作・監視するシステムを構築。</p>
+      </div>
+    </div>
+
+    <div class="tip" style="margin-top:20px;">
+      <strong>🌟 コミュニティの反応：</strong> 公開後1週間でGitHub Stars 12,000超（4日で5,000）。「OpenClawを捨ててPicoClawに移行した」という開発者が急増しています。
+    </div>
+  </div>
+
+  <!-- 10. TIPS -->
+  <div class="section" id="tips">
+    <h2><span class="section-num">10</span>実践Tips集</h2>
+    <ul class="tips-list">
+      <li data-icon="⚡">
+        <strong>まずDuckDuckGoから始める</strong>
+        <span>Web検索プロバイダーはDuckDuckGoが無料で使えます。Braveなどの有料APIが必要になるのは大量検索が必要な場合のみ。</span>
+      </li>
+      <li data-icon="🔒">
+        <strong>restrict_to_workspace: true は必ず有効に</strong>
+        <span>デフォルトで有効ですが、外すとAIがシステム全体のファイルにアクセスできます。セキュリティのため有効のままにしましょう。</span>
+      </li>
+      <li data-icon="💾">
+        <strong>MEMORY.md でセッション間記憶を活用</strong>
+        <span>「私の名前はXXです」などを MEMORY.md に書いておくと、毎回説明しなくてもAIが覚えてくれます。</span>
+      </li>
+      <li data-icon="🔄">
+        <strong>HEARTBEAT.md で定期タスクを仕込む</strong>
+        <span>30分ごとに実行されます。「毎回、今日のToDoリストを提示せよ」など常駐型エージェントとして活用できます。</span>
+      </li>
+      <li data-icon="📊">
+        <strong>temperature は用途で調整</strong>
+        <span>コード生成なら 0.2〜0.4（正確さ重視）、創作や雑談なら 0.7〜0.9（多様性重視）が目安。</span>
+      </li>
+      <li data-icon="🐛">
+        <strong>起動しない時は --version で確認</strong>
+        <span><code>picoclaw --version</code> が動くならバイナリは正常。次に <code>picoclaw agent -m "test"</code> でAPIキーの問題かどうかを切り分けできます。</span>
+      </li>
+      <li data-icon="🛡️">
+        <strong>Webコンソールは外部公開しない</strong>
+        <span>ポート18800には認証がありません。外部からアクセスする場合はSSHトンネル（<code>ssh -L 18800:localhost:18800 user@server</code>）を使いましょう。</span>
+      </li>
+      <li data-icon="📦">
+        <strong>スキルはGitHubから直接インストール</strong>
+        <span>OpenClawのスキルエコシステムと互換性があります。<code>picoclaw skill install github.com/xxx/yyy</code> でインストール可能。</span>
+      </li>
+      <li data-icon="⏱️">
+        <strong>request_timeout は長めに設定</strong>
+        <span>複雑なタスクでタイムアウトが起きる場合、デフォルトの120秒を300秒以上に増やすと安定します。</span>
+      </li>
+      <li data-icon="🎯">
+        <strong>max_tool_iterations は控えめに</strong>
+        <span>デフォルトの20で十分なケースがほとんど。増やすとAPI費用も増えます。複雑なタスクだけ増やしましょう。</span>
+      </li>
+    </ul>
+  </div>
+
+  <!-- 11. FAQ -->
+  <div class="section" id="faq">
+    <h2><span class="section-num">11</span>よくある質問（FAQ）</h2>
+
+    <div class="faq-item">
+      <div class="faq-q">PicoClawはWindowsで動きますか？</div>
+      <div class="faq-a">Windows用バイナリも配布されています（AMD64）。ただしLinuxが推奨環境です。WSL2上のUbuntuで動かすのが最も安定しています。</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">APIキーの費用はどれくらいかかりますか？</div>
+      <div class="faq-a">PicoClaw自体は無料ですが、LLMプロバイダーの費用がかかります。個人利用なら月$1〜5程度が目安です。DuckDuckGoでのWebサーチは無料です。</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">OpenClawのスキルはそのまま使えますか？</div>
+      <div class="faq-a">はい、GitHubからスキルを直接インストールする形でOpenClawのスキルエコシステムとの互換性があります。</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">起動しない・エラーが出る場合は？</div>
+      <div class="faq-a">①<code>chmod +x picoclaw</code>で実行権限を確認、②<code>file picoclaw</code>でアーキテクチャを確認、③<code>picoclaw --version</code>でバイナリ動作確認、④config.jsonのAPIキーが正しいか確認、の順に試してください。</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">本番運用に使えますか？</div>
+      <div class="faq-a">現在v0.0.1の初期段階です。個人利用・実験・ホビープロジェクトには最適ですが、クリティカルな本番環境での使用は推奨されません。v1.0まで待つか、自己責任での利用が前提です。</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">「95%がAI生成コード」とはどういう意味？</div>
+      <div class="faq-a">PicoClawの開発過程で、コードの約95%はAIエージェント自身が生成しました（人間は監督・レビューのみ）。これが「自己ブートストラップ」と呼ばれる手法です。将来的にAIが自分のコードを改善するという新しい開発パラダイムの実証でもあります。</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">公式サポートはどこで受けられますか？</div>
+      <div class="faq-a">GitHub Issues（github.com/sipeed/picoclaw/issues）が主なサポート窓口です。Sipeedのコミュニティフォーラムやwikiも参照できます。</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">PicoClawトークン・コインがあると聞いたのですが？</div>
+      <div class="faq-a">それは詐欺です。PicoClawには公式のトークン・コインは一切存在しません。pump.funなどで見かけた場合は完全に無関係の詐欺プロジェクトです。公式ドメインはpicoclaw.ioのみです。</div>
+    </div>
+  </div>
+
+  <!-- 12. GLOSSARY -->
+  <div class="section" id="glossary">
+    <h2><span class="section-num">12</span>用語集</h2>
+    <div class="glossary-grid">
+      <dl class="glossary-item">
+        <dt>OpenClaw</dt>
+        <dd>Anthropic等が開発したAIエージェントフレームワーク（Python製）。PicoClawはその超軽量代替版。</dd>
+      </dl>
+      <dl class="glossary-item">
+        <dt>LLM</dt>
+        <dd>Large Language Model（大規模言語モデル）。Claude、GPT-4、Geminiなど。PicoClawはこれらを外部APIで利用する。</dd>
+      </dl>
+      <dl class="glossary-item">
+        <dt>MCP</dt>
+        <dd>Model Context Protocol。AnthropicがAIとツールを連携させるために策定したオープンプロトコル。PicoClawはネイティブ対応。</dd>
+      </dl>
+      <dl class="glossary-item">
+        <dt>RISC-V</dt>
+        <dd>オープンソースの命令セットアーキテクチャ（ISA）。LicheeRV-Nanoなど$10前後の超安価なボードで採用されている。</dd>
+      </dl>
+      <dl class="glossary-item">
+        <dt>Heartbeat</dt>
+        <dd>PicoClawが30分ごとに自動実行する定期タスク。HEARTBEAT.mdにプロンプトを書いて設定する。</dd>
+      </dl>
+      <dl class="glossary-item">
+        <dt>Workspace</dt>
+        <dd>PicoClawの作業領域（~/.picoclaw/workspace/）。セッション、メモリ、状態、cronジョブ、スキルを格納。</dd>
+      </dl>
+      <dl class="glossary-item">
+        <dt>Soul / Identity</dt>
+        <dd>AIエージェントの性格・役割定義ファイル。SOUL.md・IDENTITY.mdを編集してキャラクターをカスタマイズできる。</dd>
+      </dl>
+      <dl class="glossary-item">
+        <dt>Gateway</dt>
+        <dd>PicoClawのHTTPサーバー機能。チャットアプリ（Telegram等）との連携やWebコンソールに使用。デフォルトポートは18790/18800。</dd>
+      </dl>
+      <dl class="glossary-item">
+        <dt>Skill</dt>
+        <dd>PicoClawに追加できる機能モジュール。GitHubから直接インストール可能。OpenClawのスキルと互換性あり。</dd>
+      </dl>
+      <dl class="glossary-item">
+        <dt>Cron</dt>
+        <dd>時間を指定して定期的にコマンドやスクリプトを実行するUnixの仕組み。PicoClawもcron形式でタスクをスケジュールできる。</dd>
+      </dl>
+      <dl class="glossary-item">
+        <dt>OpenRouter</dt>
+        <dd>複数のLLMプロバイダーを一つのAPIで利用できるサービス。Claude、GPT、Geminiなどを統一インターフェースで使える。</dd>
+      </dl>
+      <dl class="glossary-item">
+        <dt>Termux</dt>
+        <dd>Android上でLinux環境を動かすアプリ。これを使うことでAndroidスマートフォンでPicoClawを動かせる。</dd>
+      </dl>
+    </div>
+  </div>
+
+  <!-- Cross-link bar bottom -->
+  <div class="crosslink-bar">
+    <div>
+      <div class="cl-text">セキュリティ重視・複数アプリ統合版もチェック →</div>
+      <div class="cl-title">🛡️ NanoClaw — コンテナ分離・Agent Swarm・WhatsApp / Gmail対応</div>
+    </div>
+    <a href="nanoclaw-install-guide.html" class="cl-btn">NanoClaw ガイドへ</a>
+  </div>
+
+  <!-- DONE -->
+  <div class="done-box">
+    <h2>🎉 セットアップ完了！</h2>
+    <p>まずはこのコマンドで話しかけてみましょう。</p>
+    <div class="done-cmd">picoclaw agent -m "よろしく！"</div>
+    <p style="margin-top:8px;">困ったらFAQとGitHub Issuesへ。コミュニティも活発です。</p>
+    <div class="links-row">
+      <a href="https://github.com/sipeed/picoclaw" target="_blank">📦 GitHub</a>
+      <a href="https://picoclaw.io" target="_blank">🌐 公式サイト</a>
+      <a href="https://picoclaw.club/picoclaw-faq.html" target="_blank">❓ FAQ</a>
+      <a href="https://picoclaw.pro/docs/configuration/" target="_blank">📖 ドキュメント</a>
+      <a href="nanoclaw-install-guide.html">🛡️ NanoClaw ガイド</a>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  このガイドは公式ドキュメント・GitHub・コミュニティ情報をもとに作成されました（2026年3月時点）。<br>
+  最新情報は <a href="https://github.com/sipeed/picoclaw">公式GitHub</a> をご確認ください。
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qwen (The Scholar) | Tech Workbench</title>
+    <style>
+        :root {
+            --bg: #0b1220;
+            --panel: #101418;
+            --muted: #94a3b8;
+            --text: #e2e8f0;
+            --accent: #8b5cf6;
+            /* Qwen Violet/Purple */
+            --accent-grad: linear-gradient(135deg, #8b5cf6, #c4b5fd);
+            --border: rgba(139, 92, 246, 0.2);
+            --radius: 16px;
+            --font-mono: "SF Mono", "Consolas", monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Segoe UI", "SF Pro Display", system-ui, sans-serif;
+            color: var(--text);
+            background: var(--bg);
+            padding: 32px 20px 64px;
+            line-height: 1.7;
+        }
+
+        .shell {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        header.hero {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 48px 40px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        header.hero::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--accent-grad);
+        }
+
+        header.hero::after {
+            content: "";
+            position: absolute;
+            right: -100px;
+            bottom: -100px;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.1), transparent 70%);
+            pointer-events: none;
+        }
+
+        .meta-tag {
+            display: inline-block;
+            background: rgba(139, 92, 246, 0.15);
+            color: #c4b5fd;
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .last-updated {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--muted);
+            opacity: 0.7;
+            margin-top: 8px;
+            display: block;
+        }
+
+        .eyebrow {
+            font-size: 0.9em;
+            margin-bottom: 12px;
+            display: block;
+            color: var(--accent);
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        h1 {
+            margin: 0 0 16px;
+            font-size: 48px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            line-height: 1.1;
+            background: linear-gradient(to right, #fff, #ddd6fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .lead {
+            margin: 0 0 32px;
+            font-size: 20px;
+            color: var(--muted);
+            max-width: 760px;
+            font-weight: 300;
+        }
+
+        .back {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        .back:hover {
+            opacity: 1;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 32px;
+            transition: transform 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        h2 {
+            margin: 0 0 20px;
+            font-size: 24px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+        }
+
+        h2::before {
+            content: "";
+            width: 4px;
+            height: 24px;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+
+        h3 {
+            margin: 24px 0 12px;
+            font-size: 18px;
+            color: #fff;
+            font-weight: 600;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 8px;
+        }
+
+        p {
+            margin: 0 0 16px;
+            color: var(--muted);
+            font-size: 16px;
+        }
+
+        ul {
+            margin: 0 0 24px;
+            padding-left: 24px;
+            color: var(--muted);
+        }
+
+        li {
+            margin-bottom: 12px;
+        }
+
+        li strong {
+            color: var(--text);
+        }
+
+        .spec-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .spec-item {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .spec-label {
+            display: block;
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--muted);
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .spec-value {
+            display: block;
+            font-size: 16px;
+            color: #fff;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="shell">
+        <header class="hero">
+            <div class="meta-tag">INTELLIGENCE / ALIBABA</div>
+            <span class="eyebrow">The Scholar (学者)</span>
+            <h1>Qwen</h1>
+            <p class="lead">多言語の壁を超え、数理的思考とコーディングにおいて卓越した能力を発揮する碩学。最新の「Qwen
+                3」は、MoEアーキテクチャによる効率化と、Qwen-Coderによるトップクラスの実装力を兼ね備えます。</p>
+            <span class="last-updated">Last Updated: 2026.02.11</span>
+            <br>
+            <a class="back" href="../index.html">← Workbenchへ戻る</a>
+        </header>
+
+        <section class="grid">
+            <article class="card">
+                <h2>Core Specs</h2>
+                <div class="spec-grid">
+                    <div class="spec-item">
+                        <span class="spec-label">Latest Model</span>
+                        <span class="spec-value">Qwen 3 / Coder 2.5+</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Architecture</span>
+                        <span class="spec-value">Mixture-of-Experts (MoE)</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Languages</span>
+                        <span class="spec-value">29+ Supported</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Strength</span>
+                        <span class="spec-value">Math & Code</span>
+                    </div>
+                </div>
+                <p>Qwenは「通千問（Tóngqiānwèn）」の名が示す通り、あらゆる問いに答えることを目指して設計されました。特に理数系タスクとプログラミングにおいて、商用トップモデルに肉薄、あるいは凌駕する性能を見せています。
+                </p>
+            </article>
+
+            <article class="card">
+                <h2>Qwen-Coder: The Coding Specialist</h2>
+                <p>Qwenファミリーの中でも、Vibe Codingにおいて最も重要なのが「Qwen-Coder」です。</p>
+                <ul>
+                    <li><strong>Code-First Thinking</strong>: 一般的な会話データだけでなく、膨大なコードリポジトリと技術文書で学習されており、「開発者の文脈」を完璧に理解します。
+                    </li>
+                    <li><strong>Artifact Generation</strong>: 単なるスニペットではなく、ファイル構造全体や、実行可能な完全なスクリプトを生成する能力に長けています。</li>
+                </ul>
+            </article>
+        </section>
+
+        <section class="card">
+            <h2>Multilingual & MoE</h2>
+            <p>Qwen 3は、効率的なMoE（専門家混合）アーキテクチャを採用しています。</p>
+            <div style="display: flex; gap: 24px; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 280px;">
+                    <h3>Global Understanding</h3>
+                    <p>英語や中国語だけでなく、日本語を含む多数の言語で高い流暢さを持ちます。ドキュメントが英語しかないライブラリの使い方も、自然な日本語で解説してくれます。</p>
+                </div>
+                <div style="flex: 1; min-width: 280px;">
+                    <h3>Cost Efficiency</h3>
+                    <p>推論時にアクティブになるパラメータ数を抑えることで、高性能でありながら高速かつ低コストな動作を実現しています。</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="grid">
+            <article class="card">
+                <h2>Why use for Vibe Coding?</h2>
+                <p>Qwenは**「数学に強いアルゴリズム担当」**です。</p>
+                <ul>
+                    <li><strong>アルゴリズム実装</strong>: 複雑な計算ロジックや、データ構造の最適化が必要な場面で、非常に精度の高い回答を出します。</li>
+                    <li><strong>多言語対応</strong>: 日本語のコメントを含んだコード生成において、違和感のない自然な日本語を使ってくれます。</li>
+                </ul>
+            </article>
+
+            <article class="card">
+                <h2>Comparison</h2>
+                <ul>
+                    <li><strong>vs Mistral</strong>: Mistralは汎用的ですが、Qwenはより「理数系」に特化した鋭い回答をする傾向があります。</li>
+                    <li><strong>vs DeepSeek</strong>: どちらも中国発の強力なモデルですが、QwenはAlibaba
+                        Cloudのインフラを背景にした「実用性・堅牢性」重視、DeepSeekは「推論能力」重視という住み分けがあります。</li>
+                </ul>
+            </article>
+        </section>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Git (Time Control) | Knowledge Base</title>
+    <style>
+        :root {
+            --bg: #0b1220;
+            --panel: #1c1e24;
+            --muted: #abb2bf;
+            --text: #d7dae0;
+            --accent: #e06c75;
+            /* Git Red */
+            --accent-2: #98c379;
+            /* Green for add */
+            --border: rgba(255, 255, 255, 0.08);
+            --radius: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Segoe UI", "SF Pro Display", monospace, sans-serif;
+            color: var(--text);
+            background: var(--bg);
+            padding: 32px 20px 64px;
+            line-height: 1.6;
+        }
+
+        .shell {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        header.hero {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header.hero::after {
+            content: "";
+            position: absolute;
+            right: -20px;
+            bottom: -20px;
+            width: 150px;
+            height: 150px;
+            background: repeating-linear-gradient(45deg, rgba(224, 108, 117, 0.1), rgba(224, 108, 117, 0.1) 10px, transparent 10px, transparent 20px);
+            pointer-events: none;
+        }
+
+        .eyebrow {
+            font-family: monospace;
+            color: var(--accent);
+            font-size: 0.9em;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        h1 {
+            margin: 0 0 16px;
+            font-size: 36px;
+            color: #fff;
+            letter-spacing: -0.5px;
+        }
+
+        .lead {
+            margin: 0 0 20px;
+            font-size: 18px;
+            color: var(--muted);
+            max-width: 700px;
+        }
+
+        .back {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            border-color: var(--muted);
+        }
+
+        h2 {
+            margin: 0 0 12px;
+            font-size: 20px;
+            color: #fff;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
+        }
+
+        .cmd-box {
+            background: #111;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: "Consolas", monospace;
+            color: var(--accent-2);
+            margin-bottom: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .cmd-desc {
+            font-size: 14px;
+            color: var(--muted);
+            margin-bottom: 16px;
+        }
+
+        strong {
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="shell">
+        <header class="hero">
+            <span class="eyebrow">ENVIRONMENT / VERSION CONTROL</span>
+            <h1>Git (Time Control)</h1>
+            <p class="lead">開発における「セーブポイント」作成ツール。失敗しても過去に戻れる安心感が、大胆な実験（Vibe Coding）を可能にします。</p>
+            <a class="back" href="../index.html">← Workbenchへ戻る</a>
+        </header>
+
+        <section class="grid">
+            <article class="card">
+                <h2>基本の3ステップ</h2>
+
+                <div class="cmd-box">git add .</div>
+                <p class="cmd-desc"><strong>「ステージング」</strong>：変更したファイルを「次のセーブ対象」として選ぶ。</p>
+
+                <div class="cmd-box">git commit -m "機能追加"</div>
+                <p class="cmd-desc"><strong>「コミット」</strong>：セーブを実行する。メッセージは何をしたかのメモ。</p>
+
+                <div class="cmd-box">git push</div>
+                <p class="cmd-desc"><strong>「プッシュ」</strong>：手元のセーブデータをクラウド（GitHub等）にアップロードする。</p>
+            </article>
+
+            <article class="card">
+                <h2>AIと使う Git</h2>
+                <p>難解なコマンド（rebase, cherry-pick等）を覚える必要はありません。複雑な操作が必要なときは、<strong>Claude Code</strong> や
+                    <strong>Cursor</strong> にこう頼んでください。</p>
+                <p style="background:rgba(255,255,255,0.05); padding:10px; border-radius:8px;">
+                    「直前のコミットを取り消して、変更内容はそのまま残しておいて（Soft Reset）」</p>
+                <p>AIは正確なコマンドを知っています。あなたは「時間をどう操作したいか」を指示するだけです。</p>
+            </article>
+        </section>
+
+        <section class="card">
+            <h2>困ったときの呪文</h2>
+            <div class="cmd-box">git status</div>
+            <p class="cmd-desc">現在の状況（変更されたファイル、ステージングの状態）を確認する。迷ったらまずはこれ。</p>
+
+            <div class="cmd-box">git log --oneline</div>
+            <p class="cmd-desc">過去のセーブポイント（コミット履歴）を一覧表示する。</p>
+        </section>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenClaw (Autonomous Agent) | Tech Workbench</title>
+    <style>
+        :root {
+            --bg: #0b1220;
+            --panel: #1a1412;
+            /* Dark Brown/Red base for "Danger/Power" feel */
+            --muted: #bcaaa4;
+            --text: #eceff1;
+            --accent: #ff5722;
+            /* Deep Orange */
+            --accent-secondary: #d32f2f;
+            /* Red */
+            --accent-grad: linear-gradient(135deg, #ff5722, #b71c1c);
+            --border: rgba(255, 87, 34, 0.2);
+            --radius: 16px;
+            --font-mono: "SF Mono", "Consolas", monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Segoe UI", "SF Pro Display", system-ui, sans-serif;
+            color: var(--text);
+            background: var(--bg);
+            padding: 32px 20px 64px;
+            line-height: 1.7;
+        }
+
+        .shell {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        header.hero {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 48px 40px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        header.hero::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--accent-grad);
+        }
+
+        header.hero::after {
+            content: "";
+            position: absolute;
+            right: -100px;
+            bottom: -100px;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255, 87, 34, 0.08), transparent 70%);
+            pointer-events: none;
+        }
+
+        .eyebrow {
+            font-size: 0.9em;
+            margin-bottom: 12px;
+            display: block;
+            color: var(--accent);
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        h1 {
+            margin: 0 0 24px;
+            font-size: 48px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            line-height: 1.1;
+        }
+
+        .lead {
+            margin: 0 0 32px;
+            font-size: 20px;
+            color: var(--muted);
+            max-width: 760px;
+            font-weight: 300;
+        }
+
+        .back {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        .back:hover {
+            opacity: 1;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 32px;
+            transition: transform 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        h2 {
+            margin: 0 0 20px;
+            font-size: 24px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+        }
+
+        h2::before {
+            content: "";
+            width: 4px;
+            height: 24px;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+
+        h3 {
+            margin: 24px 0 12px;
+            font-size: 18px;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        p {
+            margin: 0 0 16px;
+            color: var(--muted);
+            font-size: 16px;
+        }
+
+        ul {
+            margin: 0 0 24px;
+            padding-left: 24px;
+            color: var(--muted);
+        }
+
+        li {
+            margin-bottom: 12px;
+        }
+
+        li strong {
+            color: var(--text);
+        }
+
+        .feature-list {
+            display: grid;
+            gap: 16px;
+        }
+
+        .feature-item {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 16px;
+            border-radius: 8px;
+            border-left: 2px solid var(--accent);
+        }
+
+        .feature-title {
+            display: block;
+            color: #fff;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .warning-section {
+            background: rgba(211, 47, 47, 0.1);
+            border: 1px solid var(--accent-secondary);
+            color: #ffcdc9;
+            padding: 24px;
+            border-radius: 12px;
+            margin-top: 16px;
+        }
+
+        .warning-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: bold;
+            color: var(--accent-secondary);
+            font-size: 18px;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .code-block {
+            background: #000;
+            padding: 16px;
+            border-radius: 8px;
+            font-family: var(--font-mono);
+            font-size: 0.9em;
+            color: #a5d6ff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow-x: auto;
+            margin-bottom: 24px;
+        }
+
+        .tag-autonomous {
+            display: inline-block;
+            background: var(--accent);
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="shell">
+        <header class="hero">
+            <div class="tag-autonomous">Autonomous Agent</div>
+            <span class="eyebrow">Intelligence / Orchestration</span>
+            <h1>OpenClaw</h1>
+            <p class="lead">世界が注目する「自律型AIエージェント」。<br>Cloudbot / Multibot
+                の系譜にあるこの存在は、単なるチャット相手ではなく、あなたのPC上で自ら考え、手を動かし、継続的に学習する「もう一人の住人」です。</p>
+            <a class="back" href="../index.html">← Workbenchへ戻る</a>
+        </header>
+
+        <section class="grid">
+            <article class="card">
+                <h2>概念: "Agentic AI" とは何か？</h2>
+                <p>従来のLLM（ChatGPTなど）は「聞かれたら答える」受動的な存在でした。OpenClawなどの<strong>Agentic
+                        AI（自律エージェント）</strong>は、目的を与えられると、それを達成するために自ら行動計画を立て、実行します。</p>
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <span class="feature-title">Self-Hosted</span>
+                        クラウドではなく、あなたのローカルPCやVPS上で動作します。データはすべて手元にあり、外部に漏れません。
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-title">Action-Oriented</span>
+                        「コードを書いて」と言うと、チャット画面にコードを表示するのではなく、実際にファイルを作成し、テストを実行し、エラーがあれば修正まで行います。
+                    </div>
+                </div>
+            </article>
+
+            <article class="card">
+                <h2>コア・アーキテクチャ</h2>
+                <p>OpenClawの能力を支える3つの柱。</p>
+                <ul>
+                    <li><strong>Full System Access (Deep Integration)</strong><br>
+                        OSレベルの権限を持ちます。ファイルシステム、ターミナル、ブラウザ、インストールされた全アプリを操作可能です。これにより「環境構築」や「複雑なリサーチ」を完遂できます。
+                    </li>
+                    <li><strong>Persistent Memory (永続記憶)</strong><br>
+                        セッションが終わっても記憶はリセットされません。「以前話したプロジェクトAの件だけど」と言えば通じます。あなたの好み、癖、プロジェクトの文脈を永遠に学習し続けます。
+                    </li>
+                    <li><strong>Recursive Improvement (自己改善)</strong><br>
+                        タスク遂行に必要なツールがなければ、自らスクリプトを書いてインストールしたり、新しいスキルを習得しようとします。
+                    </li>
+                </ul>
+            </article>
+        </section>
+
+        <section class="card">
+            <h2>Vibe Coding における役割</h2>
+            <p>あなた（Human）と、Gemini（Architect）、そして OpenClaw（Executor）のトリオ編成。</p>
+            <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 20px;">
+                <div style="flex: 1; min-width: 250px;">
+                    <h3>Gemini (The Brain)</h3>
+                    <p>「このアプリの設計はどうすべきか？」「どういうUIがいいか？」といった、抽象度の高い思考と設計を担当。</p>
+                </div>
+                <div style="flex: 1; min-width: 250px; border-left: 1px solid var(--border); padding-left: 20px;">
+                    <h3>OpenClaw (The Hands)</h3>
+                    <p>「設計図通りに全ファイルを生成して」「依存ライブラリを全部入れてテスト通るまでやっておいて」という、具体的かつ手数の多い作業を自律実行。</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="card warning-section">
+            <div class="warning-header">⚠️ DANGER: With Great Power...</div>
+            <p>OpenClawは「あなたのPCを自由に操作できる他者」と同義です。リスクを理解してください。</p>
+            <ul>
+                <li><strong>破壊的操作のリスク</strong>: 強力な権限を持つため、誤った判断で重要なファイルを削除したり、システム設定を破壊する可能性があります。</li>
+                <li><strong>Prompt Injection</strong>:
+                    悪意あるWebサイトをOpenClawに閲覧させた場合、そのサイト内の指示に従ってPC内部の情報を外部へ送信してしまうリスクがあります。</li>
+                <li><strong>Sandboxing</strong>: 運用時は必ずDockerなどのサンドボックス環境内や、権限を制限したユーザーアカウントで実行することを強く推奨します。</li>
+            </ul>
+            <p style="margin-bottom: 0;"><strong>「便利な右腕」は、使い方を誤れば「最強のセキュリティホール」になります。</strong></p>
+        </section>
+
+        <section class="grid">
+            <article class="card">
+                <h2>多様なインターフェース</h2>
+                <p>ターミナルだけでなく、日常使うチャットアプリが「司令室」になります。</p>
+                <ul>
+                    <li><strong>WhatsApp / Telegram / Discord</strong>: 外出先からスマホで「サーバーの様子どう？」と聞けば、ログを確認して返信してくれます。</li>
+                    <li><strong>Slack</strong>: チームメンバーの一員としてチャンネルに参加させることも可能。</li>
+                </ul>
+            </article>
+
+            <article class="card">
+                <h2>Next Step</h2>
+                <p>現在セットアップ中とのことですので、稼働後は以下の実験をおすすめします。</p>
+                <ol>
+                    <li><strong>「私のPCのスペックを調べてレポートにして」</strong>：コマンド実行能力のテスト。</li>
+                    <li><strong>「このフォルダ内の画像を全部リサイズして」</strong>：一括ファイル操作のテスト。</li>
+                    <li><strong>「今日のTech Newsを要約して送って」</strong>：ブラウジングと要約のテスト。</li>
+                </ol>
+            </article>
+        </section>
+    </div>
+</body>
+
+</html>

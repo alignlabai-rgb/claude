@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intelligence Matrix | Tech Workbench</title>
+    <style>
+        :root {
+            --bg: #0b1220;
+            --panel: #101418;
+            --muted: #94a3b8;
+            --text: #e2e8f0;
+            --accent: #a172db;
+            /* Intelligence Purple */
+            --accent-grad: linear-gradient(135deg, #a172db, #c4b5fd);
+            --border: rgba(161, 114, 219, 0.2);
+            --radius: 16px;
+            --font-mono: "SF Mono", "Consolas", monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Segoe UI", "SF Pro Display", system-ui, sans-serif;
+            color: var(--text);
+            background: var(--bg);
+            padding: 32px 20px 64px;
+            line-height: 1.7;
+        }
+
+        .shell {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        header.hero {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 48px 40px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        header.hero::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--accent-grad);
+        }
+
+        .meta-tag {
+            display: inline-block;
+            background: rgba(161, 114, 219, 0.15);
+            color: #d8b4fe;
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(161, 114, 219, 0.3);
+        }
+
+        .last-updated {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--muted);
+            opacity: 0.7;
+            margin-top: 8px;
+            display: block;
+        }
+
+        h1 {
+            margin: 0 0 16px;
+            font-size: 48px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            line-height: 1.1;
+            background: linear-gradient(to right, #fff, #e9d5ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .lead {
+            margin: 0 0 32px;
+            font-size: 20px;
+            color: var(--muted);
+            max-width: 800px;
+            font-weight: 300;
+        }
+
+        .back {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        .back:hover {
+            opacity: 1;
+        }
+
+        /* Comparison Table */
+        .matrix-container {
+            overflow-x: auto;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1000px;
+        }
+
+        th {
+            text-align: left;
+            padding: 20px;
+            border-bottom: 2px solid var(--border);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--muted);
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 14px;
+            color: var(--text);
+            vertical-align: top;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .model-name {
+            font-weight: 700;
+            font-size: 16px;
+            color: #fff;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .model-role {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            opacity: 0.6;
+            color: var(--muted);
+            text-transform: uppercase;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-right: 4px;
+            margin-bottom: 4px;
+            white-space: nowrap;
+        }
+
+        .tag.highlight {
+            background: rgba(161, 114, 219, 0.2);
+            color: #d8b4fe;
+            border: 1px solid rgba(161, 114, 219, 0.3);
+        }
+
+        .tag.std {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--muted);
+        }
+
+        /* Link Style */
+        .row-link {
+            color: inherit;
+            text-decoration: none;
+            display: block;
+            height: 100%;
+            width: 100%;
+            transition: color 0.2s;
+        }
+
+        .row-link:hover .model-name {
+            color: var(--accent);
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="shell">
+        <header class="hero">
+            <div class="meta-tag">INTELLIGENCE / OVERVIEW</div>
+            <h1>The Matrix</h1>
+            <p class="lead">現代の最強知性（The 9 High-End Models）の能力比較。それぞれのモデルが持つ「役割（Role）」を理解し、タスクに応じてパートナーを切り替えることが、Vibe
+                Codingの極意です。</p>
+            <span class="last-updated">Last Updated: 2026.02.11</span>
+            <br>
+            <a class="back" href="../index.html">← Workbenchへ戻る</a>
+        </header>
+
+        <div class="matrix-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Model / Role</th>
+                        <th>Key Strength</th>
+                        <th>Context (Tokens)</th>
+                        <th>Vibe Coding Use Case</th>
+                        <th>Latest Version</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- 1. Gemini -->
+                    <tr>
+                        <td>
+                            <a href="gemini.html" class="row-link">
+                                <span class="model-name">Gemini</span>
+                                <span class="model-role">The Architect</span>
+                            </a>
+                        </td>
+                        <td><span class="tag highlight">Deep Think</span><span class="tag highlight">Native
+                                Agentic</span></td>
+                        <td>2,000,000+</td>
+                        <td>大規模設計、プロジェクト全体のコンテキスト保持</td>
+                        <td>Gemini 3.0</td>
+                    </tr>
+                    <!-- 2. ChatGPT -->
+                    <tr>
+                        <td>
+                            <a href="chatgpt.html" class="row-link">
+                                <span class="model-name">ChatGPT</span>
+                                <span class="model-role">The Pioneer</span>
+                            </a>
+                        </td>
+                        <td><span class="tag highlight">Agentic Coding</span><span class="tag bg">Reasoning</span></td>
+                        <td>128k (Reasoning)</td>
+                        <td>高速な実装ループ、現場監督としての指示</td>
+                        <td>GPT-5.3 Codex</td>
+                    </tr>
+                    <!-- 3. Claude -->
+                    <tr>
+                        <td>
+                            <a href="claude-model.html" class="row-link">
+                                <span class="model-name">Claude</span>
+                                <span class="model-role">The Sage</span>
+                            </a>
+                        </td>
+                        <td><span class="tag highlight">Adaptive Think</span><span class="tag highlight">Quality</span>
+                        </td>
+                        <td>1,000,000 (Beta)</td>
+                        <td>コードレビュー、要件定義の深掘り、相談役</td>
+                        <td>Claude 4.6 Opus</td>
+                    </tr>
+                    <!-- 4. Grok -->
+                    <tr>
+                        <td>
+                            <a href="grok.html" class="row-link">
+                                <span class="model-name">Grok</span>
+                                <span class="model-role">The Maverick</span>
+                            </a>
+                        </td>
+                        <td><span class="tag highlight">Real-time Data</span><span class="tag std">Personality</span>
+                        </td>
+                        <td>128k</td>
+                        <td>最新トレンド技術の調査、インタラクティブな開発</td>
+                        <td>Grok 4.1</td>
+                    </tr>
+                    <!-- 5. Mistral -->
+                    <tr>
+                        <td>
+                            <a href="mistral.html" class="row-link">
+                                <span class="model-name">Mistral</span>
+                                <span class="model-role">The Specialist</span>
+                            </a>
+                        </td>
+                        <td><span class="tag highlight">Open Weights</span><span class="tag highlight">Voxtral</span>
+                        </td>
+                        <td>32k - 128k</td>
+                        <td>ローカル環境での実行、音声対話エージェント</td>
+                        <td>Mistral 3 Large</td>
+                    </tr>
+                    <!-- 6. Qwen -->
+                    <tr>
+                        <td>
+                            <a href="qwen.html" class="row-link">
+                                <span class="model-name">Qwen</span>
+                                <span class="model-role">The Scholar</span>
+                            </a>
+                        </td>
+                        <td><span class="tag highlight">Math & Code</span><span class="tag std">Multilingual</span></td>
+                        <td>128k</td>
+                        <td>アルゴリズム実装、多言語ドキュメント読解</td>
+                        <td>Qwen 3</td>
+                    </tr>
+                    <!-- 7. DeepSeek -->
+                    <tr>
+                        <td>
+                            <a href="deepseek.html" class="row-link">
+                                <span class="model-name">DeepSeek</span>
+                                <span class="model-role">The Disruptor</span>
+                            </a>
+                        </td>
+                        <td><span class="tag highlight">Engram Arch</span><span class="tag highlight">Efficiency</span>
+                        </td>
+                        <td>128k (Cache)</td>
+                        <td>コスト重視の実験、論理デバッグ、FIM補完</td>
+                        <td>DeepSeek V4</td>
+                    </tr>
+                    <!-- 8. GLM -->
+                    <tr>
+                        <td>
+                            <a href="glm.html" class="row-link">
+                                <span class="model-name">GLM</span>
+                                <span class="model-role">The Connector</span>
+                            </a>
+                        </td>
+                        <td><span class="tag highlight">All Tools</span><span class="tag std">Edge AI</span></td>
+                        <td>128k</td>
+                        <td>複数ツールを連携させる自動化タスク、APIテスト</td>
+                        <td>GLM-4.7</td>
+                    </tr>
+                    <!-- 9. Kimi -->
+                    <tr>
+                        <td>
+                            <a href="kimi.html" class="row-link">
+                                <span class="model-name">Kimi</span>
+                                <span class="model-role">The Explorer</span>
+                            </a>
+                        </td>
+                        <td><span class="tag highlight">Agent Swarm</span><span class="tag highlight">Long
+                                Context</span></td>
+                        <td>200k+</td>
+                        <td>並列リサーチ、超長文脈の論文解析</td>
+                        <td>Kimi 2.5</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+
+</html>

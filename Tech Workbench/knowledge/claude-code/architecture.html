@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Architecture | Claude Code Mastery</title>
+    <style>
+        :root {
+            --bg: #0b1220;
+            --text: #e9edf5;
+            --accent: #d97757;
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: sans-serif;
+            padding: 40px;
+            line-height: 1.8;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: var(--accent);
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #888;
+            font-size: 20px;
+            margin-bottom: 60px;
+            display: block;
+        }
+
+        h2 {
+            font-size: 28px;
+            margin-top: 60px;
+            border-left: 4px solid var(--accent);
+            padding-left: 16px;
+            color: #fff;
+        }
+
+        h3 {
+            font-size: 20px;
+            margin-top: 40px;
+            color: #ddd;
+            font-weight: bold;
+        }
+
+        p {
+            color: #ccc;
+            margin-bottom: 24px;
+        }
+
+        .file-tree {
+            background: #0f172a;
+            padding: 24px;
+            border-radius: 8px;
+            font-family: monospace;
+            color: #94a3b8;
+            line-height: 1.5;
+            white-space: pre;
+            border: 1px solid #334155;
+        }
+
+        .highlight {
+            background: rgba(217, 119, 87, 0.1);
+            padding: 24px;
+            border-radius: 8px;
+            border: 1px solid rgba(217, 119, 87, 0.3);
+            margin: 30px 0;
+        }
+
+        code {
+            font-family: monospace;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #fdb;
+        }
+
+        .back {
+            display: inline-block;
+            margin-bottom: 40px;
+            color: #666;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <a href="index.html" class="back">← Strategy Hub</a>
+
+        <h1>Agent-First Architecture</h1>
+        <span class="subtitle">Designing Systems for the AI Mind</span>
+
+        <section>
+            <p>「2週間で動くシステムを作る」ためには、人間にとっての読みやすさよりも、<strong>AI（Opus 4.6）にとっての理解しやすさ</strong>を優先したディレクトリ構造が必要です。</p>
+
+            <h2>1. The "Context-Friendly" Directory Structure</h2>
+            <p>エージェントが迷子にならないための推奨構成です。「どこに何を置くか」の判断を迷わせないために、トップレベルは極めてシンプルにします。</p>
+
+            <div class="file-tree">
+                / (Project Root)
+                ├── .ai/ <span style="color:#64748b"># エージェント専用の記憶領域</span>
+                │ ├── CONTEXT.md <span style="color:#d97757"># [重要] プロジェクトの全貌・目的・制約条件</span>
+                │ ├── RULES.md <span style="color:#d97757"># [重要] コーディング規約 (例: "TSはstrictモードで")</span>
+                │ └── MEMORY.md <span style="color:#d97757"># エージェントが自分で更新する「作業ログ・決定事項」</span>
+                │
+                ├── modules/ <span style="color:#64748b"># マイクロサービス的な機能区分</span>
+                │ ├── auth/ <span style="color:#818cf8"># 認証機能 (独立したContextを持つ)</span>
+                │ │ ├── api/
+                │ │ ├── ui/
+                │ │ └── services/
+                │ ├── billing/ <span style="color:#818cf8"># 課金機能</span>
+                │ └── core/ <span style="color:#818cf8"># 基盤ロジック</span>
+                │
+                ├── shared/ <span style="color:#64748b"># 共通コンポーネント</span>
+                │ ├── ui-kit/
+                │ └── utils/
+                │
+                ├── tests/ <span style="color:#64748b"># E2Eテスト</span>
+                └── README.md
+            </div>
+
+            <div class="highlight">
+                <strong>Key Strategy: "Colocation" (関連性の凝集)</strong><br>
+                従来のMVC（Model/View/Controllerフォルダに分ける）はAIにとって最悪です。機能 A を修正するために3つの離れたフォルダを行き来させる必要があるからです。<br>
+                AIには<strong>「機能単位（modules/xxx）」ですべての関連ファイルが1箇所にまとまっている構造</strong>が最強です。
+            </div>
+
+            <h2>2. Format of CONTEXT.md</h2>
+            <p>エージェントへの「最初の神の啓示」となるファイルのテンプレートです。</p>
+            <div class="file-tree" style="background:#1e1e1e; color:#ccc;">
+                # Project Phoenix Context
+
+                ## 1. Goal
+                このプロジェクトは「SaaSに依存しない自社製Core Work System」を構築することである。
+                最終的には社内ユーザー50名が使用する日報・承認システムとなる。
+
+                ## 2. Tech Stack
+                - Frontend: React 19 (No Next.js), TailwindCSS
+                - Backend: Supabase (Edge Functions)
+                - Language: TypeScript (Strict)
+
+                ## 3. Core Principles
+                1. **Agent-First**: コードは常にAIによる修正を前提とする。複雑な抽象化よりも、冗長でも分かりやすいコードを好む。
+                2. **Speed over Beauty**: UIは `shadcn/ui` をそのまま使うこと。デザインに時間をかけない。
+                3. **No Hidden Logic**: ビジネスロジックは全て `modules/*/services` に集約すること。UIにロジックを書かない。
+
+                ## 4. Current Phase
+                現在は「Authモジュール」の実装中。ユーザー登録フローを完了させることが最優先。
+            </div>
+
+            <h2>3. Agent-Driven Development Fow</h2>
+            <p>このアーキテクチャを使って開発を進める具体的なフロー。</p>
+
+            <h3>Phase 1: Definition</h3>
+            <p>まず <code>.ai/CONTEXT.md</code> を人間が書きます。コードは書きません。</p>
+
+            <h3>Phase 2: Skeleton</h3>
+            <p>Claudeにコマンドを投げます。<br>
+                <code>$ claude "Read .ai/CONTEXT.md and generate the directory structure and empty files for the Auth module."</code>
+            </p>
+
+            <h3>Phase 3: Logic & Test</h3>
+            <p>中身を埋めさせます。<br>
+                <code>$ claude "Implement the Auth service based on best practices. Create tests first."</code>
+            </p>
+        </section>
+    </div>
+</body>
+
+</html>

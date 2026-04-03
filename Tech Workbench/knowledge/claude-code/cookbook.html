@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <title>The Cookbook | Claude Code Mastery</title>
+    <style>
+        :root {
+            --bg: #0b1220;
+            --text: #e9edf5;
+            --accent: #10b981;
+            /* Emerald Green */
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: sans-serif;
+            padding: 40px;
+            line-height: 1.8;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: var(--accent);
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #888;
+            font-size: 20px;
+            margin-bottom: 60px;
+            display: block;
+        }
+
+        .recipe-card {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-bottom: 60px;
+        }
+
+        .recipe-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 10px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            color: var(--accent);
+            font-weight: bold;
+            margin-top: 30px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .prompt-box {
+            background: #111;
+            padding: 24px;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent);
+            font-family: monospace;
+            color: #a5d6ff;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .code-box {
+            background: #0f172a;
+            padding: 16px;
+            border-radius: 6px;
+            font-family: monospace;
+            color: #ccc;
+            font-size: 0.9em;
+            margin-top: 10px;
+            border: 1px solid #334155;
+        }
+
+        .explanation {
+            color: #bbb;
+            margin-bottom: 20px;
+        }
+
+        .tag {
+            display: inline-block;
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--accent);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            vertical-align: middle;
+            margin-left: 10px;
+        }
+
+        .back {
+            display: inline-block;
+            margin-bottom: 40px;
+            color: #666;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <a href="index.html" class="back">← Strategy Hub</a>
+
+        <h1>The Cookbook</h1>
+        <span class="subtitle">Practical Recipes for Daily Engineering</span>
+
+        <section>
+
+            <!-- Recipe 1 -->
+            <div class="recipe-card">
+                <div class="recipe-title">Recipe 01: The "Strangler Fig" Refactoring <span class="tag">LEGACY
+                        CODE</span></div>
+                <p class="explanation">動いている巨大レガシーシステムを止めずに、少しずつ新システムへ移行させる高等テクニック（ストラングラー・フィグ・パターン）の実践。</p>
+
+                <div class="section-title">Step 1: Interface Extraction</div>
+                <p class="explanation">まず、既存の複雑な関数をラップするインターフェースを作らせます。</p>
+                <div class="prompt-box">$ claude "src/legacy/OldBilling.js の `calculateTax`
+                    メソッドと同じ入出力を持つTypeScriptインターフェース `ITaxCalculator` を定義して。実装はまだしなくていい。"</div>
+
+                <div class="section-title">Step 2: Dual Implementation</div>
+                <p class="explanation">新旧両方のロジックを並行稼働させる準備をします。</p>
+                <div class="prompt-box">$ claude "ありがとう。次に `BillingProxy` クラスを作成して。このクラスは `ITaxCalculator` を実装し、内部に
+                    `OldBilling` と `NewBilling` (まだ空でいい) の両方を持つ。
+                    featureFlag が true なら New を、false なら Old を呼ぶようにして。"</div>
+
+                <div class="section-title">Step 3: Test & Switch</div>
+                <p class="explanation">新しいロジックを実装し、テストを通します。</p>
+                <div class="prompt-box">$ claude "完璧だ。では `NewBilling` に最新の税率計算ロジックを実装して。その上で、Old と New
+                    が同じ入力を受けた時に、同じ結果を返すかを検証するテスト `parity.spec.ts` を書いて。"</div>
+            </div>
+
+            <!-- Recipe 2 -->
+            <div class="recipe-card">
+                <div class="recipe-title">Recipe 02: "Read-Only" Analyst Mode <span class="tag">RESEARCH</span></div>
+                <p class="explanation">コードを書き換えずに、プロジェクトの構造や潜在的なバグだけを調査させる、安全な分析モード。</p>
+
+                <div class="section-title">The Prompt (Copy & Paste)</div>
+                <div class="prompt-box">$ claude --print "このプロジェクトを Security Analyst として監査して。
+                    以下の3点に絞ってレポートを出力せよ（ファイル修正は禁止）。
+
+                    1. **SQL Injection**: 生のSQL文字列結合を行っている箇所はあるか？
+                    2. **Sensitive Data**: APIキーやパスワードがハードコードされていないか？
+                    3. **Dependency**: 脆弱性が既知の古いライブラリ (`package.json`) はあるか？
+
+                    出力はMarkdown形式のレポート `AUDIT_REPORT.md` として標準出力すること。" > AUDIT_REPORT.md</div>
+            </div>
+
+            <!-- Recipe 3 -->
+            <div class="recipe-card">
+                <div class="recipe-title">Recipe 03: The "TDD" Loop <span class="tag">BEST PRACTICE</span></div>
+                <p class="explanation">最も堅実な開発スタイル。テストファーストをAIに強制する。</p>
+
+                <div class="section-title">Phase 1: Generative Testing</div>
+                <div class="prompt-box">$ claude "機能: ユーザーがCSVをアップロードし、一括登録するAPI
+                    要件:
+                    - 1回の上限は1000件
+                    - メールアドレスの形式チェック必須
+                    - 重複ユーザーはスキップ
+
+                    上記仕様を満たす `import-users.spec.ts` を作成して。
+                    実装クラス `ImportService` はまだ存在しないので、インポートエラーになっても構わない。
+                    まずは『あるべき仕様』をテストコードとして定義して。"</div>
+
+                <div class="section-title">Phase 2: Implementation to Green</div>
+                <div class="prompt-box">$ claude "テストありがとう。
+                    では、このテスト `import-users.spec.ts` がコンパイルエラーなく実行でき、かつ全てのテストケースが PASS するように `ImportService.ts` を実装して。
+                    必要なライブラリがあれば `npm install` していい。"</div>
+            </div>
+
+        </section>
+    </div>
+</body>
+
+</html>

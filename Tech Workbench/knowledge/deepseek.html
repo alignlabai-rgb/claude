@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeepSeek (The Disruptor) | Tech Workbench</title>
+    <style>
+        :root {
+            --bg: #0b1220;
+            --panel: #101418;
+            --muted: #94a3b8;
+            --text: #e2e8f0;
+            --accent: #3b82f6;
+            /* DeepSeek Blue */
+            --accent-grad: linear-gradient(135deg, #3b82f6, #60a5fa);
+            --border: rgba(59, 130, 246, 0.2);
+            --radius: 16px;
+            --font-mono: "SF Mono", "Consolas", monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Segoe UI", "SF Pro Display", system-ui, sans-serif;
+            color: var(--text);
+            background: var(--bg);
+            padding: 32px 20px 64px;
+            line-height: 1.7;
+        }
+
+        .shell {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        header.hero {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 48px 40px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        header.hero::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--accent-grad);
+        }
+
+        header.hero::after {
+            content: "";
+            position: absolute;
+            right: -100px;
+            bottom: -100px;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.1), transparent 70%);
+            pointer-events: none;
+        }
+
+        .meta-tag {
+            display: inline-block;
+            background: rgba(59, 130, 246, 0.15);
+            color: #93c5fd;
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .last-updated {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--muted);
+            opacity: 0.7;
+            margin-top: 8px;
+            display: block;
+        }
+
+        .eyebrow {
+            font-size: 0.9em;
+            margin-bottom: 12px;
+            display: block;
+            color: var(--accent);
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        h1 {
+            margin: 0 0 16px;
+            font-size: 48px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            line-height: 1.1;
+            background: linear-gradient(to right, #fff, #bfdbfe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .lead {
+            margin: 0 0 32px;
+            font-size: 20px;
+            color: var(--muted);
+            max-width: 760px;
+            font-weight: 300;
+        }
+
+        .back {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        .back:hover {
+            opacity: 1;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 32px;
+            transition: transform 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        h2 {
+            margin: 0 0 20px;
+            font-size: 24px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+        }
+
+        h2::before {
+            content: "";
+            width: 4px;
+            height: 24px;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+
+        h3 {
+            margin: 24px 0 12px;
+            font-size: 18px;
+            color: #fff;
+            font-weight: 600;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 8px;
+        }
+
+        p {
+            margin: 0 0 16px;
+            color: var(--muted);
+            font-size: 16px;
+        }
+
+        ul {
+            margin: 0 0 24px;
+            padding-left: 24px;
+            color: var(--muted);
+        }
+
+        li {
+            margin-bottom: 12px;
+        }
+
+        li strong {
+            color: var(--text);
+        }
+
+        .spec-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .spec-item {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .spec-label {
+            display: block;
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--muted);
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .spec-value {
+            display: block;
+            font-size: 16px;
+            color: #fff;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="shell">
+        <header class="hero">
+            <div class="meta-tag">INTELLIGENCE / DEEPSEEK</div>
+            <span class="eyebrow">The Disruptor (破壊者)</span>
+            <h1>DeepSeek</h1>
+            <p class="lead">業界の常識を覆す破壊的イノベーター。最新の「DeepSeek
+                V4」は、Engramアーキテクチャによる圧倒的な推論効率と、蒸留（Distillation）技術により、最高峰の知能を極めて低コストで提供します。</p>
+            <span class="last-updated">Last Updated: 2026.02.11</span>
+            <br>
+            <a class="back" href="../index.html">← Workbenchへ戻る</a>
+        </header>
+
+        <section class="grid">
+            <article class="card">
+                <h2>Core Specs</h2>
+                <div class="spec-grid">
+                    <div class="spec-item">
+                        <span class="spec-label">Latest Model</span>
+                        <span class="spec-value">DeepSeek V4</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Architecture</span>
+                        <span class="spec-value">Engram (Memory)</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Key Feature</span>
+                        <span class="spec-value">Cheap Reasoning</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Efficiency</span>
+                        <span class="spec-value">99% Cache Hit</span>
+                    </div>
+                </div>
+                <p>DeepSeekは「AIの民主化」を掲げ、OpenAIやGoogleが莫大なコストをかけて提供するのと同等の推論能力を、10分の1以下のコストで実現しています。その秘密は独自のアーキテクチャ技術にあります。
+                </p>
+            </article>
+
+            <article class="card">
+                <h2>DeepSeek V4 & Engram Arch</h2>
+                <p>V4から採用された「Engram（記憶痕跡）」アーキテクチャは、LLMのメモリ管理に革命を起こしました。</p>
+                <ul>
+                    <li><strong>Context Caching</strong>:
+                        過去の対話や読み込んだドキュメントを「Engram」として効率的にキャッシュし、99%以上のヒット率で再利用します。これにより、同じ質問に対して再計算する必要がなくなり、爆速の応答速度を実現しています。
+                    </li>
+                    <li><strong>Distilled Reasoning</strong>:
+                        超巨大な「教師モデル」の思考プロセスを、小型のモデルに蒸留（Distillation）して移植。これにより、PC上で動くサイズでありながら、博士号レベルの推論が可能になりました。</li>
+                </ul>
+            </article>
+        </section>
+
+        <section class="card">
+            <h2>For Developers</h2>
+            <p>Vibe Codingにおいて、DeepSeekは「コストを気にせず使い倒せる実験室」です。</p>
+            <div style="display: flex; gap: 24px; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 280px;">
+                    <h3>FIM (Fill-In-the-Middle)</h3>
+                    <p>コードの途中を補完する能力（FIM）において、世界最高の精度を誇ります。関数名と閉じ括弧だけ書いて中身を提案させるような使い方で威力を発揮します。</p>
+                </div>
+                <div style="flex: 1; min-width: 280px;">
+                    <h3>Hard Logic</h3>
+                    <p>抽象的な会話よりも、数式やロジック、正規表現の生成など、「正解/不正解」がはっきりしたタスクに滅法強いのが特徴です。</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="grid">
+            <article class="card">
+                <h2>Why use for Vibe Coding?</h2>
+                <p>DeepSeekは**「論理の鬼」**です。</p>
+                <ul>
+                    <li><strong>デバッグ能力</strong>: エラーログを投げると、その原因を極めて論理的に、かつ簡潔に指摘してくれます。感情的な慰めはありませんが、解決策は的確です。</li>
+                    <li><strong>コスパ最強</strong>: 個人開発者がAPIを使ってツールを自作する場合、DeepSeekを選べば財布へのダメージを最小限に抑えられます。</li>
+                </ul>
+            </article>
+
+            <article class="card">
+                <h2>Comparison</h2>
+                <ul>
+                    <li><strong>vs Qwen</strong>: Qwenは「学者」として広範な知識を持ちますが、DeepSeekは「エンジニア」として特定の問題解決に特化しています。</li>
+                    <li><strong>vs OpenAI</strong>: o1/o3モデルと比較しても、DeepSeek V4の推論能力は遜色なく、コストパフォーマンスでは圧倒しています。</li>
+                </ul>
+            </article>
+        </section>
+    </div>
+</body>
+
+</html>

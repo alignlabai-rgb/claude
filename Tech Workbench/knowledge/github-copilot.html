@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Copilot (The Ubiquitous Partner) | Tech Workbench</title>
+    <style>
+        :root {
+            --bg: #0b1220;
+            --panel: #161b22;
+            --muted: #8b949e;
+            --text: #c9d1d9;
+            --accent: #238636;
+            /* GitHub Green */
+            --accent-grad: linear-gradient(135deg, #238636, #2ea043);
+            --border: rgba(48, 54, 61, 0.7);
+            --radius: 16px;
+            --font-mono: "SF Mono", "Consolas", monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Segoe UI", "SF Pro Display", system-ui, sans-serif;
+            color: var(--text);
+            background: var(--bg);
+            padding: 32px 20px 64px;
+            line-height: 1.7;
+        }
+
+        .shell {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        header.hero {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 48px 40px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        header.hero::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--accent-grad);
+        }
+
+        .role-badge {
+            display: inline-block;
+            background: rgba(35, 134, 54, 0.15);
+            color: #3fb950;
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(35, 134, 54, 0.3);
+        }
+
+        h1 {
+            margin: 0 0 16px;
+            font-size: 48px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            line-height: 1.1;
+            color: #fff;
+        }
+
+        .lead {
+            margin: 0 0 32px;
+            font-size: 20px;
+            color: var(--muted);
+            max-width: 760px;
+            font-weight: 300;
+        }
+
+        .back {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        .back:hover {
+            opacity: 1;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 32px;
+            transition: transform 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        h3 {
+            margin: 0 0 12px;
+            font-size: 20px;
+            color: #fff;
+            font-weight: 700;
+        }
+
+        p {
+            margin: 0 0 16px;
+            color: var(--muted);
+            font-size: 16px;
+        }
+
+        ul {
+            margin: 0 0 24px;
+            padding-left: 24px;
+            color: var(--muted);
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .feature-tag {
+            font-size: 11px;
+            background: #238636;
+            color: #fff;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        .workflow-box {
+            background: #0d1117;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            margin-top: 10px;
+        }
+
+        .step {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .step-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            alignItems: center;
+            justifyContent: center;
+            color: #ccc;
+        }
+
+        .step-text {
+            font-size: 14px;
+            color: #ccc;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="shell">
+        <header class="hero">
+            <div class="role-badge">LEVEL 2 : AGENT</div>
+            <h1>GitHub Copilot</h1>
+            <p class="lead">開発ライフサイクルのすべてに偏在（Ubiquitous）するパートナー。<br>エディタ内の補完から、PRレビュー、Issue整理、そして「Copilot
+                Workspace」による自律コーディングまで、GitHubエコシステム全体をAI化します。</p>
+            <a class="back" href="../index.html">← Workbenchへ戻る</a>
+        </header>
+
+        <div class="grid">
+            <section class="card">
+                <h3>1. Copilot Workspace <span class="feature-tag">CORE</span></h3>
+                <p>「IssueからPRまで」を自律的にこなすエージェント機能です。</p>
+                <div class="workflow-box">
+                    <div class="step">
+                        <span class="step-icon">📝</span>
+                        <span class="step-text"><strong>Issue理解</strong>: ユーザーがIssueを立てると、その意図と関連コードを自動解析。</span>
+                    </div>
+                    <div class="step">
+                        <span class="step-icon">💡</span>
+                        <span class="step-text"><strong>Plan策定</strong>: 「どのファイルのどこを直すか」という計画を自然言語で提案。</span>
+                    </div>
+                    <div class="step">
+                        <span class="step-icon">✨</span>
+                        <span class="step-text"><strong>Implement</strong>: エディタを開かずに、ブラウザ上またはVS
+                            Code上でコードを自動生成し、修正案を提示。</span>
+                    </div>
+                </div>
+                <p style="margin-top: 16px; font-size: 14px;">Claude
+                    Codeが「対話型」なら、Workspaceは事前にタスク構造化を行う「仕様書駆動型」のアプローチです。</p>
+            </section>
+
+            <section class="card">
+                <h3>2. Copilot in VS Code</h3>
+                <p>最も馴染み深い、エディタ統合型の機能です。</p>
+                <ul>
+                    <li><strong>Ghost Text</strong>: カーソルの動きを読んで、数行先のコードをグレー文字で先読み提案（Completion）。</li>
+                    <li><strong>Inline Chat</strong>: <code>Cmd+I</code> でエディタ内にチャット欄を呼び出し、「この関数をリファクタリングして」と指示。</li>
+                    <li><strong>Next Edit Suggestions</strong>: 「ここを直したなら、あっちも直すべき」という関連個所へのカーソルジャンプ（Copilot Edits）。
+                    </li>
+                </ul>
+            </section>
+        </div>
+
+        <section class="card">
+            <h3>3. Comparison: Copilot vs Claude Code</h3>
+            <p>どちらも「エージェント」ですが、得意な距離感が異なります。</p>
+            <div style="display:flex; gap: 20px; flex-wrap: wrap;">
+                <div style="flex:1; min-width: 250px;">
+                    <h4 style="color:#fff; margin-bottom:8px;">🚀 GitHub Copilot</h4>
+                    <ul style="font-size: 14px;">
+                        <li><strong>エコシステム重視</strong>: GitHub IssueやPRとの連携が最強。</li>
+                        <li><strong>補完タイプ</strong>: ユーザーが書いている最中の「先読み」が得意。</li>
+                        <li><strong>Workspace</strong>: タスク単位でまとめて修正案を作る。</li>
+                    </ul>
+                </div>
+                <div style="flex:1; min-width: 250px;">
+                    <h4 style="color:#d97757; margin-bottom:8px;">🧠 Claude Code</h4>
+                    <ul style="font-size: 14px;">
+                        <li><strong>思考力重視</strong>: 複雑な設計や、答えのない問題への壁打ちが得意。</li>
+                        <li><strong>対話タイプ</strong>: ユーザーと会話しながら深掘りする。</li>
+                        <li><strong>CLI/MCP</strong>: ローカル環境や外部ツールを自由に組み合わせて使う。</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <div class="card">
+            <h3 style="color: var(--accent);">Vibe Codingでの使い分け</h3>
+            <p><strong>「Copilotは手足（と反射神経）、Claude Codeは参謀」</strong></p>
+            <ul>
+                <li>日常的なコーディング、定型的なバグ修正、PR作成 → <strong>GitHub Copilot</strong> に任せる。</li>
+                <li>新しいアーキテクチャの検討、原因不明の難解なバグ、仕様策定 → <strong>Claude Code</strong> と相談する。</li>
+            </ul>
+            <p>両者は競合するものではなく、Level 2のエージェントレイヤーにおいて補完し合う関係にあります。</p>
+        </div>
+
+    </div>
+</body>
+
+</html>

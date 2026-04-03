@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vibe Coding Handbook | Tech Workbench</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-body: #0f1115;
+            --bg-sidebar: #16181d;
+            --bg-card: #1c1e24;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --accent: #38bdf8;
+            /* Sky Blue */
+            --accent-glow: rgba(56, 189, 248, 0.2);
+            --border: #2d3748;
+            --header-height: 60px;
+            --sidebar-width: 260px;
+        }
+
+        /* Base Reset */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.7;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+            transition: 0.2s;
+        }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #cbd5e1;
+            font-size: 0.9em;
+        }
+
+        /* Layout */
+        .app-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .brand {
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            border-bottom: 1px solid var(--border);
+            font-weight: 800;
+            font-size: 1.2rem;
+            gap: 8px;
+            color: #fff;
+        }
+
+        .brand span {
+            color: var(--accent);
+        }
+
+        .nav-scroller {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px 0;
+        }
+
+        .nav-group {
+            margin-bottom: 24px;
+        }
+
+        .nav-header {
+            padding: 0 24px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 8px 24px;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .nav-item.active {
+            color: var(--accent);
+            background: rgba(56, 189, 248, 0.05);
+            border-left-color: var(--accent);
+            font-weight: 600;
+        }
+
+        .sidebar-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border);
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .back-btn:hover {
+            color: #fff;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            position: relative;
+        }
+
+        .content-wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 60px 40px 100px;
+        }
+
+        section {
+            margin-bottom: 100px;
+            scroll-margin-top: 100px;
+        }
+
+        section:last-child {
+            margin-bottom: 0;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 16px;
+            letter-spacing: -1px;
+        }
+
+        h1.page-title {
+            margin-bottom: 40px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 40px;
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 24px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        h2::before {
+            content: "#";
+            color: var(--accent);
+            opacity: 0.5;
+            font-size: 1.5rem;
+        }
+
+        h3 {
+            font-size: 1.4rem;
+            margin: 32px 0 16px;
+            color: #fff;
+        }
+
+        p {
+            margin-bottom: 24px;
+            font-size: 1.05rem;
+            color: var(--text-muted);
+        }
+
+        /* Cards & Components */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .card h4 {
+            margin-bottom: 12px;
+            color: #fff;
+            font-size: 1.1rem;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+        }
+
+        .callout {
+            background: rgba(56, 189, 248, 0.05);
+            border-left: 4px solid var(--accent);
+            padding: 20px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 24px;
+        }
+
+        /* Agent Badges */
+        .agent-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            background: #333;
+            color: #fff;
+        }
+
+        .badge-claude {
+            background: rgba(217, 119, 87, 0.2);
+            color: #fcb69f;
+        }
+
+        .badge-copilot {
+            background: rgba(35, 134, 54, 0.2);
+            color: #7ee787;
+        }
+
+        .badge-codex {
+            background: rgba(16, 163, 127, 0.2);
+            color: #5ac8fa;
+        }
+
+        /* Diagram */
+        .stack-visual {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin: 40px 0;
+        }
+
+        .layer-box {
+            padding: 16px 24px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.02);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .layer-box strong {
+            color: #fff;
+        }
+
+        .layer-0 {
+            border-color: var(--accent);
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="brand">
+                TECH<span>WORKBENCH</span>
+            </div>
+            <div class="nav-scroller">
+                <div class="nav-group">
+                    <div class="nav-header">Introduction</div>
+                    <a class="nav-item active" onclick="scrollToSection('philosophy')">Philosophy</a>
+                    <a class="nav-item" onclick="scrollToSection('stack')">The 5 Layers</a>
+                </div>
+                <div class="nav-group">
+                    <div class="nav-header">Methodology</div>
+                    <a class="nav-item" onclick="scrollToSection('mindset')">Mindset</a>
+                    <a class="nav-item" onclick="scrollToSection('workflow')">The Vibe Loop</a>
+                    <a class="nav-item" onclick="scrollToSection('agents')">Agent Roles</a>
+                </div>
+                <div class="nav-group">
+                    <div class="nav-header">Resources</div>
+                    <a class="nav-item" onclick="scrollToSection('records')">Battle Records</a>
+                    <a class="nav-item" onclick="scrollToSection('laws')">The 7 Laws</a>
+                    <a class="nav-item" onclick="scrollToSection('patterns')">Prompt Patterns</a>
+                </div>
+            </div>
+            <div class="sidebar-footer">
+                <a href="../index.html" class="back-btn">← Back to Portal</a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content" id="main-scroll">
+            <div class="content-wrapper">
+
+                <h1 class="page-title">Vibe Coding Handbook</h1>
+
+                <!-- 1. Philosophy -->
+                <section id="philosophy">
+                    <h2>Philosophy</h2>
+                    <p class="lead">コードを書く時代は終わりました。今は「知能を指揮する」時代です。</p>
+                    <div class="callout">
+                        <strong>The Core Shift:</strong><br>
+                        From "Writing Syntax" (文法を書く) → To "Directing Intelligence" (知能を指揮する)
+                    </div>
+                    <p>Vibe
+                        Codingとは、AIエージェントをパートナーとして迎え、人間が「監督（Director）」兼「審美眼（Critic）」の役割に徹する開発スタイルです。あなたはもはやタイピストではありません。あなたはプロジェクトのオーナーであり、指揮官です。
+                    </p>
+                </section>
+
+                <!-- 2. The Stack -->
+                <section id="stack">
+                    <h2>The 5 Layers Strategy</h2>
+                    <p>Tech Workbenchは、単なるツール集ではありません。以下の5つのレイヤーが有機的に結合した「知能増幅装置」です。</p>
+
+                    <div class="stack-visual">
+                        <div class="layer-box layer-4">
+                            <div><strong>L4. AUTONOMOUS</strong></div>
+                            <small>OpenClaw (Project Goal)</small>
+                        </div>
+                        <div class="layer-box layer-3">
+                            <div><strong>L3. INTELLIGENCE</strong></div>
+                            <small>Gemini, GPT-5, etc. (Brain Power)</small>
+                        </div>
+                        <div class="layer-box layer-2">
+                            <div><strong>L2. AGENTS</strong></div>
+                            <small>Claude Code, Copilot, Codex (Partners)</small>
+                        </div>
+                        <div class="layer-box layer-1">
+                            <div><strong>L1. ENVIRONMENT</strong></div>
+                            <small>VS Code, Mac, Git (Infrastructure)</small>
+                        </div>
+                        <div class="layer-box layer-0">
+                            <div><strong>L0. METHODOLOGY</strong></div>
+                            <small>Vibe Coding (Mindset)</small>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 3. Mindset -->
+                <section id="mindset">
+                    <h2>The Mindset</h2>
+                    <div class="grid-2">
+                        <div class="card">
+                            <h4>❌ Old Way (The Typist)</h4>
+                            <ul>
+                                <li>文法エラーを恐れる</li>
+                                <li>すべての行を自分で理解しようとする</li>
+                                <li>AIを「検索エンジンの代わり」として使う</li>
+                            </ul>
+                        </div>
+                        <div class="card" style="border-color: var(--accent);">
+                            <h4>✅ Vibe Way (The Director)</h4>
+                            <ul>
+                                <li>「実現したい振る舞い」を語る</li>
+                                <li>詳細はAIに任せ、結果（Output）を評価する</li>
+                                <li>AIを「専門家チームの部下」として扱う</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 4. Workflow (The Loop) -->
+                <section id="workflow">
+                    <h2>The Vibe Loop</h2>
+                    <p>Vibe Codingの実践サイクルは、以下の4ステップを高速で回すことです。</p>
+
+                    <div class="card">
+                        <h3>1. Dictate (指揮)</h3>
+                        <p>「何を作りたいか」「なぜ必要か」「どんな雰囲気（Vibe）か」を言葉にします。<br>
+                            <code>例: "ユーザー設定画面を作って。サイバーパンク風で、でも使いやすく。"</code>
+                        </p>
+
+                        <h3>2. Generate (生成)</h3>
+                        <p>Agent (Claude Code / Copilot) がその意図をコードに変換します。彼らは数秒で数百行を実装します。</p>
+
+                        <h3>3. Verify (検証)</h3>
+                        <p>ブラウザやターミナルで結果を確認します。コードレビューは後回しです。「意図通り動いているか？」だけを見てください。</p>
+
+                        <h3>4. Refine (調整)</h3>
+                        <p>違和感をフィードバックします。「もっと暗くして」「アニメーションを速くして」。この繰り返しが品質を高めます。</p>
+                    </div>
+                </section>
+
+                <!-- 5. Agent Roles -->
+                <section id="agents">
+                    <h2>Agent Roles</h2>
+                    <p>適切な場面で、適切なエージェントを起用することが重要です。</p>
+
+                    <div class="grid-3">
+                        <div class="card">
+                            <div class="agent-badge badge-claude">Claude Code</div>
+                            <h3>The Architect</h3>
+                            <p><strong>[CLI / 設計]</strong><br>
+                                大きなリファクタリング、新機能の実装、複数ファイルの整合性が必要なタスクに。</p>
+                        </div>
+                        <div class="card">
+                            <div class="agent-badge badge-copilot">GitHub Copilot</div>
+                            <h3>The Partner</h3>
+                            <p><strong>[Editor / 反射神経]</strong><br>
+                                コーディング中の補完、メソッド単位の修正、テストコードの自動生成に。</p>
+                        </div>
+                        <div class="card">
+                            <div class="agent-badge badge-codex">OpenAI Codex</div>
+                            <h3>The Operator</h3>
+                            <p><strong>[App / 司令室]</strong><br>
+                                複数エージェントの管理、PC操作、プロジェクト全体の進行管理に。</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 6. Battle Records -->
+                <section id="records">
+                    <h2>Battle Records</h2>
+                    <p>実際の開発現場での成功事例。</p>
+                    <div class="card">
+                        <h4>Case: Thinkers-700 Project</h4>
+                        <p>300以上の静的HTMLファイルのデザインを一括変更する際、手作業では数週間かかるところを、Claude
+                            Codeへの1つのプロンプト「全ファイルのヘッダーをこのデザインに統一して」で、わずか20分で完了しました。</p>
+                    </div>
+                </section>
+
+                <!-- 7. The 7 Laws -->
+                <section id="laws">
+                    <h2>The 7 Laws of Vibe</h2>
+                    <p>このスタイルを極めるための、絶対的な行動指針。</p>
+                    <div class="grid-2">
+                        <div class="card">
+                            <h4>1. Don't Write, Dictate.</h4>
+                            <p>自分でコードを書こうとした瞬間、負けです。手は膝の上に。</p>
+                        </div>
+                        <div class="card">
+                            <h4>2. Context is King.</h4>
+                            <p>「何を」より「なぜ」を伝えてください。背景情報こそが最大の武器です。</p>
+                        </div>
+                        <div class="card">
+                            <h4>3. Trust but Verify.</h4>
+                            <p>AIを信頼しても、盲信してはいけません。必ず動かして確認すること。</p>
+                        </div>
+                        <div class="card">
+                            <h4>4. Iterate Fast.</h4>
+                            <p>一発で正解を出そうとしない。60点のものを3秒で作らせ、それを磨くのです。</p>
+                        </div>
+                        <div class="card">
+                            <h4>5. Read the Vibe.</h4>
+                            <p>コードの「行」ではなく、全体の「雰囲気（設計の匂い）」を感じ取ってください。</p>
+                        </div>
+                        <div class="card">
+                            <h4>6. Be the CEO.</h4>
+                            <p>マイクロマネジメントはやめましょう。大きな方針を示し、細部は任せます。</p>
+                        </div>
+                        <div class="card" style="grid-column: 1 / -1; border-color: var(--primary);">
+                            <h4>7. Enjoy the Flow.</h4>
+                            <p>Vibe Codingは楽しいものです。苦しいと感じたら、やり方が間違っています。</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 8. Prompt Patterns -->
+                <section id="patterns">
+                    <h2>Prompt Engineering</h2>
+                    <p>AIエージェントを動かすための「共通言語」。</p>
+
+                    <div class="card">
+                        <div style="margin-bottom: 24px;">
+                            <h4 style="color: #ef4444;">❌ Bad Vibe (Instruction only)</h4>
+                            <div
+                                style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 6px; font-family: monospace; color: #aaa;">
+                                ヘッダーの背景色を黒にして。あと文字を白にして。
+                            </div>
+                        </div>
+                        <div>
+                            <h4 style="color: var(--accent);">✅ Good Vibe (Intent + Context)</h4>
+                            <div
+                                style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 6px; font-family: monospace; color: #fff;">
+                                サイト全体の印象を「高級感のあるモダンなダークモード」にしたい。<br>
+                                ヘッダーもそれに合わせて再設計して。配色は君のセンスに任せる。
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h4>Magic Phrases (魔法の言葉)</h4>
+                        <ul>
+                            <li><code>"Make it robust."</code> (堅牢にして) → エラーハンドリングや型定義を強化してくれます。</li>
+                            <li><code>"Refactor for readability."</code> (読みやすくして) → 複雑なロジックを整理してくれます。</li>
+                            <li><code>"Surprise me."</code> (驚かせて) → AIの創造性を最大限に引き出し、予想外の提案をもらえます。</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section
+                    style="margin-top: 80px; text-align: center; border-top: 1px solid var(--border); padding-top: 40px;">
+                    <p>Welcome to the future of coding.</p>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Smooth scrolling for sidebar links
+        function scrollToSection(id) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                // Update active state
+                document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+                event.target.classList.add('active');
+            }
+        }
+
+        // Highlight active section on scroll
+        const mainContent = document.getElementById('main-scroll');
+        const sections = document.querySelectorAll('section');
+        const navItems = document.querySelectorAll('.nav-item');
+
+        mainContent.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (mainContent.scrollTop >= (sectionTop - 300)) { // Offset adjusted
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                // Simple partial match for navigation highlighting
+                if (item.getAttribute('onclick') && item.getAttribute('onclick').includes(current)) {
+                    item.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

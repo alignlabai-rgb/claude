@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grok (The Maverick) | Tech Workbench</title>
+    <style>
+        :root {
+            --bg: #0b1220;
+            --panel: #101418;
+            --muted: #94a3b8;
+            --text: #e2e8f0;
+            --accent: #fff;
+            /* Grok White/Black (X) */
+            --accent-grad: linear-gradient(135deg, #fff, #888);
+            --border: rgba(255, 255, 255, 0.2);
+            --radius: 16px;
+            --font-mono: "SF Mono", "Consolas", monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Segoe UI", "SF Pro Display", system-ui, sans-serif;
+            color: var(--text);
+            background: var(--bg);
+            padding: 32px 20px 64px;
+            line-height: 1.7;
+        }
+
+        .shell {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        header.hero {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 48px 40px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        header.hero::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--accent-grad);
+        }
+
+        header.hero::after {
+            content: "";
+            position: absolute;
+            right: -100px;
+            bottom: -100px;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent 70%);
+            pointer-events: none;
+        }
+
+        .meta-tag {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .last-updated {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--muted);
+            opacity: 0.7;
+            margin-top: 8px;
+            display: block;
+        }
+
+        .eyebrow {
+            font-size: 0.9em;
+            margin-bottom: 12px;
+            display: block;
+            color: var(--accent);
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        h1 {
+            margin: 0 0 16px;
+            font-size: 48px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            line-height: 1.1;
+            background: linear-gradient(to right, #fff, #bbb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .lead {
+            margin: 0 0 32px;
+            font-size: 20px;
+            color: var(--muted);
+            max-width: 760px;
+            font-weight: 300;
+        }
+
+        .back {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        .back:hover {
+            opacity: 1;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 32px;
+            transition: transform 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        h2 {
+            margin: 0 0 20px;
+            font-size: 24px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+        }
+
+        h2::before {
+            content: "";
+            width: 4px;
+            height: 24px;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+
+        h3 {
+            margin: 24px 0 12px;
+            font-size: 18px;
+            color: #fff;
+            font-weight: 600;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 8px;
+        }
+
+        p {
+            margin: 0 0 16px;
+            color: var(--muted);
+            font-size: 16px;
+        }
+
+        ul {
+            margin: 0 0 24px;
+            padding-left: 24px;
+            color: var(--muted);
+        }
+
+        li {
+            margin-bottom: 12px;
+        }
+
+        li strong {
+            color: var(--text);
+        }
+
+        .spec-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .spec-item {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .spec-label {
+            display: block;
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--muted);
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .spec-value {
+            display: block;
+            font-size: 16px;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .quote-box {
+            border-left: 2px solid var(--text);
+            padding-left: 16px;
+            font-style: italic;
+            color: #bbb;
+            margin: 16px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="shell">
+        <header class="hero">
+            <div class="meta-tag">INTELLIGENCE / xAI</div>
+            <span class="eyebrow">The Maverick (異端児)</span>
+            <h1>Grok</h1>
+            <p class="lead">xAIが放つ、最も尖った知性。最新の「Grok 4.1」は、Thinking Modeによる論理的深さと、Emotional
+                Awarenessによる人間味、そしてX（旧Twitter）を通じたリアルタイム情報へのアクセスを併せ持ちます。</p>
+            <span class="last-updated">Last Updated: 2026.02.11</span>
+            <br>
+            <a class="back" href="../index.html">← Workbenchへ戻る</a>
+        </header>
+
+        <section class="grid">
+            <article class="card">
+                <h2>Core Specs</h2>
+                <div class="spec-grid">
+                    <div class="spec-item">
+                        <span class="spec-label">Latest Model</span>
+                        <span class="spec-value">Grok 4.1</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Access</span>
+                        <span class="spec-value">Real-time (X Data)</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Reasoning</span>
+                        <span class="spec-value">Thinking Mode</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Personality</span>
+                        <span class="spec-value">Emotional Awareness</span>
+                    </div>
+                </div>
+                <p>Grokは他のLLMとは一線を画す「個性」を持っています。退屈な優等生ではなく、ウィットに富み、時に反骨精神すら感じさせる「Maverick（一匹狼）」なパートナーです。</p>
+            </article>
+
+            <article class="card">
+                <h2>Why "thinking" + "Real-time"?</h2>
+                <p>Grok 4.1の最大の特徴は、この2つの相反する要素の融合です。</p>
+                <ul>
+                    <li><strong>Thinking Mode</strong>: OpenAI
+                        o1/o3に対抗する深い推論モード。複雑な数学、科学、プログラミングの問題に対し、時間をかけて思考ステップを踏みます。</li>
+                    <li><strong>Universe (Real-time)</strong>:
+                        X上の膨大な投稿をリアルタイムに検索・分析。「今、世界で何が起きているか」に基づいたコーディングや意思決定が可能です。</li>
+                </ul>
+            </article>
+        </section>
+
+        <section class="card">
+            <h2>Emotional Awareness & Personality</h2>
+            <p>Grok 4.1は、ユーザーの感情的なニュアンスを理解し、人間味のある反応を返す能力（Emotional Awareness）が強化されています。</p>
+            <div class="quote-box">
+                "I'm not just a calculator. I get the joke."
+            </div>
+            <p>Vibe
+                Codingにおいては、「無機質なコード出力機」ではなく、「一緒に開発を楽しむ相棒」としての側面の強さがあります。ジョークを交えたり、率直なフィードバックをくれたりするインタラクションは、長時間の開発における孤独感を軽減します。
+            </p>
+        </section>
+
+        <section class="grid">
+            <article class="card">
+                <h2>Why use for Vibe Coding?</h2>
+                <p>Grokは**「トレンドに敏感なハッカー」**です。</p>
+                <ul>
+                    <li><strong>最新技術のキャッチアップ</strong>:
+                        「今朝発表されたばかりのJSフレームワークを使ってみたい」といった場合、他のモデルは学習データが古くて知りませんが、GrokはX上のドキュメントや感想を読み込んで即座に対応できます。</li>
+                    <li><strong>Grok 4.1 Fast</strong>: 開発者向けに提供される高速版モデル。ターミナルでの高速なツール呼び出しや、エージェントワークフローの中核として機能します。
+                    </li>
+                </ul>
+            </article>
+
+            <article class="card">
+                <h2>Comparison</h2>
+                <ul>
+                    <li><strong>vs ChatGPT/Claude</strong>: 知識の正確性や安全性では及ばないこともありますが、「最新性」と「面白さ」ではGrokが圧勝します。</li>
+                    <li><strong>vs DeepSeek</strong>: どちらもオープンな精神（Grokはweights公開の実績あり）を持ちますが、GrokはSNSデータという独自の武器を持っています。
+                    </li>
+                </ul>
+            </article>
+        </section>
+    </div>
+</body>
+
+</html>
