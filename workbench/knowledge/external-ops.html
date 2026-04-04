@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>External Ops | Claude / Codex 外出先運用ガイド</title>
+  <style>
+    :root {
+      --bg: #08111d;
+      --panel: #0f1a2b;
+      --panel-2: #101f34;
+      --text: #edf2fb;
+      --muted: #b9c6dc;
+      --border: rgba(255, 255, 255, 0.08);
+      --accent: #7df0cf;
+      --accent-2: #59b7ff;
+      --accent-3: #ffba57;
+      --shadow: 0 22px 56px rgba(0, 0, 0, 0.35);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", "SF Pro Display", "Noto Sans JP", system-ui, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 18% 14%, rgba(125, 240, 207, 0.16), transparent 28%),
+        radial-gradient(circle at 82% 0%, rgba(89, 183, 255, 0.14), transparent 28%),
+        linear-gradient(145deg, #08111d 0%, #0a1423 55%, #060d18 100%);
+      line-height: 1.7;
+      padding: 28px 18px 56px;
+    }
+
+    .shell {
+      max-width: 1120px;
+      margin: 0 auto;
+      display: grid;
+      gap: 18px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(125, 240, 207, 0.14);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    h1,
+    h2,
+    h3 {
+      margin: 0 0 10px;
+    }
+
+    h1 {
+      font-size: 34px;
+      margin-top: 12px;
+    }
+
+    h2 {
+      font-size: 24px;
+    }
+
+    h3 {
+      font-size: 19px;
+    }
+
+    p {
+      margin: 0 0 12px;
+      color: var(--muted);
+    }
+
+    .top-links,
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .top-links a,
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      text-decoration: none;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .top-links a.primary {
+      color: var(--accent);
+      border-color: rgba(125, 240, 207, 0.45);
+      background: rgba(125, 240, 207, 0.08);
+    }
+
+    .grid-3,
+    .grid-2 {
+      display: grid;
+      gap: 16px;
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    }
+
+    .card {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 10px;
+    }
+
+    .tag.claude {
+      background: rgba(255, 186, 87, 0.16);
+      color: var(--accent-3);
+    }
+
+    .tag.codex {
+      background: rgba(89, 183, 255, 0.16);
+      color: var(--accent-2);
+    }
+
+    .tag.local {
+      background: rgba(125, 240, 207, 0.16);
+      color: var(--accent);
+    }
+
+    ul,
+    ol {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+    }
+
+    li {
+      margin-bottom: 8px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 6px;
+      font-size: 14px;
+    }
+
+    th,
+    td {
+      text-align: left;
+      vertical-align: top;
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    th {
+      color: var(--text);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .note {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .callout {
+      border-left: 3px solid var(--accent);
+      padding-left: 14px;
+    }
+
+    .sources a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    @media (max-width: 760px) {
+      body {
+        padding: 20px 14px 44px;
+      }
+
+      .panel {
+        padding: 18px;
+      }
+
+      h1 {
+        font-size: 28px;
+      }
+
+      table,
+      thead,
+      tbody,
+      tr,
+      th,
+      td {
+        display: block;
+      }
+
+      thead {
+        display: none;
+      }
+
+      tr {
+        border-bottom: 1px solid var(--border);
+        padding: 10px 0;
+      }
+
+      td {
+        border: 0;
+        padding: 6px 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+    <section class="panel">
+      <div class="eyebrow">External Ops</div>
+      <h1>外出先からこのハブを動かすための運用ガイド</h1>
+      <p>
+        このページは、PCを触れない日でも `claude` フォルダ配下の技術ハブを更新し続けるための実務メモです。
+        目的は「壊れてもよい」ではなく、「壊さず回し、必要なら戻せる状態を保つ」ことです。
+      </p>
+      <div class="top-links">
+        <a href="index.html">Knowledge Hub</a>
+        <a href="../index.html">Workbench Portal</a>
+        <a class="primary" href="../../CLAUDE.md">Claude 運用指示</a>
+        <a href="../../logs/next-actions.html">Next Actions</a>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>結論</h2>
+      <div class="grid-3">
+        <article class="card">
+          <div class="tag claude">Primary</div>
+          <h3>Claude を外出先の主系統にする</h3>
+          <p>スマホから投げる前提なら、現時点では Claude 系の方が運用の相性が良いです。</p>
+          <ul>
+            <li>短い指示で継続更新しやすい</li>
+            <li>`CLAUDE.md` を読ませる運用と噛み合う</li>
+            <li>このハブの「留守中の更新係」に向いている</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <div class="tag codex">Secondary</div>
+          <h3>Codex は補助線として十分使える</h3>
+          <p>OpenAI 側も web / ChatGPT モバイル / Slack に広がっているので、外部運用の候補には入ります。</p>
+          <ul>
+            <li>Codex web でクラウド実行</li>
+            <li>ChatGPT モバイル経由で継続</li>
+            <li>Slack 連携で軽いタスク依頼</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <div class="tag local">Fallback</div>
+          <h3>重い整理は家に戻ってからやる</h3>
+          <p>大規模な移設、構造変更、CSS 改修、複数ページの再編はローカル作業を基本にします。</p>
+          <ul>
+            <li>Codex CLI / app / IDE</li>
+            <li>このローカル環境の Codex</li>
+            <li>差分確認とテストを伴う作業</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>このハブ向けの使い分け</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>系統</th>
+            <th>外で始めやすい入口</th>
+            <th>向いている作業</th>
+            <th>注意点</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Claude</td>
+            <td>Claude アプリ、Claude Code 系のリモート運用、GitHub連携</td>
+            <td>記事追加、リンク修正、要約追記、軽いページ新設、ログ更新</td>
+            <td>変更範囲を狭く指定しないと、広めに整理しにいくことがある</td>
+          </tr>
+          <tr>
+            <td>Codex</td>
+            <td>Codex web、ChatGPT モバイル、Slack、必要に応じてデスクトップ app</td>
+            <td>Issue ベースの整理、文章化、比較ページ追加、検証付きの実装</td>
+            <td>モバイル中心の運用はできるが、体感は Claude 優先の方が自然</td>
+          </tr>
+          <tr>
+            <td>OpenClaw / 実験系</td>
+            <td>このハブ内の参考設計として扱う</td>
+            <td>自動化の検証、放置型オーケストレーションの研究、比較材料づくり</td>
+            <td>外出先の本番更新基盤としては、現時点では実験枠に留める</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="note">更新日基準: 2026年4月4日。公式情報は将来変わる可能性があるため、主要リンクは末尾に残しています。</p>
+    </section>
+
+    <section class="panel">
+      <h2>このハブで外から投げるべきタスク</h2>
+      <div class="grid-2">
+        <article class="card">
+          <h3>外でやるべきもの</h3>
+          <ol>
+            <li>新技術の要約を `research` に追加する</li>
+            <li>比較ページや運用メモを `workbench` に足す</li>
+            <li>優先順位や次アクションを `strategy` `logs` に更新する</li>
+            <li>壊れたリンクや明らかな文言ミスを直す</li>
+          </ol>
+        </article>
+
+        <article class="card">
+          <h3>家でやるべきもの</h3>
+          <ol>
+            <li>フォルダ移設や大規模リネーム</li>
+            <li>全体デザインの刷新</li>
+            <li>複数セクション横断の構造改修</li>
+            <li>GitHub 公開前の最終確認とコミット整理</li>
+          </ol>
+        </article>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>運用ルール</h2>
+      <div class="callout">
+        <p>この `claude` ハブは「公開できる技術ハブ」であり、「理念や作品そのもの」は別管理です。外から触らせるのは主にここで、ALIGN_Lab 本体は必要に応じて後から取り込む方針が安全です。</p>
+      </div>
+      <ul>
+        <li>変更依頼はカテゴリ単位で出す。例: `workbench/knowledge だけ更新`</li>
+        <li>必ず目的を書く。例: `外出先からの運用方法を1ページに整理`</li>
+        <li>壊したくないページは明示する。例: `index.html の構造は維持`</li>
+        <li>変更後は `logs` に要点を残す</li>
+        <li>公開前はリンク確認と差分確認を行う</li>
+      </ul>
+    </section>
+
+    <section class="panel">
+      <h2>このあと追加すると強いもの</h2>
+      <div class="chips">
+        <span class="chip">Issue テンプレート</span>
+        <span class="chip">更新チェックリスト</span>
+        <span class="chip">公開前レビュー手順</span>
+        <span class="chip">Claude / Codex 比較表</span>
+      </div>
+      <p>
+        次に整備するなら、まず `logs/change-log` と `remote-task-template` です。
+        外出中の依頼文を型化しておくと、Claude でも Codex でもブレがかなり減ります。
+      </p>
+    </section>
+
+    <section class="panel sources">
+      <h2>公式ソース</h2>
+      <ul>
+        <li><a href="https://openai.com/index/introducing-the-codex-app/" target="_blank" rel="noopener noreferrer">OpenAI: Introducing the Codex app</a></li>
+        <li><a href="https://help.openai.com/en/articles/11381614" target="_blank" rel="noopener noreferrer">OpenAI Help: Codex CLI and Sign in with ChatGPT</a></li>
+        <li><a href="https://help.openai.com/en/articles/6825453-chatgpt-apps-on-ios-and-android" target="_blank" rel="noopener noreferrer">OpenAI Help: ChatGPT apps on iOS and Android</a></li>
+        <li><a href="https://docs.claude.com/ja/docs/agents-and-tools/claude-code/overview" target="_blank" rel="noopener noreferrer">Claude Docs: Claude Code 概要</a></li>
+        <li><a href="https://www.anthropic.com/product/claude-code" target="_blank" rel="noopener noreferrer">Anthropic: Claude Code</a></li>
+        <li><a href="https://support.claude.com/en/articles/11869629-using-claude-with-android-apps" target="_blank" rel="noopener noreferrer">Claude Help Center: Using Claude with Android Apps</a></li>
+      </ul>
+    </section>
+  </div>
+</body>
+
+</html>

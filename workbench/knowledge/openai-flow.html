@@ -1,0 +1,259 @@
+﻿<!doctype html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenAI & Workflows | Tech Workbench</title>
+  <style>
+    :root {
+      --bg: #0d1322;
+      --panel: #111a2d;
+      --panel-2: #0f1728;
+      --text: #ecf1fa;
+      --muted: #bcc8dd;
+      --border: rgba(255, 255, 255, 0.08);
+      --accent: #56d0ff;
+      --accent-2: #ffb84d;
+      --shadow: 0 20px 48px rgba(0, 0, 0, 0.35);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", "SF Pro Display", "Noto Sans JP", system-ui, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 20% 15%, rgba(86, 208, 255, 0.14), transparent 28%),
+        radial-gradient(circle at 80% 0%, rgba(255, 184, 77, 0.15), transparent 30%),
+        linear-gradient(145deg, #0b1220 0%, #0d1424 55%, #09111d 100%);
+      line-height: 1.7;
+      padding: 28px 18px 56px;
+    }
+
+    .shell {
+      max-width: 1080px;
+      margin: 0 auto;
+      display: grid;
+      gap: 18px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(86, 208, 255, 0.14);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    h1, h2, h3 {
+      margin: 0 0 10px;
+    }
+
+    h1 {
+      font-size: 34px;
+      margin-top: 12px;
+    }
+
+    p {
+      margin: 0 0 12px;
+      color: var(--muted);
+    }
+
+    .top-links,
+    .chips,
+    .grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .top-links a,
+    .chip,
+    .cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      text-decoration: none;
+    }
+
+    .top-links a,
+    .cta {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .cta.primary {
+      background: rgba(86, 208, 255, 0.15);
+      border-color: rgba(86, 208, 255, 0.4);
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .chip {
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.04);
+      font-size: 13px;
+    }
+
+    .grid {
+      align-items: stretch;
+    }
+
+    .card {
+      flex: 1 1 280px;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+    }
+
+    li {
+      margin-bottom: 8px;
+    }
+
+    code,
+    pre {
+      font-family: Consolas, "JetBrains Mono", monospace;
+    }
+
+    pre {
+      margin: 0;
+      background: #0a101d;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      overflow-x: auto;
+      color: #d6e0f2;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    @media (max-width: 640px) {
+      h1 {
+        font-size: 28px;
+      }
+
+      .panel {
+        padding: 18px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+    <section class="panel">
+      <div class="top-links">
+        <a href="../index.html">← Workbenchへ戻る</a>
+        <a href="../../index.html">AI Creator Hub</a>
+        <a href="../../creator-system/openclaw.html">OpenClaw連携</a>
+      </div>
+      <div class="eyebrow">Workflow Design</div>
+      <h1>OpenAI & Workflows</h1>
+      <p>
+        OpenAI系モデルを単発のチャットとして使うだけでなく、役割分担のあるワークフローとして設計するための整理ページです。
+        推論、下書き、実装、検証、公開前チェックを分けると運用が安定します。
+      </p>
+      <div class="chips">
+        <span class="chip">Reasoning</span>
+        <span class="chip">Drafting</span>
+        <span class="chip">Execution</span>
+        <span class="chip">Verification</span>
+        <span class="chip">Publishing</span>
+      </div>
+      <div class="actions">
+        <a class="cta primary" href="../../claw-stack/index.html">Claw Guidesを見る</a>
+        <a class="cta" href="../../research/openclaw-news/api.html">OpenClaw API</a>
+      </div>
+    </section>
+
+    <section class="grid">
+      <article class="card">
+        <h2>1. 役割を混ぜない</h2>
+        <p>同じモデルに全部やらせるより、役割ごとに責務を分けた方が出力品質と再現性が上がります。</p>
+        <ul>
+          <li>推論: 要件整理、リスク洗い出し、設計判断</li>
+          <li>汎用生成: 下書き、要約、言い換え、比較表</li>
+          <li>実行: コード編集、コマンド実行、ファイル操作</li>
+          <li>検証: リンクチェック、テスト、レビュー</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <h2>2. ワークフローで管理する</h2>
+        <p>公開向けコンテンツやアプリ運用では、モデル単体よりフロー全体を先に設計した方が崩れにくくなります。</p>
+        <ul>
+          <li>入力の型を決める</li>
+          <li>途中成果物の保存先を決める</li>
+          <li>人間確認ポイントを先に入れる</li>
+          <li>公開前の自動チェックを固定する</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <h2>3. このサイトとの関係</h2>
+        <p>AI Creator Hub では、OpenClaw をオーケストレーター、各LLMを専門担当として扱う構図が分かりやすいです。</p>
+        <ul>
+          <li><a href="../../creator-system/openclaw.html">OpenClaw連携</a>: 全体の制御設計</li>
+          <li><a href="../../research/openclaw-news/index.html">OpenClaw News</a>: 周辺知識の補強</li>
+          <li><a href="../../claw-stack/index.html">Claw Guides</a>: 導入方式の比較</li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="panel">
+      <h2>推奨フロー例</h2>
+      <pre>1. 要件定義
+   - 目的、対象読者、公開先、締切を固定
+
+2. 設計
+   - 章立て、ページ構成、必要な内部リンクを決定
+
+3. 生成
+   - 各ページ本文、比較表、補助ドキュメントを作成
+
+4. 接続
+   - index、ガイドハブ、関連ページの相互リンクを追加
+
+5. 検証
+   - 壊れたリンク、未接続ページ、重複導線を点検
+
+6. 公開
+   - README、構成説明、GitHub向けの最終確認</pre>
+    </section>
+  </div>
+</body>
+</html>
+
