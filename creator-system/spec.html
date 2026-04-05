@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>システム仕様書 | AI Creator Hub</title>
+  <meta name="description" content="AI Creator Hub の各モジュール仕様・API・データフロー定義">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">AI Creator Hub</div>
+  <ul class="nav-links">
+    <li><a href="index.html">ホーム</a></li>
+    <li><a href="video-pipeline.html">動画制作</a></li>
+    <li><a href="manga-pipeline.html">漫画制作</a></li>
+    <li><a href="evaluation.html">評価システム</a></li>
+    <li><a href="monetization.html">マネタイズ</a></li>
+    <li><a href="spec.html" class="active">仕様書</a></li>
+    <li><a href="openclaw.html">OpenClaw連携</a></li>
+  </ul>
+  <div class="nav-hamburger"><span></span><span></span><span></span></div>
+</nav>
+
+<section class="hero" style="min-height: 60vh;">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <div class="hero-badge"><span class="dot-live"></span>仕様書 v0.1</div>
+    <h1 class="fade-up">
+      AI Creator Hub<br>
+      <span class="gradient-text">システム仕様書</span>
+    </h1>
+    <p class="hero-desc fade-up-2">
+      各モジュールのインターフェース定義・データフロー・API仕様をまとめたリファレンスです。<br>
+      実装時・連携設計時の一次情報源として利用します。
+    </p>
+    <div class="hero-cta fade-up-3">
+      <a href="#modules" class="btn btn-primary">モジュール一覧へ</a>
+      <a href="index.html" class="btn btn-outline">全体像に戻る</a>
+    </div>
+  </div>
+</section>
+
+<!-- Module Overview -->
+<section class="section" id="modules">
+  <div class="section-inner">
+    <div class="section-label">モジュール構成</div>
+    <h2 class="section-title">5つのコアモジュール</h2>
+    <p class="section-desc">
+      各モジュールは独立したOpenClaw Skillとして実装され、メッセージキューで非同期連携します。
+    </p>
+
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon purple">1</div>
+        <h3>topic-analyzer</h3>
+        <p>ネタ文章を受け取り、ジャンル・ターゲット・難易度を分析してメタデータを付与する。</p>
+        <div style="margin-top: 1rem; font-size: 0.82rem; color: var(--text-muted);">
+          <strong>Input:</strong> raw_text: string<br>
+          <strong>Output:</strong> topic_data: TopicMeta
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-icon cyan">2</div>
+        <h3>video-pipeline</h3>
+        <p>topic_data からスクリプト生成・画像生成・音声合成・動画合成を行う。</p>
+        <div style="margin-top: 1rem; font-size: 0.82rem; color: var(--text-muted);">
+          <strong>Input:</strong> topic_data: TopicMeta<br>
+          <strong>Output:</strong> video: ContentArtifact
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-icon orange">3</div>
+        <h3>manga-pipeline</h3>
+        <p>topic_data からコマ割り・キャラ生成・セリフ配置・ページ合成を行う。</p>
+        <div style="margin-top: 1rem; font-size: 0.82rem; color: var(--text-muted);">
+          <strong>Input:</strong> topic_data: TopicMeta<br>
+          <strong>Output:</strong> manga: ContentArtifact
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-icon green">4</div>
+        <h3>content-evaluator</h3>
+        <p>生成コンテンツをスコアリングし、公開可否フラグと改善提案を返す。</p>
+        <div style="margin-top: 1rem; font-size: 0.82rem; color: var(--text-muted);">
+          <strong>Input:</strong> artifact: ContentArtifact<br>
+          <strong>Output:</strong> result: EvalResult
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-icon purple">5</div>
+        <h3>monetization-manager</h3>
+        <p>評価通過コンテンツを指定プラットフォームに投稿し、収益データを記録する。</p>
+        <div style="margin-top: 1rem; font-size: 0.82rem; color: var(--text-muted);">
+          <strong>Input:</strong> artifact: ContentArtifact, score: number<br>
+          <strong>Output:</strong> publish: PublishResult
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Data Types -->
+<section class="section" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-label">型定義</div>
+    <h2 class="section-title">共通データ型</h2>
+    <div class="two-col">
+      <div>
+        <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--text-muted);">TopicMeta</h3>
+        <div class="code-block">
+<span class="fn">type</span> <span class="str">TopicMeta</span> = {
+  <span class="fn">id</span>: <span class="str">string</span>          <span class="cm">// UUID</span>
+  <span class="fn">raw_text</span>: <span class="str">string</span>    <span class="cm">// 元ネタ文章</span>
+  <span class="fn">genre</span>: <span class="str">string</span>       <span class="cm">// "comedy"|"horror"|...</span>
+  <span class="fn">target_age</span>: <span class="str">string</span>  <span class="cm">// "teen"|"adult"|"all"</span>
+  <span class="fn">difficulty</span>: <span class="str">number</span>  <span class="cm">// 1–5</span>
+  <span class="fn">keywords</span>: <span class="str">string[]</span>  <span class="cm">// タグ</span>
+  <span class="fn">created_at</span>: <span class="str">string</span>  <span class="cm">// ISO 8601</span>
+}</div>
+
+        <h3 style="margin: 1.5rem 0 1rem; font-size: 1rem; color: var(--text-muted);">ContentArtifact</h3>
+        <div class="code-block">
+<span class="fn">type</span> <span class="str">ContentArtifact</span> = {
+  <span class="fn">id</span>: <span class="str">string</span>
+  <span class="fn">type</span>: <span class="str">"video" | "manga"</span>
+  <span class="fn">file_path</span>: <span class="str">string</span>   <span class="cm">// ストレージパス</span>
+  <span class="fn">thumbnail</span>: <span class="str">string</span>   <span class="cm">// サムネイルURL</span>
+  <span class="fn">duration_sec</span>: <span class="str">number</span><span class="cm">// 動画の場合</span>
+  <span class="fn">page_count</span>: <span class="str">number</span>  <span class="cm">// 漫画の場合</span>
+  <span class="fn">topic_id</span>: <span class="str">string</span>    <span class="cm">// TopicMeta.id</span>
+  <span class="fn">created_at</span>: <span class="str">string</span>
+}</div>
+      </div>
+      <div>
+        <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--text-muted);">EvalResult</h3>
+        <div class="code-block">
+<span class="fn">type</span> <span class="str">EvalResult</span> = {
+  <span class="fn">artifact_id</span>: <span class="str">string</span>
+  <span class="fn">score</span>: <span class="str">number</span>        <span class="cm">// 0–100</span>
+  <span class="fn">passed</span>: <span class="str">boolean</span>     <span class="cm">// score >= 85</span>
+  <span class="fn">breakdown</span>: {
+    <span class="fn">quality</span>: <span class="str">number</span>   <span class="cm">// 映像/画像品質</span>
+    <span class="fn">engagement</span>: <span class="str">number</span><span class="cm">// エンゲージメント予測</span>
+    <span class="fn">originality</span>: <span class="str">number</span>
+  }
+  <span class="fn">suggestions</span>: <span class="str">string[]</span>
+}</div>
+
+        <h3 style="margin: 1.5rem 0 1rem; font-size: 1rem; color: var(--text-muted);">PublishResult</h3>
+        <div class="code-block">
+<span class="fn">type</span> <span class="str">PublishResult</span> = {
+  <span class="fn">artifact_id</span>: <span class="str">string</span>
+  <span class="fn">platforms</span>: {
+    <span class="fn">name</span>: <span class="str">string</span>      <span class="cm">// "youtube"|"note"|...</span>
+    <span class="fn">url</span>: <span class="str">string</span>
+    <span class="fn">published_at</span>: <span class="str">string</span>
+  }[]
+  <span class="fn">revenue_est</span>: <span class="str">number</span> <span class="cm">// 初期収益試算 (JPY)</span>
+}</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- API Endpoints -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label">API エンドポイント</div>
+    <h2 class="section-title">モジュール間インターフェース</h2>
+
+    <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem;">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+          <span style="background: rgba(108,60,225,0.2); color: #a48cf5; font-size: 0.78rem; font-weight: 700; padding: 0.25rem 0.6rem; border-radius: 4px;">POST</span>
+          <code style="font-size: 0.9rem;">/api/v1/topic-analyzer/analyze</code>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 0.75rem;">ネタ文章を解析してTopicMetaを返す。</p>
+        <div class="code-block" style="margin: 0;">
+<span class="cm">// Request</span>
+{ <span class="fn">"raw_text"</span>: <span class="str">"ネタ文章をここに..."</span> }
+
+<span class="cm">// Response 200</span>
+{ <span class="fn">"topic_data"</span>: TopicMeta }</div>
+      </div>
+
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem;">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+          <span style="background: rgba(0,212,255,0.2); color: var(--accent); font-size: 0.78rem; font-weight: 700; padding: 0.25rem 0.6rem; border-radius: 4px;">POST</span>
+          <code style="font-size: 0.9rem;">/api/v1/{video|manga}-pipeline/start</code>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 0.75rem;">コンテンツ生成を開始する。非同期ジョブとして実行。</p>
+        <div class="code-block" style="margin: 0;">
+<span class="cm">// Request</span>
+{ <span class="fn">"topic_data"</span>: TopicMeta, <span class="fn">"target_duration"</span>: <span class="str">60</span> }
+
+<span class="cm">// Response 202</span>
+{ <span class="fn">"job_id"</span>: <span class="str">"string"</span>, <span class="fn">"status"</span>: <span class="str">"queued"</span> }</div>
+      </div>
+
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem;">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+          <span style="background: rgba(0,220,130,0.2); color: #00DC82; font-size: 0.78rem; font-weight: 700; padding: 0.25rem 0.6rem; border-radius: 4px;">POST</span>
+          <code style="font-size: 0.9rem;">/api/v1/evaluator/ingest</code>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 0.75rem;">生成済みコンテンツをスコアリングキューに投入する。</p>
+        <div class="code-block" style="margin: 0;">
+<span class="cm">// Request</span>
+{ <span class="fn">"artifact"</span>: ContentArtifact }
+
+<span class="cm">// Response 200</span>
+{ <span class="fn">"eval_result"</span>: EvalResult }</div>
+      </div>
+
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem;">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+          <span style="background: rgba(255,107,107,0.2); color: #FF6B6B; font-size: 0.78rem; font-weight: 700; padding: 0.25rem 0.6rem; border-radius: 4px;">POST</span>
+          <code style="font-size: 0.9rem;">/api/v1/monetization/publish</code>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 0.75rem;">評価通過コンテンツを指定プラットフォームに投稿する。</p>
+        <div class="code-block" style="margin: 0;">
+<span class="cm">// Request</span>
+{ <span class="fn">"artifact"</span>: ContentArtifact, <span class="fn">"score"</span>: <span class="str">92</span>, <span class="fn">"platforms"</span>: [<span class="str">"youtube"</span>, <span class="str">"note"</span>] }
+
+<span class="cm">// Response 200</span>
+{ <span class="fn">"publish_result"</span>: PublishResult }</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Error Codes -->
+<section class="section" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-label">エラーコード</div>
+    <h2 class="section-title">共通エラー定義</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>コード</th><th>意味</th><th>対処</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>400</td><td>リクエスト不正（必須フィールド欠損）</td><td>ペイロードを確認する</td></tr>
+          <tr><td>422</td><td>コンテンツ生成失敗（AIエラー）</td><td>fallbackモデルに切り替え再試行</td></tr>
+          <tr><td>429</td><td>APIレート制限超過</td><td>exponential backoffで再試行</td></tr>
+          <tr><td>503</td><td>外部AIサービス障害</td><td>フォールバックサービスへ自動切替</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">AI Creator Hub</div>
+    <nav>
+      <a href="index.html">ホーム</a>
+      <a href="spec.html">仕様書</a>
+      <a href="video-pipeline.html">動画制作</a>
+      <a href="manga-pipeline.html">漫画制作</a>
+      <a href="evaluation.html">評価システム</a>
+      <a href="openclaw.html">OpenClaw連携</a>
+    </nav>
+    <p>AI Creator Hub — システム仕様書</p>
+  </div>
+</footer>
+
+<script src="main.js"></script>
+</body>
+</html>
