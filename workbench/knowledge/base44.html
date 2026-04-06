@@ -126,6 +126,31 @@
     </div>
   </div>
 
+  <!-- Builder Chat の使い方 -->
+  <div class="panel">
+    <h2>Builder Chat の仕組み — 2つのモード</h2>
+    <div class="grid2">
+      <div>
+        <h3 style="color:#60d0ff; font-size:0.9rem; margin-bottom:8px;">Discussion Mode（無料）</h3>
+        <p>クレジットを消費せずにアイデアを練るモード。</p>
+        <ul>
+          <li>AIとブレインストーミング・要件整理ができる</li>
+          <li>「こういうアプリを作りたいが何から始めるか」などの相談に使う</li>
+          <li>Build Modeに移行するまでクレジットは消費しない</li>
+        </ul>
+      </div>
+      <div>
+        <h3 style="color:#a78bfa; font-size:0.9rem; margin-bottom:8px;">Build Mode（クレジット消費）</h3>
+        <p>実際にアプリを生成・変更するモード。</p>
+        <ul>
+          <li>1回の生成で <strong>メッセージクレジット</strong> を消費</li>
+          <li>生成後はコンポーネントをクリックして色・文字・レイアウトを微調整できる</li>
+          <li>再生成せずに済む細かい修正はUIから直接編集</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
   <!-- タイムライン -->
   <div class="panel">
     <h2>沿革タイムライン</h2>
@@ -153,9 +178,9 @@
     </div>
   </div>
 
-  <!-- 料金 -->
+  <!-- クレジット詳細 -->
   <div class="panel">
-    <h2>料金プラン（2026年）</h2>
+    <h2>料金プランとクレジットの仕組み（2026年）</h2>
     <div class="price-grid">
       <div class="price-card">
         <div class="plan">Free</div>
@@ -178,20 +203,88 @@
         <div class="period">/月（年払い）/ $100（月払い）</div>
       </div>
     </div>
-    <p style="margin-top:12px; font-size:0.82rem;">※ クレジット制。高機能LLMや大量生成ではクレジット消費が増える点に注意。</p>
+
+    <div class="grid2" style="margin-top:16px;">
+      <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:14px;">
+        <div style="font-size:0.8rem; font-weight:700; color:#a78bfa; margin-bottom:8px;">メッセージクレジット</div>
+        <p style="margin:0; font-size:0.85rem;">AIにアプリの生成・変更を依頼するたびに消費。Starterは月100件。使い切ったら追加購入か翌月まで待つ。</p>
+      </div>
+      <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:14px;">
+        <div style="font-size:0.8rem; font-weight:700; color:#60d0ff; margin-bottom:8px;">インテグレーションクレジット</div>
+        <p style="margin:0; font-size:0.85rem;">アプリが外部APIを呼んだりLLMを使ったりするたびに消費。Starterは月2,000件。ユーザー数が増えると消費が加速する。</p>
+      </div>
+    </div>
+    <p style="margin-top:12px; font-size:0.82rem; color:var(--muted);">
+      ⚠️ クレジットは<strong>翌月に繰り越しなし</strong>。使い切っても追加購入しないと機能が止まる点に注意。
+    </p>
+  </div>
+
+  <!-- 重要な制限事項 -->
+  <div class="panel" style="border-color:rgba(255,107,107,0.25);">
+    <h2 style="color:#ff9090;">知っておくべき制限・リスク</h2>
+    <div class="grid2">
+      <div>
+        <h3 style="font-size:0.9rem; color:#ff9090; margin-bottom:8px;">バックエンドロックイン</h3>
+        <ul>
+          <li>GitHubへのコードexport は<strong>フロントエンドのみ</strong></li>
+          <li>DB・API・認証ロジックはBase44/Wixのインフラ上にのみ存在</li>
+          <li>自前サーバーへの移植は実質不可能（Base44 SDKに依存）</li>
+          <li>将来的にサービスが終了した場合にバックエンドを持ち出せない</li>
+        </ul>
+      </div>
+      <div>
+        <h3 style="font-size:0.9rem; color:#ff9090; margin-bottom:8px;">運用・コンプライアンス</h3>
+        <ul>
+          <li><strong>SOC 2・ISO 27001 未取得</strong>（2026年時点）</li>
+          <li>セルフホスティング不可（Wixインフラ強制）</li>
+          <li>2026年2月3日: <strong>約3時間の全停止</strong>（全アプリが502エラー）</li>
+          <li>単一インフラ障害で全顧客アプリが同時停止するリスク</li>
+        </ul>
+      </div>
+    </div>
+    <p style="margin-top:12px; font-size:0.85rem; color:var(--muted);">
+      PoC・プロトタイプ・社内ツールには向くが、外部顧客向け本番サービスや機密データを扱う用途には慎重な検討が必要。
+    </p>
+  </div>
+
+  <!-- 競合詳細比較 -->
+  <div class="panel">
+    <h2>競合との詳細比較</h2>
+    <table class="compare">
+      <thead>
+        <tr><th>項目</th><th style="color:#a78bfa;">Base44</th><th style="color:#60d0ff;">Lovable</th><th style="color:#ffb84d;">Bolt.new</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>生成速度</td><td>◎ 最速（約6分）</td><td>○ やや遅め（約10分）</td><td>○ 速いが不安定</td></tr>
+        <tr><td>初心者向け</td><td>◎ 自動エラー修正あり</td><td>○ 普通</td><td>△ エンジニア寄り</td></tr>
+        <tr><td>コード品質</td><td>△ プロプライエタリ</td><td>◎ React+TypeScript 本番品質</td><td>○ 良いが実行エラーが多い</td></tr>
+        <tr><td>バックエンド</td><td>◎ 自動で込み</td><td>△ Supabase 別途設定</td><td>△ 別途設定</td></tr>
+        <tr><td>GitHub連携</td><td>△ フロントのみ export</td><td>◎ 双方向同期</td><td>○ コード直接編集可</td></tr>
+        <tr><td>本番スケール</td><td>△ 不向き</td><td>◎ 向く</td><td>△ 不安定</td></tr>
+        <tr><td>コード所有権</td><td>✕ バックエンドは持ち出し不可</td><td>◎ 完全に所有</td><td>◎ 完全に所有</td></tr>
+        <tr><td>向いている人</td><td>非エンジニア・PoC重視</td><td>エンジニア・長期運用</td><td>エンジニア・高速試作</td></tr>
+      </tbody>
+    </table>
   </div>
 
   <div class="grid2">
-    <!-- 競合比較 -->
+    <!-- こんな人に向く／向かない -->
     <div class="panel">
-      <h2>競合との位置づけ</h2>
+      <h2>向く用途 / 向かない用途</h2>
+      <p style="font-size:0.82rem; font-weight:700; color:#5ddb7a; margin-bottom:6px;">✅ 向く</p>
       <ul>
-        <li><strong>Lovable</strong>: 同様のAI App Builder。UIデザイン重視。</li>
-        <li><strong>Bolt.new</strong>: StackBlitz製。エンジニア向け・コード編集自由度高め。</li>
-        <li><strong>Cursor</strong>: IDEベース。既存コードの改修に強い。</li>
-        <li><strong>n8n / Make</strong>: ワークフロー自動化寄り。アプリ生成はしない。</li>
+        <li>アイデアを素早く形にしてステークホルダーに見せたい</li>
+        <li>エンジニアなしで社内ツールを作りたい</li>
+        <li>PoC・プロトタイプ段階で本格開発前の検証をしたい</li>
+        <li>デザイナーがクリッカブルプロトを作りたい</li>
       </ul>
-      <p style="margin-top:10px;">Base44はノンエンジニアが「アプリを所有する」ことに特化している。</p>
+      <p style="font-size:0.82rem; font-weight:700; color:#ff9090; margin-top:12px; margin-bottom:6px;">❌ 向かない</p>
+      <ul>
+        <li>外部顧客に公開して実際に使わせる本番アプリ</li>
+        <li>大量ユーザー・複雑なロール管理が必要な運用</li>
+        <li>コンプライアンス要件がある業界（医療・金融等）</li>
+        <li>将来エンジニアに引き渡してフル開発する前提のもの</li>
+      </ul>
     </div>
 
     <!-- AI Creator Hub との接点 -->
@@ -204,6 +297,7 @@
         <li>コンテンツ評価レポートポータル</li>
         <li>OpenClawトリガー用の簡易管理画面</li>
       </ul>
+      <p style="margin-top:10px; font-size:0.85rem;">ただしバックエンドロックインの制限上、<strong>PoC・社内確認用途</strong>にとどめ、本番移行時は Lovable か自前実装を検討するのが安全。</p>
     </div>
   </div>
 

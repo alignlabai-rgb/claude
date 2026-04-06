@@ -92,7 +92,7 @@
       <h2>何が革新的か</h2>
       <p>
         通常のLLMは各パラメータを16bit（FP16）や4bitで表現する。
-        Bonsai 8Bはこれを<strong>1bit（-1 / 0 / +1 の3値）</strong>まで極限圧縮した。
+        Bonsai 8Bはこれを<strong>1bit（{-1, +1} の2値）</strong>まで極限圧縮した。
       </p>
       <ul>
         <li>8Bパラメータで <strong>1.15GB</strong>（FP16なら約16GB）</li>
@@ -118,6 +118,50 @@
     </div>
   </div>
 
+  <!-- 技術的な仕組み -->
+  <div class="panel">
+    <h2>技術的な仕組み — なぜ1bitで動くのか</h2>
+    <div class="grid2">
+      <div>
+        <h3 style="color:var(--accent); font-size:0.9rem; margin-bottom:8px;">重みの表現方法</h3>
+        <p>各重みパラメータを符号だけで表現する。値は <strong>{-1, +1}</strong> の2択のみ。</p>
+        <ul>
+          <li>ゼロがない純粋な2値（バイナリ）— これが BitNet との最大の違い</li>
+          <li>グループごとに共有スケールファクターを保持して精度を補完</li>
+          <li>埋め込み・Attention・LM ヘッドすべてを1-bitで構築（エンドツーエンド）</li>
+        </ul>
+        <p style="margin-top:10px;">従来の量子化（訓練後に圧縮）と異なり、<strong>最初から1-bit精度で学習</strong>している点が重要。</p>
+      </div>
+      <div>
+        <h3 style="color:var(--accent); font-size:0.9rem; margin-bottom:8px;">BitNet（Microsoft）との比較</h3>
+        <table class="compare" style="margin-top:0;">
+          <thead><tr><th>項目</th><th>Bonsai（PrismML）</th><th>BitNet（Microsoft）</th></tr></thead>
+          <tbody>
+            <tr><td>重みの値</td><td>{-1, +1}（2値）</td><td>{-1, 0, +1}（3値 = 1.58bit）</td></tr>
+            <tr><td>ゼロ重み</td><td>なし</td><td>あり</td></tr>
+            <tr><td>精度</td><td>純粋1-bit</td><td>1.58-bit相当</td></tr>
+            <tr><td>商用ライセンス</td><td>Apache 2.0</td><td>研究寄り</td></tr>
+          </tbody>
+        </table>
+        <p style="margin-top:10px; font-size:0.82rem;">訓練には Google TPU v4 を使用。消費者向けCPU・NPU・エッジGPUでの推論に最適化。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- デバイス別速度 -->
+  <div class="panel">
+    <h2>デバイス別 推論速度</h2>
+    <div class="stat-grid">
+      <div class="stat"><div class="val">368</div><div class="lbl">tokens/s<br>RTX 4090</div></div>
+      <div class="stat"><div class="val">131</div><div class="lbl">tokens/s<br>M4 Pro Mac</div></div>
+      <div class="stat"><div class="val">44</div><div class="lbl">tokens/s<br>iPhone 17 Pro Max</div></div>
+      <div class="stat"><div class="val">8×</div><div class="lbl">FP16比 高速<br>（同ハード）</div></div>
+    </div>
+    <p style="margin-top:14px; font-size:0.85rem; color:var(--muted);">
+      FP16の8Bモデルを動かすには通常16GB以上のメモリが必要でGPUが必須になるが、Bonsai 8BはCPUのみのデバイスでも実用速度で動く。
+    </p>
+  </div>
+
   <!-- ベンチマーク比較 -->
   <div class="panel">
     <h2>ベンチマーク比較</h2>
@@ -127,26 +171,66 @@
       </thead>
       <tbody>
         <tr class="hl"><td>Bonsai 8B（1-bit）</td><td>1.15 GB</td><td>70.5</td><td>← このモデル</td></tr>
-        <tr><td>Llama 3.1 8B（FP16）</td><td>~16 GB</td><td>67.1</td><td>14× 大きい</td></tr>
+        <tr><td>Olmo 3 7B</td><td>~14 GB</td><td>70.9</td><td>僅差</td></tr>
+        <tr><td>Ministral3 8B</td><td>~16 GB</td><td>71.0</td><td>僅差</td></tr>
         <tr><td>LFM2 8B</td><td>~8 GB</td><td>69.6</td><td></td></tr>
-        <tr><td>Gemma 3 9B</td><td>~18 GB</td><td>~71</td><td>近似値</td></tr>
+        <tr><td>Llama 3.1 8B（FP16）</td><td>~16 GB</td><td>67.1</td><td>14× 大きい</td></tr>
       </tbody>
     </table>
-    <p style="margin-top:12px; font-size:0.82rem;">
-      メモリフットプリントが1/14でありながら、FP16ライバルと同等以上のスコアを記録。
+    <p style="margin-top:10px; font-size:0.82rem;">
+      評価ベンチマーク: IFEval・GSM8K・HumanEval+・BFCL・MuSR・MMLU-Redux の平均。<br>
+      メモリ1/14 でライバルと互角以上のスコアを達成。
     </p>
+  </div>
+
+  <!-- 驚きのデモ -->
+  <div class="panel" style="border-color:rgba(93,219,122,0.35);">
+    <h2>長期エージェントタスクでの逆転現象</h2>
+    <p>
+      50件のサポートチケットを要約・振り分けするエージェントタスクをシミュレーションした比較デモで、
+      予想外の結果が出ている：
+    </p>
+    <div class="grid2" style="margin-top:12px;">
+      <div style="background:rgba(93,219,122,0.07); border:1px solid rgba(93,219,122,0.2); border-radius:12px; padding:16px; text-align:center;">
+        <div style="font-size:2.5rem; font-weight:800; color:#5ddb7a;">50 / 50</div>
+        <div style="font-size:0.85rem; color:var(--muted); margin-top:6px;">Bonsai 8B（1-bit）<br>全チケットを完走</div>
+      </div>
+      <div style="background:rgba(255,107,107,0.07); border:1px solid rgba(255,107,107,0.2); border-radius:12px; padding:16px; text-align:center;">
+        <div style="font-size:2.5rem; font-weight:800; color:#ff9090;">6 / 50</div>
+        <div style="font-size:0.85rem; color:var(--muted); margin-top:6px;">標準FP16 8Bモデル<br>メモリ不足で失速</div>
+      </div>
+    </div>
+    <p style="margin-top:12px; font-size:0.85rem;">
+      長時間のエージェントタスクでは、メモリ帯域の制約でFP16が途中停止する一方、
+      Bonsai は省メモリゆえに最後まで処理を継続できる。ベンチスコア以上の実用差が出る場面がある。
+    </p>
+  </div>
+
+  <!-- モデルファミリー -->
+  <div class="panel">
+    <h2>モデルファミリー</h2>
+    <table class="compare">
+      <thead><tr><th>モデル</th><th>パラメータ数</th><th>メモリ</th><th>用途目安</th></tr></thead>
+      <tbody>
+        <tr class="hl"><td>Bonsai 8B</td><td>8.2B</td><td>1.15 GB</td><td>汎用・スマートフォン・PCローカル</td></tr>
+        <tr><td>Bonsai 4B</td><td>4B</td><td>0.5 GB</td><td>軽量デバイス・Raspberry Pi 等</td></tr>
+        <tr><td>Bonsai 1.7B</td><td>1.7B</td><td>0.24 GB</td><td>マイコン・ウェアラブル</td></tr>
+      </tbody>
+    </table>
+    <p style="margin-top:10px; font-size:0.82rem;">すべて Apache 2.0・商用利用可。HuggingFace で無料ダウンロード可能。</p>
   </div>
 
   <div class="grid2">
     <!-- 使い道 -->
     <div class="panel">
-      <h2>どこで使えるか</h2>
+      <h2>どこで使えるか（用途別）</h2>
       <ul>
-        <li><span class="tag tag-green">スマートフォン</span> iPhone / Android 上でオフライン推論</li>
-        <li><span class="tag tag-blue">エッジ</span> Raspberry Pi・組み込みデバイス</li>
-        <li><span class="tag tag-orange">クラウド</span> APIコスト削減（省メモリで大量並列）</li>
-        <li>プライバシー重視のローカル AI アシスタント</li>
-        <li>IoT デバイスへの LLM 搭載</li>
+        <li><span class="tag tag-green">スマートフォン</span> iPhone / Android 上でオフライン推論・音声AI</li>
+        <li><span class="tag tag-blue">エッジ</span> Raspberry Pi・ドローン・産業用センサー</li>
+        <li><span class="tag tag-orange">ロボティクス</span> リアルタイム判断が必要な自律ロボット</li>
+        <li><span class="tag tag-green">ウェアラブル</span> スマートグラス・ヘルスデバイス</li>
+        <li><span class="tag tag-blue">セキュア企業</span> 外部送信不可の閉域LLM（コンプライアンス対応）</li>
+        <li><span class="tag tag-orange">クラウド</span> 省メモリで大量並列処理・APIコスト削減</li>
       </ul>
     </div>
 
@@ -159,6 +243,7 @@
         <li>オフライン環境での topic-analyzer 代替</li>
         <li>PicoClaw のバックエンドLLMとして利用</li>
         <li>APIコストが不要になる場面での採用検討</li>
+        <li>長期エージェント処理（50件超バッチ）でのFP16代替</li>
       </ul>
     </div>
   </div>
@@ -169,6 +254,7 @@
     <ul>
       <li>HuggingFace: <code>prism-ml/Bonsai-8B-gguf</code>（LM Studio・Ollama で動く）</li>
       <li>Apple Silicon 向け: <code>prism-ml/Bonsai-8B-mlx-1bit</code></li>
+      <li>デモ: <code>github.com/PrismML-Eng/Bonsai-demo</code></li>
       <li>ライセンス: Apache 2.0（商用利用・改変・再配布 OK）</li>
       <li>公式サイト: prismml.com</li>
     </ul>
