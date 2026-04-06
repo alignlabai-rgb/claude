@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bonsai 8B | Tech Workbench</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --panel: #0f1a10;
+      --muted: #c8d3e3;
+      --text: #e9edf5;
+      --accent: #5ddb7a;
+      --accent-grad: linear-gradient(135deg, #5ddb7a, #3dd8c5);
+      --border: rgba(93,219,122,0.2);
+      --radius: 16px;
+      --mono: "SF Mono","Consolas",monospace;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin:0; min-height:100vh; font-family:"Segoe UI","Noto Sans JP",system-ui,sans-serif; color:var(--text); background:var(--bg); padding:32px 20px 64px; line-height:1.7; }
+    .shell { max-width:1100px; margin:0 auto; display:flex; flex-direction:column; gap:28px; }
+
+    header.hero {
+      background:var(--panel); border:1px solid var(--border); border-radius:var(--radius);
+      padding:52px 40px; position:relative; overflow:hidden;
+      box-shadow:0 20px 50px rgba(0,0,0,0.3);
+    }
+    header.hero::before { content:""; position:absolute; top:0; left:0; width:100%; height:4px; background:var(--accent-grad); }
+    header.hero::after { content:""; position:absolute; right:-80px; bottom:-80px; width:420px; height:420px; background:radial-gradient(circle, rgba(93,219,122,0.12), transparent 70%); pointer-events:none; }
+
+    .badge { display:inline-block; background:rgba(93,219,122,0.15); color:var(--accent); padding:5px 14px; border-radius:99px; font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; margin-bottom:14px; }
+    h1 { margin:0 0 12px; font-size:2.4rem; line-height:1.2; }
+    .grad { background:var(--accent-grad); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .subtitle { color:var(--muted); font-size:1rem; max-width:680px; }
+
+    .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    @media(max-width:680px){ .grid2 { grid-template-columns:1fr; } h1 { font-size:1.8rem; } header.hero { padding:32px 22px; } }
+
+    .panel { background:#0f172a; border:1px solid rgba(255,255,255,0.07); border-radius:var(--radius); padding:24px; }
+    .panel h2 { margin:0 0 14px; font-size:1.1rem; color:var(--accent); }
+    .panel h3 { margin:0 0 8px; font-size:0.95rem; }
+    p,li { color:var(--muted); font-size:0.92rem; }
+    ul { padding-left:18px; margin:0; }
+    li { margin-bottom:6px; }
+    a { color:var(--accent); }
+
+    .stat-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+    @media(max-width:680px){ .stat-grid { grid-template-columns:repeat(2,1fr); } }
+    .stat { background:#0f172a; border:1px solid rgba(255,255,255,0.07); border-radius:14px; padding:18px; text-align:center; }
+    .stat .val { font-size:1.9rem; font-weight:800; color:var(--accent); line-height:1; }
+    .stat .lbl { font-size:0.75rem; color:var(--muted); margin-top:6px; }
+
+    .compare { width:100%; border-collapse:collapse; font-size:0.88rem; }
+    .compare th { text-align:left; padding:10px 14px; background:rgba(93,219,122,0.08); color:var(--accent); font-size:0.8rem; border-bottom:1px solid rgba(255,255,255,0.07); }
+    .compare td { padding:10px 14px; border-bottom:1px solid rgba(255,255,255,0.05); color:var(--muted); }
+    .compare tr:last-child td { border-bottom:none; }
+    .compare tr.hl td { background:rgba(93,219,122,0.06); color:var(--text); font-weight:600; }
+
+    .tag { display:inline-block; font-size:0.72rem; font-weight:700; padding:0.15rem 0.5rem; border-radius:5px; margin-right:4px; }
+    .tag-green { background:rgba(93,219,122,0.15); color:#5ddb7a; }
+    .tag-blue  { background:rgba(0,180,255,0.15);  color:#60d0ff; }
+    .tag-orange{ background:rgba(255,160,0,0.15);  color:#ffb84d; }
+
+    .breadcrumb { font-size:0.83rem; color:var(--muted); margin-bottom:8px; }
+    .breadcrumb a { color:var(--accent); text-decoration:none; }
+  </style>
+</head>
+<body>
+<div class="shell">
+
+  <header class="hero">
+    <div class="breadcrumb"><a href="../index.html">Workbench</a> / <a href="index.html">Knowledge</a> / Bonsai 8B</div>
+    <div class="badge">PrismML · 2026-03-31 発表</div>
+    <h1>Bonsai 8B<br><span class="grad">世界初・商用1-bit LLM</span></h1>
+    <p class="subtitle">
+      Caltechの研究を基に PrismML が開発した、8Bパラメータの1-bit量子化言語モデル。
+      メモリ1.15GBでiPhoneに収まり、FP16モデルと同等の性能を発揮する。
+    </p>
+  </header>
+
+  <!-- スペック -->
+  <div class="stat-grid">
+    <div class="stat"><div class="val">1.15<span style="font-size:1rem;">GB</span></div><div class="lbl">メモリ使用量</div></div>
+    <div class="stat"><div class="val">44</div><div class="lbl">tokens/s（iPhone 17 Pro）</div></div>
+    <div class="stat"><div class="val">14×</div><div class="lbl">FP16比 小型化</div></div>
+    <div class="stat"><div class="val">70.5</div><div class="lbl">平均ベンチスコア</div></div>
+  </div>
+
+  <div class="grid2">
+    <!-- 概要 -->
+    <div class="panel">
+      <h2>何が革新的か</h2>
+      <p>
+        通常のLLMは各パラメータを16bit（FP16）や4bitで表現する。
+        Bonsai 8Bはこれを<strong>1bit（-1 / 0 / +1 の3値）</strong>まで極限圧縮した。
+      </p>
+      <ul>
+        <li>8Bパラメータで <strong>1.15GB</strong>（FP16なら約16GB）</li>
+        <li>クラウドなしで iPhone / Raspberry Pi 上で動作</li>
+        <li>5× 省エネルギー（エッジデバイス向け）</li>
+        <li>Apache 2.0 ライセンス（商用利用可）</li>
+      </ul>
+    </div>
+
+    <!-- 誰が作ったか -->
+    <div class="panel">
+      <h2>開発元：PrismML</h2>
+      <p>
+        カリフォルニア工科大学（Caltech）の研究をベースに設立されたスタートアップ。
+        2026年3月31日にステルスから公開。
+      </p>
+      <ul>
+        <li>1-bit LLMの商用化に特化</li>
+        <li>4B・1.7B モデルも同時リリース</li>
+        <li>HuggingFace でダウンロード可能</li>
+        <li>GGUF / MLX フォーマット対応（ローカル実行しやすい）</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ベンチマーク比較 -->
+  <div class="panel">
+    <h2>ベンチマーク比較</h2>
+    <table class="compare">
+      <thead>
+        <tr><th>モデル</th><th>メモリ</th><th>平均スコア</th><th>備考</th></tr>
+      </thead>
+      <tbody>
+        <tr class="hl"><td>Bonsai 8B（1-bit）</td><td>1.15 GB</td><td>70.5</td><td>← このモデル</td></tr>
+        <tr><td>Llama 3.1 8B（FP16）</td><td>~16 GB</td><td>67.1</td><td>14× 大きい</td></tr>
+        <tr><td>LFM2 8B</td><td>~8 GB</td><td>69.6</td><td></td></tr>
+        <tr><td>Gemma 3 9B</td><td>~18 GB</td><td>~71</td><td>近似値</td></tr>
+      </tbody>
+    </table>
+    <p style="margin-top:12px; font-size:0.82rem;">
+      メモリフットプリントが1/14でありながら、FP16ライバルと同等以上のスコアを記録。
+    </p>
+  </div>
+
+  <div class="grid2">
+    <!-- 使い道 -->
+    <div class="panel">
+      <h2>どこで使えるか</h2>
+      <ul>
+        <li><span class="tag tag-green">スマートフォン</span> iPhone / Android 上でオフライン推論</li>
+        <li><span class="tag tag-blue">エッジ</span> Raspberry Pi・組み込みデバイス</li>
+        <li><span class="tag tag-orange">クラウド</span> APIコスト削減（省メモリで大量並列）</li>
+        <li>プライバシー重視のローカル AI アシスタント</li>
+        <li>IoT デバイスへの LLM 搭載</li>
+      </ul>
+    </div>
+
+    <!-- AI Creator Hub との接点 -->
+    <div class="panel">
+      <h2>AI Creator Hub との関係</h2>
+      <p>現時点では直接の接続は想定していないが、将来的な可能性：</p>
+      <ul>
+        <li>ローカル評価モデルとして content-evaluator に組み込む</li>
+        <li>オフライン環境での topic-analyzer 代替</li>
+        <li>PicoClaw のバックエンドLLMとして利用</li>
+        <li>APIコストが不要になる場面での採用検討</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 入手方法 -->
+  <div class="panel">
+    <h2>入手・試し方</h2>
+    <ul>
+      <li>HuggingFace: <code>prism-ml/Bonsai-8B-gguf</code>（LM Studio・Ollama で動く）</li>
+      <li>Apple Silicon 向け: <code>prism-ml/Bonsai-8B-mlx-1bit</code></li>
+      <li>ライセンス: Apache 2.0（商用利用・改変・再配布 OK）</li>
+      <li>公式サイト: prismml.com</li>
+    </ul>
+  </div>
+
+</div>
+</body>
+</html>
