@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SLM ガイド | Tech Workbench</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --panel: #0f1525;
+      --muted: #c8d3e3;
+      --text: #e9edf5;
+      --accent: #4FFFB0;
+      --accent2: #60d0ff;
+      --accent-grad: linear-gradient(135deg, #4FFFB0, #60d0ff);
+      --border: rgba(79,255,176,0.18);
+      --radius: 16px;
+      --mono: "SF Mono","Consolas",monospace;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin:0; min-height:100vh; font-family:"Segoe UI","Noto Sans JP",system-ui,sans-serif; color:var(--text); background:var(--bg); padding:32px 20px 64px; line-height:1.7; }
+    .shell { max-width:1100px; margin:0 auto; display:flex; flex-direction:column; gap:28px; }
+
+    header.hero {
+      background:var(--panel); border:1px solid var(--border); border-radius:var(--radius);
+      padding:52px 40px; position:relative; overflow:hidden;
+      box-shadow:0 20px 50px rgba(0,0,0,0.3);
+    }
+    header.hero::before { content:""; position:absolute; top:0; left:0; width:100%; height:4px; background:var(--accent-grad); }
+    header.hero::after { content:""; position:absolute; right:-60px; bottom:-60px; width:380px; height:380px; background:radial-gradient(circle, rgba(79,255,176,0.09), transparent 70%); pointer-events:none; }
+
+    .badge { display:inline-block; background:rgba(79,255,176,0.15); color:var(--accent); padding:5px 14px; border-radius:99px; font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; margin-bottom:14px; }
+    h1 { margin:0 0 12px; font-size:2.4rem; line-height:1.2; }
+    .grad { background:var(--accent-grad); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .subtitle { color:var(--muted); font-size:1rem; max-width:720px; }
+
+    .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    @media(max-width:680px){ .grid2 { grid-template-columns:1fr; } h1 { font-size:1.8rem; } header.hero { padding:32px 22px; } }
+
+    .panel { background:#0f172a; border:1px solid rgba(255,255,255,0.07); border-radius:var(--radius); padding:24px; }
+    .panel h2 { margin:0 0 14px; font-size:1.1rem; color:var(--accent); }
+    .panel h3 { margin:12px 0 8px; font-size:0.95rem; color:var(--text); }
+    p,li { color:var(--muted); font-size:0.92rem; }
+    ul { padding-left:18px; margin:0; }
+    li { margin-bottom:6px; }
+    a { color:var(--accent); }
+
+    .stat-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+    @media(max-width:680px){ .stat-grid { grid-template-columns:repeat(2,1fr); } }
+    .stat { background:#0f172a; border:1px solid rgba(255,255,255,0.07); border-radius:14px; padding:18px; text-align:center; }
+    .stat .val { font-size:1.6rem; font-weight:800; color:var(--accent); line-height:1; }
+    .stat .lbl { font-size:0.72rem; color:var(--muted); margin-top:6px; }
+
+    .model-card { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:22px; transition:border-color 0.2s; }
+    .model-card:hover { border-color:rgba(79,255,176,0.3); }
+    .model-card .model-header { display:flex; align-items:center; gap:12px; margin-bottom:14px; }
+    .model-card .model-icon { width:44px; height:44px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.3rem; flex-shrink:0; }
+    .model-card .model-name { font-size:1.05rem; font-weight:700; color:var(--text); }
+    .model-card .model-maker { font-size:0.78rem; color:var(--muted); }
+    .model-card .model-stats { display:flex; flex-wrap:wrap; gap:8px; margin:10px 0; }
+    .model-stat { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:4px 10px; font-size:0.75rem; color:var(--muted); font-family:var(--mono); }
+    .model-stat strong { color:var(--accent); }
+
+    .compare { width:100%; border-collapse:collapse; font-size:0.85rem; }
+    .compare th { text-align:left; padding:10px 12px; background:rgba(79,255,176,0.08); color:var(--accent); font-size:0.78rem; border-bottom:1px solid rgba(255,255,255,0.07); white-space:nowrap; }
+    .compare td { padding:10px 12px; border-bottom:1px solid rgba(255,255,255,0.05); color:var(--muted); vertical-align:middle; }
+    .compare tr.hl td { background:rgba(79,255,176,0.05); color:var(--text); }
+    .compare tr:last-child td { border-bottom:none; }
+    .compare tr:hover td { background:rgba(255,255,255,0.02); }
+
+    code { background:rgba(255,255,255,0.08); color:#7dd3fc; padding:2px 7px; border-radius:5px; font-family:var(--mono); font-size:0.84rem; }
+    pre { background:#060d18; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:18px; overflow-x:auto; font-family:var(--mono); font-size:0.84rem; color:#a5f3d0; line-height:1.6; margin:10px 0; }
+
+    .tag { display:inline-block; font-size:0.71rem; font-weight:700; padding:0.15rem 0.5rem; border-radius:5px; margin-right:4px; }
+    .tag-green  { background:rgba(79,255,176,0.15);  color:#4FFFB0; }
+    .tag-blue   { background:rgba(96,208,255,0.15);  color:#60d0ff; }
+    .tag-orange { background:rgba(255,160,0,0.15);   color:#ffb84d; }
+    .tag-purple { background:rgba(167,139,250,0.15); color:#a78bfa; }
+    .tag-red    { background:rgba(255,100,100,0.15); color:#ff9090; }
+
+    .rec-box { background:linear-gradient(135deg, rgba(79,255,176,0.08), rgba(96,208,255,0.08)); border:1px solid rgba(79,255,176,0.25); border-radius:14px; padding:20px; }
+    .rec-box h3 { color:#fff; font-size:1rem; margin-bottom:10px; }
+
+    .note-box { background:rgba(79,255,176,0.06); border-left:3px solid var(--accent); padding:14px 18px; border-radius:0 10px 10px 0; margin-top:12px; }
+    .note-box p { margin:0; font-size:0.88rem; }
+
+    .breadcrumb { font-size:0.83rem; color:var(--muted); margin-bottom:8px; }
+    .breadcrumb a { color:var(--accent); text-decoration:none; }
+
+    .use-scenario { background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:16px; }
+    .use-scenario .scenario-title { font-size:0.85rem; font-weight:700; color:var(--accent); margin-bottom:8px; }
+  </style>
+</head>
+<body>
+<div class="shell">
+
+  <header class="hero">
+    <div class="breadcrumb"><a href="../index.html">Workbench</a> / <a href="index.html">Knowledge</a> / SLM ガイド</div>
+    <div class="badge">Small Language Models · 2026</div>
+    <h1>SLM ガイド<br><span class="grad">Claw Stack のためのローカルモデル選定</span></h1>
+    <p class="subtitle">
+      PicoClaw / NanoClaw / OpenClaw のバックエンド LLM をクラウド API から
+      <strong>ローカル SLM（Small Language Model）に切り替える</strong>ための完全ガイド。
+      コスト削減・オフライン化・プライバシー確保の3つを同時に達成する。
+    </p>
+  </header>
+
+  <!-- なぜ SLM か -->
+  <div class="stat-grid">
+    <div class="stat"><div class="val">$0</div><div class="lbl">API コスト（ローカル推論）</div></div>
+    <div class="stat"><div class="val">&lt;200ms</div><div class="lbl">応答レイテンシ（ローカル）</div></div>
+    <div class="stat"><div class="val">100%</div><div class="lbl">データ外部送信なし</div></div>
+    <div class="stat"><div class="val">24/7</div><div class="lbl">オフライン稼働可能</div></div>
+  </div>
+
+  <!-- 主要SLM一覧 -->
+  <div class="panel">
+    <h2>主要 SLM ラインナップ（2026年4月）</h2>
+    <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:16px; margin-top:8px;">
+
+      <!-- Bonsai 8B -->
+      <div class="model-card">
+        <div class="model-header">
+          <div class="model-icon" style="background:rgba(93,219,122,0.15);">🌿</div>
+          <div>
+            <div class="model-name">Bonsai 8B</div>
+            <div class="model-maker">PrismML（Caltech発, 2026年3月）</div>
+          </div>
+        </div>
+        <p>世界初の商用1-bit LLM。メモリ1.15GBでiPhoneに収まる超省メモリモデル。長時間エージェントタスクでFP16を逆転する。</p>
+        <div class="model-stats">
+          <span class="model-stat"><strong>1.15</strong> GB</span>
+          <span class="model-stat"><strong>44</strong> tok/s (iPhone)</span>
+          <span class="model-stat"><strong>368</strong> tok/s (RTX 4090)</span>
+          <span class="model-stat"><strong>Apache 2.0</strong></span>
+        </div>
+        <div style="margin-top:8px;">
+          <span class="tag tag-green">超省メモリ</span>
+          <span class="tag tag-green">1-bit量子化</span>
+          <span class="tag tag-blue">エッジ特化</span>
+        </div>
+        <p style="margin-top:8px; font-size:0.82rem;"><a href="bonsai-8b.html">詳細解説 →</a></p>
+      </div>
+
+      <!-- Gemma 4 E2B -->
+      <div class="model-card">
+        <div class="model-header">
+          <div class="model-icon" style="background:rgba(96,208,255,0.15);">◆</div>
+          <div>
+            <div class="model-name">Gemma 4 E2B / E4B</div>
+            <div class="model-maker">Google DeepMind（2026年4月）</div>
+          </div>
+        </div>
+        <p>「Effective」パラメーター設計。スマートフォン・Raspberry Pi向けに最適化。ネイティブマルチモーダル＋ファンクションコール対応。</p>
+        <div class="model-stats">
+          <span class="model-stat"><strong>E2B:</strong> 1.5GB</span>
+          <span class="model-stat"><strong>E4B:</strong> 2〜3GB</span>
+          <span class="model-stat"><strong>128k</strong> ctx</span>
+          <span class="model-stat"><strong>Apache 2.0</strong></span>
+        </div>
+        <div style="margin-top:8px;">
+          <span class="tag tag-blue">マルチモーダル</span>
+          <span class="tag tag-blue">ネイティブ関数呼び出し</span>
+          <span class="tag tag-green">Ollama対応</span>
+        </div>
+      </div>
+
+      <!-- Phi-4 Mini -->
+      <div class="model-card">
+        <div class="model-header">
+          <div class="model-icon" style="background:rgba(167,139,250,0.15);">Φ</div>
+          <div>
+            <div class="model-name">Phi-4 Mini</div>
+            <div class="model-maker">Microsoft（2025年〜2026年）</div>
+          </div>
+        </div>
+        <p>3.8B ながら数学・推論・コーディングで圧倒的なパフォーマンス。SambaYアーキテクチャの flash-reasoning 版は10×スループット向上。</p>
+        <div class="model-stats">
+          <span class="model-stat"><strong>3.8B</strong> params</span>
+          <span class="model-stat"><strong>128k</strong> ctx</span>
+          <span class="model-stat"><strong>~2GB</strong> RAM</span>
+          <span class="model-stat"><strong>MIT</strong></span>
+        </div>
+        <div style="margin-top:8px;">
+          <span class="tag tag-purple">推論特化</span>
+          <span class="tag tag-purple">数学・コード強い</span>
+          <span class="tag tag-blue">NPU最適化</span>
+        </div>
+      </div>
+
+      <!-- Llama 3.2 -->
+      <div class="model-card">
+        <div class="model-header">
+          <div class="model-icon" style="background:rgba(255,160,0,0.15);">🦙</div>
+          <div>
+            <div class="model-name">Llama 3.2 (1B / 3B)</div>
+            <div class="model-maker">Meta（2024年後半〜）</div>
+          </div>
+        </div>
+        <p>エッジ向けの超軽量モデル。1B は Raspberry Pi Zero でも動く。エコシステムが最大で、Ollama/llama.cpp での運用実績が豊富。</p>
+        <div class="model-stats">
+          <span class="model-stat"><strong>1B/3B</strong> params</span>
+          <span class="model-stat"><strong>128k</strong> ctx</span>
+          <span class="model-stat"><strong>0.6〜2GB</strong></span>
+          <span class="model-stat"><strong>LLAMA</strong></span>
+        </div>
+        <div style="margin-top:8px;">
+          <span class="tag tag-orange">超軽量</span>
+          <span class="tag tag-orange">エコシステム最大</span>
+          <span class="tag tag-green">実績豊富</span>
+        </div>
+      </div>
+
+      <!-- Llama 3.1 8B -->
+      <div class="model-card">
+        <div class="model-header">
+          <div class="model-icon" style="background:rgba(255,160,0,0.15);">🦙</div>
+          <div>
+            <div class="model-name">Llama 3.1 8B</div>
+            <div class="model-maker">Meta（2024年〜）</div>
+          </div>
+        </div>
+        <p>汎用性と性能のバランスが最も良い中量級モデル。ローカル開発の標準的な選択肢。ファンクションコール・ツール使用に対応。</p>
+        <div class="model-stats">
+          <span class="model-stat"><strong>8B</strong> params</span>
+          <span class="model-stat"><strong>128k</strong> ctx</span>
+          <span class="model-stat"><strong>~5GB</strong> (Q4)</span>
+          <span class="model-stat"><strong>LLAMA</strong></span>
+        </div>
+        <div style="margin-top:8px;">
+          <span class="tag tag-orange">汎用バランス</span>
+          <span class="tag tag-green">ツール使用対応</span>
+          <span class="tag tag-blue">FIM補完</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 一覧比較表 -->
+  <div class="panel">
+    <h2>比較表 — Claw Stack での選定指標</h2>
+    <div style="overflow-x:auto;">
+      <table class="compare">
+        <thead>
+          <tr>
+            <th>モデル</th>
+            <th>RAM (Q4)</th>
+            <th>推論速度</th>
+            <th>推論能力</th>
+            <th>ツール使用</th>
+            <th>マルチモーダル</th>
+            <th>PicoClaw適性</th>
+            <th>NanoClaw適性</th>
+            <th>ライセンス</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="hl">
+            <td>Bonsai 8B</td>
+            <td>1.15 GB</td>
+            <td>⭐⭐⭐⭐⭐</td>
+            <td>⭐⭐⭐</td>
+            <td>○ (限定的)</td>
+            <td>✕</td>
+            <td>◎ 超軽量エッジ</td>
+            <td>○ バッチ処理</td>
+            <td>Apache 2.0</td>
+          </tr>
+          <tr>
+            <td>Gemma 4 E2B</td>
+            <td>1.5 GB</td>
+            <td>⭐⭐⭐⭐</td>
+            <td>⭐⭐⭐⭐</td>
+            <td>◎ ネイティブ</td>
+            <td>◎ ネイティブ</td>
+            <td>◎ 省メモリ+ツール</td>
+            <td>◎ 推奨</td>
+            <td>Apache 2.0</td>
+          </tr>
+          <tr>
+            <td>Gemma 4 E4B</td>
+            <td>2〜3 GB</td>
+            <td>⭐⭐⭐⭐</td>
+            <td>⭐⭐⭐⭐⭐</td>
+            <td>◎ ネイティブ</td>
+            <td>◎ ネイティブ</td>
+            <td>○ やや重め</td>
+            <td>◎ 推奨</td>
+            <td>Apache 2.0</td>
+          </tr>
+          <tr>
+            <td>Phi-4 Mini</td>
+            <td>~2 GB</td>
+            <td>⭐⭐⭐⭐</td>
+            <td>⭐⭐⭐⭐⭐</td>
+            <td>○</td>
+            <td>✕</td>
+            <td>○ 推論タスク向け</td>
+            <td>○ コード生成</td>
+            <td>MIT</td>
+          </tr>
+          <tr>
+            <td>Llama 3.2 1B</td>
+            <td>~0.6 GB</td>
+            <td>⭐⭐⭐⭐⭐</td>
+            <td>⭐⭐</td>
+            <td>○ (限定的)</td>
+            <td>✕</td>
+            <td>◎ 最軽量</td>
+            <td>△ 性能低め</td>
+            <td>LLAMA</td>
+          </tr>
+          <tr>
+            <td>Llama 3.2 3B</td>
+            <td>~2 GB</td>
+            <td>⭐⭐⭐⭐</td>
+            <td>⭐⭐⭐</td>
+            <td>○</td>
+            <td>✕</td>
+            <td>◎ バランス型</td>
+            <td>○</td>
+            <td>LLAMA</td>
+          </tr>
+          <tr>
+            <td>Llama 3.1 8B</td>
+            <td>~5 GB</td>
+            <td>⭐⭐⭐</td>
+            <td>⭐⭐⭐⭐</td>
+            <td>◎</td>
+            <td>✕</td>
+            <td>△ やや重い</td>
+            <td>◎ 推奨</td>
+            <td>LLAMA</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 用途別推奨 -->
+  <div class="panel">
+    <h2>用途別・推奨 SLM</h2>
+    <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:14px; margin-top:8px;">
+
+      <div class="rec-box">
+        <h3>🍓 Raspberry Pi / エッジデバイス<br><small style="font-weight:400; color:var(--muted);">PicoClaw ローカルバックエンド</small></h3>
+        <p><strong style="color:#4FFFB0;">第1推奨：Bonsai 8B</strong><br>1.15GBで稼働。24時間エージェントタスクでも安定。</p>
+        <p><strong style="color:#4FFFB0;">第2推奨：Gemma 4 E2B</strong><br>1.5GBでネイティブ関数呼び出し対応。</p>
+      </div>
+
+      <div class="rec-box">
+        <h3>💻 PC/Mac ローカル開発<br><small style="font-weight:400; color:var(--muted);">NanoClaw / 個人開発</small></h3>
+        <p><strong style="color:#4FFFB0;">第1推奨：Llama 3.1 8B</strong><br>汎用性と性能のバランス最良。ツール使用◎。</p>
+        <p><strong style="color:#4FFFB0;">第2推奨：Gemma 4 E4B</strong><br>マルチモーダルが必要な場合。</p>
+      </div>
+
+      <div class="rec-box">
+        <h3>🧮 推論・コーディング特化<br><small style="font-weight:400; color:var(--muted);">code-analyzer / evaluator</small></h3>
+        <p><strong style="color:#4FFFB0;">第1推奨：Phi-4 Mini</strong><br>3.8Bながら数学・コード推論でトップクラス。</p>
+        <p><strong style="color:#4FFFB0;">代替：Phi-4-mini-flash-reasoning</strong><br>レイテンシ2〜3×削減の特化版。</p>
+      </div>
+
+      <div class="rec-box">
+        <h3>📦 大量バッチ処理<br><small style="font-weight:400; color:var(--muted);">コンテンツ評価・分類</small></h3>
+        <p><strong style="color:#4FFFB0;">第1推奨：Bonsai 8B</strong><br>50件同時でもメモリ枯渇なし（実証済み）。</p>
+        <p><strong style="color:#4FFFB0;">第2推奨：Llama 3.2 3B</strong><br>単純分類タスクなら十分な性能。</p>
+      </div>
+
+      <div class="rec-box">
+        <h3>📱 スマートフォン on-device<br><small style="font-weight:400; color:var(--muted);">モバイルPicoClawノード</small></h3>
+        <p><strong style="color:#4FFFB0;">第1推奨：Bonsai 8B</strong><br>iPhone 17 Proで44 tok/s。1.15GBで収まる。</p>
+        <p><strong style="color:#4FFFB0;">第2推奨：Llama 3.2 1B</strong><br>最軽量。旧世代スマホも対象。</p>
+      </div>
+
+      <div class="rec-box">
+        <h3>🔒 オフライン・閉域環境<br><small style="font-weight:400; color:var(--muted);">機密データ・セキュア環境</small></h3>
+        <p><strong style="color:#4FFFB0;">第1推奨：Gemma 4 E2B</strong><br>Apache 2.0で商用利用可。完全ローカル動作。</p>
+        <p><strong style="color:#4FFFB0;">代替：Bonsai 8B</strong><br>同じくApache 2.0・商用OK。</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Ollamaセットアップ -->
+  <div class="panel">
+    <h2>Ollama でのセットアップ — PicoClaw と繋ぐ</h2>
+    <div class="grid2">
+      <div>
+        <h3>Step 1: Ollama インストール</h3>
+        <pre># Linux / Mac
+curl -fsSL https://ollama.ai/install.sh | sh
+
+# Windows (PowerShell)
+winget install Ollama.Ollama</pre>
+
+        <h3>Step 2: モデルをプル</h3>
+        <pre># Gemma 4 E2B（推奨）
+ollama pull gemma4:e2b
+
+# Bonsai 8B
+ollama pull bonsai:8b-1bit-q8
+
+# Llama 3.1 8B
+ollama pull llama3.1:8b
+
+# Phi-4 Mini
+ollama pull phi4-mini</pre>
+      </div>
+      <div>
+        <h3>Step 3: PicoClaw の config を切り替え</h3>
+        <pre>{
+  "provider": "openai-compatible",
+  "base_url": "http://localhost:11434/v1",
+  "api_key": "ollama",
+  "model": "gemma4:e2b",
+  "max_tokens": 4096,
+  "temperature": 0.7,
+  "max_tool_iterations": 15
+}</pre>
+
+        <h3>Step 4: 動作確認</h3>
+        <pre># Ollama が起動していることを確認
+ollama serve &amp;
+
+# PicoClaw でテスト
+picoclaw agent -m "ローカルAIでの動作テスト"</pre>
+
+        <div class="note-box">
+          <p>💡 <strong>コスト試算：</strong> Claude Sonnet APIを月1000回呼ぶと約$1.5〜3。同じタスクをOllama on Raspberry Pi 5で行えば電気代のみ（月数十円程度）。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- API vs SLM コスト比較 -->
+  <div class="panel">
+    <h2>API vs ローカル SLM — コスト・性能比較</h2>
+    <div style="overflow-x:auto;">
+      <table class="compare">
+        <thead>
+          <tr><th>項目</th><th>Claude Sonnet API</th><th>GPT-4o mini API</th><th>Ollama + Gemma4 E2B</th><th>Ollama + Bonsai 8B</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>コスト（月1000回呼出）</td><td>$1.5〜6</td><td>$0.3〜1</td><td>電気代のみ</td><td>電気代のみ</td></tr>
+          <tr><td>レイテンシ</td><td>500ms〜2s</td><td>300ms〜1s</td><td>100〜300ms（ローカル）</td><td>50〜150ms（1-bit高速）</td></tr>
+          <tr><td>プライバシー</td><td>△ 外部送信あり</td><td>△ 外部送信あり</td><td>◎ 完全ローカル</td><td>◎ 完全ローカル</td></tr>
+          <tr><td>オフライン動作</td><td>✕</td><td>✕</td><td>◎</td><td>◎</td></tr>
+          <tr><td>推論品質（複雑タスク）</td><td>⭐⭐⭐⭐⭐</td><td>⭐⭐⭐⭐</td><td>⭐⭐⭐⭐</td><td>⭐⭐⭐</td></tr>
+          <tr class="hl"><td>Claw Stack 推奨シーン</td><td>本番・重要判断</td><td>高頻度・軽量</td><td>開発・テスト・PoC</td><td>エッジ・バッチ</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note-box" style="margin-top:16px;">
+      <p>💡 <strong>ハイブリッド戦略：</strong> PicoClawのルーティングで「複雑な判断はClaude API、単純な分類はBonsai8Bローカル」と振り分けると、コストと品質を両立できる。</p>
+    </div>
+  </div>
+
+  <!-- 関連ページ -->
+  <div class="panel">
+    <h2>関連ページ</h2>
+    <ul>
+      <li><a href="bonsai-8b.html">Bonsai 8B 詳細解説</a> — PrismML の 1-bit LLM、デバイス別速度・PicoClaw統合</li>
+      <li><a href="../../claw-stack/picoclaw/index.html">PicoClaw ガイド</a> — SLM をバックエンドとして使うエッジエージェント</li>
+      <li><a href="../../claw-stack/comparison.html">Claw スタック比較表</a> — PicoClaw / NanoClaw / OpenClaw の選定</li>
+      <li><a href="intelligence-matrix.html">Intelligence Matrix</a> — フルスケール LLM の比較</li>
+    </ul>
+  </div>
+
+</div>
+</body>
+</html>

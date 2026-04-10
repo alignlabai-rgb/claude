@@ -3,17 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Base44 | Tech Workbench</title>
+  <title>Base44 Skills | Tech Workbench</title>
   <style>
     :root {
       --bg: #0b1220;
-      --panel: #100f1a;
+      --panel: #0f1525;
       --muted: #c8d3e3;
       --text: #e9edf5;
-      --accent: #a78bfa;
-      --accent-grad: linear-gradient(135deg, #a78bfa, #60d0ff);
-      --border: rgba(167,139,250,0.2);
+      --accent: #60d0ff;
+      --accent2: #a78bfa;
+      --accent-grad: linear-gradient(135deg, #60d0ff, #a78bfa);
+      --border: rgba(96,208,255,0.2);
       --radius: 16px;
+      --mono: "SF Mono","Consolas",monospace;
     }
     *, *::before, *::after { box-sizing: border-box; }
     body { margin:0; min-height:100vh; font-family:"Segoe UI","Noto Sans JP",system-ui,sans-serif; color:var(--text); background:var(--bg); padding:32px 20px 64px; line-height:1.7; }
@@ -25,280 +27,292 @@
       box-shadow:0 20px 50px rgba(0,0,0,0.3);
     }
     header.hero::before { content:""; position:absolute; top:0; left:0; width:100%; height:4px; background:var(--accent-grad); }
-    header.hero::after { content:""; position:absolute; right:-80px; bottom:-80px; width:420px; height:420px; background:radial-gradient(circle, rgba(167,139,250,0.12), transparent 70%); pointer-events:none; }
+    header.hero::after { content:""; position:absolute; right:-80px; bottom:-80px; width:420px; height:420px; background:radial-gradient(circle, rgba(96,208,255,0.1), transparent 70%); pointer-events:none; }
 
-    .badge { display:inline-block; background:rgba(167,139,250,0.15); color:var(--accent); padding:5px 14px; border-radius:99px; font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; margin-bottom:14px; }
-    .badge-wix { display:inline-block; background:rgba(0,180,255,0.12); color:#60d0ff; padding:4px 12px; border-radius:99px; font-size:0.75rem; font-weight:700; margin-left:8px; }
+    .badge { display:inline-block; background:rgba(96,208,255,0.15); color:var(--accent); padding:5px 14px; border-radius:99px; font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; margin-bottom:14px; }
+    .badge2 { display:inline-block; background:rgba(167,139,250,0.12); color:var(--accent2); padding:4px 12px; border-radius:99px; font-size:0.75rem; font-weight:700; margin-left:8px; }
     h1 { margin:0 0 12px; font-size:2.4rem; line-height:1.2; }
     .grad { background:var(--accent-grad); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-    .subtitle { color:var(--muted); font-size:1rem; max-width:680px; }
+    .subtitle { color:var(--muted); font-size:1rem; max-width:700px; }
 
     .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
-    @media(max-width:680px){ .grid2 { grid-template-columns:1fr; } h1 { font-size:1.8rem; } header.hero { padding:32px 22px; } }
+    .grid3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; }
+    @media(max-width:720px){ .grid2,.grid3 { grid-template-columns:1fr; } h1 { font-size:1.8rem; } header.hero { padding:32px 22px; } }
 
     .panel { background:#0f172a; border:1px solid rgba(255,255,255,0.07); border-radius:var(--radius); padding:24px; }
     .panel h2 { margin:0 0 14px; font-size:1.1rem; color:var(--accent); }
-    .panel h3 { margin:0 0 8px; font-size:0.95rem; }
+    .panel h3 { margin:12px 0 8px; font-size:0.95rem; color:var(--text); }
     p,li { color:var(--muted); font-size:0.92rem; }
     ul { padding-left:18px; margin:0; }
     li { margin-bottom:6px; }
     a { color:var(--accent); }
 
+    .highlight-panel { background:linear-gradient(135deg, rgba(96,208,255,0.08), rgba(167,139,250,0.08)); border:1px solid rgba(96,208,255,0.25); border-radius:var(--radius); padding:24px; }
+    .highlight-panel h2 { color:#fff; font-size:1.2rem; margin-bottom:10px; }
+
     .stat-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
     @media(max-width:680px){ .stat-grid { grid-template-columns:repeat(2,1fr); } }
     .stat { background:#0f172a; border:1px solid rgba(255,255,255,0.07); border-radius:14px; padding:18px; text-align:center; }
     .stat .val { font-size:1.9rem; font-weight:800; color:var(--accent); line-height:1; }
-    .stat .lbl { font-size:0.75rem; color:var(--muted); margin-top:6px; }
+    .stat .lbl { font-size:0.72rem; color:var(--muted); margin-top:6px; }
 
-    .timeline { display:flex; flex-direction:column; gap:0; }
-    .tl-item { display:grid; grid-template-columns:100px 1fr; gap:16px; padding:14px 0; border-bottom:1px solid rgba(255,255,255,0.05); }
-    .tl-item:last-child { border-bottom:none; }
-    .tl-date { font-size:0.78rem; color:var(--accent); font-weight:700; padding-top:2px; }
-    .tl-body { font-size:0.88rem; color:var(--muted); }
-    .tl-body strong { color:var(--text); }
+    .skill-card { background:rgba(255,255,255,0.03); border:1px solid rgba(96,208,255,0.2); border-radius:14px; padding:20px; }
+    .skill-card .skill-name { font-size:1rem; font-weight:700; color:var(--accent); font-family:var(--mono); margin-bottom:8px; }
+    .skill-card p { margin:0 0 8px; }
 
-    .price-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
-    @media(max-width:680px){ .price-grid { grid-template-columns:repeat(2,1fr); } }
-    .price-card { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:14px; text-align:center; }
-    .price-card .plan { font-size:0.8rem; font-weight:700; color:var(--accent); margin-bottom:6px; }
-    .price-card .amount { font-size:1.4rem; font-weight:800; color:var(--text); }
-    .price-card .period { font-size:0.7rem; color:var(--muted); }
+    code { background:rgba(255,255,255,0.08); color:#7dd3fc; padding:2px 7px; border-radius:5px; font-family:var(--mono); font-size:0.85rem; }
+    pre { background:#060d18; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:18px; overflow-x:auto; font-family:var(--mono); font-size:0.85rem; color:#a5f3d0; line-height:1.6; margin:10px 0; }
 
     .tag { display:inline-block; font-size:0.72rem; font-weight:700; padding:0.15rem 0.5rem; border-radius:5px; margin-right:4px; }
-    .tag-green  { background:rgba(93,219,122,0.15); color:#5ddb7a; }
-    .tag-purple { background:rgba(167,139,250,0.15); color:#a78bfa; }
-    .tag-blue   { background:rgba(0,180,255,0.15);  color:#60d0ff; }
-    .tag-orange { background:rgba(255,160,0,0.15);  color:#ffb84d; }
+    .tag-blue  { background:rgba(96,208,255,0.15);  color:#60d0ff; }
+    .tag-purple{ background:rgba(167,139,250,0.15); color:#a78bfa; }
+    .tag-green { background:rgba(93,219,122,0.15);  color:#5ddb7a; }
+    .tag-orange{ background:rgba(255,160,0,0.15);   color:#ffb84d; }
+
+    .compare { width:100%; border-collapse:collapse; font-size:0.88rem; }
+    .compare th { text-align:left; padding:10px 14px; background:rgba(96,208,255,0.08); color:var(--accent); font-size:0.8rem; border-bottom:1px solid rgba(255,255,255,0.07); }
+    .compare td { padding:10px 14px; border-bottom:1px solid rgba(255,255,255,0.05); color:var(--muted); vertical-align:top; }
+    .compare tr.hl td { background:rgba(96,208,255,0.05); color:var(--text); font-weight:600; }
 
     .breadcrumb { font-size:0.83rem; color:var(--muted); margin-bottom:8px; }
     .breadcrumb a { color:var(--accent); text-decoration:none; }
+
+    .flow { display:flex; gap:0; align-items:stretch; flex-wrap:wrap; }
+    .flow-step { flex:1; min-width:160px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); padding:16px; position:relative; }
+    .flow-step:not(:last-child)::after { content:"→"; position:absolute; right:-12px; top:50%; transform:translateY(-50%); color:var(--accent); font-weight:700; z-index:1; }
+    .flow-step .step-label { font-size:0.7rem; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:6px; }
+    .flow-step p { margin:0; font-size:0.82rem; }
+
+    .note-box { background:rgba(96,208,255,0.06); border-left:3px solid var(--accent); padding:14px 18px; border-radius:0 10px 10px 0; margin-top:12px; }
+    .note-box p { margin:0; font-size:0.88rem; }
   </style>
 </head>
 <body>
 <div class="shell">
 
   <header class="hero">
-    <div class="breadcrumb"><a href="../index.html">Workbench</a> / <a href="index.html">Knowledge</a> / Base44</div>
-    <div class="badge">AI ノーコード App Builder</div>
-    <span class="badge-wix">Wix 傘下（2025年6月買収）</span>
-    <h1>Base44<br><span class="grad">自然言語でフルスタックアプリを生成</span></h1>
+    <div class="breadcrumb"><a href="../index.html">Workbench</a> / <a href="index.html">Knowledge</a> / Base44 Skills</div>
+    <div class="badge">Agent Skills Standard · 2025〜</div>
+    <span class="badge2">OpenClaw エコシステム</span>
+    <h1>Base44 Skills<br><span class="grad">エージェントのハリュシネーションを構造で止める</span></h1>
     <p class="subtitle">
-      「こういうアプリが欲しい」と文章で書くだけで、UI・バックエンド・DB・認証・ホスティングまで
-      込みのウェブアプリを自動生成するAIプラットフォーム。2024年末ローンチ、6ヶ月で25万ユーザーを突破。
+      AI コーディングエージェント（Claude Code / Cursor / OpenClaw など）がプラットフォーム固有の操作を誤らないよう、
+      <strong>「Skills」</strong>という構造化された命令セットの仕様を定めたオープンスタンダード。
+      エージェントに渡す「地図」を統一することで、幻覚（hallucination）によるAPI誤呼び出しを根本から防ぐ。
     </p>
   </header>
 
+  <!-- なぜ Skills が必要か -->
+  <div class="highlight-panel">
+    <h2>🧠 なぜエージェントはハリュシネーションを起こすのか</h2>
+    <p style="color:var(--muted); font-size:0.95rem;">
+      Claude Code や Cursor などのエージェントは、学習データに基づいて SDK メソッドを「推測」する。
+      プラットフォームが頻繁にAPIを変更すると、エージェントは古い・存在しないメソッドを自信満々に呼び出してしまう。
+      <strong style="color:var(--text);">Base44 Skills はその「推測」をなくし、エージェントに確実な地図を渡す仕組み。</strong>
+    </p>
+  </div>
+
   <!-- 数値 -->
   <div class="stat-grid">
-    <div class="stat"><div class="val">400K+</div><div class="lbl">ユーザー数（2026年）</div></div>
-    <div class="stat"><div class="val">$80M</div><div class="lbl">Wix買収額（2025年6月）</div></div>
-    <div class="stat"><div class="val">3</div><div class="lbl">対応LLM（Claude/GPT/Gemini）</div></div>
-    <div class="stat"><div class="val">無料〜</div><div class="lbl">$200/月まで</div></div>
+    <div class="stat"><div class="val">3</div><div class="lbl">コアSkillsの種類</div></div>
+    <div class="stat"><div class="val">Open</div><div class="lbl">Agent Skills 標準（OSS）</div></div>
+    <div class="stat"><div class="val">SKILL.md</div><div class="lbl">各Skillの定義フォーマット</div></div>
+    <div class="stat"><div class="val">npx</div><div class="lbl">グローバルインストール対応</div></div>
   </div>
 
-  <div class="grid2">
-    <!-- 何ができるか -->
-    <div class="panel">
-      <h2>何ができるか</h2>
-      <p>「Builder Chat」でアプリの概要を入力すると、すべてを自動生成：</p>
-      <ul>
-        <li><span class="tag tag-purple">UI</span> フロントエンド画面一式</li>
-        <li><span class="tag tag-blue">Backend</span> サーバー処理・APIエンドポイント</li>
-        <li><span class="tag tag-green">DB</span> データスキーマ・CRUD操作</li>
-        <li><span class="tag tag-orange">Auth</span> ユーザー認証・ログイン機能</li>
-        <li>ホスティング（そのまま公開可能）</li>
-        <li>GitHubへのコードpush（2025年3月から対応）</li>
-      </ul>
-    </div>
-
-    <!-- 使われ方 -->
-    <div class="panel">
-      <h2>代表的な使われ方</h2>
-      <ul>
-        <li>社内CRM・顧客管理ツール</li>
-        <li>予約管理システム</li>
-        <li>タスクトラッカー・プロジェクト管理</li>
-        <li>クライアント向けポータル</li>
-        <li>在庫管理・発注システム</li>
-        <li>簡易ダッシュボード・レポートツール</li>
-      </ul>
-      <p style="margin-top:10px;">「エンジニア不要で業務ツールをゼロから作る」のが主なユースケース。</p>
-    </div>
-  </div>
-
-  <!-- Builder Chat の使い方 -->
+  <!-- 3つのコアSkills -->
   <div class="panel">
-    <h2>Builder Chat の仕組み — 2つのモード</h2>
+    <h2>3つのコアSkills</h2>
+    <p>エージェントが Base44 プラットフォームを誤りなく操作するために設計された、3種類の公式 Skill：</p>
+    <div class="grid3" style="margin-top:16px;">
+      <div class="skill-card">
+        <div class="skill-name">base44-cli</div>
+        <p>プロジェクト初期化、スキーマ管理、リソース設定、デプロイメントを担当。</p>
+        <ul>
+          <li>プロジェクト構造の作成</li>
+          <li>DBスキーマ定義・マイグレーション</li>
+          <li>本番へのデプロイ操作</li>
+          <li>環境変数・設定の管理</li>
+        </ul>
+      </div>
+      <div class="skill-card">
+        <div class="skill-name">base44-sdk</div>
+        <p>JavaScript SDK を使った機能実装をガイド。エージェントが正しいメソッドを使えるよう厳密に定義。</p>
+        <ul>
+          <li>認証（Auth）の実装パターン</li>
+          <li>DB クエリの正しい書き方</li>
+          <li>バックエンド関数の呼び出し</li>
+          <li>型定義・バリデーション</li>
+        </ul>
+      </div>
+      <div class="skill-card">
+        <div class="skill-name">base44-troubleshooter</div>
+        <p>本番障害のデバッグをエージェントが支援。ログ解析・エラートレース読解を構造化。</p>
+        <ul>
+          <li>エラーログの解析手順</li>
+          <li>スタックトレースの読み方</li>
+          <li>よくある失敗パターン集</li>
+          <li>修正の優先順位ガイド</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Skills の仕組み -->
+  <div class="panel">
+    <h2>Skills の仕組み — SKILL.md</h2>
     <div class="grid2">
       <div>
-        <h3 style="color:#60d0ff; font-size:0.9rem; margin-bottom:8px;">Discussion Mode（無料）</h3>
-        <p>クレジットを消費せずにアイデアを練るモード。</p>
+        <p>各 Skill は <code>SKILL.md</code> というマークダウンファイルで定義される。エージェントはこのファイルを読み込んで、プラットフォーム固有の操作方法を「確実な事実」として保持する。</p>
         <ul>
-          <li>AIとブレインストーミング・要件整理ができる</li>
-          <li>「こういうアプリを作りたいが何から始めるか」などの相談に使う</li>
-          <li>Build Modeに移行するまでクレジットは消費しない</li>
+          <li><span class="tag tag-blue">メタデータ</span> Skill の名前・バージョン・対象プラットフォーム</li>
+          <li><span class="tag tag-purple">命令セット</span> 正しい SDK メソッド・コマンド・ワークフロー</li>
+          <li><span class="tag tag-green">禁止事項</span> やってはいけないパターン（Anti-patterns）</li>
+          <li><span class="tag tag-orange">例示</span> 正しい実装例・間違い例のペア</li>
         </ul>
+        <div class="note-box">
+          <p>💡 <strong>ポータビリティ：</strong> SKILL.md はオープン標準のため、Claude Code・Cursor・Anti-Gravity など対応エージェントならどれでも同じ Skill を使い回せる。</p>
+        </div>
       </div>
       <div>
-        <h3 style="color:#a78bfa; font-size:0.9rem; margin-bottom:8px;">Build Mode（クレジット消費）</h3>
-        <p>実際にアプリを生成・変更するモード。</p>
-        <ul>
-          <li>1回の生成で <strong>メッセージクレジット</strong> を消費</li>
-          <li>生成後はコンポーネントをクリックして色・文字・レイアウトを微調整できる</li>
-          <li>再生成せずに済む細かい修正はUIから直接編集</li>
-        </ul>
+        <p style="font-size:0.8rem; color:var(--muted); margin-bottom:6px;">SKILL.md の例（抜粋）：</p>
+        <pre># base44-sdk Skill
+version: 1.2.0
+platform: base44
+
+## 正しい認証の実装
+```js
+// ✅ 正しい
+const user = await App.auth.me();
+
+// ❌ 間違い（ハリュシネーション例）
+const user = await base44.getUser();  // 存在しない
+```
+
+## DBクエリ
+```js
+// ✅ 正しい
+const items = await App.db
+  .collection("tasks")
+  .filter({ status: "active" })
+  .list();
+```</pre>
       </div>
     </div>
   </div>
 
-  <!-- タイムライン -->
+  <!-- インストールと使い方 -->
   <div class="panel">
-    <h2>沿革タイムライン</h2>
-    <div class="timeline">
-      <div class="tl-item">
-        <div class="tl-date">2024年末</div>
-        <div class="tl-body"><strong>ローンチ。</strong>自然言語からフルスタックアプリを生成するサービスとして公開。バイラルで急拡大。</div>
-      </div>
-      <div class="tl-item">
-        <div class="tl-date">2025年3月</div>
-        <div class="tl-body"><strong>GitHub連携を追加。</strong>生成したアプリのコードをGitHubにpushできるように。</div>
-      </div>
-      <div class="tl-item">
-        <div class="tl-date">2025年中頃</div>
-        <div class="tl-body"><strong>25万ユーザー突破・黒字化達成。</strong>ローンチから半年以内に収益化。</div>
-      </div>
-      <div class="tl-item">
-        <div class="tl-date">2025年6月</div>
-        <div class="tl-body"><strong>Wixが$80Mで買収。</strong>NASDAQ上場のウェブ制作プラットフォームWix（WIX）に完全子会社化。</div>
-      </div>
-      <div class="tl-item">
-        <div class="tl-date">2026年現在</div>
-        <div class="tl-body"><strong>40万ユーザー超。</strong>Claude Sonnet 4 / GPT-5 / Gemini 2.5 Pro の3モデルを用途に応じて自動選択。</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- クレジット詳細 -->
-  <div class="panel">
-    <h2>料金プランとクレジットの仕組み（2026年）</h2>
-    <div class="price-grid">
-      <div class="price-card">
-        <div class="plan">Free</div>
-        <div class="amount">$0</div>
-        <div class="period">試用向け</div>
-      </div>
-      <div class="price-card">
-        <div class="plan">Starter</div>
-        <div class="amount">$16</div>
-        <div class="period">/月（年払い）/ $20（月払い）</div>
-      </div>
-      <div class="price-card">
-        <div class="plan">Builder</div>
-        <div class="amount">$40</div>
-        <div class="period">/月（年払い）/ $50（月払い）</div>
-      </div>
-      <div class="price-card">
-        <div class="plan">Pro</div>
-        <div class="amount">$80</div>
-        <div class="period">/月（年払い）/ $100（月払い）</div>
-      </div>
-    </div>
-
-    <div class="grid2" style="margin-top:16px;">
-      <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:14px;">
-        <div style="font-size:0.8rem; font-weight:700; color:#a78bfa; margin-bottom:8px;">メッセージクレジット</div>
-        <p style="margin:0; font-size:0.85rem;">AIにアプリの生成・変更を依頼するたびに消費。Starterは月100件。使い切ったら追加購入か翌月まで待つ。</p>
-      </div>
-      <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:14px;">
-        <div style="font-size:0.8rem; font-weight:700; color:#60d0ff; margin-bottom:8px;">インテグレーションクレジット</div>
-        <p style="margin:0; font-size:0.85rem;">アプリが外部APIを呼んだりLLMを使ったりするたびに消費。Starterは月2,000件。ユーザー数が増えると消費が加速する。</p>
-      </div>
-    </div>
-    <p style="margin-top:12px; font-size:0.82rem; color:var(--muted);">
-      ⚠️ クレジットは<strong>翌月に繰り越しなし</strong>。使い切っても追加購入しないと機能が止まる点に注意。
-    </p>
-  </div>
-
-  <!-- 重要な制限事項 -->
-  <div class="panel" style="border-color:rgba(255,107,107,0.25);">
-    <h2 style="color:#ff9090;">知っておくべき制限・リスク</h2>
+    <h2>インストールと使い方</h2>
     <div class="grid2">
       <div>
-        <h3 style="font-size:0.9rem; color:#ff9090; margin-bottom:8px;">バックエンドロックイン</h3>
-        <ul>
-          <li>GitHubへのコードexport は<strong>フロントエンドのみ</strong></li>
-          <li>DB・API・認証ロジックはBase44/Wixのインフラ上にのみ存在</li>
-          <li>自前サーバーへの移植は実質不可能（Base44 SDKに依存）</li>
-          <li>将来的にサービスが終了した場合にバックエンドを持ち出せない</li>
-        </ul>
+        <h3>グローバルインストール（推奨）</h3>
+        <p>一度インストールすれば、接続するどのエージェントにも自動で Skill が引き継がれる：</p>
+        <pre>npx skills add base44/skills -g</pre>
+        <p style="margin-top:10px;">これにより Claude Code・Cursor などが Base44 プロジェクトで操作を行う際、Skills の定義に沿った正確なコードを生成する。</p>
       </div>
       <div>
-        <h3 style="font-size:0.9rem; color:#ff9090; margin-bottom:8px;">運用・コンプライアンス</h3>
+        <h3>プロジェクト単位での追加</h3>
+        <p>特定のプロジェクトのみに適用する場合：</p>
+        <pre>cd my-base44-project
+npx skills add base44/skills
+# → .skills/ ディレクトリが生成される</pre>
+        <h3 style="margin-top:16px;">対応エージェント</h3>
         <ul>
-          <li><strong>SOC 2・ISO 27001 未取得</strong>（2026年時点）</li>
-          <li>セルフホスティング不可（Wixインフラ強制）</li>
-          <li>2026年2月3日: <strong>約3時間の全停止</strong>（全アプリが502エラー）</li>
-          <li>単一インフラ障害で全顧客アプリが同時停止するリスク</li>
+          <li>Claude Code（Anthropic）</li>
+          <li>Cursor</li>
+          <li>Anti-Gravity（Google）</li>
+          <li>OpenClaw / PicoClaw（Skills標準対応版）</li>
+          <li>その他 Agent Skills 標準対応ツール全般</li>
         </ul>
       </div>
     </div>
-    <p style="margin-top:12px; font-size:0.85rem; color:var(--muted);">
-      PoC・プロトタイプ・社内ツールには向くが、外部顧客向け本番サービスや機密データを扱う用途には慎重な検討が必要。
-    </p>
   </div>
 
-  <!-- 競合詳細比較 -->
+  <!-- エージェントのワークフロー -->
   <div class="panel">
-    <h2>競合との詳細比較</h2>
+    <h2>Skills を使ったエージェントワークフロー</h2>
+    <div class="flow" style="border-radius:12px; overflow:hidden; gap:1px; background:rgba(255,255,255,0.05);">
+      <div class="flow-step">
+        <div class="step-label">① 指示</div>
+        <p>ユーザーが「認証付きTodoアプリを作って」と依頼</p>
+      </div>
+      <div class="flow-step">
+        <div class="step-label">② Skills 読込</div>
+        <p>エージェントが base44-sdk の SKILL.md を参照</p>
+      </div>
+      <div class="flow-step">
+        <div class="step-label">③ 正確な実装</div>
+        <p>正しいメソッド・パターンでコードを生成（推測なし）</p>
+      </div>
+      <div class="flow-step">
+        <div class="step-label">④ 検証</div>
+        <p>base44-troubleshooter で動作確認・エラー対処</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- OpenClaw エコシステムとの関係 -->
+  <div class="panel" style="border-color:rgba(167,139,250,0.3);">
+    <h2 style="color:var(--accent2);">OpenClaw エコシステムとの関係</h2>
+    <div class="grid2">
+      <div>
+        <p>Base44 Skills は、OpenClaw / PicoClaw / NanoClaw と同じ「Skills エコシステム」の上に乗る概念。各 Claw スタックが Base44 Skills を読み込めば、Base44 プラットフォームへの操作を自律的に行えるようになる。</p>
+        <table class="compare" style="margin-top:12px;">
+          <thead><tr><th>スタック</th><th>Base44 Skills の活用場面</th></tr></thead>
+          <tbody>
+            <tr><td>PicoClaw</td><td>ローカルからBase44プロジェクトを操作するCLIエージェント</td></tr>
+            <tr><td>NanoClaw</td><td>CI/CDパイプラインでBase44への自動デプロイ</td></tr>
+            <tr class="hl"><td>OpenClaw</td><td>本番規模のBase44アプリを監視・自律運用するオーケストレーター</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <h3>AI Creator Hub での活用イメージ</h3>
+        <ul>
+          <li>コンテンツ評価結果を Base44 上のダッシュボードアプリに自動反映</li>
+          <li>OpenClaw から Base44 の管理画面を Skills 経由で操作</li>
+          <li>PicoClaw の HEARTBEAT で Base44 のデプロイ状態を定期チェック</li>
+          <li>Skills 定義をそのままチームの非エンジニアとも共有</li>
+        </ul>
+        <div class="note-box">
+          <p>💡 Base44 への変更が起きても、<strong>SKILL.md を更新するだけ</strong>でエコシステム全体のエージェントが最新の正しい操作方法を参照できる。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 他スタックとの比較 -->
+  <div class="panel">
+    <h2>他のエージェント Skills 標準との比較</h2>
     <table class="compare">
-      <thead>
-        <tr><th>項目</th><th style="color:#a78bfa;">Base44</th><th style="color:#60d0ff;">Lovable</th><th style="color:#ffb84d;">Bolt.new</th></tr>
-      </thead>
+      <thead><tr><th>項目</th><th style="color:#60d0ff;">Base44 Skills</th><th>MCP (Model Context Protocol)</th><th>OpenAI function_calling</th></tr></thead>
       <tbody>
-        <tr><td>生成速度</td><td>◎ 最速（約6分）</td><td>○ やや遅め（約10分）</td><td>○ 速いが不安定</td></tr>
-        <tr><td>初心者向け</td><td>◎ 自動エラー修正あり</td><td>○ 普通</td><td>△ エンジニア寄り</td></tr>
-        <tr><td>コード品質</td><td>△ プロプライエタリ</td><td>◎ React+TypeScript 本番品質</td><td>○ 良いが実行エラーが多い</td></tr>
-        <tr><td>バックエンド</td><td>◎ 自動で込み</td><td>△ Supabase 別途設定</td><td>△ 別途設定</td></tr>
-        <tr><td>GitHub連携</td><td>△ フロントのみ export</td><td>◎ 双方向同期</td><td>○ コード直接編集可</td></tr>
-        <tr><td>本番スケール</td><td>△ 不向き</td><td>◎ 向く</td><td>△ 不安定</td></tr>
-        <tr><td>コード所有権</td><td>✕ バックエンドは持ち出し不可</td><td>◎ 完全に所有</td><td>◎ 完全に所有</td></tr>
-        <tr><td>向いている人</td><td>非エンジニア・PoC重視</td><td>エンジニア・長期運用</td><td>エンジニア・高速試作</td></tr>
+        <tr><td>焦点</td><td>プラットフォーム固有のワークフロー定義</td><td>ツール・データソースの接続</td><td>関数スキーマの宣言</td></tr>
+        <tr><td>フォーマット</td><td>Markdown（SKILL.md）</td><td>JSON Schema</td><td>JSON Schema</td></tr>
+        <tr><td>反ハリュシネーション</td><td>◎ 設計の主目的</td><td>△ 間接的に効果あり</td><td>△ スキーマ依存</td></tr>
+        <tr><td>ポータビリティ</td><td>◎ 複数エージェント共通</td><td>◎ MCP対応サーバー全般</td><td>△ OpenAI モデル向け</td></tr>
+        <tr><td>非エンジニア向け</td><td>◎ Markdown で可読</td><td>△ JSON 知識が必要</td><td>✕ 技術的</td></tr>
+        <tr class="hl"><td>Claw Stack 統合</td><td>◎ Skills エコシステム共通</td><td>○ NanoClaw / OpenClaw で対応</td><td>△ 部分対応</td></tr>
       </tbody>
     </table>
   </div>
 
-  <div class="grid2">
-    <!-- こんな人に向く／向かない -->
-    <div class="panel">
-      <h2>向く用途 / 向かない用途</h2>
-      <p style="font-size:0.82rem; font-weight:700; color:#5ddb7a; margin-bottom:6px;">✅ 向く</p>
-      <ul>
-        <li>アイデアを素早く形にしてステークホルダーに見せたい</li>
-        <li>エンジニアなしで社内ツールを作りたい</li>
-        <li>PoC・プロトタイプ段階で本格開発前の検証をしたい</li>
-        <li>デザイナーがクリッカブルプロトを作りたい</li>
-      </ul>
-      <p style="font-size:0.82rem; font-weight:700; color:#ff9090; margin-top:12px; margin-bottom:6px;">❌ 向かない</p>
-      <ul>
-        <li>外部顧客に公開して実際に使わせる本番アプリ</li>
-        <li>大量ユーザー・複雑なロール管理が必要な運用</li>
-        <li>コンプライアンス要件がある業界（医療・金融等）</li>
-        <li>将来エンジニアに引き渡してフル開発する前提のもの</li>
-      </ul>
-    </div>
+  <!-- 備考：名前の混同について -->
+  <div class="panel" style="border-color:rgba(255,160,0,0.2);">
+    <h2 style="color:#ffb84d;">📌 名前の混同について</h2>
+    <p>「Base44」と検索すると、<strong>Wix が 2025年6月に $80M で買収したノーコードアプリ生成サービス「Base44」</strong>が検索上位に出てくるが、これは同名の別サービス。このページで扱うのはエージェントの Skills 標準・OpenClaw エコシステムとの連携文脈における Base44 Skills の概念。プラットフォームとしての Base44（Wix）を使う場合でも、Skills 標準は同様に適用される。</p>
+  </div>
 
-    <!-- AI Creator Hub との接点 -->
-    <div class="panel">
-      <h2>AI Creator Hub との関係</h2>
-      <p>OpenClawのSkillを管理するダッシュボードや、コンテンツ評価結果を可視化するUIを Base44 で素早く作る、という使い方が考えられる：</p>
-      <ul>
-        <li>収益管理ダッシュボード（API連携）</li>
-        <li>ジョブ実行状況モニタリングUI</li>
-        <li>コンテンツ評価レポートポータル</li>
-        <li>OpenClawトリガー用の簡易管理画面</li>
-      </ul>
-      <p style="margin-top:10px; font-size:0.85rem;">ただしバックエンドロックインの制限上、<strong>PoC・社内確認用途</strong>にとどめ、本番移行時は Lovable か自前実装を検討するのが安全。</p>
-    </div>
+  <!-- 参照リンク -->
+  <div class="panel">
+    <h2>関連ページ</h2>
+    <ul>
+      <li><a href="../../claw-stack/comparison.html">Claw スタック比較表</a> — PicoClaw / NanoClaw / OpenClaw の選定ガイド</li>
+      <li><a href="../../claw-stack/picoclaw/index.html">PicoClaw ガイド</a> — Skills エコシステムの軽量実装例</li>
+      <li><a href="../../workbench/knowledge/openclaw.html">OpenClaw 知識ページ</a></li>
+      <li><a href="slm-guide.html">SLM ガイド</a> — Claw Stack でのローカルモデル活用</li>
+    </ul>
   </div>
 
 </div>

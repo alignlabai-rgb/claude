@@ -234,16 +234,45 @@
       </ul>
     </div>
 
-    <!-- AI Creator Hub との接点 -->
-    <div class="panel">
-      <h2>AI Creator Hub との関係</h2>
-      <p>現時点では直接の接続は想定していないが、将来的な可能性：</p>
+    <!-- Claw Stack との統合 -->
+    <div class="panel" style="border-color:rgba(93,219,122,0.3);">
+      <h2>PicoClaw / Claw Stack との統合</h2>
+      <p>Bonsai 8B を PicoClaw のバックエンド LLM として使う最も実践的なアプローチ。Ollama 経由で OpenAI 互換 API として動かし、config.json から切り替えるだけ。</p>
+
+      <h3 style="color:var(--accent); font-size:0.9rem; margin-top:18px;">Step 1: Ollama + Bonsai 8B をセットアップ</h3>
+      <pre style="background:#060d18; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:14px; font-family:monospace; font-size:0.84rem; color:#a5f3d0; overflow-x:auto;"># Ollama インストール（Linux / Raspberry Pi）
+curl -fsSL https://ollama.ai/install.sh | sh
+
+# Bonsai 8B をプル（1-bit 量子化版・1.15GB）
+ollama pull bonsai:8b-1bit-q8
+
+# バックグラウンドで起動
+ollama serve &amp;</pre>
+
+      <h3 style="color:var(--accent); font-size:0.9rem; margin-top:16px;">Step 2: PicoClaw の config.json を切り替え</h3>
+      <pre style="background:#060d18; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:14px; font-family:monospace; font-size:0.84rem; color:#a5f3d0; overflow-x:auto;">{
+  "provider": "openai-compatible",
+  "base_url": "http://localhost:11434/v1",
+  "api_key": "ollama",
+  "model": "bonsai:8b-1bit-q8",
+  "max_tokens": 4096,
+  "temperature": 0.7,
+  "max_tool_iterations": 15,
+  "web_search": {
+    "enabled": true,
+    "provider": "duckduckgo"
+  }
+}</pre>
+      <div style="background:rgba(93,219,122,0.07); border-left:3px solid var(--accent); padding:12px 16px; border-radius:0 8px 8px 0; margin-top:10px;">
+        <p style="margin:0; font-size:0.86rem;">💡 <strong>コスト比較：</strong> Claude Sonnet API で月1000コール ≈ $1.5〜6 → Bonsai ローカルは電気代のみ（Raspberry Pi 5 で月数十円程度）。</p>
+      </div>
+
+      <h3 style="color:var(--accent); font-size:0.9rem; margin-top:18px;">Claw Stack 別の活用シーン</h3>
       <ul>
-        <li>ローカル評価モデルとして content-evaluator に組み込む</li>
-        <li>オフライン環境での topic-analyzer 代替</li>
-        <li>PicoClaw のバックエンドLLMとして利用</li>
-        <li>APIコストが不要になる場面での採用検討</li>
-        <li>長期エージェント処理（50件超バッチ）でのFP16代替</li>
+        <li><strong>PicoClaw（エッジ）：</strong> Raspberry Pi / iPhone 上でオフライン稼働。外出先のデバイスでエージェントが完結。</li>
+        <li><strong>NanoClaw（Docker）：</strong> <code>gpu: none</code> の CPU コンテナでも実用速度。API コスト不要のバッチ処理コンテナとして。</li>
+        <li><strong>OpenClaw（本番）：</strong> 単純分類・トピック抽出タスクを Bonsai にルーティングし、複雑な判断のみ Claude API へ。コスト最適化パイプライン。</li>
+        <li><strong>content-evaluator：</strong> 50件超のコンテンツ評価バッチを Bonsai でこなす（FP16 モデルが 6/50 で止まる所を 50/50 完走する実証あり）。</li>
       </ul>
     </div>
   </div>
