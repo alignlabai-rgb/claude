@@ -14,99 +14,140 @@
       --border: rgba(255,255,255,0.08);
       --accent: #66e0c2;
       --accent-2: #f4b860;
-      --shadow: 0 22px 60px rgba(0,0,0,0.35);
-      --radius: 22px;
+      --shadow: 0 8px 32px rgba(0,0,0,0.28);
+      --radius: 20px;
     }
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      margin: 0;
-      min-height: 100vh;
       font-family: "Segoe UI", "Noto Sans JP", system-ui, sans-serif;
       color: var(--text);
       background:
-        radial-gradient(circle at 15% 15%, rgba(102,224,194,0.15), transparent 28%),
-        radial-gradient(circle at 85% 0%, rgba(137,180,255,0.14), transparent 30%),
-        linear-gradient(145deg, #07111d 0%, #0a1422 48%, #060d18 100%);
+        radial-gradient(circle at 15% 15%, rgba(102,224,194,0.12), transparent 28%),
+        radial-gradient(circle at 85% 5%,  rgba(137,180,255,0.10), transparent 30%),
+        linear-gradient(145deg, #07111d 0%, #0a1422 50%, #060d18 100%);
       line-height: 1.7;
-      padding: 28px 18px 56px;
+      padding: 28px 20px 64px;
     }
-    .shell { max-width: 1180px; margin: 0 auto; display: grid; gap: 18px; }
-    .panel {
+
+    /* ─── レイアウト ─── */
+    .shell { max-width: 1180px; margin: 0 auto; }
+
+    /* ─── ヘッダー ─── */
+    .hero {
       background: var(--panel);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
-      padding: 26px;
+      padding: 28px 30px;
+      margin-bottom: 20px;
     }
     .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      padding: 6px 10px;
-      border-radius: 999px;
-      background: rgba(102,224,194,0.14);
-      color: var(--accent);
-      font-size: 12px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
+      display: inline-flex; align-items: center;
+      padding: 5px 12px; border-radius: 999px;
+      background: rgba(102,224,194,0.14); color: var(--accent);
+      font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+      margin-bottom: 12px;
     }
-    h1, h2, h3 { margin: 0 0 10px; }
-    h1 { font-size: 38px; margin-top: 12px; }
-    p { margin: 0 0 12px; color: var(--muted); }
-    .links { display: flex; flex-wrap: wrap; gap: 10px; }
-    .links a {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 12px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      text-decoration: none;
-      color: var(--text);
+    .hero h1 { font-size: 34px; margin-bottom: 10px; }
+    .hero p { color: var(--muted); font-size: 0.92rem; margin-bottom: 16px; max-width: 760px; }
+    .quicklinks { display: flex; flex-wrap: wrap; gap: 8px; }
+    .quicklinks a {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 14px; border-radius: 10px;
+      border: 1px solid var(--border); text-decoration: none;
+      color: var(--text); font-size: 0.86rem;
       background: rgba(255,255,255,0.04);
+      transition: background 0.15s, border-color 0.15s;
     }
+    .quicklinks a:hover { background: rgba(102,224,194,0.1); border-color: rgba(102,224,194,0.3); }
+
+    /* ─── 注目バナー（Claude Code デモ） ─── */
+    .banner {
+      background: linear-gradient(135deg, rgba(244,184,96,0.12), rgba(102,224,194,0.08));
+      border: 1px solid rgba(244,184,96,0.3);
+      border-radius: 14px;
+      padding: 16px 22px;
+      margin-bottom: 20px;
+      display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+    }
+    .banner .banner-icon { font-size: 1.8rem; }
+    .banner .banner-text { flex: 1; min-width: 200px; }
+    .banner .banner-text strong { color: var(--accent-2); }
+    .banner .banner-text p { color: var(--muted); font-size: 0.88rem; margin: 2px 0 0; }
+    .banner-btn {
+      display: inline-block; padding: 10px 20px; border-radius: 10px;
+      background: rgba(244,184,96,0.2); border: 1px solid rgba(244,184,96,0.4);
+      color: var(--accent-2); text-decoration: none; font-weight: 700; font-size: 0.88rem;
+      white-space: nowrap; transition: background 0.15s;
+    }
+    .banner-btn:hover { background: rgba(244,184,96,0.3); }
+
+    /* ─── カードグリッド ─── */
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      grid-template-columns: repeat(3, 1fr);
       gap: 16px;
-      align-items: stretch;
+      margin-bottom: 20px;
     }
+    @media (max-width: 900px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 580px) { .grid { grid-template-columns: 1fr; } }
+
     .card {
-      min-height: 220px;
       background: var(--panel-2);
       border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 20px;
+      border-radius: 16px;
+      padding: 20px 22px;
       text-decoration: none;
       color: inherit;
       display: flex;
       flex-direction: column;
+      gap: 10px;
+      transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+      box-shadow: var(--shadow);
     }
-    .card h3 { font-size: 22px; }
-    .card p { margin-bottom: 14px; }
-    .tag {
-      display: inline-block;
-      padding: 4px 8px;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 700;
-      background: rgba(244,184,96,0.14);
-      color: var(--accent-2);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
+    .card:hover {
+      border-color: rgba(102,224,194,0.35);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+      transform: translateY(-2px);
     }
-    ul { margin: 0; padding-left: 18px; color: var(--muted); }
-    li { margin-bottom: 8px; }
-    @media (max-width: 640px) {
-      h1 { font-size: 30px; }
-      .panel { padding: 18px; }
-      .grid { grid-template-columns: 1fr; }
+    .card .tag {
+      display: inline-block; padding: 3px 9px; border-radius: 7px;
+      font-size: 11px; font-weight: 700;
+      background: rgba(244,184,96,0.14); color: var(--accent-2);
+      text-transform: uppercase; letter-spacing: 0.05em;
+      align-self: flex-start;
+    }
+    .card h3 { font-size: 18px; color: var(--text); }
+    .card p { color: var(--muted); font-size: 0.88rem; }
+    .card ul {
+      margin: 0; padding-left: 16px; color: var(--muted);
+      font-size: 0.85rem; display: flex; flex-direction: column; gap: 4px;
+    }
+    .card ul a { color: var(--accent); text-decoration: none; }
+    .card ul a:hover { text-decoration: underline; }
+
+    /* 注目カード */
+    .card.highlight {
+      border-color: rgba(244,184,96,0.3);
+      background: linear-gradient(135deg, #101f34, #14202e);
+    }
+    .card.highlight .tag { background: rgba(244,184,96,0.2); }
+
+    /* ─── フッター ─── */
+    .footer-note {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 22px;
+      font-size: 0.78rem; color: #3a5060;
     }
   </style>
 </head>
 <body>
   <div class="shell">
-    <section class="panel">
+
+    <!-- ヘッダー -->
+    <section class="hero">
       <div class="eyebrow">Claude Workspace</div>
       <h1>Claude Knowledge Hub</h1>
       <p>
@@ -114,7 +155,7 @@
         ALIGN_Lab の理念や制作活動を支えるための、個人用かつ拡張型の知識基盤として使います。
         公開リポジトリ化を前提にしつつ、コンテンツ本体とは切り分けて運用します。
       </p>
-      <div class="links">
+      <div class="quicklinks">
         <a href="../ALIGN_Lab/index.html">ALIGN_Lab</a>
         <a href="CLAUDE.md">Claude 運用指示</a>
         <a href="README.md">構成ドキュメント</a>
@@ -123,7 +164,19 @@
       </div>
     </section>
 
+    <!-- 注目バナー：Claude Code デモ -->
+    <div class="banner">
+      <div class="banner-icon">🚀</div>
+      <div class="banner-text">
+        <strong>来週月曜日 — Claude Code デモ準備</strong>
+        <p>最新のモデル情報・Claude Code 機能一覧・デモ前の理解資料はこちら →</p>
+      </div>
+      <a href="research/claude-recent-updates.html" class="banner-btn">Claude 最新情報を見る</a>
+    </div>
+
+    <!-- カードグリッド -->
     <section class="grid">
+
       <a class="card" href="foundations/index.html">
         <div class="tag">Foundations</div>
         <h3>前提と理念</h3>
@@ -138,7 +191,7 @@
       <a class="card" href="strategy/index.html">
         <div class="tag">Strategy</div>
         <h3>事業との接続と優先順位</h3>
-        <p>この技術ハブが事業、制作、学習にどう効くかを整理し、今後の優先順位を決めます。</p>
+        <p>この技術ハブが事業、制作、学習にどう効くかを整理し、優先順位を決めます。</p>
         <ul>
           <li>能力マップ</li>
           <li>優先順位</li>
@@ -153,7 +206,7 @@
         <ul>
           <li>AI Creator Hub</li>
           <li>生成パイプライン</li>
-          <li><a href="creator-system/spec.html" style="color:var(--accent);">システム仕様書</a></li>
+          <li><a href="creator-system/spec.html">システム仕様書</a></li>
         </ul>
       </a>
 
@@ -163,8 +216,31 @@
         <p>実験用エージェント基盤の比較、導入、運用判断のハブです。</p>
         <ul>
           <li>PicoClaw / NanoClaw</li>
-          <li><a href="claw-stack/comparison.html" style="color:var(--accent);">スタック比較表</a></li>
+          <li><a href="claw-stack/comparison.html">スタック比較表</a></li>
           <li>OpenClaw 導線</li>
+        </ul>
+      </a>
+
+      <a class="card highlight" href="research/claude-recent-updates.html">
+        <div class="tag">⭐ Research — 注目</div>
+        <h3>Claude 最新アップデート</h3>
+        <p>Sonnet 4.6・Claude Code・Computer Use・Mythos など 2026年2〜4月の全情報。デモ前の必読資料。</p>
+        <ul>
+          <li>モデルラインナップ（Opus/Sonnet/Haiku）</li>
+          <li>Claude Code の最新機能詳細</li>
+          <li>Computer Use・Cowork・Dispatch</li>
+          <li><a href="research/index.html">調査アーカイブへ</a></li>
+        </ul>
+      </a>
+
+      <a class="card" href="workbench/index.html">
+        <div class="tag">Workbench</div>
+        <h3>実務知識と学習</h3>
+        <p>Claude Code、各種LLM、ツール操作の学習ハブ。SLMガイドも追加済み。</p>
+        <ul>
+          <li><a href="workbench/knowledge/slm-guide.html">SLM ガイド（NEW）</a></li>
+          <li><a href="workbench/knowledge/intelligence-matrix.html">LLM 比較マトリクス</a></li>
+          <li>Vibe Coding ガイド</li>
         </ul>
       </a>
 
@@ -173,20 +249,9 @@
         <h3>調査アーカイブ</h3>
         <p>OpenClaw 関連を中心に、継続的に拡張する調査・FAQ・用語集の置き場です。</p>
         <ul>
-          <li><a href="research/highlights.html" style="color:var(--accent);">重要記事ハイライト</a></li>
-          <li><a href="research/claude-timeline.html" style="color:var(--accent);">Claude リリース年表</a></li>
+          <li><a href="research/highlights.html">重要記事ハイライト</a></li>
+          <li><a href="research/claude-timeline.html">Claude リリース年表</a></li>
           <li>API / FAQ / Glossary</li>
-        </ul>
-      </a>
-
-      <a class="card" href="workbench/index.html">
-        <div class="tag">Workbench</div>
-        <h3>実務知識と学習</h3>
-        <p>Claude Code、Codex、OpenAI、各種LLM、ツール操作の学習ハブです。</p>
-        <ul>
-          <li>知識ページ</li>
-          <li>比較と使い分け</li>
-          <li>Vibe Coding ガイド</li>
         </ul>
       </a>
 
@@ -200,7 +265,13 @@
           <li>次の改善候補</li>
         </ul>
       </a>
+
     </section>
+
+    <div class="footer-note">
+      最終更新: 2026-04-10 &nbsp;|&nbsp; Claude Knowledge Hub (alignlabai-rgb/claude) &nbsp;|&nbsp; 運用原則は <a href="CLAUDE.md" style="color:#66e0c2;">CLAUDE.md</a> を参照
+    </div>
+
   </div>
 </body>
 </html>
