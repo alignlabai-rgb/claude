@@ -53,7 +53,7 @@
     h1, h2, h3 { margin: 0 0 10px; }
     h1 { font-size: 38px; margin-top: 12px; }
     p { margin: 0 0 12px; color: var(--muted); }
-    .links, .grid { display: flex; flex-wrap: wrap; gap: 10px; }
+    .links { display: flex; flex-wrap: wrap; gap: 10px; }
     .links a {
       display: inline-flex;
       align-items: center;
@@ -65,9 +65,13 @@
       color: var(--text);
       background: rgba(255,255,255,0.04);
     }
-    .grid { align-items: stretch; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+      align-items: stretch;
+    }
     .card {
-      flex: 1 1 280px;
       min-height: 220px;
       background: var(--panel-2);
       border: 1px solid var(--border);
@@ -75,6 +79,8 @@
       padding: 20px;
       text-decoration: none;
       color: inherit;
+      display: flex;
+      flex-direction: column;
     }
     .card h3 { font-size: 22px; }
     .card p { margin-bottom: 14px; }
@@ -94,6 +100,7 @@
     @media (max-width: 640px) {
       h1 { font-size: 30px; }
       .panel { padding: 18px; }
+      .grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
