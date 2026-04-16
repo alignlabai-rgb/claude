@@ -12,6 +12,15 @@
 - 外出中でも Claude に非同期で更新を依頼できる基盤にする
 - 必要に応じて Codex でも同じ構造を理解できる状態を保つ
 
+## 新しいセッションで最初に読むべきページ
+
+1. このファイル（CLAUDE.md）
+2. `foundations/align-lab-context.html` — ALIGN Lab のミッション・資産・AI協働方針
+3. `foundations/agent-protocol.html` — エージェントとして作業する際のプロトコル・ルール
+4. `logs/next-actions.html` — 直近の TODO と優先タスク
+
+上記4点を読んでから作業を始めること。迷ったら `foundations/operating-principles.html` も参照。
+
 ## Priorities
 
 1. リンク切れを作らない
