@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claude API 深掘りガイド | Advisor Tool / Managed Agents / Files API</title>
+  <style>
+    :root {
+      --bg: #07111d;
+      --panel: #0d1829;
+      --panel2: #091018;
+      --text: #e8eef9;
+      --muted: #b6c3da;
+      --dim: #5a7a9a;
+      --accent: #66e0c2;
+      --gold: #f4b860;
+      --blue: #60d0ff;
+      --purple: #c4a0ff;
+      --red: #ff9090;
+      --green: #4FFFB0;
+      --orange: #f7a87a;
+      --border: rgba(255,255,255,0.08);
+      --r: 16px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Segoe UI","Noto Sans JP",system-ui,sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; padding: 0 0 80px; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code { background: rgba(255,255,255,0.08); border-radius: 4px; padding: 0.1em 0.45em; font-size: 0.84em; font-family: "Fira Code","Consolas",monospace; color: #a5f3d0; }
+    pre { background: #060e1a; border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 16px 18px; overflow-x: auto; font-family: "Fira Code","Consolas",monospace; font-size: 0.83em; color: #a5f3d0; line-height: 1.6; margin: 10px 0; }
+
+    .hero { background: linear-gradient(135deg, #0d1a2e 0%, #10203d 60%, #091525 100%); border-bottom: 1px solid rgba(96,208,255,0.25); padding: 52px 40px 44px; }
+    .breadcrumb { font-size: 0.8rem; color: var(--dim); margin-bottom: 16px; }
+    .breadcrumb a { color: var(--accent); }
+    .hero-eyebrow { display: inline-flex; align-items: center; gap: 8px; background: rgba(96,208,255,0.12); border: 1px solid rgba(96,208,255,0.3); color: var(--blue); font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; padding: 5px 14px; border-radius: 999px; margin-bottom: 16px; }
+    .hero h1 { font-size: 2.4rem; font-weight: 900; line-height: 1.15; margin-bottom: 12px; }
+    .hero h1 em { font-style: normal; background: linear-gradient(90deg, #60d0ff, #c4a0ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero-sub { color: var(--muted); font-size: 0.95rem; max-width: 700px; }
+    .hero-meta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
+    .meta-chip { background: rgba(255,255,255,0.06); border: 1px solid var(--border); border-radius: 8px; padding: 5px 12px; font-size: 0.78rem; color: var(--muted); }
+    .meta-chip strong { color: var(--blue); }
+
+    .shell { max-width: 1060px; margin: 0 auto; padding: 0 24px; }
+    .section { padding: 44px 0 0; }
+    .section-label { font-size: 0.7rem; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+    .section-title { font-size: 1.4rem; font-weight: 800; margin-bottom: 6px; }
+    .section-sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 20px; }
+
+    .panel { background: var(--panel); border: 1px solid var(--border); border-radius: var(--r); padding: 22px 26px; }
+    .panel.blue { border-color: rgba(96,208,255,0.3); background: linear-gradient(135deg, #0d1829, #0e1c30); }
+    .panel.gold { border-color: rgba(244,184,96,0.3); background: linear-gradient(135deg, #0d1829, #141c2c); }
+    .panel.purple { border-color: rgba(196,160,255,0.3); background: linear-gradient(135deg, #0d1829, #13102a); }
+    .panel.green { border-color: rgba(79,255,176,0.3); background: linear-gradient(135deg, #0d1829, #0d1e1a); }
+
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+    @media (max-width: 720px) { .grid2, .grid3 { grid-template-columns: 1fr; } }
+
+    .card { background: var(--panel2); border: 1px solid var(--border); border-radius: 14px; padding: 20px 22px; }
+    .card h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 8px; }
+    .card p, .card li { font-size: 0.86rem; color: var(--muted); }
+    .card ul { padding-left: 16px; display: flex; flex-direction: column; gap: 5px; margin-top: 6px; }
+
+    .feature-card { border-radius: 14px; padding: 24px 26px; margin-bottom: 14px; }
+    .feature-card.advisor { background: rgba(96,208,255,0.05); border: 1px solid rgba(96,208,255,0.22); }
+    .feature-card.managed { background: rgba(102,224,194,0.05); border: 1px solid rgba(102,224,194,0.22); }
+    .feature-card.files { background: rgba(244,184,96,0.05); border: 1px solid rgba(244,184,96,0.22); }
+    .feature-card.cache { background: rgba(196,160,255,0.05); border: 1px solid rgba(196,160,255,0.22); }
+    .feature-card.thinking { background: rgba(79,255,176,0.05); border: 1px solid rgba(79,255,176,0.22); }
+    .fc-eyebrow { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
+    .advisor .fc-eyebrow { color: var(--blue); }
+    .managed .fc-eyebrow { color: var(--accent); }
+    .files .fc-eyebrow { color: var(--gold); }
+    .cache .fc-eyebrow { color: var(--purple); }
+    .thinking .fc-eyebrow { color: var(--green); }
+    .feature-card h3 { font-size: 1.15rem; font-weight: 800; margin-bottom: 10px; }
+    .feature-card p { font-size: 0.87rem; color: var(--muted); margin-bottom: 12px; }
+    .feature-card ul { padding-left: 16px; font-size: 0.86rem; color: var(--muted); display: flex; flex-direction: column; gap: 6px; }
+
+    .badge { display: inline-block; font-size: 0.64rem; font-weight: 700; padding: 2px 8px; border-radius: 5px; text-transform: uppercase; letter-spacing: 0.06em; margin-left: 6px; vertical-align: middle; }
+    .b-beta { background: rgba(96,208,255,0.18); color: #60d0ff; }
+    .b-ga { background: rgba(79,255,176,0.18); color: #4FFFB0; }
+    .b-new { background: rgba(244,184,96,0.18); color: #f4b860; }
+    .b-preview { background: rgba(196,160,255,0.18); color: #c4a0ff; }
+
+    .tag { display: inline-block; font-size: 0.68rem; font-weight: 700; padding: 2px 8px; border-radius: 5px; }
+    .t-g { background: rgba(79,255,176,0.15); color: #4FFFB0; }
+    .t-b { background: rgba(96,208,255,0.15); color: #60d0ff; }
+    .t-p { background: rgba(196,160,255,0.15); color: #c4a0ff; }
+    .t-o { background: rgba(244,184,96,0.15); color: #f4b860; }
+    .t-r { background: rgba(255,144,144,0.15); color: #ff9090; }
+
+    .tip-box { background: linear-gradient(135deg, rgba(96,208,255,0.08), rgba(102,224,194,0.05)); border: 1px solid rgba(96,208,255,0.25); border-radius: 10px; padding: 13px 16px; margin-top: 12px; }
+    .tip-box.gold { background: linear-gradient(135deg, rgba(244,184,96,0.08), rgba(247,168,122,0.05)); border-color: rgba(244,184,96,0.3); }
+    .tip-box.green { background: linear-gradient(135deg, rgba(79,255,176,0.08), rgba(102,224,194,0.05)); border-color: rgba(79,255,176,0.3); }
+    .tip-label { font-size: 0.68rem; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px; }
+    .tip-box.gold .tip-label { color: var(--gold); }
+    .tip-box.green .tip-label { color: var(--green); }
+    .tip-box p { font-size: 0.84rem; color: var(--text); margin: 0; }
+
+    .arch-diagram { background: #060e1a; border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; padding: 28px 24px; text-align: center; }
+    .arch-row { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 10px 0; flex-wrap: wrap; }
+    .arch-box { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 10px 18px; font-size: 0.82rem; font-weight: 600; }
+    .arch-box.blue { border-color: rgba(96,208,255,0.4); color: var(--blue); background: rgba(96,208,255,0.07); }
+    .arch-box.green { border-color: rgba(102,224,194,0.4); color: var(--accent); background: rgba(102,224,194,0.07); }
+    .arch-box.purple { border-color: rgba(196,160,255,0.4); color: var(--purple); background: rgba(196,160,255,0.07); }
+    .arch-box.gold { border-color: rgba(244,184,96,0.4); color: var(--gold); background: rgba(244,184,96,0.07); }
+    .arch-arrow { color: var(--dim); font-size: 1.2rem; }
+    .arch-label { font-size: 0.72rem; color: var(--dim); margin: 4px 0 2px; }
+
+    .table-wrap { overflow-x: auto; margin: 14px 0; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    thead th { background: #0b1728; color: var(--blue); font-weight: 700; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.06em; padding: 10px 14px; text-align: left; border-bottom: 1px solid rgba(96,208,255,0.2); }
+    tbody tr { border-bottom: 1px solid rgba(255,255,255,0.04); }
+    tbody tr:last-child { border-bottom: none; }
+    tbody td { padding: 10px 14px; color: var(--muted); vertical-align: top; }
+    tbody td:first-child { color: var(--text); font-weight: 600; }
+    tbody tr:hover { background: rgba(255,255,255,0.02); }
+
+    .flow-step { display: flex; gap: 16px; align-items: flex-start; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .flow-step:last-child { border-bottom: none; }
+    .step-num { min-width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 800; flex-shrink: 0; }
+    .step-num.blue { background: rgba(96,208,255,0.18); color: var(--blue); }
+    .step-num.green { background: rgba(102,224,194,0.18); color: var(--accent); }
+    .step-num.gold { background: rgba(244,184,96,0.18); color: var(--gold); }
+    .flow-step h4 { font-size: 0.9rem; font-weight: 700; margin-bottom: 4px; }
+    .flow-step p { font-size: 0.84rem; color: var(--muted); }
+
+    .compare-row { display: grid; grid-template-columns: 180px 1fr 1fr; gap: 1px; background: var(--border); }
+    .compare-row > div { background: var(--panel2); padding: 11px 14px; font-size: 0.84rem; }
+    .compare-row.head > div { background: #0b1728; font-size: 0.76rem; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: 0.06em; }
+    .compare-row > div:first-child { color: var(--dim); font-size: 0.8rem; }
+    .compare-wrap { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin: 14px 0; }
+
+    footer { margin: 60px 24px 0; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.06); font-size: 0.78rem; color: var(--dim); display: flex; gap: 16px; flex-wrap: wrap; justify-content: space-between; }
+  </style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="breadcrumb"><a href="../index.html">← Workbench</a> / <a href="index.html">Claude Code</a> / API Deep Dive</div>
+  <div class="hero-eyebrow">🔌 Claude API · 2026年4月版 深掘りガイド</div>
+  <h1>Claude API <em>Deep Dive</em></h1>
+  <p class="hero-sub">Advisor Tool・Managed Agents・Files API・Prompt Caching・Adaptive Thinking・Agent SDK。エージェント時代に必要なAPIの全機能を実務視点で整理する。</p>
+  <div class="hero-meta">
+    <div class="meta-chip">更新日: <strong>2026年4月16日</strong></div>
+    <div class="meta-chip">対象: <strong>Anthropic API v1</strong></div>
+    <div class="meta-chip">モデル: <strong>Claude Opus 4.6 / Sonnet 4.6 / Haiku 4.5</strong></div>
+    <div class="meta-chip">用途: <strong>MAチームDD自動化 / エージェント開発</strong></div>
+  </div>
+</div>
+
+<div class="shell">
+
+  <!-- Overview -->
+  <section class="section">
+    <div class="section-label">全体像</div>
+    <div class="section-title">なぜいまClaude APIを深掘りするのか</div>
+    <div class="section-sub">チャット型からエージェント型への移行で、APIの使い方が根本的に変わった。</div>
+
+    <div class="panel blue" style="margin-bottom:16px;">
+      <p style="font-size:0.88rem; color:var(--muted); margin-bottom:16px;">
+        2025年以前のAI API利用は「テキスト入力→テキスト出力」のシンプルなモデルだった。
+        2026年のClaude APIは、<strong style="color:var(--text)">長時間タスク・並列実行・状態管理・モデル連携</strong>を前提とした
+        エージェントインフラとして設計されている。MAチームがDDを自動化するなら、この5機能の理解が必須になる。
+      </p>
+      <div class="grid3">
+        <div class="card">
+          <h3 style="color:var(--blue);">⚡ Advisor Tool</h3>
+          <p>速いモデル×賢いモデルを自動ペアリング。長時間タスクの品質を保ちながらコストを削減。</p>
+          <div style="margin-top:8px;"><span class="badge b-beta">Beta</span></div>
+        </div>
+        <div class="card">
+          <h3 style="color:var(--accent);">☁️ Managed Agents</h3>
+          <p>エージェント実行環境をクラウドで自動プロビジョニング。インフラ管理ゼロで本番エージェントを稼動。</p>
+          <div style="margin-top:8px;"><span class="badge b-beta">Beta</span></div>
+        </div>
+        <div class="card">
+          <h3 style="color:var(--gold);">📁 Files API</h3>
+          <p>ファイルをセッションをまたいで永続化。DDレポートやソース資料を一度アップすれば再利用可能。</p>
+          <div style="margin-top:8px;"><span class="badge b-ga">GA</span></div>
+        </div>
+        <div class="card">
+          <h3 style="color:var(--purple);">🏎️ Prompt Caching</h3>
+          <p>最大1時間のキャッシュTTL。大規模システムプロンプトを繰り返し使うDD分析で90%コスト削減。</p>
+          <div style="margin-top:8px;"><span class="badge b-ga">GA</span></div>
+        </div>
+        <div class="card">
+          <h3 style="color:var(--green);">🧠 Adaptive Thinking</h3>
+          <p>Opus 4.6が推論予算をターンごとに自動決定。Extended Thinkingの「常時最大ON」問題を解決。</p>
+          <div style="margin-top:8px;"><span class="badge b-new">New</span></div>
+        </div>
+        <div class="card">
+          <h3 style="color:var(--orange);">🤖 Agent SDK</h3>
+          <p>マルチエージェントオーケストレーションの標準ライブラリ。Python/TypeScriptで本番品質のエージェントを構築。</p>
+          <div style="margin-top:8px;"><span class="badge b-ga">GA</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Advisor Tool -->
+  <section class="section">
+    <div class="section-label">機能 1</div>
+    <div class="section-title">Advisor Tool <span class="badge b-beta">Beta</span></div>
+    <div class="section-sub">「速いモデルが動き、賢いモデルが監督する」— 長時間エージェントタスクのための新しいモデルペアリング戦略。</div>
+
+    <div class="feature-card advisor">
+      <div class="fc-eyebrow">⚡ Advisor Tool — 2026年3月 Beta公開</div>
+      <h3>エグゼキューター + アドバイザーの分業モデル</h3>
+      <p>
+        従来のエージェントは「高品質モデル1つが全タスクを処理」していた。Advisor Toolは
+        <strong style="color:var(--text)">エグゼキューター（高速・安価）</strong>が実行を担当し、
+        <strong style="color:var(--text)">アドバイザー（高知性・高コスト）</strong>が必要な判断ポイントだけに介入する
+        ハイブリッドアーキテクチャ。長時間タスクでコストを抑えながら品質を維持できる。
+      </p>
+      <div class="arch-diagram" style="margin:14px 0;">
+        <div class="arch-label">Advisor Tool アーキテクチャ</div>
+        <div class="arch-row">
+          <div class="arch-box blue">エグゼキューター<br><small>Haiku 4.5 / Sonnet 4.6</small></div>
+          <div class="arch-arrow">⟷</div>
+          <div class="arch-box gold">Advisor Tool<br><small>Opus 4.6</small></div>
+        </div>
+        <div class="arch-label" style="margin-top:12px;">エグゼキューターが判断を要請 → Advisorが戦略的助言 → エグゼキューターが実行継続</div>
+      </div>
+      <ul>
+        <li>エグゼキューターは通常の高速モデル（Haiku / Sonnet）がタスクを処理する</li>
+        <li>「判断が難しい」「重要な分岐点」でAdvisor（Opus 4.6）にツール呼び出しで相談</li>
+        <li>Advisorは実行を引き継がず、<strong style="color:var(--text)">助言だけを返す</strong>（コンテキストを渡さない）</li>
+        <li>長時間タスク（DD分析など）で特に有効：90%の処理はHaikuコスト、10%の重要判断だけOpusコスト</li>
+      </ul>
+    </div>
+
+    <div class="grid2" style="margin-bottom:14px;">
+      <div>
+        <p style="font-size:0.78rem; font-weight:700; color:var(--dim); text-transform:uppercase; margin-bottom:8px;">コスト比較例（1時間のDD分析）</p>
+        <div class="compare-wrap">
+          <div class="compare-row head">
+            <div>構成</div><div>コスト</div><div>品質</div>
+          </div>
+          <div class="compare-row">
+            <div>Opus 4.6 単体</div>
+            <div style="color:var(--red);">$12〜18</div>
+            <div style="color:var(--green);">最高</div>
+          </div>
+          <div class="compare-row">
+            <div>Sonnet 4.6 単体</div>
+            <div style="color:var(--gold);">$3〜5</div>
+            <div style="color:var(--gold);">高</div>
+          </div>
+          <div class="compare-row">
+            <div style="color:var(--accent);">Advisor Tool<br><small>Haiku+Opus</small></div>
+            <div style="color:var(--accent);">$2〜4</div>
+            <div style="color:var(--green);">最高（要判断部分）</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <p style="font-size:0.78rem; font-weight:700; color:var(--dim); text-transform:uppercase; margin-bottom:8px;">MAチームでの活用シナリオ</p>
+        <div class="panel" style="padding:16px;">
+          <div class="flow-step" style="padding:10px 0;">
+            <div class="step-num blue">1</div>
+            <div>
+              <h4>財務数値の抽出（Haiku）</h4>
+              <p>大量PDFからB/S・P&Lを機械的に抽出。速度重視でHaikuが高速処理。</p>
+            </div>
+          </div>
+          <div class="flow-step" style="padding:10px 0;">
+            <div class="step-num gold">2</div>
+            <div>
+              <h4>異常値の戦略的判断（Opus Advisor）</h4>
+              <p>「のれんの急増」「FCFと純利益の乖離」などHaikuが検出した要注意ポイントをAdvisorに相談。</p>
+            </div>
+          </div>
+          <div class="flow-step" style="padding:10px 0; border-bottom:none;">
+            <div class="step-num green">3</div>
+            <div>
+              <h4>レポート生成（Haiku）</h4>
+              <p>Advisorの分析を組み込んでHaikuが最終DDレポートを生成。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <pre><code class="language-python"># Advisor Tool — Python SDK 実装例
+import anthropic
+
+client = anthropic.Anthropic()
+
+# Advisor Tool の定義（エグゼキューターが使うツールとして登録）
+advisor_tool = {
+    "name": "ask_advisor",
+    "description": "複雑な判断や戦略的分析が必要な場合にOpus 4.6アドバイザーに相談する",
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "question": {"type": "string", "description": "アドバイザーへの相談内容"},
+            "context": {"type": "string", "description": "判断に必要な背景情報"}
+        },
+        "required": ["question"]
+    }
+}
+
+def handle_advisor_call(question: str, context: str = "") -> str:
+    """Opus 4.6をAdvisorとして呼び出す"""
+    advisor_response = client.messages.create(
+        model="claude-opus-4-6",
+        max_tokens=1024,
+        messages=[{
+            "role": "user",
+            "content": f"[M&A DD分析アドバイザー]\n\n背景: {context}\n\n質問: {question}"
+        }]
+    )
+    return advisor_response.content[0].text
+
+# エグゼキューター（Haiku）がAdvisor Toolを使って長時間タスクを実行
+response = client.messages.create(
+    model="claude-haiku-4-5-20251001",  # 高速・安価なエグゼキューター
+    max_tokens=4096,
+    tools=[advisor_tool],
+    messages=[{
+        "role": "user",
+        "content": "以下の財務データを分析してDD要約レポートを作成してください。..."
+    }]
+)</code></pre>
+  </section>
+
+  <!-- Managed Agents -->
+  <section class="section">
+    <div class="section-label">機能 2</div>
+    <div class="section-title">Claude Managed Agents <span class="badge b-beta">Beta · 2026年4月</span></div>
+    <div class="section-sub">クラウド上にエージェント実行コンテナを自動プロビジョニング。インフラゼロで本番エージェントが稼動する。</div>
+
+    <div class="feature-card managed">
+      <div class="fc-eyebrow">☁️ Managed Agents — インフラ不要のエージェント本番化</div>
+      <h3>「エージェントを動かすサーバー」が不要になる</h3>
+      <p>
+        従来、Claude APIでエージェントを本番稼動させるには、自前でサーバーを立て、
+        コンテキスト管理・再試行・タイムアウト処理・スケーリングを実装する必要があった。
+        Managed AgentsはこれをAnthropicのクラウドが引き受ける。
+        開発者は<strong style="color:var(--text)">プロンプトとツールだけを定義すればよい</strong>。
+      </p>
+      <ul>
+        <li>エージェント定義（JSON）をAPIに登録するだけでクラウドコンテナが自動起動</li>
+        <li>自動Prompt Cachingが有効化（長いシステムプロンプトを毎回送らなくてよい）</li>
+        <li>ツール呼び出し・再試行・エラーハンドリングをManaged環境が管理</li>
+        <li>Webhookで完了通知を受け取れる（非同期実行対応）</li>
+        <li>実行ログ・コスト追跡がダッシュボードで確認可能</li>
+      </ul>
+    </div>
+
+    <div class="grid2" style="margin-bottom:14px;">
+      <div>
+        <p style="font-size:0.78rem; font-weight:700; color:var(--dim); text-transform:uppercase; margin-bottom:8px;">セルフホスト vs Managed Agents</p>
+        <div class="compare-wrap">
+          <div class="compare-row head">
+            <div>項目</div><div>セルフホスト</div><div>Managed Agents</div>
+          </div>
+          <div class="compare-row">
+            <div>インフラ</div>
+            <div style="color:var(--red);">自前でサーバー必要</div>
+            <div style="color:var(--green);">不要</div>
+          </div>
+          <div class="compare-row">
+            <div>スケーリング</div>
+            <div style="color:var(--red);">手動設定</div>
+            <div style="color:var(--green);">自動</div>
+          </div>
+          <div class="compare-row">
+            <div>コスト追跡</div>
+            <div style="color:var(--gold);">自前で実装</div>
+            <div style="color:var(--green);">ダッシュボードあり</div>
+          </div>
+          <div class="compare-row">
+            <div>Prompt Cache</div>
+            <div style="color:var(--gold);">手動設定</div>
+            <div style="color:var(--green);">自動有効</div>
+          </div>
+          <div class="compare-row">
+            <div>再試行処理</div>
+            <div style="color:var(--red);">自前で実装</div>
+            <div style="color:var(--green);">組み込み済み</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <pre style="height:100%; margin:0;"><code class="language-python"># Managed Agent の登録と実行
+import anthropic
+
+client = anthropic.Anthropic()
+
+# エージェント定義を登録
+agent = client.agents.create(
+    name="dd-analysis-agent",
+    model="claude-sonnet-4-6",
+    system_prompt="""あなたはM&A DDの専門家エージェントです。
+    財務諸表・契約書・ビジネス資料を分析し、
+    リスクと機会を特定してレポートを生成します。""",
+    tools=[financial_analysis_tool, contract_review_tool],
+    # 自動Prompt Cachingが有効化される
+)
+
+# 非同期でエージェントを実行
+run = client.agents.runs.create(
+    agent_id=agent.id,
+    input="対象企業Xの財務DDを実施してください",
+    webhook_url="https://yourapp.com/webhook/dd-complete"
+)
+
+# Webhookで完了通知を受け取る（ノンブロッキング）
+print(f"DD実行開始: {run.id}")</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- Files API -->
+  <section class="section">
+    <div class="section-label">機能 3</div>
+    <div class="section-title">Files API <span class="badge b-ga">GA</span></div>
+    <div class="section-sub">ファイルをAnthropicサーバーに永続保存。毎回アップロードせずにセッションをまたいで参照できる。</div>
+
+    <div class="feature-card files">
+      <div class="fc-eyebrow">📁 Files API — セッションをまたぐファイル永続化</div>
+      <h3>DDソース資料を一度アップすれば何度でも参照可能</h3>
+      <p>
+        従来はAPIリクエストのたびにファイルを送信していた。大量のPDF・Excelを扱うDD分析では
+        これが帯域・コスト・レイテンシのボトルネックになっていた。
+        Files APIは<strong style="color:var(--text)">一度アップロードしたファイルをfile_idで参照</strong>できる。
+        複数のエージェントが同じソース資料を共有するマルチエージェントDDで特に効果的。
+      </p>
+      <ul>
+        <li>対応形式: PDF・テキスト・画像・スプレッドシート（Excel/CSV）</li>
+        <li>最大ファイルサイズ: 32MB / 1ファイル、合計500MB / API key</li>
+        <li>有効期限: デフォルト30日（設定変更可）</li>
+        <li>アクセス制御: API keyスコープで分離（チーム間の誤参照なし）</li>
+        <li>マルチエージェント共有: 複数のClaudeインスタンスが同一file_idを参照可</li>
+      </ul>
+    </div>
+
+    <pre style="margin-bottom:14px;"><code class="language-python"># Files API — アップロードと再利用
+import anthropic
+
+client = anthropic.Anthropic()
+
+# 1. DDソース資料を一度だけアップロード
+with open("target_company_financials.pdf", "rb") as f:
+    uploaded_file = client.files.upload(
+        file=("target_company_financials.pdf", f, "application/pdf"),
+    )
+
+file_id = uploaded_file.id
+print(f"ファイルID: {file_id}")  # file_abc123xyz
+
+# 2. 財務分析エージェントが参照（ファイル再送不要）
+financial_analysis = client.messages.create(
+    model="claude-sonnet-4-6",
+    max_tokens=4096,
+    messages=[{
+        "role": "user",
+        "content": [
+            {
+                "type": "document",
+                "source": {
+                    "type": "file",
+                    "file_id": file_id  # アップロード済みIDを参照
+                }
+            },
+            {
+                "type": "text",
+                "text": "この財務諸表からEBITDA・FCF・ネット負債を抽出してください"
+            }
+        ]
+    }]
+)
+
+# 3. リスク分析エージェントも同じfile_idを使用（再アップ不要）
+risk_analysis = client.messages.create(
+    model="claude-opus-4-6",
+    max_tokens=4096,
+    messages=[{
+        "role": "user",
+        "content": [
+            {"type": "document", "source": {"type": "file", "file_id": file_id}},
+            {"type": "text", "text": "財務上の主要リスクを特定し、優先度をつけてください"}
+        ]
+    }]
+)
+
+# 4. ファイル一覧・削除
+files = client.files.list()
+client.files.delete(file_id)  # 不要になったら削除</code></pre>
+
+    <div class="tip-box gold">
+      <div class="tip-label">MAチーム実務Tips</div>
+      <p>DDのデータルームPDF（IM・財務・契約書）をFiles APIに一括登録しておけば、財務分析・法務分析・ビジネス分析の各サブエージェントが同じソースを参照できる。データルーム更新時は差分ファイルのみ再アップすればよい。</p>
+    </div>
+  </section>
+
+  <!-- Prompt Caching -->
+  <section class="section">
+    <div class="section-label">機能 4</div>
+    <div class="section-title">Prompt Caching <span class="badge b-ga">GA</span> <span class="badge b-new">TTL 1時間に延長</span></div>
+    <div class="section-sub">大きなシステムプロンプトやコンテキストをキャッシュ。繰り返し使うDD分析で90%コスト削減が可能。</div>
+
+    <div class="feature-card cache">
+      <div class="fc-eyebrow">🏎️ Prompt Caching — コスト最適化の切り札</div>
+      <h3>「毎回同じ長文プロンプトを送る」問題を根本解決</h3>
+      <p>
+        大規模なエージェントシステムでは、詳細なシステムプロンプト・Few-shotサンプル・参照文書など
+        毎回送信するコンテキストが膨大になる。Prompt Cachingは<strong style="color:var(--text)">一度処理したトークンを
+        最大1時間キャッシュ</strong>し、以降のリクエストでキャッシュトークン分の入力コストを90%削減する。
+      </p>
+      <ul>
+        <li>キャッシュTTL: <strong style="color:var(--text)">最大1時間</strong>（以前は5分、今回の更新で大幅延長）</li>
+        <li>最小キャッシュサイズ: 1,024トークン（Haikuは2,048）</li>
+        <li>キャッシュヒット: 入力コストの<strong style="color:var(--text)">10%</strong>のみ請求</li>
+        <li>キャッシュミス: 通常の入力コスト + キャッシュ書き込みコスト（+25%）</li>
+        <li>有効戦略: 変わらない部分（システムプロンプト・参考文書）を先頭に、変わる部分（ユーザー入力）を末尾に配置</li>
+      </ul>
+    </div>
+
+    <div class="grid2">
+      <div>
+        <pre><code class="language-python"># Prompt Caching 実装例
+import anthropic
+
+client = anthropic.Anthropic()
+
+# キャッシュ対象: 変化しない大きなシステムプロンプト
+system_prompt = """
+[M&A DDエージェント — 詳細手順書]
+
+## 財務分析フレームワーク
+... (5,000トークン規模の詳細手順) ...
+
+## リスク評価基準
+... (DDチェックリスト、評価基準) ...
+
+## レポートフォーマット
+... (出力テンプレート詳細) ...
+"""
+
+# cache_control で明示的にキャッシュ指定
+response = client.messages.create(
+    model="claude-sonnet-4-6",
+    max_tokens=4096,
+    system=[{
+        "type": "text",
+        "text": system_prompt,
+        "cache_control": {"type": "ephemeral"}  # TTL: 1時間
+    }],
+    messages=[{
+        "role": "user",
+        # ここだけが毎回変わる（キャッシュ対象外）
+        "content": "対象企業Aの財務DDを開始してください"
+    }]
+)</code></pre>
+      </div>
+      <div>
+        <p style="font-size:0.78rem; font-weight:700; color:var(--dim); text-transform:uppercase; margin-bottom:8px;">コスト削減試算（DDワークフロー）</p>
+        <div class="panel" style="padding:16px;">
+          <table>
+            <thead>
+              <tr><th>シナリオ</th><th>入力コスト/回</th><th>30回分</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>キャッシュなし<br><small>毎回8,000トークン送信</small></td>
+                <td style="color:var(--red);">$0.024</td>
+                <td style="color:var(--red);">$0.72</td>
+              </tr>
+              <tr>
+                <td>初回キャッシュ書き込み<br><small>6,000トークンがキャッシュ対象</small></td>
+                <td style="color:var(--gold);">$0.030</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td style="color:var(--accent);">キャッシュヒット<br><small>1時間以内の29回</small></td>
+                <td style="color:var(--accent);">$0.006</td>
+                <td style="color:var(--accent);">$0.174</td>
+              </tr>
+            </tbody>
+          </table>
+          <div style="margin-top:10px; padding:8px 12px; background:rgba(79,255,176,0.08); border-radius:8px; font-size:0.83rem;">
+            <strong style="color:var(--green);">節約額: $0.516 / セッション（76%削減）</strong><br>
+            <span style="color:var(--muted);">月100セッション実行で約$50削減</span>
+          </div>
+        </div>
+
+        <div class="tip-box green" style="margin-top:12px;">
+          <div class="tip-label">ベストプラクティス</div>
+          <p>Managed AgentsはPrompt Cachingを自動有効化する。手動実装の場合は「安定した長文コンテキスト → 動的なユーザー入力」の順でメッセージを構成すること。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Adaptive Thinking -->
+  <section class="section">
+    <div class="section-label">機能 5</div>
+    <div class="section-title">Extended / Adaptive Thinking <span class="badge b-new">Opus 4.6 — Adaptive</span></div>
+    <div class="section-sub">「考える深さ」を問題の複雑さに応じてモデルが自動調整する。難問だけに深い推論を使いコストを最適化。</div>
+
+    <div class="feature-card thinking">
+      <div class="fc-eyebrow">🧠 Thinking — Extended から Adaptive へ</div>
+      <h3>推論予算の自動最適化</h3>
+      <p>
+        Extended Thinkingは推論バジェット（thinking tokens）を手動設定する必要があり、
+        「全タスクに最大トークンを使う」か「全タスクに最小トークンを使う」かの二択になりがちだった。
+        <strong style="color:var(--text)">Adaptive Thinking（Opus 4.6）</strong>はモデルが問題の複雑さを評価し、
+        ターンごとに推論予算を自動決定する。
+      </p>
+      <ul>
+        <li>簡単なタスク: Thinkingトークンをほぼ使わず高速・安価に応答</li>
+        <li>複雑なタスク: 深い推論チェーンを自動展開して精度を最大化</li>
+        <li>Opus 4.6ではデフォルトでAdaptive Thinkingが有効（明示設定不要）</li>
+        <li>Sonnet 4.6: Extended Thinking（手動設定）は引き続き利用可能</li>
+      </ul>
+    </div>
+
+    <div class="grid2">
+      <div>
+        <p style="font-size:0.78rem; font-weight:700; color:var(--dim); text-transform:uppercase; margin-bottom:8px;">Extended vs Adaptive Thinking</p>
+        <div class="compare-wrap">
+          <div class="compare-row head">
+            <div>比較軸</div><div>Extended（手動）</div><div>Adaptive（自動）</div>
+          </div>
+          <div class="compare-row">
+            <div>推論予算</div>
+            <div>開発者が設定</div>
+            <div style="color:var(--green);">モデルが自動決定</div>
+          </div>
+          <div class="compare-row">
+            <div>対応モデル</div>
+            <div>Sonnet 4.6</div>
+            <div style="color:var(--green);">Opus 4.6（デフォルト）</div>
+          </div>
+          <div class="compare-row">
+            <div>コスト予測</div>
+            <div style="color:var(--gold);">予測しやすい</div>
+            <div>変動あり（平均は低い）</div>
+          </div>
+          <div class="compare-row">
+            <div>設定の手間</div>
+            <div style="color:var(--red);">budget_tokensを調整</div>
+            <div style="color:var(--green);">不要</div>
+          </div>
+          <div class="compare-row">
+            <div>適合ユースケース</div>
+            <div>コスト上限が決まってる</div>
+            <div style="color:var(--green);">品質最大化したい</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <pre><code class="language-python"># Extended Thinking — Sonnet 4.6（手動設定）
+response = client.messages.create(
+    model="claude-sonnet-4-6",
+    max_tokens=16000,
+    thinking={
+        "type": "enabled",
+        "budget_tokens": 10000  # 推論予算を手動設定
+    },
+    messages=[{"role": "user", "content": "複雑な財務モデルを構築..."}]
+)
+
+# Adaptive Thinking — Opus 4.6（設定不要）
+response = client.messages.create(
+    model="claude-opus-4-6",
+    max_tokens=16000,
+    # thinking設定不要 — Opusが自動でAdaptive Thinkingを使用
+    messages=[{
+        "role": "user",
+        "content": "この買収案件のValuation range を算出し、想定シナジーとPMIリスクを分析してください"
+    }]
+)
+
+# ThinkingブロックはExtendedでは明示的に返される
+for block in response.content:
+    if block.type == "thinking":
+        print(f"思考プロセス: {block.thinking[:200]}...")
+    elif block.type == "text":
+        print(f"回答: {block.text}")</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- Agent SDK -->
+  <section class="section">
+    <div class="section-label">機能 6</div>
+    <div class="section-title">Claude Agent SDK <span class="badge b-ga">GA</span></div>
+    <div class="section-sub">マルチエージェントオーケストレーションの公式ライブラリ。P2P・階層型・パイプライン型エージェントを標準コードで実装。</div>
+
+    <div class="feature-card" style="background:rgba(247,168,122,0.05); border:1px solid rgba(247,168,122,0.22);">
+      <div class="fc-eyebrow" style="color:var(--orange);">🤖 Agent SDK — マルチエージェントの標準基盤</div>
+      <h3>エージェントシステムの設計パターンを標準化</h3>
+      <p>
+        Claude Code の Agent Teams（実験的）とは異なり、Claude Agent SDK は
+        <strong style="color:var(--text)">本番APIで使うマルチエージェントシステムをコードで構築するための公式ライブラリ</strong>。
+        オーケストレーター・サブエージェント・ハンドオフ・状態共有などのパターンが組み込まれている。
+      </p>
+      <div class="grid2" style="margin-top:14px;">
+        <ul>
+          <li><code>Orchestrator</code>: 複数エージェントへのタスク分配と結果統合</li>
+          <li><code>Agent</code>: ツール付きの単一実行ユニット（Skills定義可）</li>
+          <li><code>Handoff</code>: エージェント間での制御権移譲（P2P通信）</li>
+        </ul>
+        <ul>
+          <li><code>SharedContext</code>: エージェント間でのメモリ・状態共有</li>
+          <li><code>TaskList</code>: 共有タスクキュー（Agent Teamsと同等の概念）</li>
+          <li>Python / TypeScript SDK両対応</li>
+        </ul>
+      </div>
+    </div>
+
+    <pre style="margin-bottom:14px;"><code class="language-python"># Claude Agent SDK — MAチームDD Swarmの実装例
+from anthropic.agents import Orchestrator, Agent, SharedContext
+
+# 共有コンテキスト（全エージェントがアクセス可能）
+shared_ctx = SharedContext({
+    "target_company": "株式会社X",
+    "deal_size": "50億円",
+    "dd_files": [financial_file_id, legal_file_id, business_file_id]
+})
+
+# サブエージェント定義（Skillsパターン）
+financial_agent = Agent(
+    name="財務DDエージェント",
+    model="claude-sonnet-4-6",
+    system_prompt="M&Aの財務デューデリジェンス専門家。財務諸表分析・バリュエーション・FCF分析を担当。",
+    tools=[financial_analysis_tool, valuation_tool],
+    context=shared_ctx
+)
+
+legal_agent = Agent(
+    name="法務DDエージェント",
+    model="claude-sonnet-4-6",
+    system_prompt="M&Aの法務デューデリジェンス専門家。契約書・コンプライアンス・訴訟リスクを担当。",
+    tools=[contract_review_tool, compliance_check_tool],
+    context=shared_ctx
+)
+
+business_agent = Agent(
+    name="ビジネスDDエージェント",
+    model="claude-opus-4-6",  # ビジネス判断はOpusを使用
+    system_prompt="M&Aのビジネスデューデリジェンス専門家。市場分析・競合調査・シナジー評価を担当。",
+    tools=[market_research_tool, competitor_analysis_tool],
+    context=shared_ctx
+)
+
+report_agent = Agent(
+    name="レポート統合エージェント",
+    model="claude-opus-4-6",
+    system_prompt="各エージェントの分析結果を統合し、エグゼクティブサマリーを作成する。",
+    context=shared_ctx
+)
+
+# オーケストレーターが全体を指揮
+orchestrator = Orchestrator(
+    agents=[financial_agent, legal_agent, business_agent, report_agent],
+    strategy="parallel_then_synthesize"  # 並列実行→統合
+)
+
+# DD Swarm 起動
+result = await orchestrator.run(
+    "対象企業Xの総合DDを実施し、投資委員会向けレポートを生成してください"
+)
+print(result.final_output)</code></pre>
+
+    <div class="grid2">
+      <div>
+        <p style="font-size:0.78rem; font-weight:700; color:var(--dim); text-transform:uppercase; margin-bottom:8px;">Agent SDK vs Claude Code Agent Teams</p>
+        <div class="compare-wrap">
+          <div class="compare-row head">
+            <div>比較軸</div><div>Agent SDK（API）</div><div>Claude Code Teams</div>
+          </div>
+          <div class="compare-row">
+            <div>実行環境</div>
+            <div>自社サーバー/クラウド</div>
+            <div>開発者のローカルPC</div>
+          </div>
+          <div class="compare-row">
+            <div>用途</div>
+            <div style="color:var(--green);">本番システム組込</div>
+            <div style="color:var(--gold);">開発・コード作業</div>
+          </div>
+          <div class="compare-row">
+            <div>定義方法</div>
+            <div>Python/TypeScript</div>
+            <div>.claude/agents/ YAML</div>
+          </div>
+          <div class="compare-row">
+            <div>ステータス</div>
+            <div style="color:var(--green);">GA（本番利用可）</div>
+            <div style="color:var(--gold);">実験的</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="panel" style="padding:16px;">
+          <p style="font-size:0.82rem; font-weight:700; color:var(--text); margin-bottom:10px;">Agent SDK エコシステム接続</p>
+          <div class="arch-diagram">
+            <div class="arch-row">
+              <div class="arch-box blue">Agent SDK</div>
+            </div>
+            <div class="arch-row">
+              <div class="arch-arrow">↓</div>
+            </div>
+            <div class="arch-row">
+              <div class="arch-box green">Files API</div>
+              <div class="arch-box gold">Prompt Cache</div>
+              <div class="arch-box purple">Managed Agents</div>
+            </div>
+            <div class="arch-row">
+              <div class="arch-arrow">↓</div>
+            </div>
+            <div class="arch-row">
+              <div class="arch-box blue">Advisor Tool</div>
+              <div class="arch-box green">Adaptive Thinking</div>
+            </div>
+          </div>
+          <p style="font-size:0.8rem; color:var(--muted); margin-top:10px; text-align:center;">Agent SDKはAPIの全機能を統合して使える</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAチーム実装ロードマップ -->
+  <section class="section">
+    <div class="section-label">まとめ</div>
+    <div class="section-title">MAチームDDシステム構築ロードマップ</div>
+    <div class="section-sub">6機能をどの順番で導入するか — 実務インパクトと難易度のバランスで優先度を決める。</div>
+
+    <div class="panel blue" style="padding:24px 28px;">
+      <div class="flow-step">
+        <div class="step-num blue">1</div>
+        <div>
+          <h4>Files API <span class="tag t-g">GA</span> <span class="tag t-b">即効性大</span></h4>
+          <p>DDデータルームPDFをFiles APIに登録する。複数エージェントが同一ソースを参照できる基盤を整備。導入コスト低・即効性大。</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num blue">2</div>
+        <div>
+          <h4>Prompt Caching <span class="tag t-g">GA</span> <span class="tag t-o">コスト削減</span></h4>
+          <p>既存のAPI呼び出しにcache_controlを追加するだけ。大きなシステムプロンプトを持つDDエージェントで即座にコスト削減。</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num gold">3</div>
+        <div>
+          <h4>Adaptive Thinking（Opus 4.6） <span class="tag t-b">品質向上</span></h4>
+          <p>複雑なバリュエーション・シナジー評価にOpus 4.6を採用。設定不要でAdaptive Thinkingが有効になり分析精度が向上。</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num gold">4</div>
+        <div>
+          <h4>Advisor Tool <span class="tag t-p">Beta</span> <span class="tag t-g">コスト最適化</span></h4>
+          <p>日常的な処理はHaiku、重要判断はOpus Advisorに委ねるハイブリッド構成を実装。大規模DD自動化でコスト構造が変わる。</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num green">5</div>
+        <div>
+          <h4>Agent SDK <span class="tag t-g">GA</span> <span class="tag t-b">本番化</span></h4>
+          <p>財務・法務・ビジネスの並列DDエージェントをOrchestrator/Agentパターンで実装。チームの標準ツールとして本番稼動。</p>
+        </div>
+      </div>
+      <div class="flow-step" style="border-bottom:none;">
+        <div class="step-num green">6</div>
+        <div>
+          <h4>Managed Agents <span class="tag t-p">Beta</span> <span class="tag t-b">インフラ最適化</span></h4>
+          <p>エージェントの実行インフラをAnthropicクラウドに移行。サーバー管理ゼロで24時間稼動するDD自動化パイプラインが完成。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="tip-box" style="margin-top:16px;">
+      <div class="tip-label">重要な視点 — APIレベルの理解がゲームチェンジャーになる理由</div>
+      <p>Claude Codeのチャット画面やAgent Teamsは「UIレイヤー」に過ぎない。APIレベルで機能を組み合わせることで、DDS自動化・日次モニタリング・投資委員会レポート生成を人間の介在なしに動かすシステムが構築できる。これが「1人の社員が1,000社を並列監視する」という新しいMAチームの姿に直結する。</p>
+    </div>
+  </section>
+
+</div>
+
+<footer class="shell">
+  <span>Claude API Deep Dive — 2026年4月16日更新</span>
+  <span>出典: Anthropic API Docs · Claude Agent SDK Docs · Anthropic Engineering Blog</span>
+</footer>
+
+</body>
+</html>
