@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChatGPT (The Pioneer) | Tech Workbench</title>
+    <title>ChatGPT / GPT-5.4 (The Pioneer) | Tech Workbench</title>
     <style>
         :root {
             --bg: #0b1220;
@@ -13,7 +13,7 @@
             --text: #e2e8f0;
             --accent: #10a37f;
             /* OpenAI Green */
-            --accent-grad: linear-gradient(135deg, #10a37f, #fff);
+            --accent-grad: linear-gradient(135deg, #10a37f, #a2f2d8);
             --border: rgba(16, 163, 127, 0.2);
             --radius: 16px;
             --font-mono: "SF Mono", "Consolas", monospace;
@@ -236,6 +236,41 @@
             color: #fff;
             font-weight: bold;
         }
+
+        .bench-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            background: rgba(0,0,0,0.25);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        .bench-label { font-size: 0.87rem; color: var(--muted); }
+        .bench-val { font-size: 0.9rem; font-weight: 700; color: #5efcba; font-family: var(--font-mono); }
+        .bench-bar-wrap { height: 6px; background: rgba(255,255,255,0.07); border-radius:99px; overflow:hidden; margin-top:4px; }
+        .bench-bar { height: 6px; background: linear-gradient(90deg, #10a37f, #5efcba); border-radius:99px; }
+
+        .highlight-box {
+            background: rgba(16, 163, 127, 0.07);
+            border: 1px solid rgba(16, 163, 127, 0.25);
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin-top: 12px;
+        }
+        .highlight-box p { font-size: 0.88rem; margin: 0; color: var(--text); }
+
+        .tier-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 5px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+        .tier-new { background: rgba(79,255,176,0.15); color: #4fffb0; }
     </style>
 </head>
 
@@ -243,13 +278,14 @@
     <div class="shell">
         <header class="hero">
             <div class="meta-tag">INTELLIGENCE / OPENAI</div>
-            <span class="eyebrow">The Pioneer</span>
-            <h1>ChatGPT</h1>
-            <p class="lead">AI業界を牽引し続けるパイオニア。最新の「GPT-5.3 Codex」による自己進化型コーディングと、「GPT-5.2
-                Thinking」による深い推論能力で、あらゆるタスクをこなします。</p>
-            <span class="last-updated">Last Updated: 2026.02.11</span>
+            <span class="eyebrow">The Pioneer — Updated GPT-5.4</span>
+            <h1>ChatGPT / GPT-5.4</h1>
+            <p class="lead">2026年3月5日リリース。統合アーキテクチャでコーディング・推論・エージェント能力を1モデルに集約。
+                OSWorld 75%で「デスクトップ自動化における人間専門家を超えた」初のAI。
+                1Mトークンコンテキスト対応、価格は$2.50/$15。</p>
+            <span class="last-updated">Last Updated: 2026.04.16 — GPT-5.4 (Mar 5, 2026)</span>
             <br>
-            <a class="back" href="../index.html">← Workbenchへ戻る</a>
+            <a class="back" href="index.html">← Workbenchへ戻る</a>
         </header>
 
         <section class="grid">
@@ -258,47 +294,108 @@
                 <div class="spec-grid">
                     <div class="spec-item">
                         <span class="spec-label">Latest Model</span>
-                        <span class="spec-value">GPT-5.3 Codex</span>
+                        <span class="spec-value">GPT-5.4</span>
                     </div>
                     <div class="spec-item">
-                        <span class="spec-label">Reasoning Model</span>
-                        <span class="spec-value">GPT-5.2 Thinking</span>
+                        <span class="spec-label">Context Window</span>
+                        <span class="spec-value">1M+ Tokens</span>
                     </div>
                     <div class="spec-item">
-                        <span class="spec-label">Key Feature</span>
-                        <span class="spec-value">Agentic & Self-Improvement</span>
+                        <span class="spec-label">Max Output</span>
+                        <span class="spec-value">128K Tokens</span>
                     </div>
                     <div class="spec-item">
-                        <span class="spec-label">Speed</span>
-                        <span class="spec-value">+25% faster than 5.2</span>
+                        <span class="spec-label">Architecture</span>
+                        <span class="spec-value">Unified (Codex + Reasoning)</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Price (Input)</span>
+                        <span class="spec-value">$2.50 / M tokens</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Price (Output)</span>
+                        <span class="spec-value">$15 / M tokens</span>
                     </div>
                 </div>
-                <p>GPT-5.3 Codexは、自身のトレーニングデータのデバッグにすら使用された「自己進化型」のモデルです。エージェントとしての自律性が飛躍的に向上しています。</p>
+                <p>GPT-5.3 Codex（コーディング特化）とGPT-5.2 Thinking（推論特化）を統合した単一アーキテクチャ。標準は272Kトークン、1Mまでの拡張には追加料金が発生（$5/MTok）。</p>
+                <div class="highlight-box">
+                    <p>💡 <strong>統合アーキテクチャ:</strong> 以前の「Codex / Thinking」の使い分けが不要になった。1つのモデルがコーディング・推論・エージェント・マルチモーダルを担う。</p>
+                </div>
             </article>
 
             <article class="card">
-                <h2>Two Major Engines</h2>
-                <p>用途に応じて使い分ける2つの強力なエンジン。</p>
-                <ul>
-                    <li><strong>GPT-5.3 Codex</strong>: コーディングとエージェントタスクに特化。コンピュータ操作やツール使用において人間のような柔軟性を発揮。</li>
-                    <li><strong>GPT-5.2 Thinking (Pro)</strong>:
-                        o1/o3の系譜を継ぐ推論特化型。コンテキスト長400,000トークンを誇り、複雑な論理パズルや研究開発フェーズでの意思決定支援に最強の性能を発揮します。</li>
-                </ul>
+                <h2>Benchmark Scores</h2>
+                <div class="bench-row">
+                    <div>
+                        <div class="bench-label">OSWorld <span class="tier-new" style="margin-left:6px;">Human Expert超え</span></div>
+                        <div class="bench-bar-wrap"><div class="bench-bar" style="width:75%;"></div></div>
+                    </div>
+                    <div class="bench-val">75%</div>
+                </div>
+                <div class="bench-row">
+                    <div>
+                        <div class="bench-label">SWE-Bench Verified</div>
+                        <div class="bench-bar-wrap"><div class="bench-bar" style="width:80%;"></div></div>
+                    </div>
+                    <div class="bench-val">~80%</div>
+                </div>
+                <div class="bench-row">
+                    <div>
+                        <div class="bench-label">SWE-Bench Pro</div>
+                        <div class="bench-bar-wrap"><div class="bench-bar" style="width:57.7%;"></div></div>
+                    </div>
+                    <div class="bench-val">57.7%</div>
+                </div>
+                <div class="bench-row">
+                    <div>
+                        <div class="bench-label">Long Context (Graphwalks BFS, 0–128K)</div>
+                        <div class="bench-bar-wrap"><div class="bench-bar" style="width:93%;"></div></div>
+                    </div>
+                    <div class="bench-val">93.0%</div>
+                </div>
+                <div class="bench-row">
+                    <div>
+                        <div class="bench-label">MRCR v2 8-needle (16–32K)</div>
+                        <div class="bench-bar-wrap"><div class="bench-bar" style="width:97.2%;"></div></div>
+                    </div>
+                    <div class="bench-val">97.2%</div>
+                </div>
+                <p style="font-size:0.82rem; margin-top:8px;">OSWorld 75%は「デスクトップ自動化タスクで人間の専門家を超えた初のAI」として特筆される。SWE-bench Verifiedでは Claude Opus 4.6 と拮抗。</p>
             </article>
         </section>
 
         <section class="card">
-            <h2>Agentic Capabilities</h2>
-            <p>5.3 Codexは単にコードを書くだけではありません。プロジェクト全体を俯瞰し、自律的に動く「エンジニア」です。</p>
+            <h2>Unified Architecture — 統合の意味</h2>
+            <p>GPT-5.4最大の変革は「Codex（コーディング）とThinking（推論）の統合」。以前は使い分けが必要だった2エンジンが1モデルに収束した。</p>
             <div style="display: flex; gap: 24px; flex-wrap: wrap;">
                 <div style="flex: 1; min-width: 280px;">
-                    <h3>Self-Correction</h3>
-                    <p>書いたコードを自分で実行し、エラーが出ればログを読み、修正し、再実行するループを自律的に回します。「人間がエラーを指摘する」手間が劇的に減りました。</p>
+                    <h3>Self-Correction Loop</h3>
+                    <p>コードを書き → 自分で実行 → エラーログを読み → 修正して再実行。このサイクルをユーザー介入なしに高速で回す。SWE-bench ~80%はこの自律サイクルの賜物。</p>
                 </div>
                 <div style="flex: 1; min-width: 280px;">
-                    <h3>Real-time Steering</h3>
-                    <p>エージェントが作業している最中に、横から「あ、そこはこうして」とインタラクティブに指示を出し、方向修正（Steering）が可能です。完全に任せるのではなく、ペアプログラミングのような協働作業が実現します。
-                    </p>
+                    <h3>Computer Use (Desktop Automation)</h3>
+                    <p>OSWorld 75%が示す通り、GUI操作・フォーム入力・ブラウザ操作を人間専門家レベルで自律実行。単なるコード生成から「PCを使う作業者」としての能力を持つ。</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Model Variants</h2>
+            <div style="display: flex; gap: 16px; flex-wrap: wrap; margin-top: 4px;">
+                <div style="flex: 1; min-width: 220px; background: rgba(16,163,127,0.07); border: 1px solid rgba(16,163,127,0.2); border-radius: 12px; padding: 20px;">
+                    <div style="font-weight:700; color:#5efcba; margin-bottom:8px;">GPT-5.4</div>
+                    <div style="font-size:0.85rem; color:var(--muted); margin-bottom:8px;">標準モデル。コーディング・エージェント・会話すべてをバランスよくカバー。</div>
+                    <div style="font-size:0.82rem; color:var(--text);">$2.50/$15 per M tokens</div>
+                </div>
+                <div style="flex: 1; min-width: 220px; background: rgba(16,163,127,0.03); border: 1px solid rgba(16,163,127,0.15); border-radius: 12px; padding: 20px;">
+                    <div style="font-weight:700; color:#fff; margin-bottom:8px;">GPT-5.4 Pro</div>
+                    <div style="font-size:0.85rem; color:var(--muted); margin-bottom:8px;">Pro Tier向け最大能力モデル。複雑な研究・戦略分析・長文推論に。</div>
+                    <div style="font-size:0.82rem; color:var(--text);">$30/$180 per M tokens</div>
+                </div>
+                <div style="flex: 1; min-width: 220px; background: rgba(16,163,127,0.03); border: 1px solid rgba(16,163,127,0.15); border-radius: 12px; padding: 20px;">
+                    <div style="font-weight:700; color:var(--muted); margin-bottom:8px;">GPT-5.4 mini / nano</div>
+                    <div style="font-size:0.85rem; color:var(--muted); margin-bottom:8px;">軽量・高速・低コストモデル。大量バッチ処理や埋め込み用途に。</div>
+                    <div style="font-size:0.82rem; color:var(--text);">低価格帯（詳細は要確認）</div>
                 </div>
             </div>
         </section>
@@ -306,22 +403,35 @@
         <section class="grid">
             <article class="card">
                 <h2>Why use for Vibe Coding?</h2>
-                <p>Vibe Codingにおいて、ChatGPTは**「頼れる現場監督」**です。</p>
+                <p>Vibe Codingにおいて、ChatGPT / GPT-5.4は<strong>「頼れる現場監督」</strong>です。</p>
                 <ul>
-                    <li><strong>実装スピード</strong>: 5.3 Codexの推論速度は非常に速く、アイデアを即座に形にします。</li>
-                    <li><strong>柔軟性</strong>: 曖昧な指示からも意図を汲み取る能力（Instruction
-                        Following）が極めて高く、「なんとなくいい感じに」を実現するセンスに長けています。</li>
+                    <li><strong>実装スピード</strong>: 統合アーキテクチャにより、設計→コーディング→テストが1モデルで完結。思考の切れ目がなく、開発フローが滑らか。</li>
+                    <li><strong>曖昧な指示への対応</strong>: Instruction Followingが高水準。「なんとなくいい感じに」を汲み取る自然言語理解は業界随一の評価を維持。</li>
+                    <li><strong>GUI自動化との統合</strong>: Computer Use能力により、コード生成だけでなく「実際のブラウザ・アプリ操作」も同一モデルが担う。</li>
                 </ul>
             </article>
 
             <article class="card">
                 <h2>Comparison</h2>
                 <ul>
-                    <li><strong>vs Gemini 3.0</strong>:
-                        コンテキストやツール統合ではGeminiが有利ですが、純粋な「コードの質」や「会話の機転」においてはGPT-5.3が上回る場面も多いです。</li>
-                    <li><strong>vs Claude 4.6</strong>: Claudeは長文読解や分析に強いですが、ChatGPTは「動くものを作る」実装力とスピード感で勝負します。</li>
+                    <li><strong>vs Gemini 3.1 Pro</strong>:
+                        Geminiはコンテキスト長・Googleエコシステム連携・ハルシネーション抑制で優位。GPT-5.4はOSWorld（デスクトップ自動化）・会話の自然さ・ChatGPT UIの洗練度で競合。価格は拮抗（$2.50 vs $2.00）。</li>
+                    <li><strong>vs Claude Opus 4.6</strong>: SWE-bench Verifiedでほぼ同スコア（両者~80%）。Claudeは長文分析・Adaptive Thinking・倫理的配慮で優れるが、GPT-5.4はGUI自動化と統合アーキテクチャの使いやすさで差別化。</li>
+                    <li><strong>vs Claude Mythos Preview</strong>: セキュリティ特化の非公開モデルとは比較の土俵が異なる。一般利用ではGPT-5.4が現実的な選択肢。</li>
                 </ul>
             </article>
+        </section>
+
+        <section class="card">
+            <h2>利用可能なプラットフォーム</h2>
+            <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                <div style="background:rgba(16,163,127,0.08); border:1px solid rgba(16,163,127,0.2); border-radius:8px; padding:10px 16px; font-size:0.88rem;">ChatGPT Web / App</div>
+                <div style="background:rgba(16,163,127,0.08); border:1px solid rgba(16,163,127,0.2); border-radius:8px; padding:10px 16px; font-size:0.88rem;">OpenAI API</div>
+                <div style="background:rgba(16,163,127,0.08); border:1px solid rgba(16,163,127,0.2); border-radius:8px; padding:10px 16px; font-size:0.88rem;">OpenAI Codex (Platform)</div>
+                <div style="background:rgba(16,163,127,0.08); border:1px solid rgba(16,163,127,0.2); border-radius:8px; padding:10px 16px; font-size:0.88rem;">GitHub Copilot (Enterprise)</div>
+                <div style="background:rgba(16,163,127,0.08); border:1px solid rgba(16,163,127,0.2); border-radius:8px; padding:10px 16px; font-size:0.88rem;">Azure OpenAI Service</div>
+            </div>
+            <p style="font-size:0.85rem; margin-top:16px; color:var(--muted);">2026年3月5日、ChatGPT・API・Codexで同時リリース。ChatGPT Plusユーザーから段階的に展開。</p>
         </section>
     </div>
 </body>

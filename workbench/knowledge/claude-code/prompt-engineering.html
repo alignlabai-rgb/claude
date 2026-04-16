@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>エージェント向けプロンプト設計 | Claude Code — CLAUDE.md・システムプロンプト・XML構造化</title>
+  <style>
+    :root {
+      --bg: #07111d; --panel: #0d1829; --panel2: #091018;
+      --text: #e8eef9; --muted: #b6c3da; --dim: #5a7a9a;
+      --accent: #66e0c2; --gold: #f4b860; --blue: #60d0ff;
+      --purple: #c4a0ff; --red: #ff9090; --green: #4FFFB0;
+      --orange: #f7a87a; --border: rgba(255,255,255,0.08); --r: 16px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Segoe UI","Noto Sans JP",system-ui,sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; padding: 0 0 80px; }
+    a { color: var(--accent); text-decoration: none; } a:hover { text-decoration: underline; }
+    code { background: rgba(255,255,255,0.08); border-radius: 4px; padding: 0.1em 0.45em; font-size: 0.84em; font-family: "Fira Code","Consolas",monospace; color: #a5f3d0; }
+    pre { background: #060e1a; border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 16px 18px; overflow-x: auto; font-family: "Fira Code","Consolas",monospace; font-size: 0.83em; color: #a5f3d0; line-height: 1.6; margin: 10px 0; }
+    .hero { background: linear-gradient(135deg, #0d1a2e 0%, #1a100d 60%, #091525 100%); border-bottom: 1px solid rgba(244,184,96,0.25); padding: 52px 40px 44px; }
+    .breadcrumb { font-size: 0.8rem; color: var(--dim); margin-bottom: 16px; }
+    .breadcrumb a { color: var(--accent); }
+    .hero-eyebrow { display: inline-flex; align-items: center; gap: 8px; background: rgba(244,184,96,0.12); border: 1px solid rgba(244,184,96,0.3); color: var(--gold); font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; padding: 5px 14px; border-radius: 999px; margin-bottom: 16px; }
+    .hero h1 { font-size: 2.4rem; font-weight: 900; line-height: 1.15; margin-bottom: 12px; }
+    .hero h1 em { font-style: normal; background: linear-gradient(90deg, #f4b860, #66e0c2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero-sub { color: var(--muted); font-size: 0.95rem; max-width: 700px; }
+    .hero-meta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
+    .meta-chip { background: rgba(255,255,255,0.06); border: 1px solid var(--border); border-radius: 8px; padding: 5px 12px; font-size: 0.78rem; color: var(--muted); }
+    .meta-chip strong { color: var(--gold); }
+    .shell { max-width: 1060px; margin: 0 auto; padding: 0 24px; }
+    .section { padding: 44px 0 0; }
+    .section-label { font-size: 0.7rem; font-weight: 700; color: var(--gold); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+    .section-title { font-size: 1.4rem; font-weight: 800; margin-bottom: 6px; }
+    .section-sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 20px; }
+    .panel { background: var(--panel); border: 1px solid var(--border); border-radius: var(--r); padding: 22px 26px; }
+    .panel.gold { border-color: rgba(244,184,96,0.3); background: linear-gradient(135deg, #0d1829, #141c0e); }
+    .panel.blue { border-color: rgba(96,208,255,0.3); background: linear-gradient(135deg, #0d1829, #0e1c30); }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+    @media (max-width: 720px) { .grid2, .grid3 { grid-template-columns: 1fr; } }
+    .card { background: var(--panel2); border: 1px solid var(--border); border-radius: 14px; padding: 20px 22px; }
+    .card h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 8px; }
+    .card p, .card li { font-size: 0.86rem; color: var(--muted); }
+    .card ul { padding-left: 16px; display: flex; flex-direction: column; gap: 5px; margin-top: 6px; }
+    .tag { display: inline-block; font-size: 0.68rem; font-weight: 700; padding: 2px 8px; border-radius: 5px; }
+    .t-g { background: rgba(79,255,176,0.15); color: #4FFFB0; }
+    .t-b { background: rgba(96,208,255,0.15); color: #60d0ff; }
+    .t-o { background: rgba(244,184,96,0.15); color: #f4b860; }
+    .t-r { background: rgba(255,144,144,0.15); color: #ff9090; }
+    .tip-box { border-radius: 10px; padding: 13px 16px; margin-top: 12px; }
+    .tip-box.gold { background: linear-gradient(135deg, rgba(244,184,96,0.08), rgba(247,168,122,0.05)); border: 1px solid rgba(244,184,96,0.3); }
+    .tip-box.green { background: linear-gradient(135deg, rgba(79,255,176,0.08), rgba(102,224,194,0.05)); border: 1px solid rgba(79,255,176,0.3); }
+    .tip-box.red { background: linear-gradient(135deg, rgba(255,144,144,0.08), rgba(247,168,122,0.05)); border: 1px solid rgba(255,144,144,0.3); }
+    .tip-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px; }
+    .tip-box.gold .tip-label { color: var(--gold); }
+    .tip-box.green .tip-label { color: var(--green); }
+    .tip-box.red .tip-label { color: var(--red); }
+    .tip-box p { font-size: 0.84rem; color: var(--text); margin: 0; }
+    .compare-wrap { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin: 14px 0; }
+    .compare-row { display: grid; grid-template-columns: 160px 1fr 1fr; gap: 1px; background: var(--border); }
+    .compare-row > div { background: var(--panel2); padding: 11px 14px; font-size: 0.84rem; }
+    .compare-row.head > div { background: #0b1728; font-size: 0.76rem; font-weight: 700; color: var(--gold); text-transform: uppercase; letter-spacing: 0.06em; }
+    .compare-row > div:first-child { color: var(--dim); font-size: 0.8rem; }
+    footer { margin: 60px 24px 0; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.06); font-size: 0.78rem; color: var(--dim); display: flex; gap: 16px; flex-wrap: wrap; justify-content: space-between; }
+  </style>
+</head>
+<body>
+<div class="hero">
+  <div class="breadcrumb shell"><a href="../index.html">← Workbench</a> / <a href="index.html">Claude Code</a> / プロンプト設計</div>
+  <div class="shell">
+    <div class="hero-eyebrow">✍️ エージェント向けプロンプト設計 · 2026年版</div>
+    <h1>エージェント向け<br><em>プロンプト設計</em></h1>
+    <p class="hero-sub">チャット型プロンプトとエージェント型プロンプトは根本的に異なる。CLAUDE.md・XMLタグ・システムプロンプト三部構成・Few-shot設計。MAチームのDD自動化に直結するプロンプト技法を体系化する。</p>
+    <div class="hero-meta">
+      <div class="meta-chip">対象モデル: <strong>Claude Opus 4.6 / Sonnet 4.6</strong></div>
+      <div class="meta-chip">出典: <strong>Anthropic Prompting Best Practices 2026</strong></div>
+    </div>
+  </div>
+</div>
+
+<div class="shell">
+
+  <!-- チャット型 vs エージェント型 -->
+  <section class="section">
+    <div class="section-label">基本概念</div>
+    <div class="section-title">チャット型プロンプト vs エージェント型プロンプト</div>
+    <div class="section-sub">同じ「プロンプト」という言葉でも、エージェント設計では求められることが根本的に違う。</div>
+    <div class="compare-wrap">
+      <div class="compare-row head"><div>観点</div><div>チャット型（1回のやり取り）</div><div>エージェント型（長時間・自律）</div></div>
+      <div class="compare-row"><div>目的</div><div>良い答えを1回得る</div><div style="color:var(--green);">目標を定義し、自律達成させる</div></div>
+      <div class="compare-row"><div>プロンプトの役割</div><div>質問</div><div style="color:var(--green);">役割・権限・制約・出力仕様の契約書</div></div>
+      <div class="compare-row"><div>曖昧さへの対応</div><div>Claudeが補完してくれる</div><div style="color:var(--red);">多ターンで誤った方向に積み上がる</div></div>
+      <div class="compare-row"><div>ツール利用</div><div>なし</div><div style="color:var(--green);">いつ・どのツールを使うかを明示</div></div>
+      <div class="compare-row"><div>出力仕様</div><div>柔軟でよい</div><div style="color:var(--green);">厳密なフォーマット指定が必須</div></div>
+      <div class="compare-row"><div>失敗モード</div><div>答えが悪い</div><div style="color:var(--red);">長時間動いた末に全体が無駄になる</div></div>
+    </div>
+  </section>
+
+  <!-- システムプロンプト三部構成 -->
+  <section class="section">
+    <div class="section-label">システムプロンプト</div>
+    <div class="section-title">システムプロンプト三部構成 — Identity・Rules・Output</div>
+    <div class="section-sub">Anthropic推奨の2026年版システムプロンプト構造。「契約書」として機能する3セクション。</div>
+    <pre><code class="language-text"># ① Identity（誰か・何ができるか）
+あなたはM&A専門の財務デューデリジェンスエージェントです。
+グループ海外事業統括部のMAチームの一員として動作します。
+対象企業の財務諸表を分析し、投資委員会向けのDDレポートを生成することが
+あなたの唯一の責務です。
+
+# ② Rules（何をしていいか・してはいけないか）
+## 許可された操作
+- 提供されたファイル（Files API経由）の読み取り・分析
+- WebSearchによる公開財務データ・業界ベンチマークの収集
+- DDレポートの生成と保存
+
+## 禁止された操作
+- 財務数値の推測・補完（データがない場合は「要確認」と明記する）
+- 投資判断の最終決定（あなたは分析者であり意思決定者ではない）
+- 機密情報のSlack以外への送信
+
+## 判断基準
+- 不明な点は推測せず「[要確認: XX]」とマーキングして先に進む
+- リスク評価は「高・中・低」の3段階で必ず明示する
+
+# ③ Output Format（どんな形で出力するか）
+レポートは以下の構造で出力すること:
+&lt;executive_summary&gt;
+  投資判断に直結する3つのポイントを箇条書きで記載
+&lt;/executive_summary&gt;
+
+&lt;financial_analysis&gt;
+  EBITDA・FCF・ネット負債の表形式サマリー（3年分）
+  バリュエーション（EV/EBITDAレンジ・DCF中央値）
+&lt;/financial_analysis&gt;
+
+&lt;risk_matrix&gt;
+  高：[具体的リスク項目]
+  中：[具体的リスク項目]
+  要確認：[データ不足項目]
+&lt;/risk_matrix&gt;</code></pre>
+    <div class="tip-box gold">
+      <div class="tip-label">Anthropic公式の知見（2026）</div>
+      <p>良いシステムプロンプトは「短い契約書」のように書く。Identity・Rules・Outputが明確で、読んだだけで「何をすべきか」「何をすべきでないか」が完全に分かる状態を目指す。曖昧さはエージェントの多ターン処理で誤差が増幅されるため致命的になる。</p>
+    </div>
+  </section>
+
+  <!-- XMLタグ戦略 -->
+  <section class="section">
+    <div class="section-label">XML構造化</div>
+    <div class="section-title">XMLタグ — Claudeの「理解の境界線」を作る</div>
+    <div class="section-sub">XMLタグはMarkdownと異なり、Claudeが意味的な境界として処理する。長い入力・複雑な指示での精度が劇的に向上する。</div>
+    <div class="grid2">
+      <div>
+        <p style="font-size:0.75rem;font-weight:700;color:var(--dim);text-transform:uppercase;margin-bottom:8px;">❌ XMLなし（曖昧な境界）</p>
+        <pre style="margin:0;"><code class="language-text">以下の財務データを分析してください:
+売上: 100億円 EBITDA: 15億円
+次の指示に従ってください:
+バリュエーションを計算し
+リスクを特定し
+レポートを生成してください
+競合他社: A社 売上80億円 B社 売上120億円
+業界平均EV/EBITDA: 8.5x</code></pre>
+        <p style="font-size:0.82rem;color:var(--red);margin-top:8px;">→ どこまでが「データ」でどこからが「指示」か境界が曖昧。長くなるほど混乱。</p>
+      </div>
+      <div>
+        <p style="font-size:0.75rem;font-weight:700;color:var(--dim);text-transform:uppercase;margin-bottom:8px;">✅ XMLあり（明確な境界）</p>
+        <pre style="margin:0;"><code class="language-text">&lt;financial_data&gt;
+  &lt;target&gt;
+    売上: 100億円
+    EBITDA: 15億円
+  &lt;/target&gt;
+  &lt;comparables&gt;
+    A社: 売上80億円
+    B社: 売上120億円
+    業界平均EV/EBITDA: 8.5x
+  &lt;/comparables&gt;
+&lt;/financial_data&gt;
+
+&lt;instructions&gt;
+  1. バリュエーションを計算する
+  2. リスクを特定する
+  3. 下記フォーマットでレポートを生成する
+&lt;/instructions&gt;</code></pre>
+        <p style="font-size:0.82rem;color:var(--green);margin-top:8px;">→ 構造が明確。複雑な資料でも精度が維持される。</p>
+      </div>
+    </div>
+    <div class="grid3" style="margin-top:14px;">
+      <div class="card"><h3 style="color:var(--gold);">&lt;context&gt;</h3><p>背景情報・案件概要。Claudeが判断の前提として参照する。</p></div>
+      <div class="card"><h3 style="color:var(--gold);">&lt;instructions&gt;</h3><p>実行すべきタスクのリスト。番号付きで順序を明示する。</p></div>
+      <div class="card"><h3 style="color:var(--gold);">&lt;constraints&gt;</h3><p>してはいけないこと。禁止事項を明示的に囲む。</p></div>
+      <div class="card"><h3 style="color:var(--gold);">&lt;examples&gt;</h3><p>Few-shotサンプル。「こういう入力→こういう出力」の実例。</p></div>
+      <div class="card"><h3 style="color:var(--gold);">&lt;output_format&gt;</h3><p>出力の正確なフォーマット。テンプレートを直接書く。</p></div>
+      <div class="card"><h3 style="color:var(--gold);">&lt;thinking&gt;</h3><p>Extended/Adaptive Thinkingの出力が入るブロック。レスポンス処理時に分離して扱う。</p></div>
+    </div>
+  </section>
+
+  <!-- CLAUDE.md 設計 -->
+  <section class="section">
+    <div class="section-label">CLAUDE.md</div>
+    <div class="section-title">CLAUDE.md — エージェントの「永続的な記憶」</div>
+    <div class="section-sub">Claude Codeがプロジェクト起動時に自動読み込みする設定ファイル。「毎回説明しなくてよいこと」を全部書く。</div>
+    <div class="grid2">
+      <div>
+        <pre><code class="language-markdown"># CLAUDE.md — MAチームDD用プロジェクト設定
+
+## プロジェクト概要
+グループ海外事業統括部のM&A DDワークフロー自動化。
+案件ごとにDD Swarmを起動し、財務・法務・ビジネスの
+並列分析を実施してレポートを生成する。
+
+## チーム構成と権限
+- MD: 最終判断・投資委員会プレゼン担当
+- アナリスト: DD実行・レポートドラフト
+- Claudeの役割: 分析補助・ドラフト生成（意思決定は人間）
+
+## 使用技術スタック
+- Files API: DDソース資料の永続化（file_idはdd-files.json参照）
+- MCPサーバー: dd-database（localhost:3000）, slack, google-drive
+- Skillライブラリ: .claude/agents/ 参照
+
+## バリュエーション前提（デフォルト）
+- WACC: 8〜10%（カントリーリスクプレミアム含む）
+- ターミナル成長率: 2〜3%
+- EV/EBITDA倍率: 業界別に dd-database MCP で取得する
+
+## 出力・保存ルール
+- DDレポートは必ず /reports/YYYY-MM-DD-[企業名]/ に保存
+- Slackへの通知は #ma-current-deals チャンネルのみ
+- 数値の単位は億円（小数点以下1桁まで）
+
+## 禁止事項
+- 財務数値を推測・補完してはいけない
+- 投資判断の最終的な推薦をしてはいけない
+- 社外への情報送信は絶対禁止
+
+## 使い方
+"DD Swarm開始: [企業名]" → Orchestratorが自動起動
+"@dd-financial-analyst [指示]" → 財務DDエージェント単体起動</code></pre>
+      </div>
+      <div>
+        <p style="font-size:0.75rem;font-weight:700;color:var(--dim);text-transform:uppercase;margin-bottom:8px;">CLAUDE.mdに書くべきもの・書かないもの</p>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div class="card">
+            <h3 style="color:var(--green);">✅ CLAUDE.mdに書く</h3>
+            <ul>
+              <li>プロジェクト固有の背景・目的</li>
+              <li>チーム構成・役割分担</li>
+              <li>繰り返し説明するバリュエーション前提</li>
+              <li>ファイル保存ルール・命名規則</li>
+              <li>使用MCPサーバーとツールの説明</li>
+              <li>禁止事項・制約</li>
+              <li>Skillの使い方ガイド</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3 style="color:var(--red);">❌ CLAUDE.mdに書かない</h3>
+            <ul>
+              <li>案件固有の情報（Projectsに書く）</li>
+              <li>一時的な指示</li>
+              <li>秘密情報・APIキー</li>
+              <li>頻繁に変わるデータ（バリュエーション数値など）</li>
+              <li>あまりに長い説明（重要部分が埋もれる）</li>
+            </ul>
+          </div>
+        </div>
+        <div class="tip-box gold" style="margin-top:10px;">
+          <div class="tip-label">CLAUDE.md の読み込みタイミング</div>
+          <p>Claude Codeがプロジェクト起動時に自動読み込みする。ディレクトリ階層を上に辿ってすべてのCLAUDE.mdを読み込むため、ルートに共通設定、サブディレクトリに案件固有設定を分割できる。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Few-shot設計 -->
+  <section class="section">
+    <div class="section-label">Few-shot設計</div>
+    <div class="section-title">エージェント向けFew-shot — 「こういう動き」を見せる</div>
+    <div class="section-sub">エージェントのFew-shotは「良い答えのサンプル」ではなく「良いプロセスのサンプル」を示す。</div>
+    <pre><code class="language-text">&lt;examples&gt;
+&lt;example&gt;
+  &lt;input&gt;
+    対象企業: A社（製造業）
+    財務資料: [file_id: file_001]
+  &lt;/input&gt;
+  &lt;good_behavior&gt;
+    1. まずfile_001を読み込んでB/S・P&Lを確認する
+    2. EBITDAを3年分計算してトレンドを確認する
+    3. FCFとEBITDAが乖離していたらその理由を調査する
+    4. dd-database MCPで同業種のバリュエーション前提を取得する
+    5. 不明な数値があれば [要確認: XX項目] とマーキングして先に進む
+    6. executive_summaryから始まるフォーマットでレポートを生成する
+  &lt;/good_behavior&gt;
+  &lt;bad_behavior&gt;
+    - ファイルを読まずにバリュエーションを計算する（数値の根拠なし）
+    - 不明な数値を推測して埋める（正確性の担保なし）
+    - executive_summaryを省略してdetailから書き始める
+  &lt;/bad_behavior&gt;
+&lt;/example&gt;
+&lt;/examples&gt;</code></pre>
+    <div class="tip-box green">
+      <div class="tip-label">エージェントFew-shotの鉄則</div>
+      <p>「正解の出力」だけでなく「悪いプロセスの例」も示す。Claudeはネガティブサンプルから学習して同じ失敗を避けるようになる。DDでは「推測して穴埋めする」「フォーマット無視で出力する」を明示的に禁止例として示すのが効果的。</p>
+    </div>
+  </section>
+
+  <!-- 長時間エージェントのプロンプト設計 -->
+  <section class="section">
+    <div class="section-label">長時間エージェント</div>
+    <div class="section-title">長時間・多ターンエージェントの設計パターン</div>
+    <div class="section-sub">DD分析のような長時間タスクではコンテキスト管理と中間チェックポイントが品質を左右する。</div>
+    <div class="grid2">
+      <div>
+        <p style="font-size:0.75rem;font-weight:700;color:var(--dim);text-transform:uppercase;margin-bottom:8px;">チェックポイント設計</p>
+        <pre style="margin:0;"><code class="language-text">あなたは長時間のDDタスクを実行します。
+以下のチェックポイントルールに従ってください:
+
+## チェックポイントルール
+- 各フェーズ完了時に必ず進捗を &lt;progress&gt; タグで報告する
+- 不確実な仮定を置いた場合は &lt;assumption&gt; タグで明示する
+- 重要な発見は即座に &lt;finding priority="high"&gt; タグで記録する
+- コンテキストが長くなった場合は
+  &lt;context_summary&gt; で重要事項を要約してから続ける
+
+## フェーズ定義
+Phase 1: データ収集 → Phase 2: 分析
+→ Phase 3: バリュエーション → Phase 4: レポート生成
+
+各フェーズの開始時に "=== Phase N 開始 ===" と宣言すること。</code></pre>
+      </div>
+      <div>
+        <p style="font-size:0.75rem;font-weight:700;color:var(--dim);text-transform:uppercase;margin-bottom:8px;">委任権限の明示</p>
+        <pre style="margin:0;"><code class="language-text">## 自律権限の定義
+あなたには以下の権限を与えます:
+
+### 自律実行してよいこと（確認不要）
+- ファイルの読み取り・分析
+- WebSearch（情報収集のみ）
+- dd-database MCPの検索クエリ
+- 中間レポートのファイル保存
+
+### 確認が必要なこと（実行前に質問する）
+- Slackへの投稿（内容を先に提示する）
+- 外部サービスへのデータ送信
+
+### 禁止事項（絶対に実行しない）
+- ファイルの削除
+- 機密データの外部送信
+- 投資推薦の最終決定
+
+迷った場合は必ず確認を求めること。</code></pre>
+        <div class="tip-box gold" style="margin-top:10px;">
+          <div class="tip-label">委任権限設計の重要性</div>
+          <p>「何でもやってよい」では長時間エージェントが意図しない操作をする可能性がある。「自律OK・要確認・禁止」の3段階を明示することで、人間の介在なしに安全に長時間動作できる。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAチーム向け実践テンプレート -->
+  <section class="section">
+    <div class="section-label">実践テンプレート</div>
+    <div class="section-title">MAチームDD用 完成系システムプロンプトテンプレート</div>
+    <div class="section-sub">コピー&ペーストして使える完成形。企業名と案件情報を差し替えるだけで使用可能。</div>
+    <pre><code class="language-text"># DD財務エージェント — システムプロンプトテンプレート v2.0
+
+&lt;identity&gt;
+あなたはグループ海外事業統括部のMAチームの財務DDエージェントです。
+対象企業の財務諸表を分析し、投資委員会向けの財務DDレポートを生成します。
+dd-financial-analyst Skillの権限で動作します。
+&lt;/identity&gt;
+
+&lt;context&gt;
+案件名: {{DEAL_NAME}}
+対象企業: {{TARGET_COMPANY}}（{{SECTOR}}、売上規模{{REVENUE_SCALE}}）
+分析目的: {{DD_PURPOSE}}
+期日: {{DEADLINE}}
+ソース資料: Files API file_id = {{FILE_IDS}}
+&lt;/context&gt;
+
+&lt;instructions&gt;
+1. 提供されたfile_idからソース資料を読み込む
+2. B/S・P&L・CFを3年分抽出して構造化する
+3. EBITDA・FCF・ネット負債を計算する
+4. dd-database MCPで同業種のバリュエーション前提を取得する
+5. EV/EBITDAレンジとDCF中央値を算出する
+6. リスクを高/中/要確認で分類する
+7. 下記フォーマットでレポートを生成する
+&lt;/instructions&gt;
+
+&lt;constraints&gt;
+- 財務数値は推測・補完しない（不明は[要確認]とマーキング）
+- 投資の最終判断は行わない（分析と根拠提示のみ）
+- 数値単位は億円・小数点1桁
+&lt;/constraints&gt;
+
+&lt;output_format&gt;
+&lt;executive_summary&gt;
+投資判断に直結する3ポイント（各1行で簡潔に）
+&lt;/executive_summary&gt;
+&lt;financial_summary&gt;
+| 指標 | FY2024 | FY2025 | FY2026 |
+（表形式）
+&lt;/financial_summary&gt;
+&lt;valuation&gt;EV/EBITDAレンジ・DCF中央値&lt;/valuation&gt;
+&lt;risk_matrix&gt;高/中/要確認&lt;/risk_matrix&gt;
+&lt;/output_format&gt;</code></pre>
+  </section>
+
+</div>
+<footer class="shell">
+  <span>エージェント向けプロンプト設計ガイド — 2026年4月16日更新</span>
+  <span>出典: Anthropic Prompting Best Practices · Claude API Docs · Claude Code Best Practices</span>
+</footer>
+</body>
+</html>

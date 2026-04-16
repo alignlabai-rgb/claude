@@ -4,17 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gemini 3.0 (The Architect) | Tech Workbench</title>
+    <title>Gemini 3.1 Pro (The Architect) | Tech Workbench</title>
     <style>
         :root {
             --bg: #0b1220;
             --panel: #101418;
-            /* Deep Blue/Black */
             --muted: #94a3b8;
             --text: #e2e8f0;
             --accent: #4e8cff;
             /* Gemini Blue */
-            --accent-grad: linear-gradient(135deg, #4e8cff, #fff);
+            --accent-grad: linear-gradient(135deg, #4e8cff, #a5caff);
             --border: rgba(78, 140, 255, 0.2);
             --radius: 16px;
             --font-mono: "SF Mono", "Consolas", monospace;
@@ -237,20 +236,57 @@
             color: #fff;
             font-weight: bold;
         }
+
+        .bench-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            background: rgba(0,0,0,0.25);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        .bench-label { font-size: 0.87rem; color: var(--muted); }
+        .bench-val { font-size: 0.9rem; font-weight: 700; color: #8bbeff; font-family: var(--font-mono); }
+        .bench-bar-wrap { height: 6px; background: rgba(255,255,255,0.07); border-radius:99px; overflow:hidden; margin-top:4px; }
+        .bench-bar { height: 6px; background: linear-gradient(90deg, #4e8cff, #a5caff); border-radius:99px; }
+
+        .highlight-box {
+            background: rgba(78, 140, 255, 0.07);
+            border: 1px solid rgba(78, 140, 255, 0.25);
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin-top: 12px;
+        }
+        .highlight-box p { font-size: 0.88rem; margin: 0; color: var(--text); }
+
+        .tier-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 5px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+        .tier-new { background: rgba(79,255,176,0.15); color: #4fffb0; }
+        .tier-up { background: rgba(78,140,255,0.15); color: #8bbeff; }
     </style>
 </head>
 
 <body>
     <div class="shell">
         <header class="hero">
-            <div class="meta-tag">INTELLIGENCE / GOOGLE</div>
-            <span class="eyebrow">The Architect</span>
-            <h1>Gemini 3.0</h1>
-            <p class="lead">Googleが誇る最新鋭のマルチモーダルモデル。"Deep Think"による深い推論と、ネイティブなエージェント能力を統合。Vibe
-                Codingにおいて最も信頼できる「設計者（Architect）」です。</p>
-            <span class="last-updated">Last Updated: 2026.02.11</span>
+            <div class="meta-tag">INTELLIGENCE / GOOGLE DEEPMIND</div>
+            <span class="eyebrow">The Architect — Updated 3.1</span>
+            <h1>Gemini 3.1 Pro</h1>
+            <p class="lead">2026年2月19日リリース。ARC-AGI-2 77.1%・GPQA Diamond 94.3%・SWE-bench 80.6%。
+                Gemini 3.0から推論能力を2倍に向上させ、18ベンチマーク中12以上でトップを獲得。
+                価格はGemini 3.0 Proと同一のまま（$2/$12）。</p>
+            <span class="last-updated">Last Updated: 2026.04.16 — Gemini 3.1 Pro (Feb 19, 2026)</span>
             <br>
-            <a class="back" href="../index.html">← Workbenchへ戻る</a>
+            <a class="back" href="index.html">← Workbenchへ戻る</a>
         </header>
 
         <section class="grid">
@@ -259,47 +295,110 @@
                 <div class="spec-grid">
                     <div class="spec-item">
                         <span class="spec-label">Version</span>
-                        <span class="spec-value">3.0 Pro / Ultra</span>
+                        <span class="spec-value">3.1 Pro</span>
                     </div>
                     <div class="spec-item">
                         <span class="spec-label">Context Window</span>
-                        <span class="spec-value">2,000,000+ Tokens</span>
+                        <span class="spec-value">1,000,000 Tokens</span>
                     </div>
                     <div class="spec-item">
-                        <span class="spec-label">Key Feature</span>
-                        <span class="spec-value">Deep Think</span>
+                        <span class="spec-label">Max Output</span>
+                        <span class="spec-value">64K Tokens</span>
                     </div>
                     <div class="spec-item">
                         <span class="spec-label">Multimodal</span>
-                        <span class="spec-value">Native (Audio/Video/Code)</span>
+                        <span class="spec-value">Native (Text/Audio/Video/Code)</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Price (Input)</span>
+                        <span class="spec-value">$2 / M tokens</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Price (Output)</span>
+                        <span class="spec-value">$12 / M tokens</span>
                     </div>
                 </div>
-                <p>Gemini 2.5からの最大の進化点は「推論能力」と「自律性」です。単なるチャットボットから、複雑なタスクを計画・実行する真のパートナーへと進化しました。</p>
+                <p>Gemini 3.0 Proと同価格のまま、推論能力を2倍に向上。200K超のコンテキストには$4/$18の拡張プランが適用される。</p>
+                <div class="highlight-box">
+                    <p>💡 <strong>価格据え置き:</strong> Gemini 3.0 Pro → 3.1 Proへのアップグレードでコスト増なし。既存APIユーザーはモデル名を変更するだけで恩恵を受けられる。</p>
+                </div>
             </article>
 
             <article class="card">
-                <h2>Deep Think Capability</h2>
-                <p>OpenAIのo1/o3と同様に、回答を出力する前に「思考プロセス」を挟むことが可能です。</p>
-                <ul>
-                    <li><strong>内部思考</strong>: ユーザーに見えないところで複数の解決策をシミュレーションし、最適なパスを選び取ります。</li>
-                    <li><strong>複雑な設計</strong>:
-                        「このアプリのアーキテクチャはどうあるべきか？」といった抽象的な問いに対し、セキュリティ、スケーラビリティ、メンテ性を考慮した回答を導き出します。</li>
-                </ul>
+                <h2>Benchmark Scores</h2>
+                <div class="bench-row">
+                    <div>
+                        <div class="bench-label">ARC-AGI-2 <span class="tier-new" style="margin-left:6px;">+46pt</span></div>
+                        <div class="bench-bar-wrap"><div class="bench-bar" style="width:77.1%;"></div></div>
+                    </div>
+                    <div class="bench-val">77.1%</div>
+                </div>
+                <div class="bench-row">
+                    <div>
+                        <div class="bench-label">GPQA Diamond</div>
+                        <div class="bench-bar-wrap"><div class="bench-bar" style="width:94.3%;"></div></div>
+                    </div>
+                    <div class="bench-val">94.3%</div>
+                </div>
+                <div class="bench-row">
+                    <div>
+                        <div class="bench-label">SWE-Bench Verified</div>
+                        <div class="bench-bar-wrap"><div class="bench-bar" style="width:80.6%;"></div></div>
+                    </div>
+                    <div class="bench-val">80.6%</div>
+                </div>
+                <div class="bench-row">
+                    <div>
+                        <div class="bench-label">MMLU</div>
+                        <div class="bench-bar-wrap"><div class="bench-bar" style="width:92.6%;"></div></div>
+                    </div>
+                    <div class="bench-val">92.6%</div>
+                </div>
+                <div class="bench-row">
+                    <div>
+                        <div class="bench-label">Humanity's Last Exam (HLE)</div>
+                        <div class="bench-bar-wrap"><div class="bench-bar" style="width:44.4%;"></div></div>
+                    </div>
+                    <div class="bench-val">44.4%</div>
+                </div>
+                <div class="bench-row">
+                    <div>
+                        <div class="bench-label">BrowseComp</div>
+                        <div class="bench-bar-wrap"><div class="bench-bar" style="width:85.9%;"></div></div>
+                    </div>
+                    <div class="bench-val">85.9%</div>
+                </div>
+                <p style="font-size:0.82rem; margin-top:8px;">18ベンチマーク中12以上でトップ。ARC-AGI-2のスコアはGemini 3.0 Proの31.1%から46ポイント大幅向上。</p>
             </article>
         </section>
 
         <section class="card">
+            <h2>3.0からの主な進化点</h2>
+            <div style="display: flex; gap: 24px; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 280px;">
+                    <h3>2× Reasoning Improvement</h3>
+                    <p>「より効率的な思考」による推論能力の2倍向上。ARC-AGI-2での劇的なスコアアップ（31.1% → 77.1%）がその証拠。複雑な多段階推論タスクで特に顕著な改善を示す。</p>
+                    <p>新たに追加された<strong>Medium Thinking Level</strong>により、コストと能力のトレードオフを細かく制御可能に。</p>
+                </div>
+                <div style="flex: 1; min-width: 280px;">
+                    <h3>Enhanced Agentic Performance</h3>
+                    <p>APEX-Agentsスコア33.5%、MCP Atlas 69.2%と、エージェントタスクでの実行能力が大幅向上。ツール使用・計画立案・マルチステップ実行において信頼性が増した。</p>
+                    <p>Gemini CLI、AI Studio、Vertex AI、AntiGravity IDE、Android Studioなど幅広いプラットフォームで即日利用可能。</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
             <h2>Native Agentic Workflow</h2>
-            <p>Gemini 3.0は、最初から「ツールを使うこと」を前提に設計されています。</p>
+            <p>Gemini 3.1 Proは、最初から「ツールを使うこと」を前提に設計されています。</p>
             <div style="display: flex; gap: 24px; flex-wrap: wrap;">
                 <div style="flex: 1; min-width: 280px;">
                     <h3>Google Ecosystem Integration</h3>
-                    <p>Gmail, Google Docs, Drive,
-                        Calendarとシームレスに連携。ドキュメントを読み込んで要約し、カレンダーを確認してスケジュールを調整するといった一連の流れを自然言語で指示できます。</p>
+                    <p>Gmail, Google Docs, Drive, Calendarとシームレスに連携。ドキュメントを読み込んで要約し、カレンダーを確認してスケジュールを調整するといった一連の流れを自然言語で指示できます。</p>
                 </div>
                 <div style="flex: 1; min-width: 280px;">
-                    <h3>Code & Execution</h3>
-                    <p>生成したコードをサンドボックス内で即座に実行し、エラーが出れば自己修正します。"Vibe Coding"においては、このサイクルが非常に強力な武器となります。</p>
+                    <h3>Code Execution & Self-Correction</h3>
+                    <p>SWE-bench Verified 80.6%が示す通り、生成したコードをサンドボックス内で即座に実行・テストし、エラーが出れば自律的に修正するサイクルが強力。LiveCodeBench Pro 2887 Eloは業界トップクラスのコーディング実力を証明する。</p>
                 </div>
             </div>
         </section>
@@ -307,22 +406,36 @@
         <section class="grid">
             <article class="card">
                 <h2>Why use for Vibe Coding?</h2>
-                <p>Vibe Codingにおいて、Gemini 3.0は**「最初の相談相手」**として最適です。</p>
+                <p>Vibe Codingにおいて、Gemini 3.1 Proは<strong>「最初の相談相手」</strong>として最適です。</p>
                 <ul>
-                    <li><strong>圧倒的なコンテキスト長</strong>: プロジェクト全体のファイル、大量のドキュメントを一度に読み込ませても、文脈を見失いません。</li>
-                    <li><strong>マルチモーダル理解</strong>: UIのスクリーンショットや、ホワイトボードの手書き図をそのまま貼り付けて、「これを作って」と指示できます。</li>
+                    <li><strong>圧倒的なコンテキスト長</strong>: 1Mトークンのコンテキストウィンドウ。プロジェクト全体のファイルや大量のドキュメントを一度に読み込ませても文脈を見失わない。</li>
+                    <li><strong>マルチモーダル理解</strong>: UIのスクリーンショットや手書き図をそのまま貼り付けて「これを作って」と指示可能。動画・音声も含めたネイティブ対応。</li>
+                    <li><strong>設計思考</strong>: GPQA 94.3%が示す専門的推論能力。アーキテクチャ設計の相談相手として特に秀でている。</li>
                 </ul>
             </article>
 
             <article class="card">
                 <h2>Comparison</h2>
                 <ul>
-                    <li><strong>vs ChatGPT (GPT-5.3)</strong>:
-                        GeminiはGoogleエコシステムとの連携とコンテキスト長で勝ります。ChatGPTは「個」としての創造性や会話の自然さで優れる場合があります。</li>
-                    <li><strong>vs Claude 4.6</strong>: Claudeは「人間に寄り添う」能力が高いですが、Geminiはより「システム的・構造的」なアプローチに強みがあります。
-                    </li>
+                    <li><strong>vs ChatGPT (GPT-5.4)</strong>:
+                        GeminiはGoogleエコシステム連携・コンテキスト長・ハルシネーション抑制（AA-Omniscience 1位）で優位。GPT-5.4は1Mコンテキスト・統合アーキテクチャ・会話の自然さで競合。</li>
+                    <li><strong>vs Claude Opus 4.6</strong>: Claudeは深い推論とコーディング精度（Adaptive Thinking）で強みを持つが、価格対性能比ではGemini 3.1 Proが競争力を持つ（$2/$12 vs $15/$75）。</li>
+                    <li><strong>vs Claude Mythos Preview</strong>: セキュリティ特化の非公開モデルであるMythosとは土俵が異なる。汎用性と一般アクセスでは3.1 Proが優位。</li>
                 </ul>
             </article>
+        </section>
+
+        <section class="card">
+            <h2>利用可能なプラットフォーム</h2>
+            <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                <div style="background:rgba(78,140,255,0.08); border:1px solid rgba(78,140,255,0.2); border-radius:8px; padding:10px 16px; font-size:0.88rem;">Gemini App (Web/Mobile)</div>
+                <div style="background:rgba(78,140,255,0.08); border:1px solid rgba(78,140,255,0.2); border-radius:8px; padding:10px 16px; font-size:0.88rem;">Google AI Studio</div>
+                <div style="background:rgba(78,140,255,0.08); border:1px solid rgba(78,140,255,0.2); border-radius:8px; padding:10px 16px; font-size:0.88rem;">Vertex AI API</div>
+                <div style="background:rgba(78,140,255,0.08); border:1px solid rgba(78,140,255,0.2); border-radius:8px; padding:10px 16px; font-size:0.88rem;">Gemini CLI</div>
+                <div style="background:rgba(78,140,255,0.08); border:1px solid rgba(78,140,255,0.2); border-radius:8px; padding:10px 16px; font-size:0.88rem;">AntiGravity IDE</div>
+                <div style="background:rgba(78,140,255,0.08); border:1px solid rgba(78,140,255,0.2); border-radius:8px; padding:10px 16px; font-size:0.88rem;">Android Studio</div>
+            </div>
+            <p style="font-size:0.85rem; margin-top:16px; color:var(--muted);">発表日（2026年2月19日）より即日プレビューアクセス開始。GA（一般提供）はその後数週間以内。</p>
         </section>
     </div>
 </body>

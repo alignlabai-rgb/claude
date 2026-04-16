@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claude Mythos / Project Glasswing | Tech Workbench</title>
+  <style>
+    :root {
+      --bg: #07111d; --panel: #0d1829; --panel2: #091018;
+      --text: #e8eef9; --muted: #b6c3da; --dim: #5a7a9a;
+      --accent: #ff6b6b; --gold: #f4b860; --blue: #60d0ff;
+      --purple: #c4a0ff; --red: #ff6b6b; --green: #4FFFB0;
+      --orange: #f7a87a; --border: rgba(255,255,255,0.08); --r: 16px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Segoe UI","Noto Sans JP",system-ui,sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; padding: 0 0 80px; }
+    a { color: var(--accent); text-decoration: none; } a:hover { text-decoration: underline; }
+    code { background: rgba(255,255,255,0.08); border-radius: 4px; padding: 0.1em 0.45em; font-size: 0.84em; font-family: "Fira Code","Consolas",monospace; color: #ffb0b0; }
+    pre { background: #060e1a; border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 16px 18px; overflow-x: auto; font-family: "Fira Code","Consolas",monospace; font-size: 0.83em; color: #ffb0b0; line-height: 1.6; margin: 10px 0; }
+    .hero { background: linear-gradient(135deg, #1a0b0b 0%, #1a0d1a 40%, #0d0b1a 100%); border-bottom: 1px solid rgba(255,107,107,0.3); padding: 52px 40px 44px; position: relative; overflow: hidden; }
+    .hero::after { content: ""; position: absolute; top: -80px; right: -80px; width: 320px; height: 320px; background: radial-gradient(circle, rgba(255,107,107,0.08) 0%, transparent 70%); pointer-events: none; }
+    .breadcrumb { font-size: 0.8rem; color: var(--dim); margin-bottom: 16px; position: relative; z-index: 1; }
+    .breadcrumb a { color: var(--accent); }
+    .hero-eyebrow { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,107,107,0.12); border: 1px solid rgba(255,107,107,0.35); color: var(--red); font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; padding: 5px 14px; border-radius: 999px; margin-bottom: 16px; }
+    .restricted-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,107,107,0.15); border: 1px solid rgba(255,107,107,0.4); color: #ffb0b0; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; padding: 4px 12px; border-radius: 4px; margin-left: 12px; vertical-align: middle; }
+    .restricted-badge::before { content: "◉"; font-size: 0.6rem; color: #ff6b6b; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
+    .hero h1 { font-size: 2.5rem; font-weight: 900; line-height: 1.15; margin-bottom: 12px; position: relative; z-index: 1; }
+    .hero h1 em { font-style: normal; background: linear-gradient(90deg, #ff6b6b, #f7a87a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero-sub { color: var(--muted); font-size: 0.95rem; max-width: 720px; position: relative; z-index: 1; }
+    .hero-meta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; position: relative; z-index: 1; }
+    .meta-chip { background: rgba(255,255,255,0.06); border: 1px solid var(--border); border-radius: 8px; padding: 5px 12px; font-size: 0.78rem; color: var(--muted); }
+    .meta-chip strong { color: var(--red); }
+    .shell { max-width: 1060px; margin: 0 auto; padding: 0 24px; }
+    .section { padding: 44px 0 0; }
+    .section-label { font-size: 0.7rem; font-weight: 700; color: var(--red); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+    .section-title { font-size: 1.4rem; font-weight: 800; margin-bottom: 6px; }
+    .section-sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 20px; }
+    .panel { background: var(--panel); border: 1px solid var(--border); border-radius: var(--r); padding: 22px 26px; }
+    .panel.red { border-color: rgba(255,107,107,0.3); background: linear-gradient(135deg, #0d1829, #1a0d0d); }
+    .panel.gold { border-color: rgba(244,184,96,0.25); background: linear-gradient(135deg, #0d1829, #1a1507); }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+    @media (max-width: 720px) { .grid2,.grid3 { grid-template-columns: 1fr; } }
+    .card { background: var(--panel2); border: 1px solid var(--border); border-radius: 14px; padding: 20px 22px; }
+    .card h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 8px; }
+    .card p, .card li { font-size: 0.86rem; color: var(--muted); }
+    .card ul { padding-left: 16px; display: flex; flex-direction: column; gap: 5px; margin-top: 6px; }
+    .tag { display: inline-block; font-size: 0.68rem; font-weight: 700; padding: 2px 8px; border-radius: 5px; }
+    .t-g { background: rgba(79,255,176,0.15); color: #4FFFB0; }
+    .t-b { background: rgba(96,208,255,0.15); color: #60d0ff; }
+    .t-p { background: rgba(196,160,255,0.15); color: #c4a0ff; }
+    .t-o { background: rgba(244,184,96,0.15); color: #f4b860; }
+    .t-r { background: rgba(255,107,107,0.15); color: #ff6b6b; }
+    .tip-box { border-radius: 10px; padding: 13px 16px; margin-top: 12px; }
+    .tip-box.red { background: linear-gradient(135deg, rgba(255,107,107,0.08), rgba(247,168,122,0.05)); border: 1px solid rgba(255,107,107,0.3); }
+    .tip-box.gold { background: linear-gradient(135deg, rgba(244,184,96,0.08), rgba(247,168,122,0.05)); border: 1px solid rgba(244,184,96,0.3); }
+    .tip-box.blue { background: linear-gradient(135deg, rgba(96,208,255,0.08), rgba(79,255,176,0.05)); border: 1px solid rgba(96,208,255,0.3); }
+    .tip-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px; }
+    .tip-box.red .tip-label { color: var(--red); }
+    .tip-box.gold .tip-label { color: var(--gold); }
+    .tip-box.blue .tip-label { color: var(--blue); }
+    .tip-box p { font-size: 0.84rem; color: var(--text); margin: 0; }
+    /* benchmark bar chart */
+    .bench-row { display: grid; grid-template-columns: 200px 1fr 80px; align-items: center; gap: 12px; margin-bottom: 14px; }
+    .bench-label { font-size: 0.82rem; color: var(--muted); }
+    .bench-track { background: rgba(255,255,255,0.06); border-radius: 999px; height: 10px; position: relative; overflow: visible; }
+    .bench-bar { height: 10px; border-radius: 999px; transition: width 0.6s; }
+    .bench-bar.mythos { background: linear-gradient(90deg, #ff6b6b, #f7a87a); }
+    .bench-bar.opus { background: rgba(196,160,255,0.5); }
+    .bench-val { font-size: 0.82rem; font-weight: 700; text-align: right; }
+    .bench-val.mythos { color: #ff9090; }
+    .bench-val.opus { color: var(--purple); }
+    .compare-wrap { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin: 14px 0; }
+    .compare-row { display: grid; grid-template-columns: 180px 1fr 1fr; gap: 1px; background: var(--border); }
+    .compare-row > div { background: var(--panel2); padding: 11px 14px; font-size: 0.84rem; }
+    .compare-row.head > div { background: #0b1728; font-size: 0.76rem; font-weight: 700; color: var(--red); text-transform: uppercase; letter-spacing: 0.06em; }
+    .compare-row > div:first-child { color: var(--dim); font-size: 0.8rem; }
+    /* zero day cards */
+    .cve-card { background: linear-gradient(135deg, rgba(255,107,107,0.06), rgba(247,168,122,0.04)); border: 1px solid rgba(255,107,107,0.25); border-radius: 14px; padding: 20px 22px; }
+    .cve-badge { font-family: "Fira Code",monospace; font-size: 0.72rem; font-weight: 700; color: #ff9090; background: rgba(255,107,107,0.12); border: 1px solid rgba(255,107,107,0.25); padding: 2px 8px; border-radius: 4px; display: inline-block; margin-bottom: 8px; }
+    .cve-age { font-size: 0.72rem; color: var(--gold); font-weight: 700; margin-left: 8px; }
+    .cve-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 6px; }
+    .cve-card p { font-size: 0.85rem; color: var(--muted); }
+    /* company logos grid */
+    .company-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+    .company-chip { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 7px 14px; font-size: 0.82rem; font-weight: 600; color: var(--muted); }
+    /* exploit capability */
+    .exploit-item { border-left: 3px solid rgba(255,107,107,0.4); padding: 12px 16px; margin-bottom: 10px; background: rgba(255,107,107,0.04); border-radius: 0 10px 10px 0; }
+    .exploit-item h4 { font-size: 0.88rem; font-weight: 700; color: var(--red); margin-bottom: 4px; }
+    .exploit-item p { font-size: 0.83rem; color: var(--muted); margin: 0; }
+    /* pricing table */
+    .price-table { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+    .price-row { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1px; background: var(--border); }
+    .price-row > div { background: var(--panel2); padding: 11px 14px; font-size: 0.83rem; }
+    .price-row.head > div { background: #0b1728; font-size: 0.74rem; font-weight: 700; color: var(--red); text-transform: uppercase; letter-spacing: 0.06em; }
+    footer { margin: 60px 24px 0; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.06); font-size: 0.78rem; color: var(--dim); display: flex; gap: 16px; flex-wrap: wrap; justify-content: space-between; }
+  </style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="breadcrumb shell"><a href="../index.html">← Workbench</a> / <a href="index.html">Knowledge</a> / Claude Mythos</div>
+  <div class="shell" style="margin-top:16px;">
+    <div class="hero-eyebrow">⚠ Restricted Access · Gated Research Preview</div>
+    <h1><em>Claude Mythos</em> &amp; Project Glasswing<span class="restricted-badge">NOT PUBLIC</span></h1>
+    <p class="hero-sub">
+      2026年4月7日発表。Anthropicの最上位モデル「Claude Mythos Preview」と、クリティカルインフラを守るためのセキュリティコンソーシアム「Project Glasswing」の完全解説。
+      このモデルは一般公開されておらず、12の主要テック企業および選定パートナーのみがアクセス可能。
+    </p>
+    <div class="hero-meta">
+      <div class="meta-chip"><strong>発表日</strong> 2026年4月7日</div>
+      <div class="meta-chip"><strong>アクセス</strong> Gated Research Preview</div>
+      <div class="meta-chip"><strong>モデル階層</strong> Opus 4.6の上位</div>
+      <div class="meta-chip"><strong>コードネーム</strong> Capybara</div>
+      <div class="meta-chip"><strong>価格</strong> $25/$125 per M tokens</div>
+    </div>
+  </div>
+</div>
+
+<div class="shell">
+
+  <!-- WHAT IS MYTHOS -->
+  <div class="section">
+    <div class="section-label">Overview</div>
+    <div class="section-title">Claude Mythosとは何か</div>
+    <div class="section-sub">Opus 4.6を大幅に超える能力を持つ、Anthropic史上最強のモデル。サイバーセキュリティ能力に特化した設計。</div>
+
+    <div class="grid2">
+      <div class="panel red">
+        <h3 style="font-size:1rem; font-weight:700; margin-bottom:12px; color:#ff9090;">なぜ公開されていないか</h3>
+        <p style="font-size:0.87rem; color:var(--muted); margin-bottom:12px;">
+          Mythos Previewは、ソフトウェアの脆弱性を発見・エクスプロイトする能力において、「最も熟練した人間のセキュリティ研究者を除くすべての人間を超える」レベルに到達しています。
+        </p>
+        <p style="font-size:0.87rem; color:var(--muted);">
+          このような能力が悪用された場合の壊滅的リスクを考慮し、AnthropicはMythosを一般公開しないと明言。代わりに、防御目的に限定したProject Glasswingコンソーシアムを通じてのみ提供します。
+        </p>
+        <div class="tip-box red" style="margin-top:14px;">
+          <div class="tip-label">Core Principle</div>
+          <p>「このモデルは一般公開しない。将来も一般公開する計画はない」— Anthropic公式発表</p>
+        </div>
+      </div>
+      <div class="panel">
+        <h3 style="font-size:1rem; font-weight:700; margin-bottom:12px; color:var(--text);">Opus 4.6との能力差</h3>
+        <div class="compare-wrap">
+          <div class="compare-row head">
+            <div>タスク</div>
+            <div style="color:#ff9090;">Mythos</div>
+            <div style="color:var(--purple);">Opus 4.6</div>
+          </div>
+          <div class="compare-row">
+            <div>Firefox exploits</div>
+            <div style="color:#ff9090; font-weight:700;">181件</div>
+            <div style="color:var(--purple);">約2件</div>
+          </div>
+          <div class="compare-row">
+            <div>OSS-Fuzz crashes</div>
+            <div style="color:#ff9090; font-weight:700;">595件 (Tier1-2)</div>
+            <div style="color:var(--purple);">1件 (Tier3)</div>
+          </div>
+          <div class="compare-row">
+            <div>自律エクスプロイト開発</div>
+            <div style="color:#ff9090; font-weight:700;">高い成功率</div>
+            <div style="color:var(--purple);">ほぼ0%</div>
+          </div>
+          <div class="compare-row">
+            <div>CyberGym ベンチ</div>
+            <div style="color:#ff9090; font-weight:700;">83.1%</div>
+            <div style="color:var(--purple);">66.6%</div>
+          </div>
+        </div>
+        <p style="font-size:0.82rem; color:var(--dim); margin-top:10px;">※ 1ヶ月前のOpus 4.6は「自律エクスプロイト開発においてほぼ0%の成功率」。Mythosはカテゴリが異なるレベルで動作する。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- BENCHMARKS -->
+  <div class="section">
+    <div class="section-label">Benchmarks</div>
+    <div class="section-title">パフォーマンス指標</div>
+    <div class="section-sub">Mythos vs Opus 4.6 — 汎用・セキュリティ・コーディング全領域での比較</div>
+
+    <div class="panel">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:32px;">
+        <div>
+          <p style="font-size:0.78rem; font-weight:700; color:#ff9090; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:16px;">Claude Mythos Preview</p>
+          <div class="bench-row">
+            <div class="bench-label">CyberGym (サイバーセキュリティ)</div>
+            <div class="bench-track"><div class="bench-bar mythos" style="width:83.1%;"></div></div>
+            <div class="bench-val mythos">83.1%</div>
+          </div>
+          <div class="bench-row">
+            <div class="bench-label">SWE-bench Pro</div>
+            <div class="bench-track"><div class="bench-bar mythos" style="width:77.8%;"></div></div>
+            <div class="bench-val mythos">77.8%</div>
+          </div>
+          <div class="bench-row">
+            <div class="bench-label">Terminal-Bench 2.0</div>
+            <div class="bench-track"><div class="bench-bar mythos" style="width:82%;"></div></div>
+            <div class="bench-val mythos">82.0%</div>
+          </div>
+          <div class="bench-row">
+            <div class="bench-label">SWE-bench Verified</div>
+            <div class="bench-track"><div class="bench-bar mythos" style="width:93.9%;"></div></div>
+            <div class="bench-val mythos">93.9%</div>
+          </div>
+        </div>
+        <div>
+          <p style="font-size:0.78rem; font-weight:700; color:var(--purple); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:16px;">Claude Opus 4.6 (比較)</p>
+          <div class="bench-row">
+            <div class="bench-label">CyberGym (サイバーセキュリティ)</div>
+            <div class="bench-track"><div class="bench-bar opus" style="width:66.6%;"></div></div>
+            <div class="bench-val opus">66.6%</div>
+          </div>
+          <div class="bench-row">
+            <div class="bench-label">SWE-bench Pro</div>
+            <div class="bench-track"><div class="bench-bar opus" style="width:55%;"></div></div>
+            <div class="bench-val opus">~55%</div>
+          </div>
+          <div class="bench-row">
+            <div class="bench-label">Terminal-Bench 2.0</div>
+            <div class="bench-track"><div class="bench-bar opus" style="width:62%;"></div></div>
+            <div class="bench-val opus">~62%</div>
+          </div>
+          <div class="bench-row">
+            <div class="bench-label">SWE-bench Verified</div>
+            <div class="bench-track"><div class="bench-bar opus" style="width:72%;"></div></div>
+            <div class="bench-val opus">~72%</div>
+          </div>
+        </div>
+      </div>
+      <div class="tip-box gold" style="margin-top:20px;">
+        <div class="tip-label">Key Takeaway</div>
+        <p>SWE-bench Verified 93.9% は「コーディングタスクにおいて人間のトップエンジニアを超える」レベル。CyberGymの83.1%はサイバーセキュリティ特化で特に顕著な向上を示す。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ZERO-DAY DISCOVERIES -->
+  <div class="section">
+    <div class="section-label">Zero-Day Discoveries</div>
+    <div class="section-title">発見されたゼロデイ脆弱性</div>
+    <div class="section-sub">数十年間、人間のセキュリティ研究者の目を逃れ続けた脆弱性を自律的に発見。</div>
+
+    <div class="grid3">
+      <div class="cve-card">
+        <div>
+          <span class="cve-badge">CVE-2026-4747</span>
+          <span class="cve-age">17年前の脆弱性</span>
+        </div>
+        <h3>FreeBSD NFS リモートコード実行</h3>
+        <p style="margin-bottom:10px;">スタックバッファオーバーフロー + 20-gadget ROPチェーン。非認証ユーザーがインターネット越しにrootアクセスを取得可能。</p>
+        <p><strong style="color:#ff9090;">エクスプロイト技法:</strong> NFS経由のスタックバッファオーバーフロー、精密なROPチェーン構築</p>
+        <div style="margin-top:10px;">
+          <span class="tag t-r">RCE</span>
+          <span class="tag t-r" style="margin-left:4px;">Root Access</span>
+          <span class="tag t-r" style="margin-left:4px;">Unauthenticated</span>
+        </div>
+      </div>
+      <div class="cve-card">
+        <div>
+          <span class="cve-badge">OpenBSD TCP SACK</span>
+          <span class="cve-age">27年前の脆弱性</span>
+        </div>
+        <h3>OpenBSD TCPスタック リモートDoS</h3>
+        <p style="margin-bottom:10px;">符号付き整数オーバーフロー + ヌルポインタ参照。リモートからのサービス拒否攻撃が可能。</p>
+        <p><strong style="color:#ff9090;">発見の意義:</strong> 27年間のコードレビューと数百万回のファジングテストを潜り抜けてきた脆弱性。</p>
+        <div style="margin-top:10px;">
+          <span class="tag t-r">DoS</span>
+          <span class="tag t-o" style="margin-left:4px;">Integer Overflow</span>
+        </div>
+      </div>
+      <div class="cve-card">
+        <div>
+          <span class="cve-badge">FFmpeg H.264</span>
+          <span class="cve-age">16年前の脆弱性</span>
+        </div>
+        <h3>FFmpeg H.264デコーダ 境界外書き込み</h3>
+        <p style="margin-bottom:10px;">スライス番号とセンチネル値の衝突による境界外書き込み。動画ファイルの再生だけで任意コード実行の可能性。</p>
+        <p><strong style="color:#ff9090;">影響範囲:</strong> FFmpegはほぼすべての動画処理ソフトウェアに使用される基盤ライブラリ。</p>
+        <div style="margin-top:10px;">
+          <span class="tag t-r">Out-of-Bounds Write</span>
+          <span class="tag t-o" style="margin-left:4px;">Media</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="tip-box red" style="margin-top:20px;">
+      <div class="tip-label">Scale of Discovery</div>
+      <p>Project Glasswing参加以来、Mythos Previewは主要OSすべて・主要ブラウザすべて・その他重要ソフトウェアで「数千件のゼロデイ脆弱性」を発見。そのうち99%以上はまだパッチ未適用（ベンダー通知プロセス中）。</p>
+    </div>
+  </div>
+
+  <!-- EXPLOIT CAPABILITIES -->
+  <div class="section">
+    <div class="section-label">Exploit Capabilities</div>
+    <div class="section-title">エクスプロイト開発能力</div>
+    <div class="section-sub">脆弱性の「発見」だけでなく、実際に機能するエクスプロイトの「構築」まで自律的に実行。</div>
+
+    <div class="grid2">
+      <div>
+        <div class="exploit-item">
+          <h4>JIT Heap Spray</h4>
+          <p>JavaScriptエンジンのJITコンパイラを標的とした高度なヒープスプレー攻撃を自律構築。Firefox 147に対して181件の動作するエクスプロイトを生成。</p>
+        </div>
+        <div class="exploit-item">
+          <h4>ROP Chain Construction</h4>
+          <p>複数パケットにまたがるReturn-Oriented Programmingチェーンを自律構築。FreeBSD NFS exploitでは20-gadget ROPチェーンを使用。</p>
+        </div>
+        <div class="exploit-item">
+          <h4>Privilege Escalation Chain</h4>
+          <p>複数の脆弱性を組み合わせた権限昇格チェーンを設計。通常権限から完全なroot制御まで段階的に権限を昇格。</p>
+        </div>
+      </div>
+      <div>
+        <div class="exploit-item">
+          <h4>Reverse Engineering</h4>
+          <p>ストリップされたバイナリから推定ソースコードを再構築。クローズドソースソフトウェアの比較分析による脆弱性識別も可能。</p>
+        </div>
+        <div class="exploit-item">
+          <h4>Guest-to-Host Memory Corruption</h4>
+          <p>「メモリセーフVMM」においてゲストからホストへのメモリ破壊フローを特定。仮想化境界を越えた攻撃経路を発見。</p>
+        </div>
+        <div class="exploit-item">
+          <h4>OSS-Fuzz Scale Testing</h4>
+          <p>約7,000のエントリポイントを持つオープンソースリポジトリで595件のTier1-2クラッシュ。完全なコントロールフローハイジャックを10件達成。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROJECT GLASSWING -->
+  <div class="section">
+    <div class="section-label">Project Glasswing</div>
+    <div class="section-title">参加組織とミッション</div>
+    <div class="section-sub">クリティカルソフトウェアインフラを防御するために選定された12の主要テック企業 + 40以上のオープンソース組織。</div>
+
+    <div class="panel">
+      <p style="font-size:0.88rem; color:var(--muted); margin-bottom:20px;">
+        Project Glasswingは「広範配布される前に、AIの能力に似た能力を使って世界の最も重要なソフトウェアを守る」ことを目的としたコンソーシアム。
+        発見した脆弱性のパッチ適用を優先し、攻撃者がMythosと同等の能力を持つ前にインフラを堅牢化することを目指す。
+      </p>
+      <p style="font-size:0.78rem; font-weight:700; color:var(--dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:12px;">創設パートナー（12社）</p>
+      <div class="company-grid">
+        <div class="company-chip">Amazon Web Services</div>
+        <div class="company-chip">Anthropic</div>
+        <div class="company-chip">Apple</div>
+        <div class="company-chip">Broadcom</div>
+        <div class="company-chip">Cisco</div>
+        <div class="company-chip">CrowdStrike</div>
+        <div class="company-chip">Google</div>
+        <div class="company-chip">JPMorgan Chase</div>
+        <div class="company-chip">Linux Foundation</div>
+        <div class="company-chip">Microsoft</div>
+        <div class="company-chip">NVIDIA</div>
+        <div class="company-chip">Palo Alto Networks</div>
+      </div>
+      <p style="font-size:0.78rem; font-weight:700; color:var(--dim); text-transform:uppercase; letter-spacing:0.08em; margin-top:20px; margin-bottom:12px;">財政支援</p>
+      <div class="grid3">
+        <div class="card">
+          <h3 style="color:#ff9090;">$100M</h3>
+          <p>Anthropicがリサーチプレビュー期間中に提供するモデル利用クレジット</p>
+        </div>
+        <div class="card">
+          <h3 style="color:var(--gold);">$2.5M</h3>
+          <p>オープンソースセキュリティ組織への寄付（Alpha-Omega、OpenSSF）</p>
+        </div>
+        <div class="card">
+          <h3 style="color:var(--blue);">$1.5M</h3>
+          <p>Apache Software Foundationへの直接寄付</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACCESS MODEL -->
+  <div class="section">
+    <div class="section-label">Access &amp; Pricing</div>
+    <div class="section-title">アクセスモデルと価格</div>
+    <div class="section-sub">リサーチプレビュー期間は$100Mクレジットで提供。プレビュー後の標準価格は高水準。</div>
+
+    <div class="grid2">
+      <div>
+        <div class="price-table">
+          <div class="price-row head">
+            <div>モデル</div>
+            <div>Input</div>
+            <div>Output</div>
+            <div>ステータス</div>
+          </div>
+          <div class="price-row">
+            <div style="color:#ff9090; font-weight:700;">Mythos Preview</div>
+            <div>$25/M tokens</div>
+            <div>$125/M tokens</div>
+            <div><span class="tag t-r">Gated</span></div>
+          </div>
+          <div class="price-row">
+            <div style="color:var(--purple);">Opus 4.6</div>
+            <div>$15/M tokens</div>
+            <div>$75/M tokens</div>
+            <div><span class="tag t-g">Public</span></div>
+          </div>
+          <div class="price-row">
+            <div style="color:var(--blue);">Sonnet 4.6</div>
+            <div>$3/M tokens</div>
+            <div>$15/M tokens</div>
+            <div><span class="tag t-g">Public</span></div>
+          </div>
+        </div>
+        <div class="tip-box gold" style="margin-top:14px;">
+          <div class="tip-label">Research Preview</div>
+          <p>$100Mのクレジットが提供されるリサーチプレビュー期間中は、参加組織は実質的に無料でMythosを利用可能。</p>
+        </div>
+      </div>
+      <div>
+        <div class="panel">
+          <h3 style="font-size:0.9rem; font-weight:700; margin-bottom:12px; color:var(--text);">利用可能なプラットフォーム</h3>
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <div style="display:flex; align-items:center; gap:10px; padding:10px 14px; background:rgba(255,255,255,0.04); border-radius:8px; border:1px solid rgba(255,255,255,0.07);">
+              <span class="tag t-r">Gated</span>
+              <span style="font-size:0.85rem;">Claude API (Direct)</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px; padding:10px 14px; background:rgba(255,255,255,0.04); border-radius:8px; border:1px solid rgba(255,255,255,0.07);">
+              <span class="tag t-r">Gated</span>
+              <span style="font-size:0.85rem;">Amazon Bedrock</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px; padding:10px 14px; background:rgba(255,255,255,0.04); border-radius:8px; border:1px solid rgba(255,255,255,0.07);">
+              <span class="tag t-r">Gated</span>
+              <span style="font-size:0.85rem;">Google Cloud Vertex AI</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px; padding:10px 14px; background:rgba(255,255,255,0.04); border-radius:8px; border:1px solid rgba(255,255,255,0.07);">
+              <span class="tag t-r">Gated</span>
+              <span style="font-size:0.85rem;">Microsoft Azure Foundry</span>
+            </div>
+          </div>
+          <p style="font-size:0.8rem; color:var(--dim); margin-top:12px;">全プラットフォームでGated Research Preview。申請・承認プロセス必須。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESPONSIBLE DISCLOSURE -->
+  <div class="section">
+    <div class="section-label">Responsible Disclosure</div>
+    <div class="section-title">責任ある開示プロセス</div>
+    <div class="section-sub">発見した脆弱性はすぐに公表せず、ベンダーが修正できる時間を確保するプロセスを採用。</div>
+
+    <div class="grid3">
+      <div class="card">
+        <div class="tag t-r" style="margin-bottom:10px;">Step 1</div>
+        <h3>発見 &amp; 検証</h3>
+        <p>Mythos Previewが脆弱性を発見。人間のセキュリティ専門家がすべての発見を検証してから次のステップへ進む。</p>
+      </div>
+      <div class="card">
+        <div class="tag t-o" style="margin-bottom:10px;">Step 2</div>
+        <h3>ベンダー通知</h3>
+        <p>影響を受けるソフトウェアベンダーに非公開で通知。パッチ開発のために90〜135日の猶予期間を提供。</p>
+      </div>
+      <div class="card">
+        <div class="tag t-g" style="margin-bottom:10px;">Step 3</div>
+        <h3>公開開示</h3>
+        <p>パッチ適用後、SHA-3ハッシュによる暗号学的証明付きで詳細な技術分析を公開。ブロックチェーンにタイムスタンプを記録。</p>
+      </div>
+    </div>
+
+    <div class="tip-box blue" style="margin-top:20px;">
+      <div class="tip-label">99% Unpatched</div>
+      <p>発見された脆弱性の99%以上はまだパッチ未適用の状態。Glasswingチームは現在ベンダーとの連携・開示プロセスの真っ最中にある。このデータが公開されている理由は「存在を知らせること」であり、「悪用を助長すること」ではない。</p>
+    </div>
+  </div>
+
+  <!-- STRATEGIC IMPLICATIONS -->
+  <div class="section">
+    <div class="section-label">Strategic Implications</div>
+    <div class="section-title">何を意味するか — 大局的視点</div>
+    <div class="section-sub">Claude Mythosの登場が示す、AIと安全保障の転換点。</div>
+
+    <div class="grid2">
+      <div class="panel red">
+        <h3 style="font-size:1rem; font-weight:700; margin-bottom:12px; color:#ff9090;">能力の「ジャギー・フロンティア」</h3>
+        <p style="font-size:0.87rem; color:var(--muted); margin-bottom:10px;">
+          Mythos発表前、多くの研究者は「AIによる自律的なゼロデイ発見はまだ先の話」と考えていた。
+          しかしMythosはこれを一夜にして覆した。このような「突然の能力飛躍」がAI進化の特徴。
+        </p>
+        <p style="font-size:0.87rem; color:var(--muted);">
+          <strong style="color:#ff9090;">Implication:</strong> 今日「安全」と思っているソフトウェアインフラは、
+          1〜2年後にMythos相当の能力が普及したとき、同時多発的に発見・悪用される可能性がある。
+          防御的な先手がこれほど重要な時代はなかった。
+        </p>
+      </div>
+      <div class="panel gold">
+        <h3 style="font-size:1rem; font-weight:700; margin-bottom:12px; color:var(--gold);">MAチーム・金融機関への示唆</h3>
+        <p style="font-size:0.87rem; color:var(--muted); margin-bottom:10px;">
+          JPMorgan ChaseがProject Glasswingの創設パートナーに含まれていることは象徴的。
+          金融機関にとってサイバーセキュリティはシステミックリスクそのもの。
+        </p>
+        <ul style="padding-left:16px; font-size:0.85rem; color:var(--muted); display:flex; flex-direction:column; gap:6px;">
+          <li>デューデリジェンス対象企業のサイバーリスク評価の精度が向上</li>
+          <li>Portfolio企業のセキュリティ診断への活用可能性</li>
+          <li>M&A後のITシステム統合リスクの事前評価</li>
+          <li>規制当局報告における「AI活用セキュリティ対策」の明示</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:16px;">
+      <h3 style="font-size:0.95rem; font-weight:700; margin-bottom:14px;">CFRが指摘する「6つの転換点」</h3>
+      <div class="grid3">
+        <div style="padding:12px; border:1px solid rgba(255,255,255,0.07); border-radius:10px; background:rgba(255,255,255,0.02);">
+          <div class="tag t-r" style="margin-bottom:8px;">①</div>
+          <p style="font-size:0.83rem; color:var(--muted);">AIが初めて「自律的なゼロデイ発見者」として実証された歴史的瞬間</p>
+        </div>
+        <div style="padding:12px; border:1px solid rgba(255,255,255,0.07); border-radius:10px; background:rgba(255,255,255,0.02);">
+          <div class="tag t-r" style="margin-bottom:8px;">②</div>
+          <p style="font-size:0.83rem; color:var(--muted);">攻撃者優位から防御者優位へのパラダイムシフトの可能性</p>
+        </div>
+        <div style="padding:12px; border:1px solid rgba(255,255,255,0.07); border-radius:10px; background:rgba(255,255,255,0.02);">
+          <div class="tag t-r" style="margin-bottom:8px;">③</div>
+          <p style="font-size:0.83rem; color:var(--muted);">能力の選択的配布モデル（民主化 vs 管理）のデファクトスタンダード確立</p>
+        </div>
+        <div style="padding:12px; border:1px solid rgba(255,255,255,0.07); border-radius:10px; background:rgba(255,255,255,0.02);">
+          <div class="tag t-o" style="margin-bottom:8px;">④</div>
+          <p style="font-size:0.83rem; color:var(--muted);">ビッグテック連合によるオープンソースインフラ保護の新しい協調モデル</p>
+        </div>
+        <div style="padding:12px; border:1px solid rgba(255,255,255,0.07); border-radius:10px; background:rgba(255,255,255,0.02);">
+          <div class="tag t-o" style="margin-bottom:8px;">⑤</div>
+          <p style="font-size:0.83rem; color:var(--muted);">国家レベルのサイバー能力とAI企業の能力が交差する地政学的転換</p>
+        </div>
+        <div style="padding:12px; border:1px solid rgba(255,255,255,0.07); border-radius:10px; background:rgba(255,255,255,0.02);">
+          <div class="tag t-g" style="margin-bottom:8px;">⑥</div>
+          <p style="font-size:0.83rem; color:var(--muted);">「知的能力の制限的配布」という倫理規範がAI業界に定着するかどうかの試金石</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TECHNICAL CONTEXT -->
+  <div class="section">
+    <div class="section-label">Technical Context</div>
+    <div class="section-title">モデル位置付けとアーキテクチャ</div>
+    <div class="section-sub">Claudeのモデル階層における「Mythos」の位置づけと既知の技術的特性。</div>
+
+    <div class="grid2">
+      <div class="panel">
+        <h3 style="font-size:0.9rem; font-weight:700; margin-bottom:14px;">Claude モデル階層 (2026年4月現在)</h3>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; align-items:center; gap:12px; padding:12px 16px; background:rgba(255,107,107,0.1); border:1px solid rgba(255,107,107,0.3); border-radius:10px;">
+            <span style="font-size:1.2rem;">🔒</span>
+            <div>
+              <div style="font-weight:700; color:#ff9090; font-size:0.9rem;">Claude Mythos Preview</div>
+              <div style="font-size:0.75rem; color:var(--dim);">Gated / Glasswing only · Codename: Capybara</div>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px; padding:12px 16px; background:rgba(196,160,255,0.08); border:1px solid rgba(196,160,255,0.2); border-radius:10px;">
+            <span style="font-size:1.2rem;">🧠</span>
+            <div>
+              <div style="font-weight:700; color:var(--purple); font-size:0.9rem;">Claude Opus 4.6</div>
+              <div style="font-size:0.75rem; color:var(--dim);">Public · Best reasoning · $15/$75</div>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px; padding:12px 16px; background:rgba(102,224,194,0.06); border:1px solid rgba(102,224,194,0.15); border-radius:10px;">
+            <span style="font-size:1.2rem;">⚡</span>
+            <div>
+              <div style="font-weight:700; color:#66e0c2; font-size:0.9rem;">Claude Sonnet 4.6</div>
+              <div style="font-size:0.75rem; color:var(--dim);">Public · Balanced · $3/$15</div>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px; padding:12px 16px; background:rgba(244,184,96,0.06); border:1px solid rgba(244,184,96,0.15); border-radius:10px;">
+            <span style="font-size:1.2rem;">🚀</span>
+            <div>
+              <div style="font-weight:700; color:var(--gold); font-size:0.9rem;">Claude Haiku 4.5</div>
+              <div style="font-size:0.75rem; color:var(--dim);">Public · Fast / Cost-efficient</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="panel" style="margin-bottom:16px;">
+          <h3 style="font-size:0.9rem; font-weight:700; margin-bottom:10px; color:var(--text);">なぜ「Mythos」という名前か</h3>
+          <p style="font-size:0.85rem; color:var(--muted);">
+            「神話」を意味するMythosは、これまで「伝説」として語られてきたレベルのAI能力が現実になったことを示唆する命名。
+            内部コードネーム「Capybara」とは対照的に、外部名称はその象徴的な意味を強調。
+          </p>
+        </div>
+        <div class="tip-box red">
+          <div class="tip-label">一般ユーザーへの影響</div>
+          <p>
+            今すぐMythosを使える可能性はゼロに近い。しかし、Mythosが発見した脆弱性のパッチは
+            将来的に使っているOSやブラウザのアップデートに含まれる。
+            実質的には「すでにMythosの恩恵を受けている」状態になりつつある。
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /shell -->
+
+<footer class="shell">
+  <div>
+    <a href="index.html">← Knowledge Index</a>
+    &nbsp;·&nbsp;
+    <a href="claude-model.html">Claude モデル概観</a>
+    &nbsp;·&nbsp;
+    <a href="intelligence-matrix.html">Intelligence Matrix</a>
+  </div>
+  <div>Source: Anthropic Project Glasswing · red.anthropic.com · April 2026</div>
+</footer>
+
+</body>
+</html>

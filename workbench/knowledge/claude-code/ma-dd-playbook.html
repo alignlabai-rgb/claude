@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MA-DD自動化 完全プレイブック | Skills × Agent Teams × Routines × MCP × Computer Use × Cowork</title>
+  <style>
+    :root {
+      --bg: #07111d;
+      --panel: #0d1829;
+      --panel2: #091018;
+      --text: #e8eef9;
+      --muted: #b6c3da;
+      --dim: #5a7a9a;
+      --accent: #66e0c2;
+      --gold: #f4b860;
+      --blue: #60d0ff;
+      --purple: #c4a0ff;
+      --red: #ff9090;
+      --green: #4FFFB0;
+      --orange: #f7a87a;
+      --border: rgba(255,255,255,0.08);
+      --r: 16px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Segoe UI","Noto Sans JP",system-ui,sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; padding: 0 0 80px; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code { background: rgba(255,255,255,0.08); border-radius: 4px; padding: 0.1em 0.45em; font-size: 0.84em; font-family: "Fira Code","Consolas",monospace; color: #a5f3d0; }
+    pre { background: #060e1a; border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 16px 18px; overflow-x: auto; font-family: "Fira Code","Consolas",monospace; font-size: 0.83em; color: #a5f3d0; line-height: 1.6; margin: 10px 0; }
+
+    .hero { background: linear-gradient(135deg, #071420 0%, #0c1e10 40%, #0d1a2e 100%); border-bottom: 2px solid rgba(244,184,96,0.3); padding: 56px 40px 48px; }
+    .breadcrumb { font-size: 0.8rem; color: var(--dim); margin-bottom: 16px; }
+    .breadcrumb a { color: var(--accent); }
+    .hero-eyebrow { display: inline-flex; align-items: center; gap: 8px; background: rgba(244,184,96,0.12); border: 1px solid rgba(244,184,96,0.35); color: var(--gold); font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; padding: 5px 16px; border-radius: 999px; margin-bottom: 18px; }
+    .hero h1 { font-size: 2.6rem; font-weight: 900; line-height: 1.12; margin-bottom: 14px; }
+    .hero h1 em { font-style: normal; background: linear-gradient(90deg, #f4b860, #4FFFB0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero-sub { color: var(--muted); font-size: 0.97rem; max-width: 760px; line-height: 1.8; }
+    .hero-meta { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 22px; }
+    .meta-chip { background: rgba(255,255,255,0.06); border: 1px solid var(--border); border-radius: 8px; padding: 5px 12px; font-size: 0.77rem; color: var(--muted); }
+    .meta-chip strong { color: var(--gold); }
+
+    .shell { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+    .section { padding: 48px 0 0; }
+    .section-label { font-size: 0.7rem; font-weight: 700; color: var(--gold); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+    .section-title { font-size: 1.45rem; font-weight: 800; margin-bottom: 6px; }
+    .section-sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 22px; }
+
+    .panel { background: var(--panel); border: 1px solid var(--border); border-radius: var(--r); padding: 22px 26px; }
+    .panel.gold { border-color: rgba(244,184,96,0.35); background: linear-gradient(135deg, #0d1829, #141c0e); }
+    .panel.blue { border-color: rgba(96,208,255,0.3); background: linear-gradient(135deg, #0d1829, #0e1c30); }
+    .panel.dark { background: #060e1a; border-color: rgba(255,255,255,0.06); }
+
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+    .grid4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
+    @media (max-width: 800px) { .grid2,.grid3 { grid-template-columns: 1fr; } .grid4 { grid-template-columns: 1fr 1fr; } }
+
+    .card { background: var(--panel2); border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; }
+    .card h3 { font-size: 0.93rem; font-weight: 700; margin-bottom: 7px; }
+    .card p, .card li { font-size: 0.85rem; color: var(--muted); }
+    .card ul { padding-left: 15px; display: flex; flex-direction: column; gap: 4px; margin-top: 5px; }
+
+    .tag { display: inline-block; font-size: 0.67rem; font-weight: 700; padding: 2px 8px; border-radius: 5px; }
+    .t-g { background: rgba(79,255,176,0.15); color: #4FFFB0; }
+    .t-b { background: rgba(96,208,255,0.15); color: #60d0ff; }
+    .t-p { background: rgba(196,160,255,0.15); color: #c4a0ff; }
+    .t-o { background: rgba(244,184,96,0.15); color: #f4b860; }
+    .t-r { background: rgba(255,144,144,0.15); color: #ff9090; }
+
+    /* === BIG ARCH DIAGRAM === */
+    .big-arch { background: #060e1a; border: 1px solid rgba(255,255,255,0.07); border-radius: 20px; padding: 36px 28px; }
+    .arch-title { font-size: 0.72rem; font-weight: 700; color: var(--dim); text-transform: uppercase; letter-spacing: 0.08em; text-align: center; margin-bottom: 28px; }
+
+    .layer { margin-bottom: 18px; }
+    .layer-label { font-size: 0.65rem; font-weight: 700; color: var(--dim); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; text-align: center; }
+    .layer-row { display: flex; align-items: stretch; justify-content: center; gap: 10px; flex-wrap: wrap; }
+    .abox { border-radius: 10px; padding: 10px 16px; font-size: 0.8rem; font-weight: 700; border: 1px solid; text-align: center; min-width: 120px; }
+    .abox small { display: block; font-size: 0.68rem; font-weight: 400; margin-top: 3px; opacity: 0.8; }
+    .abox.gold  { border-color: rgba(244,184,96,0.5);  color: var(--gold);   background: rgba(244,184,96,0.08); }
+    .abox.green { border-color: rgba(79,255,176,0.5);  color: var(--green);  background: rgba(79,255,176,0.07); }
+    .abox.blue  { border-color: rgba(96,208,255,0.5);  color: var(--blue);   background: rgba(96,208,255,0.07); }
+    .abox.purple{ border-color: rgba(196,160,255,0.5); color: var(--purple); background: rgba(196,160,255,0.07); }
+    .abox.orange{ border-color: rgba(247,168,122,0.5); color: var(--orange); background: rgba(247,168,122,0.07); }
+    .abox.accent{ border-color: rgba(102,224,194,0.5); color: var(--accent); background: rgba(102,224,194,0.07); }
+    .abox.red   { border-color: rgba(255,144,144,0.4); color: var(--red);    background: rgba(255,144,144,0.06); }
+    .arch-arrow-down { text-align: center; color: var(--dim); font-size: 1.1rem; margin: 4px 0; }
+    .arch-divider { border-top: 1px dashed rgba(255,255,255,0.06); margin: 18px 0; }
+
+    /* === PHASE TIMELINE === */
+    .phase { display: flex; gap: 0; margin-bottom: 0; }
+    .phase-bar { width: 6px; background: linear-gradient(180deg, var(--bar-color), transparent); border-radius: 3px; flex-shrink: 0; margin-right: 20px; }
+    .phase-content { flex: 1; padding-bottom: 32px; }
+    .phase-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+    .phase-num { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.82rem; font-weight: 900; flex-shrink: 0; border: 2px solid; }
+    .phase-title { font-size: 1.05rem; font-weight: 800; }
+    .phase-subtitle { font-size: 0.82rem; color: var(--muted); margin-top: 2px; }
+
+    .step-item { display: flex; gap: 12px; align-items: flex-start; padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .step-item:last-child { border-bottom: none; }
+    .step-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 7px; }
+    .step-item h4 { font-size: 0.88rem; font-weight: 700; margin-bottom: 3px; }
+    .step-item p { font-size: 0.82rem; color: var(--muted); }
+
+    /* === TECH PILL ROW === */
+    .tech-pills { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+    .pill { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 999px; padding: 4px 12px; font-size: 0.75rem; font-weight: 600; }
+
+    .tip-box { border-radius: 10px; padding: 13px 16px; margin-top: 12px; }
+    .tip-box.gold { background: linear-gradient(135deg, rgba(244,184,96,0.08), rgba(247,168,122,0.05)); border: 1px solid rgba(244,184,96,0.3); }
+    .tip-box.green { background: linear-gradient(135deg, rgba(79,255,176,0.08), rgba(102,224,194,0.05)); border: 1px solid rgba(79,255,176,0.3); }
+    .tip-box.blue  { background: linear-gradient(135deg, rgba(96,208,255,0.08), rgba(102,224,194,0.05)); border: 1px solid rgba(96,208,255,0.3); }
+    .tip-label { font-size: 0.67rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 5px; }
+    .tip-box.gold .tip-label  { color: var(--gold); }
+    .tip-box.green .tip-label { color: var(--green); }
+    .tip-box.blue .tip-label  { color: var(--blue); }
+    .tip-box p { font-size: 0.84rem; color: var(--text); margin: 0; }
+
+    .kpi-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin: 16px 0; }
+    @media (max-width: 700px) { .kpi-row { grid-template-columns: 1fr 1fr; } }
+    .kpi { background: var(--panel2); border: 1px solid var(--border); border-radius: 12px; padding: 16px; text-align: center; }
+    .kpi .val { font-size: 2rem; font-weight: 900; line-height: 1; }
+    .kpi .lbl { font-size: 0.72rem; color: var(--muted); margin-top: 5px; }
+
+    footer { margin: 60px 24px 0; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.06); font-size: 0.78rem; color: var(--dim); display: flex; gap: 16px; flex-wrap: wrap; justify-content: space-between; }
+  </style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="breadcrumb shell"><a href="../index.html">← Workbench</a> / <a href="index.html">Claude Code</a> / MA-DD 完全プレイブック</div>
+  <div class="shell">
+    <div class="hero-eyebrow">🏆 統合設計書 · MAチームDD自動化 · 2026年版</div>
+    <h1><em>MA-DD自動化</em><br>完全プレイブック</h1>
+    <p class="hero-sub">Skills × Agent Teams × Routines × MCP × Computer Use × Cowork — 6つの機能がどう連携してMAチームのデューデリジェンスを自動化するか。個別ページの集大成として、「全部つなぐとどう動くか」を1枚の設計図で示す実務プレイブック。</p>
+    <div class="hero-meta">
+      <div class="meta-chip">対象: <strong>SBI新生銀行 グループ海外事業統括部</strong></div>
+      <div class="meta-chip">更新: <strong>2026年4月16日</strong></div>
+      <div class="meta-chip">前提: <strong>Claude Cowork Team + Claude Code Max</strong></div>
+    </div>
+  </div>
+</div>
+
+<div class="shell">
+
+  <!-- ビジョン -->
+  <section class="section">
+    <div class="section-label">ビジョン</div>
+    <div class="section-title">目指す状態 — 「1人のアナリストが100社を並列監視する」</div>
+    <div class="section-sub">チャット型AIとの決定的な断絶。完全自動化DDパイプラインが実現すること。</div>
+
+    <div class="kpi-row">
+      <div class="kpi"><div class="val" style="color:var(--gold);">100社</div><div class="lbl">1人が同時監視できる<br>ターゲット企業数</div></div>
+      <div class="kpi"><div class="val" style="color:var(--green);">24h</div><div class="lbl">人間不在でも<br>DDが進む時間</div></div>
+      <div class="kpi"><div class="val" style="color:var(--blue);">-80%</div><div class="lbl">情報収集・整理の<br>手作業削減率</div></div>
+      <div class="kpi"><div class="val" style="color:var(--purple);">Day 1</div><div class="lbl">新人が使える<br>チームDDライブラリ</div></div>
+    </div>
+  </section>
+
+  <!-- 全体アーキテクチャ図 -->
+  <section class="section">
+    <div class="section-label">全体設計</div>
+    <div class="section-title">完全自動DDパイプライン — 全コンポーネントの接続図</div>
+    <div class="section-sub">6機能が階層を成してDDパイプラインを構成する。上から下へデータが流れ、結果が人間に届く。</div>
+
+    <div class="big-arch">
+      <div class="arch-title">MA-DD自動化 完全アーキテクチャ（2026年4月版）</div>
+
+      <div class="layer">
+        <div class="layer-label">トリガー層 — いつ動くか</div>
+        <div class="layer-row">
+          <div class="abox gold">⏰ Routines<br><small>毎朝8時・毎週月曜</small></div>
+          <div class="abox gold">🔌 API Trigger<br><small>案件登録時に即起動</small></div>
+          <div class="abox gold">👤 手動起動<br><small>Claude Code @コマンド</small></div>
+        </div>
+      </div>
+      <div class="arch-arrow-down">↓</div>
+
+      <div class="layer">
+        <div class="layer-label">コーディネーション層 — 誰が指揮するか</div>
+        <div class="layer-row">
+          <div class="abox blue">🤖 Orchestrator Agent<br><small>dd-swarm-orchestrator Skill</small></div>
+        </div>
+      </div>
+      <div class="arch-arrow-down">↓ 並列タスク分配</div>
+
+      <div class="layer">
+        <div class="layer-label">実行層 — 誰が作業するか（Agent Teams × Skills）</div>
+        <div class="layer-row">
+          <div class="abox green">💹 財務DDエージェント<br><small>dd-financial-analyst Skill</small></div>
+          <div class="abox green">⚖️ 法務DDエージェント<br><small>dd-legal-reviewer Skill</small></div>
+          <div class="abox green">📊 ビジネスDDエージェント<br><small>dd-business-analyst Skill</small></div>
+        </div>
+      </div>
+      <div class="arch-arrow-down">↓ 各エージェントがMCPで外部データ取得</div>
+
+      <div class="layer">
+        <div class="layer-label">データ取得層 — どこからデータを取るか（MCP × Computer Use × Files API）</div>
+        <div class="layer-row">
+          <div class="abox orange">🔌 Bloomberg MCP<br><small>財務データ・株価</small></div>
+          <div class="abox orange">🗄️ DD-DB MCP<br><small>過去案件・ベンチマーク</small></div>
+          <div class="abox orange">🖥️ Computer Use<br><small>データルーム・EDINET</small></div>
+          <div class="abox orange">📁 Files API<br><small>アップ済みPDF参照</small></div>
+        </div>
+      </div>
+      <div class="arch-arrow-down">↓ 分析結果を統合</div>
+
+      <div class="layer">
+        <div class="layer-label">統合・記憶層 — 知識をどう蓄積するか（Cowork × Advisor Tool）</div>
+        <div class="layer-row">
+          <div class="abox purple">📋 レポート統合Agent<br><small>dd-report-synthesizer Skill</small></div>
+          <div class="abox purple">⚡ Advisor Tool<br><small>Opus 4.6が重要判断をレビュー</small></div>
+          <div class="abox purple">🧠 Group Memory<br><small>学びを蓄積・次回に活用</small></div>
+        </div>
+      </div>
+      <div class="arch-arrow-down">↓ 結果を届ける</div>
+
+      <div class="layer">
+        <div class="layer-label">デリバリー層 — 誰にどう届けるか</div>
+        <div class="layer-row">
+          <div class="abox accent">💬 Slack通知<br><small>MCP経由で即時</small></div>
+          <div class="abox accent">📄 DDレポートPDF<br><small>Google Drive保存</small></div>
+          <div class="abox accent">🏢 Cowork Project<br><small>チーム全員が参照可</small></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- フェーズ別実装ロードマップ -->
+  <section class="section">
+    <div class="section-label">実装ロードマップ</div>
+    <div class="section-title">フェーズ別導入計画 — 4週間で動くシステムを作る</div>
+    <div class="section-sub">「全部一度に」は失敗のもと。価値が出る順番に積み上げる4フェーズ戦略。</div>
+
+    <!-- Phase 1 -->
+    <div class="phase" style="--bar-color: var(--blue);">
+      <div class="phase-bar" style="background: linear-gradient(180deg, var(--blue), rgba(96,208,255,0.1));"></div>
+      <div class="phase-content">
+        <div class="phase-header">
+          <div class="phase-num" style="border-color:var(--blue); color:var(--blue); background:rgba(96,208,255,0.1);">W1</div>
+          <div>
+            <div class="phase-title">Phase 1: 基盤整備</div>
+            <div class="phase-subtitle">Cowork設定 × Skillライブラリ × Files API — 「土台」を作る</div>
+          </div>
+        </div>
+        <div class="panel" style="padding:16px 20px;">
+          <div class="step-item">
+            <div class="step-dot" style="background:var(--blue);"></div>
+            <div><h4>Coworkアカウント設定（Day 1）</h4><p>管理者がclaude.ai/teamでチームを作成。RBAC設定（MD=Admin, アナリスト=Member）。メンバー招待。</p></div>
+          </div>
+          <div class="step-item">
+            <div class="step-dot" style="background:var(--blue);"></div>
+            <div><h4>Group Memory初期投入（Day 2-3）</h4><p>既存DDチェックリスト・バリュエーション基準・顧問リストをGroup Memoryに移行。チームで30分のKick-offで書き込みを依頼。</p></div>
+          </div>
+          <div class="step-item">
+            <div class="step-dot" style="background:var(--blue);"></div>
+            <div><h4>Skillライブラリ作成（Day 3-5）</h4><p><code>.claude/agents/</code>に財務・法務・ビジネスDDの3 Skillを作成。既存チェックリストを本文に変換するだけでよい。完璧を求めない。</p></div>
+          </div>
+          <div class="step-item" style="border-bottom:none;">
+            <div class="step-dot" style="background:var(--blue);"></div>
+            <div><h4>Files API — DDデータルームのアップロード（Day 4-5）</h4><p>進行中案件のPDFをFiles APIに一括登録。file_idをスプレッドシートで管理。以降のDDで再利用可能になる。</p></div>
+          </div>
+        </div>
+        <div class="tip-box blue" style="margin-top:10px;">
+          <div class="tip-label">Week 1終了時点で得られるもの</div>
+          <p>チーム全員が同じSkillを使える環境が整う。新人が初日から「財務DDを開始して」と言えばチームの標準手順でDDが始まる。</p>
+        </div>
+        <div class="tech-pills" style="margin-top:10px;">
+          <span class="pill" style="color:var(--blue);">Cowork RBAC</span>
+          <span class="pill" style="color:var(--green);">Skills (.claude/agents/)</span>
+          <span class="pill" style="color:var(--gold);">Files API</span>
+          <span class="pill" style="color:var(--green);">Group Memory</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Phase 2 -->
+    <div class="phase" style="--bar-color: var(--green);">
+      <div class="phase-bar" style="background: linear-gradient(180deg, var(--green), rgba(79,255,176,0.1));"></div>
+      <div class="phase-content">
+        <div class="phase-header">
+          <div class="phase-num" style="border-color:var(--green); color:var(--green); background:rgba(79,255,176,0.1);">W2</div>
+          <div>
+            <div class="phase-title">Phase 2: マルチエージェント化</div>
+            <div class="phase-subtitle">Agent Teams × MCP — 「並列処理」を手に入れる</div>
+          </div>
+        </div>
+        <div class="panel" style="padding:16px 20px;">
+          <div class="step-item">
+            <div class="step-dot" style="background:var(--green);"></div>
+            <div><h4>settings.json にAgent Teams有効化（Day 1）</h4><p><code>CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS: "1"</code>を設定。OrchestratorとWorkerの役割分担を定義した<code>dd-swarm-orchestrator.md</code>を作成。</p></div>
+          </div>
+          <div class="step-item">
+            <div class="step-dot" style="background:var(--green);"></div>
+            <div><h4>社内DDデータベースMCPの構築（Day 2-4）</h4><p>TypeScriptでdd-database MCPサーバーを実装。過去案件検索・バリュエーションベンチマーク取得の2ツールを先行リリース。Postgresに接続。</p></div>
+          </div>
+          <div class="step-item">
+            <div class="step-dot" style="background:var(--green);"></div>
+            <div><h4>公式MCPサーバーの接続（Day 3）</h4><p>Slack MCP + Google Drive MCPを設定ファイルに追加。DDレポートをDriveに自動保存 + Slackに要約通知するフローを構築。</p></div>
+          </div>
+          <div class="step-item" style="border-bottom:none;">
+            <div class="step-dot" style="background:var(--green);"></div>
+            <div><h4>DD Swarm初回試走（Day 4-5）</h4><p>3エージェント並列DDを実際の案件で試走。Orchestratorの指示 → 3エージェントが並列実行 → 統合レポート生成 の全フローを確認。</p></div>
+          </div>
+        </div>
+        <div class="tip-box green">
+          <div class="tip-label">Week 2終了時点で得られるもの</div>
+          <p>財務・法務・ビジネスDDが並列実行できる。従来3日かかったDD初期分析が午前中に完了するようになる。</p>
+        </div>
+        <div class="tech-pills" style="margin-top:10px;">
+          <span class="pill" style="color:var(--green);">Agent Teams</span>
+          <span class="pill" style="color:var(--orange);">Custom MCP (DD-DB)</span>
+          <span class="pill" style="color:var(--orange);">Slack MCP</span>
+          <span class="pill" style="color:var(--orange);">Google Drive MCP</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Phase 3 -->
+    <div class="phase" style="--bar-color: var(--gold);">
+      <div class="phase-bar" style="background: linear-gradient(180deg, var(--gold), rgba(244,184,96,0.1));"></div>
+      <div class="phase-content">
+        <div class="phase-header">
+          <div class="phase-num" style="border-color:var(--gold); color:var(--gold); background:rgba(244,184,96,0.1);">W3</div>
+          <div>
+            <div class="phase-title">Phase 3: 自動化</div>
+            <div class="phase-subtitle">Routines × Computer Use — 「呼ばなくても動く」状態へ</div>
+          </div>
+        </div>
+        <div class="panel" style="padding:16px 20px;">
+          <div class="step-item">
+            <div class="step-dot" style="background:var(--gold);"></div>
+            <div><h4>毎朝ニュースモニタリングRoutineの設定</h4><p>毎朝7:50に起動してターゲット企業リストのニュースをスキャン。8:00に要約をSlack #ma-monitoring に投稿。<code>/schedule "毎週月曜8時"</code>で設定。</p></div>
+          </div>
+          <div class="step-item">
+            <div class="step-dot" style="background:var(--gold);"></div>
+            <div><h4>Computer Use — EDINET自動収集の構築</h4><p>Dockerサンドボックスを用意。EDINETから対象企業の有価証券報告書を自動ダウンロード → Files APIにアップロード → 財務DDエージェントが即分析を開始するパイプラインを構築。</p></div>
+          </div>
+          <div class="step-item">
+            <div class="step-dot" style="background:var(--gold);"></div>
+            <div><h4>案件登録API Triggerの設定</h4><p>社内の案件管理システムからWebhookでDD Swarmを起動。案件DBに新レコードが追加された瞬間にMCPがClaudeにPOSTしてDDが自動開始。</p></div>
+          </div>
+          <div class="step-item" style="border-bottom:none;">
+            <div class="step-dot" style="background:var(--gold);"></div>
+            <div><h4>Advisor Tool の組み込み</h4><p>日常処理はHaiku（エグゼキューター）、バリュエーション判断・重大リスク評価はOpus 4.6（Advisor）に委ねるハイブリッド構成に移行。コスト構造が変わる。</p></div>
+          </div>
+        </div>
+        <div class="tip-box gold">
+          <div class="tip-label">Week 3終了時点で得られるもの</div>
+          <p>毎朝出社するとSlackにターゲット企業の動向サマリーが届いている。案件登録の瞬間にDDが自動開始されている。「AIを動かす」から「AIが勝手に動いている」へ。</p>
+        </div>
+        <div class="tech-pills" style="margin-top:10px;">
+          <span class="pill" style="color:var(--gold);">Routines（Schedule）</span>
+          <span class="pill" style="color:var(--gold);">Routines（API Trigger）</span>
+          <span class="pill" style="color:var(--purple);">Computer Use</span>
+          <span class="pill" style="color:var(--blue);">Advisor Tool</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Phase 4 -->
+    <div class="phase" style="--bar-color: var(--purple);">
+      <div class="phase-bar" style="background: linear-gradient(180deg, var(--purple), rgba(196,160,255,0.1));"></div>
+      <div class="phase-content">
+        <div class="phase-header">
+          <div class="phase-num" style="border-color:var(--purple); color:var(--purple); background:rgba(196,160,255,0.1);">W4+</div>
+          <div>
+            <div class="phase-title">Phase 4: 最適化 & 拡張</div>
+            <div class="phase-subtitle">Managed Agents × Prompt Caching × 継続改善 — 「本番品質」へ</div>
+          </div>
+        </div>
+        <div class="panel" style="padding:16px 20px;">
+          <div class="step-item">
+            <div class="step-dot" style="background:var(--purple);"></div>
+            <div><h4>Managed Agentsへの移行</h4><p>Agent Teams実行環境をAnthropicクラウドに移行。サーバー管理ゼロ。自動Prompt Cachingが有効化されコスト最適化が完了。</p></div>
+          </div>
+          <div class="step-item">
+            <div class="step-dot" style="background:var(--purple);"></div>
+            <div><h4>Bloomberg MCP接続（優先度: 高）</h4><p>Bloomberg Terminal APIをMCP経由でDDエージェントに接続。財務データ取得の人手作業が完全ゼロになる。</p></div>
+          </div>
+          <div class="step-item">
+            <div class="step-dot" style="background:var(--purple);"></div>
+            <div><h4>Skillライブラリの継続改善</h4><p>毎案件終了後にSkillを更新。Group Memoryに学びを追記。3ヶ月でチームの集合知が蓄積され、新人が即日プロレベルのDDを実行できる状態になる。</p></div>
+          </div>
+          <div class="step-item" style="border-bottom:none;">
+            <div class="step-dot" style="background:var(--purple);"></div>
+            <div><h4>SSEリモートMCPサーバーの本番化</h4><p>社内サーバーにMCPをデプロイ。チーム全員がURLだけで同一ツールに接続。カスタムMCPが真の「チームインフラ」になる。</p></div>
+          </div>
+        </div>
+        <div class="tech-pills" style="margin-top:10px;">
+          <span class="pill" style="color:var(--purple);">Managed Agents</span>
+          <span class="pill" style="color:var(--purple);">Prompt Caching</span>
+          <span class="pill" style="color:var(--orange);">Bloomberg MCP</span>
+          <span class="pill" style="color:var(--green);">Skill継続改善</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 実際の起動プロンプト集 -->
+  <section class="section">
+    <div class="section-label">実践プロンプト集</div>
+    <div class="section-title">すぐ使える起動コマンド</div>
+    <div class="section-sub">各フェーズで実際に使うClaudeへの指示文。コピー&ペーストで即使用可能。</div>
+
+    <div class="grid2">
+      <div>
+        <p style="font-size:0.75rem; font-weight:700; color:var(--dim); text-transform:uppercase; margin-bottom:8px;">DD Swarm起動（Agent Teams）</p>
+        <pre style="margin:0;"><code>@dd-swarm-orchestrator
+対象企業: 株式会社X（製造業、売上300億円）
+資料: [Files APIのfile_id: file_abc123]
+期日: 今週金曜まで
+
+財務・法務・ビジネスの並列DDを開始してください。
+完了後にSlackの #ma-current-deals に要約を投稿し、
+Google DriveのDDフォルダにレポートを保存してください。</code></pre>
+      </div>
+      <div>
+        <p style="font-size:0.75rem; font-weight:700; color:var(--dim); text-transform:uppercase; margin-bottom:8px;">毎朝モニタリングRoutine設定</p>
+        <pre style="margin:0;"><code>/schedule "毎日 月〜金 7:50"
+
+以下のターゲット企業リスト（Group Memoryの
+「監視リスト_2026Q2」）について最新ニュースを
+スキャンしてください。
+
+重要なニュースがあれば Slack #ma-monitoring に
+「【要注意】企業名: 内容の要点」形式で投稿。
+何もなければ「本日の監視: 異常なし」と投稿。</code></pre>
+      </div>
+      <div>
+        <p style="font-size:0.75rem; font-weight:700; color:var(--dim); text-transform:uppercase; margin-bottom:8px;">Computer Use — データルーム収集</p>
+        <pre style="margin:0;"><code>@computer-use-agent
+Intralinksのデータルームにアクセスしてください。
+
+URL: [データルームURL]
+認証情報: [環境変数から取得]
+
+以下を順番にダウンロードしてください:
+1. Financial Information フォルダ内の全PDF
+2. Legal Documents フォルダ内の全PDF
+
+ダウンロード完了後、Files APIにアップロードし、
+ファイルIDの一覧をSlackに通知してください。</code></pre>
+      </div>
+      <div>
+        <p style="font-size:0.75rem; font-weight:700; color:var(--dim); text-transform:uppercase; margin-bottom:8px;">案件完了後のナレッジ追加</p>
+        <pre style="margin:0;"><code>今回の株式会社X案件のDDが完了しました。
+以下をチームのGroup Memoryに追加してください:
+
+1. 製造業（XX製品）のDD特有の注意点
+2. 今回発見したリスクパターンで汎用的なもの
+3. 使ったバリュエーション前提と根拠
+4. 今後の同種案件で参考になる学び
+
+「MA-DD知見_製造業」カテゴリで保存してください。</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- コスト試算 -->
+  <section class="section">
+    <div class="section-label">ROI試算</div>
+    <div class="section-title">投資対効果 — 月次コスト vs 削減工数</div>
+    <div class="section-sub">5名チームで月10件のDD処理を想定した試算。</div>
+
+    <div class="grid2">
+      <div class="panel dark" style="padding:20px;">
+        <p style="font-size:0.8rem; font-weight:700; color:var(--gold); margin-bottom:12px;">月次AIコスト（試算）</p>
+        <table style="width:100%; font-size:0.84rem; border-collapse:collapse;">
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.06);">
+            <td style="padding:8px 0; color:var(--muted);">Cowork Team（5名）</td>
+            <td style="text-align:right; color:var(--text);">$125</td>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.06);">
+            <td style="padding:8px 0; color:var(--muted);">DD Swarm実行（10案件 × $4）</td>
+            <td style="text-align:right; color:var(--text);">$40</td>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.06);">
+            <td style="padding:8px 0; color:var(--muted);">毎日モニタリング Routines</td>
+            <td style="text-align:right; color:var(--text);">$15</td>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.06);">
+            <td style="padding:8px 0; color:var(--muted);">Computer Use（データ収集）</td>
+            <td style="text-align:right; color:var(--text);">$20</td>
+          </tr>
+          <tr>
+            <td style="padding:10px 0; font-weight:700; color:var(--text);">月次合計</td>
+            <td style="text-align:right; font-size:1.1rem; font-weight:900; color:var(--gold);">~$200</td>
+          </tr>
+        </table>
+      </div>
+      <div class="panel dark" style="padding:20px;">
+        <p style="font-size:0.8rem; font-weight:700; color:var(--green); margin-bottom:12px;">月次削減工数（試算）</p>
+        <table style="width:100%; font-size:0.84rem; border-collapse:collapse;">
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.06);">
+            <td style="padding:8px 0; color:var(--muted);">情報収集・整理作業</td>
+            <td style="text-align:right; color:var(--text);">40h削減</td>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.06);">
+            <td style="padding:8px 0; color:var(--muted);">DD初期分析（財務・法務・ビジネス）</td>
+            <td style="text-align:right; color:var(--text);">60h削減</td>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.06);">
+            <td style="padding:8px 0; color:var(--muted);">企業モニタリング作業</td>
+            <td style="text-align:right; color:var(--text);">20h削減</td>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.06);">
+            <td style="padding:8px 0; color:var(--muted);">レポート作成・整形</td>
+            <td style="text-align:right; color:var(--text);">30h削減</td>
+          </tr>
+          <tr>
+            <td style="padding:10px 0; font-weight:700; color:var(--text);">月次削減合計</td>
+            <td style="text-align:right; font-size:1.1rem; font-weight:900; color:var(--green);">150h</td>
+          </tr>
+        </table>
+        <div style="margin-top:12px; padding:10px; background:rgba(79,255,176,0.08); border-radius:8px; font-size:0.82rem;">
+          アナリスト時給換算（¥5,000）で<strong style="color:var(--green);">月75万円相当</strong>の工数削減。<br>
+          AIコスト（約¥3万）に対して<strong style="color:var(--green);">ROI 2500%</strong>。
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer class="shell">
+  <span>MA-DD自動化 完全プレイブック — 2026年4月16日</span>
+  <span>Skills · Agent Teams · Routines · MCP · Computer Use · Cowork · API の統合設計</span>
+</footer>
+
+</body>
+</html>
