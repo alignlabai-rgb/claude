@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agent Protocol | Foundations</title>
+  <style>
+    body { font-family: "Segoe UI", "Noto Sans JP", system-ui, sans-serif; margin: 0; background: #0b1220; color: #edf2fb; line-height: 1.75; padding: 28px 18px 48px; }
+    .shell { max-width: 980px; margin: 0 auto; display: grid; gap: 18px; }
+    .panel { background: #111a2b; border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 26px; }
+    a { color: #75d7c0; }
+    h1, h2, h3 { margin: 0 0 10px; }
+    p, li { color: #c5d0e3; }
+    .step { display: flex; gap: 14px; margin: 14px 0; align-items: flex-start; }
+    .step-num { background: #3dd8c5; color: #0b1220; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85rem; flex-shrink: 0; margin-top: 2px; }
+    .step-body h3 { font-size: 0.95rem; color: #edf2fb; margin-bottom: 2px; }
+    .step-body p { font-size: 0.9rem; margin: 2px 0; }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    th { background: rgba(61,216,197,0.1); color: #3dd8c5; text-align: left; padding: 8px 12px; font-size: 0.9rem; }
+    td { padding: 8px 12px; border-top: 1px solid rgba(255,255,255,0.06); font-size: 0.92rem; color: #c5d0e3; vertical-align: top; }
+    .good { color: #3dd8c5; }
+    .bad { color: #fc8181; }
+    code { background: rgba(255,255,255,0.07); padding: 1px 6px; border-radius: 4px; font-size: 0.88rem; }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="panel">
+      <p><a href="index.html">← Foundations</a> / <a href="../index.html">Hub Top</a></p>
+      <h1>Agent Protocol</h1>
+      <p>このリポジトリは複数の Claude インスタンスが非同期で更新します。このページでは、インスタンスがどう協調し、文脈を引き継ぎ、意図を記録するかのプロトコルを定義します。</p>
+    </div>
+
+    <div class="panel">
+      <h2>インスタンスが来たときの最初の5ステップ</h2>
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h3>CLAUDE.md を読む</h3>
+          <p>リポジトリの目的・フォルダ構造・編集方針が書かれている。必ず最初に読む。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h3>foundations/ を読む</h3>
+          <p>「なぜこの構造なのか」「誰が使うのか」「何が成功か」を理解する。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h3>logs/ の最新エントリを確認する</h3>
+          <p>直近の変更内容・未完了 TODO・既知の問題を把握する。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h3>git log で最近のコミットを確認する</h3>
+          <p>他のインスタンスが何を変えたかを把握してから作業を始める。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <h3>作業を始める</h3>
+          <p>文脈を理解した上で、指示された作業を実行する。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>共有記憶の構造</h2>
+      <p>インスタンスはセッションが終わると記憶を失います。「記憶」はリポジトリのファイルとして残します。</p>
+      <table>
+        <tr><th>場所</th><th>何を記録するか</th><th>読むべきタイミング</th></tr>
+        <tr><td><code>CLAUDE.md</code></td><td>方針・原則・フォルダ規則</td><td>毎回最初</td></tr>
+        <tr><td><code>foundations/</code></td><td>目的・意図・設計思想</td><td>構造変更前</td></tr>
+        <tr><td><code>logs/</code></td><td>変更記録・TODO・実験メモ</td><td>作業開始前</td></tr>
+        <tr><td><code>strategy/roadmap.html</code></td><td>優先度・フェーズ・完了済みの判断</td><td>新規タスク検討時</td></tr>
+        <tr><td>Git コミットメッセージ</td><td>何をなぜ変えたか</td><td>履歴を追うとき</td></tr>
+      </table>
+    </div>
+
+    <div class="panel">
+      <h2>よい変更・避けるべき変更</h2>
+      <table>
+        <tr><th class="good">やってよいこと</th><th class="bad">避けること</th></tr>
+        <tr>
+          <td>新しいページを追加してインデックスからリンクする</td>
+          <td>理由なく既存ページを削除する</td>
+        </tr>
+        <tr>
+          <td>情報を加筆・更新する</td>
+          <td>構造を大きく変えてインデックスのリンクを壊す</td>
+        </tr>
+        <tr>
+          <td>誤情報・リンク切れを修正する</td>
+          <td>カテゴリをまたいで大量のファイルを一度に移動する</td>
+        </tr>
+        <tr>
+          <td>変更理由を logs/ かコミットメッセージに書く</td>
+          <td>「とりあえず動く」状態で意図を記録しない</td>
+        </tr>
+        <tr>
+          <td>大きな変更はブランチを切って PR 経由でマージする</td>
+          <td>実験的な変更を main に直接 push する</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="panel">
+      <h2>意図の記録が重要な理由</h2>
+      <p>人間の組織でも、「なぜそうなっているか」がわからないルールは誰かが意図せず壊します。Claude インスタンスも同じです。</p>
+      <p>ファイルが存在するだけでは不十分で、<strong>「なぜその構造なのか」「何を達成しようとしているのか」</strong>が記録されていることで：</p>
+      <ul>
+        <li>新しいインスタンスが一貫した判断をできる</li>
+        <li>変更の影響を事前に評価できる</li>
+        <li>同じ議論・同じ失敗を繰り返さない</li>
+        <li>オーナーが長期間離れても方向性が保たれる</li>
+      </ul>
+      <p>このページ自体がその実践例です。</p>
+    </div>
+
+    <div class="panel">
+      <h2>ブランチ戦略</h2>
+      <table>
+        <tr><th>変更の種類</th><th>推奨方法</th></tr>
+        <tr><td>誤字修正・リンク追加など小さな修正</td><td>main に直接 push でよい</td></tr>
+        <tr><td>新規ページ追加（1〜2本）</td><td>main に直接 push でよい</td></tr>
+        <tr><td>構造変更・大量ページ追加</td><td>ブランチを切って PR 経由でマージ</td></tr>
+        <tr><td>実験的な変更</td><td>必ずブランチを切る</td></tr>
+      </table>
+    </div>
+  </div>
+</body>
+</html>

@@ -3,14 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Operating Principles</title>
+  <title>Operating Principles | Foundations</title>
   <style>
     body { font-family: "Segoe UI", "Noto Sans JP", system-ui, sans-serif; margin: 0; background: #0b1220; color: #edf2fb; line-height: 1.75; padding: 28px 18px 48px; }
     .shell { max-width: 980px; margin: 0 auto; display: grid; gap: 18px; }
-    .panel { background: #111a2b; border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 22px; }
+    .panel { background: #111a2b; border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 26px; }
     a { color: #75d7c0; }
-    h1, h2 { margin: 0 0 10px; }
+    h1, h2, h3 { margin: 0 0 10px; }
     p, li { color: #c5d0e3; }
+    .principle { border-left: 3px solid #3dd8c5; padding-left: 16px; margin: 18px 0; }
+    .principle h3 { color: #edf2fb; font-size: 1rem; margin-bottom: 4px; }
+    .principle p { margin: 4px 0; font-size: 0.95rem; }
+    .why { color: #a0aec0; font-size: 0.88rem; font-style: italic; }
+    .tag { display: inline-block; background: rgba(61,216,197,0.12); color: #3dd8c5; border-radius: 6px; padding: 1px 8px; font-size: 0.8rem; margin-right: 6px; }
   </style>
 </head>
 <body>
@@ -18,17 +23,73 @@
     <div class="panel">
       <p><a href="index.html">← Foundations</a> / <a href="../index.html">Hub Top</a></p>
       <h1>運用原則</h1>
-      <p>Claude や Codex に更新を任せる前提で、壊さず・戻せて・拡張しやすい状態を保つための原則です。</p>
+      <p>このリポジトリを複数の Claude インスタンスが非同期で更新し続けるために必要な原則です。「なぜその原則があるか」を記録することで、新しいインスタンスが初めて来ても同じ判断ができる状態を目指しています。</p>
     </div>
+
     <div class="panel">
-      <h2>原則</h2>
-      <ul>
-        <li>壊れてよいのではなく、戻せる前提で更新する</li>
-        <li>ルートの総合トップは常に保つ</li>
-        <li>カテゴリ責務をまたぐ変更は記録する</li>
-        <li>新規追加前にカテゴリを決める</li>
-        <li>リンク切れと文字化けを最優先で直す</li>
-      </ul>
+      <h2>基本姿勢</h2>
+      <div class="principle">
+        <h3>壊してよいではなく、戻せる前提で更新する</h3>
+        <p>実験的な運用であっても、破壊的な変更は Git の履歴に必ず残す。削除より「別の場所に移す」を優先する。</p>
+        <p class="why">→ なぜ：誰かが何かを消したとき、「意図的な削除」と「事故」を区別できないと復元判断ができない。</p>
+      </div>
+      <div class="principle">
+        <h3>ルートの index.html を総合ポータルとして維持する</h3>
+        <p>どんな変更をしても、ルートの入口だけは常に全カテゴリへ辿れる状態にする。</p>
+        <p class="why">→ なぜ：初めてアクセスするインスタンスや人が、ここから全体を把握できることが最低保証。</p>
+      </div>
+      <div class="principle">
+        <h3>カテゴリ責務をまたぐ変更は logs/ に記録する</h3>
+        <p>複数カテゴリに影響する構造変更は、変更日・変更内容・理由を logs/ に残す。</p>
+        <p class="why">→ なぜ：なぜ構造がこうなっているかを後のインスタンスが理解できない場合、同じ変更を繰り返すか、意図に反した変更をする。</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>コンテンツ追加の原則</h2>
+      <div class="principle">
+        <h3>追加前にカテゴリを決める</h3>
+        <p>新しいページを作る前に、どのフォルダに属するかを決め、そのフォルダの index から辿れるようにする。</p>
+        <p class="why">→ なぜ：フォルダに入れてもリンクされていないページは「存在しない」のと同じ。発見できないコンテンツに価値はない。</p>
+      </div>
+      <div class="principle">
+        <h3>リンク切れと文字化けを最優先で直す</h3>
+        <p>新規追加よりも既存の壊れた状態の修正を優先する。</p>
+        <p class="why">→ なぜ：壊れたリンクは信頼性を損なう。「増やしているが使えない」状態は「何もない」より悪い。</p>
+      </div>
+      <div class="principle">
+        <h3>次のインスタンスが理解できる状態を目指す</h3>
+        <p>「動く」だけでなく、なぜその構造・内容にしたかが伝わるように書く。</p>
+        <p class="why">→ なぜ：このリポジトリは複数インスタンスが引き継いで更新する。意図が伝わらなければ毎回ゼロから判断することになる。</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>インスタンス間の協調原則</h2>
+      <p>このリポジトリは複数の Claude インスタンスが同時・非同期で更新する場合があります。</p>
+      <div class="principle">
+        <h3>ファイル単位で責務を分ける</h3>
+        <p>同一ファイルへの同時編集は Git コンフリクトの原因になる。担当領域を分けて作業する。</p>
+      </div>
+      <div class="principle">
+        <h3>CLAUDE.md を共通の判断基準とする</h3>
+        <p>迷ったときは CLAUDE.md に立ち返る。CLAUDE.md に書かれていない判断をしたときは、その判断を logs/ か foundations/ に記録する。</p>
+      </div>
+      <div class="principle">
+        <h3>main への直接 push は小さな変更のみ</h3>
+        <p>大きな構造変更はブランチを切って PR 経由でマージする。小さな修正・追記は main への直接 push で可。</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>判断に迷ったときのフロー</h2>
+      <ol>
+        <li>CLAUDE.md を確認する</li>
+        <li>foundations/ の関連ページを確認する</li>
+        <li>logs/ の最近の記録を確認する</li>
+        <li>それでも迷う場合は、より保守的な選択をして logs/ にその旨を記録する</li>
+        <li>大きな変更は人間（リポジトリオーナー）に確認を求める</li>
+      </ol>
     </div>
   </div>
 </body>
