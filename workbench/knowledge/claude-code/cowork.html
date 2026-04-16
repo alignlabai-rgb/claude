@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claude Cowork | チーム全員でClaudeを使う基盤 — 2026年4月 GA</title>
+  <style>
+    :root {
+      --bg: #07111d;
+      --panel: #0d1829;
+      --panel2: #091018;
+      --text: #e8eef9;
+      --muted: #b6c3da;
+      --dim: #5a7a9a;
+      --accent: #66e0c2;
+      --gold: #f4b860;
+      --blue: #60d0ff;
+      --purple: #c4a0ff;
+      --red: #ff9090;
+      --green: #4FFFB0;
+      --orange: #f7a87a;
+      --border: rgba(255,255,255,0.08);
+      --r: 16px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Segoe UI","Noto Sans JP",system-ui,sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; padding: 0 0 80px; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code { background: rgba(255,255,255,0.08); border-radius: 4px; padding: 0.1em 0.45em; font-size: 0.84em; font-family: "Fira Code","Consolas",monospace; color: #a5f3d0; }
+    pre { background: #060e1a; border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 16px 18px; overflow-x: auto; font-family: "Fira Code","Consolas",monospace; font-size: 0.83em; color: #a5f3d0; line-height: 1.6; margin: 10px 0; }
+
+    .hero { background: linear-gradient(135deg, #0d1a2e 0%, #0f1e38 60%, #091525 100%); border-bottom: 1px solid rgba(96,208,255,0.25); padding: 52px 40px 44px; }
+    .breadcrumb { font-size: 0.8rem; color: var(--dim); margin-bottom: 16px; }
+    .breadcrumb a { color: var(--accent); }
+    .hero-eyebrow { display: inline-flex; align-items: center; gap: 8px; background: rgba(96,208,255,0.12); border: 1px solid rgba(96,208,255,0.3); color: var(--blue); font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; padding: 5px 14px; border-radius: 999px; margin-bottom: 16px; }
+    .hero h1 { font-size: 2.4rem; font-weight: 900; line-height: 1.15; margin-bottom: 12px; }
+    .hero h1 em { font-style: normal; background: linear-gradient(90deg, #60d0ff, #66e0c2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero-sub { color: var(--muted); font-size: 0.95rem; max-width: 700px; }
+    .hero-meta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
+    .meta-chip { background: rgba(255,255,255,0.06); border: 1px solid var(--border); border-radius: 8px; padding: 5px 12px; font-size: 0.78rem; color: var(--muted); }
+    .meta-chip strong { color: var(--blue); }
+
+    .shell { max-width: 1060px; margin: 0 auto; padding: 0 24px; }
+    .section { padding: 44px 0 0; }
+    .section-label { font-size: 0.7rem; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+    .section-title { font-size: 1.4rem; font-weight: 800; margin-bottom: 6px; }
+    .section-sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 20px; }
+
+    .panel { background: var(--panel); border: 1px solid var(--border); border-radius: var(--r); padding: 22px 26px; }
+    .panel.blue { border-color: rgba(96,208,255,0.3); background: linear-gradient(135deg, #0d1829, #0e1c30); }
+    .panel.gold { border-color: rgba(244,184,96,0.3); background: linear-gradient(135deg, #0d1829, #141c2c); }
+    .panel.green { border-color: rgba(79,255,176,0.3); background: linear-gradient(135deg, #0d1829, #0d1e18); }
+
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+    @media (max-width: 720px) { .grid2, .grid3 { grid-template-columns: 1fr; } }
+
+    .card { background: var(--panel2); border: 1px solid var(--border); border-radius: 14px; padding: 20px 22px; }
+    .card h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 8px; }
+    .card p, .card li { font-size: 0.86rem; color: var(--muted); }
+    .card ul { padding-left: 16px; display: flex; flex-direction: column; gap: 5px; margin-top: 6px; }
+
+    .badge { display: inline-block; font-size: 0.64rem; font-weight: 700; padding: 2px 8px; border-radius: 5px; text-transform: uppercase; letter-spacing: 0.06em; margin-left: 6px; vertical-align: middle; }
+    .b-ga { background: rgba(79,255,176,0.18); color: #4FFFB0; }
+    .b-new { background: rgba(96,208,255,0.18); color: #60d0ff; }
+
+    .tag { display: inline-block; font-size: 0.68rem; font-weight: 700; padding: 2px 8px; border-radius: 5px; }
+    .t-g { background: rgba(79,255,176,0.15); color: #4FFFB0; }
+    .t-b { background: rgba(96,208,255,0.15); color: #60d0ff; }
+    .t-p { background: rgba(196,160,255,0.15); color: #c4a0ff; }
+    .t-o { background: rgba(244,184,96,0.15); color: #f4b860; }
+
+    .tip-box { background: linear-gradient(135deg, rgba(96,208,255,0.08), rgba(102,224,194,0.05)); border: 1px solid rgba(96,208,255,0.25); border-radius: 10px; padding: 13px 16px; margin-top: 12px; }
+    .tip-box.gold { background: linear-gradient(135deg, rgba(244,184,96,0.08), rgba(247,168,122,0.05)); border-color: rgba(244,184,96,0.3); }
+    .tip-box.green { background: linear-gradient(135deg, rgba(79,255,176,0.08), rgba(102,224,194,0.05)); border-color: rgba(79,255,176,0.3); }
+    .tip-label { font-size: 0.68rem; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px; }
+    .tip-box.gold .tip-label { color: var(--gold); }
+    .tip-box.green .tip-label { color: var(--green); }
+    .tip-box p { font-size: 0.84rem; color: var(--text); margin: 0; }
+
+    .feature-card { border-radius: 14px; padding: 22px 24px; margin-bottom: 12px; }
+    .feature-card.rbac { background: rgba(96,208,255,0.05); border: 1px solid rgba(96,208,255,0.22); }
+    .feature-card.memory { background: rgba(79,255,176,0.05); border: 1px solid rgba(79,255,176,0.22); }
+    .feature-card.projects { background: rgba(244,184,96,0.05); border: 1px solid rgba(244,184,96,0.22); }
+    .feature-card.dashboard { background: rgba(196,160,255,0.05); border: 1px solid rgba(196,160,255,0.22); }
+    .fc-eyebrow { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
+    .rbac .fc-eyebrow { color: var(--blue); }
+    .memory .fc-eyebrow { color: var(--green); }
+    .projects .fc-eyebrow { color: var(--gold); }
+    .dashboard .fc-eyebrow { color: var(--purple); }
+    .feature-card h3 { font-size: 1.05rem; font-weight: 800; margin-bottom: 10px; }
+    .feature-card p { font-size: 0.87rem; color: var(--muted); margin-bottom: 12px; }
+    .feature-card ul { padding-left: 16px; font-size: 0.85rem; color: var(--muted); display: flex; flex-direction: column; gap: 6px; }
+
+    .compare-wrap { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin: 14px 0; }
+    .compare-row { display: grid; grid-template-columns: 180px 1fr 1fr; gap: 1px; background: var(--border); }
+    .compare-row > div { background: var(--panel2); padding: 11px 14px; font-size: 0.84rem; }
+    .compare-row.head > div { background: #0b1728; font-size: 0.76rem; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: 0.06em; }
+    .compare-row > div:first-child { color: var(--dim); font-size: 0.8rem; }
+
+    .role-card { background: var(--panel2); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; }
+    .role-name { font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+    .role-card.admin .role-name { color: var(--red); }
+    .role-card.member .role-name { color: var(--blue); }
+    .role-card.viewer .role-name { color: var(--dim); }
+    .role-card h4 { font-size: 0.9rem; font-weight: 700; margin-bottom: 6px; }
+    .role-card ul { padding-left: 14px; font-size: 0.83rem; color: var(--muted); display: flex; flex-direction: column; gap: 4px; }
+
+    .flow-step { display: flex; gap: 16px; align-items: flex-start; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .flow-step:last-child { border-bottom: none; }
+    .step-num { min-width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.78rem; font-weight: 800; flex-shrink: 0; }
+    .step-num.blue { background: rgba(96,208,255,0.18); color: var(--blue); }
+    .step-num.gold { background: rgba(244,184,96,0.18); color: var(--gold); }
+    .step-num.green { background: rgba(79,255,176,0.18); color: var(--green); }
+    .flow-step h4 { font-size: 0.9rem; font-weight: 700; margin-bottom: 4px; }
+    .flow-step p { font-size: 0.83rem; color: var(--muted); }
+
+    .memory-item { background: var(--panel2); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; margin-bottom: 8px; }
+    .memory-category { font-size: 0.68rem; font-weight: 700; color: var(--green); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 5px; }
+    .memory-item h4 { font-size: 0.88rem; font-weight: 700; margin-bottom: 4px; }
+    .memory-item p { font-size: 0.82rem; color: var(--muted); }
+
+    footer { margin: 60px 24px 0; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.06); font-size: 0.78rem; color: var(--dim); display: flex; gap: 16px; flex-wrap: wrap; justify-content: space-between; }
+  </style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="breadcrumb shell"><a href="../index.html">← Workbench</a> / <a href="index.html">Claude Code</a> / Cowork</div>
+  <div class="shell">
+    <div class="hero-eyebrow">👥 Claude Cowork · 2026年4月 GA</div>
+    <h1>Claude <em>Cowork</em></h1>
+    <p class="hero-sub">「自分だけのClaude」から「チーム全員のClaude」へ。RBAC・Group Memory・共有Projects・コスト管理ダッシュボードで、AIをチームの公式インフラに変える。2026年4月、一般公開（GA）。</p>
+    <div class="hero-meta">
+      <div class="meta-chip">ステータス: <strong>GA（2026年4月）</strong></div>
+      <div class="meta-chip">対応プラン: <strong>Team / Enterprise</strong></div>
+      <div class="meta-chip">管理画面: <strong>claude.ai/team</strong></div>
+      <div class="meta-chip">対象: <strong>5名〜組織全体</strong></div>
+    </div>
+  </div>
+</div>
+
+<div class="shell">
+
+  <!-- Coworkとは何か -->
+  <section class="section">
+    <div class="section-label">基本概念</div>
+    <div class="section-title">Coworkとは何か — チームAIインフラへの転換</div>
+    <div class="section-sub">個人がバラバラにClaudeを使う状態から、チームで統制・共有・最適化する状態へ。</div>
+
+    <div class="grid2" style="margin-bottom:16px;">
+      <div style="background:rgba(255,144,144,0.06); border:1px solid rgba(255,144,144,0.2); border-radius:14px; padding:22px;">
+        <div style="font-size:0.7rem; font-weight:700; color:#ff9090; text-transform:uppercase; letter-spacing:0.09em; margin-bottom:10px;">❌ Before: 個人がバラバラに使う</div>
+        <ul style="padding-left:14px; font-size:0.85rem; color:var(--muted); display:flex; flex-direction:column; gap:6px;">
+          <li>各自がPersonalプランで各自払い</li>
+          <li>誰が何にClaudeを使っているか管理者が把握できない</li>
+          <li>過去のDDナレッジは個人のチャット履歴に埋もれる</li>
+          <li>新人が入っても引き継げる資産がない</li>
+          <li>コスト管理・セキュリティポリシーの適用が不可能</li>
+          <li>同じ質問を全員が個別に繰り返す</li>
+        </ul>
+      </div>
+      <div style="background:rgba(96,208,255,0.06); border:1px solid rgba(96,208,255,0.2); border-radius:14px; padding:22px;">
+        <div style="font-size:0.7rem; font-weight:700; color:#60d0ff; text-transform:uppercase; letter-spacing:0.09em; margin-bottom:10px;">✅ After: Coworkでチーム管理</div>
+        <ul style="padding-left:14px; font-size:0.85rem; color:var(--muted); display:flex; flex-direction:column; gap:6px;">
+          <li>一括契約でコスト最適化・領収書一本化</li>
+          <li>管理ダッシュボードで全員の利用状況を可視化</li>
+          <li>Group Memoryにチームの共有ナレッジを蓄積</li>
+          <li>新人が初日からチームのナレッジにアクセス可能</li>
+          <li>RBACで機密情報へのアクセスを役割別に制御</li>
+          <li>共有Projectsで案件ごとにチームが協力</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 主要機能4つ -->
+  <section class="section">
+    <div class="section-label">主要機能</div>
+    <div class="section-title">Coworkの4つのコア機能</div>
+    <div class="section-sub">2026年4月GA版で利用可能な機能一覧。</div>
+
+    <div class="feature-card rbac">
+      <div class="fc-eyebrow">🔐 機能1 — RBAC（役割ベースアクセス制御）</div>
+      <h3>誰が何にアクセスできるかを役割で管理する</h3>
+      <p>
+        金融機関において最も重要な機能。案件情報・DDレポート・ターゲットリストへのアクセスを
+        役割（Role）に基づいて制御する。「アナリストはPublicプロジェクトのみ」「MDは全案件参照可」
+        といった設定が管理画面から数クリックで完了する。
+      </p>
+      <div class="grid3" style="margin-top:12px;">
+        <div class="role-card admin">
+          <div class="role-name">👑 Admin（管理者）</div>
+          <h4>MD / 部長クラス</h4>
+          <ul>
+            <li>全プロジェクト・全メモリへのアクセス</li>
+            <li>メンバー招待・権限変更</li>
+            <li>コスト上限・ポリシー設定</li>
+            <li>利用ログの全閲覧</li>
+          </ul>
+        </div>
+        <div class="role-card member">
+          <div class="role-name">👤 Member（メンバー）</div>
+          <h4>アナリスト / アソシエイト</h4>
+          <ul>
+            <li>担当プロジェクトへのアクセス</li>
+            <li>Group Memoryの読み取り・書き込み</li>
+            <li>共有Skillsの利用</li>
+            <li>自分の利用ログのみ閲覧</li>
+          </ul>
+        </div>
+        <div class="role-card viewer">
+          <div class="role-name">👁️ Viewer（閲覧者）</div>
+          <h4>外部顧問 / インターン</h4>
+          <ul>
+            <li>指定プロジェクトの閲覧のみ</li>
+            <li>Group Memoryは読み取り専用</li>
+            <li>Skillsの利用（書き込み不可）</li>
+            <li>ログエクスポート不可</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="feature-card memory">
+      <div class="fc-eyebrow">🧠 機能2 — Group Memory（チーム共有記憶）</div>
+      <h3>チームの知識を蓄積し、全員が恩恵を受ける</h3>
+      <p>
+        個人のPersonal Memoryとは別に、チーム全員が共有する記憶領域。
+        「先週のDDで学んだXX業界の注意点」「過去に失敗した交渉パターン」
+        「よく使うバリュエーション前提」を蓄積すると、次の案件から全員が活用できる。
+      </p>
+      <div class="grid2" style="margin-top:12px;">
+        <div>
+          <p style="font-size:0.78rem; font-weight:700; color:var(--dim); text-transform:uppercase; margin-bottom:8px;">MAチームが蓄積すべきGroup Memory</p>
+          <div class="memory-item">
+            <div class="memory-category">業界ナレッジ</div>
+            <h4>セクター別DDチェックポイント</h4>
+            <p>「製造業のDDではWCAPの季節変動に注意。特にXX業種は在庫評価に独自リスクがある」</p>
+          </div>
+          <div class="memory-item">
+            <div class="memory-category">バリュエーション前提</div>
+            <h4>業界別EV/EBITDAレンジ（更新日付き）</h4>
+            <p>「2026年Q1時点の国内製造業M&AのEV/EBITDA中央値は8.2x（出典: XX）」</p>
+          </div>
+          <div class="memory-item">
+            <div class="memory-category">過去案件パターン</div>
+            <h4>見落としがちなリスクパターン集</h4>
+            <p>「環境負債はオフバランスになりやすい。製造業・化学系では必ず土壌汚染リスクを確認」</p>
+          </div>
+          <div class="memory-item">
+            <div class="memory-category">アドバイザー情報</div>
+            <h4>法務・税務顧問の得意分野メモ</h4>
+            <p>「XX法律事務所のYY弁護士はCross-border案件に強い。ターンアラウンド1週間以内」</p>
+          </div>
+        </div>
+        <div>
+          <p style="font-size:0.78rem; font-weight:700; color:var(--dim); text-transform:uppercase; margin-bottom:8px;">Group Memoryへの書き込み方法</p>
+          <pre style="margin:0; height:auto;"><code class="language-bash"># Claude Codeから直接書き込み
+"このDDで学んだことをチームのGroup Memoryに追加してください:
+XX製造業は売掛金の回収期間が業界平均より長い傾向がある。
+DDでは売掛金明細（顧客別・期日別）を必ず入手すること。"
+
+# 管理画面（claude.ai/team/memory）からも追加可能
+
+# Routinesで定期的に更新
+"先週完了したDDの知見をGroup Memoryに追記してください"</code></pre>
+          <div class="tip-box green" style="margin-top:10px;">
+            <div class="tip-label">ナレッジマネジメントのコツ</div>
+            <p>案件終了のたびに「次のDDで活かせる学び」を3つGroup Memoryに書き込む習慣をつける。半年でチームの集合知が形成される。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="feature-card projects">
+      <div class="fc-eyebrow">📁 機能3 — 共有Projects（チーム協働作業スペース）</div>
+      <h3>案件ごとにチームが同一コンテキストで協力する</h3>
+      <p>
+        個人のProjectsとは別に、チーム全員がアクセス・編集できる共有Projectsを作成できる。
+        DDプロジェクトごとに専用Projectを立ち上げ、システムプロンプト（案件概要・指示）・
+        アップロードファイル・チャット履歴をチームで共有する。
+      </p>
+      <ul>
+        <li>Projectシステムプロンプト: 案件の基本情報・対象企業概要・DDの目的を設定→全員が同じ前提で作業</li>
+        <li>ファイル共有: DDソース資料をProjectにアップロード→チーム全員がFiles APIのように参照可能</li>
+        <li>チャット履歴の共有: 他のメンバーのClaude対話を見て学習・引き継ぎがスムーズに</li>
+        <li>Skillsとの統合: Project専用のSkillセットを設定（このProjectではdd-financial-analystを使用）</li>
+      </ul>
+    </div>
+
+    <div class="feature-card dashboard">
+      <div class="fc-eyebrow">📊 機能4 — 利用ダッシュボード（コスト・ログ管理）</div>
+      <h3>誰が何に使っているかを可視化・管理する</h3>
+      <p>
+        金融機関のコンプライアンス要件を満たすための管理機能。
+        誰がいつClaudeに何を入力したかのログ、部門・プロジェクト別のコスト配賦、
+        上限設定による予算管理まで一元管理できる。
+      </p>
+      <ul>
+        <li>メンバー別・プロジェクト別のトークン使用量とコスト</li>
+        <li>月次・週次のコストレポート（経費申請・部門配賦に使える）</li>
+        <li>コスト上限アラート（月$XXを超えたら管理者に通知）</li>
+        <li>監査ログ: 全入出力の記録（エクスポート可）</li>
+        <li>コンプライアンスモード: 機密キーワードを含む入力の検出・アラート</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 個人プラン vs Cowork比較 -->
+  <section class="section">
+    <div class="section-label">プラン比較</div>
+    <div class="section-title">個人プラン vs Cowork Team — 何が変わるか</div>
+    <div class="section-sub">5人のMAチームで月額コストと機能を比較した場合。</div>
+
+    <div class="compare-wrap">
+      <div class="compare-row head">
+        <div>機能</div><div>個人Pro × 5名（バラバラ）</div><div>Cowork Team（5名）</div>
+      </div>
+      <div class="compare-row">
+        <div>月額コスト概算</div>
+        <div>$20 × 5 = $100/月</div>
+        <div style="color:var(--green);">$25/名 × 5 = $125/月<br><small>（機能差を考えると実質最安）</small></div>
+      </div>
+      <div class="compare-row">
+        <div>RBAC</div>
+        <div style="color:var(--red);">なし</div>
+        <div style="color:var(--green);">✅ 3段階ロール</div>
+      </div>
+      <div class="compare-row">
+        <div>Group Memory</div>
+        <div style="color:var(--red);">なし（個人Memoryのみ）</div>
+        <div style="color:var(--green);">✅ チーム共有記憶</div>
+      </div>
+      <div class="compare-row">
+        <div>共有Projects</div>
+        <div style="color:var(--red);">なし（個人Projectsのみ）</div>
+        <div style="color:var(--green);">✅ チーム協働作業</div>
+      </div>
+      <div class="compare-row">
+        <div>コスト管理</div>
+        <div style="color:var(--red);">各自クレジットカード</div>
+        <div style="color:var(--green);">✅ 一括請求・ダッシュボード</div>
+      </div>
+      <div class="compare-row">
+        <div>利用ログ</div>
+        <div style="color:var(--red);">個人の履歴のみ</div>
+        <div style="color:var(--green);">✅ 管理者が全ログ閲覧・エクスポート</div>
+      </div>
+      <div class="compare-row">
+        <div>共有Skillsライブラリ</div>
+        <div style="color:var(--red);">なし</div>
+        <div style="color:var(--green);">✅ チーム共有 .claude/agents/</div>
+      </div>
+      <div class="compare-row">
+        <div>SSO / SAML</div>
+        <div style="color:var(--red);">なし</div>
+        <div style="color:var(--green);">✅ Enterprise版で対応</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SBI新生銀行 展開シナリオ -->
+  <section class="section">
+    <div class="section-label">実装シナリオ</div>
+    <div class="section-title">グループ海外事業統括部へのCowork展開プラン</div>
+    <div class="section-sub">MAチームでのCowork導入を想定した具体的な設計とロールアウト手順。</div>
+
+    <div class="grid2" style="margin-bottom:16px;">
+      <div>
+        <p style="font-size:0.78rem; font-weight:700; color:var(--dim); text-transform:uppercase; margin-bottom:8px;">RBAC設計案（MAチーム）</p>
+        <div class="panel" style="padding:16px;">
+          <div class="flow-step" style="padding:10px 0;">
+            <div class="step-num" style="background:rgba(255,144,144,0.18); color:var(--red);">MD</div>
+            <div>
+              <h4>Admin: マネージングディレクター</h4>
+              <p>全案件・全メモリ・コスト管理。Skillライブラリの更新権限。監査ログエクスポート。</p>
+            </div>
+          </div>
+          <div class="flow-step" style="padding:10px 0;">
+            <div class="step-num blue">担当</div>
+            <div>
+              <h4>Member: 担当アナリスト / アソシエイト</h4>
+              <p>担当案件のProjectにフルアクセス。Group Memoryへの書き込み可。Skillsの利用可。</p>
+            </div>
+          </div>
+          <div class="flow-step" style="padding:10px 0; border-bottom:none;">
+            <div class="step-num" style="background:rgba(102,224,194,0.18); color:var(--accent);">外部</div>
+            <div>
+              <h4>Viewer: 外部顧問 / インターン</h4>
+              <p>指定Projectの閲覧のみ。Group Memoryは読み取り専用。機密情報への直接アクセスなし。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <p style="font-size:0.78rem; font-weight:700; color:var(--dim); text-transform:uppercase; margin-bottom:8px;">Group Memory 初期コンテンツ設計</p>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <div class="memory-item">
+            <div class="memory-category">海外M&A固有ナレッジ</div>
+            <h4>アジア主要市場のDD注意点</h4>
+            <p>東南アジア・インド・中国それぞれの法制度・会計慣行・文化的リスクの要点</p>
+          </div>
+          <div class="memory-item">
+            <div class="memory-category">バリュエーション前提</div>
+            <h4>クロスボーダー案件のWACC算定基準</h4>
+            <p>カントリーリスクプレミアム・為替ヘッジコストの組み込み方針</p>
+          </div>
+          <div class="memory-item">
+            <div class="memory-category">社内承認プロセス</div>
+            <h4>投資委員会提出物のフォーマット</h4>
+            <p>エグゼクティブサマリーの必須項目・承認基準・提出先</p>
+          </div>
+          <div class="memory-item">
+            <div class="memory-category">外部アドバイザー</div>
+            <h4>主要ロー・ファーム・会計事務所リスト</h4>
+            <p>各国の推奨アドバイザー・得意分野・過去実績・コンタクト先</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p style="font-size:0.78rem; font-weight:700; color:var(--dim); text-transform:uppercase; margin-bottom:10px;">導入ロードマップ</p>
+    <div class="panel blue" style="padding:20px 24px;">
+      <div class="flow-step">
+        <div class="step-num blue">W1</div>
+        <div>
+          <h4>管理者セットアップ（claude.ai/team）</h4>
+          <p>チームアカウント作成・RBAC設定・メンバー招待メール送付。所要時間: 約2時間。</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num blue">W1</div>
+        <div>
+          <h4>Group Memory初期コンテンツの投入</h4>
+          <p>既存のDDチェックリスト・ガイドライン・ノウハウをGroup Memoryに移行。メンバーに書き込みを依頼。</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num gold">W2</div>
+        <div>
+          <h4>Skillライブラリの共有設定</h4>
+          <p>既存の<code>.claude/agents/</code>をチームリポジトリに移動。共有Projectsと連携設定。</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num gold">W2-3</div>
+        <div>
+          <h4>進行中案件をCowork Projectsに移行</h4>
+          <p>案件ごとに共有Projectを作成。システムプロンプト（案件概要）・DDソース資料をアップロード。</p>
+        </div>
+      </div>
+      <div class="flow-step" style="border-bottom:none;">
+        <div class="step-num green">M2〜</div>
+        <div>
+          <h4>Routines・Agent Teamsとの統合</h4>
+          <p>Coworkの共有ProjectsをDD Swarmの起点に設定。毎朝の自動モニタリングをチーム全員が確認できる状態に。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 既存ワークフローへの統合 -->
+  <section class="section">
+    <div class="section-label">統合方法</div>
+    <div class="section-title">既存ワークフローへの統合</div>
+    <div class="section-sub">CoworkはAPIとSlack連携で既存ツールとシームレスに接続できる。</div>
+
+    <div class="grid2">
+      <div>
+        <p style="font-size:0.78rem; font-weight:700; color:var(--dim); text-transform:uppercase; margin-bottom:8px;">Slack連携（通知・起動）</p>
+        <pre style="margin:0;"><code class="language-python"># Cowork API + Slack Bot連携例
+import anthropic
+from slack_sdk import WebClient
+
+claude = anthropic.Anthropic()
+slack = WebClient(token=SLACK_BOT_TOKEN)
+
+def handle_slack_command(command: str, user: str, channel: str):
+    """SlackコマンドでCoworkプロジェクトのDDを起動"""
+
+    # Coworkのチームプロジェクトを指定してClaude実行
+    response = claude.messages.create(
+        model="claude-sonnet-4-6",
+        max_tokens=4096,
+        system=get_project_system_prompt("ma-dd-2026"),
+        # Group Memoryは自動的に参照される（Team版）
+        messages=[{"role": "user", "content": command}]
+    )
+
+    # 結果をSlackに投稿
+    slack.chat_postMessage(
+        channel=channel,
+        text=f"*DD分析結果* (@{user})\n{response.content[0].text}"
+    )
+
+# Slackで "/dd XYZ企業の財務サマリーを出して" と入力するだけで実行</code></pre>
+      </div>
+      <div>
+        <div class="tip-box" style="margin-bottom:12px;">
+          <div class="tip-label">Enterprise版の追加機能</div>
+          <p>Enterprise版ではSAML/SSOによる社内認証基盤との統合、コンプライアンスフィルタリング（機密キーワードの検出・ブロック）、専用クラウドリージョン（日本リージョン対応）が追加される。金融機関向けの要件に対応。</p>
+        </div>
+        <div class="tip-box gold">
+          <div class="tip-label">次のステップ</div>
+          <p>Coworkは「AIの民主化」と「ガバナンス」を両立する仕組み。まず管理者（MD）がアカウントを作成し、小さく始めること。5人×1ヶ月の試用で、Group Memoryにどれだけのナレッジが蓄積されるかを測ると導入価値が実感できる。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer class="shell">
+  <span>Claude Cowork ガイド — 2026年4月16日更新</span>
+  <span>出典: Anthropic Claude Cowork Docs · claude.ai/team · Claude Team Plan Overview</span>
+</footer>
+
+</body>
+</html>

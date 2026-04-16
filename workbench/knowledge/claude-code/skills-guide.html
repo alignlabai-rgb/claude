@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Skills 実践ガイド | Claude Code — 再利用可能なAI能力の標準化</title>
+  <style>
+    :root {
+      --bg: #07111d;
+      --panel: #0d1829;
+      --panel2: #091018;
+      --text: #e8eef9;
+      --muted: #b6c3da;
+      --dim: #5a7a9a;
+      --accent: #66e0c2;
+      --gold: #f4b860;
+      --blue: #60d0ff;
+      --purple: #c4a0ff;
+      --red: #ff9090;
+      --green: #4FFFB0;
+      --orange: #f7a87a;
+      --border: rgba(255,255,255,0.08);
+      --r: 16px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Segoe UI","Noto Sans JP",system-ui,sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; padding: 0 0 80px; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code { background: rgba(255,255,255,0.08); border-radius: 4px; padding: 0.1em 0.45em; font-size: 0.84em; font-family: "Fira Code","Consolas",monospace; color: #a5f3d0; }
+    pre { background: #060e1a; border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 16px 18px; overflow-x: auto; font-family: "Fira Code","Consolas",monospace; font-size: 0.83em; color: #a5f3d0; line-height: 1.6; margin: 10px 0; }
+
+    .hero { background: linear-gradient(135deg, #0d1a2e 0%, #0f2240 60%, #091525 100%); border-bottom: 1px solid rgba(79,255,176,0.25); padding: 52px 40px 44px; }
+    .breadcrumb { font-size: 0.8rem; color: var(--dim); margin-bottom: 16px; }
+    .breadcrumb a { color: var(--accent); }
+    .hero-eyebrow { display: inline-flex; align-items: center; gap: 8px; background: rgba(79,255,176,0.12); border: 1px solid rgba(79,255,176,0.3); color: var(--green); font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; padding: 5px 14px; border-radius: 999px; margin-bottom: 16px; }
+    .hero h1 { font-size: 2.4rem; font-weight: 900; line-height: 1.15; margin-bottom: 12px; }
+    .hero h1 em { font-style: normal; background: linear-gradient(90deg, #4FFFB0, #66e0c2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero-sub { color: var(--muted); font-size: 0.95rem; max-width: 700px; }
+    .hero-meta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
+    .meta-chip { background: rgba(255,255,255,0.06); border: 1px solid var(--border); border-radius: 8px; padding: 5px 12px; font-size: 0.78rem; color: var(--muted); }
+    .meta-chip strong { color: var(--green); }
+
+    .shell { max-width: 1060px; margin: 0 auto; padding: 0 24px; }
+    .section { padding: 44px 0 0; }
+    .section-label { font-size: 0.7rem; font-weight: 700; color: var(--green); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+    .section-title { font-size: 1.4rem; font-weight: 800; margin-bottom: 6px; }
+    .section-sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 20px; }
+
+    .panel { background: var(--panel); border: 1px solid var(--border); border-radius: var(--r); padding: 22px 26px; }
+    .panel.green { border-color: rgba(79,255,176,0.3); background: linear-gradient(135deg, #0d1829, #0d1e18); }
+    .panel.gold { border-color: rgba(244,184,96,0.3); background: linear-gradient(135deg, #0d1829, #141c2c); }
+    .panel.blue { border-color: rgba(96,208,255,0.3); background: linear-gradient(135deg, #0d1829, #0e1c30); }
+
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+    @media (max-width: 720px) { .grid2, .grid3 { grid-template-columns: 1fr; } }
+
+    .card { background: var(--panel2); border: 1px solid var(--border); border-radius: 14px; padding: 20px 22px; }
+    .card h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 8px; }
+    .card p, .card li { font-size: 0.86rem; color: var(--muted); }
+    .card ul { padding-left: 16px; display: flex; flex-direction: column; gap: 5px; margin-top: 6px; }
+
+    .skill-card { border-radius: 14px; padding: 22px 24px; overflow: hidden; }
+    .skill-card.financial { background: rgba(79,255,176,0.05); border: 1px solid rgba(79,255,176,0.22); }
+    .skill-card.legal { background: rgba(96,208,255,0.05); border: 1px solid rgba(96,208,255,0.22); }
+    .skill-card.business { background: rgba(244,184,96,0.05); border: 1px solid rgba(244,184,96,0.22); }
+    .skill-card.report { background: rgba(196,160,255,0.05); border: 1px solid rgba(196,160,255,0.22); }
+    .sc-eyebrow { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
+    .financial .sc-eyebrow { color: var(--green); }
+    .legal .sc-eyebrow { color: var(--blue); }
+    .business .sc-eyebrow { color: var(--gold); }
+    .report .sc-eyebrow { color: var(--purple); }
+    .skill-card h3 { font-size: 1rem; font-weight: 800; margin-bottom: 8px; }
+    .skill-card p { font-size: 0.86rem; color: var(--muted); margin-bottom: 10px; }
+    .skill-card ul { padding-left: 16px; font-size: 0.84rem; color: var(--muted); display: flex; flex-direction: column; gap: 5px; }
+
+    .badge { display: inline-block; font-size: 0.64rem; font-weight: 700; padding: 2px 8px; border-radius: 5px; text-transform: uppercase; letter-spacing: 0.06em; margin-left: 6px; vertical-align: middle; }
+    .b-new { background: rgba(79,255,176,0.18); color: #4FFFB0; }
+    .b-open { background: rgba(96,208,255,0.18); color: #60d0ff; }
+    .b-beta { background: rgba(244,184,96,0.18); color: #f4b860; }
+
+    .tag { display: inline-block; font-size: 0.68rem; font-weight: 700; padding: 2px 8px; border-radius: 5px; }
+    .t-g { background: rgba(79,255,176,0.15); color: #4FFFB0; }
+    .t-b { background: rgba(96,208,255,0.15); color: #60d0ff; }
+    .t-p { background: rgba(196,160,255,0.15); color: #c4a0ff; }
+    .t-o { background: rgba(244,184,96,0.15); color: #f4b860; }
+
+    .tip-box { background: linear-gradient(135deg, rgba(79,255,176,0.08), rgba(102,224,194,0.05)); border: 1px solid rgba(79,255,176,0.25); border-radius: 10px; padding: 13px 16px; margin-top: 12px; }
+    .tip-box.gold { background: linear-gradient(135deg, rgba(244,184,96,0.08), rgba(247,168,122,0.05)); border-color: rgba(244,184,96,0.3); }
+    .tip-label { font-size: 0.68rem; font-weight: 700; color: var(--green); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px; }
+    .tip-box.gold .tip-label { color: var(--gold); }
+    .tip-box p { font-size: 0.84rem; color: var(--text); margin: 0; }
+
+    .compare-wrap { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin: 14px 0; }
+    .compare-row { display: grid; grid-template-columns: 180px 1fr 1fr; gap: 1px; background: var(--border); }
+    .compare-row > div { background: var(--panel2); padding: 11px 14px; font-size: 0.84rem; }
+    .compare-row.head > div { background: #0b1728; font-size: 0.76rem; font-weight: 700; color: var(--green); text-transform: uppercase; letter-spacing: 0.06em; }
+    .compare-row > div:first-child { color: var(--dim); font-size: 0.8rem; }
+
+    .arch-diagram { background: #060e1a; border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; padding: 28px 24px; }
+    .arch-row { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 8px 0; flex-wrap: wrap; }
+    .arch-box { border-radius: 10px; padding: 10px 18px; font-size: 0.82rem; font-weight: 600; border: 1px solid; }
+    .arch-box.green { border-color: rgba(79,255,176,0.4); color: var(--green); background: rgba(79,255,176,0.07); }
+    .arch-box.blue { border-color: rgba(96,208,255,0.4); color: var(--blue); background: rgba(96,208,255,0.07); }
+    .arch-box.gold { border-color: rgba(244,184,96,0.4); color: var(--gold); background: rgba(244,184,96,0.07); }
+    .arch-box.purple { border-color: rgba(196,160,255,0.4); color: var(--purple); background: rgba(196,160,255,0.07); }
+    .arch-box.orange { border-color: rgba(247,168,122,0.4); color: var(--orange); background: rgba(247,168,122,0.07); }
+    .arch-arrow { color: var(--dim); font-size: 1.1rem; }
+    .arch-label { font-size: 0.72rem; color: var(--dim); text-align: center; margin: 4px 0; }
+
+    .flow-step { display: flex; gap: 16px; align-items: flex-start; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .flow-step:last-child { border-bottom: none; }
+    .step-num { min-width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 800; flex-shrink: 0; }
+    .step-num.green { background: rgba(79,255,176,0.18); color: var(--green); }
+    .step-num.blue { background: rgba(96,208,255,0.18); color: var(--blue); }
+    .step-num.gold { background: rgba(244,184,96,0.18); color: var(--gold); }
+    .flow-step h4 { font-size: 0.9rem; font-weight: 700; margin-bottom: 4px; }
+    .flow-step p { font-size: 0.84rem; color: var(--muted); }
+
+    .table-wrap { overflow-x: auto; margin: 14px 0; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    thead th { background: #0b1728; color: var(--green); font-weight: 700; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.06em; padding: 10px 14px; text-align: left; border-bottom: 1px solid rgba(79,255,176,0.2); }
+    tbody tr { border-bottom: 1px solid rgba(255,255,255,0.04); }
+    tbody tr:last-child { border-bottom: none; }
+    tbody td { padding: 10px 14px; color: var(--muted); vertical-align: top; }
+    tbody td:first-child { color: var(--text); font-weight: 600; }
+    tbody tr:hover { background: rgba(255,255,255,0.02); }
+
+    footer { margin: 60px 24px 0; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.06); font-size: 0.78rem; color: var(--dim); display: flex; gap: 16px; flex-wrap: wrap; justify-content: space-between; }
+  </style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="breadcrumb shell"><a href="../index.html">← Workbench</a> / <a href="index.html">Claude Code</a> / Skills</div>
+  <div class="shell">
+    <div class="hero-eyebrow">🎯 Skills · オープン標準 · 2026年</div>
+    <h1>Claude Code <em>Skills</em></h1>
+    <p class="hero-sub">「毎回同じことを説明する」から「一度定義したら誰でも使える」へ。Skillsは再利用可能なAI能力をファイルとして標準化し、チーム全体で共有するオープン規格。属人化を解消し、MAチームのDD能力を組織の資産にする。</p>
+    <div class="hero-meta">
+      <div class="meta-chip">規格: <strong>オープン標準</strong></div>
+      <div class="meta-chip">対応: <strong>Claude Code / Agent SDK</strong></div>
+      <div class="meta-chip">場所: <strong>.claude/agents/ または Skills Hub</strong></div>
+      <div class="meta-chip">用途: <strong>チーム標準化 / DD自動化</strong></div>
+    </div>
+  </div>
+</div>
+
+<div class="shell">
+
+  <!-- Skillsとは何か -->
+  <section class="section">
+    <div class="section-label">基本概念</div>
+    <div class="section-title">Skillsとは何か — 「プロンプト」から「能力ファイル」へ</div>
+    <div class="section-sub">チャット型AIの最大の弱点は「記憶がない」こと。毎回同じ説明から始まる。Skillsはその問題を根本から解決する。</div>
+
+    <div class="grid2" style="margin-bottom:16px;">
+      <div style="background:rgba(255,144,144,0.06); border:1px solid rgba(255,144,144,0.2); border-radius:14px; padding:22px;">
+        <div style="font-size:0.7rem; font-weight:700; color:#ff9090; text-transform:uppercase; letter-spacing:0.09em; margin-bottom:10px;">❌ 旧来のチャット型（毎回リセット）</div>
+        <ul style="padding-left:14px; font-size:0.85rem; color:var(--muted); display:flex; flex-direction:column; gap:6px;">
+          <li>「あなたはM&A財務アナリストです。EBITDAを計算し…」を毎回冒頭に書く</li>
+          <li>同じ手順・判断基準・出力フォーマットをメンバーごとに再発明</li>
+          <li>ベテランが退職すると知識も消える（属人化）</li>
+          <li>品質が担当者のプロンプト力に依存する</li>
+          <li>改善しても次のセッションには反映されない</li>
+        </ul>
+      </div>
+      <div style="background:rgba(79,255,176,0.06); border:1px solid rgba(79,255,176,0.2); border-radius:14px; padding:22px;">
+        <div style="font-size:0.7rem; font-weight:700; color:#4FFFB0; text-transform:uppercase; letter-spacing:0.09em; margin-bottom:10px;">✅ Skills（能力の資産化）</div>
+        <ul style="padding-left:14px; font-size:0.85rem; color:var(--muted); display:flex; flex-direction:column; gap:6px;">
+          <li>Skill定義ファイルに「役割・手順・ツール・出力形式」を一度書く</li>
+          <li>チーム全員が同じSkillを呼び出す（標準化）</li>
+          <li>Skillは組織のGitリポジトリで管理・バージョン管理</li>
+          <li>改善はSkillファイルを更新するだけで全員に反映</li>
+          <li>新メンバーが即日プロレベルのDDを実行できる</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      <div class="tip-label">本質的な変化</div>
+      <p>Skillsは「AIへの指示」ではなく「組織の能力定義」。ベテランのDDノウハウをファイルに書き出すことで、その知識が永続的な組織資産になる。これが「属人化解消」の実体。</p>
+    </div>
+  </section>
+
+  <!-- Skillファイルの構造 -->
+  <section class="section">
+    <div class="section-label">Skill定義ファイル</div>
+    <div class="section-title">Skill定義ファイルの書き方</div>
+    <div class="section-sub">Skillは <code>.claude/agents/</code> 以下に置くマークダウンファイル。YAMLフロントマターで設定、本文でロールと手順を定義する。</div>
+
+    <pre style="margin-bottom:16px;"><code class="language-yaml"># .claude/agents/dd-financial-analyst.md
+---
+name: dd-financial-analyst
+description: |
+  M&A財務デューデリジェンスの専門Skill。
+  財務諸表（B/S・P&L・CF）の分析、EBITDA/FCFの算出、
+  バリュエーション、リスクフラグの特定を実施する。
+  対象企業の財務資料が提供されたときに使用する。
+tools:
+  - Read        # PDFや財務資料ファイルの読み込み
+  - Write       # DDレポートの生成
+  - WebSearch   # 公開財務データ・業界ベンチマークの検索
+model: claude-sonnet-4-6   # デフォルトモデル（高コスト分析時はOpus 4.6を指定）
+---
+
+# 財務DDエージェント
+
+## 役割
+あなたはM&A専門の財務デューデリジェンスアナリストです。
+提供された財務資料を分析し、投資委員会が意思決定に使えるレベルの
+財務DDレポートを作成します。
+
+## 分析フレームワーク
+
+### 1. 財務実績の分析
+- 過去3〜5年の売上高・EBITDA・純利益の推移とCAGR
+- P&LとCFの乖離（利益の質の評価）
+- 運転資本の変動とその意味
+
+### 2. バリュエーション
+- EV/EBITDA倍率（業界比較）
+- DCF（WACC・ターミナル成長率は業界標準を適用）
+- トランザクションコンパラブル
+
+### 3. リスクフラグ（必ず明示）
+- のれん・無形資産の急増
+- 一時項目の常態化
+- 関連当事者取引
+- 偶発債務・簿外負債
+
+## 出力形式
+エグゼクティブサマリー（1ページ）→ 詳細分析 → リスクマトリクス の順で出力。
+数値は全て円換算・百万円単位。信頼区間が低い推計値には★マークを付ける。</code></pre>
+
+    <div class="grid2">
+      <div>
+        <p style="font-size:0.78rem; font-weight:700; color:var(--dim); text-transform:uppercase; margin-bottom:8px;">YAMLフロントマターの主要フィールド</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>フィールド</th><th>説明</th><th>必須</th></tr></thead>
+            <tbody>
+              <tr><td>name</td><td>Skill識別子（@メンションで呼び出す名前）</td><td>✅</td></tr>
+              <tr><td>description</td><td>いつ使うか・何をするかの説明（AIが判断に使う）</td><td>✅</td></tr>
+              <tr><td>tools</td><td>このSkillに許可するツールのリスト</td><td>推奨</td></tr>
+              <tr><td>model</td><td>使用モデルの指定（省略時は親から継承）</td><td>任意</td></tr>
+              <tr><td>max_turns</td><td>最大ターン数の制限</td><td>任意</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div>
+        <p style="font-size:0.78rem; font-weight:700; color:var(--dim); text-transform:uppercase; margin-bottom:8px;">Skillの呼び出し方</p>
+        <pre><code class="language-bash"># 方法1: @メンションで直接指定
+"@dd-financial-analyst 対象企業XのDDを開始してください"
+
+# 方法2: Claude Codeが自動判断
+"財務DDを実施してください"
+# → descriptionを読んでdd-financial-analystを自動選択
+
+# 方法3: Agent TeamsでOrchestrator経由
+"DD Swarmを起動してください"
+# → Orchestratorが3つのSkillを並列起動</code></pre>
+        <div class="tip-box" style="margin-top:10px;">
+          <div class="tip-label">Descriptionが重要</div>
+          <p>descriptionはAIが「このSkillをいつ使うか」を判断する根拠。「〜の場合に使用する」「〜が提供されたとき」と使い所を明示すること。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAチーム向けSkillライブラリ -->
+  <section class="section">
+    <div class="section-label">MAチーム実装</div>
+    <div class="section-title">MAチーム向けSkillライブラリの設計</div>
+    <div class="section-sub">DDの4領域（財務・法務・ビジネス・統合）に対応する4つのコアSkillと補助Skillで構成する。</div>
+
+    <div class="grid2" style="margin-bottom:14px;">
+      <div class="skill-card financial">
+        <div class="sc-eyebrow">💹 Core Skill 1</div>
+        <h3>dd-financial-analyst</h3>
+        <p>財務諸表分析・バリュエーション・FCF評価。EBITDAマルチプル・DCF・リスクフラグの特定。</p>
+        <ul>
+          <li>ツール: Read, Write, WebSearch</li>
+          <li>モデル: Sonnet 4.6（通常）/ Opus 4.6（複雑案件）</li>
+          <li>出力: 財務DDレポート + バリュエーションレンジ</li>
+        </ul>
+      </div>
+      <div class="skill-card legal">
+        <div class="sc-eyebrow">⚖️ Core Skill 2</div>
+        <h3>dd-legal-reviewer</h3>
+        <p>契約書・定款・コンプライアンス資料の審査。重要条項の抽出・リスク評価・Change of Control条項特定。</p>
+        <ul>
+          <li>ツール: Read, Write</li>
+          <li>モデル: Opus 4.6（法的判断精度優先）</li>
+          <li>出力: 法務リスクマトリクス + 重要条項一覧</li>
+        </ul>
+      </div>
+      <div class="skill-card business">
+        <div class="sc-eyebrow">📊 Core Skill 3</div>
+        <h3>dd-business-analyst</h3>
+        <p>市場分析・競合調査・シナジー評価・PMI計画。業界ポジション・成長ドライバー・リスク要因の特定。</p>
+        <ul>
+          <li>ツール: Read, Write, WebSearch</li>
+          <li>モデル: Opus 4.6（戦略判断）</li>
+          <li>出力: ビジネスDDレポート + シナジー試算</li>
+        </ul>
+      </div>
+      <div class="skill-card report">
+        <div class="sc-eyebrow">📋 Synthesis Skill</div>
+        <h3>dd-report-synthesizer</h3>
+        <p>3つのDDレポートを統合してエグゼクティブサマリーを生成。投資委員会向けの意思決定資料を作成。</p>
+        <ul>
+          <li>ツール: Read, Write</li>
+          <li>モデル: Opus 4.6（統合・要約）</li>
+          <li>出力: 投資委員会プレゼン用サマリー</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="grid3">
+      <div class="card">
+        <h3 style="color:var(--accent);">🔍 Utility: market-researcher</h3>
+        <p>特定企業・業界のWebリサーチ。財務・ビジネスDDの補助として呼び出し可能。</p>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--accent);">📑 Utility: document-extractor</h3>
+        <p>PDFやWordからの情報抽出・構造化。大量資料の前処理に特化。</p>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--accent);">📧 Utility: communication-drafter</h3>
+        <p>対象企業・アドバイザー向けのメール・質問状の下書き生成。</p>
+      </div>
+    </div>
+
+    <pre style="margin-top:14px;"><code class="language-bash"># .claude/agents/ のディレクトリ構造（MAチームDDライブラリ）
+.claude/
+└── agents/
+    ├── core/
+    │   ├── dd-financial-analyst.md      # 財務DDコアSkill
+    │   ├── dd-legal-reviewer.md         # 法務DDコアSkill
+    │   ├── dd-business-analyst.md       # ビジネスDDコアSkill
+    │   └── dd-report-synthesizer.md     # レポート統合Skill
+    ├── utility/
+    │   ├── market-researcher.md         # 市場調査補助
+    │   ├── document-extractor.md        # 資料抽出補助
+    │   └── communication-drafter.md     # 文書作成補助
+    └── orchestrator/
+        └── dd-swarm-orchestrator.md     # DD Swarm全体指揮</code></pre>
+  </section>
+
+  <!-- Skills vs 旧来方式 -->
+  <section class="section">
+    <div class="section-label">比較</div>
+    <div class="section-title">Skills vs 旧来方式 — 組織規模でのインパクト</div>
+    <div class="section-sub">5人のMAチームで年間20件のDDを処理する場合の試算。</div>
+
+    <div class="compare-wrap">
+      <div class="compare-row head">
+        <div>比較軸</div><div>旧来（毎回プロンプト）</div><div>Skills（標準化）</div>
+      </div>
+      <div class="compare-row">
+        <div>初回セットアップ</div>
+        <div>毎回0から（5〜15分/回）</div>
+        <div style="color:var(--green);">一度作成、以降ゼロ</div>
+      </div>
+      <div class="compare-row">
+        <div>品質のばらつき</div>
+        <div style="color:var(--red);">担当者のスキルに依存</div>
+        <div style="color:var(--green);">全員が同じベースライン</div>
+      </div>
+      <div class="compare-row">
+        <div>改善の反映</div>
+        <div style="color:var(--red);">個人の頭の中だけ</div>
+        <div style="color:var(--green);">Gitコミットで全員に即反映</div>
+      </div>
+      <div class="compare-row">
+        <div>新人のスタートライン</div>
+        <div style="color:var(--red);">ゼロから学習（数ヶ月）</div>
+        <div style="color:var(--green);">初日からSkillライブラリを活用可</div>
+      </div>
+      <div class="compare-row">
+        <div>年間セットアップ工数<br><small>5人×20件×10分</small></div>
+        <div style="color:var(--red);">約1,000分（16.7時間）</div>
+        <div style="color:var(--green);">0分（Skill初期構築除く）</div>
+      </div>
+      <div class="compare-row">
+        <div>知識の継承</div>
+        <div style="color:var(--red);">退職でノウハウ消失</div>
+        <div style="color:var(--green);">Skillファイルに永続記録</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Skillエコシステム -->
+  <section class="section">
+    <div class="section-label">エコシステム</div>
+    <div class="section-title">Skillエコシステム — 公開・共有・バージョン管理</div>
+    <div class="section-sub">Skillsはオープン標準として設計されている。組織内での管理から、業界横断での共有まで。</div>
+
+    <div class="grid3" style="margin-bottom:16px;">
+      <div class="card">
+        <h3 style="color:var(--green);">🏠 組織内Skills</h3>
+        <p>プライベートGitリポジトリで管理。PRでのレビュー・バージョン管理・ロールバック可能。MAチーム専用のナレッジを保護しながら管理。</p>
+        <div style="margin-top:10px;"><span class="tag t-g">非公開</span> <span class="tag t-g">Git管理</span></div>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--blue);">🌐 Skills Hub（公開）</h3>
+        <p>Anthropicが運営する公開Skillマーケットプレイス（β）。業界標準のSkillを検索・インポート・評価できる。コミュニティ貢献も可能。</p>
+        <div style="margin-top:10px;"><span class="tag t-b">公開</span> <span class="tag t-b">コミュニティ</span></div>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--gold);">🏢 業界Skills連合</h3>
+        <p>同業他社・業界団体でSkillを共同開発・共有する新しいモデル。金融業界のDD標準Skillなど、業界知識の集合知化。</p>
+        <div style="margin-top:10px;"><span class="tag t-o">業界標準</span> <span class="tag t-o">協調</span></div>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div>
+        <p style="font-size:0.78rem; font-weight:700; color:var(--dim); text-transform:uppercase; margin-bottom:8px;">Skillバージョン管理フロー（Git）</p>
+        <div class="panel" style="padding:16px;">
+          <div class="flow-step">
+            <div class="step-num green">1</div>
+            <div>
+              <h4>開発ブランチでSkill改善</h4>
+              <p><code>feature/dd-financial-v2</code> ブランチでアナリストが改善案を作成</p>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="step-num green">2</div>
+            <div>
+              <h4>MDが変更をレビュー・承認</h4>
+              <p>Pull Requestでチームレビュー。「このリスク判断基準は正しいか」を確認</p>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="step-num green">3</div>
+            <div>
+              <h4>mainにマージ → 全員に即反映</h4>
+              <p>mergeした瞬間から全メンバーが改善されたSkillを使用</p>
+            </div>
+          </div>
+          <div class="flow-step" style="border-bottom:none;">
+            <div class="step-num green">4</div>
+            <div>
+              <h4>問題があればロールバック</h4>
+              <p><code>git revert</code>で以前のバージョンに即戻し。Skillの品質を守る安全網</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <p style="font-size:0.78rem; font-weight:700; color:var(--dim); text-transform:uppercase; margin-bottom:8px;">Skills + Agent Teams + Routinesの統合</p>
+        <div class="arch-diagram">
+          <div class="arch-label">3つの新機能が組み合わさるアーキテクチャ</div>
+          <div class="arch-row" style="margin-top:16px;">
+            <div class="arch-box gold">Routines<br><small>毎朝8時に自動起動</small></div>
+          </div>
+          <div class="arch-row"><div class="arch-arrow">↓</div></div>
+          <div class="arch-row">
+            <div class="arch-box blue">Agent Teams<br><small>Orchestratorが3エージェント起動</small></div>
+          </div>
+          <div class="arch-row"><div class="arch-arrow">↓</div></div>
+          <div class="arch-row">
+            <div class="arch-box green">財務Skill</div>
+            <div class="arch-box green">法務Skill</div>
+            <div class="arch-box green">ビジネスSkill</div>
+          </div>
+          <div class="arch-row"><div class="arch-arrow">↓</div></div>
+          <div class="arch-row">
+            <div class="arch-box orange">DDレポート自動生成</div>
+          </div>
+          <div class="arch-label" style="margin-top:12px;">人間が介在しない完全自動DDパイプライン</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ゲームチェンジャーとしての意義 -->
+  <section class="section">
+    <div class="section-label">大局観</div>
+    <div class="section-title">なぜSkillsが「ゲームチェンジャー」なのか</div>
+    <div class="section-sub">従来のAI活用との根本的な違いを整理する。</div>
+
+    <div class="panel green" style="padding:26px 28px;">
+      <div class="grid3">
+        <div>
+          <h3 style="font-size:0.95rem; color:var(--green); margin-bottom:8px;">断絶① 能力の資産化</h3>
+          <p style="font-size:0.85rem; color:var(--muted);">チャット型AIは「使い捨て」。Skillsは組織の能力をファイル化して永続的に蓄積する。ベテランの知識が組織資産になる初めての仕組み。</p>
+        </div>
+        <div>
+          <h3 style="font-size:0.95rem; color:var(--green); margin-bottom:8px;">断絶② 属人化の解消</h3>
+          <p style="font-size:0.85rem; color:var(--muted);">優秀なプロンプトエンジニアがいなくても、Skillライブラリが標準品質を保証する。1人のMDが設計したDDフレームワークをチーム全員が再現できる。</p>
+        </div>
+        <div>
+          <h3 style="font-size:0.95rem; color:var(--green); margin-bottom:8px;">断絶③ 1人で1000社へ</h3>
+          <p style="font-size:0.85rem; color:var(--muted);">Skillsで標準化したDDをRoutinesで自動起動・Agent Teamsで並列実行すると、1人のアナリストが100社を同時監視するシステムが完成する。</p>
+        </div>
+      </div>
+      <div class="tip-box" style="margin-top:16px; background:rgba(79,255,176,0.05);">
+        <div class="tip-label">DBS銀行との接続</div>
+        <p>シンガポールDBS銀行が「AIと協働するバンカー」モデルで生産性を倍増させた背景には、こうした能力の標準化がある。Skillsはその仕組みを自社で構築するための技術基盤。SBI新生銀行のMAチームでも、まず財務DDのSkillライブラリを整備することが最初のステップになる。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 実装ロードマップ -->
+  <section class="section">
+    <div class="section-label">導入手順</div>
+    <div class="section-title">MAチームへのSkills導入ステップ</div>
+    <div class="section-sub">最初の1週間で動くSkillライブラリを作る最短ルート。</div>
+
+    <div class="panel" style="padding:20px 24px;">
+      <div class="flow-step">
+        <div class="step-num gold">1</div>
+        <div>
+          <h4>既存DDチェックリストを棚卸し（1日）</h4>
+          <p>現在チームが使っているDDフレームワーク・チェックリスト・フォーマットを集める。これがSkillの原材料。</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num gold">2</div>
+        <div>
+          <h4>財務DDSkillを最初に作る（2日）</h4>
+          <p><code>dd-financial-analyst.md</code>を作成。既存チェックリストをそのままskill本文に変換するだけでよい。完璧を求めない。</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num gold">3</div>
+        <div>
+          <h4>実際のDDで試用・改善（1週間）</h4>
+          <p>リアル案件で使いながら「この手順が足りない」「この出力形式を変えたい」を反映。Skillは使いながら育てる。</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num gold">4</div>
+        <div>
+          <h4>法務・ビジネスSkillに拡張（2週目）</h4>
+          <p>財務Skillが安定したら法務・ビジネスへ展開。3つ揃えばDD Swarmが組める。</p>
+        </div>
+      </div>
+      <div class="flow-step" style="border-bottom:none;">
+        <div class="step-num gold">5</div>
+        <div>
+          <h4>Routinesと組み合わせて自動化（1ヶ月後）</h4>
+          <p>毎朝7時に自動でSkillを起動し、ターゲットリスト企業の動向をスキャン。「気づいたら分析が終わっている」状態へ。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer class="shell">
+  <span>Skills 実践ガイド — 2026年4月16日更新</span>
+  <span>出典: Anthropic Claude Code Docs · Skills Open Standard · Agent Teams Guide</span>
+</footer>
+
+</body>
+</html>

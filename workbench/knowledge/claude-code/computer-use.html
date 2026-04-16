@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Computer Use API | Claude Code — ClaudeがGUIを自律操作する</title>
+  <style>
+    :root {
+      --bg: #07111d;
+      --panel: #0d1829;
+      --panel2: #091018;
+      --text: #e8eef9;
+      --muted: #b6c3da;
+      --dim: #5a7a9a;
+      --accent: #66e0c2;
+      --gold: #f4b860;
+      --blue: #60d0ff;
+      --purple: #c4a0ff;
+      --red: #ff9090;
+      --green: #4FFFB0;
+      --orange: #f7a87a;
+      --border: rgba(255,255,255,0.08);
+      --r: 16px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Segoe UI","Noto Sans JP",system-ui,sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; padding: 0 0 80px; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code { background: rgba(255,255,255,0.08); border-radius: 4px; padding: 0.1em 0.45em; font-size: 0.84em; font-family: "Fira Code","Consolas",monospace; color: #a5f3d0; }
+    pre { background: #060e1a; border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 16px 18px; overflow-x: auto; font-family: "Fira Code","Consolas",monospace; font-size: 0.83em; color: #a5f3d0; line-height: 1.6; margin: 10px 0; }
+
+    .hero { background: linear-gradient(135deg, #0d1a2e 0%, #17102a 60%, #091525 100%); border-bottom: 1px solid rgba(196,160,255,0.25); padding: 52px 40px 44px; }
+    .breadcrumb { font-size: 0.8rem; color: var(--dim); margin-bottom: 16px; }
+    .breadcrumb a { color: var(--accent); }
+    .hero-eyebrow { display: inline-flex; align-items: center; gap: 8px; background: rgba(196,160,255,0.12); border: 1px solid rgba(196,160,255,0.3); color: var(--purple); font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; padding: 5px 14px; border-radius: 999px; margin-bottom: 16px; }
+    .hero h1 { font-size: 2.4rem; font-weight: 900; line-height: 1.15; margin-bottom: 12px; }
+    .hero h1 em { font-style: normal; background: linear-gradient(90deg, #c4a0ff, #9b6dff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero-sub { color: var(--muted); font-size: 0.95rem; max-width: 700px; }
+    .hero-meta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
+    .meta-chip { background: rgba(255,255,255,0.06); border: 1px solid var(--border); border-radius: 8px; padding: 5px 12px; font-size: 0.78rem; color: var(--muted); }
+    .meta-chip strong { color: var(--purple); }
+
+    .shell { max-width: 1060px; margin: 0 auto; padding: 0 24px; }
+    .section { padding: 44px 0 0; }
+    .section-label { font-size: 0.7rem; font-weight: 700; color: var(--purple); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+    .section-title { font-size: 1.4rem; font-weight: 800; margin-bottom: 6px; }
+    .section-sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 20px; }
+
+    .panel { background: var(--panel); border: 1px solid var(--border); border-radius: var(--r); padding: 22px 26px; }
+    .panel.purple { border-color: rgba(196,160,255,0.3); background: linear-gradient(135deg, #0d1829, #13102a); }
+    .panel.gold { border-color: rgba(244,184,96,0.3); background: linear-gradient(135deg, #0d1829, #141c2c); }
+    .panel.red { border-color: rgba(255,144,144,0.3); background: linear-gradient(135deg, #0d1829, #1e0e0e); }
+    .panel.green { border-color: rgba(79,255,176,0.3); background: linear-gradient(135deg, #0d1829, #0d1e18); }
+
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+    @media (max-width: 720px) { .grid2, .grid3 { grid-template-columns: 1fr; } }
+
+    .card { background: var(--panel2); border: 1px solid var(--border); border-radius: 14px; padding: 20px 22px; }
+    .card h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 8px; }
+    .card p, .card li { font-size: 0.86rem; color: var(--muted); }
+    .card ul { padding-left: 16px; display: flex; flex-direction: column; gap: 5px; margin-top: 6px; }
+
+    .tool-card { border-radius: 14px; padding: 22px 24px; }
+    .tool-card.screenshot { background: rgba(196,160,255,0.05); border: 1px solid rgba(196,160,255,0.22); }
+    .tool-card.computer { background: rgba(96,208,255,0.05); border: 1px solid rgba(96,208,255,0.22); }
+    .tool-card.bash { background: rgba(102,224,194,0.05); border: 1px solid rgba(102,224,194,0.22); }
+    .tc-eyebrow { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
+    .screenshot .tc-eyebrow { color: var(--purple); }
+    .computer .tc-eyebrow { color: var(--blue); }
+    .bash .tc-eyebrow { color: var(--accent); }
+    .tool-card h3 { font-size: 1rem; font-weight: 800; margin-bottom: 8px; }
+    .tool-card p { font-size: 0.86rem; color: var(--muted); margin-bottom: 10px; }
+    .tool-card ul { padding-left: 16px; font-size: 0.84rem; color: var(--muted); display: flex; flex-direction: column; gap: 5px; }
+
+    .badge { display: inline-block; font-size: 0.64rem; font-weight: 700; padding: 2px 8px; border-radius: 5px; text-transform: uppercase; letter-spacing: 0.06em; margin-left: 6px; vertical-align: middle; }
+    .b-ga { background: rgba(79,255,176,0.18); color: #4FFFB0; }
+    .b-warn { background: rgba(255,144,144,0.18); color: #ff9090; }
+    .b-sandbox { background: rgba(244,184,96,0.18); color: #f4b860; }
+
+    .tag { display: inline-block; font-size: 0.68rem; font-weight: 700; padding: 2px 8px; border-radius: 5px; }
+    .t-g { background: rgba(79,255,176,0.15); color: #4FFFB0; }
+    .t-b { background: rgba(96,208,255,0.15); color: #60d0ff; }
+    .t-p { background: rgba(196,160,255,0.15); color: #c4a0ff; }
+    .t-o { background: rgba(244,184,96,0.15); color: #f4b860; }
+    .t-r { background: rgba(255,144,144,0.15); color: #ff9090; }
+
+    .tip-box { background: linear-gradient(135deg, rgba(196,160,255,0.08), rgba(102,224,194,0.05)); border: 1px solid rgba(196,160,255,0.25); border-radius: 10px; padding: 13px 16px; margin-top: 12px; }
+    .tip-box.warn { background: linear-gradient(135deg, rgba(255,144,144,0.08), rgba(247,168,122,0.05)); border-color: rgba(255,144,144,0.3); }
+    .tip-box.gold { background: linear-gradient(135deg, rgba(244,184,96,0.08), rgba(247,168,122,0.05)); border-color: rgba(244,184,96,0.3); }
+    .tip-label { font-size: 0.68rem; font-weight: 700; color: var(--purple); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px; }
+    .tip-box.warn .tip-label { color: var(--red); }
+    .tip-box.gold .tip-label { color: var(--gold); }
+    .tip-box p { font-size: 0.84rem; color: var(--text); margin: 0; }
+
+    .arch-diagram { background: #060e1a; border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; padding: 24px; }
+    .arch-row { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 8px 0; flex-wrap: wrap; }
+    .arch-box { border-radius: 10px; padding: 10px 18px; font-size: 0.82rem; font-weight: 600; border: 1px solid; text-align: center; }
+    .arch-box.purple { border-color: rgba(196,160,255,0.4); color: var(--purple); background: rgba(196,160,255,0.07); }
+    .arch-box.blue { border-color: rgba(96,208,255,0.4); color: var(--blue); background: rgba(96,208,255,0.07); }
+    .arch-box.green { border-color: rgba(102,224,194,0.4); color: var(--accent); background: rgba(102,224,194,0.07); }
+    .arch-box.gold { border-color: rgba(244,184,96,0.4); color: var(--gold); background: rgba(244,184,96,0.07); }
+    .arch-box.orange { border-color: rgba(247,168,122,0.4); color: var(--orange); background: rgba(247,168,122,0.07); }
+    .arch-arrow { color: var(--dim); font-size: 1.1rem; }
+    .arch-label { font-size: 0.72rem; color: var(--dim); text-align: center; margin: 4px 0; }
+
+    .loop-step { background: var(--panel2); border: 1px solid var(--border); border-radius: 12px; padding: 14px 18px; }
+    .loop-step-num { font-size: 0.72rem; font-weight: 800; color: var(--purple); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 5px; }
+    .loop-step h4 { font-size: 0.9rem; font-weight: 700; margin-bottom: 4px; }
+    .loop-step p { font-size: 0.83rem; color: var(--muted); }
+
+    .scenario { background: var(--panel2); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; margin-bottom: 12px; }
+    .scenario-head { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
+    .scenario-icon { font-size: 1.4rem; }
+    .scenario-title { font-size: 0.95rem; font-weight: 700; }
+    .scenario-tag { margin-left: auto; }
+    .scenario-body { padding: 16px 20px; font-size: 0.86rem; color: var(--muted); }
+    .scenario-body p { margin-bottom: 10px; }
+    .scenario-body ul { padding-left: 16px; display: flex; flex-direction: column; gap: 5px; }
+
+    .compare-wrap { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin: 14px 0; }
+    .compare-row { display: grid; grid-template-columns: 160px 1fr 1fr; gap: 1px; background: var(--border); }
+    .compare-row > div { background: var(--panel2); padding: 11px 14px; font-size: 0.84rem; }
+    .compare-row.head > div { background: #0b1728; font-size: 0.76rem; font-weight: 700; color: var(--purple); text-transform: uppercase; letter-spacing: 0.06em; }
+    .compare-row > div:first-child { color: var(--dim); font-size: 0.8rem; }
+
+    footer { margin: 60px 24px 0; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.06); font-size: 0.78rem; color: var(--dim); display: flex; gap: 16px; flex-wrap: wrap; justify-content: space-between; }
+  </style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="breadcrumb shell"><a href="../index.html">← Workbench</a> / <a href="index.html">Claude Code</a> / Computer Use</div>
+  <div class="shell">
+    <div class="hero-eyebrow">🖥️ Computer Use API · GA · 2026年</div>
+    <h1>Claude <em>Computer Use</em></h1>
+    <p class="hero-sub">ClaudeがスクリーンショットでGUIを見て、クリック・タイプ・スクロールで操作する。「APIがない」「ログインが必要」「Excelしかない」という壁を超えてDDを自動化する次世代能力。</p>
+    <div class="hero-meta">
+      <div class="meta-chip">ステータス: <strong>GA（一般公開）</strong></div>
+      <div class="meta-chip">環境: <strong>Dockerサンドボックス必須</strong></div>
+      <div class="meta-chip">モデル: <strong>claude-sonnet-4-6（推奨）</strong></div>
+      <div class="meta-chip">用途: <strong>GUI操作・データ収集・フォーム入力自動化</strong></div>
+    </div>
+  </div>
+</div>
+
+<div class="shell">
+
+  <!-- Computer Useとは何か -->
+  <section class="section">
+    <div class="section-label">基本概念</div>
+    <div class="section-title">Computer Useとは何か — AIが「目」と「手」を持つ</div>
+    <div class="section-sub">従来のAIは「テキスト入出力」のみ。Computer UseはClaudeに画面を見る目とGUIを操作する手を与える。</div>
+
+    <div class="grid2" style="margin-bottom:16px;">
+      <div>
+        <div class="arch-diagram">
+          <div class="arch-label">Computer Use の動作ループ</div>
+          <div style="display:flex; flex-direction:column; gap:10px; margin-top:12px;">
+            <div class="loop-step">
+              <div class="loop-step-num">Step 1 — 見る</div>
+              <h4>スクリーンショットを取得</h4>
+              <p>Claudeが画面全体のスクリーンショットを撮影してコンテキストに取り込む</p>
+            </div>
+            <div style="text-align:center; color:var(--dim);">↓</div>
+            <div class="loop-step">
+              <div class="loop-step-num">Step 2 — 判断する</div>
+              <h4>画像を解析して次の行動を決定</h4>
+              <p>「ログインボタンはここにある」「入力フィールドはここだ」とマルチモーダルで分析</p>
+            </div>
+            <div style="text-align:center; color:var(--dim);">↓</div>
+            <div class="loop-step">
+              <div class="loop-step-num">Step 3 — 操作する</div>
+              <h4>クリック・タイプ・スクロールを実行</h4>
+              <p>座標指定クリック、キーボード入力、マウスドラッグなど実際の操作を実行</p>
+            </div>
+            <div style="text-align:center; color:var(--dim);">↓</div>
+            <div class="loop-step">
+              <div class="loop-step-num">Step 1に戻る（ループ）</div>
+              <h4>操作結果を確認</h4>
+              <p>再度スクリーンショットを撮り、操作が成功したか・次に何をするかを判断</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <p style="font-size:0.78rem; font-weight:700; color:var(--dim); text-transform:uppercase; margin-bottom:10px;">3つのコアツール</p>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div class="tool-card screenshot">
+            <div class="tc-eyebrow">👁️ screenshot_tool</div>
+            <h3>画面を見る</h3>
+            <p>指定サイズのスクリーンショットを撮影してBase64エンコード画像として返す。Claudeの「目」。</p>
+            <ul>
+              <li>引数: なし（現在の画面を撮影）</li>
+              <li>戻り値: Base64 PNG画像</li>
+            </ul>
+          </div>
+          <div class="tool-card computer">
+            <div class="tc-eyebrow">🖱️ computer_tool</div>
+            <h3>マウス・キーボードで操作する</h3>
+            <p>クリック・ドラッグ・タイプ・スクロールなどのGUI操作を実行。Claudeの「手」。</p>
+            <ul>
+              <li>action: "left_click", "type", "scroll", "key" など</li>
+              <li>coordinate: [x, y] でクリック位置を指定</li>
+            </ul>
+          </div>
+          <div class="tool-card bash">
+            <div class="tc-eyebrow">⌨️ bash_tool</div>
+            <h3>コマンドラインを実行する</h3>
+            <p>シェルコマンド・スクリプトをサンドボックス内で実行。ファイル操作・API呼び出しなど。</p>
+            <ul>
+              <li>command: 実行するbashコマンド</li>
+              <li>サンドボックス内のみで動作（ホストに影響なし）</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- セットアップ -->
+  <section class="section">
+    <div class="section-label">セットアップ</div>
+    <div class="section-title">Docker サンドボックス環境の構築</div>
+    <div class="section-sub">Computer UseはDockerコンテナ内の仮想デスクトップで動作する。ホスト環境への影響をゼロにするための必須要件。</div>
+
+    <div class="tip-box warn" style="margin-bottom:16px;">
+      <div class="tip-label">⚠️ 重要: サンドボックスは必須</div>
+      <p>Computer UseをDockerなしで実際のPCデスクトップに接続しないこと。Claudeが実際のファイル・ブラウザ・アプリを操作できるため、意図しないデータ操作・削除のリスクがある。必ずサンドボックス環境内で動作させること。</p>
+    </div>
+
+    <pre style="margin-bottom:16px;"><code class="language-bash"># Anthropic公式Computer Useデモ環境のセットアップ
+git clone https://github.com/anthropics/anthropic-quickstarts.git
+cd anthropic-quickstarts/computer-use-demo
+
+# Docker imageのビルド
+docker build -t computer-use-demo .
+
+# コンテナ起動（Xvfb仮想ディスプレイ + VNC + noVNC含む）
+docker run \
+  -e ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY \
+  -v $HOME/.anthropic:/home/user/.anthropic \
+  -p 5900:5900 \   # VNC接続ポート
+  -p 6080:6080 \   # noVNC Webブラウザポート
+  -p 8501:8501 \   # Streamlit UIポート
+  computer-use-demo
+
+# ブラウザで http://localhost:6080 にアクセスすると仮想デスクトップが見える</code></pre>
+
+    <div class="grid2">
+      <div>
+        <p style="font-size:0.78rem; font-weight:700; color:var(--dim); text-transform:uppercase; margin-bottom:8px;">サンドボックス環境の構成</p>
+        <div class="arch-diagram">
+          <div class="arch-row">
+            <div class="arch-box gold">ホストPC（安全な外側）</div>
+          </div>
+          <div class="arch-row"><div class="arch-arrow">↓ Dockerネットワーク分離</div></div>
+          <div class="arch-row">
+            <div class="arch-box purple">Docker コンテナ（サンドボックス）</div>
+          </div>
+          <div class="arch-row">
+            <div class="arch-box blue">Xvfb 仮想ディスプレイ</div>
+            <div class="arch-box blue">Firefox ブラウザ</div>
+          </div>
+          <div class="arch-row">
+            <div class="arch-box green">screenshot_tool</div>
+            <div class="arch-box green">computer_tool</div>
+          </div>
+          <div class="arch-row"><div class="arch-arrow">↑ APIコール</div></div>
+          <div class="arch-row">
+            <div class="arch-box gold">Claude API（外部）</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <p style="font-size:0.78rem; font-weight:700; color:var(--dim); text-transform:uppercase; margin-bottom:8px;">Python実装の基本骨格</p>
+        <pre style="height:calc(100% - 30px); margin:0;"><code class="language-python">import anthropic
+import base64
+from PIL import ImageGrab  # サンドボックス内
+
+client = anthropic.Anthropic()
+
+def take_screenshot():
+    """スクリーンショットを撮ってBase64に変換"""
+    img = ImageGrab.grab()
+    import io
+    buf = io.BytesIO()
+    img.save(buf, format='PNG')
+    return base64.b64encode(buf.getvalue()).decode()
+
+def computer_use_loop(task: str):
+    """Computer Use メインループ"""
+    messages = [{"role": "user", "content": task}]
+
+    while True:
+        response = client.beta.messages.create(
+            model="claude-sonnet-4-6",
+            max_tokens=4096,
+            tools=[
+                {"type": "computer_20250124", "name": "computer",
+                 "display_width_px": 1280, "display_height_px": 800},
+                {"type": "bash_20250124", "name": "bash"}
+            ],
+            messages=messages,
+            betas=["computer-use-2025-01-24"]
+        )
+
+        # tool_useがなければ完了
+        if response.stop_reason == "end_turn":
+            break
+
+        # ツール呼び出しを処理してループ継続
+        tool_results = process_tool_calls(response)
+        messages.append({"role": "assistant", "content": response.content})
+        messages.append({"role": "user", "content": tool_results})</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAチームDD活用シナリオ -->
+  <section class="section">
+    <div class="section-label">MAチーム活用</div>
+    <div class="section-title">DDにおけるComputer Use活用シナリオ</div>
+    <div class="section-sub">「APIがない」「ログインが必要」という壁を超えて自動化できる。</div>
+
+    <div class="scenario">
+      <div class="scenario-head">
+        <div class="scenario-icon">🏦</div>
+        <div class="scenario-title">シナリオ1: データルームポータルからの自動資料収集</div>
+        <div class="scenario-tag"><span class="tag t-p">高価値</span></div>
+      </div>
+      <div class="scenario-body">
+        <p>IntralinksやAnsaradaのようなデータルームポータルはAPIを提供していない。Computer Useを使えば、ブラウザでログイン→フォルダ階層をナビゲート→全PDFをダウンロードする操作を自動化できる。</p>
+        <ul>
+          <li>ログイン（ID/PW入力、2FA対応）</li>
+          <li>ドキュメントリストの取得（スクリーンショット解析）</li>
+          <li>全カテゴリのPDFを順番にダウンロード</li>
+          <li>ファイル名・フォルダ構造をメタデータとして記録</li>
+          <li>Files APIへ自動アップロードして分析エージェントへ受け渡し</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="scenario">
+      <div class="scenario-head">
+        <div class="scenario-icon">📊</div>
+        <div class="scenario-title">シナリオ2: 公開財務データの自動収集</div>
+        <div class="scenario-tag"><span class="tag t-b">定期実行可</span></div>
+      </div>
+      <div class="scenario-body">
+        <p>EDINETやSECのEDGARから対象企業の有価証券報告書・10-K・プレスリリースを自動収集。ログイン不要の公開サイトならRoutinesと組み合わせて定期収集も可能。</p>
+        <ul>
+          <li>検索フォームに企業名・証券コードを入力</li>
+          <li>検索結果から最新の報告書リンクを特定・クリック</li>
+          <li>PDFダウンロードボタンを押す</li>
+          <li>複数企業を順番にループ処理（監視リスト全社を一括処理）</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="scenario">
+      <div class="scenario-head">
+        <div class="scenario-icon">📋</div>
+        <div class="scenario-title">シナリオ3: Excelフォームへの自動入力・出力</div>
+        <div class="scenario-tag"><span class="tag t-o">実用的</span></div>
+      </div>
+      <div class="scenario-body">
+        <p>社内のExcelベースのDD進捗管理表や、顧問弁護士から送られてくるExcelフォームへの記入作業を自動化。APIやPythonで直接操作できないマクロ付きExcelでも対応可能。</p>
+        <ul>
+          <li>ExcelファイルをDockerコンテナ内のLibreOfficeで開く</li>
+          <li>AI分析の結果を該当セルにタイプして入力</li>
+          <li>保存・PDF出力まで一連の操作を実行</li>
+          <li>完成したファイルをホスト環境へ受け渡し</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="scenario">
+      <div class="scenario-head">
+        <div class="scenario-icon">🔍</div>
+        <div class="scenario-title">シナリオ4: 競合他社・ターゲット企業の定期モニタリング</div>
+        <div class="scenario-tag"><span class="tag t-g">Routines連携</span></div>
+      </div>
+      <div class="scenario-body">
+        <p>Bloomberg Terminal・Capital IQのようなデスクトップアプリや、スクレイピング禁止サイトの情報を、「人間の代理として閲覧・転記」という形で収集する。毎朝Routinesで起動して自動レポート生成まで。</p>
+        <ul>
+          <li>アプリケーション起動・ログイン</li>
+          <li>特定銘柄の最新データをスクリーンショットで取得</li>
+          <li>画像内のテキストをOCRで読み取り構造化</li>
+          <li>前日比変化点をフラグアップしてSlack通知</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- できること/できないこと -->
+  <section class="section">
+    <div class="section-label">制約と注意事項</div>
+    <div class="section-title">できること・できないこと</div>
+    <div class="section-sub">Computer Useには重要な制約がある。過度な期待を持たず、適切なユースケースを選ぶことが成功の鍵。</div>
+
+    <div class="compare-wrap">
+      <div class="compare-row head">
+        <div>項目</div><div style="color:var(--green);">✅ できること</div><div style="color:var(--red);">❌ できないこと・難しいこと</div>
+      </div>
+      <div class="compare-row">
+        <div>ナビゲーション</div>
+        <div>シンプルなサイト・アプリのページ遷移</div>
+        <div>CAPTCHA・reCAPTCHAの突破</div>
+      </div>
+      <div class="compare-row">
+        <div>データ収集</div>
+        <div>公開Webサイトのフォームや一覧からの読み取り</div>
+        <div>JavaScriptで動的生成される無限スクロールコンテンツの完全収集</div>
+      </div>
+      <div class="compare-row">
+        <div>ファイル操作</div>
+        <div>ダウンロード・アップロード・ファイル名変更</div>
+        <div>暗号化PDFのロック解除（非公開情報へのアクセス）</div>
+      </div>
+      <div class="compare-row">
+        <div>フォーム入力</div>
+        <div>テキスト・数値・ドロップダウン選択</div>
+        <div>極めて複雑な動的フォーム（順序依存のある高度なUI）</div>
+      </div>
+      <div class="compare-row">
+        <div>速度</div>
+        <div>人間と同等またはそれ以下のペース</div>
+        <div style="color:var(--red);">高速スクレイピング（ボット検知の対象になる）</div>
+      </div>
+      <div class="compare-row">
+        <div>信頼性</div>
+        <div>確認ステップを組み込めば高精度</div>
+        <div>UI変更（ボタン位置の変更等）に自動追従するのは難しい場合がある</div>
+      </div>
+    </div>
+
+    <div class="grid2" style="margin-top:14px;">
+      <div class="tip-box warn">
+        <div class="tip-label">⚠️ 法的・倫理的注意事項</div>
+        <p>利用規約でスクレイピングを禁止しているサイトでの使用は違反になる可能性がある。データルームの場合はNDA・利用許諾の範囲内での使用を確認すること。「人間が手作業でする操作をAIが代行する」という範囲に留めること。</p>
+      </div>
+      <div class="tip-box gold">
+        <div class="tip-label">コスト見積もり</div>
+        <p>スクリーンショット1枚 ≈ 1,000〜2,000トークン。操作が複雑なほどターン数が増えてコストが上昇する。1つのタスク（30操作程度）でSonnet換算 $0.05〜0.20 程度。重要なのは確認ステップを組み込んで無駄なループを防ぐこと。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- リスク管理と実装のベストプラクティス -->
+  <section class="section">
+    <div class="section-label">ベストプラクティス</div>
+    <div class="section-title">安全な実装のための設計パターン</div>
+    <div class="section-sub">確認ステップと人間監視を組み込んだ「Human-in-the-loop」設計が推奨される。</div>
+
+    <pre style="margin-bottom:16px;"><code class="language-python"># 安全なComputer Use実装 — 確認ステップ付き
+import anthropic
+
+client = anthropic.Anthropic()
+
+def safe_computer_use(task: str, require_confirmation: bool = True):
+    """
+    MAチーム向け安全設計のComputer Use実装
+    - 重要操作前に確認を求める
+    - ファイルダウンロードのみ許可（アップロード・送信は別確認）
+    - 操作ログを全記録
+    """
+    system_prompt = """
+    あなたはMAチームのデータ収集補助エージェントです。
+    以下のルールを厳守してください：
+
+    【許可する操作】
+    - Webサイトの閲覧・スクロール
+    - ファイルのダウンロード
+    - フォームへの読み取り専用アクセス
+
+    【禁止する操作】
+    - メールの送信・フォームの送信（SUBMIT不可）
+    - ファイルの削除・移動
+    - アカウント設定の変更
+    - ダウンロード以外のアップロード
+
+    重要な操作（ダウンロード、ログイン等）を実行する前に、
+    必ず「これから[操作内容]を行います。よろしいですか？」と確認すること。
+    """
+
+    messages = [{"role": "user", "content": task}]
+    operation_log = []
+
+    while True:
+        response = client.beta.messages.create(
+            model="claude-sonnet-4-6",
+            max_tokens=4096,
+            system=system_prompt,
+            tools=[
+                {"type": "computer_20250124", "name": "computer",
+                 "display_width_px": 1280, "display_height_px": 800},
+                {"type": "bash_20250124", "name": "bash"}
+            ],
+            messages=messages,
+            betas=["computer-use-2025-01-24"]
+        )
+
+        # 操作ログに記録
+        for block in response.content:
+            if hasattr(block, 'type') and block.type == 'tool_use':
+                operation_log.append({
+                    "tool": block.name,
+                    "input": block.input,
+                    "timestamp": datetime.now().isoformat()
+                })
+
+        if response.stop_reason == "end_turn":
+            break
+
+        # ツール結果を処理してループ継続
+        tool_results = process_tool_calls(response)
+        messages.append({"role": "assistant", "content": response.content})
+        messages.append({"role": "user", "content": tool_results})
+
+    return {"result": response.content, "log": operation_log}</code></pre>
+
+    <div class="grid3">
+      <div class="card">
+        <h3 style="color:var(--purple);">🔒 最小権限原則</h3>
+        <p>Skillとして定義する際にtoolsを明示的に制限する。Computer Useはデータ収集専用Skillに限定し、財務分析Skillとは分離する。</p>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--purple);">📋 操作ログの記録</h3>
+        <p>全操作をタイムスタンプ付きで記録する。「何をいつダウンロードしたか」の監査証跡が、コンプライアンス上も重要になる。</p>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--purple);">👁️ Human-in-the-loop</h3>
+        <p>初回実行は必ず人間が監視する。noVNCでリアルタイムに画面を確認しながら動作を観察し、問題がないことを確認してから自動化する。</p>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer class="shell">
+  <span>Computer Use API ガイド — 2026年4月16日更新</span>
+  <span>出典: Anthropic Computer Use Docs · anthropic-quickstarts GitHub · Claude API Reference</span>
+</footer>
+
+</body>
+</html>
