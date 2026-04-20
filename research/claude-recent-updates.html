@@ -3,707 +3,712 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Claude 最新アップデート完全版（2026年2〜4月）| Research</title>
+  <title>Claude 最新アップデート完全版 | Research</title>
   <style>
-    body { font-family:"Segoe UI","Noto Sans JP",system-ui,sans-serif; margin:0; background:#07111d; color:#e8eef9; line-height:1.75; padding:28px 18px 80px; }
-    .shell { max-width:1000px; margin:0 auto; display:grid; gap:20px; }
-
-    .panel { background:#0d1829; border:1px solid rgba(255,255,255,0.07); border-radius:18px; padding:24px 28px; }
-    .panel.accent { border-color:rgba(102,224,194,0.3); }
-    .panel.warn   { border-color:rgba(244,184,96,0.3); background:linear-gradient(135deg,#0d1829,#141c2c); }
-    .panel.code-panel { border-color:rgba(217,119,87,0.3); }
-    a { color:#66e0c2; text-decoration:none; }
-    a:hover { text-decoration:underline; }
-    h1,h2,h3,h4 { margin:0 0 10px; }
-    h1 { font-size:2rem; }
-    h2 { font-size:1.15rem; }
-    p,li { color:#b6c3da; font-size:0.91rem; }
-    ul { padding-left:18px; margin:6px 0 0; }
-    li { margin-bottom:5px; }
-    strong { color:#e8eef9; }
-    code { background:rgba(255,255,255,0.08); border-radius:4px; padding:0.1rem 0.45rem; font-size:0.84rem; font-family:"Fira Code","Consolas",monospace; color:#a5f3d0; }
-    pre { background:#060e1a; border:1px solid rgba(255,255,255,0.07); border-radius:10px; padding:14px 16px; overflow-x:auto; font-family:"Fira Code","Consolas",monospace; font-size:0.82rem; color:#a5f3d0; line-height:1.6; margin:10px 0; }
-
-    /* タグ */
-    .tag { display:inline-block; font-size:0.68rem; font-weight:700; padding:0.15rem 0.55rem; border-radius:5px; margin:0 3px 3px 0; vertical-align:middle; }
-    .tag-model   { background:rgba(167,139,250,0.18); color:#c4a0ff; }
-    .tag-product { background:rgba(0,180,255,0.15);   color:#60d0ff; }
-    .tag-feature { background:rgba(102,224,194,0.15); color:#66e0c2; }
-    .tag-api     { background:rgba(255,184,96,0.15);  color:#f4b860; }
-    .tag-cc      { background:rgba(217,119,87,0.2);   color:#f7a87a; }
-    .tag-big     { background:rgba(255,107,107,0.18); color:#ff9090; }
-    .tag-note    { background:rgba(255,255,255,0.07); color:#8899bb; }
-    .tag-new     { background:rgba(79,255,176,0.18);  color:#4FFFB0; }
-
-    /* KPI */
-    .kpi-row { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
-    @media(max-width:640px){ .kpi-row { grid-template-columns:repeat(2,1fr); } }
-    .kpi { background:#091018; border:1px solid rgba(255,255,255,0.06); border-radius:14px; padding:16px; text-align:center; }
-    .kpi .val { font-size:2rem; font-weight:800; color:#66e0c2; line-height:1; }
-    .kpi .lbl { font-size:0.7rem; color:#7a8aaa; margin-top:6px; }
-
-    /* タイムライン */
-    .tl { position:relative; padding-left:28px; display:grid; gap:14px; }
-    .tl::before { content:""; position:absolute; left:8px; top:0; bottom:0; width:2px; background:rgba(255,255,255,0.06); }
-    .tl-item { position:relative; }
-    .tl-item::before { content:""; position:absolute; left:-23px; top:16px; width:9px; height:9px; border-radius:50%; background:#0d1829; border:2px solid #66e0c2; }
-    .tl-item.hot::before { border-color:#f7a87a; }
-
-    .tl-card { background:#091018; border:1px solid rgba(255,255,255,0.06); border-radius:12px; padding:14px 18px; }
-    .tl-card.hot { border-color:rgba(217,119,87,0.25); }
-    .tl-head { display:flex; align-items:flex-start; gap:10px; flex-wrap:wrap; margin-bottom:6px; }
-    .tl-date { font-size:0.72rem; color:#5a7a9a; font-weight:700; white-space:nowrap; padding-top:3px; min-width:70px; }
-    .tl-title { font-size:0.95rem; font-weight:700; color:#e8eef9; flex:1; }
-    .tl-desc { font-size:0.88rem; color:#b6c3da; margin:0 0 6px; }
-    .tl-detail { margin-top:8px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.05); }
-    .tl-detail ul { margin:0; }
-
-    /* グリッド */
-    .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
-    @media(max-width:640px){ .grid2,.grid3 { grid-template-columns:1fr; } }
-    .grid3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
-    @media(max-width:700px){ .grid3 { grid-template-columns:1fr 1fr; } }
-
-    /* モデルカード */
-    .model-card { background:#091018; border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:18px; }
-    .model-card.top { border-color:rgba(167,139,250,0.3); }
-    .model-name { font-size:1.05rem; font-weight:800; color:#e8eef9; margin-bottom:4px; }
-    .model-sub  { font-size:0.72rem; color:#5a7a9a; margin-bottom:10px; }
-    .model-stat { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
-    .stat-pill  { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); border-radius:6px; padding:3px 10px; font-size:0.73rem; color:#b6c3da; font-family:monospace; }
-    .stat-pill strong { color:#66e0c2; }
-
-    /* Claude Code 機能テーブル */
-    .feat-table { width:100%; border-collapse:collapse; font-size:0.87rem; }
-    .feat-table th { text-align:left; padding:9px 12px; background:rgba(217,119,87,0.1); color:#f7a87a; font-size:0.78rem; border-bottom:1px solid rgba(255,255,255,0.06); }
-    .feat-table td { padding:9px 12px; border-bottom:1px solid rgba(255,255,255,0.04); color:#b6c3da; vertical-align:top; }
-    .feat-table tr.new td { background:rgba(79,255,176,0.04); }
-    .feat-table tr:last-child td { border-bottom:none; }
-
-    /* 比較表 */
-    .compare { width:100%; border-collapse:collapse; font-size:0.86rem; }
-    .compare th { text-align:left; padding:9px 12px; background:rgba(102,224,194,0.08); color:#66e0c2; font-size:0.78rem; border-bottom:1px solid rgba(255,255,255,0.06); }
-    .compare td { padding:9px 12px; border-bottom:1px solid rgba(255,255,255,0.04); color:#b6c3da; }
-    .compare tr.hl td { background:rgba(102,224,194,0.04); color:#e8eef9; font-weight:600; }
-
-    /* 凡例 */
-    .legend { display:flex; flex-wrap:wrap; gap:8px; align-items:center; font-size:0.78rem; color:#b6c3da; margin-top:10px; }
-
-    .breadcrumb { font-size:0.82rem; color:#5a7a9a; margin-bottom:8px; }
-    .breadcrumb a { color:#66e0c2; }
-    .last-update { font-size:0.74rem; color:#3a5060; margin-top:4px; }
-
-    /* デモ向けハイライトボックス */
-    .demo-tip { background:linear-gradient(135deg, rgba(244,184,96,0.1), rgba(102,224,194,0.07)); border:1px solid rgba(244,184,96,0.3); border-radius:12px; padding:14px 18px; margin-top:14px; }
-    .demo-tip .tip-label { font-size:0.72rem; font-weight:700; color:#f4b860; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:6px; }
-    .demo-tip p { margin:0; font-size:0.87rem; }
+    :root {
+      --bg: #07111d;
+      --panel: #0d1829;
+      --panel-2: #101f34;
+      --panel-3: #09131f;
+      --text: #e8eef9;
+      --muted: #b6c3da;
+      --soft: #7f92ac;
+      --border: rgba(255,255,255,0.08);
+      --accent: #66e0c2;
+      --accent-2: #f4b860;
+      --accent-3: #f7a87a;
+      --accent-4: #d8b4fe;
+      --shadow: 0 12px 36px rgba(0,0,0,0.28);
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 12% 14%, rgba(102,224,194,0.14), transparent 28%),
+        radial-gradient(circle at 88% 4%, rgba(244,184,96,0.12), transparent 24%),
+        linear-gradient(145deg, #07111d 0%, #0a1422 52%, #060d18 100%);
+      color: var(--text);
+      font-family: "Segoe UI", "Noto Sans JP", system-ui, sans-serif;
+      line-height: 1.72;
+      padding: 28px 18px 80px;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .shell { max-width: 1100px; margin: 0 auto; display: grid; gap: 18px; }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px 26px;
+    }
+    .hero {
+      background: linear-gradient(135deg, rgba(102,224,194,0.08), rgba(244,184,96,0.08)), var(--panel);
+    }
+    .breadcrumb { color: var(--soft); font-size: 0.82rem; margin-bottom: 8px; }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      background: rgba(102,224,194,0.12);
+      color: var(--accent);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    h1, h2, h3, h4 { margin: 0 0 10px; }
+    h1 { font-size: 2rem; }
+    h2 { font-size: 1.18rem; }
+    h3 { font-size: 1rem; }
+    h4 { font-size: 0.92rem; color: var(--text); }
+    p, li { color: var(--muted); font-size: 0.92rem; }
+    ul { margin: 8px 0 0; padding-left: 18px; }
+    li { margin-bottom: 6px; }
+    strong { color: var(--text); }
+    .last-update { color: var(--soft); font-size: 0.8rem; margin-top: 10px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    @media (max-width: 920px) {
+      .grid-4, .grid-3 { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 640px) {
+      .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; }
+    }
+    .card, .stat, .subpanel {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+    }
+    .subpanel.deep { background: var(--panel-3); }
+    .stat .value { font-size: 1.8rem; color: var(--accent); font-weight: 800; line-height: 1; }
+    .stat .label { color: var(--soft); font-size: 0.75rem; margin-top: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .tag {
+      display: inline-block;
+      padding: 3px 8px;
+      margin-right: 6px;
+      margin-bottom: 6px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+    .tag-model { background: rgba(167,139,250,0.18); color: var(--accent-4); }
+    .tag-product { background: rgba(96,208,255,0.16); color: #7dd3fc; }
+    .tag-code { background: rgba(247,168,122,0.16); color: #fdba74; }
+    .tag-api { background: rgba(244,184,96,0.16); color: #fcd34d; }
+    .tag-new { background: rgba(79,255,176,0.16); color: #4FFFB0; }
+    .tag-risk { background: rgba(255,107,107,0.16); color: #fca5a5; }
+    .summary {
+      border-left: 4px solid var(--accent);
+      padding-left: 14px;
+      margin-top: 8px;
+    }
+    .timeline {
+      position: relative;
+      display: grid;
+      gap: 14px;
+      padding-left: 28px;
+    }
+    .timeline::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 9px;
+      width: 2px;
+      background: rgba(255,255,255,0.08);
+    }
+    .item {
+      position: relative;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 18px;
+    }
+    .item::before {
+      content: "";
+      position: absolute;
+      left: -24px;
+      top: 18px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--panel);
+      border: 2px solid var(--accent);
+    }
+    .item.hot::before { border-color: var(--accent-2); }
+    .date { font-size: 0.76rem; color: var(--soft); font-weight: 700; margin-bottom: 4px; }
+    .note {
+      background: rgba(244,184,96,0.08);
+      border: 1px solid rgba(244,184,96,0.24);
+      border-radius: 12px;
+      padding: 14px 16px;
+    }
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+    .table th {
+      text-align: left;
+      padding: 10px 12px;
+      color: var(--accent-3);
+      background: rgba(247,168,122,0.08);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      vertical-align: top;
+    }
+    .table td {
+      padding: 10px 12px;
+      color: var(--muted);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      vertical-align: top;
+    }
+    .table tr:last-child td { border-bottom: none; }
+    .sources li { margin-bottom: 8px; }
+    code {
+      font-family: "Fira Code", "Consolas", monospace;
+      background: rgba(255,255,255,0.06);
+      padding: 0.12rem 0.4rem;
+      border-radius: 6px;
+      color: #a5f3d0;
+    }
+    .small { font-size: 0.84rem; color: var(--soft); }
   </style>
 </head>
 <body>
-<div class="shell">
-
-  <!-- ヘッダー -->
-  <div class="panel accent">
-    <div class="breadcrumb"><a href="index.html">← Research</a> / <a href="../index.html">Hub Top</a></div>
-    <h1>Claude 最新アップデート完全版</h1>
-    <p style="font-size:0.95rem;">
-      Anthropic が <strong>2026年2〜4月</strong>にかけてリリースしたモデル・プロダクト・機能・APIを完全収録。<br>
-      <strong>4/17（木）の Claude Code デモ</strong>の前段階理解資料として活用してください。
-    </p>
-    <div class="legend">
-      <span class="tag tag-model">モデル</span>
-      <span class="tag tag-product">プロダクト</span>
-      <span class="tag tag-feature">機能</span>
-      <span class="tag tag-api">API/開発</span>
-      <span class="tag tag-cc">Claude Code</span>
-      <span class="tag tag-big">注目</span>
-      <span class="tag tag-new">NEW</span>
-    </div>
-    <p class="last-update">最終更新: 2026-04-16</p>
-  </div>
-
-  <!-- KPI -->
-  <div class="kpi-row">
-    <div class="kpi"><div class="val">74</div><div class="lbl">52日間のリリース数</div></div>
-    <div class="kpi"><div class="val">1.4<span style="font-size:1rem;">日</span></div><div class="lbl">平均リリース間隔</div></div>
-    <div class="kpi"><div class="val">1M</div><div class="lbl">最大コンテキスト（β）</div></div>
-    <div class="kpi"><div class="val">v2.1.90+</div><div class="lbl">Claude Code 最新バージョン</div></div>
-  </div>
-
-  <!-- ===== モデルラインナップ ===== -->
-  <div class="panel">
-    <h2>📦 現行モデルラインナップ（2026年4月時点）</h2>
-    <p style="margin-bottom:14px;">Anthopicのモデルは <strong>Opus / Sonnet / Haiku</strong> の3ティア。現行の最新バージョンは下記。</p>
-
-    <div class="grid3">
-      <div class="model-card top">
-        <div class="model-name">Claude Opus 4.6</div>
-        <div class="model-sub">最上位フラッグシップ · 2026年2月5日リリース</div>
-        <div class="model-stat">
-          <span class="stat-pill"><strong>1M</strong> ctx tokens (β)</span>
-          <span class="stat-pill"><strong>14.5h</strong> 長期実行対応</span>
-          <span class="stat-pill">API ID: claude-opus-4-6</span>
-        </div>
-        <ul>
-          <li>コーディング・計画・デバッグ・財務分析が大幅強化</li>
-          <li>企業文書ライブラリ丸ごと処理が可能（100万トークン）</li>
-          <li>Message Batches API で max_tokens <strong>300K</strong> に拡大</li>
-          <li>マルチエージェントオーケストレーションに最適</li>
-        </ul>
-        <div class="demo-tip">
-          <div class="tip-label">💡 デモポイント</div>
-          <p>「Opusは考える」— 複雑な計画・長期タスクに使う。コストは高いがSonnetより深い推論。</p>
-        </div>
+  <div class="shell">
+    <section class="panel hero">
+      <div class="breadcrumb"><a href="index.html">Research</a> / <a href="../index.html">Hub Top</a></div>
+      <div class="eyebrow">Claude Update Tracker</div>
+      <h1>Claude 最新アップデート完全版</h1>
+      <p>
+        Anthropic の公式ニュース、Claude Help Center の release notes、Claude Code の
+        official changelog をもとに、<strong>2026年2月から4月20日まで</strong>の大きな変化を
+        実務視点で再整理したページです。今回は単なる出来事の列挙ではなく、
+        <strong>何が変わり、どこに効き、どう使い分けるか</strong>まで厚めにまとめています。
+      </p>
+      <div class="summary">
+        <p>
+          4月後半の本質は、Claude が「賢いチャット」や「強いコーディングモデル」から、
+          <strong>長時間タスクを運転できるワークスタック</strong>へ一段進んだことです。
+          具体的には、<strong>Opus 4.7</strong> が hardest task を引き受け、
+          <strong>Cowork</strong> が知識ワーク自動化の器になり、
+          <strong>Claude Design</strong> がデザインと資料をつなぎ、
+          <strong>Claude Code</strong> が実装支援からレビューと運用まで含むエージェント基盤に寄ってきています。
+        </p>
       </div>
+      <p class="last-update">最終更新: 2026-04-20</p>
+    </section>
 
-      <div class="model-card top">
-        <div class="model-name">Claude Sonnet 4.6</div>
-        <div class="model-sub">バランス型 主力モデル · 2026年2月17日リリース</div>
-        <div class="model-stat">
-          <span class="stat-pill"><strong>1M</strong> ctx (β)</span>
-          <span class="stat-pill">コスパ最良</span>
-          <span class="stat-pill">API ID: claude-sonnet-4-6</span>
+    <section class="grid-4">
+      <div class="stat"><div class="value">4/16</div><div class="label">Opus 4.7 GA</div></div>
+      <div class="stat"><div class="value">4/17</div><div class="label">Claude Design</div></div>
+      <div class="stat"><div class="value">4/9</div><div class="label">Cowork GA</div></div>
+      <div class="stat"><div class="value">2.1.111+</div><div class="label">Claude Code wave</div></div>
+    </section>
+
+    <section class="panel">
+      <h2>まず押さえる結論</h2>
+      <div class="grid-3">
+        <div class="card">
+          <span class="tag tag-model">Model</span>
+          <h3>Opus 4.7 は「最難課題担当」</h3>
+          <p>
+            Opus 4.7 は benchmark で強いだけではなく、
+            <strong>複雑なコード修正、長時間の自律実行、自己検証、厳密な指示追従</strong>で価値があるモデルです。
+            4.6 との違いは「賢さの増加」より「仕事を最後まで崩れず運ぶ力」の増加です。
+          </p>
         </div>
-        <ul>
-          <li>エージェント検索性能が向上しつつトークン消費を削減</li>
-          <li><strong>Claude Code のデフォルトモデル</strong>（コーディング最適化）</li>
-          <li>自律コーディングワークロードで最もよく使われる</li>
-          <li>速度とインテリジェンスのバランスが最良</li>
-        </ul>
-        <div class="demo-tip">
-          <div class="tip-label">💡 デモポイント</div>
-          <p>「Sonnetは動く」— Claude Code で実際に動かして見せるのはほぼこれ。速くてコスパが良い。</p>
+        <div class="card">
+          <span class="tag tag-product">Product</span>
+          <h3>Cowork と Design で仕事の面が広がった</h3>
+          <p>
+            Claude は coding の外でも、調査、資料、デザイン、日常の knowledge work をまとめて扱える方向に進んでいます。
+            4月はその流れが、一つ一つの機能ではなく
+            <strong>つながる体験</strong>として見えた月でした。
+          </p>
+        </div>
+        <div class="card">
+          <span class="tag tag-code">CLI</span>
+          <h3>Claude Code はレビュー基盤化</h3>
+          <p>
+            4月の CLI 更新を見ると、中心は単なる edit 支援ではありません。
+            <code>/ultrareview</code>、<code>xhigh</code>、Auto Mode、PowerShell rollout から見えるのは、
+            <strong>実装 + レビュー + 長時間運転 + 権限制御</strong>をまとめた基盤化です。
+          </p>
         </div>
       </div>
+    </section>
 
-      <div class="model-card">
-        <div class="model-name">Claude Haiku 4.5</div>
-        <div class="model-sub">高速・低コスト · 現行最軽量</div>
-        <div class="model-stat">
-          <span class="stat-pill">超低レイテンシ</span>
-          <span class="stat-pill">大量処理向け</span>
-          <span class="stat-pill">API ID: claude-haiku-4-5</span>
-        </div>
-        <ul>
-          <li>高速応答が必要なリアルタイムアプリに最適</li>
-          <li>大量のAPI呼び出しをコスト効率よく処理</li>
-          <li>シンプルな分類・要約・フォームへの回答に</li>
-          <li>PicoClawのデフォルトモデルとして使いやすい</li>
-        </ul>
-        <div class="demo-tip">
-          <div class="tip-label">💡 デモポイント</div>
-          <p>「Haikuは速い」— 1秒以内の応答が必要なチャットボットや大量バッチに。Sonnetの10分の1のコスト。</p>
-        </div>
+    <section class="panel">
+      <h2>重要タイムライン</h2>
+      <div class="timeline">
+        <article class="item hot">
+          <div class="date">2026-04-17</div>
+          <h3>Claude Design by Anthropic Labs</h3>
+          <p>
+            Claude Design が research preview として公開。
+            Claude と対話しながら、<strong>デザイン、プロトタイプ、スライド、ワンペーパー</strong>を作成できる新製品です。
+            Anthropic はここで「Claude は文章生成だけではなく、視覚成果物も扱う」という方向を明確にしました。
+          </p>
+          <ul>
+            <li>テキスト、画像、文書、コードベースから開始可能</li>
+            <li>ブランドや既存デザインを読み、チーム用 design system を組める</li>
+            <li>PDF / PPTX / HTML / Canva に出力可能</li>
+            <li>Claude Code 向け handoff bundle があり、デザインから実装へ橋渡しできる</li>
+          </ul>
+        </article>
+
+        <article class="item hot">
+          <div class="date">2026-04-16</div>
+          <h3>Claude Opus 4.7 一般提供開始</h3>
+          <p>
+            Opus 4.7 は Opus 4.6 の minor refresh ではなく、Anthropic が hardest tasks 向けに押し出す新しい中心です。
+            特に強調されたのは、<strong>advanced software engineering</strong>、
+            <strong>long-running tasks の rigor and consistency</strong>、
+            <strong>higher-resolution vision</strong>、
+            <strong>professional output quality</strong> でした。
+          </p>
+          <ul>
+            <li>API モデル ID: <code>claude-opus-4-7</code></li>
+            <li>画像は長辺 2,576px まで入力可能</li>
+            <li>effort に <code>xhigh</code> を追加</li>
+            <li>task budgets が Claude Platform で public beta</li>
+            <li>Claude Code では Opus 4.7 の既定 effort が <code>xhigh</code></li>
+          </ul>
+        </article>
+
+        <article class="item">
+          <div class="date">2026-04-09</div>
+          <h3>Claude Cowork が GA</h3>
+          <p>
+            Claude Cowork が Claude Desktop 上で macOS / Windows に正式展開。
+            これにより Cowork は「試す機能」から、
+            <strong>組織で運用を考える機能</strong>に移りました。
+          </p>
+          <ul>
+            <li>Analytics API に Cowork データが追加</li>
+            <li>Team / Enterprise 向け usage analytics 追加</li>
+            <li>OpenTelemetry 対応</li>
+            <li>Enterprise の role-based permissions 強化</li>
+          </ul>
+        </article>
+
+        <article class="item">
+          <div class="date">2026-03-23</div>
+          <h3>Computer Use が Cowork / Claude Code に研究プレビュー展開</h3>
+          <p>
+            Claude がファイルを開き、dev tools を使い、クリックし、画面を見てナビゲートする能力が
+            Pro / Max に広がりました。これにより、「文章生成」ではなく
+            <strong>PC 上の作業代行</strong>として Claude を考える必要が出てきました。
+          </p>
+        </article>
+
+        <article class="item">
+          <div class="date">2026-02-17</div>
+          <h3>Claude Sonnet 4.6</h3>
+          <p>
+            Sonnet 4.6 は coding、computer use、agent planning、long-context reasoning を広く底上げ。
+            Claude 全体の default workhorse としての位置づけをさらに強めました。
+          </p>
+        </article>
+
+        <article class="item">
+          <div class="date">2026-02-05</div>
+          <h3>Claude Opus 4.6 と Platform 拡張</h3>
+          <p>
+            adaptive thinking、effort controls、context compaction、1M context beta、
+            128K output など、今の Claude Platform の土台になる枠組みがここで整理されました。
+          </p>
+        </article>
       </div>
-    </div>
+    </section>
 
-    <!-- 使い分け表 -->
-    <h3 style="margin-top:20px; font-size:0.95rem; color:#66e0c2;">モデル選択ガイド（Claude Codeデモでの説明用）</h3>
-    <table class="compare" style="margin-top:10px;">
-      <thead><tr><th>モデル</th><th>最適なユースケース</th><th>相対コスト</th><th>応答速度</th></tr></thead>
-      <tbody>
-        <tr class="hl"><td>Opus 4.6</td><td>長期エージェントタスク・財務分析・複雑な設計<br><small>「週次コンテンツ計画を立ててください」</small></td><td>高（基準）</td><td>やや遅め</td></tr>
-        <tr><td>Sonnet 4.6</td><td>Claude Codeでのコーディング・日常タスク全般<br><small>「このバグを直してPRを作ってください」</small></td><td>中（1/5）</td><td>速い</td></tr>
-        <tr><td>Haiku 4.5</td><td>大量処理・チャットボット・分類タスク<br><small>「1000件のメールを分類してください」</small></td><td>低（1/25）</td><td>最速</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- ===== CLAUDE CODE 詳細 ===== -->
-  <div class="panel code-panel">
-    <h2>🤖 Claude Code — 完全機能ガイド（2026年4月版）</h2>
-    <p style="margin-bottom:14px;">
-      Claude Code はターミナルから動くエージェント型コーディングアシスタント。
-      <strong>コードを読み・書き・実行・デバッグ・GitにPushまで</strong>を自律でこなす。
-      2026年に入り機能が急速に拡充し、「開発者のためのオペレーティングシステム」と呼ばれ始めている。
-    </p>
-
-    <!-- インストール -->
-    <h3 style="font-size:0.9rem; color:#f7a87a; margin-bottom:8px;">インストールとセットアップ</h3>
-    <pre>npm install -g @anthropic-ai/claude-code
-claude-code --version   # バージョン確認
-claude-code             # 起動</pre>
-
-    <!-- 主要機能一覧 -->
-    <h3 style="font-size:0.9rem; color:#f7a87a; margin:16px 0 8px;">📋 主要機能一覧（2026年4月10日時点）</h3>
-    <table class="feat-table">
-      <thead><tr><th>機能</th><th>バージョン</th><th>概要</th><th>使い方・ポイント</th></tr></thead>
-      <tbody>
-        <tr class="new">
-          <td><strong>/powerup コマンド</strong> <span class="tag tag-new">NEW</span></td>
-          <td>v2.1.90（4/1）</td>
-          <td>インタラクティブなインターミナルチュートリアル。アニメーション付きデモで機能を学習</td>
-          <td>Claude Codeを起動後に <code>/powerup</code> と入力するだけ。デモにも使えるインタラクティブ教材。</td>
-        </tr>
-        <tr class="new">
-          <td><strong>Computer Use（CLI）</strong> <span class="tag tag-new">NEW</span></td>
-          <td>v2.1.86+</td>
-          <td>ターミナルからGUIアプリを操作。クリック・タイピング・スクロール・画面確認まで自律実行</td>
-          <td>操作優先順位: コネクター → ブラウザ → 画面コントロール。機密データには現在は非推奨。</td>
-        </tr>
-        <tr>
-          <td><strong>Auto Mode（自動実行）</strong></td>
-          <td>v2.1.70+（3/24）</td>
-          <td>承認なしで連続タスクを自動実行。危険操作はブロックリストで制御</td>
-          <td><code>--auto</code> フラグで起動。PermissionDenied hook で拒否後の <code>{retry: true}</code> リトライが可能。</td>
-        </tr>
-        <tr>
-          <td><strong>Remote Control（リモート接続）</strong></td>
-          <td>Research Preview</td>
-          <td>長時間実行セッションをウェブ・デスクトップアプリから監視・操作できる</td>
-          <td>「実行中のセッションに後から繋いで状況確認」ができる。外出先からの管理に有効。</td>
-        </tr>
-        <tr>
-          <td><strong>フリッカーフリーレンダリング</strong></td>
-          <td>v2.1.89（4月上旬）</td>
-          <td>プロンプト入力が画面下部に固定され、ちらつきが完全消滅</td>
-          <td><code>CLAUDE_CODE_NO_FLICKER=1</code>（古い環境向け旧式にフォールバック）</td>
-        </tr>
-        <tr>
-          <td><strong>@ mention（サブエージェント名）</strong></td>
-          <td>v2.1.90（4/1）</td>
-          <td>@ メンション入力時にサブエージェント名が候補表示されるように</td>
-          <td>マルチエージェント構成でのエージェント指定が視覚的にわかりやすくなった。</td>
-        </tr>
-        <tr>
-          <td><strong>MCP 強化（大容量ペイロード）</strong></td>
-          <td>v2.1.88+</td>
-          <td>ツールのresultサイズ上限が最大50万文字まで（per-tool override）</td>
-          <td>大規模DBスキーマや長いスプレッドシートもMCP経由でそのまま渡せる。</td>
-        </tr>
-        <tr>
-          <td><strong>Plugin bin/ ディレクトリ対応</strong></td>
-          <td>v2.1.87+</td>
-          <td>Pluginが <code>bin/</code> に実行ファイルを置くと、アクティブ時に自動でPATHに追加される</td>
-          <td>Pluginと一緒に外部ツールを配布できる。CLI拡張をバンドルしやすくなった。</td>
-        </tr>
-        <tr>
-          <td><strong>GCP Vertex AI 統合ウィザード</strong></td>
-          <td>v2.1.90</td>
-          <td>ログインフロー内にGCP Vertex AI設定ウィザードが新設。</td>
-          <td>Anthropic API ではなく GCP 経由で使いたい企業が設定しやすくなった。</td>
-        </tr>
-        <tr>
-          <td><strong>Windows 対応（Computer Use）</strong></td>
-          <td>4/3追加</td>
-          <td>macOS限定だったComputer UseがWindowsにも対応</td>
-          <td>Pro/Max サブスクライバー向け。アプリ操作・ブラウザ・ファイル管理を Windows 上で実行。</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <!-- ワークフローの流れ -->
-    <h3 style="font-size:0.9rem; color:#f7a87a; margin:16px 0 8px;">Claude Code の典型的なワークフロー</h3>
-    <pre># 1. プロジェクトディレクトリに移動
-cd my-project
-
-# 2. Claude Code 起動
-claude-code
-
-# 3. タスクを自然言語で指示
-> "このリポジトリのバグを調査してください。テストが失敗している原因を特定して、
->  修正するPRブランチを作成し、変更内容をコミットしてください。"
-
-# → Claude は自律的に:
-#   1. ファイルツリーを読む
-#   2. テストログを確認
-#   3. 関連コードを特定
-#   4. 修正を実装
-#   5. git checkout -b fix/xxx でブランチ作成
-#   6. git commit → git push まで完了</pre>
-
-    <!-- 課金についての注意 -->
-    <div style="background:rgba(255,107,107,0.08); border:1px solid rgba(255,107,107,0.2); border-radius:10px; padding:14px 18px; margin-top:14px;">
-      <p style="margin:0; font-size:0.88rem;"><strong style="color:#ff9090;">⚠️ 4/4 課金ポリシー変更（重要）</strong><br>
-      OpenClaw など <strong>サードパーティ経由の Claude Code 利用</strong>は、2026年4月4日以降サブスクリプション枠外になり <strong>従量課金（pay-as-you-go）</strong> に切り替わった。<br>
-      <strong>claude.ai・公式IDE拡張からは引き続きサブスクリプション枠内で利用可能。</strong></p>
-    </div>
-  </div>
-
-  <!-- ===== プロダクトエコシステム ===== -->
-  <div class="panel">
-    <h2>🌐 Anthropic プロダクトエコシステム（全体図）</h2>
-    <div class="grid2" style="margin-top:14px;">
-      <div>
-        <h3 style="font-size:0.9rem; color:#66e0c2; margin-bottom:10px;">プロダクト一覧</h3>
-        <ul>
-          <li><strong>claude.ai</strong> — Webチャット・個人利用（Free / Pro / Max）</li>
-          <li><strong>Claude Code</strong> — ターミナル・IDEエージェント（v2.1.90）</li>
-          <li><strong>Claude Cowork</strong> — 知識ワーク向けエージェント（2月〜Research Preview）</li>
-          <li><strong>Dispatch</strong> — Coworkのタスク委任・完了通知機能</li>
-          <li><strong>Claude Marketplace</strong> — エンタープライズ向けサードパーティ統合（3/6〜）</li>
-          <li><strong>Claude API</strong> — 開発者向け直接アクセス</li>
-          <li><strong>Claude for PowerPoint</strong> — Microsoft Office統合（2月〜）</li>
-        </ul>
-      </div>
-      <div>
-        <h3 style="font-size:0.9rem; color:#f4b860; margin-bottom:10px;">Claude Cowork とは（デモ前の理解として）</h3>
-        <p>Claude Code の「コーディング能力」を<strong>知識ワーク全般</strong>に拡張した新プロダクト。</p>
-        <ul>
-          <li>ドキュメント作成・データ分析・リサーチ・メール整理に対応</li>
-          <li>Skill / Plugin / Connector を一元管理する「Customize」セクション</li>
-          <li>定期・スポットのタスクスケジューリング機能</li>
-          <li>Dispatch 経由でスマホから指示→デスクトップで実行→完了通知という非同期フロー</li>
-        </ul>
-        <div class="demo-tip" style="margin-top:10px;">
-          <div class="tip-label">💡 Cowork vs Claude Code</div>
-          <p>Claude Code = <strong>エンジニア向け・ターミナル</strong><br>Cowork = <strong>ビジネス職・コードなし・ブラウザUI</strong></p>
+    <section class="panel">
+      <h2>モデル面で何が変わったか</h2>
+      <div class="grid-3">
+        <div class="subpanel">
+          <span class="tag tag-model">Frontier</span>
+          <h3>Claude Opus 4.7</h3>
+          <p>
+            いま Claude ファミリーの最上位。Anthropic の書きぶりを見る限り、
+            4.7 は「deepest reasoning」だけでなく
+            <strong>long-horizon autonomy</strong> と <strong>self-verification</strong> に軸があります。
+          </p>
+          <ul>
+            <li>難しいコード修正や refactor</li>
+            <li>厳密な code review</li>
+            <li>複数段の資料・設計・分析のつなぎ込み</li>
+            <li>図表や UI を含む高解像度視覚理解</li>
+          </ul>
+        </div>
+        <div class="subpanel">
+          <span class="tag tag-model">Default Workhorse</span>
+          <h3>Claude Sonnet 4.6</h3>
+          <p>
+            Sonnet 4.6 は Claude 全体の中心であり続けています。
+            コストと性能のバランスが良く、Claude Code や Cowork の大半の通常運用は依然ここが主役です。
+          </p>
+          <ul>
+            <li>日常コーディング</li>
+            <li>文書理解・検索・要約</li>
+            <li>browser / desktop の補助作業</li>
+            <li>一般的な agent workflow</li>
+          </ul>
+        </div>
+        <div class="subpanel">
+          <span class="tag tag-model">Fast / Cheap</span>
+          <h3>Claude Haiku 4.5</h3>
+          <p>
+            小型・低レイテンシ用途の受け皿。大規模バッチや分類、前処理には有効ですが、
+            4月後半の Claude の話題の中心は完全に Opus 4.7 と Sonnet 4.6 にあります。
+          </p>
+          <ul>
+            <li>高速応答</li>
+            <li>軽い整形・分類</li>
+            <li>大量処理</li>
+            <li>コスト重視運用</li>
+          </ul>
         </div>
       </div>
-    </div>
-  </div>
+      <div class="note" style="margin-top:14px;">
+        <p>
+          重要なのは、Anthropic が Mythos Preview を非公開のより強いクラスとして示しつつ、
+          広い展開の主力は Opus 4.7 に置いていることです。つまり 4月後半の実務判断では、
+          <strong>いま使うべき frontier Claude は Mythos ではなく Opus 4.7</strong> と考えるのが自然です。
+        </p>
+      </div>
+    </section>
 
-  <!-- ===== タイムライン ===== -->
-  <div class="panel">
-    <h2>📅 2026年2〜4月 タイムライン（全件）</h2>
+    <section class="panel">
+      <h2>Opus 4.7 と Opus 4.6 の違い</h2>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>観点</th>
+            <th>Opus 4.6</th>
+            <th>Opus 4.7</th>
+            <th>実務上の意味</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>長時間タスク</strong></td>
+            <td>強いが、難題でぶれやすい場面が残る</td>
+            <td>より厳密で、最後まで運び切る傾向を強調</td>
+            <td>長い PR 修正、調査、複数段タスクでの信頼性が上がる</td>
+          </tr>
+          <tr>
+            <td><strong>指示追従</strong></td>
+            <td>かなり強い</td>
+            <td>さらに literal に従う傾向が強い</td>
+            <td>古い prompt は再調整が必要。雑な指示ほど意図しない厳密適用が起きうる</td>
+          </tr>
+          <tr>
+            <td><strong>vision</strong></td>
+            <td>通常の画像理解</td>
+            <td>高解像度画像に対応、細部把握が強化</td>
+            <td>画面キャプチャ、技術図面、複雑 UI の読み取りが改善</td>
+          </tr>
+          <tr>
+            <td><strong>professional output</strong></td>
+            <td>高品質</td>
+            <td>より tasteful / polished と説明</td>
+            <td>資料、UI、デザイン、ドキュメントの完成度が上がる</td>
+          </tr>
+          <tr>
+            <td><strong>effort control</strong></td>
+            <td>low / medium / high / max</td>
+            <td><code>xhigh</code> を追加</td>
+            <td>hard problem で latency と intelligence の中間調整がしやすい</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="small" style="margin-top:12px;">
+        Anthropic は Opus 4.7 について、prompt written for earlier models can produce unexpected results と明言しています。
+        つまり upgrade は model swap だけでは済まず、prompt / harness / review expectations の再調整も含みます。
+      </p>
+    </section>
 
-    <!-- 2月 -->
-    <h3 style="font-size:0.92rem; color:#c4a0ff; margin:14px 0 10px;">─ 2026年2月 — モデル刷新・Cowork登場</h3>
-    <div class="tl">
-      <div class="tl-item hot">
-        <div class="tl-card hot">
-          <div class="tl-head">
-            <span class="tl-date">2月5日</span>
-            <span class="tl-title">Claude Opus 4.6 リリース <span class="tag tag-model">モデル</span><span class="tag tag-big">最重要</span></span>
-          </div>
-          <p class="tl-desc">現行最高性能モデル。コーディング・計画・デバッグ・財務分析が大幅強化。</p>
-          <div class="tl-detail"><ul>
-            <li>コンテキストウィンドウ <strong>100万トークン（β）</strong> — 企業文書ライブラリ丸ごと処理可能</li>
-            <li>タスク完了時間軸: <strong>最大14.5時間</strong>の長期エージェント実行に対応</li>
-            <li>Message Batches API で max_tokens 上限を <strong>300K</strong> に拡大</li>
-          </ul></div>
+    <section class="panel">
+      <h2>Claude Design の意味</h2>
+      <div class="grid-2">
+        <div class="subpanel">
+          <h3>単なる画像生成ではない</h3>
+          <p>
+            Claude Design は画像を一枚作るツールではなく、
+            <strong>構造を持った visual work</strong> を Claude で作るための product です。
+            記事でも design、prototype、slides、one-pagers といった成果物が前面に出ています。
+          </p>
+        </div>
+        <div class="subpanel">
+          <h3>Claude Code との接続が重要</h3>
+          <p>
+            もっとも大きいのは handoff bundle です。
+            これは「Claude で考えて、別のツールで実装する」ではなく、
+            <strong>Claude Design で作って、そのまま Claude Code で build する</strong> 流れを意味します。
+          </p>
+        </div>
+        <div class="subpanel">
+          <h3>ブランドと既存資産を食べる</h3>
+          <p>
+            コードベースや design files を読んで design system を立てるという説明があるため、
+            汎用生成よりも「既存のチーム資産に沿う」方向へ舵を切っています。
+            これは企業導入に重要です。
+          </p>
+        </div>
+        <div class="subpanel">
+          <h3>資料生成の位置づけが変わる</h3>
+          <p>
+            Claude がすでに PowerPoint、Excel、document workflow とつながっていることを考えると、
+            Design の追加で「考える」「調べる」「作る」「見せる」が一つの面に寄ってきました。
+          </p>
         </div>
       </div>
+      <div class="note" style="margin-top:14px;">
+        <p>
+          実務目線では、Claude Design は「デザインツール参入」よりも
+          <strong>Claude を front-end ideation と business artifact generation の中心に置く布石</strong> と見る方が重要です。
+        </p>
+      </div>
+    </section>
 
-      <div class="tl-item">
-        <div class="tl-card">
-          <div class="tl-head">
-            <span class="tl-date">2月17日</span>
-            <span class="tl-title">Claude Sonnet 4.6 リリース <span class="tag tag-model">モデル</span></span>
-          </div>
-          <p class="tl-desc">速度とコスパのバランスが最良。Claude Codeのデフォルトモデル。エージェント検索性能が向上しつつトークン消費を削減。1Mトークンコンテキスト(β)も利用可。</p>
+    <section class="panel">
+      <h2>Cowork GA の意味</h2>
+      <div class="grid-2">
+        <div class="subpanel">
+          <h3>知識ワーク自動化の器が固まった</h3>
+          <p>
+            Cowork は coding 専用の概念ではなく、Claude の agentic capability を knowledge work に広げる器です。
+            4月9日の GA で、それが正式な導入対象に変わりました。
+          </p>
+        </div>
+        <div class="subpanel">
+          <h3>管理機能が付いた</h3>
+          <p>
+            Analytics API、usage analytics、OpenTelemetry、RBAC の追加は、
+            Cowork が「便利な機能」から「運用・監査・管理を考えるシステム」へ移ったことを示します。
+          </p>
+        </div>
+        <div class="subpanel">
+          <h3>Computer Use と組み合わせて真価が出る</h3>
+          <p>
+            3月の computer use preview と合わせると、Cowork は単なる task runner ではなく、
+            画面を見て動ける local / desktop agent の受け皿になります。
+          </p>
+        </div>
+        <div class="subpanel">
+          <h3>導入説明がしやすくなった</h3>
+          <p>
+            4月以前は「面白い preview」に近かったものが、
+            4月9日以降は「利用権限と分析を持つ正規の product」として説明できます。
+          </p>
         </div>
       </div>
+    </section>
 
-      <div class="tl-item hot">
-        <div class="tl-card hot">
-          <div class="tl-head">
-            <span class="tl-date">2月初旬</span>
-            <span class="tl-title">Claude Cowork リサーチプレビュー開始 <span class="tag tag-product">プロダクト</span><span class="tag tag-big">注目</span></span>
-          </div>
-          <p class="tl-desc">Claude Code のコーディング能力を「知識ワーク全般」に拡張した新プロダクト。</p>
-          <div class="tl-detail"><ul>
-            <li>ドキュメント作成・データ分析・リサーチ・メール整理などに対応</li>
-            <li>Skill・Plugin・Connector を一元管理する「Customize」セクションを搭載</li>
-            <li>定期・スポットのタスクスケジューリング機能</li>
-          </ul></div>
+    <section class="panel">
+      <h2>Claude Code の 4月 wave を分解する</h2>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>更新</th>
+            <th>出所</th>
+            <th>何が嬉しいか</th>
+            <th>読み方</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong><code>/ultrareview</code></strong></td>
+            <td>v2.1.111</td>
+            <td>parallel multi-agent analysis を使う専用レビューセッション</td>
+            <td>Claude Code の中心が「書く」から「厳密に見る」に広がった</td>
+          </tr>
+          <tr>
+            <td><strong><code>xhigh</code> effort</strong></td>
+            <td>v2.1.111</td>
+            <td><code>high</code> と <code>max</code> の中間調整が可能</td>
+            <td>Opus 4.7 を hard task に実用投入しやすい</td>
+          </tr>
+          <tr>
+            <td><strong>Auto Mode for Max</strong></td>
+            <td>v2.1.111</td>
+            <td>長時間タスクでの確認回数が減る</td>
+            <td>CLI がより unattended operation を志向している</td>
+          </tr>
+          <tr>
+            <td><strong><code>/less-permission-prompts</code></strong></td>
+            <td>v2.1.111</td>
+            <td>allowlist 候補の整理を支援</td>
+            <td>実戦運用で permission friction を下げる方向</td>
+          </tr>
+          <tr>
+            <td><strong>PowerShell tool rollout</strong></td>
+            <td>v2.1.111</td>
+            <td>Windows 運用が現実的になる</td>
+            <td>CLI が Mac/Linux だけのものではなくなっていく</td>
+          </tr>
+          <tr>
+            <td><strong>native Claude Code binary</strong></td>
+            <td>v2.1.113</td>
+            <td>起動・配布・安定性面の改善余地</td>
+            <td>プロダクトとしての成熟を感じる変更</td>
+          </tr>
+          <tr>
+            <td><strong><code>/extra-usage</code> remote control 対応</strong></td>
+            <td>v2.1.113</td>
+            <td>mobile / web remote control から操作可能</td>
+            <td>remote operation を前提にした更新が続いている</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="grid-2" style="margin-top:14px;">
+        <div class="subpanel deep">
+          <h3>Claude Code をどう見るべきか</h3>
+          <p>
+            changelog を通して見ると、Claude Code は editor companion というより
+            <strong>agent operations console</strong> になりつつあります。
+            実装、レビュー、設定、許可、遠隔利用、長時間実行の全体を吸収しています。
+          </p>
+        </div>
+        <div class="subpanel deep">
+          <h3>今後の見方</h3>
+          <p>
+            Claude Code の価値は「賢い補完」ではなく、
+            <strong>複数の仕事を回す orchestration surface</strong> にあります。
+            その意味で Opus 4.7、Cowork、Design と同じ方向を向いています。
+          </p>
         </div>
       </div>
+    </section>
 
-      <div class="tl-item">
-        <div class="tl-card">
-          <div class="tl-head">
-            <span class="tl-date">2月</span>
-            <span class="tl-title">Cowork Marketplace ローンチ <span class="tag tag-product">プロダクト</span></span>
-          </div>
-          <p class="tl-desc">プロフェッショナルワークフロー向けプラグインを集約したマーケットプレイス。Team・Enterprise プランで管理者コントロールも提供。</p>
+    <section class="panel">
+      <h2>実務での使い分け</h2>
+      <div class="grid-3">
+        <div class="subpanel">
+          <span class="tag tag-model">When To Use Sonnet 4.6</span>
+          <ul>
+            <li>通常のコーディング</li>
+            <li>日常的な資料や調査</li>
+            <li>複数回まわす定型 agent</li>
+            <li>コストと速度の両立が重要な場面</li>
+          </ul>
+        </div>
+        <div class="subpanel">
+          <span class="tag tag-model">When To Use Opus 4.7</span>
+          <ul>
+            <li>難しい PR review</li>
+            <li>長時間の refactor や debugging</li>
+            <li>図面、複雑 UI、 dense screenshot 読解</li>
+            <li>設計と検証を一気に進めたい場面</li>
+          </ul>
+        </div>
+        <div class="subpanel">
+          <span class="tag tag-product">When To Think About Cowork / Design</span>
+          <ul>
+            <li>coding 以外の knowledge work を自動化したい</li>
+            <li>資料化まで Claude にやらせたい</li>
+            <li>design to build の流れを Claude で閉じたい</li>
+            <li>チーム導入と利用状況の管理まで考えている</li>
+          </ul>
         </div>
       </div>
+    </section>
 
-      <div class="tl-item">
-        <div class="tl-card">
-          <div class="tl-head">
-            <span class="tl-date">2月</span>
-            <span class="tl-title">Claude for PowerPoint（Add-in） <span class="tag tag-product">プロダクト</span></span>
-          </div>
-          <p class="tl-desc">Microsoft PowerPoint の Add-in として Claude が利用可能に。スライド文章の生成・改善・要約をPowerPoint内で直接実行。</p>
+    <section class="panel">
+      <h2>注意点とリスク</h2>
+      <div class="grid-2">
+        <div class="subpanel">
+          <span class="tag tag-risk">Prompt Drift</span>
+          <h3>Opus 4.7 は古い prompt を literal に実行しやすい</h3>
+          <p>
+            Anthropic 自身が、earlier models 向け prompt が Opus 4.7 では unexpected results を生みうると書いています。
+            upgrade 後は、prompt / eval harness / reviewer expectation の再調整が必要です。
+          </p>
+        </div>
+        <div class="subpanel">
+          <span class="tag tag-risk">Security</span>
+          <h3>より強い自律性は、そのまま運用リスクでもある</h3>
+          <p>
+            computer use、auto mode、remote control、desktop operations が広がるほど、
+            permission 設計、監査、可視化、allowlist の設計が重要になります。
+          </p>
+        </div>
+        <div class="subpanel">
+          <span class="tag tag-risk">Cost / Effort</span>
+          <h3>xhigh は便利だが常用前提ではない</h3>
+          <p>
+            Opus 4.7 + xhigh は hardest task に効きますが、
+            すべてをそこに寄せるとコストと待ち時間が増えます。日常は Sonnet 4.6、難所だけ Opus 4.7 が基本線です。
+          </p>
+        </div>
+        <div class="subpanel">
+          <span class="tag tag-risk">Hype</span>
+          <h3>Design はまだ preview</h3>
+          <p>
+            Claude Design は非常に重要な動きですが、まだ preview です。
+            いま評価すべきなのは完成度より、Anthropic が Claude をどこに持っていこうとしているかです。
+          </p>
         </div>
       </div>
-    </div>
+    </section>
 
-    <!-- 3月 -->
-    <h3 style="font-size:0.92rem; color:#60d0ff; margin:20px 0 10px;">─ 2026年3月 — Computer Use・API強化・Marketplace</h3>
-    <div class="tl">
-      <div class="tl-item hot">
-        <div class="tl-card hot">
-          <div class="tl-head">
-            <span class="tl-date">3月6日</span>
-            <span class="tl-title">Claude Marketplace ローンチ <span class="tag tag-product">プロダクト</span><span class="tag tag-big">注目</span></span>
-          </div>
-          <p class="tl-desc">サードパーティのClaudeベースサービスを統合するエンタープライズ向けマーケットプレイス。</p>
-          <div class="tl-detail"><ul>
-            <li>Asana・Box・Canva・Figma・Hex・monday.com・Slack など主要サービスが参加</li>
-            <li>Claudeのウィンドウを離れずに外部アプリのUIを操作できる <strong>MCP Apps</strong> 対応</li>
-          </ul></div>
+    <section class="panel">
+      <h2>この更新をどう読むべきか</h2>
+      <div class="grid-2">
+        <div class="subpanel deep">
+          <h3>Biz / Product 視点</h3>
+          <p>
+            Claude は 2026年4月時点で、chat assistant ではなく
+            <strong>knowledge work stack</strong> として見るのが妥当です。
+            調査、資料、デザイン、日常業務、レビューまでの面がそろってきました。
+          </p>
+        </div>
+        <div class="subpanel deep">
+          <h3>Engineering 視点</h3>
+          <p>
+            実装の主力は Sonnet 4.6 のままでも十分ですが、
+            hardest task、review、vision-heavy tasks は Opus 4.7 に寄せると良いです。
+            Claude Code は review-first の道具としての価値が上がっています。
+          </p>
+        </div>
+        <div class="subpanel deep">
+          <h3>Operational 視点</h3>
+          <p>
+            Cowork、Computer Use、Auto Mode、remote control の組み合わせにより、
+            Claude は unattended work の領域に入っています。
+            その分、権限、監査、観測性まで含めた設計が必要です。
+          </p>
+        </div>
+        <div class="subpanel deep">
+          <h3>Why This Matters For This Hub</h3>
+          <p>
+            このハブで Claude を扱うなら、今後の中心テーマは
+            「どのモデルが強いか」だけでなく、
+            <strong>どの surface で、どこまで仕事を任せるか</strong> に移ります。
+          </p>
         </div>
       </div>
+    </section>
 
-      <div class="tl-item">
-        <div class="tl-card">
-          <div class="tl-head">
-            <span class="tl-date">3月中旬</span>
-            <span class="tl-title">API強化 4点セット <span class="tag tag-api">API/開発</span><span class="tag tag-big">注目</span></span>
-          </div>
-          <p class="tl-desc">開発者向けに4つの新機能を同時リリース。</p>
-          <div class="tl-detail"><ul>
-            <li><strong>Code Execution Tool：</strong> Claude がコードを実行してデータ分析・計算を直接実施</li>
-            <li><strong>MCP Connector：</strong> 外部システムへの接続を標準化（Notion・Google Drive 等）</li>
-            <li><strong>Files API：</strong> セッションをまたいでファイルを効率的に保存・参照</li>
-            <li><strong>Prompt Caching：</strong> 最大1時間のキャッシュでコストを大幅削減</li>
-          </ul></div>
-        </div>
-      </div>
-
-      <div class="tl-item">
-        <div class="tl-card">
-          <div class="tl-head">
-            <span class="tl-date">3月中旬</span>
-            <span class="tl-title">Tool Search Tool（ツール動的探索） <span class="tag tag-api">API/開発</span></span>
-          </div>
-          <p class="tl-desc">全ツール定義を事前にロードせず、必要時に Claude が動的にツールを探索する仕組み。</p>
-          <div class="tl-detail"><ul>
-            <li><code>defer_loading: true</code> でオンデマンドに切り替え</li>
-            <li>トークン使用量 <strong>85%削減</strong></li>
-            <li>大規模ツールセットを持つエージェントに特に有効</li>
-          </ul></div>
-        </div>
-      </div>
-
-      <div class="tl-item hot">
-        <div class="tl-card hot">
-          <div class="tl-head">
-            <span class="tl-date">3月24日</span>
-            <span class="tl-title">Computer Use — macOS プレビュー公開 <span class="tag tag-feature">機能</span><span class="tag tag-big">注目</span></span>
-          </div>
-          <p class="tl-desc">Claudeが実際にあなたのコンピュータを操作してタスクを完了する機能。Pro/Max サブスクライバー向けに macOS で先行公開。</p>
-          <div class="tl-detail"><ul>
-            <li>操作優先順位: コネクター → ブラウザ → 画面コントロール の順でフォールバック</li>
-            <li>新しいアプリへのアクセス前に必ず許可を求める（安全設計）</li>
-            <li>Cowork の <strong>Dispatch</strong> 機能と連携: スマホで指示→デスクトップで実行→完了通知</li>
-            <li>機密データへの利用はまだ非推奨（早期プレビュー段階）</li>
-          </ul></div>
-        </div>
-      </div>
-
-      <div class="tl-item">
-        <div class="tl-card">
-          <div class="tl-head">
-            <span class="tl-date">3月24日</span>
-            <span class="tl-title">Claude Code — Auto Mode追加 <span class="tag tag-cc">Claude Code</span></span>
-          </div>
-          <p class="tl-desc">承認なしで連続タスクを実行できる自動実行モード。PermissionDenied hook で拒否後リトライも可。</p>
-        </div>
-      </div>
-
-      <div class="tl-item">
-        <div class="tl-card">
-          <div class="tl-head">
-            <span class="tl-date">3月26日</span>
-            <span class="tl-title">Claude Mythos（次世代モデル）存在が確認 <span class="tag tag-model">モデル</span><span class="tag tag-note">内部確認</span></span>
-          </div>
-          <p class="tl-desc">Anthropicが社内テスト中の次世代モデル。Fortune誌が報道、4月に内部確認。</p>
-          <div class="tl-detail"><ul>
-            <li>コーディング・学術推論・サイバーセキュリティで「段階的な能力向上」</li>
-            <li>コードネーム <strong>Capybara</strong>: Opusを超える新ティアとされる</li>
-            <li>「Project Glasswing」でエンタープライズ向けサイバーセキュリティ防衛用途に限定公開中</li>
-            <li>Claude 5 の前哨戦として位置づけられている可能性大</li>
-          </ul></div>
-        </div>
-      </div>
-
-      <div class="tl-item">
-        <div class="tl-card">
-          <div class="tl-head">
-            <span class="tl-date">3月31日</span>
-            <span class="tl-title">Claude Code ソースコード誤公開インシデント <span class="tag tag-cc">Claude Code</span><span class="tag tag-note">インシデント</span></span>
-          </div>
-          <p class="tl-desc">デバッグファイルの設定ミスにより、Claude Code の全ソースコードが npm レジストリに一時公開。Anthropicは迅速に削除・対応。</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- 4月 -->
-    <h3 style="font-size:0.92rem; color:#66e0c2; margin:20px 0 10px;">─ 2026年4月（上旬）— Windows対応・課金改定・Claude Code強化</h3>
-    <div class="tl">
-      <div class="tl-item">
-        <div class="tl-card">
-          <div class="tl-head">
-            <span class="tl-date">4月1日</span>
-            <span class="tl-title">Claude Code v2.1.90 — /powerup コマンド追加 <span class="tag tag-cc">Claude Code</span><span class="tag tag-new">NEW</span></span>
-          </div>
-          <p class="tl-desc">インタラクティブなインターミナルチュートリアルシステム。アニメーション付きデモで機能を学習できる。@ mention でサブエージェント名も表示されるように。</p>
-        </div>
-      </div>
-
-      <div class="tl-item">
-        <div class="tl-card">
-          <div class="tl-head">
-            <span class="tl-date">4月3日</span>
-            <span class="tl-title">Computer Use — Windows 対応追加 <span class="tag tag-feature">機能</span><span class="tag tag-new">NEW</span></span>
-          </div>
-          <p class="tl-desc">macOS 限定だった Computer Use が Windows にも対応。Cowork と Claude Code の両方で利用可能に。Pro/Max サブスクライバー向け。</p>
-        </div>
-      </div>
-
-      <div class="tl-item hot">
-        <div class="tl-card hot">
-          <div class="tl-head">
-            <span class="tl-date">4月4日</span>
-            <span class="tl-title">Claude Code — サードパーティ課金ポリシー変更 <span class="tag tag-cc">Claude Code</span><span class="tag tag-big">重要変更</span></span>
-          </div>
-          <p class="tl-desc">OpenClawなど外部ハーネスからのClaude Code利用が、サブスクリプション枠内では使えなくなる。</p>
-          <div class="tl-detail"><ul>
-            <li>2026年4月4日正午（太平洋時間）以降に適用</li>
-            <li>サードパーティ経由の使用は <strong>従量課金（pay-as-you-go）</strong> に切り替え</li>
-            <li>claude.ai・公式IDE拡張からの利用はサブスクリプション枠内で継続</li>
-          </ul></div>
-        </div>
-      </div>
-
-      <div class="tl-item">
-        <div class="tl-card">
-          <div class="tl-head">
-            <span class="tl-date">4月上旬</span>
-            <span class="tl-title">Claude Code v2.1.89〜90 — UX・安定性改善 <span class="tag tag-cc">Claude Code</span><span class="tag tag-new">NEW</span></span>
-          </div>
-          <p class="tl-desc">ユーザー体験と安定性の大幅改善。</p>
-          <div class="tl-detail"><ul>
-            <li><strong>フリッカーフリー alt-screen レンダリング</strong>（プロンプトが画面下部に固定）</li>
-            <li>MCP ツールのresultサイズ上限が最大 <strong>50万文字</strong> に（per-tool override）</li>
-            <li>Plugin <code>bin/</code> ディレクトリが自動的にBash tool PATHに追加</li>
-            <li>GCP Vertex AI 統合ウィザードがログインフローに追加</li>
-            <li>長時間セッションの安定性改善・Windows/音声問題の修正</li>
-          </ul></div>
-        </div>
-      </div>
-
-      <div class="tl-item hot">
-        <div class="tl-card hot">
-          <div class="tl-head">
-            <span class="tl-date">4月7日</span>
-            <span class="tl-title">Claude Mythos Preview 正式発表 <span class="tag tag-model">モデル</span><span class="tag tag-big">最重要</span></span>
-          </div>
-          <p class="tl-desc">Anthropic史上最強のモデルが正式発表。ただしサイバーセキュリティ能力が強力すぎるため、一般公開なし。</p>
-          <div class="tl-detail"><ul>
-            <li>全主要OS・全主要ブラウザで<strong>数千件のゼロデイ脆弱性を自律発見</strong>（OpenBSDで27年間未発見の穴を発見）</li>
-            <li>コーディング・学術推論・サイバーセキュリティで「段階的な能力向上（step change）」</li>
-            <li><strong>Project Glasswing</strong>として限定公開：AWS・Apple・Google・Microsoft・JPMorganChaseなど主要企業が防衛用途に使用</li>
-            <li>一般ユーザーへの公開予定なし。Claude 5の前哨戦と位置づけられている</li>
-            <li>コードネーム <strong>Capybara</strong>：Opusを超える新ティアの可能性</li>
-          </ul></div>
-        </div>
-      </div>
-
-      <div class="tl-item hot">
-        <div class="tl-card hot">
-          <div class="tl-head">
-            <span class="tl-date">4月14日</span>
-            <span class="tl-title">Claude Code Routines（ルーティン）Research Preview <span class="tag tag-cc">Claude Code</span><span class="tag tag-big">注目</span><span class="tag tag-new">NEW</span></span>
-          </div>
-          <p class="tl-desc">AIが「呼ばれなくても勝手に仕事を始める」機能。スケジュール・API・GitHubの3種トリガーで自動実行される保存済みエージェント設定。</p>
-          <div class="tl-detail"><ul>
-            <li><strong>Scheduled</strong>：毎朝・毎夜・毎週など時間スケジュールで自動実行</li>
-            <li><strong>API</strong>：HTTP POSTで任意のタイミングに外部からトリガー</li>
-            <li><strong>GitHub</strong>：PR作成・マージなどリポジトリイベントで自動実行</li>
-            <li>Macを閉じていてもクラウド上で実行される（ローカル不要）</li>
-            <li>Pro・Max・Team・Enterprise ユーザー向け Research Preview</li>
-          </ul></div>
-        </div>
-      </div>
-
-      <div class="tl-item">
-        <div class="tl-card">
-          <div class="tl-head">
-            <span class="tl-date">4月14日</span>
-            <span class="tl-title">Claude Code Desktop App 全面刷新 <span class="tag tag-cc">Claude Code</span><span class="tag tag-product">プロダクト</span><span class="tag tag-new">NEW</span></span>
-          </div>
-          <p class="tl-desc">Claude Codeのデスクトップアプリが大幅リニューアル。並列セッション管理・統合ターミナル・ドラッグ&ドロップレイアウトを搭載。</p>
-          <div class="tl-detail"><ul>
-            <li><strong>複数セッション並行管理</strong>：1ウィンドウで複数のClaudeセッションをサイドバーから管理</li>
-            <li>統合ターミナル・ファイル編集・HTMLプレビュー・高速Diffビューワー</li>
-            <li>ドラッグ&ドロップでレイアウトを自由に配置</li>
-          </ul></div>
-        </div>
-      </div>
-
-      <div class="tl-item">
-        <div class="tl-card">
-          <div class="tl-head">
-            <span class="tl-date">4月（GA）</span>
-            <span class="tl-title">Claude Cowork 正式リリース（GA） <span class="tag tag-product">プロダクト</span><span class="tag tag-new">NEW</span></span>
-          </div>
-          <p class="tl-desc">Research Previewから正式版に格上げ。macOS・Windows両対応のClaudeデスクトップアプリ経由で利用可能に。</p>
-          <div class="tl-detail"><ul>
-            <li>拡張アナリティクス・OpenTelemetryサポート追加</li>
-            <li>Enterprise向けロールベースアクセスコントロール（RBAC）</li>
-            <li>グループ管理機能：ユーザーをグループに分類し、Claude機能を役割ごとに割り当て</li>
-          </ul></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== デモ準備サマリー ===== -->
-  <div class="panel warn">
-    <h2 style="color:#f4b860;">🎯 4/17（木）Claude Code デモ — 準備チェックリスト</h2>
-    <div class="grid2" style="margin-top:14px;">
-      <div>
-        <h3 style="font-size:0.9rem; margin-bottom:10px;">伝えるべき核心メッセージ</h3>
-        <ul>
-          <li><strong>Claude Code = 自律コーディングエージェント</strong><br>「指示するだけでコードを読み・書き・実行・Pushまでやってくれる」</li>
-          <li><strong>デフォルトは Sonnet 4.6</strong><br>速い・安い・賢い。実演ではこのモデルを使う</li>
-          <li><strong>Auto Mode があれば放置でOK</strong><br>承認なし連続実行。長いタスクも自律完了</li>
-          <li><strong>Computer Use が加わった</strong><br>「AIがPCを操作する」— 視覚的にインパクト大</li>
-        </ul>
-      </div>
-      <div>
-        <h3 style="font-size:0.9rem; margin-bottom:10px;">事前確認事項</h3>
-        <ul>
-          <li>Claude Code インストール確認: <code>claude-code --version</code></li>
-          <li>Anthropic APIキー設定済みか確認</li>
-          <li><code>/powerup</code> で操作感をプレビュー</li>
-          <li>デモ用のサンプルリポジトリを事前に準備</li>
-          <li>4/4の課金変更を参加者に説明できるよう準備</li>
-          <li>質問想定: 「ChatGPTと何が違う？」→「自律実行・ターミナル統合・ファイル操作」</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== サマリー ===== -->
-  <div class="grid2">
-    <div class="panel">
-      <h2 style="font-size:1rem; color:#66e0c2; margin-bottom:12px;">プロダクト全体図（2026年4月）</h2>
-      <ul>
-        <li><strong>claude.ai</strong> — Webチャット・個人利用</li>
-        <li><strong>Claude Code</strong> — ターミナル・IDE エージェント（v2.1.90）</li>
-        <li><strong>Claude Cowork</strong> — 知識ワーク向けエージェント（Research Preview）</li>
-        <li><strong>Dispatch</strong> — Coworkのタスク委任・通知機能</li>
-        <li><strong>Claude Marketplace</strong> — エンタープライズ向けサードパーティ統合</li>
-        <li><strong>Computer Use</strong> — PC自律操作（macOS/Windows）</li>
-        <li><strong>Claude API</strong> — 開発者向け直接アクセス</li>
-        <li><strong>Claude for PowerPoint</strong> — Microsoft Office 統合</li>
+    <section class="panel">
+      <h2>公式ソース</h2>
+      <ul class="sources">
+        <li><a href="https://www.anthropic.com/news/claude-opus-4-7">Introducing Claude Opus 4.7</a> (Anthropic, 2026-04-16)</li>
+        <li><a href="https://www.anthropic.com/news/claude-design-anthropic-labs">Introducing Claude Design by Anthropic Labs</a> (Anthropic, 2026-04-17)</li>
+        <li><a href="https://support.claude.com/en/articles/12138966-release-notes">Claude Release Notes</a> (Claude Help Center, 2026-04-20 時点確認)</li>
+        <li><a href="https://www.anthropic.com/news/claude-sonnet-4-6">Introducing Claude Sonnet 4.6</a> (Anthropic, 2026-02-17)</li>
+        <li><a href="https://www.anthropic.com/news/claude-opus-4-6">Introducing Claude Opus 4.6</a> (Anthropic, 2026-02-05)</li>
+        <li><a href="https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md">Claude Code CHANGELOG.md</a> (v2.1.111〜v2.1.114 を参照)</li>
       </ul>
-    </div>
-
-    <div class="panel">
-      <h2 style="font-size:1rem; color:#f4b860; margin-bottom:12px;">2026年の5大トレンド</h2>
-      <ul>
-        <li><strong>エージェント化の加速</strong> — Computer Use・Dispatch・Auto Mode・Routinesで「設定して離れれば完了」が現実に</li>
-        <li><strong>並列エージェント（Agent Teams）</strong> — サブエージェントが協調して動く。1人が無限チームを指揮できる時代へ</li>
-        <li><strong>コンテキストの極大化</strong> — 1Mトークンで企業規模のデータを一括処理</li>
-        <li><strong>エコシステム整備</strong> — MCP・Marketplace・Files API・Skillsオープン標準でサードパーティ連携を標準化</li>
-        <li><strong>次世代モデルの予告</strong> — Mythos Preview（非公開）が能力の段階的向上を示す。Claude 5 の前哨戦</li>
-      </ul>
-    </div>
+    </section>
   </div>
-
-  <!-- フッター -->
-  <div class="panel" style="font-size:0.78rem; color:#3a5060; padding:12px 22px;">
-    <p style="margin:0;">情報源: Anthropic公式・Wikipedia・Reddit・GitHub Claude Code リリースノート・Fortune・9to5Mac・SiliconANGLE・InfoQ・TechCrunch・SecurityWeek（2026年4月16日時点）。<br>
-    予告・β機能は変更の可能性あり。Claude Code バージョン情報は公式リリースノートで最新版を確認してください。</p>
-  </div>
-
-</div>
 </body>
 </html>

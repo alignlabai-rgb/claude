@@ -1,0 +1,726 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hermes Agent | Tech Workbench</title>
+    <style>
+        :root {
+            --bg: #08131f;
+            --panel: #102235;
+            --panel-soft: #142b43;
+            --text: #eef6ff;
+            --muted: #a9bfd4;
+            --accent: #50d4d9;
+            --accent-2: #7f8cff;
+            --accent-3: #ffca6a;
+            --border: rgba(80, 212, 217, 0.18);
+            --radius: 18px;
+            --shadow: 0 24px 60px rgba(0, 0, 0, 0.34);
+            --font-mono: "SF Mono", "Consolas", monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Segoe UI", "SF Pro Display", system-ui, sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at top right, rgba(127, 140, 255, 0.16), transparent 28%),
+                radial-gradient(circle at top left, rgba(80, 212, 217, 0.14), transparent 24%),
+                linear-gradient(180deg, #07111b 0%, #0b1724 100%);
+            padding: 32px 20px 64px;
+            line-height: 1.75;
+        }
+
+        .shell {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+
+        .hero,
+        .panel,
+        .card,
+        .callout,
+        .warning {
+            background: rgba(16, 34, 53, 0.9);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .hero {
+            padding: 48px 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: "";
+            position: absolute;
+            inset: 0 auto auto 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-2), var(--accent-3));
+        }
+
+        .hero::after {
+            content: "";
+            position: absolute;
+            right: -60px;
+            bottom: -80px;
+            width: 340px;
+            height: 340px;
+            background: radial-gradient(circle, rgba(80, 212, 217, 0.12), transparent 68%);
+            pointer-events: none;
+        }
+
+        .eyebrow {
+            display: inline-block;
+            margin-bottom: 14px;
+            color: var(--accent);
+            font-size: 0.88rem;
+            font-weight: 800;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            margin: 0 0 20px;
+            font-size: 52px;
+            line-height: 1.08;
+            letter-spacing: -0.03em;
+        }
+
+        .lead {
+            max-width: 820px;
+            margin: 0;
+            font-size: 1.14rem;
+            color: var(--muted);
+        }
+
+        .back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 700;
+            opacity: 0.76;
+        }
+
+        .back:hover {
+            opacity: 1;
+        }
+
+        .hero-meta,
+        .chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .hero-meta {
+            margin-top: 24px;
+        }
+
+        .chip {
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--text);
+            font-size: 0.88rem;
+            font-weight: 700;
+        }
+
+        .panel {
+            padding: 30px 30px 28px;
+        }
+
+        .section-title {
+            margin: 0 0 16px;
+            font-size: 1.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .section-title::after {
+            content: "";
+            display: block;
+            width: 72px;
+            height: 3px;
+            margin-top: 10px;
+            border-radius: 999px;
+            background: linear-gradient(90deg, var(--accent), transparent);
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .card,
+        .callout,
+        .warning {
+            padding: 24px;
+        }
+
+        .callout {
+            background: rgba(80, 212, 217, 0.08);
+        }
+
+        .warning {
+            background: rgba(255, 202, 106, 0.08);
+            border-color: rgba(255, 202, 106, 0.22);
+        }
+
+        h2,
+        h3 {
+            margin-top: 0;
+        }
+
+        p,
+        li {
+            color: var(--muted);
+        }
+
+        ul,
+        ol {
+            margin: 0;
+            padding-left: 1.2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 0.95rem;
+        }
+
+        th,
+        td {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 14px 12px;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            color: var(--text);
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        code,
+        pre {
+            font-family: var(--font-mono);
+        }
+
+        pre {
+            margin: 0;
+            padding: 18px;
+            border-radius: 14px;
+            background: rgba(3, 11, 18, 0.88);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            overflow-x: auto;
+            color: #dff8ff;
+        }
+
+        a {
+            color: #8fdfff;
+        }
+
+        .muted-strong {
+            color: var(--text);
+            font-weight: 700;
+        }
+
+        @media (max-width: 860px) {
+            .grid-2,
+            .grid-3 {
+                grid-template-columns: 1fr;
+            }
+
+            .hero {
+                padding: 36px 24px;
+            }
+
+            h1 {
+                font-size: 38px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="shell">
+        <a class="back" href="index.html">← Knowledge Index に戻る</a>
+
+        <header class="hero">
+            <span class="eyebrow">Persistent Agent Stack</span>
+            <h1>Hermes Agent</h1>
+            <p class="lead">Nous Research の Hermes Agent は、単発の会話ツールではなく、記憶し、技能を育て、複数の窓口から同じ人格として動く「常駐型エージェント環境」です。OpenClaw の延長で見ると理解を外しやすく、むしろ「週をまたいで育てる運用対象」として捉えた方が本質に近いです。</p>
+            <div class="hero-meta">
+                <span class="chip">Persistent Memory</span>
+                <span class="chip">Skills</span>
+                <span class="chip">Gateway</span>
+                <span class="chip">Provider-Agnostic</span>
+                <span class="chip">OpenClaw Migration</span>
+            </div>
+        </header>
+
+        <section class="panel">
+            <h2 class="section-title">結論</h2>
+            <div class="callout">
+                <p><span class="muted-strong">Hermes を学ぶとは、良いプロンプトを書くことではなく、長期で育つエージェントを設計し運用することです。</span> 会話品質だけでなく、どの記憶を残すか、どの技能を外出しするか、どの窓口から呼び出すか、どの実行環境で安全に走らせるかまで含めて初めて Hermes の実力が出ます。</p>
+            </div>
+            <div class="grid-3" style="margin-top:18px;">
+                <article class="card">
+                    <h3>本質</h3>
+                    <p>Hermes は「その場で答える AI」ではなく、「経験から運用知を積み上げる resident agent」です。ここを取り違えると、単なる CLI ラッパーとしてしか使えません。</p>
+                </article>
+                <article class="card">
+                    <h3>学びどころ</h3>
+                    <p>Memory、Skills、Gateway、Backend、Security の 5 点を一体で理解するほど価値が出ます。どれか一つだけでは片手落ちです。</p>
+                </article>
+                <article class="card">
+                    <h3>あなた向きの理由</h3>
+                    <p>「徹底的に自分のスキルとして身につけたい」という方針にかなり合います。Hermes は単発ノウハウより、運用筋力が残る設計だからです。</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2 class="section-title">Hermes とは何か</h2>
+            <div class="grid-2">
+                <article class="card">
+                    <h3>1. 常駐前提のエージェント</h3>
+                    <p>Hermes はローカル PC だけで閉じる発想より、VPS や GPU マシンやクラウド上に居続ける前提で設計されています。CLI で入る時も、Telegram や Discord から入る時も、同じエージェント資産を引き継げるのが大きな特徴です。</p>
+                </article>
+                <article class="card">
+                    <h3>2. 自己改善ループ</h3>
+                    <p>README が前面に出しているのは、経験から skill を作り、使う中で skill を改善し、会話やユーザー理解を積み増すという学習ループです。つまり「答える」だけでなく「次回の自分を強くする」方向に振られています。</p>
+                </article>
+                <article class="card">
+                    <h3>3. 一つの人格を複数の surface から呼ぶ</h3>
+                    <p>CLI、Gateway、メッセージング、API、バッチ実行が一つのコアに繋がっています。これにより、深い作業はターミナル、軽い指示はメッセージアプリ、定期処理は cron という使い分けができます。</p>
+                </article>
+                <article class="card">
+                    <h3>4. モデル非依存の運用層</h3>
+                    <p>OpenAI でも Anthropic でも OpenRouter でも、自前エンドポイントでも回せます。モデル選定の話を「エージェントの本体」と切り離しやすいのも Hermes の強みです。</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2 class="section-title">OpenClaw との関係</h2>
+            <p>Hermes は OpenClaw と地続きの部分を持ちながら、狙っている時間軸と運用密度が少し違います。OpenClaw を知っているほど入門は速くなりますが、同一視すると Hermes の強みを見落とします。</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>観点</th>
+                        <th>OpenClaw</th>
+                        <th>Hermes Agent</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>中心思想</td>
+                        <td>オーケストレーションと構造化されたエージェント実行</td>
+                        <td>常駐する個体を育て、知識と技能を週単位で蓄積する</td>
+                    </tr>
+                    <tr>
+                        <td>記憶</td>
+                        <td>プロジェクトやルールの整理に強い</td>
+                        <td> curated memory と過去会話検索を組み合わせ、継続運用を前提化</td>
+                    </tr>
+                    <tr>
+                        <td>skills</td>
+                        <td>構造化されたスキル運用の理解に向く</td>
+                        <td>skills を自己改善対象に置き、ハブや外部配布経路も広い</td>
+                    </tr>
+                    <tr>
+                        <td>surface</td>
+                        <td>ローカル中心の理解がしやすい</td>
+                        <td>CLI と messaging gateway を同じ個体の入り口として扱う</td>
+                    </tr>
+                    <tr>
+                        <td>移行</td>
+                        <td>起点</td>
+                        <td><code>hermes claw migrate</code> で既存資産を持ち込める</td>
+                    </tr>
+                    <tr>
+                        <td>研究用途</td>
+                        <td>実運用オーケストレーションの理解</td>
+                        <td>trajectory 生成や RL 連携など研究橋渡しも強い</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="warning" style="margin-top:18px;">
+                <p><span class="muted-strong">重要なのは、移行コマンドがあることと、完全に同じ思想であることは別だという点です。</span> OpenClaw から Hermes に入る時は、「資産を移せる」だけでなく、「時間軸が長くなる」「surface が増える」「安全境界の考え方が変わる」ことまで理解した方が定着します。</p>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2 class="section-title">なぜ今学ぶ価値があるか</h2>
+            <div class="grid-2">
+                <article class="card">
+                    <h3>Resident Agent の成熟を見る教材になる</h3>
+                    <p>2026 年前後のエージェント界隈で、単発 chat や IDE assistant ではなく「居続ける agent」をどこまで本気で作るかは重要な分岐です。Hermes はそこをかなり全面的に押し出しています。</p>
+                </article>
+                <article class="card">
+                    <h3>Memory と Skills の役割分離が学べる</h3>
+                    <p>何を memory に入れ、何を skill に昇格し、何を毎回その場で考えさせるか。ここを運用で切り分ける感覚は、他の agent stack に移っても残る土台になります。</p>
+                </article>
+                <article class="card">
+                    <h3>モデル依存ではなく運用依存で強くなれる</h3>
+                    <p>特定モデルの勝ち負けに振り回されず、どの provider を使っても再利用できる設計知識が身につきます。これは長期的にかなり大きいです。</p>
+                </article>
+                <article class="card">
+                    <h3>研究と実務の橋渡しになる</h3>
+                    <p>Hermes は trajectory 生成や Atropos RL など研究寄りの導線も持っています。実務の運用理解が、そのまま研究の読み解きにも繋がりやすい構造です。</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2 class="section-title">Hermes の全体構造</h2>
+            <div class="grid-3">
+                <article class="card">
+                    <h3>Entry Points</h3>
+                    <p>CLI、Gateway、ACP、Batch Runner、API Server、Python Library など複数の入口があります。ここで大事なのは入口が複数でも、コアの人格や状態管理を極力共通化していることです。</p>
+                </article>
+                <article class="card">
+                    <h3>Core Agent</h3>
+                    <p>ドキュメント上では <code>run_agent.py</code> の <code>AIAgent</code> が中心です。prompt 構築、provider 解決、tool dispatch、compression、永続化などがここに集約されます。</p>
+                </article>
+                <article class="card">
+                    <h3>Runtime Value</h3>
+                    <p>モデルの IQ よりも、terminal、browser、web、MCP、file などをどう組み合わせるかで実用性が決まります。Hermes の本当の価値はこの runtime 側にあります。</p>
+                </article>
+            </div>
+            <div class="callout" style="margin-top:18px;">
+                <p><span class="muted-strong">理解のコツは、Hermes を「高機能チャット UI」と見ないことです。</span> 実際には「複数入口を持つ agent OS に近いもの」として見ると、構造がずっと読みやすくなります。</p>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2 class="section-title">Persistent Memory の理解</h2>
+            <div class="grid-2">
+                <article class="card">
+                    <h3>Bounded curated memory</h3>
+                    <p>Hermes の memory は無限ログ蓄積ではなく、圧縮された curated memory です。代表は <code>MEMORY.md</code> と <code>USER.md</code> で、前者は agent の作業メモ、後者はユーザープロファイルとして機能します。</p>
+                </article>
+                <article class="card">
+                    <h3>起動時 snapshot という発想</h3>
+                    <p>memory は毎ターン生で差し込まれるより、セッション開始時に凍結 snapshot として読み込まれます。これにより文脈がぶれにくく、運用側も「今の土台」を意識しやすくなります。</p>
+                </article>
+                <article class="card">
+                    <h3>検索可能な過去会話</h3>
+                    <p>長期記憶は memory ファイルだけではありません。SQLite と FTS5 による session search があり、「以前どんな判断をしたか」を探し返せます。これは resident agent にとってかなり大事な層です。</p>
+                </article>
+                <article class="card">
+                    <h3>外部メモリ連携</h3>
+                    <p>Honcho、Mem0、Hindsight など外部 memory provider にも繋げられます。ただし最初から広げ過ぎると構造把握が崩れるので、まずは内蔵 memory の癖を掴むのが先です。</p>
+                </article>
+            </div>
+            <div class="warning" style="margin-top:18px;">
+                <p><span class="muted-strong">初心者がやりがちな失敗は、memory を何でも入れる万能倉庫にしてしまうことです。</span> 長く残すべき安定知識だけを置き、手順や再利用可能な判断は skill に逃がす方が、後で圧倒的に扱いやすくなります。</p>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2 class="section-title">Skills System の理解</h2>
+            <div class="grid-2">
+                <article class="card">
+                    <h3>Skill は「外部化した手続き記憶」</h3>
+                    <p>skills は単なるメモではなく、状況に応じて呼び出される運用知です。何度も繰り返す判断、よく使うワークフロー、危険な作業の定石を skill 化すると agent のブレが急速に減ります。</p>
+                </article>
+                <article class="card">
+                    <h3>Progressive disclosure が重要</h3>
+                    <p>Hermes の skill system は必要な時だけ詳細を出す progressive disclosure を採っています。これにより全部を常時コンテキストに詰め込まず、必要な深さだけロードできます。</p>
+                </article>
+                <article class="card">
+                    <h3>オープン標準互換の価値</h3>
+                    <p>agentskills.io 互換で、Skills Hub、GitHub、well-known endpoint、ClawHub など配布経路が広いです。これは単に量が多いというより、skill を「移植可能な資産」として扱える意味があります。</p>
+                </article>
+                <article class="card">
+                    <h3>最初に作るべき skill</h3>
+                    <p>他人の skill を大量導入するより、自分が毎週繰り返す作業を 3 本だけ skill 化する方が学習効率は高いです。例として、環境点検、ログ確認、定例リサーチ整理のようなものが向いています。</p>
+                </article>
+            </div>
+            <div class="callout" style="margin-top:18px;">
+                <p><span class="muted-strong">memory は「覚えておいてほしいこと」、skill は「こう振る舞ってほしいこと」</span> と分けて考えると整理しやすいです。この分離を自分の言葉で説明できるようになると、Hermes 理解はかなり深くなります。</p>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2 class="section-title">Gateway と Surface 設計</h2>
+            <div class="grid-2">
+                <article class="card">
+                    <h3>Gateway は bot UI ではなく運用面の control plane</h3>
+                    <p>Telegram、Discord、Slack、WhatsApp、Signal などから Hermes に入れるのは便利機能ではありますが、本質は「どこからでも同じエージェント資産に接続できる」ことです。</p>
+                </article>
+                <article class="card">
+                    <h3>強い構成は front door と deep maintenance の分離</h3>
+                    <p>実務では、日常指示は Telegram など、深い保守や skill 更新は CLI という分業がかなり強いです。窓口を増やすことより、役割を分けることが重要です。</p>
+                </article>
+            </div>
+            <pre style="margin-top:18px;"><code>軽い依頼・確認        -> Telegram / Discord
+深い作業・修理        -> CLI
+定期実行              -> cron
+安全な隔離実行        -> Docker / Singularity / Modal
+リモート作業先        -> SSH / Daytona</code></pre>
+        </section>
+
+        <section class="panel">
+            <h2 class="section-title">Backend と実行面の考え方</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Backend</th>
+                        <th>向いている場面</th>
+                        <th>理解ポイント</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Local</td>
+                        <td>最初の立ち上げ、設定確認、手元検証</td>
+                        <td>最も早く始められるが、権限や事故範囲もそのまま広い</td>
+                    </tr>
+                    <tr>
+                        <td>Docker</td>
+                        <td>安全境界を作りたい時、再現性を上げたい時</td>
+                        <td>Hermes の security を理解する上でかなり重要な基準線</td>
+                    </tr>
+                    <tr>
+                        <td>SSH</td>
+                        <td>既存サーバーを作業先にしたい時</td>
+                        <td>「どこで agent が走るか」を明確に意識できる</td>
+                    </tr>
+                    <tr>
+                        <td>Modal / Daytona / Singularity</td>
+                        <td>より強い隔離、クラウド運用、計算資源の柔軟運用</td>
+                        <td>ローカル体験より、運用基盤の設計理解が問われる</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="warning" style="margin-top:18px;">
+                <p><span class="muted-strong">Hermes を深く理解したいなら、backend 選びを後回しにしない方がいいです。</span> どの backend で走らせるかは、権限、安全性、速度、 unattended 運用の限界を全部変えます。これは設定項目ではなく、設計判断です。</p>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2 class="section-title">Provider 戦略</h2>
+            <div class="grid-2">
+                <article class="card">
+                    <h3>Hermes の強さは provider 非依存</h3>
+                    <p>OpenAI、Anthropic、OpenRouter、Nous Portal、GitHub Copilot、Gemini、Hugging Face、自前 endpoint までかなり広く対応しています。モデルの入れ替え可能性を前提に agent 層を設計できるのは大きな利点です。</p>
+                </article>
+                <article class="card">
+                    <h3>ただし最初は一つに絞る</h3>
+                    <p>学習初期に複数 provider を同時設定すると、失敗時にどこが悪いのか切り分けにくくなります。まず一つの provider と一つの model で全体を通し、その後に比較へ入る方が速いです。</p>
+                </article>
+            </div>
+            <div class="callout" style="margin-top:18px;">
+                <p><span class="muted-strong">最初に学ぶべきなのは「どのモデルが最強か」ではなく、「model を入れ替えても運用が崩れない構造」です。</span> Hermes はそこを学ぶ教材としてかなり優秀です。</p>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2 class="section-title">Security をどう理解すべきか</h2>
+            <div class="grid-3">
+                <article class="card">
+                    <h3>Approvals は性格ノブ</h3>
+                    <p><code>approvals.mode</code> は単なる確認回数の設定ではなく、agent にどこまで自主性を与えるかの設計です。manual、smart、off の違いを体感で理解すると運用像が掴めます。</p>
+                </article>
+                <article class="card">
+                    <h3>本当の境界は container</h3>
+                    <p>危険コマンド検知も大事ですが、より本質的なのは「どこに閉じ込めて走らせるか」です。Docker や Singularity が安全境界として機能する、という説明はかなり重要です。</p>
+                </article>
+                <article class="card">
+                    <h3>Gateway 側の認証も本丸</h3>
+                    <p>DM pairing やチャネル制限を甘く見ると、エージェントに対する入口が無防備になります。CLI だけでなく gateway を含めて threat model を描く必要があります。</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2 class="section-title">OpenClaw から来る人が見るべきポイント</h2>
+            <div class="grid-2">
+                <article class="card">
+                    <h3>1. 移行コマンドは非常に実務的</h3>
+                    <p><code>hermes claw migrate</code> と dry-run、preset、overwrite があり、SOUL.md、memories、skills、allowlist、messaging 設定、API key などを持ち込めます。OpenClaw 資産を無駄にしなくていいのは大きいです。</p>
+                </article>
+                <article class="card">
+                    <h3>2. ただし「移しただけ」では完成しない</h3>
+                    <p>移行後に、memory の圧縮方針、skills の粒度、gateway の入口設計、backend の安全境界を再整理しないと、Hermes 的な強さは出ません。</p>
+                </article>
+                <article class="card">
+                    <h3>3. OpenClaw で学んだ skill 感覚は活きる</h3>
+                    <p>スキルの構造化、コンテキスト汚染の防止、エージェントの暴走対策といった感覚はかなり流用できます。むしろ Hermes でその価値がはっきり見えるはずです。</p>
+                </article>
+                <article class="card">
+                    <h3>4. 一番大きい差は時間軸</h3>
+                    <p>OpenClaw をタスク実行の延長で見ていたなら、Hermes では「来週の自分の agent をどう強くするか」を主眼に置くと理解が一段深くなります。</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2 class="section-title">学習ロードマップ</h2>
+            <ol>
+                <li><span class="muted-strong">Phase 1:</span> CLI 起動、provider 設定、backend 選択、memory の基本構造を理解する。</li>
+                <li><span class="muted-strong">Phase 2:</span> <code>SOUL.md</code> と <code>USER.md</code> の役割を整理し、自分専用 skill を 2 から 3 本作る。</li>
+                <li><span class="muted-strong">Phase 3:</span> gateway を一つだけ開き、Docker かリモート backend で unattended 気味の小さなタスクを回す。</li>
+                <li><span class="muted-strong">Phase 4:</span> subagents、外部 memory provider、fallback provider、trajectory 系の発想に進む。</li>
+            </ol>
+            <div class="callout" style="margin-top:18px;">
+                <p><span class="muted-strong">順番を守る意味は大きいです。</span> 最初から gateway、複数 provider、外部 memory、複数 backend を全部開くと、理解ではなく設定作業になってしまいます。まず単線で通す、その後に横展開する方が定着します。</p>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2 class="section-title">最初に覚えるコマンド</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Command</th>
+                        <th>役割</th>
+                        <th>覚え方</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>hermes</code></td>
+                        <td>基本の起動点</td>
+                        <td>まずはここから入る</td>
+                    </tr>
+                    <tr>
+                        <td><code>hermes setup</code></td>
+                        <td>初期セットアップ</td>
+                        <td>最初の道案内</td>
+                    </tr>
+                    <tr>
+                        <td><code>hermes model</code></td>
+                        <td>model / provider の確認と切替</td>
+                        <td>provider 学習の基点</td>
+                    </tr>
+                    <tr>
+                        <td><code>hermes tools</code></td>
+                        <td>使える tools の把握</td>
+                        <td>agent の手足を知る</td>
+                    </tr>
+                    <tr>
+                        <td><code>hermes config edit</code></td>
+                        <td>設定ファイルの編集</td>
+                        <td>表面 UI ではなく設定思想を学ぶ</td>
+                    </tr>
+                    <tr>
+                        <td><code>hermes gateway setup</code></td>
+                        <td>gateway 準備</td>
+                        <td>surface 拡張の入口</td>
+                    </tr>
+                    <tr>
+                        <td><code>hermes gateway</code></td>
+                        <td>gateway 実行</td>
+                        <td>resident 化の第一歩</td>
+                    </tr>
+                    <tr>
+                        <td><code>hermes doctor</code></td>
+                        <td>環境診断</td>
+                        <td>困ったら真っ先に見る</td>
+                    </tr>
+                    <tr>
+                        <td><code>hermes claw migrate --dry-run</code></td>
+                        <td>OpenClaw からの移行確認</td>
+                        <td>まず dry-run で差分を見る</td>
+                    </tr>
+                    <tr>
+                        <td><code>hermes update</code></td>
+                        <td>更新</td>
+                        <td>構成が落ち着いてから実行</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="panel">
+            <h2 class="section-title">おすすめの実践順</h2>
+            <div class="grid-2">
+                <article class="card">
+                    <h3>3 日ループ</h3>
+                    <p>1 日目は起動と model 切替、2 日目は memory と skill の最小構成、3 日目は gateway なしのまま一つ recurring task を回す。この短期ループで基礎の輪郭がかなり見えます。</p>
+                </article>
+                <article class="card">
+                    <h3>1 週間ループ</h3>
+                    <p>1 週間かけて、毎日の対話から「残すべき知識」と「skill 化すべき手順」を分けていくと、Hermes の思想が体に入ります。ここで初めて resident agent 的な手応えが出ます。</p>
+                </article>
+            </div>
+            <pre style="margin-top:18px;"><code>hermes setup
+hermes model
+hermes
+hermes tools
+hermes doctor
+hermes claw migrate --dry-run</code></pre>
+        </section>
+
+        <section class="panel">
+            <h2 class="section-title">落とし穴</h2>
+            <div class="grid-3">
+                <article class="card">
+                    <h3>Provider を盛りすぎる</h3>
+                    <p>最初から全部つなぐと、設定は派手でも理解が浅くなります。一つ通してから比較に入る方が圧倒的に速いです。</p>
+                </article>
+                <article class="card">
+                    <h3>Memory を肥大化させる</h3>
+                    <p>何でも残すと、curated memory の良さが消えます。安定知識だけ残し、再利用手順は skill に寄せます。</p>
+                </article>
+                <article class="card">
+                    <h3>Gateway を「ただの bot」と見なす</h3>
+                    <p>入口が増えるだけだと思うと設計を誤ります。認証、通知、日常導線、深い作業との役割分担まで含めて設計対象です。</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2 class="section-title">私の見立て</h2>
+            <p>Hermes Agent は、いま見えている persistent-agent 系の中でもかなり完成度が高い部類です。特に、memory、skills、gateway、backend、security を一つの運用思想として束ねている点が強いです。OpenClaw を触ってきた人にとっては入りやすく、同時に「その先」を学ぶ教材にもなります。</p>
+            <p>あなたのように「設定して終わりではなく、自分のスキルとして身につけたい」という前提なら、Hermes は単なるツール候補ではなく、エージェント運用の教科書として扱う価値があります。重要なのは、全部盛りで使い始めることではなく、最小構成で回しながら、memory と skill の境界を自分で説明できるところまで掘ることです。</p>
+        </section>
+
+        <section class="panel">
+            <h2 class="section-title">公式ソース</h2>
+            <ul>
+                <li><a href="https://github.com/NousResearch/hermes-agent" target="_blank" rel="noreferrer">GitHub Repository</a></li>
+                <li><a href="https://nousresearch.com/hermes-agent/" target="_blank" rel="noreferrer">Official Product Page</a></li>
+                <li><a href="https://nousresearch.github.io/hermes-agent/" target="_blank" rel="noreferrer">Documentation Top</a></li>
+                <li><a href="https://nousresearch.github.io/hermes-agent/user-guide/features/memory/" target="_blank" rel="noreferrer">Memory</a></li>
+                <li><a href="https://nousresearch.github.io/hermes-agent/user-guide/features/skills/" target="_blank" rel="noreferrer">Skills</a></li>
+                <li><a href="https://nousresearch.github.io/hermes-agent/user-guide/security/" target="_blank" rel="noreferrer">Security</a></li>
+                <li><a href="https://nousresearch.github.io/hermes-agent/user-guide/configuration/" target="_blank" rel="noreferrer">Configuration</a></li>
+                <li><a href="https://nousresearch.github.io/hermes-agent/integrations/providers/" target="_blank" rel="noreferrer">AI Providers</a></li>
+                <li><a href="https://nousresearch.github.io/hermes-agent/developer-guide/architecture/" target="_blank" rel="noreferrer">Architecture</a></li>
+            </ul>
+        </section>
+    </main>
+</body>
+
+</html>
