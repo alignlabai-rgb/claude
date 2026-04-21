@@ -61,6 +61,95 @@
     }
     .quicklinks a:hover { background: rgba(102,224,194,0.1); border-color: rgba(102,224,194,0.3); }
 
+    .knowledge-spotlight {
+      background:
+        linear-gradient(135deg, rgba(102,224,194,0.16), rgba(137,180,255,0.10)),
+        var(--panel);
+      border: 1px solid rgba(102,224,194,0.28);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 22px 24px;
+      margin-bottom: 20px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(260px, 0.85fr);
+      gap: 18px;
+      align-items: center;
+    }
+    .knowledge-spotlight .label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(102,224,194,0.12);
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .knowledge-spotlight h2 {
+      font-size: 1.65rem;
+      margin-bottom: 8px;
+    }
+    .knowledge-spotlight p {
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin-bottom: 16px;
+      max-width: 760px;
+    }
+    .spotlight-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .spotlight-actions a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 10px 16px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 700;
+      transition: transform 0.15s, border-color 0.15s, background 0.15s;
+    }
+    .spotlight-actions a:hover { transform: translateY(-1px); }
+    .spotlight-primary {
+      background: rgba(102,224,194,0.18);
+      border: 1px solid rgba(102,224,194,0.36);
+      color: var(--text);
+    }
+    .spotlight-secondary {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+    .knowledge-mini-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .knowledge-mini-card {
+      padding: 14px 14px 12px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .knowledge-mini-card strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--text);
+      font-size: 0.9rem;
+    }
+    .knowledge-mini-card span {
+      color: var(--muted);
+      font-size: 0.8rem;
+      line-height: 1.5;
+    }
+
     /* ─── 注目バナー（Claude Code デモ） ─── */
     .banner {
       background: linear-gradient(135deg, rgba(244,184,96,0.12), rgba(102,224,194,0.08));
@@ -91,6 +180,9 @@
     }
     @media (max-width: 900px) { .grid { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 580px) { .grid { grid-template-columns: 1fr; } }
+    @media (max-width: 860px) {
+      .knowledge-spotlight { grid-template-columns: 1fr; }
+    }
 
     .card {
       background: var(--panel-2);
@@ -178,6 +270,40 @@
         <a href="README.md">構成ドキュメント</a>
         <a href="foundations/index.html">Foundations</a>
         <a href="strategy/index.html">Strategy</a>
+      </div>
+    </section>
+
+    <section class="knowledge-spotlight">
+      <div>
+        <div class="label">Knowledge Shortcut</div>
+        <h2>知識ページに最短で入るならここです</h2>
+        <p>
+          Claude 配下の調査・比較・実務ノートをまとめた入口は <strong>Knowledge Index</strong> です。
+          Hermes Agent、OpenClaw、Claude Code、各種 LLM 比較、SLM ガイドまでここから辿れます。
+        </p>
+        <div class="spotlight-actions">
+          <a class="spotlight-primary" href="workbench/knowledge/index.html">Knowledge Index を開く</a>
+          <a class="spotlight-secondary" href="workbench/knowledge/hermes-agent.html">Hermes 深掘りへ</a>
+          <a class="spotlight-secondary" href="workbench/index.html">Tech Workbench へ</a>
+        </div>
+      </div>
+      <div class="knowledge-mini-grid">
+        <div class="knowledge-mini-card">
+          <strong>Hermes Agent</strong>
+          <span>Persistent Memory、Skills、Gateway、OpenClaw からの見方を厚く整理。</span>
+        </div>
+        <div class="knowledge-mini-card">
+          <strong>OpenClaw</strong>
+          <span>オーケストレーション観点の起点。Hermes との違いも比較しやすい位置です。</span>
+        </div>
+        <div class="knowledge-mini-card">
+          <strong>Claude Code</strong>
+          <span>CLI エージェントとしての位置づけと、他スタックとの関係を整理。</span>
+        </div>
+        <div class="knowledge-mini-card">
+          <strong>LLM Catalog</strong>
+          <span>モデル比較や用途整理のページ群へ、そのまま横展開できます。</span>
+        </div>
       </div>
     </section>
 

@@ -251,9 +251,140 @@
             font-weight: 700;
         }
 
+        .diagram-stack {
+            display: grid;
+            grid-template-columns: minmax(220px, 0.9fr) 64px minmax(220px, 1.1fr);
+            gap: 16px;
+            align-items: stretch;
+            margin-top: 20px;
+        }
+
+        .diagram-box {
+            padding: 20px 18px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.04);
+            position: relative;
+        }
+
+        .diagram-box h3,
+        .diagram-flow h3 {
+            margin-bottom: 10px;
+        }
+
+        .diagram-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .diagram-node {
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(3, 11, 18, 0.55);
+            color: var(--text);
+            font-weight: 700;
+            line-height: 1.45;
+        }
+
+        .diagram-node small {
+            display: block;
+            margin-top: 4px;
+            color: var(--muted);
+            font-weight: 500;
+        }
+
+        .diagram-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-size: 2rem;
+            font-weight: 900;
+            letter-spacing: -0.08em;
+        }
+
+        .diagram-flow {
+            padding: 20px 18px;
+            border-radius: 16px;
+            border: 1px solid rgba(127, 140, 255, 0.22);
+            background: rgba(127, 140, 255, 0.08);
+        }
+
+        .diagram-steps {
+            display: grid;
+            gap: 12px;
+            counter-reset: step;
+        }
+
+        .diagram-step {
+            display: grid;
+            grid-template-columns: 38px minmax(0, 1fr);
+            gap: 12px;
+            align-items: start;
+        }
+
+        .diagram-step .num {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            color: #041019;
+            font-weight: 900;
+        }
+
+        .diagram-step strong {
+            color: var(--text);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .diagram-caption {
+            margin-top: 14px;
+            font-size: 0.9rem;
+        }
+
+        .decision-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px;
+            margin-top: 18px;
+        }
+
+        .decision-card {
+            padding: 20px 18px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .decision-card h3 {
+            margin-bottom: 10px;
+        }
+
+        .decision-card.memory {
+            border-color: rgba(80, 212, 217, 0.24);
+            background: rgba(80, 212, 217, 0.08);
+        }
+
+        .decision-card.skill {
+            border-color: rgba(127, 140, 255, 0.24);
+            background: rgba(127, 140, 255, 0.08);
+        }
+
+        .decision-card.prompt {
+            border-color: rgba(255, 202, 106, 0.24);
+            background: rgba(255, 202, 106, 0.08);
+        }
+
         @media (max-width: 860px) {
             .grid-2,
-            .grid-3 {
+            .grid-3,
+            .diagram-stack,
+            .decision-grid {
                 grid-template-columns: 1fr;
             }
 
@@ -263,6 +394,11 @@
 
             h1 {
                 font-size: 38px;
+            }
+
+            .diagram-arrow {
+                transform: rotate(90deg);
+                min-height: 40px;
             }
         }
     </style>
@@ -284,6 +420,43 @@
                 <span class="chip">OpenClaw Migration</span>
             </div>
         </header>
+
+        <section class="panel">
+            <h2 class="section-title">まず図で掴む Hermes</h2>
+            <div class="diagram-stack">
+                <div class="diagram-box">
+                    <h3>入口</h3>
+                    <div class="diagram-list">
+                        <div class="diagram-node">CLI<small>深い保守、設定、skill 更新</small></div>
+                        <div class="diagram-node">Gateway<small>Telegram / Discord / Slack など日常導線</small></div>
+                        <div class="diagram-node">Batch / API<small>定期処理、連携、自動化</small></div>
+                    </div>
+                </div>
+                <div class="diagram-arrow">→</div>
+                <div class="diagram-flow">
+                    <h3>Hermes の中で起きていること</h3>
+                    <div class="diagram-steps">
+                        <div class="diagram-step">
+                            <div class="num">1</div>
+                            <div><strong>記憶を読む</strong><span>MEMORY.md と USER.md の curated memory を土台にする。</span></div>
+                        </div>
+                        <div class="diagram-step">
+                            <div class="num">2</div>
+                            <div><strong>skill を呼ぶ</strong><span>必要な手続き知だけを progressive disclosure で展開する。</span></div>
+                        </div>
+                        <div class="diagram-step">
+                            <div class="num">3</div>
+                            <div><strong>tools と backend を使う</strong><span>terminal、browser、MCP、Docker、SSH などで実際に動く。</span></div>
+                        </div>
+                        <div class="diagram-step">
+                            <div class="num">4</div>
+                            <div><strong>次回のために残す</strong><span>会話検索、memory 更新、skill 改善で来週の自分を強くする。</span></div>
+                        </div>
+                    </div>
+                    <p class="diagram-caption">この流れで見ると、Hermes は「賢いチャット」よりも「入口を複数持つ常駐エージェント運用基盤」に近いとわかります。</p>
+                </div>
+            </div>
+        </section>
 
         <section class="panel">
             <h2 class="section-title">結論</h2>
@@ -442,6 +615,20 @@
             </div>
             <div class="warning" style="margin-top:18px;">
                 <p><span class="muted-strong">初心者がやりがちな失敗は、memory を何でも入れる万能倉庫にしてしまうことです。</span> 長く残すべき安定知識だけを置き、手順や再利用可能な判断は skill に逃がす方が、後で圧倒的に扱いやすくなります。</p>
+            </div>
+            <div class="decision-grid">
+                <div class="decision-card memory">
+                    <h3>Memory に置くもの</h3>
+                    <p>長く安定していて、毎回の判断土台になる情報です。ユーザーの好み、作業スタイル、恒常的な制約、継続方針のような「覚えていてほしいこと」が向いています。</p>
+                </div>
+                <div class="decision-card skill">
+                    <h3>Skill に置くもの</h3>
+                    <p>何度も繰り返す手順、危険作業の定石、調査の型、レビュー観点のような「こう振る舞ってほしいこと」です。再利用手順は skill 化した方がぶれません。</p>
+                </div>
+                <div class="decision-card prompt">
+                    <h3>その場で考えさせるもの</h3>
+                    <p>一回性の依頼、状況固有の解釈、今回だけの制約は毎回のプロンプトで十分です。ここまで memory や skill に入れると、むしろノイズになります。</p>
+                </div>
             </div>
         </section>
 
