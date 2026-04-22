@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Skills & サブエージェント 完全深掘り | MAチーム向けデモ補足資料</title>
+  <style>
+    :root {
+      --bg: #07111d;
+      --panel: #0d1829;
+      --dark: #060e1a;
+      --text: #e8eef9;
+      --muted: #b6c3da;
+      --dim: #6a7a9a;
+      --accent: #66e0c2;
+      --gold: #f4b860;
+      --blue: #60d0ff;
+      --purple: #c4a0ff;
+      --red: #ff9090;
+      --green: #4FFFB0;
+      --orange: #f7a87a;
+      --border: rgba(255,255,255,0.08);
+      --r: 18px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Segoe UI", "Noto Sans JP", system-ui, sans-serif;
+      background: linear-gradient(135deg, #07111d 0%, #060d18 100%);
+      color: var(--text); line-height: 1.75; padding: 0 0 80px;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* HERO */
+    .hero {
+      background: linear-gradient(135deg, #0a1a2e 0%, #0d1f3a 50%, #091525 100%);
+      border-bottom: 1px solid rgba(102,224,194,0.2);
+      padding: 52px 40px 44px; text-align: center;
+    }
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(167,139,250,0.15); border: 1px solid rgba(167,139,250,0.3);
+      color: var(--purple); font-size: 0.75rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      padding: 6px 16px; border-radius: 999px; margin-bottom: 20px;
+    }
+    .hero h1 { font-size: 2.6rem; font-weight: 900; line-height: 1.2; margin-bottom: 14px; }
+    .hero h1 em { font-style: normal; background: linear-gradient(90deg, #66e0c2, #c4a0ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero-sub { color: var(--muted); font-size: 0.97rem; max-width: 640px; margin: 0 auto 28px; }
+    .breadcrumb { font-size: 0.82rem; color: var(--dim); margin-bottom: 18px; }
+    .breadcrumb a { color: var(--accent); }
+    .hero-chips { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+    .chip { background: rgba(255,255,255,0.06); border: 1px solid var(--border); border-radius: 8px; padding: 5px 14px; font-size: 0.78rem; color: var(--muted); }
+    .chip strong { color: var(--accent); }
+
+    /* SHELL */
+    .shell { max-width: 1060px; margin: 0 auto; padding: 0 24px; }
+    .section { padding: 52px 0 0; }
+    .section-label { font-size: 0.72rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
+    .section-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 6px; }
+    .section-sub { color: var(--muted); font-size: 0.92rem; margin-bottom: 24px; }
+
+    /* GRID */
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+    @media (max-width: 720px) { .grid2, .grid3 { grid-template-columns: 1fr; } .hero h1 { font-size: 1.9rem; } .hero { padding: 36px 20px 32px; } }
+
+    /* PANELS */
+    .panel { background: var(--panel); border: 1px solid var(--border); border-radius: var(--r); padding: 26px 28px; }
+    .panel.accent { border-color: rgba(102,224,194,0.3); }
+    .panel.purple { border-color: rgba(196,160,255,0.3); }
+    .panel.gold { border-color: rgba(244,184,96,0.3); background: linear-gradient(135deg, #0d1829, #141c2c); }
+    .panel.featured { background: linear-gradient(135deg, #0d1f34, #0e2038); border-color: rgba(102,224,194,0.25); }
+    .panel h2 { font-size: 1.1rem; font-weight: 800; margin-bottom: 12px; }
+    .panel h3 { font-size: 0.93rem; font-weight: 700; margin-bottom: 8px; }
+    .panel p { color: var(--muted); font-size: 0.89rem; }
+
+    /* CARD */
+    .card { background: var(--dark); border: 1px solid var(--border); border-radius: 14px; padding: 20px 22px; }
+    .card.hl { border-color: rgba(102,224,194,0.25); background: linear-gradient(135deg, #0d1f34, #0e2038); }
+    .card.purple { border-color: rgba(196,160,255,0.25); background: linear-gradient(135deg, #0f1428, #130e2a); }
+    .card.gold { border-color: rgba(244,184,96,0.25); }
+    .card h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 10px; }
+    .card p, .card li { font-size: 0.86rem; color: var(--muted); }
+    .card ul { padding-left: 16px; display: flex; flex-direction: column; gap: 5px; margin-top: 8px; }
+
+    /* STEPS LIST */
+    .steps-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .steps-list li { font-size: 0.87rem; color: var(--muted); display: flex; align-items: flex-start; gap: 8px; }
+    .steps-list li::before { content: "→"; color: var(--accent); font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+
+    /* COMPARE */
+    .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+    .compare-side { padding: 20px 22px; border-radius: 14px; }
+    .compare-side.old { background: rgba(255,144,144,0.06); border: 1px solid rgba(255,144,144,0.2); }
+    .compare-side.new { background: rgba(79,255,176,0.06); border: 1px solid rgba(79,255,176,0.2); }
+    .compare-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.09em; margin-bottom: 12px; }
+    .compare-side.old .compare-label { color: #ff9090; }
+    .compare-side.new .compare-label { color: #4FFFB0; }
+
+    /* PROMPT BOX */
+    .prompt-box {
+      background: #040b14; border: 1px solid rgba(96,208,255,0.2);
+      border-radius: 12px; padding: 16px 18px; margin: 12px 0;
+    }
+    .prompt-label { font-size: 0.68rem; font-weight: 700; color: var(--dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+    .prompt-text { font-size: 0.84rem; color: var(--blue); line-height: 1.65; white-space: pre-wrap; }
+    .prompt-box.copy { border-color: rgba(102,224,194,0.25); }
+    .prompt-box.copy .prompt-text { color: var(--accent); }
+
+    /* WOW BOX */
+    .wow-box {
+      background: linear-gradient(135deg, rgba(102,224,194,0.08), rgba(96,208,255,0.06));
+      border: 1px solid rgba(102,224,194,0.2); border-radius: 12px; padding: 14px 16px; margin-top: 14px;
+    }
+    .wow-label { font-size: 0.68rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 5px; }
+    .wow-box p { font-size: 0.85rem; color: var(--text); margin: 0; }
+
+    /* TIP BOX */
+    .tip-box {
+      background: linear-gradient(135deg, rgba(244,184,96,0.1), rgba(102,224,194,0.07));
+      border: 1px solid rgba(244,184,96,0.3); border-radius: 10px; padding: 13px 16px; margin-top: 12px;
+    }
+    .tip-label { font-size: 0.68rem; font-weight: 700; color: var(--gold); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px; }
+    .tip-box p { font-size: 0.84rem; color: var(--text); margin: 0; }
+
+    /* TAGS */
+    .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+    .tag { display: inline-block; font-size: 0.7rem; font-weight: 700; padding: 3px 9px; border-radius: 5px; }
+    .t-g { background: rgba(79,255,176,0.15); color: #4FFFB0; }
+    .t-b { background: rgba(96,208,255,0.15); color: #60d0ff; }
+    .t-p { background: rgba(196,160,255,0.15); color: #c4a0ff; }
+    .t-o { background: rgba(244,184,96,0.15); color: #f4b860; }
+    .t-r { background: rgba(255,144,144,0.15); color: #ff9090; }
+    .t-a { background: rgba(102,224,194,0.15); color: #66e0c2; }
+
+    /* FLOW DIAGRAM */
+    .flow { display: flex; align-items: center; gap: 0; flex-wrap: wrap; margin: 16px 0; }
+    .flow-node {
+      background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+      padding: 12px 16px; text-align: center; min-width: 110px;
+    }
+    .flow-node.leader { border-color: rgba(102,224,194,0.4); background: linear-gradient(135deg,#0d1f34,#0e2038); }
+    .flow-node.agent { border-color: rgba(96,208,255,0.3); }
+    .flow-node.final { border-color: rgba(244,184,96,0.4); background: linear-gradient(135deg,#141c2c,#1a1630); }
+    .flow-node .node-role { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--dim); margin-bottom: 4px; }
+    .flow-node .node-name { font-size: 0.82rem; font-weight: 700; }
+    .flow-node .node-task { font-size: 0.72rem; color: var(--muted); margin-top: 3px; }
+    .flow-arrow { font-size: 1.2rem; color: var(--dim); margin: 0 8px; flex-shrink: 0; }
+    .flow-parallel { display: flex; flex-direction: column; gap: 8px; }
+    .flow-bracket { display: flex; align-items: center; }
+    .flow-bracket-inner { display: flex; flex-direction: column; gap: 8px; border-left: 2px solid rgba(96,208,255,0.3); padding-left: 12px; }
+
+    /* STAT */
+    .stat-row { display: flex; gap: 16px; flex-wrap: wrap; margin: 16px 0; }
+    .stat-box { flex: 1; min-width: 140px; background: var(--dark); border: 1px solid rgba(102,224,194,0.2); border-radius: 14px; padding: 18px 20px; text-align: center; }
+    .stat-val { font-size: 2rem; font-weight: 900; color: var(--accent); line-height: 1; }
+    .stat-lbl { font-size: 0.73rem; color: var(--muted); margin-top: 5px; }
+
+    /* SKILL CARD */
+    .skill-card {
+      background: var(--dark); border: 1px solid rgba(196,160,255,0.2);
+      border-radius: 14px; padding: 20px 22px;
+    }
+    .skill-card .skill-title { font-size: 0.9rem; font-weight: 700; color: var(--purple); margin-bottom: 8px; }
+    .skill-card .skill-desc { font-size: 0.84rem; color: var(--muted); margin-bottom: 10px; }
+    .skill-card .skill-tag { font-size: 0.68rem; font-weight: 700; color: var(--dim); }
+
+    /* TABLE */
+    table.matrix { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+    table.matrix th { background: rgba(102,224,194,0.08); color: var(--accent); text-align: left; padding: 10px 14px; font-size: 0.76rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--border); }
+    table.matrix td { padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--muted); vertical-align: top; }
+    table.matrix tr.hl td { background: rgba(102,224,194,0.04); color: var(--text); }
+
+    /* FOOTER */
+    .footer { background: var(--panel); border-top: 1px solid var(--border); margin-top: 56px; padding: 20px 40px; display: flex; gap: 20px; flex-wrap: wrap; align-items: center; justify-content: space-between; }
+    .footer a { color: var(--accent); font-size: 0.83rem; }
+    .footer p { font-size: 0.78rem; color: var(--dim); margin: 0; }
+  </style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="breadcrumb"><a href="ma-demo-2026.html">← デモ資料に戻る</a></div>
+  <div class="hero-eyebrow">🔬 深掘り資料 · MAチームデモ補足</div>
+  <h1>Skills &amp; サブエージェント<br><em>完全深掘り</em></h1>
+  <p class="hero-sub">デモで見た2つの機能を、なぜ強いのか・どう使うのか・実際にどう動くのかまで徹底解説。コード不要でMA業務に直結する使い方に絞って説明する。</p>
+  <div class="hero-chips">
+    <div class="chip">対象: <strong>MAチーム</strong></div>
+    <div class="chip">前提知識: <strong>不要</strong></div>
+    <div class="chip">Skills + Sub-agents + 組み合わせ</div>
+  </div>
+</div>
+
+<div class="shell">
+
+  <!-- ====== PART 1: SKILLS ====== -->
+  <section class="section">
+    <div class="section-label">Part 1 — Skills</div>
+    <div class="section-title">⚡ Skills — チームの「専門能力」を制度化する</div>
+    <div class="section-sub">Skillsは単なる便利なプロンプト保存ではない。チームの標準能力をシステム化して、誰が使っても・何度使っても同じ品質で出力させる仕組みだ。</div>
+
+    <!-- Skills本質 -->
+    <div class="compare">
+      <div class="compare-side old">
+        <div class="compare-label">❌ Skillsなし（今の状態）</div>
+        <ul class="steps-list">
+          <li>「DDメモを作って」→ 毎回フォーマットがバラバラ</li>
+          <li>「社内の稟議書の書き方で」と毎回説明が必要</li>
+          <li>高橋さんのプロンプトが優秀だが、チームと共有できていない</li>
+          <li>新人が使うとベテランと出力の質が大きく違う</li>
+          <li>プロンプトは個人のメモ帳にしかない</li>
+        </ul>
+      </div>
+      <div class="compare-side new">
+        <div class="compare-label">✅ Skillsあり（導入後）</div>
+        <ul class="steps-list">
+          <li>「DDメモを作って」→ 必ず社内フォーマットで出力される</li>
+          <li>フォーマット・トーン・チェック項目はSkillに一度書けば永続</li>
+          <li>最高のプロンプトをSkillとして保存 → チーム全員が同じ品質</li>
+          <li>新人が使っても、Skillがあればベテランと同じ水準</li>
+          <li>Skillはチームの資産。退職者が出ても知識が残る</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Skillsとは何か（図解的に） -->
+    <div class="panel accent" style="margin-bottom: 20px;">
+      <h2 style="color: var(--accent);">Skillsの正体 — 「MAチーム専用の記憶」をAIに持たせる</h2>
+      <p style="margin-bottom: 16px;">SkillsはMarkdownファイル（<code style="background:rgba(255,255,255,0.08);padding:1px 6px;border-radius:4px;font-size:0.85em;">SKILL.md</code>）で定義する。Claudeはこのファイルを読み込んで、そこに書かれたルール・知識・手順を「確実な事実」として持つ。推測や創作をしなくなる。</p>
+      <div class="grid2">
+        <div>
+          <div style="font-size:0.72rem; font-weight:700; color:var(--dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px;">Skillsに書けること（何でもOK）</div>
+          <ul class="steps-list">
+            <li>社内ディールメモの構成・セクション名・書き方</li>
+            <li>SBIグループとしてのコンプライアンス確認項目</li>
+            <li>FCPA・贈賄防止法の適用チェックリスト</li>
+            <li>リスク分類の基準（高/中/低の定義）</li>
+            <li>役員向け資料のトーン・禁止表現・推奨表現</li>
+            <li>ターゲット企業への英文メール文体ルール</li>
+            <li>DDチェックリストの全項目と優先順位</li>
+          </ul>
+        </div>
+        <div>
+          <div style="font-size:0.72rem; font-weight:700; color:var(--dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px;">Skillsを使うと何が変わるか</div>
+          <ul class="steps-list">
+            <li>「ターゲット企業名」だけ入力すればDDメモが完成する</li>
+            <li>フォーマットの確認・修正作業がゼロになる</li>
+            <li>コンプライアンスチェック漏れがなくなる</li>
+            <li>日英バイリンガル版も同時に生成できる</li>
+            <li>5人のチームが5通りの書き方をする問題が消える</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- MA向けSkill設計例 -->
+    <div class="section-label" style="margin-top:32px;">MA向けSkill設計例</div>
+    <div class="section-title" style="font-size:1.2rem;">実際にどんなSkillを作るか</div>
+    <div class="grid3" style="margin-bottom: 24px;">
+      <div class="skill-card">
+        <div class="skill-title">📋 DDメモ生成 Skill</div>
+        <div class="skill-desc">社内フォーマット通りのディールメモを自動生成。企業名を入力するだけで、決まった構成・決まったトーン・決まった確認項目が全部入った状態で出力される。</div>
+        <div class="skill-tag">含む情報：構成5ページ / リスク分類基準 / 日英両版 / 稟議書トーン</div>
+        <div class="tag-row"><span class="tag t-p">高頻度</span><span class="tag t-a">即効性高</span></div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-title">⚖️ コンプライアンスチェック Skill</div>
+        <div class="skill-desc">海外M&Aにおける法的リスクを自動フラグ。FCPA・贈賄防止法・反マネーロンダリング規制の適用確認を毎回漏れなく実行する。</div>
+        <div class="skill-tag">含む情報：FCPA要件 / 制裁対象国リスト / 反社チェック観点 / 法務エスカレ基準</div>
+        <div class="tag-row"><span class="tag t-r">必須</span><span class="tag t-p">リスク管理</span></div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-title">🌏 海外メール文章 Skill</div>
+        <div class="skill-desc">海外カウンターパートへの英文メール・LOI・NDA初版ドラフトを生成。SBIグループとしてのトーン・禁止表現・署名フォーマットを記憶している。</div>
+        <div class="skill-tag">含む情報：文体ルール / ビジネス英語表現集 / 署名フォーマット / 文化別配慮点</div>
+        <div class="tag-row"><span class="tag t-b">汎用性高</span><span class="tag t-a">毎日使える</span></div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-title">📊 シナジー試算 Skill</div>
+        <div class="skill-desc">SBIグループ視点での買収シナジーを体系的に試算。コスト削減・クロスセル・技術統合の3軸で、毎回同じフレームで比較できるアウトプットを生成。</div>
+        <div class="skill-tag">含む情報：SBIグループ事業一覧 / シナジー分類フレーム / 試算の前提条件</div>
+        <div class="tag-row"><span class="tag t-o">分析</span><span class="tag t-a">フレーム統一</span></div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-title">📰 マーケットモニタリング Skill</div>
+        <div class="skill-desc">Bloomberg・Reuters・現地メディアのM&Aニュースを定期スキャンして、SBIグループ関連案件を抽出・要約するRoutineと組み合わせて使う。</div>
+        <div class="skill-tag">含む情報：注目セクター / キーワードリスト / 競合他社リスト / 要約フォーマット</div>
+        <div class="tag-row"><span class="tag t-g">Routines連携</span><span class="tag t-b">情報収集</span></div>
+      </div>
+      <div class="skill-card" style="border-color:rgba(244,184,96,0.3);">
+        <div class="skill-title" style="color:var(--gold);">💡 サードパーティ Skill（将来）</div>
+        <div class="skill-desc">AnthropicはSkillsをオープン標準として公開。今後、Bloomberg・S&P・法律事務所などが専門Skillを配布・販売できるエコシステムが構築される予定。</div>
+        <div class="skill-tag">例：Bloomberg財務分析Skill / 特許調査Skill / 規制モニタリングSkill</div>
+        <div class="tag-row"><span class="tag t-o">エコシステム</span><span class="tag t-o">将来展望</span></div>
+      </div>
+    </div>
+
+    <!-- Skillsの設定方法（技術不要） -->
+    <div class="panel">
+      <h2>Skillsの設定方法 — コードは一切不要</h2>
+      <p style="margin-bottom:16px; color:var(--muted);">Claude.aiの「Project」機能を使えば、今すぐSkillsを設定できる。開発者は必要ない。</p>
+      <div class="grid2">
+        <div>
+          <div style="font-size:0.8rem; font-weight:700; color:var(--accent); margin-bottom:12px;">今すぐできる設定方法（claude.ai）</div>
+          <ul class="steps-list">
+            <li><strong>Project を作成</strong>：「MAチーム DDワークフロー」と名前をつける</li>
+            <li><strong>System Prompt にルールを記入</strong>：社内フォーマット・トーン・チェック項目を貼り付ける</li>
+            <li><strong>チームメンバーを招待</strong>：全員が同じProjectを共有</li>
+            <li><strong>以降は全員がそのProjectで会話</strong>：Skillが自動で適用される</li>
+          </ul>
+          <div class="tip-box" style="margin-top:14px;">
+            <div class="tip-label">所要時間</div>
+            <p>初期設定は30分〜1時間。一度設定すれば、チームメンバーが増えても設定不要。</p>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:0.8rem; font-weight:700; color:var(--purple); margin-bottom:12px;">Claude Code を使った高度な設定（将来）</div>
+          <ul class="steps-list">
+            <li><code style="background:rgba(255,255,255,0.08);padding:1px 5px;border-radius:3px;font-size:0.8em;">.claude/agents/</code> フォルダに <code style="background:rgba(255,255,255,0.08);padding:1px 5px;border-radius:3px;font-size:0.8em;">SKILL.md</code> を配置</li>
+            <li>複数のエージェントに異なるSkillを割り当てられる</li>
+            <li>DDエージェントにはDDのSkill、法務エージェントには法務のSkill、と役割分担できる</li>
+            <li>Sub-agentsとSkillsを組み合わせることで精度が大幅に向上</li>
+          </ul>
+          <div class="wow-box" style="margin-top:14px;">
+            <div class="wow-label">重要な原則</div>
+            <p>「良いSkillを持ったエージェント」は、「高品質なプロンプトを毎回書ける人」と同等の能力を持つ。Skillを整備することは、チームの底上げに直結する。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== PART 2: SUB-AGENTS ====== -->
+  <section class="section">
+    <div class="section-label">Part 2 — Sub-agents & Agent Teams</div>
+    <div class="section-title">🤖 サブエージェント — 1人が無限のチームを指揮する</div>
+    <div class="section-sub">「1対1のAI会話」から「1人が∞のAIチームを並列指揮する」への根本的な変化。MAチームのDDワークフローが、人員を増やさずに10倍速くなる。</div>
+
+    <!-- Sub-agents vs Agent Teams -->
+    <div class="panel accent" style="margin-bottom: 20px;">
+      <h2 style="color: var(--accent); margin-bottom: 14px;">「サブエージェント」と「Agent Teams」— 2つの使い分け</h2>
+      <div class="grid2">
+        <div class="card">
+          <h3 style="color: var(--blue);">⬡ サブエージェント（Sub-agents）</h3>
+          <p style="margin-bottom:10px;">メインのClaudeが子エージェントを生み出して指示する。子同士は直接会話しない。独立したタスクを並列で実行するのに最適。</p>
+          <ul class="steps-list">
+            <li>「同じ調査を10社に並列でかける」</li>
+            <li>「企業概要・財務・リスクを同時に別々で調べる」</li>
+            <li>各エージェントの結果が独立していてOKな場合</li>
+          </ul>
+          <div class="tag-row"><span class="tag t-b">並列・独立タスク</span></div>
+        </div>
+        <div class="card hl">
+          <h3 style="color: var(--accent);">✦ Agent Teams（チーム型）</h3>
+          <p style="margin-bottom:10px;">複数のエージェントが独立したセッションで動き、互いに結果を受け渡す。DDのように「前のエージェントの結果を次のエージェントが使う」場合に最適。</p>
+          <ul class="steps-list">
+            <li>「各担当の調査結果を最後に統合してメモを作る」</li>
+            <li>「Writerが書いたものをReviewerがチェックして修正する」</li>
+            <li>前工程の成果物を次工程が必要とする場合</li>
+          </ul>
+          <div class="tag-row"><span class="tag t-g">連携・統合タスク</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DDスウォーム詳細フロー -->
+    <div class="section-label" style="margin-top:32px;">DDスウォームの全体像</div>
+    <div class="section-title" style="font-size:1.2rem;">「ターゲット企業名を入れる」だけで何が起きるか</div>
+    <div class="panel featured" style="margin-bottom: 20px;">
+      <p style="color: var(--muted); font-size:0.88rem; margin-bottom:20px;">人間が1回指示を出した後、5つのエージェントが自律的に動いてディールメモを完成させる。人間は完成通知を待つだけ。</p>
+
+      <!-- フロー図 -->
+      <div style="overflow-x:auto; padding-bottom:8px;">
+        <div style="display:flex; align-items:flex-start; gap:12px; min-width:700px;">
+
+          <!-- 人間 -->
+          <div style="display:flex; flex-direction:column; align-items:center; gap:6px; flex-shrink:0;">
+            <div class="flow-node leader" style="width:120px;">
+              <div class="node-role">人間</div>
+              <div class="node-name" style="color:var(--gold);">MAチーム担当者</div>
+              <div class="node-task">「XX社のDD初期調査を」と1行入力</div>
+            </div>
+          </div>
+
+          <div class="flow-arrow">▶</div>
+
+          <!-- リーダー -->
+          <div style="display:flex; flex-direction:column; align-items:center; gap:6px; flex-shrink:0;">
+            <div class="flow-node leader" style="width:130px;">
+              <div class="node-role">Leader AI</div>
+              <div class="node-name" style="color:var(--accent);">タスク分解</div>
+              <div class="node-task">4つに分解してAgent A〜Dに同時指示</div>
+            </div>
+          </div>
+
+          <div class="flow-arrow">▶</div>
+
+          <!-- 並列エージェント -->
+          <div style="display:flex; flex-direction:column; gap:8px; flex-shrink:0;">
+            <div class="flow-node agent" style="width:130px;">
+              <div class="node-role">Agent A</div>
+              <div class="node-name" style="color:var(--blue);">企業概要</div>
+              <div class="node-task">事業・代表・グループ構成</div>
+            </div>
+            <div class="flow-node agent" style="width:130px;">
+              <div class="node-role">Agent B</div>
+              <div class="node-name" style="color:var(--blue);">財務分析</div>
+              <div class="node-task">3年売上・利益率・業界比較</div>
+            </div>
+            <div class="flow-node agent" style="width:130px;">
+              <div class="node-role">Agent C</div>
+              <div class="node-name" style="color:var(--blue);">リスク調査</div>
+              <div class="node-task">法的・地政学・コンプライアンス</div>
+            </div>
+            <div class="flow-node agent" style="width:130px;">
+              <div class="node-role">Agent D</div>
+              <div class="node-name" style="color:var(--blue);">シナジー試算</div>
+              <div class="node-task">SBIグループ視点で3〜5点</div>
+            </div>
+          </div>
+
+          <div class="flow-arrow">▶</div>
+
+          <!-- 統合エージェント -->
+          <div style="display:flex; flex-direction:column; align-items:center; gap:6px; flex-shrink:0;">
+            <div class="flow-node final" style="width:130px;">
+              <div class="node-role">Agent E</div>
+              <div class="node-name" style="color:var(--gold);">統合・生成</div>
+              <div class="node-task">全結果を受け取り社内フォーマットでディールメモ完成</div>
+            </div>
+          </div>
+
+          <div class="flow-arrow">▶</div>
+
+          <!-- 完成物 -->
+          <div style="display:flex; flex-direction:column; align-items:center; gap:6px; flex-shrink:0;">
+            <div class="flow-node" style="width:120px; border-color:rgba(79,255,176,0.4); background:rgba(79,255,176,0.05);">
+              <div class="node-role">完成</div>
+              <div class="node-name" style="color:#4FFFB0;">ディールメモ</div>
+              <div class="node-task">5ページ・日英両版・約5分</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:20px;">
+        <div class="tip-box">
+          <div class="tip-label">⏱ 所要時間の比較</div>
+          <p>従来：アナリスト4人 × 2〜3日 = <strong style="color:#ff9090;">8〜12人日</strong><br>
+          Agent Teams：<strong style="color:#4FFFB0;">約5分</strong>（Anthropic社内実測値）</p>
+        </div>
+        <div class="wow-box">
+          <div class="wow-label">人間の仕事はどこか</div>
+          <p>「どの企業を調査するか」を決めることと、完成したディールメモを確認・判断することだけ。実行はすべてAIチームが担う。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4つのユースケース -->
+    <div class="grid2">
+      <div class="card hl">
+        <h3 style="color:var(--accent);">🐝 DDスウォーム（最重要）</h3>
+        <p style="margin-bottom:10px;">複数エージェントが異なる調査軸で並列実行。最後に統合エージェントがディールメモを生成。</p>
+        <ul class="steps-list">
+          <li>1社だけでなく、候補5社を同時にDDできる</li>
+          <li>各エージェントの専門スキルをSkillsで強化</li>
+          <li>深夜・休日でも自律的に稼働</li>
+        </ul>
+        <div class="tag-row"><span class="tag t-a">最も効果大</span><span class="tag t-g">MA業務直結</span></div>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--blue);">📝 ドキュメントレビューループ</h3>
+        <p style="margin-bottom:10px;">Writerエージェントが作成 → Reviewerエージェントがチェックしてフィードバック → Writerが修正。人間が介入しない自律的なレビューサイクル。</p>
+        <ul class="steps-list">
+          <li>英文契約書の初版作成〜チェックを自動化</li>
+          <li>法的観点・ビジネス観点を別々のエージェントが確認</li>
+          <li>最後に人間が最終確認するだけ</li>
+        </ul>
+        <div class="tag-row"><span class="tag t-b">法務・契約</span></div>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--purple);">🌐 マルチソース情報収集</h3>
+        <p style="margin-bottom:10px;">Agent Aが英語メディア、Agent Bが現地語メディア、Agent Cが規制データベースを同時にスキャン。Leaderが統合レポートを作成。</p>
+        <ul class="steps-list">
+          <li>Bloomberg・Reuters・日経・現地メディアを横断</li>
+          <li>毎週月曜に自動実行（Routinesと組み合わせ）</li>
+          <li>出社したらレポートが完成している状態</li>
+        </ul>
+        <div class="tag-row"><span class="tag t-p">情報収集</span><span class="tag t-o">Routines連携</span></div>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--gold);">🤖 Claude が他のAIを指揮</h3>
+        <p style="margin-bottom:10px;">ClaudeがOrchestrator（司令塔）として、DeepSeekやPerplexityなど他のAIにタスクを振る。AIが人間の代わりにAIを使う次世代の働き方。</p>
+        <ul class="steps-list">
+          <li>「DeepSeekで中国語ソースを調べてまとめて」</li>
+          <li>Perplexityで最新ニュースを取得してレポートに追記</li>
+          <li>Claudeは結果の統合・品質管理に専念</li>
+        </ul>
+        <div class="tag-row"><span class="tag t-o">オーケストレーター</span><span class="tag t-g">AI×AI</span></div>
+      </div>
+    </div>
+
+    <!-- 実績 -->
+    <div class="stat-row" style="margin-top: 24px;">
+      <div class="stat-box">
+        <div class="stat-val">5分</div>
+        <div class="stat-lbl">アナリスト4人×2日分の調査</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val">3.4×</div>
+        <div class="stat-lbl">コードレビューカバレッジ向上<br>（16%→54%、Anthropic社内）</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val">∞社</div>
+        <div class="stat-lbl">同時並列でDDをかけられる<br>企業数（理論値）</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val">0</div>
+        <div class="stat-lbl">人間が画面の前に<br>いる必要がある時間</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== PART 3: COMBINATION ====== -->
+  <section class="section">
+    <div class="section-label">Part 3 — Skills × Sub-agents の組み合わせ</div>
+    <div class="section-title">🔗 2つを組み合わせると何が起きるか</div>
+    <div class="section-sub">SkillsとSub-agentsは単体でも強力だが、組み合わせることで「専門知識を持ったエージェントチームが並列で動く」という最強の状態になる。</div>
+
+    <div class="panel gold" style="margin-bottom:20px;">
+      <h2 style="color: var(--gold);">組み合わせの本質</h2>
+      <div class="grid2">
+        <div>
+          <div style="font-size:0.82rem; font-weight:700; color:var(--muted); margin-bottom:10px;">Skills単体の状態</div>
+          <ul class="steps-list">
+            <li>1人のエージェントが社内フォーマットを知っている</li>
+            <li>でも調査は1件ずつ、順番に実行される</li>
+            <li>完了まで時間がかかる</li>
+          </ul>
+        </div>
+        <div>
+          <div style="font-size:0.82rem; font-weight:700; color:var(--muted); margin-bottom:10px;">Sub-agents単体の状態</div>
+          <ul class="steps-list">
+            <li>複数が同時に動いて速い</li>
+            <li>でも各エージェントは「一般的なAI」として動く</li>
+            <li>出力のフォーマットや品質にバラつきが出る</li>
+          </ul>
+        </div>
+      </div>
+      <div style="margin-top:16px; padding:14px 16px; background:rgba(244,184,96,0.08); border-radius:10px; border:1px solid rgba(244,184,96,0.2);">
+        <div style="font-size:0.72rem; font-weight:700; color:var(--gold); text-transform:uppercase; letter-spacing:0.07em; margin-bottom:6px;">✦ 組み合わせたときの状態</div>
+        <p style="font-size:0.88rem; color:var(--text);">「DDの専門知識とフォーマットを持ったエージェントが5体、同時に並列で動いて5分でディールメモを完成させる」。速くて、正確で、フォーマット通り。これが最終形。</p>
+      </div>
+    </div>
+
+    <div class="grid3">
+      <div class="card hl">
+        <h3 style="color:var(--accent);">組み合わせ例 1</h3>
+        <div style="font-size:0.78rem; color:var(--purple); margin-bottom:10px; font-weight:700;">DDメモ生成Skill × DDスウォーム</div>
+        <ul class="steps-list">
+          <li>Agent A〜Dそれぞれに「DDメモ生成Skill」を持たせる</li>
+          <li>各エージェントが専門分野でSkillのフォーマット通りに調査</li>
+          <li>Agent Eが統合するとき「繋ぎ目がない」完璧なメモができる</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--blue);">組み合わせ例 2</h3>
+        <div style="font-size:0.78rem; color:var(--purple); margin-bottom:10px; font-weight:700;">コンプライアンスSkill × レビューLoop</div>
+        <ul class="steps-list">
+          <li>Writerがドキュメントを作成</li>
+          <li>ReviewerエージェントがコンプライアンスSkillを持っていて法的チェックを実行</li>
+          <li>FCPAチェック漏れゼロが保証された状態でドキュメントが完成</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--purple);">組み合わせ例 3</h3>
+        <div style="font-size:0.78rem; color:var(--purple); margin-bottom:10px; font-weight:700;">モニタリングSkill × Routines</div>
+        <ul class="steps-list">
+          <li>モニタリングSkillを持ったエージェントが毎週月曜に自動起動</li>
+          <li>決まったフォーマットでM&Aニュースレポートを生成</li>
+          <li>「誰も頼んでいないのに、毎週完成している」状態</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== PART 4: PROMPT TEMPLATES ====== -->
+  <section class="section">
+    <div class="section-label">Part 4 — 今すぐ使えるプロンプト集</div>
+    <div class="section-title">📋 コピーして使えるプロンプトテンプレート</div>
+    <div class="section-sub">デモでも、明日からの業務でも使えるプロンプト。[ ] の部分を変えるだけ。</div>
+
+    <div style="display:flex; flex-direction:column; gap:16px;">
+
+      <div class="panel">
+        <h3 style="margin-bottom:14px;">🐝 DDスウォーム — 一発指示テンプレート</h3>
+        <div class="prompt-box copy">
+          <div class="prompt-label">Claude への指示（そのままコピーOK）</div>
+          <div class="prompt-text">複数のエージェントを使って、以下の企業の初期DDを並列で実施してください。
+
+【ターゲット企業】[企業名を入力]
+【目的】SBIグループによる買収可能性の初期評価
+【最終アウトプット】5ページ以内のディールメモ（日本語）
+
+以下の4つの調査を同時並列で進めてください：
+・企業概要（事業内容・代表者・設立・グループ構成・主要拠点）
+・財務分析（直近3年の売上・営業利益率・負債比率・業界比較）
+・リスク調査（ネガティブニュース・訴訟・FCPA等コンプライアンス・地政学リスク）
+・シナジー試算（コスト削減・クロスセル・技術統合の観点でSBIグループとの相乗効果）
+
+全調査が完了したら、結果を統合して社内フォーマットのディールメモを日英両版で作成してください。</div>
+        </div>
+        <div class="tag-row"><span class="tag t-g">DD初期調査</span><span class="tag t-b">並列実行</span><span class="tag t-p">ディールメモ自動生成</span></div>
+      </div>
+
+      <div class="panel">
+        <h3 style="margin-bottom:14px;">🌏 マルチソース競合調査テンプレート</h3>
+        <div class="prompt-box copy">
+          <div class="prompt-label">Claude への指示</div>
+          <div class="prompt-text">複数の情報ソースを並列でスキャンして、以下のテーマの最新情報を収集してください。
+
+【テーマ】[業界名・地域・テーマを入力]（例：東南アジア フィンテック M&A動向）
+【期間】直近30日
+【対象ソース】Bloomberg、Reuters、日経電子版、現地語メディア（可能な範囲で）
+【最終アウトプット】
+  1. 主要ニュース 5〜8件（ソース・日付・概要100字）
+  2. SBIグループへの影響・チャンス・リスクの観点での総括
+  3. 今後3ヶ月の注目ポイント
+
+日本語で出力してください。</div>
+        </div>
+        <div class="tag-row"><span class="tag t-b">情報収集</span><span class="tag t-p">マーケット調査</span></div>
+      </div>
+
+      <div class="panel">
+        <h3 style="margin-bottom:14px;">📋 書類リスク分析テンプレート</h3>
+        <div class="prompt-box copy">
+          <div class="prompt-label">Claude への指示（PDF添付後に使用）</div>
+          <div class="prompt-text">添付の書類を分析して、以下の3軸でリスク項目を抽出してください。
+
+【リスク分類】
+・財務リスク（収益悪化リスク・負債・キャッシュフロー懸念）
+・法的リスク（訴訟・規制違反・知的財産・FCPA等コンプライアンス）
+・経営リスク（経営陣の安定性・ガバナンス・依存関係）
+
+各リスクを「高/中/低」で分類し、その根拠を添えてください。
+
+最後に「SBIグループとしての買収判断上、最も注目すべきリスク上位3件」を日本語でまとめてください。</div>
+        </div>
+        <div class="tag-row"><span class="tag t-r">リスク分析</span><span class="tag t-b">書類読解</span><span class="tag t-o">買収判断</span></div>
+      </div>
+
+      <div class="panel">
+        <h3 style="margin-bottom:14px;">✉️ 海外カウンターパート向けメールテンプレート</h3>
+        <div class="prompt-box copy">
+          <div class="prompt-label">Claude への指示</div>
+          <div class="prompt-text">以下の内容で、海外カウンターパートへのビジネス英文メールを作成してください。
+
+【相手の属性】[国・役職・関係性を入力]（例：シンガポール・CEOレベル・初回コンタクト）
+【目的】[メールの目的を入力]（例：秘密保持契約（NDA）の締結打診）
+【伝えたい内容】
+  ・[箇条書きで要点を入力]
+
+【トーン】フォーマル・誠実・SBIグループとしての信頼感を重視
+【長さ】200〜300語程度
+【追記】日本語の参考訳も並べてください。</div>
+        </div>
+        <div class="tag-row"><span class="tag t-g">コミュニケーション</span><span class="tag t-b">英文ドラフト</span></div>
+      </div>
+
+    </div>
+
+    <div class="wow-box" style="margin-top: 24px;">
+      <div class="wow-label">💡 プロンプトをもっと良くする1つのコツ</div>
+      <p>「何を出力してほしいか」だけでなく、「<strong>なぜその情報が必要か</strong>」をプロンプトに加えると精度が大幅に上がる。例：「リスク抽出してください」より「SBIグループとしての買収判断に使うため、リスクを高/中/低で分類してください」の方が、判断に使える出力になる。</p>
+    </div>
+  </section>
+
+  <!-- ====== FAQ ====== -->
+  <section class="section">
+    <div class="section-label">FAQ</div>
+    <div class="section-title">よくある疑問</div>
+    <div class="section-sub">サブエージェントとSkillsについての典型的な質問と回答。</div>
+
+    <div style="display:flex; flex-direction:column; gap:12px;">
+      <div class="panel">
+        <h3 style="color:var(--gold); margin-bottom:6px;">Q: サブエージェントを使うには特別なスキルが必要ですか？</h3>
+        <p>claude.aiのタブを複数開いて、それぞれに別の指示を入れる方法であれば<strong>今すぐ・誰でも・コード不要</strong>で始められます。より高度な自動化（自動的にサブエージェントを生成・管理）はClaude Codeという開発ツールが必要ですが、デモで見せる「複数タブで並列実行」は完全にノーコードです。</p>
+      </div>
+      <div class="panel">
+        <h3 style="color:var(--gold); margin-bottom:6px;">Q: Skillsを作るには開発者が必要ですか？</h3>
+        <p>claude.aiのProject機能のSystem Promptを使う方法なら<strong>開発者不要</strong>です。社内フォーマット・ルール・チェックリストをテキストで貼り付けるだけ。より高度な設定（Markdownファイルで複数エージェントに異なるSkillを割り当てる）はClaude Codeが必要ですが、まずはProjectのSystem Promptから始めて、効果を確認してから高度化するのが現実的な進め方です。</p>
+      </div>
+      <div class="panel">
+        <h3 style="color:var(--gold); margin-bottom:6px;">Q: 出力の精度は信頼できますか？</h3>
+        <p>Skillsで正確な情報・フォーマット・確認項目を定義することで、一般的なAIよりも<strong>大幅に精度が向上</strong>します。ただし「初期ドラフト・調査のたたき台」として使い、人間が最終確認するワークフローが現実的です。特に財務数値・法的判断は出典確認と専門家レビューを組み合わせることを推奨します。サブエージェントによる並列調査で<strong>調査カバレッジは上がる</strong>ため、確認漏れは減ります。</p>
+      </div>
+      <div class="panel">
+        <h3 style="color:var(--gold); margin-bottom:6px;">Q: 機密情報を入れても安全ですか？</h3>
+        <p>Claude.aiのTeam/Enterpriseプランでは<strong>会話データがAIの学習に使われません</strong>。ただし入力データはAnthropicのサーバーを通ります。現実的な運用は「社名・個人名を伏せて匿名化した形で初期調査に使い、具体的な機密情報の取り扱いは社内ポリシーに従う」というアプローチです。将来的にはAPIを使った完全社内環境構築も可能です。</p>
+      </div>
+    </div>
+  </section>
+
+</div><!-- /shell -->
+
+<!-- フッター -->
+<div class="footer">
+  <div>
+    <a href="ma-demo-2026.html">← デモ資料に戻る</a>
+    &nbsp;|&nbsp;
+    <a href="../index.html">Hub Top</a>
+    &nbsp;|&nbsp;
+    <a href="../research/claude-recent-updates.html">Claude 最新情報</a>
+  </div>
+  <p>グループ海外事業統括部 MAチーム · Skills &amp; Sub-agents 深掘り資料 · 2026年4月</p>
+</div>
+
+</body>
+</html>

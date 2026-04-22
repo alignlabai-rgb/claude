@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Routines — AIが勝手に仕事を始める | MAチームデモ深掘り</title>
+  <style>
+    :root {
+      --bg: #07111d;
+      --panel: #0d1829;
+      --dark: #060e1a;
+      --text: #e8eef9;
+      --muted: #b6c3da;
+      --dim: #6a7a9a;
+      --accent: #66e0c2;
+      --gold: #f4b860;
+      --blue: #60d0ff;
+      --purple: #c4a0ff;
+      --red: #ff9090;
+      --green: #4FFFB0;
+      --orange: #f7a87a;
+      --border: rgba(255,255,255,0.08);
+      --r: 18px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Segoe UI","Noto Sans JP",system-ui,sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; padding: 0 0 80px; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .hero { background: linear-gradient(135deg,#0a1a2e,#0e1f3c,#091525); border-bottom: 1px solid rgba(244,184,96,0.25); padding: 52px 40px 44px; text-align: center; }
+    .breadcrumb { font-size: 0.82rem; color: var(--dim); margin-bottom: 18px; }
+    .hero-eyebrow { display: inline-flex; align-items: center; gap: 8px; background: rgba(244,184,96,0.15); border: 1px solid rgba(244,184,96,0.3); color: var(--gold); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; padding: 6px 16px; border-radius: 999px; margin-bottom: 20px; }
+    .hero h1 { font-size: 2.6rem; font-weight: 900; line-height: 1.2; margin-bottom: 14px; }
+    .hero h1 em { font-style: normal; background: linear-gradient(90deg,#f4b860,#66e0c2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero-sub { color: var(--muted); font-size: 0.97rem; max-width: 640px; margin: 0 auto 26px; }
+    .hero-chips { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+    .chip { background: rgba(255,255,255,0.06); border: 1px solid var(--border); border-radius: 8px; padding: 5px 14px; font-size: 0.78rem; color: var(--muted); }
+    .chip strong { color: var(--gold); }
+
+    .shell { max-width: 1060px; margin: 0 auto; padding: 0 24px; }
+    .section { padding: 52px 0 0; }
+    .section-label { font-size: 0.72rem; font-weight: 700; color: var(--gold); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
+    .section-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 6px; }
+    .section-sub { color: var(--muted); font-size: 0.92rem; margin-bottom: 24px; }
+
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+    @media(max-width:720px){ .grid2,.grid3 { grid-template-columns: 1fr; } .hero h1 { font-size: 1.9rem; } .hero { padding: 36px 20px 32px; } }
+
+    .panel { background: var(--panel); border: 1px solid var(--border); border-radius: var(--r); padding: 26px 28px; }
+    .panel.gold { border-color: rgba(244,184,96,0.3); background: linear-gradient(135deg,#0d1829,#141c2c); }
+    .panel.accent { border-color: rgba(102,224,194,0.3); }
+    .panel h2 { font-size: 1.1rem; font-weight: 800; margin-bottom: 12px; }
+
+    .card { background: var(--dark); border: 1px solid var(--border); border-radius: 14px; padding: 22px 24px; }
+    .card.hl { border-color: rgba(102,224,194,0.25); background: linear-gradient(135deg,#0d1f34,#0e2038); }
+    .card.gold { border-color: rgba(244,184,96,0.3); }
+    .card.purple { border-color: rgba(196,160,255,0.25); background: linear-gradient(135deg,#0f1428,#130e2a); }
+    .card h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 10px; }
+    .card p, .card li { font-size: 0.86rem; color: var(--muted); }
+    .card ul { padding-left: 16px; display: flex; flex-direction: column; gap: 5px; margin-top: 8px; }
+
+    .steps-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .steps-list li { font-size: 0.87rem; color: var(--muted); display: flex; align-items: flex-start; gap: 8px; }
+    .steps-list li::before { content: "→"; color: var(--gold); font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+
+    .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+    .compare-side { padding: 20px 22px; border-radius: 14px; }
+    .compare-side.old { background: rgba(255,144,144,0.06); border: 1px solid rgba(255,144,144,0.2); }
+    .compare-side.new { background: rgba(79,255,176,0.06); border: 1px solid rgba(79,255,176,0.2); }
+    .compare-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.09em; margin-bottom: 12px; }
+    .compare-side.old .compare-label { color: #ff9090; }
+    .compare-side.new .compare-label { color: #4FFFB0; }
+
+    .trigger-card { border-radius: 16px; padding: 24px 26px; position: relative; overflow: hidden; }
+    .trigger-card::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+    .trigger-card.schedule { background: linear-gradient(135deg,#0d1f34,#0e2038); border: 1px solid rgba(102,224,194,0.3); }
+    .trigger-card.schedule::before { background: linear-gradient(90deg,#66e0c2,#60d0ff); }
+    .trigger-card.api { background: linear-gradient(135deg,#14111e,#1a1230); border: 1px solid rgba(196,160,255,0.3); }
+    .trigger-card.api::before { background: linear-gradient(90deg,#c4a0ff,#f4b860); }
+    .trigger-card.github { background: linear-gradient(135deg,#0f1c14,#0e2018); border: 1px solid rgba(79,255,176,0.3); }
+    .trigger-card.github::before { background: linear-gradient(90deg,#4FFFB0,#60d0ff); }
+    .trigger-icon { font-size: 2rem; margin-bottom: 12px; }
+    .trigger-name { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+    .trigger-card.schedule .trigger-name { color: var(--accent); }
+    .trigger-card.api .trigger-name { color: var(--purple); }
+    .trigger-card.github .trigger-name { color: var(--green); }
+    .trigger-title { font-size: 1.05rem; font-weight: 800; margin-bottom: 8px; }
+    .trigger-desc { font-size: 0.86rem; color: var(--muted); margin-bottom: 12px; }
+
+    .routine-example { background: rgba(0,0,0,0.3); border-radius: 10px; padding: 13px 16px; }
+    .example-label { font-size: 0.67rem; font-weight: 700; color: var(--dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 5px; }
+    .example-text { font-size: 0.82rem; color: var(--text); line-height: 1.6; }
+
+    .wow-box { background: linear-gradient(135deg,rgba(244,184,96,0.1),rgba(102,224,194,0.07)); border: 1px solid rgba(244,184,96,0.3); border-radius: 12px; padding: 14px 16px; margin-top: 14px; }
+    .wow-label { font-size: 0.68rem; font-weight: 700; color: var(--gold); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 5px; }
+    .wow-box p { font-size: 0.85rem; color: var(--text); margin: 0; }
+
+    .insight-box { background: linear-gradient(135deg,rgba(102,224,194,0.08),rgba(96,208,255,0.06)); border: 1px solid rgba(102,224,194,0.2); border-radius: 12px; padding: 14px 16px; margin-top: 14px; }
+    .insight-label { font-size: 0.68rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 5px; }
+    .insight-box p { font-size: 0.85rem; color: var(--text); margin: 0; }
+
+    .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+    .tag { display: inline-block; font-size: 0.7rem; font-weight: 700; padding: 3px 9px; border-radius: 5px; }
+    .t-g { background: rgba(79,255,176,0.15); color: #4FFFB0; }
+    .t-b { background: rgba(96,208,255,0.15); color: #60d0ff; }
+    .t-p { background: rgba(196,160,255,0.15); color: #c4a0ff; }
+    .t-o { background: rgba(244,184,96,0.15); color: #f4b860; }
+    .t-a { background: rgba(102,224,194,0.15); color: #66e0c2; }
+
+    .stat-row { display: flex; gap: 16px; flex-wrap: wrap; margin: 20px 0; }
+    .stat-box { flex: 1; min-width: 130px; background: var(--dark); border: 1px solid rgba(244,184,96,0.2); border-radius: 14px; padding: 18px 20px; text-align: center; }
+    .stat-val { font-size: 2rem; font-weight: 900; color: var(--gold); line-height: 1; }
+    .stat-lbl { font-size: 0.72rem; color: var(--muted); margin-top: 5px; }
+
+    .week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin: 16px 0; }
+    .day-box { background: var(--dark); border: 1px solid var(--border); border-radius: 8px; padding: 8px 6px; text-align: center; font-size: 0.7rem; }
+    .day-box.active { border-color: rgba(244,184,96,0.4); background: rgba(244,184,96,0.08); }
+    .day-box.active .day-name { color: var(--gold); font-weight: 700; }
+    .day-box .day-name { font-size: 0.68rem; color: var(--dim); margin-bottom: 3px; }
+    .day-box .day-event { font-size: 0.63rem; color: var(--muted); }
+    .day-box.active .day-event { color: var(--text); }
+
+    .prompt-box { background: #040b14; border: 1px solid rgba(102,224,194,0.25); border-radius: 12px; padding: 16px 18px; margin: 12px 0; }
+    .prompt-label { font-size: 0.68rem; font-weight: 700; color: var(--dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+    .prompt-text { font-size: 0.84rem; color: var(--accent); line-height: 1.65; white-space: pre-wrap; }
+
+    .footer { background: var(--panel); border-top: 1px solid var(--border); margin-top: 56px; padding: 20px 40px; display: flex; gap: 20px; flex-wrap: wrap; align-items: center; justify-content: space-between; }
+    .footer a { color: var(--accent); font-size: 0.83rem; }
+    .footer p { font-size: 0.78rem; color: var(--dim); margin: 0; }
+  </style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="breadcrumb"><a href="ma-demo-2026.html">← デモ資料に戻る</a></div>
+  <div class="hero-eyebrow">⏰ Routines 深掘り · 2026年4月14日リリース</div>
+  <h1>AIが<em>勝手に仕事を始める</em><br>Routinesとは何か</h1>
+  <p class="hero-sub">「呼んだら動く」から「設定したら永遠に動き続ける」へ。チームが画面の前にいなくても、AIが仕事を進めている世界がすでに始まっている。</p>
+  <div class="hero-chips">
+    <div class="chip">リリース: <strong>2026年4月14日</strong></div>
+    <div class="chip">種別: <strong>Research Preview</strong></div>
+    <div class="chip">前提知識: <strong>不要</strong></div>
+  </div>
+</div>
+
+<div class="shell">
+
+  <!-- 本質の対比 -->
+  <section class="section">
+    <div class="section-label">パラダイムシフト</div>
+    <div class="section-title">何がどう変わるのか</div>
+    <div class="section-sub">チャット型AIとRoutinesの本質的な違いは「誰が仕事を始めるか」だ。</div>
+
+    <div class="compare">
+      <div class="compare-side old">
+        <div class="compare-label">❌ チャット型AI（今の使い方）</div>
+        <ul class="steps-list" style="--color:#ff9090;">
+          <li style="--before-color:#ff9090;">毎朝「今日のM&Aニュースをまとめて」と手動で入力する</li>
+          <li>画面の前に座っているときしかAIは動かない</li>
+          <li>土日・深夜・出張中はAIが止まる</li>
+          <li>同じ作業を毎日・毎週繰り返し頼み続ける必要がある</li>
+          <li>「指示する手間」がゼロにならない限り、効率化に上限がある</li>
+        </ul>
+      </div>
+      <div class="compare-side new">
+        <div class="compare-label">✅ Routines（設定後の世界）</div>
+        <ul class="steps-list">
+          <li>一度設定すれば、毎週月曜8時に自動でレポートが届く</li>
+          <li>人間がオフラインでも、クラウド上でAIが仕事を続ける</li>
+          <li>土日・深夜も、海外出張中も、AIは止まらない</li>
+          <li>「繰り返し頼む手間」が永遠にゼロになる</li>
+          <li>人間の仕事は「設定」と「判断」だけになる</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="panel gold">
+      <h2 style="color:var(--gold);">Routinesの本質 — AIとの関係が「同期」から「非同期」に変わる</h2>
+      <p style="color:var(--muted); margin-bottom:16px; font-size:0.9rem;">チャット型AIは「同期型」— 人間とAIが同時にオンラインで対話する電話のようなもの。Routinesは「非同期型」— 人間が設定して離れても、AIがバックグラウンドで仕事を続けるメールのようなもの。</p>
+      <div class="grid2">
+        <div>
+          <div style="font-size:0.78rem; font-weight:700; color:var(--red); margin-bottom:8px;">電話型（チャット型AI）</div>
+          <ul class="steps-list">
+            <li>かけている間しか会話できない</li>
+            <li>切ったら止まる</li>
+            <li>毎回かけ直す必要がある</li>
+            <li>相手（AI）も自分も同時に時間を使う</li>
+          </ul>
+        </div>
+        <div>
+          <div style="font-size:0.78rem; font-weight:700; color:var(--green); margin-bottom:8px;">メール型（Routines）</div>
+          <ul class="steps-list">
+            <li>送信したら自分は次の仕事ができる</li>
+            <li>返信が来たら確認する（非同期）</li>
+            <li>定期メールの設定は一度だけ</li>
+            <li>自分がオフラインでも仕事が進む</li>
+          </ul>
+        </div>
+      </div>
+      <div class="wow-box">
+        <div class="wow-label">💡 ゲームチェンジの意味</div>
+        <p>これまでAIは「人間の集中力と時間」を節約するツールだった。Routinesは「人間の存在そのもの」を作業から切り離す。<strong>寝ている間に仕事が完成している</strong>という体験が、初めて現実になった。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3つのトリガー -->
+  <section class="section">
+    <div class="section-label">Routinesの仕組み</div>
+    <div class="section-title">AIを動かす3つのきっかけ</div>
+    <div class="section-sub">Routinesは3種類の「トリガー（引き金）」で起動する。MAチームの業務では主にスケジュール型が即効性が高い。</div>
+
+    <div class="grid3">
+
+      <div class="trigger-card schedule">
+        <div class="trigger-icon">🕐</div>
+        <div class="trigger-name">Scheduled — 時間スケジュール</div>
+        <div class="trigger-title">「毎週月曜8時に」自動で動く</div>
+        <div class="trigger-desc">カレンダーのように時間を指定するだけ。毎日・毎週・毎月、好きな周期で繰り返し実行できる。</div>
+        <div class="routine-example">
+          <div class="example-label">MAチームでの活用例</div>
+          <div class="example-text">毎週月曜8時：先週のM&Aニュースをスキャン → SBIグループ関連を抽出 → 要約レポートを生成。出社したらレポートが届いている</div>
+        </div>
+        <div class="tag-row"><span class="tag t-a">今すぐ使える</span><span class="tag t-o">最高の即効性</span></div>
+      </div>
+
+      <div class="trigger-card api">
+        <div class="trigger-icon">⚡</div>
+        <div class="trigger-name">API — 外部からの合図</div>
+        <div class="trigger-title">「新案件が登録されたら」自動で動く</div>
+        <div class="trigger-desc">社内システムや外部サービスからの信号で即座に起動する。「何かが起きたら」AIが自動で対応する仕組み。</div>
+        <div class="routine-example">
+          <div class="example-label">MAチームでの活用例</div>
+          <div class="example-text">案件管理システムに新案件が登録 → 自動でClaude Codeが起動 → ターゲット企業の初期DD調査を開始 → 担当者に通知</div>
+        </div>
+        <div class="tag-row"><span class="tag t-p">システム連携</span><span class="tag t-b">将来展望</span></div>
+      </div>
+
+      <div class="trigger-card github">
+        <div class="trigger-icon">🔔</div>
+        <div class="trigger-name">Event — 出来事をきっかけに</div>
+        <div class="trigger-title">「何かが起きたら」自動で動く</div>
+        <div class="trigger-desc">GitHubのPR作成・マージなどのイベントで自動起動。Anthropic社内ではこれでコードレビューを完全自動化している。</div>
+        <div class="routine-example">
+          <div class="example-label">応用例</div>
+          <div class="example-text">共有フォルダに書類が追加 → 自動でリスク分析開始 → 担当者にサマリーを送信（将来的な連携イメージ）</div>
+        </div>
+        <div class="tag-row"><span class="tag t-g">自動化</span><span class="tag t-b">Anthropic社内実装済み</span></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- MAチームの一週間 -->
+  <section class="section">
+    <div class="section-label">具体的なイメージ</div>
+    <div class="section-title">Routinesが動いているMAチームの一週間</div>
+    <div class="section-sub">設定さえすれば、AIが勝手に動いている曜日と時間帯のイメージ。</div>
+
+    <div class="week-grid">
+      <div class="day-box active">
+        <div class="day-name">月</div>
+        <div class="day-event">8:00<br>週次M&Aニュースレポート自動生成</div>
+      </div>
+      <div class="day-box">
+        <div class="day-name">火</div>
+        <div class="day-event">通常業務</div>
+      </div>
+      <div class="day-box active">
+        <div class="day-name">水</div>
+        <div class="day-event">7:30<br>競合他社動向アップデート</div>
+      </div>
+      <div class="day-box">
+        <div class="day-name">木</div>
+        <div class="day-event">通常業務</div>
+      </div>
+      <div class="day-box active">
+        <div class="day-name">金</div>
+        <div class="day-event">17:00<br>週次ウォッチリスト企業サマリー</div>
+      </div>
+      <div class="day-box active">
+        <div class="day-name">土</div>
+        <div class="day-event">— 人間オフ —<br>AIは動いている</div>
+      </div>
+      <div class="day-box active">
+        <div class="day-name">日</div>
+        <div class="day-event">23:00<br>翌週月曜用レポート事前生成</div>
+      </div>
+    </div>
+
+    <div class="grid2" style="margin-top:20px;">
+
+      <div class="card hl">
+        <h3 style="color:var(--accent);">🗓 週次M&Aニュースレポート（今すぐ実装可能）</h3>
+        <p style="margin-bottom:12px;">毎週月曜8時に自動起動。Bloomberg・Reuters・日経を横断スキャンして、SBIグループ関連のM&Aニュースを抽出・要約する。</p>
+        <div class="prompt-box">
+          <div class="prompt-label">Routineの設定内容（イメージ）</div>
+          <div class="prompt-text">毎週月曜 08:00 に実行：
+先週7日間のM&A関連ニュースを収集。
+SBIグループの事業領域（金融・証券・保険・フィンテック）に関連する案件を優先的に抽出。
+各案件を「概要・関係者・SBIへの影響度（高/中/低）」でまとめる。
+日本語のWeeklyレポートとして出力する。</div>
+        </div>
+        <div class="insight-box">
+          <div class="insight-label">何が変わるか</div>
+          <p>月曜朝に「先週のニュース調べて」と入力する作業が永遠になくなる。出社したらレポートが届いている。年間50週 × 15分 = <strong>約12時間の解放</strong>。</p>
+        </div>
+      </div>
+
+      <div class="card gold">
+        <h3 style="color:var(--gold);">🌏 ターゲット国の規制モニタリング（応用）</h3>
+        <p style="margin-bottom:12px;">投資先・検討中の国の規制動向・法改正情報を自動モニタリング。担当者が気づく前にAIが情報を収集している。</p>
+        <div class="prompt-box">
+          <div class="prompt-label">Routineの設定内容（イメージ）</div>
+          <div class="prompt-text">毎週水曜 07:30 に実行：
+ベトナム・インドネシア・インドの金融規制・外資規制に関する最新情報を収集。
+前週から変更があった項目のみ抽出し、日本語でサマリーを作成。
+「対応が必要な変更」には⚠️マークを付ける。</div>
+        </div>
+        <div class="wow-box">
+          <div class="wow-label">💡 重要な変化</div>
+          <p>担当者が「調べようと思っていた」のに手が回らなかった情報収集を、AIが代わりに続けてくれる。<strong>情報の漏れがなくなる</strong>。</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Routines × Sub-agents の組み合わせ -->
+  <section class="section">
+    <div class="section-label">発展的な活用</div>
+    <div class="section-title">Routines × サブエージェントを組み合わせると</div>
+    <div class="section-sub">Routinesは「いつ動くか」を決める。サブエージェントは「何人で動くか」を決める。組み合わせると「週1回、5人のAIチームが自律的にリサーチを完了させる」が実現する。</div>
+
+    <div class="panel accent">
+      <h2 style="color:var(--accent);">毎週月曜、誰も呼ばなくてもDD候補スクリーニングが完成する</h2>
+      <p style="color:var(--muted); font-size:0.89rem; margin-bottom:16px;">Routineが月曜8時にAgent Teamsを起動 → 複数エージェントが並列でスクリーニング → 完成レポートを担当者に通知。人間の関与はゼロ。</p>
+      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:16px;">
+        <div style="background:rgba(244,184,96,0.15); border:1px solid rgba(244,184,96,0.3); border-radius:10px; padding:10px 16px; text-align:center; min-width:100px;">
+          <div style="font-size:0.68rem; color:var(--gold); font-weight:700;">TRIGGER</div>
+          <div style="font-size:0.82rem; font-weight:700; margin-top:3px;">月曜 8:00</div>
+          <div style="font-size:0.7rem; color:var(--muted);">自動起動</div>
+        </div>
+        <div style="color:var(--dim); font-size:1.2rem;">▶</div>
+        <div style="background:rgba(102,224,194,0.1); border:1px solid rgba(102,224,194,0.3); border-radius:10px; padding:10px 16px; text-align:center; min-width:100px;">
+          <div style="font-size:0.68rem; color:var(--accent); font-weight:700;">AGENTS × 4</div>
+          <div style="font-size:0.82rem; font-weight:700; margin-top:3px;">並列スキャン</div>
+          <div style="font-size:0.7rem; color:var(--muted);">各候補企業を同時調査</div>
+        </div>
+        <div style="color:var(--dim); font-size:1.2rem;">▶</div>
+        <div style="background:rgba(79,255,176,0.1); border:1px solid rgba(79,255,176,0.3); border-radius:10px; padding:10px 16px; text-align:center; min-width:100px;">
+          <div style="font-size:0.68rem; color:var(--green); font-weight:700;">OUTPUT</div>
+          <div style="font-size:0.82rem; font-weight:700; margin-top:3px;">スクリーニング完了</div>
+          <div style="font-size:0.7rem; color:var(--muted);">担当者に通知</div>
+        </div>
+        <div style="color:var(--dim); font-size:1.2rem;">▶</div>
+        <div style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); border-radius:10px; padding:10px 16px; text-align:center; min-width:100px;">
+          <div style="font-size:0.68rem; color:var(--dim); font-weight:700;">HUMAN</div>
+          <div style="font-size:0.82rem; font-weight:700; margin-top:3px; color:var(--gold);">確認・判断</div>
+          <div style="font-size:0.7rem; color:var(--muted);">月曜の朝に</div>
+        </div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-box" style="border-color:rgba(102,224,194,0.2);">
+          <div class="stat-val" style="color:var(--accent);">0分</div>
+          <div class="stat-lbl">人間が実行に費やす時間</div>
+        </div>
+        <div class="stat-box" style="border-color:rgba(244,184,96,0.2);">
+          <div class="stat-val">52回</div>
+          <div class="stat-lbl">年間自動実行回数<br>（週1の場合）</div>
+        </div>
+        <div class="stat-box" style="border-color:rgba(79,255,176,0.2);">
+          <div class="stat-val" style="color:var(--green);">168時間</div>
+          <div class="stat-lbl">週あたりAIが稼働している時間<br>（人間の5倍の週）</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 今日から始める -->
+  <section class="section">
+    <div class="section-label">今すぐ始める</div>
+    <div class="section-title">Routinesの導入ステップ（コード不要）</div>
+    <div class="section-sub">Claude Code の Routines 機能を使う前の段階でも、claude.ai の定期利用習慣から始められる。</div>
+
+    <div class="grid3">
+      <div class="card">
+        <h3 style="color:var(--accent);">Step 1 — 今週中</h3>
+        <div style="font-size:0.72rem; color:var(--dim); margin-bottom:10px;">claude.aiで始める</div>
+        <ul class="steps-list">
+          <li>毎朝同じプロンプトを「定型文」として保存</li>
+          <li>月曜朝に必ず「週次M&Aニュース収集」を実行する習慣をつける</li>
+          <li>どんな情報をどんなフォーマットで欲しいかを練る</li>
+        </ul>
+        <div class="wow-box" style="margin-top:12px;">
+          <div class="wow-label">目的</div>
+          <p>「何を自動化したいか」を明確にする。Routineの設計は習慣化から始まる。</p>
+        </div>
+      </div>
+      <div class="card hl">
+        <h3 style="color:var(--accent);">Step 2 — 1ヶ月以内</h3>
+        <div style="font-size:0.72rem; color:var(--dim); margin-bottom:10px;">Claude Code Routines を設定</div>
+        <ul class="steps-list">
+          <li>Claude Code（Max以上のプラン）でRoutines機能を有効化</li>
+          <li>最初の1つ：週次M&Aニュースレポートを設定</li>
+          <li>月曜朝に自動で届くことを確認</li>
+          <li>フォーマットを調整して精度を上げる</li>
+        </ul>
+        <div class="insight-box" style="margin-top:12px;">
+          <div class="insight-label">最初の感動ポイント</div>
+          <p>月曜朝、自分が何もしていないのにレポートが届いている体験を一度すれば、もう元には戻れない。</p>
+        </div>
+      </div>
+      <div class="card gold">
+        <h3 style="color:var(--gold);">Step 3 — 3ヶ月後</h3>
+        <div style="font-size:0.72rem; color:var(--dim); margin-bottom:10px;">Routinesを複数展開</div>
+        <ul class="steps-list">
+          <li>週次ニュース・規制モニタリング・競合動向を3本のRoutineで並列運用</li>
+          <li>サブエージェントと組み合わせて精度・スピードを向上</li>
+          <li>「定期的な手動作業」がほぼゼロになった状態</li>
+          <li>人間の時間を「収集・集計」から「判断・実行」に全振り</li>
+        </ul>
+        <div class="wow-box" style="margin-top:12px;">
+          <div class="wow-label">3ヶ月後のチームの姿</div>
+          <p>情報収集は全自動。チームの全集中力が「どう動くか」の意思決定に使われている。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div><!-- /shell -->
+
+<div class="footer">
+  <div>
+    <a href="ma-demo-2026.html">← デモ資料に戻る</a>
+    &nbsp;|&nbsp;
+    <a href="agent-deep-dive.html">Skills &amp; Sub-agents 深掘り</a>
+    &nbsp;|&nbsp;
+    <a href="why-claude-code.html">なぜClaude Codeか →</a>
+  </div>
+  <p>グループ海外事業統括部 MAチーム · Routines 深掘り資料 · 2026年4月</p>
+</div>
+
+</body>
+</html>
