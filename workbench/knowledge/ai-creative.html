@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI × クリエイティブ | Knowledge Hub</title>
+  <style>
+    :root { --bg:#0b1220;--panel:#0f172a;--muted:#c8d3e3;--text:#e9edf5;--accent:#3dd8c5;--accent-2:#f7b733;--border:rgba(255,255,255,0.08);--shadow:0 18px 48px rgba(0,0,0,0.35);--radius:18px; }
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;font-family:"Segoe UI","SF Pro Display","Noto Sans JP",system-ui,sans-serif;color:var(--text);background:radial-gradient(circle at 18% 18%,rgba(61,216,197,0.15),transparent 32%),radial-gradient(circle at 80% 0%,rgba(247,183,51,0.18),transparent 32%),linear-gradient(145deg,#0b1220 0%,#0c1526 50%,#0a1020 100%);padding:32px 20px 64px;line-height:1.65}
+    .shell{max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+    .panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:24px 28px;box-shadow:var(--shadow)}
+    a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+    h1{margin:8px 0;font-size:2rem}h2{margin:0 0 14px;font-size:1.1rem}h3{margin:0 0 8px;font-size:.97rem}
+    p,li{color:var(--muted);font-size:.92rem}ul{padding-left:18px;margin:6px 0 0}li{margin-bottom:5px}
+    .eyebrow{display:inline-flex;gap:8px;align-items:center;padding:4px 10px;border-radius:999px;background:rgba(61,216,197,0.14);color:var(--accent);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+    .lead{color:var(--muted);font-size:.97rem;margin:0}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    @media(max-width:640px){.grid2{grid-template-columns:1fr}}
+    .card{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;padding:18px}
+    .card.accent-card{border-color:rgba(61,216,197,.3)}
+    .card.warn-card{border-color:rgba(247,183,51,.3)}
+    .card.new-card{border-color:rgba(79,255,176,.4)}
+    .tag{display:inline-block;font-size:.72rem;font-weight:700;padding:.15rem .5rem;border-radius:5px;margin:0 3px 4px 0}
+    .tag-gen{background:rgba(167,139,250,.18);color:#c4a0ff}
+    .tag-video{background:rgba(255,107,107,.18);color:#ff9090}
+    .tag-audio{background:rgba(102,224,194,.18);color:#66e0c2}
+    .tag-write{background:rgba(247,183,51,.18);color:#f7b733}
+    .tag-code{background:rgba(217,119,87,.2);color:#f7a87a}
+    .tag-new{background:rgba(79,255,176,.18);color:#4FFFB0}
+    table{width:100%;border-collapse:collapse;font-size:.88rem}
+    th{text-align:left;padding:9px 12px;background:rgba(61,216,197,.08);color:var(--accent);font-size:.8rem;border-bottom:1px solid var(--border)}
+    td{padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--muted);vertical-align:top}
+    td strong{color:var(--text)}
+    .flow{display:flex;gap:0;flex-direction:column}
+    .flow-step{display:flex;gap:14px;align-items:flex-start;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+    .flow-step:last-child{border-bottom:none}
+    .flow-num{background:rgba(61,216,197,.15);border:1px solid rgba(61,216,197,.4);color:var(--accent);border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.82rem;flex-shrink:0}
+    .flow-body h3{font-size:.92rem;margin-bottom:3px}
+    .flow-body p{margin:0;font-size:.88rem}
+    code{background:rgba(255,255,255,.07);padding:1px 6px;border-radius:4px;font-size:.85rem;color:#a5f3d0}
+    .breadcrumb{font-size:.82rem;color:#5a7a9a;margin-bottom:6px}
+    small{color:#5a7a9a;font-size:.8rem}
+  </style>
+</head>
+<body>
+<div class="shell">
+
+  <div class="panel">
+    <div class="breadcrumb"><a href="../index.html">← Workbench</a> / <a href="index.html">Knowledge Hub</a></div>
+    <div class="eyebrow">AI × Creative</div>
+    <h1>AI とクリエイティブワーク</h1>
+    <p class="lead">映像・漫画・音楽・文章——あらゆる制作領域でAIは「道具」から「共同制作者」へと変わりつつあります。2026年4月に Anthropic が Adobe・Blender・Ableton などの公式 MCP コネクターと Claude Design を公開し、クリエイティブ領域への本格参入が始まりました。</p>
+    <p><small>最終更新: 2026-05-03</small></p>
+  </div>
+
+  <div class="panel" style="border-color:rgba(79,255,176,.3);">
+    <h2>2026年4月 — クリエイティブ領域の新着</h2>
+    <div class="grid">
+      <div class="card new-card">
+        <span class="tag tag-new">NEW 4/17</span>
+        <h3>Claude Design（Anthropic Labs）</h3>
+        <p>プロンプトからデザイン・プロトタイプ・スライド・LP を生成する Anthropic Labs の新プロダクト。出力は静止画ではなく<strong>ライブ HTML</strong>。クリッカブルなプロトタイプとして即共有・テスト可能。</p>
+        <ul>
+          <li>Opus 4.7 搭載。チームのデザインシステムを自動適用</li>
+          <li>音声・インラインコメント・スライダーで細部を調整</li>
+          <li>Pro・Max・Team・Enterprise 向け Research Preview</li>
+        </ul>
+      </div>
+      <div class="card new-card">
+        <span class="tag tag-new">NEW 4/28</span>
+        <h3>クリエイティブ MCP コネクター 9本</h3>
+        <p>Anthropic が一斉公開した公式 MCP コネクター群。Claude から直接プロのクリエイティブツールを操作できるようになった。</p>
+        <ul>
+          <li><strong>Adobe for Creativity</strong>：Photoshop・Illustrator・Firefly・Premiere・Lightroom 等を横断制御</li>
+          <li><strong>Blender</strong>：3D シーンの解析・デバッグ・バッチスクリプト生成</li>
+          <li><strong>Ableton</strong>：音楽制作ワークフロー連携</li>
+          <li>Affinity by Canva・Autodesk Fusion など計9本</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>制作領域別 AI ツールマップ（2026年5月時点）</h2>
+    <table>
+      <thead><tr><th>領域</th><th>主要ツール</th><th>強み</th><th>限界・注意点</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><span class="tag tag-write">テキスト・脚本</span></td>
+          <td><strong>Claude</strong>（Sonnet/Opus）<br>ChatGPT、Gemini</td>
+          <td>長文構成・キャラクター設定・多言語対応。Claude は自然な日本語が強い</td>
+          <td>「自分の声」が薄れる。方向性・トーンを明確に与えないと均質化する</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-gen">ビジュアル設計</span></td>
+          <td><strong>Claude Design</strong>（4/17〜）<br>Figma AI</td>
+          <td>ライブHTMLのプロトタイプ・スライド・LPを生成。非デザイナーの試作高速化に最適</td>
+          <td>Research Preview。プロの仕上げ作業の代替ではなく「試作の入口」に向く</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-gen">画像生成</span></td>
+          <td>Midjourney、DALL-E 3<br>Stable Diffusion</td>
+          <td>コンセプトビジュアル・サムネイル・キャラクター試作が高速</td>
+          <td>手・文字・細部が崩れやすい。著作権・学習データの問題が継続議論中</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-video">映像・動画</span></td>
+          <td>Sora（OpenAI）、Veo（Google）<br>Runway ML</td>
+          <td>短尺映像・モーション・エフェクトの試作。絵コンテのビジュアル化</td>
+          <td>長尺・高品質は依然コストが高い。一貫したキャラクター描写が難しい</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-audio">音楽・音声</span></td>
+          <td>Suno、Udio（音楽）<br>ElevenLabs（音声）<br><strong>Ableton MCP</strong>（4/28〜）</td>
+          <td>BGM・効果音の試作、多言語ナレーション。Ableton MCP で Claude から DAW を操作</td>
+          <td>プロ品質の制作では微調整が困難。感情のニュアンスコントロールが難しい</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-code">Adobe ツール群</span></td>
+          <td><strong>Adobe for Creativity MCP</strong>（4/28〜）</td>
+          <td>Photoshop・Illustrator・Premiere・Lightroom を Claude から横断操作</td>
+          <td>MCP 接続設定が必要。複雑なワークフローの初期設定に習熟が必要</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-code">3D・自動化</span></td>
+          <td><strong>Claude Code</strong>、<strong>Blender MCP</strong>（4/28〜）</td>
+          <td>素材変換・バッチ処理・パイプライン構築。Blender MCP で3Dシーンをコードから操作</td>
+          <td>初期設計に知識が必要。過度な自動化は「作りながら考える」プロセスを失わせる</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="panel">
+    <h2>Claude をクリエイティブワークで使う — 具体的な活用パターン</h2>
+    <div class="grid">
+      <div class="card"><span class="tag tag-write">構成・脚本</span><h3>アイデアの構造化</h3><p>漠然としたビジョンを章立て・展開・必要素材リストに落とし込む。Claude はゼロから生成するより人間のアイデアを整理・強化する用途で光る。</p></div>
+      <div class="card"><span class="tag tag-write">リサーチ</span><h3>背景調査の高速化</h3><p>時代設定・専門用語・文化的文脈を Claude に任せ、自分は創造的判断に集中する。1M トークンコンテキストで大量の参考文献を一括処理できる。</p></div>
+      <div class="card new-card"><span class="tag tag-gen tag-new">NEW</span><h3>Claude Design でプロトタイプを作る</h3><p>「こんなスライドを作って」「LPのラフを見せて」と指示するだけでライブHTMLが生成される。Figmaに渡す前の方向性確認に使える。チームのデザインシステムも自動適用。</p></div>
+      <div class="card"><span class="tag tag-gen">ビジュアル</span><h3>画像生成プロンプトを Claude に作らせる</h3><p>画像生成ツールへの指示文を Claude に作ってもらう。スタイル・構図・雰囲気を言語化するのが苦手な場合に特に有効。</p></div>
+      <div class="card new-card"><span class="tag tag-code tag-new">NEW MCP</span><h3>Adobe・Blender を Claude から直接操作</h3><p>公式 MCP コネクター（4/28）で Claude Code から直接 Photoshop・Premiere・Blender を操作できるようになった。「このシーンの全オブジェクトに一括でマテリアルを適用して」などの指示が可能。</p></div>
+      <div class="card"><span class="tag tag-code">自動化</span><h3>制作パイプラインの構築</h3><p>Claude Code を使って素材変換・ファイル整理・SNS 投稿スケジューリングなどの定型作業を自動化する。Routines と組み合わせて「毎朝自動でリサイズ・アップロード」まで設定できる。</p></div>
+      <div class="card"><span class="tag tag-write">フィードバック</span><h3>批評・ブラッシュアップ</h3><p>完成物を Claude にレビューさせる。「読者目線で違和感のある箇所は？」「このシーンの感情的な着地点は明確か？」など、人間のレビュアーが気づきにくい問いを立てさせる。</p></div>
+      <div class="card"><span class="tag tag-write">多言語</span><h3>ローカライズ・翻訳</h3><p>日本語コンテンツの英語展開、または海外素材の日本語化。「文化的文脈を保ちながら自然にする」指示を与えると精度が上がる。</p></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>ALIGN_Lab 実践ワークフロー</h2>
+    <div class="flow">
+      <div class="flow-step"><div class="flow-num">1</div><div class="flow-body"><h3>コンセプトと意図を言語化する（人間の仕事）</h3><p>「何を作るか」「誰に何を伝えたいか」「なぜ今作るか」を人間が決める。ここを AI に委ねると「意図のない生成物」になる。</p></div></div>
+      <div class="flow-step"><div class="flow-num">2</div><div class="flow-body"><h3>Claude に構造を作らせる</h3><p>コンセプトを渡して章立て・場面構成・必要な素材リストを出力させる。<code>「この意図でコンテンツを作る。構成案を3パターン提案して」</code></p></div></div>
+      <div class="flow-step"><div class="flow-num">3</div><div class="flow-body"><h3>Claude Design・MCP コネクターで素材を生成・収集する</h3><p>Claude Design でスライド・LPの試作を出す。Adobe MCP で既存素材の一括加工を指示する。Blender MCP で3Dシーンを調整する。</p></div></div>
+      <div class="flow-step"><div class="flow-num">4</div><div class="flow-body"><h3>人間が編集・選択・統合する（人間の仕事）</h3><p>生成物から「意図に合うもの」を選ぶのが最も重要な人間の役割。AI は大量に作れるが、選ぶ審美眼は人間が持つ。</p></div></div>
+      <div class="flow-step"><div class="flow-num">5</div><div class="flow-body"><h3>Claude に批評させてブラッシュアップ</h3><p>完成物を Claude に見せて「意図通り伝わるか」「違和感はどこか」をフィードバックさせる。</p></div></div>
+      <div class="flow-step"><div class="flow-num">6</div><div class="flow-body"><h3>Claude Code + Routines で定型作業を自動化する</h3><p>エクスポート・リサイズ・公開スケジュールなどの繰り返し作業をスクリプト化。Routines で「毎朝自動実行」まで設定できる。</p></div></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>AI × クリエイティブで気をつけること</h2>
+    <div class="grid2">
+      <div class="card warn-card"><h3>「生成したもの = 自分の作品」ではない</h3><p>AI が生成した素材をそのまま使うだけでは個性が消える。「自分の判断・編集・意図」が入って初めて自分の作品になる。</p></div>
+      <div class="card warn-card"><h3>著作権・学習データの問題</h3><p>画像生成AIの学習データと著作権の問題は2026年現在も決着していない。商業利用には特に注意が必要。各ツールの利用規約を随時確認する。</p></div>
+      <div class="card"><h3>「AIに任せすぎると手が鈍る」</h3><p>特に文章・作曲は、AIに頼り続けると自分で書く力が衰える。AIを「補助」として使い、自分でゼロから作る体験も意識的に続ける。</p></div>
+      <div class="card"><h3>幻覚（ハルシネーション）に注意</h3><p>Claude は事実に見える誤情報を生成することがある。リサーチ目的で使う場合は必ず一次ソースで確認する。</p></div>
+    </div>
+  </div>
+
+  <div class="panel" style="padding:18px 24px;">
+    <h2>関連ページ</h2>
+    <ul style="list-style:none;padding:0;display:flex;flex-wrap:wrap;gap:10px;margin:0;">
+      <li><a href="claude-model.html">Claude モデル解説 →</a></li>
+      <li><a href="claude-code.html">Claude Code →</a></li>
+      <li><a href="../../creator-system/index.html">Creator System →</a></li>
+      <li><a href="../../research/claude-recent-updates.html">Claude 最新アップデート →</a></li>
+    </ul>
+  </div>
+
+</div>
+</body>
+</html>
