@@ -722,12 +722,21 @@
         <article class="item">
           <div class="date">2026-04月後半</div>
           <h3>Claude Managed Agents 発表 <span class="tag tag-api">API/開発</span><span class="tag tag-new">NEW</span></h3>
-          <p>長時間エージェント作業向けのホスト型 Claude Platform サービス。セッション・ハーネス・サンドボックスの安定したインターフェースを提供。</p>
+          <p>長時間エージェント作業向けのホスト型 Claude Platform サービス。セッション・ハーネス・サンドボックスの安定したインターフェースを提供。これまで開発者が自前で実装していた「中断・再開・状態保存」を Platform 側が担う。</p>
           <ul>
             <li>耐久性のある状態管理（durable state）：長期タスクが途中で失われない設計</li>
             <li>より安全なツールアクセスと高速スタートアップ</li>
             <li>API エンドポイント：<code>/v1/agents</code>・<code>/v1/sessions</code></li>
           </ul>
+          <p style="margin-top:8px;font-size:.88rem;color:var(--muted)"><strong>使い方イメージ（Python）：</strong></p>
+          <pre style="background:rgba(255,255,255,.05);border-radius:8px;padding:12px;font-size:.8rem;color:#a5f3d0;overflow-x:auto;margin:6px 0">
+# エージェントを作成しセッションを開始
+agent = client.agents.create(model="claude-opus-4-7", tools=[...])
+session = client.sessions.create(agent_id=agent.id)
+
+# タスクを投げて状態を保持したまま次回も継続
+client.sessions.submit(session.id, "データ収集タスクを再開して")</pre>
+          <p style="font-size:.82rem;color:var(--soft)">従来の stateless API と異なり、タスクを中断しても状態が server side に保持される。夜間バッチ処理・複数日にまたがるリサーチエージェントに向く。</p>
         </article>
 
         <article class="item">
@@ -758,12 +767,25 @@
             <li>長期タスクをスマホやデスクトップから確認・引き継ぎが可能に</li>
             <li>Max 展開後、数日以内に Pro プランへも順次展開</li>
           </ul>
+          <p style="margin-top:8px;font-size:.88rem;color:var(--muted)"><strong>具体的なユースケース：</strong></p>
+          <ul>
+            <li>「週次レポートを毎月曜 8:00 に自動生成して Notion に保存する」エージェントを一度設定→以降はスマホで確認だけ</li>
+            <li>外出中にスマホから「さっきのコード調査タスクの進捗は？」と確認し、デスクトップに戻って続きを指示</li>
+            <li>複数日かかるリサーチタスクを Cowork に投げ、翌朝スレッドを開くと結果がまとまっている</li>
+          </ul>
         </article>
 
         <article class="item">
           <div class="date">2026-05 上旬</div>
           <h3>Claude インライン ビジュアライゼーション生成 <span class="tag tag-product">機能</span></h3>
-          <p>Claude がレスポンス内にカスタムチャート・ダイアグラム・ビジュアライゼーションをインラインで生成できるようになった。データ分析・レポート作成での活用範囲が広がる。</p>
+          <p>Claude がレスポンス内にカスタムチャート・ダイアグラム・ビジュアライゼーションをインラインで生成できるようになった。テキスト回答の中にグラフが埋め込まれて返ってくるイメージ。</p>
+          <p style="margin-top:6px;font-size:.88rem;color:var(--muted)"><strong>使い方例（そのまま貼れるプロンプト）：</strong></p>
+          <ul>
+            <li>「このCSVデータ（↓貼り付け）を棒グラフで見せて。X軸は月、Y軸は売上。ダークテーマで」</li>
+            <li>「AGI 開発競争の主要プレイヤーとその能力をレーダーチャートで比較して」</li>
+            <li>「このプロジェクトの依存関係をフローダイアグラムで図示して」</li>
+          </ul>
+          <p style="font-size:.82rem;color:var(--soft)">現時点では Claude.ai Web（Pro/Max）が対象。生成されるのは SVG または HTML/JS の形式で、コピー可能。</p>
         </article>
 
       </div>
