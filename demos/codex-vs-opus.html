@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Codex（GPT-5.5）vs Claude Opus 4.7 完全比較 | MAチームデモ補足資料</title>
+  <style>
+    :root {
+      --bg: #07111d;
+      --panel: #0d1829;
+      --dark: #060e1a;
+      --text: #e8eef9;
+      --muted: #b6c3da;
+      --dim: #6a7a9a;
+      --accent: #66e0c2;
+      --gold: #f4b860;
+      --blue: #60d0ff;
+      --purple: #c4a0ff;
+      --red: #ff9090;
+      --green: #4FFFB0;
+      --orange: #f7a87a;
+      --border: rgba(255,255,255,0.08);
+      --r: 18px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Segoe UI","Noto Sans JP",system-ui,sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; padding: 0 0 80px; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* HERO */
+    .hero { background: linear-gradient(135deg, #0a1528 0%, #10192e 50%, #08111e 100%); border-bottom: 1px solid rgba(102,224,194,0.2); padding: 56px 40px 48px; text-align: center; }
+    .breadcrumb { font-size: 0.82rem; color: var(--dim); margin-bottom: 18px; }
+    .breadcrumb a { color: var(--accent); }
+    .hero-eyebrow { display: inline-flex; align-items: center; gap: 8px; background: rgba(102,224,194,0.1); border: 1px solid rgba(102,224,194,0.25); color: var(--accent); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; padding: 6px 16px; border-radius: 999px; margin-bottom: 20px; }
+    .hero h1 { font-size: 2.8rem; font-weight: 900; line-height: 1.15; margin-bottom: 16px; }
+    .hero h1 em.blue { font-style: normal; background: linear-gradient(90deg,#60d0ff,#c4a0ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero h1 em.green { font-style: normal; background: linear-gradient(90deg,#66e0c2,#4FFFB0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero-sub { color: var(--muted); font-size: 0.97rem; max-width: 680px; margin: 0 auto 28px; }
+    .hero-chips { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+    .chip { background: rgba(255,255,255,0.06); border: 1px solid var(--border); border-radius: 8px; padding: 5px 14px; font-size: 0.78rem; color: var(--muted); }
+    .chip strong { color: var(--accent); }
+
+    /* SHELL / SECTIONS */
+    .shell { max-width: 1060px; margin: 0 auto; padding: 0 24px; }
+    .section { padding: 52px 0 0; }
+    .section-label { font-size: 0.72rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
+    .section-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 6px; }
+    .section-sub { color: var(--muted); font-size: 0.92rem; margin-bottom: 24px; }
+
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+    @media(max-width:720px){ .grid2,.grid3 { grid-template-columns:1fr; } .hero h1 { font-size:1.9rem; } .hero { padding:36px 20px 32px; } }
+
+    /* PANELS */
+    .panel { background: var(--panel); border: 1px solid var(--border); border-radius: var(--r); padding: 28px; margin-bottom: 0; }
+    .panel-title { font-size: 1rem; font-weight: 800; margin-bottom: 14px; }
+
+    /* MODEL IDENTITY CARDS */
+    .model-card { background: var(--panel); border: 1px solid var(--border); border-radius: var(--r); padding: 26px; }
+    .model-card.openai { border-color: rgba(96,208,255,0.35); }
+    .model-card.claude { border-color: rgba(102,224,194,0.35); }
+    .model-logo { font-size: 1.6rem; font-weight: 900; margin-bottom: 6px; }
+    .model-logo.openai { color: var(--blue); }
+    .model-logo.claude { color: var(--accent); }
+    .model-tag { display: inline-block; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 5px; margin-bottom: 12px; }
+    .model-tag.openai { background: rgba(96,208,255,0.15); color: var(--blue); }
+    .model-tag.claude { background: rgba(102,224,194,0.15); color: var(--accent); }
+    .model-card p { color: var(--muted); font-size: 0.9rem; margin-bottom: 10px; }
+    .model-card ul { padding-left: 16px; margin: 0; }
+    .model-card li { color: var(--muted); font-size: 0.88rem; margin-bottom: 6px; }
+    .model-card li strong { color: var(--text); }
+
+    /* BENCHMARK TABLE */
+    .bench-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin-top: 4px; }
+    .bench-table th { background: rgba(255,255,255,0.05); color: var(--dim); font-size: 0.75rem; font-weight: 700; padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+    .bench-table td { padding: 11px 14px; border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--muted); vertical-align: middle; }
+    .bench-table tr:last-child td { border-bottom: none; }
+    .bench-table td:first-child { color: var(--text); font-weight: 600; font-size: 0.86rem; }
+    .win-openai { color: var(--blue); font-weight: 700; }
+    .win-claude { color: var(--accent); font-weight: 700; }
+    .win-tie { color: var(--gold); font-weight: 700; }
+    .badge-win { display: inline-block; font-size: 0.68rem; font-weight: 700; padding: 1px 6px; border-radius: 4px; margin-left: 6px; }
+    .badge-blue { background: rgba(96,208,255,0.2); color: var(--blue); }
+    .badge-green { background: rgba(102,224,194,0.2); color: var(--accent); }
+    .bench-note { font-size: 0.8rem; color: var(--dim); margin-top: 10px; }
+
+    /* USE CASE SCENARIOS */
+    .scenario-block { background: var(--panel); border: 1px solid var(--border); border-radius: var(--r); padding: 24px; }
+    .scenario-block + .scenario-block { margin-top: 14px; }
+    .scenario-header { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 14px; }
+    .scenario-num { background: rgba(255,255,255,0.07); color: var(--dim); border-radius: 8px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 800; flex-shrink: 0; margin-top: 2px; }
+    .scenario-meta { flex: 1; }
+    .scenario-title { font-size: 1rem; font-weight: 800; margin-bottom: 4px; }
+    .scenario-winner { display: inline-flex; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 700; padding: 2px 10px; border-radius: 999px; }
+    .winner-openai { background: rgba(96,208,255,0.15); color: var(--blue); border: 1px solid rgba(96,208,255,0.3); }
+    .winner-claude { background: rgba(102,224,194,0.15); color: var(--accent); border: 1px solid rgba(102,224,194,0.3); }
+    .winner-both { background: rgba(247,183,51,0.15); color: var(--gold); border: 1px solid rgba(247,183,51,0.3); }
+    .scenario-body { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+    @media(max-width:700px){ .scenario-body { grid-template-columns: 1fr; } }
+    .model-col { background: rgba(255,255,255,0.03); border-radius: 10px; padding: 14px; }
+    .model-col-head { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+    .model-col-head.openai { color: var(--blue); }
+    .model-col-head.claude { color: var(--accent); }
+    .model-col p { color: var(--muted); font-size: 0.87rem; margin-bottom: 0; }
+    .prompt-box { background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 12px 14px; font-size: 0.83rem; color: #a5f3d0; font-family: "SF Mono","Consolas",monospace; line-height: 1.55; white-space: pre-wrap; margin-top: 8px; }
+    .prompt-label { font-size: 0.7rem; color: var(--dim); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .stat-line { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 0.82rem; }
+    .stat-num { font-size: 1.1rem; font-weight: 800; }
+    .stat-num.blue { color: var(--blue); }
+    .stat-num.green { color: var(--accent); }
+    .stat-desc { color: var(--dim); }
+
+    /* COST CALC */
+    .cost-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.9rem; }
+    .cost-row:last-child { border-bottom: none; }
+    .cost-label { color: var(--muted); }
+    .cost-openai { color: var(--blue); font-weight: 700; }
+    .cost-claude { color: var(--accent); font-weight: 700; }
+
+    /* ROUTING GUIDE */
+    .route-card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 18px; display: flex; gap: 14px; align-items: flex-start; }
+    .route-card + .route-card { margin-top: 10px; }
+    .route-icon { font-size: 1.3rem; flex-shrink: 0; margin-top: 2px; }
+    .route-body h3 { font-size: 0.93rem; font-weight: 700; margin-bottom: 4px; }
+    .route-body p { color: var(--muted); font-size: 0.87rem; }
+    .route-tag { display: inline-block; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 5px; margin-right: 6px; margin-bottom: 4px; }
+    .rt-blue { background: rgba(96,208,255,0.15); color: var(--blue); }
+    .rt-green { background: rgba(102,224,194,0.15); color: var(--accent); }
+
+    /* STACK DIAGRAM */
+    .stack-box { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 10px; padding: 16px; text-align: center; }
+    .stack-box-title { font-size: 0.75rem; color: var(--dim); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+    .stack-box-main { font-size: 1rem; font-weight: 800; margin-bottom: 6px; }
+    .stack-box-main.blue { color: var(--blue); }
+    .stack-box-main.green { color: var(--accent); }
+    .stack-box p { color: var(--muted); font-size: 0.82rem; }
+
+    /* CALLOUT */
+    .callout { background: rgba(244,184,96,0.08); border: 1px solid rgba(244,184,96,0.3); border-radius: 12px; padding: 16px 20px; }
+    .callout p { color: var(--muted); font-size: 0.9rem; }
+    .callout strong { color: var(--gold); }
+
+    /* SOURCES */
+    .sources { margin-top: 48px; padding: 24px; border-top: 1px solid var(--border); }
+    .sources p { color: var(--dim); font-size: 0.82rem; margin-bottom: 8px; }
+    .sources ul { display: flex; flex-wrap: wrap; gap: 10px; list-style: none; padding: 0; }
+    .sources li a { color: var(--dim); font-size: 0.8rem; text-decoration: underline; }
+    .sources li a:hover { color: var(--accent); }
+  </style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="breadcrumb"><a href="ma-demo-2026.html">← Claude Code デモ資料に戻る</a></div>
+  <div class="hero-eyebrow">🔬 深掘り資料 · MAチームデモ補足 · 2026年5月</div>
+  <h1><em class="blue">Codex（GPT-5.5）</em><br>vs <em class="green">Claude Opus 4.7</em><br>完全比較</h1>
+  <p class="hero-sub">2026年4月に1週間差でリリースされた2つのフロンティアモデル。ベンチマーク・実ユースケース・コストの3軸で何が違うかを具体的に整理する。</p>
+  <div class="hero-chips">
+    <div class="chip">GPT-5.5 リリース <strong>2026/4/23</strong></div>
+    <div class="chip">Opus 4.7 リリース <strong>2026/4/16</strong></div>
+    <div class="chip">コンテキスト <strong>両モデル 1M tokens</strong></div>
+    <div class="chip">SWE-bench <strong>Opus 4.7 首位</strong></div>
+    <div class="chip">Terminal-Bench <strong>GPT-5.5 首位</strong></div>
+  </div>
+</div>
+
+<div class="shell">
+
+  <!-- ① 2モデルの位置づけ -->
+  <div class="section">
+    <div class="section-label">Section 01</div>
+    <div class="section-title">まず「何を最適化したモデルか」を理解する</div>
+    <p class="section-sub">2モデルは競合しているが、設計思想の軸が違う。「どちらが賢いか」より「何に向いているか」で比較する方が実務で役に立つ。</p>
+    <div class="grid2">
+      <div class="model-card openai">
+        <div class="model-logo openai">GPT-5.5 / Codex</div>
+        <div class="model-tag openai">OpenAI · 2026年4月23日</div>
+        <p>「ツールを使って動き続けるエージェント」として最適化。<strong>Codex</strong> はこのモデルを搭載したOpenAIのエージェント型コーディングツール（Claude Code に相当）。</p>
+        <ul>
+          <li><strong>設計軸：</strong> 計画 → ツール呼び出し → 実行 → 反復 の自律ループ</li>
+          <li><strong>強いシーン：</strong> CLIエージェント、ブラウザ操作、Computer Use、クロスツール作業</li>
+          <li><strong>特徴：</strong> 同等タスクで出力トークン数が <strong>72%少ない</strong>（効率が高い）</li>
+          <li><strong>コンテキスト：</strong> 1M tokens — 初めて本格的に使い物になると評価される</li>
+          <li><strong>価格：</strong> 入力 $5 / 出力 <strong>$30</strong> per 1M tokens</li>
+        </ul>
+      </div>
+      <div class="model-card claude">
+        <div class="model-logo claude">Claude Opus 4.7</div>
+        <div class="model-tag claude">Anthropic · 2026年4月16日</div>
+        <p>「コードを深く読んで正確に直す」として最適化。コードベース全体のアーキテクチャ理解と、長時間タスクでの目標整合性維持が強み。</p>
+        <ul>
+          <li><strong>設計軸：</strong> 広い構造把握 × 精密なコード修正 × 長文の論理追跡</li>
+          <li><strong>強いシーン：</strong> GitHub Issue解決、大規模リファクタリング、文書解析</li>
+          <li><strong>特徴：</strong> xhigh 推論レベル（high〜maxの中間）、画像解像度3.75MP（3倍向上）</li>
+          <li><strong>コンテキスト：</strong> 1M tokens — ただし512K超での長文取得精度は GPT-5.5 に劣る</li>
+          <li><strong>価格：</strong> 入力 $5 / 出力 <strong>$25</strong> per 1M tokens</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ② ベンチマーク -->
+  <div class="section">
+    <div class="section-label">Section 02</div>
+    <div class="section-title">ベンチマーク比較 — 数字で見る得意・不得意</div>
+    <p class="section-sub">10の主要ベンチマークで Opus 4.7 が6勝、GPT-5.5 が4勝。ただし「どの4勝か」が重要。</p>
+    <div class="panel">
+      <table class="bench-table">
+        <thead>
+          <tr>
+            <th>ベンチマーク</th>
+            <th>GPT-5.5</th>
+            <th>Opus 4.7</th>
+            <th>勝者・差</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>SWE-bench Pro<br><span style="font-size:.75rem;color:var(--dim)">実際のGitHub Issue修正率</span></td>
+            <td>58.6%</td>
+            <td class="win-claude">64.3%</td>
+            <td><span class="badge-win badge-green">Opus 4.7 +5.7%</span></td>
+          </tr>
+          <tr>
+            <td>SWE-bench Verified<br><span style="font-size:.75rem;color:var(--dim)">標準版GitHub Issue解決</span></td>
+            <td>—</td>
+            <td class="win-claude">87.6%</td>
+            <td><span class="badge-win badge-green">Opus 4.7</span></td>
+          </tr>
+          <tr>
+            <td>Terminal-Bench 2.0<br><span style="font-size:.75rem;color:var(--dim)">CLIエージェント作業</span></td>
+            <td class="win-openai">82.7%</td>
+            <td>69.4%</td>
+            <td><span class="badge-win badge-blue">GPT-5.5 +13.3%</span></td>
+          </tr>
+          <tr>
+            <td>Expert-SWE（社内）<br><span style="font-size:.75rem;color:var(--dim)">推定20時間超の長期コーディング</span></td>
+            <td class="win-openai">73.1%</td>
+            <td>未報告</td>
+            <td><span class="badge-win badge-blue">GPT-5.5</span></td>
+          </tr>
+          <tr>
+            <td>MRCR v2（512K〜1M）<br><span style="font-size:.75rem;color:var(--dim)">超長文からの情報取得</span></td>
+            <td class="win-openai">74.0%</td>
+            <td>32.2%</td>
+            <td><span class="badge-win badge-blue">GPT-5.5 +41.8%</span></td>
+          </tr>
+          <tr>
+            <td>MRCR v2（256K〜512K）<br><span style="font-size:.75rem;color:var(--dim)">中長文からの情報取得</span></td>
+            <td class="win-openai">87.5%</td>
+            <td>59.2%</td>
+            <td><span class="badge-win badge-blue">GPT-5.5 +28.3%</span></td>
+          </tr>
+          <tr>
+            <td>OSWorld-Verified<br><span style="font-size:.75rem;color:var(--dim)">コンピューター操作 (GUI)</span></td>
+            <td class="win-openai">78.7%</td>
+            <td>78.0%</td>
+            <td><span class="badge-win badge-blue">GPT-5.5（僅差）</span></td>
+          </tr>
+          <tr>
+            <td>CyberGym<br><span style="font-size:.75rem;color:var(--dim)">セキュリティ・CTFタスク</span></td>
+            <td class="win-openai">81.8%</td>
+            <td>73.1%</td>
+            <td><span class="badge-win badge-blue">GPT-5.5 +8.7%</span></td>
+          </tr>
+          <tr>
+            <td>Intelligence Index<br><span style="font-size:.75rem;color:var(--dim)">総合推論スコア（190モデル比較）</span></td>
+            <td class="win-openai">60</td>
+            <td>57</td>
+            <td><span class="badge-win badge-blue">GPT-5.5（3差）</span></td>
+          </tr>
+          <tr>
+            <td>実問題の推論説明品質<br><span style="font-size:.75rem;color:var(--dim)">Tom's Guide 7問テスト</span></td>
+            <td>0/7</td>
+            <td class="win-claude">7/7</td>
+            <td><span class="badge-win badge-green">Opus 4.7 完勝</span></td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="bench-note">※ SWE-bench・Terminal-Bench・MRCR は独立機関の検証値。Expert-SWE・Intelligence Index は各社発表値。</p>
+    </div>
+  </div>
+
+  <!-- ③ ユースケース別の差 -->
+  <div class="section">
+    <div class="section-label">Section 03</div>
+    <div class="section-title">ユースケース別の具体的な差</div>
+    <p class="section-sub">6つの典型シナリオで、どちらが何をどう得意とするかを実際のプロンプト例付きで比較する。</p>
+
+    <!-- 1: GitHub Issue解決 -->
+    <div class="scenario-block">
+      <div class="scenario-header">
+        <div class="scenario-num">01</div>
+        <div class="scenario-meta">
+          <div class="scenario-title">本番コードベースのバグ修正・Issue解決</div>
+          <span class="scenario-winner winner-claude">Opus 4.7 推奨</span>
+        </div>
+      </div>
+      <div class="scenario-body">
+        <div class="model-col" style="border: 1px solid rgba(102,224,194,0.2);">
+          <div class="model-col-head claude">Claude Opus 4.7（有利）</div>
+          <p>大規模コードベース全体のアーキテクチャを読んで「どのファイルが問題の根本か」を把握する能力が高い。SWE-bench Pro で 64.3%（GPT-5.5 比 +5.7%）。</p>
+          <div class="prompt-label">実際の指示例</div>
+          <div class="prompt-box">「このリポジトリ全体を見て。Issue #341（認証トークンが期限切れ後もアクセスを通す）を修正して。影響範囲が広い可能性があるのでまずアーキテクチャを把握してから変更を最小限に抑えて」</div>
+        </div>
+        <div class="model-col">
+          <div class="model-col-head openai">GPT-5.5</div>
+          <p>狭いファイル範囲での精密なツール操作は互角。ただし複数ファイルをまたいだ「構造全体の読み解き」はやや劣る。</p>
+          <div class="prompt-label">GPT-5.5 が追いつく場面</div>
+          <div class="prompt-box">「この1ファイルの関数を修正して。テストを実行して全部グリーンにして」</div>
+          <p style="margin-top:8px;font-size:.82rem;color:var(--dim)">単一ファイル・明確な修正指示 → ほぼ同等</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2: ターミナルエージェント -->
+    <div class="scenario-block">
+      <div class="scenario-header">
+        <div class="scenario-num">02</div>
+        <div class="scenario-meta">
+          <div class="scenario-title">CLIエージェント・デプロイ・長期タスクの自律実行</div>
+          <span class="scenario-winner winner-openai">GPT-5.5 / Codex 推奨</span>
+        </div>
+      </div>
+      <div class="scenario-body">
+        <div class="model-col" style="border: 1px solid rgba(96,208,255,0.2);">
+          <div class="model-col-head openai">GPT-5.5 / Codex（有利）</div>
+          <p>Terminal-Bench 2.0 で 82.7%（Opus 4.7 比 +13.3%）。「計画 → ツール呼び出し → 結果確認 → 修正 → 完了」の自律ループが安定している。NVIDIA 社内では デバッグサイクルが「数日」から「数時間」に短縮。</p>
+          <div class="prompt-label">実際の指示例（Codex CLI）</div>
+          <div class="prompt-box">「本番にデプロイして。ヘルスチェックが通らなければロールバックして原因をレポートして。全部自分でやって」</div>
+        </div>
+        <div class="model-col">
+          <div class="model-col-head claude">Claude Opus 4.7</div>
+          <p>20ステップ超の長期エージェントタスクでは、Opus 4.7 の方が「目標との整合性を維持する」能力が高いという報告がある。中間の失敗への対応が丁寧。</p>
+          <div class="prompt-label">Opus 4.7 が有利な長期エージェント場面</div>
+          <div class="prompt-box">「このプロジェクト全体のテストカバレッジを80%に上げて。複数日かかってもよい。毎日の進捗をREADMEに記録しながら進めて」</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3: 長文コンテキスト -->
+    <div class="scenario-block">
+      <div class="scenario-header">
+        <div class="scenario-num">03</div>
+        <div class="scenario-meta">
+          <div class="scenario-title">超長文ドキュメントからの情報取得（契約書・論文・会議録）</div>
+          <span class="scenario-winner winner-openai">GPT-5.5 推奨（512K超は特に）</span>
+        </div>
+      </div>
+      <div class="scenario-body">
+        <div class="model-col" style="border: 1px solid rgba(96,208,255,0.2);">
+          <div class="model-col-head openai">GPT-5.5（有利）</div>
+          <p>MRCR v2（512K〜1M）で 74% vs Opus 4.7 の 32.2%。<strong>2倍以上の差</strong>。1M コンテキストを初めて本格的に使えるモデルと評価されている。</p>
+          <div class="prompt-label">実際の指示例</div>
+          <div class="prompt-box">「この3年分の会議録（90万トークン）の中から、予算削減に関する意思決定が行われた箇所をすべて抽出して。日付・決定者・金額・理由をまとめて」</div>
+        </div>
+        <div class="model-col">
+          <div class="model-col-head claude">Claude Opus 4.7（限界あり）</div>
+          <p>256K以下の文書であれば高精度。論理的なリスク分析・構造的な矛盾の発見は得意。ただし 512K 超では精度が大幅に落ちる（74% → 32% の差が示す通り）。</p>
+          <div class="stat-line">
+            <span class="stat-num blue">74%</span><span class="stat-desc">GPT-5.5（512K超）</span>
+          </div>
+          <div class="stat-line">
+            <span class="stat-num green" style="color:var(--red)">32%</span><span class="stat-desc">Opus 4.7（512K超）</span>
+          </div>
+          <p style="margin-top:8px;font-size:.82rem;color:var(--dim)">256K以下なら Opus 4.7 でも十分対応可能</p>
+        </div>
+      </div>
+      <div class="callout">
+        <p><strong>実務判断：</strong> 契約書・財務報告・会議録など「丸ごと投入して探す」タスクで 256K を超えるなら GPT-5.5 を選ぶ。Opus 4.7 では取り逃しが増える。</p>
+      </div>
+    </div>
+
+    <!-- 4: ブラウザ・Computer Use -->
+    <div class="scenario-block">
+      <div class="scenario-header">
+        <div class="scenario-num">04</div>
+        <div class="scenario-meta">
+          <div class="scenario-title">ブラウザ操作・Computer Use・ビジュアルバグ再現</div>
+          <span class="scenario-winner winner-openai">GPT-5.5 / Codex 推奨</span>
+        </div>
+      </div>
+      <div class="scenario-body">
+        <div class="model-col" style="border: 1px solid rgba(96,208,255,0.2);">
+          <div class="model-col-head openai">GPT-5.5 / Codex（有利）</div>
+          <p>Codex には <strong>ブラウザ操作が統合されている</strong>。開発サーバーのUIをクリック・スクリーンショット撮影・動作確認・修正のループを自律実行できる。</p>
+          <div class="prompt-label">実際の指示例（Codex）</div>
+          <div class="prompt-box">「localhost:3000 でサインアップフローをテストして。各ステップのスクリーンショットを撮って、崩れているUIがあれば修正して」</div>
+          <div class="prompt-box" style="margin-top:8px;">「このチェックアウトフォームのバグを再現して。再現できたらコードを修正してスクリーンショットで確認して」</div>
+        </div>
+        <div class="model-col">
+          <div class="model-col-head claude">Claude Opus 4.7</div>
+          <p>OSWorld-Verified は 78.0%（GPT-5.5 と僅差）。画像解像度は <strong>3.75MP（3倍）</strong> に向上しており、スクリーンショット解析の細部把握は優れている。</p>
+          <p style="margin-top:8px;font-size:.85rem;color:var(--muted)">「ブラウザ操作ループ込みの自律実行」は Codex の方が統合されているが、単発の画像解析・UIのレビューは Opus 4.7 の高解像度解析が有効。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5: 密な文書分析・推論説明 -->
+    <div class="scenario-block">
+      <div class="scenario-header">
+        <div class="scenario-num">05</div>
+        <div class="scenario-meta">
+          <div class="scenario-title">密な文書の分析・推論の説明・アカデミック精度</div>
+          <span class="scenario-winner winner-claude">Opus 4.7 推奨</span>
+        </div>
+      </div>
+      <div class="scenario-body">
+        <div class="model-col" style="border: 1px solid rgba(102,224,194,0.2);">
+          <div class="model-col-head claude">Claude Opus 4.7（有利）</div>
+          <p>Tom's Guide の7問テストで <strong>7-0 完勝</strong>。正解するだけでなく、「なぜそうなるか」の推論過程を明示できる精度が評価された。契約書・研究論文・財務報告のリスク分析に向く（256K以内なら）。</p>
+          <div class="prompt-label">実際の指示例</div>
+          <div class="prompt-box">「この契約書のうち、解約条件・違約金・知財帰属の3点に関して、買い手にとって不利な可能性のある条項をすべて列挙して。各条項の問題点と理由を具体的に説明して」</div>
+        </div>
+        <div class="model-col">
+          <div class="model-col-head openai">GPT-5.5</div>
+          <p>Intelligence Index では GPT-5.5 が 60 vs Opus 4.7 の 57 でわずかに上回るが、「答えの正しさ」より「推論の説明・透明性」ではOpusが勝る結果が多い。</p>
+          <p style="margin-top:8px;font-size:.82rem;color:var(--dim)">速度重視・短い回答でよい分析タスクならGPT-5.5でも十分</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6: 速度・コスト効率 -->
+    <div class="scenario-block">
+      <div class="scenario-header">
+        <div class="scenario-num">06</div>
+        <div class="scenario-meta">
+          <div class="scenario-title">トークン効率・コスト（高頻度のAPI利用）</div>
+          <span class="scenario-winner winner-openai">GPT-5.5 有利（実コストは同等〜安い可能性あり）</span>
+        </div>
+      </div>
+      <div class="scenario-body">
+        <div class="model-col" style="border: 1px solid rgba(96,208,255,0.2);">
+          <div class="model-col-head openai">GPT-5.5（有利）</div>
+          <p>出力トークン単価は $30/1M とOpus 4.7（$25）より 20% 高いが、同等タスクで <strong>出力トークン数が 72% 少ない</strong>。理由：不要な説明を省いてコンパクトに答える傾向。</p>
+          <div class="cost-row">
+            <span class="cost-label">出力 1M tokens 単価</span>
+            <span><span class="cost-openai">$30</span> vs <span class="cost-claude">$25</span></span>
+          </div>
+          <div class="cost-row">
+            <span class="cost-label">実コード生成タスクの出力量</span>
+            <span class="cost-openai">72% 少ない</span>
+          </div>
+          <div class="cost-row">
+            <span class="cost-label">月1,000万出力トークン換算</span>
+            <span><span class="cost-openai">$300</span> vs <span class="cost-claude">$250</span></span>
+          </div>
+        </div>
+        <div class="model-col">
+          <div class="model-col-head claude">Claude Opus 4.7</div>
+          <p>単価は安いが、同じタスクで出力トークン数が多くなるため実コストは逆転することがある。推論の過程を丁寧に説明する傾向があり、ログとして有用な反面、コストがかさむ。</p>
+          <p style="margin-top:8px;font-size:.82rem;color:var(--dim)">「過程の説明が要らない大量API処理」 → GPT-5.5 が安くなりうる。「推論の根拠を残したい分析処理」 → Opus 4.7 の出力量は価値を持つ</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ④ どちらを使うか -->
+  <div class="section">
+    <div class="section-label">Section 04</div>
+    <div class="section-title">タスク別 ルーティングガイド</div>
+    <p class="section-sub">「常にどちらか一方」ではなく、タスクの性質でルーティングするのが2026年の本番スタックの標準になりつつある。</p>
+
+    <div class="route-card" style="border-color: rgba(102,224,194,0.3);">
+      <div class="route-icon">🔍</div>
+      <div class="route-body">
+        <h3>本番コードベースのバグ修正・大規模リファクタリング</h3>
+        <p><span class="route-tag rt-green">Opus 4.7</span> SWE-bench Pro +5.7%。アーキテクチャ全体を読んで最小変更で直す。</p>
+      </div>
+    </div>
+    <div class="route-card" style="border-color: rgba(96,208,255,0.3);">
+      <div class="route-icon">⚡</div>
+      <div class="route-body">
+        <h3>CLIエージェント・デプロイ・ブラウザ操作の自律実行</h3>
+        <p><span class="route-tag rt-blue">GPT-5.5 / Codex</span> Terminal-Bench +13%。計画→実行→確認のループが安定。</p>
+      </div>
+    </div>
+    <div class="route-card" style="border-color: rgba(96,208,255,0.3);">
+      <div class="route-icon">📄</div>
+      <div class="route-body">
+        <h3>512Kトークン超の長文から情報を取り出す</h3>
+        <p><span class="route-tag rt-blue">GPT-5.5</span> MRCR 74% vs 32%。Opus 4.7 ではこの規模で精度が半分以下になる。</p>
+      </div>
+    </div>
+    <div class="route-card" style="border-color: rgba(102,224,194,0.3);">
+      <div class="route-icon">📋</div>
+      <div class="route-body">
+        <h3>契約書・論文・財務報告のリスク分析（256K以内）</h3>
+        <p><span class="route-tag rt-green">Opus 4.7</span> 論理追跡と推論の説明が高精度。Tom's Guide 7問テストで7-0完勝。</p>
+      </div>
+    </div>
+    <div class="route-card" style="border-color: rgba(102,224,194,0.3);">
+      <div class="route-icon">🧠</div>
+      <div class="route-body">
+        <h3>20ステップ超の長期エージェントタスク（複数日規模）</h3>
+        <p><span class="route-tag rt-green">Opus 4.7</span> 目標との整合性を長時間維持する能力が高い。中間失敗への対応が丁寧。</p>
+      </div>
+    </div>
+    <div class="route-card" style="border-color: rgba(96,208,255,0.3);">
+      <div class="route-icon">💰</div>
+      <div class="route-body">
+        <h3>高頻度バッチAPI処理・コスト最適化</h3>
+        <p><span class="route-tag rt-blue">GPT-5.5</span> 出力トークン72%削減。単価は高いが実コストは同等〜安くなるケースがある。</p>
+      </div>
+    </div>
+    <div class="route-card">
+      <div class="route-icon">🚀</div>
+      <div class="route-body">
+        <h3>中難度・速度優先・コスト削減</h3>
+        <p><span class="route-tag rt-green">Sonnet 4.6</span> / <span class="route-tag rt-blue">GPT-5.5 mini</span> の選択肢も検討する。フロンティアモデルを全タスクに使う必要はない。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑤ 2モデルを組み合わせる -->
+  <div class="section">
+    <div class="section-label">Section 05</div>
+    <div class="section-title">2026年の本番スタック — 両モデルを組み合わせる</div>
+    <p class="section-sub">「どちらを選ぶか」より「どう使い分けるか」が2026年の現実解。多くの本番プロダクションチームが、タスクの性質に応じてルーターで自動割り振りしている。</p>
+    <div class="grid3">
+      <div class="stack-box">
+        <div class="stack-box-title">上流：設計・計画</div>
+        <div class="stack-box-main green">Opus 4.7</div>
+        <p>全体構造の把握・アーキテクチャ判断・複雑な推論</p>
+      </div>
+      <div class="stack-box" style="border-color:rgba(244,184,96,0.3);">
+        <div class="stack-box-title">中流：実行・ループ</div>
+        <div class="stack-box-main blue">GPT-5.5 / Codex</div>
+        <p>CLIコマンド実行・ブラウザ操作・デプロイ・繰り返し作業</p>
+      </div>
+      <div class="stack-box">
+        <div class="stack-box-title">下流：確認・品質保証</div>
+        <div class="stack-box-main green">Opus 4.7</div>
+        <p>コードレビュー・推論説明・最終チェック・ドキュメント生成</p>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:18px;">
+      <p><strong>実例（NVIDIA の活用）：</strong> GPT-5.5 搭載 Codex を全社展開（エンジニア・法務・マーケ・財務の 10,000人以上）。デバッグサイクルが数日 → 数時間に短縮。並行して Opus 4.7 を大規模コードベースのコードレビュー・ドキュメント分析に使うという2モデル体制。</p>
+    </div>
+  </div>
+
+  <!-- Sources -->
+  <div class="sources">
+    <p>Sources（2026年5月3日時点確認）</p>
+    <ul>
+      <li><a href="https://openai.com/index/introducing-gpt-5-5/">Introducing GPT-5.5 | OpenAI</a></li>
+      <li><a href="https://www.revolutioninai.com/2026/04/gpt-5-5-vs-claude-opus-4-7-benchmark-comparison-2026.html">GPT-5.5 vs Claude Opus 4.7: Benchmark Breakdown 2026 | revolutioninai.com</a></li>
+      <li><a href="https://www.mindstudio.ai/blog/gpt-55-vs-claude-opus-47-coding-comparison">GPT-5.5 vs Claude Opus 4.7: Real-World Coding | MindStudio</a></li>
+      <li><a href="https://www.mindstudio.ai/blog/claude-opus-4-7-vs-gpt-5-5">Claude Opus 4.7 vs GPT-5.5: Which Should You Build On? | MindStudio</a></li>
+      <li><a href="https://www.datacamp.com/blog/gpt-5-5-vs-claude-opus-4-7">Claude Opus 4.7 vs GPT-5.5: Which Frontier Model Is Best? | DataCamp</a></li>
+      <li><a href="https://llm-stats.com/blog/research/gpt-5-5-vs-claude-opus-4-7">GPT-5.5 vs Claude Opus 4.7: Pricing, Speed, Benchmarks | llm-stats.com</a></li>
+      <li><a href="https://lushbinary.com/blog/gpt-5-5-vs-claude-opus-4-7-comparison-benchmarks-pricing/">GPT-5.5 vs Claude Opus 4.7: Benchmarks, Pricing & Coding | Lushbinary</a></li>
+      <li><a href="https://artificialanalysis.ai/models/comparisons/gpt-5-5-vs-claude-opus-4-7">GPT-5.5 vs Claude Opus 4.7 Model Comparison | ArtificialAnalysis.ai</a></li>
+      <li><a href="https://www.tomsguide.com/ai/7-0-wipeout-i-put-chatgpt-5-5-and-claude-4-7-through-7-impossible-tests-and-the-results-shocked-me">7-0 wipeout: ChatGPT-5.5 vs Claude 4.7 through 7 impossible tests | Tom's Guide</a></li>
+      <li><a href="https://blogs.nvidia.com/blog/openai-codex-gpt-5-5-ai-agents/">OpenAI's New GPT-5.5 Powers Codex on NVIDIA Infrastructure | NVIDIA Blog</a></li>
+      <li><a href="https://9to5mac.com/2026/04/23/openai-upgrades-chatgpt-and-codex-with-gpt-5-5-a-new-class-of-intelligence-for-real-work/">OpenAI upgrades ChatGPT and Codex with GPT-5.5 | 9to5Mac</a></li>
+    </ul>
+  </div>
+
+</div><!-- /shell -->
+</body>
+</html>
