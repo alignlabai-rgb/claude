@@ -899,6 +899,443 @@
     </div>
   </div>
 
+  <!-- ⑥ ビジネス・M&A特化シナリオ -->
+  <div class="section">
+    <div class="section-label">Section 06 — Business &amp; M&A</div>
+    <div class="section-title">海外事業・M&amp;A 業務 特化シナリオ</div>
+    <p class="section-sub">「モデルが何を得意とするか」から逆算した、MAチーム・海外事業担当が実際に使える比較シナリオ。2026年時点でAIをM&amp;Aに活用する組織は86%に達しており、「使うかどうか」ではなく「どちらをどう使うか」が実務判断になっている。</p>
+
+    <!-- 17: CIM要約 -->
+    <div class="scenario-block" style="border-color:rgba(102,224,194,0.25);">
+      <div class="scenario-header">
+        <div class="scenario-num" style="background:rgba(102,224,194,0.1);color:var(--accent);">17</div>
+        <div class="scenario-meta">
+          <div class="scenario-title">CIM（機密情報メモランダム）の高速要約・リスクフラグ付け</div>
+          <span class="scenario-winner winner-claude">Opus 4.7 推奨</span>
+        </div>
+      </div>
+      <div class="scenario-body">
+        <div class="model-col" style="border:1px solid rgba(102,224,194,0.2);">
+          <div class="model-col-head claude">Claude Opus 4.7（有利）</div>
+          <p>50〜100ページの CIM を「読み込んで要点と懸念点を構造化する」タスクは Opus 4.7 が最も得意とする密なドキュメント分析。FinanceBench スコア 82.7%（財務文書Q&A）。<strong>System Prompt で社内フォーマットを定義すれば毎回同じ構成で出力される。</strong></p>
+          <div class="prompt-label">System Prompt（一度設定）</div>
+          <div class="prompt-box">「あなたは M&A シニアアナリストです。CIM を受け取ったら必ず以下の順で出力してください：
+①事業概要（3行）
+②財務サマリー（直近3期、EBITDA マージン強調）
+③成長ドライバー（3点）
+④リスク・懸念事項（高/中/低で色分け）
+⑤初期バリュエーション感（EV/EBITDA レンジ）
+⑥追加調査が必要な論点（箇条書き）
+日本語で出力すること。」</div>
+          <div class="prompt-label">実際のユーザー指示</div>
+          <div class="prompt-box">「このCIMを分析して（PDFを貼り付け）」</div>
+          <p style="margin-top:8px;font-size:.82rem;color:var(--dim)">Opus 4.7 は指示フォーマットを長いセッションでも崩さない。アナリスト間の出力品質ばらつきを解消できる。</p>
+        </div>
+        <div class="model-col">
+          <div class="model-col-head openai">GPT-5.5 との比較</div>
+          <p>CIM 程度の分量（50〜100P）なら GPT-5.5 でも十分対応できる。ただし System Prompt の厳密なフォーマット遵守・長いセッションでのスタイル維持は Opus 4.7 の方が安定している。</p>
+          <p style="margin-top:8px;font-size:.82rem;color:var(--dim)">「CIM 1冊を素早く処理する」ならどちらでも可。「毎回同じ社内フォーマットで量産する」なら Opus 4.7。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 18: データルーム全体スキャン -->
+    <div class="scenario-block">
+      <div class="scenario-header">
+        <div class="scenario-num">18</div>
+        <div class="scenario-meta">
+          <div class="scenario-title">データルーム数百件一括スキャン・DD質問リスト自動生成</div>
+          <span class="scenario-winner winner-openai">GPT-5.5 推奨（大規模なら）</span>
+        </div>
+      </div>
+      <div class="scenario-body">
+        <div class="model-col" style="border:1px solid rgba(96,208,255,0.2);">
+          <div class="model-col-head openai">GPT-5.5（有利・大規模時）</div>
+          <p>データルーム全体（法務・財務・IP・人事・コンプライアンス）を一括投入して横断的に分析するには 512K トークン超になるケースがある。MRCR v2（512K〜1M）で GPT-5.5 は 74%、Opus 4.7 は 32% と倍以上の差。</p>
+          <div class="prompt-label">実際の指示例</div>
+          <div class="prompt-box">「添付のデータルーム書類（契約書32件・財務諸表3期分・IP登録一覧）を横断的に読んで：
+①カテゴリ別リスクマトリクスを作成（法務/財務/IP/労務）
+②High リスク項目に絞った DD 質問リストを30件生成
+③売り手に確認すべき「隠れた論点」を5点
+全部日本語で」</div>
+        </div>
+        <div class="model-col">
+          <div class="model-col-head claude">Opus 4.7（256K以内なら同等）</div>
+          <p>データルームの書類が 256K トークン以内に収まるなら Opus 4.7 でも高精度。少規模のミドルマーケット案件（書類が絞られている）なら Opus 4.7 の分析品質・推論説明が有利に働く。</p>
+          <p style="margin-top:8px;font-size:.82rem;color:var(--dim)">目安：A4換算で約200ページ以内 → Opus 4.7。それ以上 → GPT-5.5 に切り替える。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 19: シナジー試算の検証 -->
+    <div class="scenario-block">
+      <div class="scenario-header">
+        <div class="scenario-num">19</div>
+        <div class="scenario-meta">
+          <div class="scenario-title">シナジー試算・バリュエーションモデルの感応度分析</div>
+          <span class="scenario-winner winner-openai">GPT-5.5 推奨（定量計算）</span>
+        </div>
+      </div>
+      <div class="scenario-body">
+        <div class="model-col" style="border:1px solid rgba(96,208,255,0.2);">
+          <div class="model-col-head openai">GPT-5.5（有利）</div>
+          <p>FrontierMath Tier 4 で Opus 4.7 比 +12.5%。DCF/LBO/EV 計算の検算、多変数感応度テーブル生成、「売上シナジー5%・コストシナジー3%・統合コスト2億円」のような複合条件でのシミュレーションが精度高く速い。</p>
+          <div class="prompt-label">実際の指示例</div>
+          <div class="prompt-box">「以下の前提でLBOモデルを検証して：
+- 買収価格：EV 50億円（EV/EBITDA 8x）
+- EBITDA：6.25億円（直近期）
+- 成長率：年5%（今後5年）
+- コストシナジー：統合後2年で1.5億円
+- Exit：5年後 EV/EBITDA 7x
+IRR と MoM を計算して。前提が1%ずつ変化したときの感応度テーブルも作って」</div>
+        </div>
+        <div class="model-col">
+          <div class="model-col-head claude">Opus 4.7</div>
+          <p>定量計算そのものより「シナジー前提の妥当性を批判的に検討する」「過去類似案件との比較から保守的シナリオを作る」という定性的な思考が得意。計算結果のレビューに Opus 4.7 を使うのが実務的。</p>
+          <div class="prompt-label">Opus 4.7 向きの使い方</div>
+          <div class="prompt-box">「GPT-5.5 が出したこのLBOモデル（↑）の前提で、最も楽観的すぎる仮定を3つ指摘して。それぞれ業界平均と比較した根拠を示して」</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 20: PMI統合計画 -->
+    <div class="scenario-block">
+      <div class="scenario-header">
+        <div class="scenario-num">20</div>
+        <div class="scenario-meta">
+          <div class="scenario-title">PMI（買収後統合）100日プランの自動ドラフト</div>
+          <span class="scenario-winner winner-claude">Opus 4.7 推奨</span>
+        </div>
+      </div>
+      <div class="scenario-body">
+        <div class="model-col" style="border:1px solid rgba(102,224,194,0.2);">
+          <div class="model-col-head claude">Claude Opus 4.7（有利）</div>
+          <p>長期・多段階のタスク設計、論理的な構造化、「何を・いつ・誰が・どの順番で」の依存関係を整理する能力に優れる。System Prompt で社内 PMI フレームワークを定義すれば、案件ごとに一貫したフォーマットで計画書が出力される。</p>
+          <div class="prompt-label">System Prompt（PMI用）</div>
+          <div class="prompt-box">「PMI プランは必ず以下の構造で出力：
+Phase 1（Day1-30）：緊急アクション・コミュニケーション
+Phase 2（Day31-60）：プロセス統合・KPI設定
+Phase 3（Day61-100）：シナジー実現・文化統合
+各フェーズは「施策/担当部門/期限/成功指標」の4列表で。」</div>
+          <div class="prompt-label">実際のユーザー指示</div>
+          <div class="prompt-box">「対象：東南アジアの物流SaaS企業（従業員120名）。SBIグループのIT部門との統合が主目的。コアシステムは異なるクラウド基盤。100日プランをドラフトして」</div>
+        </div>
+        <div class="model-col">
+          <div class="model-col-head openai">GPT-5.5（自動化フェーズで活用）</div>
+          <p>PMI プランのドラフトは Opus 4.7、実行フェーズのタスク追跡・リマインダー・進捗レポート自動生成は GPT-5.5 / Codex の Routines との組み合わせが効率的。</p>
+          <div class="prompt-label">GPT-5.5 で自動化できること</div>
+          <div class="prompt-box">「毎週月曜 9:00 に PMI 進捗をSlack の #pmi-tracker から収集して、遅延タスクを赤フラグ付きでまとめてNotionに投稿して」</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 21: 案件ソーシング自動化 -->
+    <div class="scenario-block">
+      <div class="scenario-header">
+        <div class="scenario-num">21</div>
+        <div class="scenario-meta">
+          <div class="scenario-title">案件ソーシング・FA照会メールの自動化ループ</div>
+          <span class="scenario-winner winner-openai">GPT-5.5 推奨（自律実行）</span>
+        </div>
+      </div>
+      <div class="scenario-body">
+        <div class="model-col" style="border:1px solid rgba(96,208,255,0.2);">
+          <div class="model-col-head openai">GPT-5.5 / Codex（有利）</div>
+          <p>「ターゲットセクターのFA・IB を定期的に監視 → 案件情報を収集 → 優先度スコアリング → 照会メールを下書き → Slack に通知」という一連の自律ループは GPT-5.5 が安定している。OpenAI が社内で実証済みのパターン（講演依頼エージェントと同構造）。</p>
+          <div class="prompt-label">実際の指示例（Routines 設定）</div>
+          <div class="prompt-box">「毎週月曜朝 8:00 に以下を実行して：
+① Merger Market・Dealogic の新着案件（東南アジア・フィンテック）を確認
+② SBI グループの投資テーマ（別ファイル）と照合して適合スコアを付与
+③ スコア 70 以上の案件に対して、担当 FA へのファーストコンタクトメール（英語）を下書き
+④ #deal-sourcing Slack チャンネルに結果を投稿」</div>
+        </div>
+        <div class="model-col">
+          <div class="model-col-head claude">Opus 4.7（照会メールのトーン維持）</div>
+          <p>メールの「声」や文化的適切さの調整は Opus 4.7 が得意。「相手の会社・担当者に応じて微妙にトーンを変えながら、毎回同じブランドボイスを維持する」指示への忠実度が高い。</p>
+          <div class="prompt-label">Opus 4.7 向きの使い方</div>
+          <div class="prompt-box">「このメール下書き（GPT-5.5作成）を、相手がシンガポール系の boutique FA であることを踏まえてリライトして。フォーマルだが距離感を縮める表現に。SBI のブランドガイドライン（別添）に沿って」</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 22: 海外市場調査 -->
+    <div class="scenario-block">
+      <div class="scenario-header">
+        <div class="scenario-num">22</div>
+        <div class="scenario-meta">
+          <div class="scenario-title">新規市場エントリー調査レポートの自動生成（海外事業）</div>
+          <span class="scenario-winner winner-openai">GPT-5.5 推奨（エージェント型調査）</span>
+        </div>
+      </div>
+      <div class="scenario-body">
+        <div class="model-col" style="border:1px solid rgba(96,208,255,0.2);">
+          <div class="model-col-head openai">GPT-5.5 / Codex（有利）</div>
+          <p>「複数ウェブソース → 自律収集 → 整理 → レポート出力」の一連をエージェントとして実行する能力が高い（Terminal-Bench +13%）。市場規模・競合・規制環境・パートナー候補を一気に収集してくれる。</p>
+          <div class="prompt-label">実際の指示例</div>
+          <div class="prompt-box">「インドネシアの消費者金融市場へのエントリー可能性調査レポートを作って：
+① 市場規模・成長率（直近3年・今後5年予測）
+② 主要プレイヤー上位5社（シェア・強み・弱み）
+③ 外資規制・ライセンス要件（OJK規制を含む）
+④ 想定される参入形態とリスク（JV/M&A/グリーンフィールド）
+⑤ 先行する日系金融機関の事例
+ウェブで調べて英語と日本語の両方でまとめて」</div>
+        </div>
+        <div class="model-col">
+          <div class="model-col-head claude">Opus 4.7（レポート深掘り）</div>
+          <p>Opus 4.7 に「GPT-5.5 が作ったドラフトを批判的にレビューして」と渡すと、論理の飛躍・前提の弱さ・不足している論点を精度よく指摘できる。調査レポートの最終品質チェックに最適。</p>
+          <div class="prompt-label">Opus 4.7 向きの使い方</div>
+          <div class="prompt-box">「このインドネシア市場調査レポート（↑）で、経営陣に提示する前に確認すべき論点の漏れや前提の弱さを指摘して。特に規制リスクと競合の参入障壁分析が薄いと感じる」</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 23: 英文契約書リスクスキャン -->
+    <div class="scenario-block">
+      <div class="scenario-header">
+        <div class="scenario-num">23</div>
+        <div class="scenario-meta">
+          <div class="scenario-title">英文契約書・SPA のリスク条項スキャン（FCPA / AML 含む）</div>
+          <span class="scenario-winner winner-claude">Opus 4.7 推奨</span>
+        </div>
+      </div>
+      <div class="scenario-body">
+        <div class="model-col" style="border:1px solid rgba(102,224,194,0.2);">
+          <div class="model-col-head claude">Claude Opus 4.7（有利）</div>
+          <p>密な法律文書のリスク分析・推論説明は Opus 4.7 の最も得意とする分野。「この条項が不利な理由」「他の条文との矛盾」「FCPA に抵触する可能性」を論理的に説明できる。Tom's Guide 推論テスト 7-0 完勝の能力が実務で生きる。256K トークン以内（約200ページ）なら高精度。</p>
+          <div class="prompt-label">実際の指示例</div>
+          <div class="prompt-box">「この SPA（英語・120ページ）を分析して：
+① 買い手にとって不利な条項を全件リストアップ（条番号付き）
+② 表明保証の範囲で「業界標準より狭い」と思われる箇所
+③ FCPA・UK Bribery Act への潜在的な抵触リスク
+④ MAC 条項の定義が売り手有利になっていないか確認
+⑤ 各リスクを「Red / Yellow / Green」で色分けして
+
+日本語で出力。法律意見ではなく参考分析であることを明記」</div>
+        </div>
+        <div class="model-col">
+          <div class="model-col-head openai">GPT-5.5</div>
+          <p>英文契約書分析は GPT-5.5 でも対応可能。ただし「なぜ不利なのかの推論説明」の精度と、同じ品質を長いセッション（複数の契約書を続けて処理する場合）で維持する能力は Opus 4.7 に軍配。</p>
+          <p style="margin-top:8px;font-size:.82rem;color:var(--dim)">SPA が 256K を超える大型案件や、複数契約書を一括スキャンする場合は GPT-5.5 の長文優位が活きる</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 24: 多言語提案書 -->
+    <div class="scenario-block">
+      <div class="scenario-header">
+        <div class="scenario-num">24</div>
+        <div class="scenario-meta">
+          <div class="scenario-title">現地語・英語・日本語 3言語の提案書・タームシート作成</div>
+          <span class="scenario-winner winner-claude">Opus 4.7 推奨</span>
+        </div>
+      </div>
+      <div class="scenario-body">
+        <div class="model-col" style="border:1px solid rgba(102,224,194,0.2);">
+          <div class="model-col-head claude">Claude Opus 4.7（有利）</div>
+          <p>「声（voice）・フォーマット・スタイル」を維持したまま多言語展開する能力が高い。「日本語のオリジナルを英語に翻訳しつつ、ターゲット市場のビジネス慣行に合ったトーンに調整して」という複合指示への精度が優れる。</p>
+          <div class="prompt-label">実際の指示例</div>
+          <div class="prompt-box">「以下のタームシート（日本語）を英語とインドネシア語（Bahasa Indonesia）に翻訳して。英語はシンガポール系ビジネスの標準的なフォーマル表現で。インドネシア語は現地パートナーが読んだとき違和感のない自然なビジネス文体で。数字・条件は一切変えないこと」</div>
+          <div class="prompt-label">文化適応の指示</div>
+          <div class="prompt-box">「このプレゼン資料（日本語）を、インドネシア現地の家族経営企業のオーナー向けに英語でリライトして。決定権者は創業家の息子（40代）。数字より「信頼関係と長期パートナーシップ」を前面に出すトーンで」</div>
+        </div>
+        <div class="model-col">
+          <div class="model-col-head openai">GPT-5.5</div>
+          <p>基本的な多言語翻訳は GPT-5.5 でも高品質。ただし「特定のフォーマットを維持しながら複数言語で一貫性を保つ」「文化的コンテキストに応じてトーンを細かく調整する」の掛け合わせでは Opus 4.7 の精度が勝る。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 25: 競合情報収集・定期レポート -->
+    <div class="scenario-block">
+      <div class="scenario-header">
+        <div class="scenario-num">25</div>
+        <div class="scenario-meta">
+          <div class="scenario-title">海外競合情報の定期モニタリング・インテリジェンスレポート自動化</div>
+          <span class="scenario-winner winner-openai">GPT-5.5 推奨（定期自動化）</span>
+        </div>
+      </div>
+      <div class="scenario-body">
+        <div class="model-col" style="border:1px solid rgba(96,208,255,0.2);">
+          <div class="model-col-head openai">GPT-5.5 / Codex（有利）</div>
+          <p>Routines と組み合わせて「毎週決まった時間に競合情報を収集・整理・配信」まで完全自動化できる。OpenAI の自社事例（Slack エージェント）と同構造。人間が定期的に手作業でスキャンしていたタスクをゼロにできる。</p>
+          <div class="prompt-label">実際の指示例（Routines）</div>
+          <div class="prompt-box">「毎週金曜 17:00 に以下を実行：
+① 東南アジアの競合フィンテック上位10社のプレスリリース・LinkedIn・現地ニュースをスキャン
+② 新規調達・提携・プロダクトリリースを抽出
+③ SBI グループへの戦略的インプリケーション（影響度：高/中/低）を付与
+④ 1ページのサマリーを #competitive-intel Slack チャンネルに投稿
+⑤ 高インパクト案件があれば担当役員に個別メンション」</div>
+        </div>
+        <div class="model-col">
+          <div class="model-col-head claude">Opus 4.7（深掘り分析）</div>
+          <p>週次サマリーを受け取った後、「この競合の動きは何を示唆するか」「自社戦略への影響」を深掘りするのは Opus 4.7 が得意。収集（GPT-5.5）→ 解釈（Opus 4.7）の分業が実務的。</p>
+          <div class="prompt-label">Opus 4.7 向きの使い方</div>
+          <div class="prompt-box">「今週のレポート（↑）を読んで：競合 A の Series C 調達とプロダクト拡張が、SBI グループの東南アジア戦略にとって3〜6ヶ月以内に意味することを3つ述べて。アクションが必要なものには優先度を付けて」</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 26: 投資委員会ワンページャー -->
+    <div class="scenario-block">
+      <div class="scenario-header">
+        <div class="scenario-num">26</div>
+        <div class="scenario-meta">
+          <div class="scenario-title">投資委員会向けワンページャー（Investment Memo）の自動生成</div>
+          <span class="scenario-winner winner-claude">Opus 4.7 推奨</span>
+        </div>
+      </div>
+      <div class="scenario-body">
+        <div class="model-col" style="border:1px solid rgba(102,224,194,0.2);">
+          <div class="model-col-head claude">Claude Opus 4.7（有利）</div>
+          <p>「投資委員会が意思決定するために必要な情報を、決まった1ページフォーマットで正確に・省略なく・曖昧さなく出力する」は System Prompt + Opus 4.7 の組み合わせが最適。「人間がレビューする成果物」を作るタスクでは Opus 4.7 を推奨（MindStudio の方針）。</p>
+          <div class="prompt-label">System Prompt（IC Memo用）</div>
+          <div class="prompt-box">「投資委員会向けメモは以下の構成で必ず出力：
+【案件名】【検討日】【推奨アクション：推奨/保留/見送り】
+① Executive Summary（5行以内）
+② 投資テーマとの適合性（SBI成長戦略との接点）
+③ ターゲット概要（事業/財務/競合優位性）
+④ バリュエーション根拠（EV・マルチプル・類似取引）
+⑤ リスクと軽減策（Top 3）
+⑥ 次のステップと担当者
+出力は A4 1枚に収まるボリュームで。日本語。」</div>
+          <div class="prompt-label">実際のユーザー指示</div>
+          <div class="prompt-box">「以下のCIM要約・DD結果・財務モデルをもとに IC メモをドラフトして（各資料を貼り付け）」</div>
+        </div>
+        <div class="model-col">
+          <div class="model-col-head openai">GPT-5.5</div>
+          <p>IC メモの素案作成は GPT-5.5 でも可能。特に「財務数値の計算・シナジー試算の根拠」など定量部分は GPT-5.5 を先に走らせてから、Opus 4.7 で全体の論理・フォーマット・トーンを整えるという分業が実務的。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 27: 現地デューデリジェンス Q&A -->
+    <div class="scenario-block">
+      <div class="scenario-header">
+        <div class="scenario-num">27</div>
+        <div class="scenario-meta">
+          <div class="scenario-title">現地 DD Q&amp;A の自動収集・回答ドラフト・追跡ループ</div>
+          <span class="scenario-winner winner-openai">GPT-5.5（自動化） / Opus 4.7（回答品質）</span>
+        </div>
+      </div>
+      <div class="scenario-body">
+        <div class="model-col" style="border:1px solid rgba(96,208,255,0.2);">
+          <div class="model-col-head openai">GPT-5.5 / Codex（Q&amp;A ループ）</div>
+          <p>売り手からのQ&Aレスポンスをデータルームから収集し、未回答・不完全回答・矛盾する回答をフラグ付けして追跡する自律ループは GPT-5.5 が得意。「データルームを監視して新着回答があれば自動取り込み・突合・エスカレーション」まで自動化できる。</p>
+          <div class="prompt-label">実際の指示例</div>
+          <div class="prompt-box">「データルームに新しい Q&A 回答が追加されたら：
+① 未回答の Q&A リスト（Notion管理）と突合
+② 回答内容が完全・部分的・回避のどれかを判定
+③「部分的」「回避」判定の場合はフォローアップ質問を自動生成
+④ 担当アナリストの Slack に通知
+⑤ 最終 DD レポートのドラフトに関連箇所を反映」</div>
+        </div>
+        <div class="model-col">
+          <div class="model-col-head claude">Opus 4.7（回答分析）</div>
+          <p>売り手の回答が「実質的に情報を開示しているか」「意図的に曖昧にしている箇所はないか」「他の開示情報と矛盾しないか」を精度高く分析するのは Opus 4.7 の推論説明能力が有効。</p>
+          <div class="prompt-label">Opus 4.7 向きの使い方</div>
+          <div class="prompt-box">「この Q&A 回答一覧（売り手提供）を読んで：回答が意図的に曖昧にされている、または情報が欠落していると思われる項目を指摘して。理由と、追加で確認すべき具体的な情報を示して」</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 28: 海外財務諸表分析 -->
+    <div class="scenario-block">
+      <div class="scenario-header">
+        <div class="scenario-num">28</div>
+        <div class="scenario-meta">
+          <div class="scenario-title">海外ターゲットの英語財務諸表・10-K 比較分析</div>
+          <span class="scenario-winner winner-claude">Opus 4.7 推奨（財務文書Q&amp;A）</span>
+        </div>
+      </div>
+      <div class="scenario-body">
+        <div class="model-col" style="border:1px solid rgba(102,224,194,0.2);">
+          <div class="model-col-head claude">Claude Opus 4.7（有利）</div>
+          <p>FinanceBench（財務文書Q&A ベンチマーク）スコア 82.7%。10-K・アニュアルレポート・四半期報告書からの数値抽出・トレンド分析・異常値検出が精度高い。「3期分の損益計算書を比較して売上総利益率の変化と要因を説明して」のような複合分析に強い。</p>
+          <div class="prompt-label">実際の指示例</div>
+          <div class="prompt-box">「ターゲット企業の過去3年分アニュアルレポート（英語）を読んで：
+① 主要財務指標の推移（売上・EBITDA・FCF・D/E）
+② 競合比較（業種内ポジショニング）
+③ Working Capital の特徴（回収サイクル・棚卸しの質）
+④ 注記（Notes）で見落としやすいリスク開示
+⑤ GAAP と Adjusted EBITDA の乖離と理由
+
+日本語でサマリー。数字は元の通貨と円換算（1ドル=155円）を併記」</div>
+          <div class="stat-line">
+            <span class="stat-num green">82.7%</span>
+            <span class="stat-desc">FinanceBench スコア（財務文書 Q&A）</span>
+          </div>
+        </div>
+        <div class="model-col">
+          <div class="model-col-head openai">GPT-5.5（大規模時）</div>
+          <p>Berkshire Hathaway の FY2024-2025 10-K（30万トークン近い）を GPT-5.5 が正常処理できた実績あり（GPT-5.4 では難しかったケース）。複数年の大型レポートを一括投入するなら GPT-5.5。分析品質は Opus 4.7 との差は小さい。</p>
+          <p style="margin-top:8px;font-size:.82rem;color:var(--dim)">単年・中規模企業の財務諸表 → Opus 4.7 の分析品質が有利。複数年・大企業の大量開示書類 → GPT-5.5 の長文処理が活きる</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 29: コンプライアンスチェック -->
+    <div class="scenario-block">
+      <div class="scenario-header">
+        <div class="scenario-num">29</div>
+        <div class="scenario-meta">
+          <div class="scenario-title">海外規制・FCPA / 贈賄防止 / AML コンプライアンスチェック</div>
+          <span class="scenario-winner winner-claude">Opus 4.7 推奨</span>
+        </div>
+      </div>
+      <div class="scenario-body">
+        <div class="model-col" style="border:1px solid rgba(102,224,194,0.2);">
+          <div class="model-col-head claude">Claude Opus 4.7（有利）</div>
+          <p>法的推論・規制文書の解釈・コンプライアンス上の懸念を論理的に説明する能力が高い（GPQA Diamond 94.2%、推論説明の透明性で Tom's Guide 7-0）。「なぜこの契約条項が FCPA に抵触しうるか」の根拠まで説明できる。ただし最終的な法務意見は弁護士が必要。</p>
+          <div class="prompt-label">実際の指示例</div>
+          <div class="prompt-box">「この業務委託契約（現地代理店との）を FCPA・UK Bribery Act・日本の不正競争防止法の観点でレビューして：
+① 政府関係者への利益供与リスクがある条項を特定
+② コミッション構造が「合理的な報酬」を超えていないか
+③ 反社チェック条項の有無と充足度
+④ 問題がある場合の修正文言の提案
+法的意見ではなく参考分析として。懸念箇所は Red/Yellow で明示して」</div>
+        </div>
+        <div class="model-col">
+          <div class="model-col-head openai">GPT-5.5</div>
+          <p>コンプライアンスチェック自体は GPT-5.5 でも対応できる。ただし「グレーゾーンの判断・デュアルユース的な文脈」では Opus 4.7 より保守的な拒否が起きやすい（The Register 報告）。法律文書に特化した場面では Opus 4.7 の方が摩擦が少ない。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 30: エグゼクティブブリーフィング資料 -->
+    <div class="scenario-block">
+      <div class="scenario-header">
+        <div class="scenario-num">30</div>
+        <div class="scenario-meta">
+          <div class="scenario-title">経営幹部・取締役会向けブリーフィング資料の自動生成</div>
+          <span class="scenario-winner winner-claude">Opus 4.7 推奨</span>
+        </div>
+      </div>
+      <div class="scenario-body">
+        <div class="model-col" style="border:1px solid rgba(102,224,194,0.2);">
+          <div class="model-col-head claude">Claude Opus 4.7（有利）</div>
+          <p>「読む人を理解した上で何を省いて何を強調するか」という判断力と、指示された文字量・フォーマット・トーンへの忠実度が高い。長いDD資料を「役員が3分で読める1枚」に凝縮する圧縮力が評価される。</p>
+          <div class="prompt-label">実際の指示例</div>
+          <div class="prompt-box">「以下の DD 資料（50ページ）を、取締役会向け3分ブリーフィング用に再構成して：
+- 読み手：CFO・法務本部長・海外事業担当役員（現場の詳細より判断軸が知りたい）
+- 分量：A4 1枚、箇条書き中心
+- 強調ポイント：①なぜ今この案件か ②最大のリスクと対処方針 ③推奨する次のステップ
+- 数字は最低限（EV・IRR・投資期間のみ）
+- 日本語、敬体（です・ます調）」</div>
+          <div class="prompt-label">多段階活用（ドラフト後）</div>
+          <div class="prompt-box">「このブリーフィング資料（↑）で、役員から「なぜこのタイミングか」と聞かれたときの想定問答（Q&A 5件）も作って」</div>
+        </div>
+        <div class="model-col">
+          <div class="model-col-head openai">GPT-5.5（速度重視時）</div>
+          <p>急いで大量の案件資料を処理してブリーフィング素案を作る場合は GPT-5.5 の速度・トークン効率が有利。品質チェックを Opus 4.7 が行う2段階構成が多くの実務チームで採用されている。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout" style="margin-top:20px; border-color:rgba(244,184,96,0.4);">
+      <p><strong>M&Aチームの実務設計原則（2026年版）：</strong> 「収集・計算・自動化」は GPT-5.5、「分析・説明・レビュー・文書化」は Opus 4.7 に振るのが基本。ただし案件規模（トークン量）・フォーマット厳守の必要性・人間レビューまでのスピード感によってケースバイケースで調整する。両モデルを競わせて良いアウトプットを選ぶ「レース型」も有効。</p>
+    </div>
+  </div>
+
   <!-- Sources -->
   <div class="sources">
     <p>Sources（2026年5月3日時点確認）</p>
