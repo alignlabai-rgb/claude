@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI News | ALIGN Lab</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { font-family: "Segoe UI", "Noto Sans JP", system-ui, sans-serif; margin: 0; background: #0b1220; color: #edf2fb; line-height: 1.8; padding: 28px 18px 64px; }
+    .shell { max-width: 860px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+    a { color: #75d7c0; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .panel { background: #111a2b; border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 22px 26px; }
+    .panel.accent { border-color: rgba(61,216,197,0.25); }
+
+    h1 { font-size: 1.45rem; font-weight: 800; margin: 0 0 8px; }
+    h2 { font-size: 1rem; font-weight: 700; color: #3dd8c5; margin: 0 0 14px; }
+    p { color: #c5d0e3; font-size: 0.9rem; margin: 0 0 8px; }
+
+    .scope-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin-top: 10px; }
+    .scope-item { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 10px 14px; font-size: 0.83rem; color: #c5d0e3; }
+    .scope-item strong { display: block; font-size: 0.75rem; color: #3dd8c5; margin-bottom: 3px; }
+
+    .news-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }
+    .news-list li { border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 6px; }
+    .news-list li:last-child { border-bottom: none; padding-bottom: 0; }
+    .news-list a { font-size: 0.9rem; color: #edf2fb; }
+    .news-list a:hover { color: #3dd8c5; }
+    .news-list .date-tag { font-size: 0.75rem; color: #4a6a7a; margin-right: 8px; font-family: monospace; }
+    .news-list .new-tag { display: inline-block; font-size: 0.68rem; font-weight: 700; background: rgba(61,216,197,0.15); color: #3dd8c5; padding: 1px 6px; border-radius: 4px; margin-left: 6px; vertical-align: middle; }
+
+    .empty-state { text-align: center; color: #4a6a7a; font-size: 0.88rem; padding: 20px 0; }
+
+    .breadcrumb { font-size: 0.82rem; color: #4a6a7a; margin-bottom: 14px; }
+    .updated { font-size: 0.78rem; color: #3a5060; margin-top: 6px; }
+
+    .how-it-works { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; margin-top: 12px; }
+    .step { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px 14px; }
+    .step-num { font-size: 0.72rem; font-weight: 700; color: #3dd8c5; margin-bottom: 4px; }
+    .step-text { font-size: 0.83rem; color: #c5d0e3; line-height: 1.5; }
+  </style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- Header -->
+  <div class="panel">
+    <p class="breadcrumb"><a href="../index.html">← Research</a> / <a href="../../index.html">Hub Top</a></p>
+    <h1>AI News</h1>
+    <p>Claude Routinesが毎日自動収集するAIニュースの日次アーカイブ。制作・エージェント・LLMの動向を中心に。</p>
+    <p class="updated">自動更新（毎日）/ 最終更新：2026-05-06</p>
+  </div>
+
+  <!-- 収集スコープ -->
+  <div class="panel">
+    <h2>収集スコープ</h2>
+    <div class="scope-grid">
+      <div class="scope-item"><strong>🔴 最優先</strong>Claude / Anthropic / OpenClaw / Hermes Agent</div>
+      <div class="scope-item"><strong>🟠 高優先</strong>GPT / Codex / 動画生成AI（Kling・Runway・Sora）</div>
+      <div class="scope-item"><strong>🟠 高優先</strong>クリエイティブMCP（Adobe・Blender・Ableton）</div>
+      <div class="scope-item"><strong>🟠 高優先</strong>中国系LLM（DeepSeek・Qwen・Kimi・GLM）</div>
+      <div class="scope-item"><strong>🟡 中優先</strong>Gemini / ビジネス×AI / 収益化事例</div>
+      <div class="scope-item"><strong>⚪ 低優先</strong>AI規制・政策（重要なもののみ）</div>
+    </div>
+  </div>
+
+  <!-- 最新ニュース一覧 -->
+  <div class="panel accent">
+    <h2>最新ニュース</h2>
+    <!-- Routinesが毎日ここにエントリを追加する -->
+    <ul class="news-list" id="news-list">
+      <li>
+        <span class="date-tag">2026-05-06</span>
+        <a href="2026-05-06.html">2026年5月6日 — システム初期化：Routines日次ニュース配信スタート</a>
+        <span class="new-tag">NEW</span>
+      </li>
+    </ul>
+  </div>
+
+  <!-- 仕組み -->
+  <div class="panel">
+    <h2>仕組み</h2>
+    <div class="how-it-works">
+      <div class="step">
+        <div class="step-num">Step 1</div>
+        <div class="step-text">Claude Routinesが毎朝起動し、AIニュースをWeb検索</div>
+      </div>
+      <div class="step">
+        <div class="step-num">Step 2</div>
+        <div class="step-text">スコープに合う情報を5〜10件に絞り、日本語で要約</div>
+      </div>
+      <div class="step">
+        <div class="step-num">Step 3</div>
+        <div class="step-text">日付付きHTMLファイルを生成し、このインデックスを更新</div>
+      </div>
+      <div class="step">
+        <div class="step-num">Step 4</div>
+        <div class="step-text">GitHub mainにpush → GitHub Pages経由でブラウザから閲覧可</div>
+      </div>
+    </div>
+    <p style="margin-top:14px;font-size:0.82rem;color:#4a6a7a;">指示書: <code>_routines/daily-news.md</code> / テンプレート: <code>_routines/news-template.html</code></p>
+  </div>
+
+  <!-- 関連ページ -->
+  <div class="panel">
+    <h2>関連ページ</h2>
+    <ul style="list-style:none;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:10px;font-size:0.88rem;">
+      <li><a href="../claude-recent-updates.html">Claude 最新情報（月次まとめ）</a></li>
+      <li><a href="../openclaw-news/index.html">OpenClaw News</a></li>
+      <li><a href="../../workbench/knowledge/hermes-agent.html">Hermes Agent 詳細</a></li>
+      <li><a href="../../workbench/knowledge/ai-creative.html">AI×クリエイティブ</a></li>
+      <li><a href="../../index.html">Hub Top</a></li>
+    </ul>
+  </div>
+
+</div>
+</body>
+</html>
