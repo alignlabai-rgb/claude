@@ -87,12 +87,27 @@ AI agent framework release 2026
 ※ `最終更新：YYYY-MM-DD` の日付も当日分に必ず更新する。  
 ※ 直近30件を超えた場合は古いものから削除する。
 
-### Step 6: git commit & push
+### Step 6: commit → PR作成 → 即マージ
+
+現在のブランチ名を確認し、そのブランチにcommit & pushしてからPRを作成して即マージする。
+
 ```bash
+# 現在のブランチにcommit & push
 git add research/ai-news/YYYY-MM-DD.html research/ai-news/index.html
 git commit -m "daily-news: YYYY-MM-DD AIニュース更新（N件）"
-git push origin main
+git push origin HEAD
+
+# PRを作成して即スカッシュマージ
+gh pr create \
+  --title "daily-news: YYYY-MM-DD AIニュース更新（N件）" \
+  --body "Routinesによる日次AIニュース自動更新。" \
+  --base main
+
+gh pr merge --squash --auto
 ```
+
+> `gh` コマンドが使えない場合は、GitHub MCP ツール（`mcp__github__create_pull_request` → `mcp__github__merge_pull_request`）を使って同等の操作を行う。
+> リポジトリ: `alignlabai-rgb/claude` / base: `main` / merge_method: `squash`
 
 ---
 
