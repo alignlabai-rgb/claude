@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>中国系 AI コーディングツール | Tech Workbench</title>
+  <title>中国系 AI コーディングツール 完全ガイド | Tech Workbench</title>
   <style>
     :root {
       --bg: #0b1220;
@@ -16,7 +16,7 @@
       --accent-grad: linear-gradient(135deg, #e63946, #f7b733);
       --border: rgba(255, 255, 255, 0.1);
       --radius: 16px;
-      --font-mono: "SF Mono", "Consolas", monospace;
+      --font-mono: "SF Mono", "JetBrains Mono", "Consolas", monospace;
     }
 
     * { box-sizing: border-box; }
@@ -30,239 +30,145 @@
         radial-gradient(circle at 10% 10%, rgba(230, 57, 70, 0.12), transparent 30%),
         radial-gradient(circle at 85% 5%, rgba(247, 183, 51, 0.15), transparent 30%),
         linear-gradient(145deg, #0b1220 0%, #0c1526 50%, #0a1020 100%);
-      padding: 32px 20px 64px;
+      padding: 32px 20px 80px;
       line-height: 1.7;
     }
 
-    .shell {
-      max-width: 1100px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 32px;
-    }
+    .shell { max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px; }
 
-    .back {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      color: var(--text);
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 14px;
-      opacity: 0.6;
-      transition: opacity 0.2s;
-    }
-    .back:hover { opacity: 1; }
+    .back { display:inline-flex; align-items:center; gap:6px; color:var(--muted); text-decoration:none; font-size:14px; font-weight:600; opacity:0.7; transition:opacity 0.2s; }
+    .back:hover { opacity:1; }
 
     header.hero {
       background: var(--panel);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 48px 40px;
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+      padding: 44px 40px 36px;
+      position: relative; overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.35);
     }
-
-    header.hero::before {
-      content: "";
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 4px;
-      background: var(--accent-grad);
-    }
+    header.hero::before { content:""; position:absolute; top:0; left:0; width:100%; height:4px; background: var(--accent-grad); }
 
     .role-badge {
       display: inline-block;
-      background: rgba(230, 57, 70, 0.15);
-      color: #f7b733;
-      padding: 4px 12px;
-      border-radius: 99px;
-      font-size: 12px;
-      font-weight: bold;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 16px;
-      border: 1px solid rgba(230, 57, 70, 0.35);
+      background: rgba(230,57,70,0.15); color: #f7b733;
+      padding: 4px 12px; border-radius: 99px; font-size: 12px;
+      font-weight: bold; text-transform: uppercase; letter-spacing: 1px;
+      margin-bottom: 16px; border: 1px solid rgba(230,57,70,0.35);
     }
 
-    h1 {
-      margin: 0 0 16px;
-      font-size: 44px;
-      font-weight: 800;
-      letter-spacing: -1px;
-      line-height: 1.1;
-      color: #fff;
+    h1 { margin: 0 0 12px; font-size: 40px; font-weight: 800; letter-spacing: -1px; color: #fff; line-height: 1.1; }
+    .lead { margin: 0 0 24px; font-size: 17px; color: var(--muted); max-width: 760px; }
+
+    .stats-row { display: flex; flex-wrap: wrap; gap: 28px; margin-bottom: 20px; }
+    .stat { display: flex; flex-direction: column; gap: 3px; }
+    .stat-val { font-size: 26px; font-weight: 800; background: var(--accent-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+
+    .toc { display:flex; flex-wrap:wrap; gap:8px; }
+    .toc a { font-size:13px; color:var(--accent-2); text-decoration:none; background:rgba(247,183,51,0.1); border:1px solid rgba(247,183,51,0.25); padding:4px 12px; border-radius:99px; transition:background 0.2s; }
+    .toc a:hover { background:rgba(247,183,51,0.2); }
+
+    .section-label {
+      font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+      color: var(--accent); display: flex; align-items: center; gap: 8px;
     }
-
-    .lead {
-      margin: 0 0 32px;
-      font-size: 18px;
-      color: var(--muted);
-      max-width: 760px;
-    }
-
-    .stats-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 24px;
-    }
-
-    .stat {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .stat-val {
-      font-size: 28px;
-      font-weight: 800;
-      background: var(--accent-grad);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .stat-label {
-      font-size: 12px;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    h2 {
-      margin: 0 0 20px;
-      font-size: 24px;
-      font-weight: 700;
-      color: #fff;
-    }
-
-    h3 {
-      margin: 0 0 10px;
-      font-size: 20px;
-      font-weight: 700;
-      color: #fff;
-    }
-
-    p { margin: 0 0 14px; color: var(--muted); font-size: 15px; }
-
-    ul { margin: 0 0 16px; padding-left: 22px; color: var(--muted); }
-    li { margin-bottom: 7px; }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 20px;
-    }
-
-    .card {
-      background: rgba(255, 255, 255, 0.025);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 28px 28px 24px;
-      transition: transform 0.2s, border-color 0.2s;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .card:hover {
-      transform: translateY(-2px);
-      border-color: rgba(230, 57, 70, 0.35);
-    }
-
-    .card-accent {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 3px;
-    }
-
-    .chip-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 7px;
-      margin-top: 12px;
-    }
-
-    .chip {
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid var(--border);
-      color: var(--muted);
-      padding: 4px 10px;
-      border-radius: 8px;
-      font-size: 12px;
-    }
-
-    .chip.accent {
-      background: rgba(230, 57, 70, 0.12);
-      border-color: rgba(230, 57, 70, 0.35);
-      color: #f7b733;
-    }
+    .section-label::after { content:""; flex:1; height:1px; background:var(--border); }
 
     .section {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 32px 36px;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 30px 34px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.2);
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 14px;
-    }
+    h2 { margin: 0 0 18px; font-size: 22px; font-weight: 700; color: #fff; }
+    h3 { margin: 14px 0 8px; font-size: 17px; font-weight: 700; color: var(--accent-2); }
+    h4 { margin: 10px 0 6px; font-size: 14px; font-weight: 700; color: var(--text); }
 
-    thead th {
-      text-align: left;
-      padding: 10px 14px;
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--muted);
-      border-bottom: 1px solid var(--border);
-    }
+    p { margin: 0 0 12px; color: var(--muted); font-size: 15px; }
+    ul { margin: 0 0 14px; padding-left: 20px; color: var(--muted); font-size: 14px; }
+    li { margin-bottom: 6px; }
+    strong { color: var(--text); }
 
-    tbody td {
-      padding: 12px 14px;
-      border-bottom: 1px solid rgba(255,255,255,0.04);
-      color: var(--muted);
-      vertical-align: top;
-    }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+    .split { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
 
+    /* ツールカード */
+    .tool-card {
+      background: rgba(255,255,255,0.025); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 26px 26px 22px;
+      transition: transform 0.2s, border-color 0.2s; position: relative; overflow: hidden;
+    }
+    .tool-card:hover { transform: translateY(-2px); border-color: rgba(230,57,70,0.35); }
+    .tool-card-accent { position: absolute; top:0; left:0; width:100%; height:3px; }
+    .tool-icon { font-size: 26px; margin-bottom: 10px; }
+    .tool-name { font-size: 18px; font-weight: 800; color: #fff; margin: 0 0 4px; }
+    .tool-sub { font-size: 13px; color: var(--muted); margin-bottom: 10px; }
+    .tool-desc { font-size: 14px; color: var(--muted); margin-bottom: 12px; line-height: 1.6; }
+    .tool-meta { display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; font-size: 13px; margin-bottom: 12px; }
+    .tool-meta-key { color: var(--accent-2); font-weight: 600; }
+    .tool-meta-val { color: var(--muted); }
+
+    /* 新着バッジ */
+    .new-tag {
+      display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 700;
+      background: rgba(52,211,153,0.15); color: #34d399; border: 1px solid rgba(52,211,153,0.3);
+      margin-left: 6px; vertical-align: middle;
+    }
+    .update-box {
+      background: rgba(52,211,153,0.06); border: 1px solid rgba(52,211,153,0.2);
+      border-radius: 10px; padding: 10px 14px; margin-top: 12px; font-size: 13px; color: var(--muted);
+    }
+    .update-box strong { color: #34d399; display: block; margin-bottom: 4px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    .chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .chip { background: rgba(255,255,255,0.06); border: 1px solid var(--border); color: var(--muted); padding: 3px 9px; border-radius: 7px; font-size: 12px; }
+    .chip.accent { background: rgba(230,57,70,0.12); border-color: rgba(230,57,70,0.35); color: #f7b733; }
+    .chip.green { background: rgba(52,211,153,0.1); border-color: rgba(52,211,153,0.3); color: #34d399; }
+
+    /* 比較表 */
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    thead th { text-align: left; padding: 10px 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); border-bottom: 1px solid var(--border); }
+    tbody td { padding: 11px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--muted); vertical-align: middle; }
     tbody tr:hover td { background: rgba(255,255,255,0.02); }
-
     td strong { color: var(--text); }
 
-    .badge {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 6px;
-      font-size: 11px;
-      font-weight: 700;
-    }
-
+    .badge { display: inline-block; padding: 2px 7px; border-radius: 5px; font-size: 11px; font-weight: 700; }
     .badge-red { background: rgba(230,57,70,0.15); color: #e63946; }
     .badge-gold { background: rgba(247,183,51,0.15); color: #f7b733; }
     .badge-blue { background: rgba(96,165,250,0.15); color: #60a5fa; }
     .badge-green { background: rgba(52,211,153,0.15); color: #34d399; }
     .badge-purple { background: rgba(167,139,250,0.15); color: #a78bfa; }
 
-    .note-box {
-      background: rgba(247, 183, 51, 0.07);
-      border: 1px solid rgba(247, 183, 51, 0.2);
-      border-radius: 12px;
-      padding: 16px 20px;
-      color: var(--muted);
-      font-size: 14px;
-    }
+    /* ステップ */
+    .steps { display: flex; flex-direction: column; gap: 10px; }
+    .step { display: grid; grid-template-columns: 28px 1fr; gap: 12px; align-items: start; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+    .step-num { width: 24px; height: 24px; border-radius: 50%; background: rgba(230,57,70,0.15); border: 1px solid rgba(230,57,70,0.4); color: var(--accent); font-weight: 800; font-size: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .step h4 { margin: 0 0 4px; font-size: 14px; color: #fff; }
+    .step p { margin: 0; font-size: 13px; }
 
+    .cmd { background: #0d1117; border: 1px solid rgba(255,255,255,0.1); border-radius: 7px; padding: 8px 12px; font-family: var(--font-mono); font-size: 13px; color: #98c379; margin: 6px 0; overflow-x: auto; }
+
+    /* 推薦カード */
+    .rec-card { background: rgba(255,255,255,0.025); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; }
+    .rec-card h4 { margin: 0 0 6px; font-size: 15px; color: #fff; }
+    .rec-card p { margin: 0 0 8px; font-size: 13px; }
+    .rec-winner { display: inline-block; font-size: 12px; font-weight: 700; color: var(--accent-2); background: rgba(247,183,51,0.1); border: 1px solid rgba(247,183,51,0.25); padding: 3px 10px; border-radius: 99px; }
+
+    /* 注意ボックス */
+    .note-box { background: rgba(247,183,51,0.07); border: 1px solid rgba(247,183,51,0.2); border-radius: 12px; padding: 16px 20px; color: var(--muted); font-size: 14px; }
     .note-box strong { color: #f7b733; }
+    .warn-box { background: rgba(230,57,70,0.07); border: 1px solid rgba(230,57,70,0.2); border-radius: 12px; padding: 16px 20px; color: var(--muted); font-size: 14px; }
+    .warn-box strong { color: var(--accent); display: block; margin-bottom: 6px; }
 
-    .split {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 20px;
-    }
+    /* トレンドタイムライン */
+    .timeline { display: flex; flex-direction: column; gap: 14px; }
+    .timeline-item { display: grid; grid-template-columns: 90px 1fr; gap: 16px; align-items: start; }
+    .timeline-date { font-size: 12px; font-weight: 700; color: var(--accent-2); text-align: right; padding-top: 2px; }
+    .timeline-body { border-left: 2px solid rgba(247,183,51,0.25); padding-left: 14px; }
+    .timeline-body h4 { margin: 0 0 3px; font-size: 14px; color: #fff; }
+    .timeline-body p { margin: 0; font-size: 13px; }
   </style>
 </head>
 
@@ -271,264 +177,533 @@
 
     <a href="index.html" class="back">← Knowledge Hub</a>
 
+    <!-- ヒーロー -->
     <header class="hero">
-      <div class="role-badge">China AI Coding · 中国系AIコーディング</div>
+      <div class="role-badge">China AI Coding · 2026年版 完全ガイド</div>
       <h1>中国系 AI コーディングツール</h1>
       <p class="lead">
-        Alibaba・ByteDance・Baidu・Huawei・Zhipu AIが開発する、Claude Code / Codexと同等のエージェント型AIコーディング支援ツール。国産LLMを基盤に急速に進化している。
+        Alibaba・ByteDance・Baidu・Huawei・Zhipu AIが開発するエージェント型AIコーディング支援ツール。2026年に入りエージェント深度・マルチモーダル・MCP対応が急速に進化。Claude Code / Codexの対抗軸として無視できない存在になっている。
       </p>
       <div class="stats-row">
-        <div class="stat">
-          <span class="stat-val">6+</span>
-          <span class="stat-label">主要プレイヤー</span>
-        </div>
-        <div class="stat">
-          <span class="stat-val">2024–</span>
-          <span class="stat-label">エージェント化加速</span>
-        </div>
-        <div class="stat">
-          <span class="stat-val">OSS</span>
-          <span class="stat-label">一部オープンソース</span>
-        </div>
-        <div class="stat">
-          <span class="stat-val">VS Code</span>
-          <span class="stat-label">主要対応IDE</span>
-        </div>
+        <div class="stat"><span class="stat-val">6+</span><span class="stat-label">主要プレイヤー</span></div>
+        <div class="stat"><span class="stat-val">v4.2</span><span class="stat-label">Comate最新版</span></div>
+        <div class="stat"><span class="stat-val">SOLO</span><span class="stat-label">Trae完全自律モード</span></div>
+        <div class="stat"><span class="stat-val">128K</span><span class="stat-label">CodeGeeXコンテキスト</span></div>
       </div>
+      <nav class="toc">
+        <a href="#tools">ツール詳細</a>
+        <a href="#compare">比較表</a>
+        <a href="#setup">セットアップ</a>
+        <a href="#usecases">用途別選び方</a>
+        <a href="#trends">2026トレンド</a>
+        <a href="#vs-west">西側との比較</a>
+        <a href="#security">セキュリティ</a>
+      </nav>
     </header>
 
-    <!-- ツール一覧 -->
-    <div class="grid">
+    <!-- ===== ツール詳細 ===== -->
+    <div id="tools">
+      <div class="section-label">各ツール詳細（2026年5月時点）</div>
 
-      <!-- Tongyi Lingma -->
-      <div class="card">
-        <div class="card-accent" style="background: linear-gradient(90deg, #ff6a00, #ee0979);"></div>
-        <div style="font-size: 28px; margin-bottom: 10px;">🟠</div>
-        <h3>通义灵码 <span style="font-size:14px;color:var(--muted);">Tongyi Lingma</span></h3>
-        <p>Alibaba（阿里巴巴）製。Qwen系LLMを基盤とするコーディングエージェント。VS Code / JetBrains対応。コード補完・レビュー・テスト生成・CLIエージェントモードを持ち、Claude Code相当のターミナル操作が可能。</p>
-        <ul>
-          <li>開発元：Alibaba Cloud</li>
-          <li>基盤モデル：Qwen2.5-Coder</li>
-          <li>IDE：VS Code、JetBrains、Cloud IDE</li>
-          <li>エージェントモード：あり（ターミナル操作・マルチステップ）</li>
-          <li>価格：無料プランあり／Alibaba Cloud連携</li>
-        </ul>
-        <div class="chip-row">
-          <span class="chip accent">Agentic</span>
-          <span class="chip">VS Code</span>
-          <span class="chip">JetBrains</span>
-          <span class="chip">CLI</span>
-          <span class="chip">Qwen</span>
+      <div class="grid">
+
+        <!-- 通义灵码 -->
+        <div class="tool-card">
+          <div class="tool-card-accent" style="background: linear-gradient(90deg, #ff6a00, #ee0979);"></div>
+          <div class="tool-icon">🟠</div>
+          <div class="tool-name">通义灵码 <span class="new-tag">Quest Beta</span></div>
+          <div class="tool-sub">Tongyi Lingma — Alibaba Cloud</div>
+          <p class="tool-desc">AlibabのQwen3.6-Maxを基盤とするコーディングエージェント。2026年2月のアップデートでClaude Code相当のマルチエージェント並列セッション・Hook機構・Quest自律プログラミングを実装。</p>
+          <div class="tool-meta">
+            <span class="tool-meta-key">基盤モデル</span><span class="tool-meta-val">Qwen3.6-Coder / Qwen3.6-Max</span>
+            <span class="tool-meta-key">IDE対応</span><span class="tool-meta-val">VS Code / JetBrains / Lingma IDE / Cloud IDE</span>
+            <span class="tool-meta-key">エージェント</span><span class="tool-meta-val">Quest（完全自律）/ Planning Agent / カスタムサブエージェント</span>
+            <span class="tool-meta-key">Hook機構</span><span class="tool-meta-val">pre/post-tool use イベントに独自ロジック挿入可</span>
+            <span class="tool-meta-key">価格</span><span class="tool-meta-val">個人無料 / Alibaba Cloud連携で企業プランあり</span>
+          </div>
+          <div class="update-box">
+            <strong>2026年2月アップデート</strong>
+            Quest自律モードBeta公開・マルチエージェント並列セッション（複数タスク同時実行）・カスタムスキル/コマンド定義・Skill UIによるHTML動的レンダリング。
+          </div>
+          <div class="chip-row">
+            <span class="chip accent">Quest 自律モード</span>
+            <span class="chip green">MCP対応</span>
+            <span class="chip">VS Code</span>
+            <span class="chip">Hook機構</span>
+            <span class="chip">Qwen3.6</span>
+          </div>
         </div>
-      </div>
 
-      <!-- Trae -->
-      <div class="card">
-        <div class="card-accent" style="background: linear-gradient(90deg, #1a1a2e, #16213e, #0f3460, #533483);"></div>
-        <div style="font-size: 28px; margin-bottom: 10px;">🟣</div>
-        <h3>Trae <span style="font-size:14px;color:var(--muted);">by ByteDance</span></h3>
-        <p>ByteDance（抖音親会社）製のCursor対抗AI IDE。Doubao系モデルを搭載し、AIチャット・インラインEdit・エージェントモードを統合。無料で提供されCursor代替として急速に普及。</p>
-        <ul>
-          <li>開発元：ByteDance</li>
-          <li>基盤モデル：Doubao / Claude（外部モデル選択可）</li>
-          <li>形態：スタンドアロンIDE（VS Codeベース）</li>
-          <li>エージェントモード：Builder（複数ファイル編集）</li>
-          <li>価格：無料（2025年現在）</li>
-        </ul>
-        <div class="chip-row">
-          <span class="chip accent">Cursor代替</span>
-          <span class="chip">スタンドアロンIDE</span>
-          <span class="chip">無料</span>
-          <span class="chip">Doubao</span>
+        <!-- Trae -->
+        <div class="tool-card">
+          <div class="tool-card-accent" style="background: linear-gradient(90deg, #7c3aed, #4f46e5);"></div>
+          <div class="tool-icon">🟣</div>
+          <div class="tool-name">Trae <span class="new-tag">SOLO Mode</span></div>
+          <div class="tool-sub">by ByteDance — AI-Native IDE</div>
+          <p class="tool-desc">ByteDance製のCursor対抗AI IDE。2026年4月にMCP対応・SOLO完全自律モード・マルチエージェントオーケストレーションを実装。Claude 3.7 Sonnet / GPT-4o / DeepSeek R1を無料で利用可能。</p>
+          <div class="tool-meta">
+            <span class="tool-meta-key">基盤モデル</span><span class="tool-meta-val">Doubao / Claude 3.7 Sonnet / GPT-4o / DeepSeek R1（選択可）</span>
+            <span class="tool-meta-key">形態</span><span class="tool-meta-val">スタンドアロンIDE（VS Codeベース）/ macOS・Windows対応</span>
+            <span class="tool-meta-key">主要モード</span><span class="tool-meta-val">Builder（マルチファイル）/ SOLO（完全自律・プランニング〜デプロイ）</span>
+            <span class="tool-meta-key">特徴</span><span class="tool-meta-val">MCP対応・Figma→コード変換・画像からUI生成・DB操作</span>
+            <span class="tool-meta-key">価格</span><span class="tool-meta-val">2026年2月よりトークン課金制（5段階サブスク）</span>
+          </div>
+          <div class="update-box">
+            <strong>2026年4月アップデート</strong>
+            MCPプロトコル対応・Figmaデザイン→コード変換・SOLO完全自律エージェントモード・マルチエージェントオーケストレーション。Windowsサポート追加。
+          </div>
+          <div class="chip-row">
+            <span class="chip accent">SOLO 完全自律</span>
+            <span class="chip green">MCP対応</span>
+            <span class="chip">Figma→Code</span>
+            <span class="chip">マルチモーダル</span>
+            <span class="chip">Win/Mac</span>
+          </div>
         </div>
-      </div>
 
-      <!-- MarsCode -->
-      <div class="card">
-        <div class="card-accent" style="background: linear-gradient(90deg, #00b4d8, #0096c7);"></div>
-        <div style="font-size: 28px; margin-bottom: 10px;">🔵</div>
-        <h3>豆包 MarsCode <span style="font-size:14px;color:var(--muted);">by ByteDance</span></h3>
-        <p>ByteDanceの別プロダクト。クラウドIDE + VS Codeプラグインの二本立て。コード補完・バグ修正・ユニットテスト生成が中心。Traeとは異なりプラグイン型で既存環境に統合しやすい。</p>
-        <ul>
-          <li>開発元：ByteDance</li>
-          <li>基盤モデル：Doubao-1.5-pro</li>
-          <li>形態：VS Codeプラグイン + クラウドIDE</li>
-          <li>対応言語：100+</li>
-          <li>価格：無料プランあり</li>
-        </ul>
-        <div class="chip-row">
-          <span class="chip accent">プラグイン型</span>
-          <span class="chip">クラウドIDE</span>
-          <span class="chip">VS Code</span>
-          <span class="chip">Doubao</span>
+        <!-- MarsCode → Trae Plugin -->
+        <div class="tool-card">
+          <div class="tool-card-accent" style="background: linear-gradient(90deg, #00b4d8, #0096c7);"></div>
+          <div class="tool-icon">🔵</div>
+          <div class="tool-name">Trae Plugin <span style="font-size:12px;color:var(--muted);">旧 MarsCode</span></div>
+          <div class="tool-sub">by ByteDance — VS Code プラグイン型</div>
+          <p class="tool-desc">MarsCodeはTraeエコシステムに統合され「Trae Plugin」として継続。Traeのエージェント機能をそのまま既存のVS Codeへプラグインとして導入できる。IDEそのものを変えたくない場合の選択肢。</p>
+          <div class="tool-meta">
+            <span class="tool-meta-key">前身</span><span class="tool-meta-val">豆包 MarsCode（2024年リリース）→ Trae Pluginに統合</span>
+            <span class="tool-meta-key">基盤モデル</span><span class="tool-meta-val">Doubao-1.5-pro / DeepSeek統合済み</span>
+            <span class="tool-meta-key">形態</span><span class="tool-meta-val">VS Code プラグイン + クラウドIDE（marscode.com）</span>
+            <span class="tool-meta-key">対応言語</span><span class="tool-meta-val">100+ 言語</span>
+            <span class="tool-meta-key">特徴</span><span class="tool-meta-val">画像・スケッチからWebページ生成（2025年10月追加）</span>
+          </div>
+          <div class="update-box">
+            <strong>ブランド統合（2026年）</strong>
+            marscode.comはTraeにリダイレクト。機能・モデルはTraeと共通化。既存ユーザーはTrae Pluginへ移行推奨。
+          </div>
+          <div class="chip-row">
+            <span class="chip accent">プラグイン型</span>
+            <span class="chip">VS Code維持</span>
+            <span class="chip">DeepSeek統合</span>
+            <span class="chip">スケッチ→Web</span>
+          </div>
         </div>
-      </div>
 
-      <!-- Baidu Comate -->
-      <div class="card">
-        <div class="card-accent" style="background: linear-gradient(90deg, #2563eb, #1d4ed8);"></div>
-        <div style="font-size: 28px; margin-bottom: 10px;">🔷</div>
-        <h3>文心快码 <span style="font-size:14px;color:var(--muted);">Baidu Comate</span></h3>
-        <p>Baidu（百度）製。ERNIE（文心）系LLMを基盤とするコーディングアシスタント。コード補完・生成・ドキュメント自動生成が主機能。企業向けにオンプレ展開も可能。</p>
-        <ul>
-          <li>開発元：Baidu</li>
-          <li>基盤モデル：ERNIE Code</li>
-          <li>IDE：VS Code、JetBrains、Eclipse</li>
-          <li>企業向けオンプレ：対応</li>
-          <li>価格：無料プランあり</li>
-        </ul>
-        <div class="chip-row">
-          <span class="chip accent">エンタープライズ</span>
-          <span class="chip">オンプレ対応</span>
-          <span class="chip">VS Code</span>
-          <span class="chip">ERNIE</span>
+        <!-- Baidu Comate -->
+        <div class="tool-card">
+          <div class="tool-card-accent" style="background: linear-gradient(90deg, #2563eb, #1d4ed8);"></div>
+          <div class="tool-icon">🔷</div>
+          <div class="tool-name">文心快码 <span class="new-tag">v4.2</span></div>
+          <div class="tool-sub">Baidu Comate — 2026/3/24 最新</div>
+          <p class="tool-desc">Baidu製。2026年3月にv4.2.0リリース。Zuluオーケストレーターが5専門エージェント（コーディング・テスト・デバッグ・セキュリティ・Q&A）を並列で動かすマルチエージェントアーキテクチャを採用。F2C（Figma→コード）で98%の忠実度を実現。</p>
+          <div class="tool-meta">
+            <span class="tool-meta-key">最新版</span><span class="tool-meta-val">v4.2.0（2026年3月24日）</span>
+            <span class="tool-meta-key">基盤モデル</span><span class="tool-meta-val">ERNIE Code（文心大码）</span>
+            <span class="tool-meta-key">IDE対応</span><span class="tool-meta-val">VS Code / JetBrains / Eclipse / Comate AI IDE</span>
+            <span class="tool-meta-key">エージェント</span><span class="tool-meta-val">Zuluオーケストレーター + 5専門エージェント並列</span>
+            <span class="tool-meta-key">F2C</span><span class="tool-meta-val">Figma→コード変換 98%忠実度・繰り返し作業80%削減</span>
+            <span class="tool-meta-key">オンプレ</span><span class="tool-meta-val">対応（企業・政府向け完全ローカル展開）</span>
+          </div>
+          <div class="update-box">
+            <strong>v4.0〜4.2 (2026年3月)</strong>
+            マルチエージェント並列化・Comate AI IDE公開（業界初のマルチモーダル・マルチエージェント統合IDE）・セキュリティエージェントによる自動脆弱性検出。
+          </div>
+          <div class="chip-row">
+            <span class="chip accent">5エージェント並列</span>
+            <span class="chip green">Figma→Code 98%</span>
+            <span class="chip">オンプレ対応</span>
+            <span class="chip">セキュリティAI</span>
+            <span class="chip">Eclipse対応</span>
+          </div>
         </div>
-      </div>
 
-      <!-- CodeGeeX -->
-      <div class="card">
-        <div class="card-accent" style="background: linear-gradient(90deg, #7c3aed, #4f46e5);"></div>
-        <div style="font-size: 28px; margin-bottom: 10px;">🟤</div>
-        <h3>CodeGeeX <span style="font-size:14px;color:var(--muted);">by Zhipu AI</span></h3>
-        <p>清華大学発のZhipu AI（智谱AI）製。オープンソースのコーディングモデルCodeGeeXをベースにしたIDE拡張。GitHub Copilot代替として研究・開発コミュニティで人気。モデル自体もHugging Faceで公開。</p>
-        <ul>
-          <li>開発元：Zhipu AI / 清華大学</li>
-          <li>基盤モデル：CodeGeeX4-All-9B（OSS）</li>
-          <li>IDE：VS Code、JetBrains</li>
-          <li>オープンソース：モデル公開あり</li>
-          <li>価格：無料</li>
-        </ul>
-        <div class="chip-row">
-          <span class="chip accent">オープンソース</span>
-          <span class="chip">VS Code</span>
-          <span class="chip">JetBrains</span>
-          <span class="chip">GLM</span>
+        <!-- CodeGeeX -->
+        <div class="tool-card">
+          <div class="tool-card-accent" style="background: linear-gradient(90deg, #7c3aed, #4f46e5);"></div>
+          <div class="tool-icon">🟤</div>
+          <div class="tool-name">CodeGeeX4</div>
+          <div class="tool-sub">Zhipu AI / 清華大学 — OSS</div>
+          <p class="tool-desc">清華大学発のZhipu AI（Z.ai）製。10B以下モデル最高水準のHumanEval 82.3%を達成。128Kコンテキスト・100%ロングコンテキスト検索精度。GLM-5.1をバックにした最新版ではエンタープライズ向けプライベートデプロイが充実。</p>
+          <div class="tool-meta">
+            <span class="tool-meta-key">最新モデル</span><span class="tool-meta-val">CodeGeeX4-ALL-9B（OSS）/ GLM-5.1バックエンド</span>
+            <span class="tool-meta-key">コンテキスト</span><span class="tool-meta-val">128K トークン（100%検索精度）</span>
+            <span class="tool-meta-key">IDE対応</span><span class="tool-meta-val">VS Code / JetBrains（4つのインタラクションモード）</span>
+            <span class="tool-meta-key">ベンチマーク</span><span class="tool-meta-val">HumanEval 82.3% / MBPP 75.7%（10B以下最高）</span>
+            <span class="tool-meta-key">対応言語</span><span class="tool-meta-val">100+ 言語（HumanEval-X: Python/C++/Java/JS/Go/Rust検証済）</span>
+            <span class="tool-meta-key">価格</span><span class="tool-meta-val">無料（モデルOSS公開）/ プライベートデプロイ対応</span>
+          </div>
+          <div class="update-box">
+            <strong>4つのインタラクションモード</strong>
+            Stealth（自動補完）/ Interactive（Ctrl+Enterで候補一覧）/ Translation（言語間変換）/ Prompt（テンプレート指定生成）
+          </div>
+          <div class="chip-row">
+            <span class="chip accent">10B以下最高性能</span>
+            <span class="chip green">128K Context</span>
+            <span class="chip green">完全OSS</span>
+            <span class="chip">ローカル実行可</span>
+            <span class="chip">100言語+</span>
+          </div>
         </div>
-      </div>
 
-      <!-- Huawei CodeArts Snap -->
-      <div class="card">
-        <div class="card-accent" style="background: linear-gradient(90deg, #dc2626, #991b1b);"></div>
-        <div style="font-size: 28px; margin-bottom: 10px;">🔴</div>
-        <h3>CodeArts Snap <span style="font-size:14px;color:var(--muted);">by Huawei</span></h3>
-        <p>Huawei（華為）のDevOpsプラットフォーム「CodeArts」に統合されたAIコーディング支援。Pangu（盤古）モデルを活用。エンタープライズ向けセキュリティ・コンプライアンス重視の設計。</p>
-        <ul>
-          <li>開発元：Huawei Cloud</li>
-          <li>基盤モデル：Pangu（盤古）Code</li>
-          <li>形態：Huawei CodeArtsプラットフォーム統合</li>
-          <li>対象：大企業・政府系</li>
-          <li>価格：Huawei Cloud契約ベース</li>
-        </ul>
-        <div class="chip-row">
-          <span class="chip accent">エンタープライズ</span>
-          <span class="chip">政府系対応</span>
-          <span class="chip">Pangu</span>
-          <span class="chip">DevOps統合</span>
+        <!-- Huawei CodeArts Snap -->
+        <div class="tool-card">
+          <div class="tool-card-accent" style="background: linear-gradient(90deg, #dc2626, #991b1b);"></div>
+          <div class="tool-icon">🔴</div>
+          <div class="tool-name">CodeArts Snap</div>
+          <div class="tool-sub">Huawei Cloud — エンタープライズ特化</div>
+          <p class="tool-desc">Huawei DevOpsプラットフォーム「CodeArts」のAIコーディング機能。Pangu（盤古）Codeモデルを活用し、国産チップ（Ascend）上で完全動作。政府・国防・金融向けの最高レベルのデータ主権・セキュリティを提供。</p>
+          <div class="tool-meta">
+            <span class="tool-meta-key">基盤モデル</span><span class="tool-meta-val">Pangu Code（盤古コードモデル）</span>
+            <span class="tool-meta-key">インフラ</span><span class="tool-meta-val">Huawei Ascendチップ上で完全動作（Nvidia不要）</span>
+            <span class="tool-meta-key">形態</span><span class="tool-meta-val">Huawei CodeArtsプラットフォーム統合 / オンプレ</span>
+            <span class="tool-meta-key">対象</span><span class="tool-meta-val">大企業・政府・国防・金融（最高セキュリティ要件）</span>
+            <span class="tool-meta-key">価格</span><span class="tool-meta-val">Huawei Cloud契約ベース（完全カスタム）</span>
+          </div>
+          <div class="update-box">
+            <strong>完全国産スタックの強み</strong>
+            Nvidia依存ゼロ・中国国内完結のサプライチェーン。GLM-5.1と同様、Huawei Ascend + Moore Threads + Cambricon で動作確認済み。
+          </div>
+          <div class="chip-row">
+            <span class="chip accent">政府・国防対応</span>
+            <span class="chip">Ascendチップ</span>
+            <span class="chip">完全オンプレ</span>
+            <span class="chip">DevOps統合</span>
+          </div>
         </div>
-      </div>
 
-    </div>
-
-    <!-- 比較表 -->
-    <div class="section">
-      <h2>一覧比較表</h2>
-      <div style="overflow-x:auto;">
-        <table>
-          <thead>
-            <tr>
-              <th>ツール</th>
-              <th>開発元</th>
-              <th>形態</th>
-              <th>エージェント</th>
-              <th>OSS</th>
-              <th>対象</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>通义灵码</strong></td>
-              <td>Alibaba</td>
-              <td>プラグイン + CLI</td>
-              <td><span class="badge badge-green">あり</span></td>
-              <td><span class="badge badge-blue">モデルOSS</span></td>
-              <td>個人〜企業</td>
-            </tr>
-            <tr>
-              <td><strong>Trae</strong></td>
-              <td>ByteDance</td>
-              <td>スタンドアロンIDE</td>
-              <td><span class="badge badge-green">あり</span></td>
-              <td><span class="badge badge-red">なし</span></td>
-              <td>個人・スタートアップ</td>
-            </tr>
-            <tr>
-              <td><strong>豆包 MarsCode</strong></td>
-              <td>ByteDance</td>
-              <td>プラグイン + クラウドIDE</td>
-              <td><span class="badge badge-gold">部分的</span></td>
-              <td><span class="badge badge-red">なし</span></td>
-              <td>個人〜中小企業</td>
-            </tr>
-            <tr>
-              <td><strong>文心快码 Comate</strong></td>
-              <td>Baidu</td>
-              <td>プラグイン</td>
-              <td><span class="badge badge-gold">部分的</span></td>
-              <td><span class="badge badge-red">なし</span></td>
-              <td>企業（オンプレ対応）</td>
-            </tr>
-            <tr>
-              <td><strong>CodeGeeX</strong></td>
-              <td>Zhipu AI / 清華大学</td>
-              <td>プラグイン</td>
-              <td><span class="badge badge-gold">部分的</span></td>
-              <td><span class="badge badge-green">あり</span></td>
-              <td>研究・個人・OSS</td>
-            </tr>
-            <tr>
-              <td><strong>CodeArts Snap</strong></td>
-              <td>Huawei</td>
-              <td>プラットフォーム統合</td>
-              <td><span class="badge badge-gold">部分的</span></td>
-              <td><span class="badge badge-red">なし</span></td>
-              <td>大企業・政府</td>
-            </tr>
-          </tbody>
-        </table>
       </div>
     </div>
 
-    <!-- Claude Code / Codex との比較 -->
-    <div class="section">
-      <h2>Claude Code / Codex との位置づけ</h2>
-      <div class="split">
-        <div>
-          <h3 style="color: var(--accent-2);">共通点</h3>
-          <ul>
-            <li>VS Code / JetBrains等の主要IDEに対応</li>
-            <li>コード補完・生成・レビュー・テスト生成</li>
-            <li>自然言語による指示でコードを変更</li>
-            <li>マルチファイル編集（エージェントモード）</li>
-            <li>ターミナル / シェル操作（一部ツール）</li>
-          </ul>
-        </div>
-        <div>
-          <h3 style="color: var(--accent);">主な違い</h3>
-          <ul>
-            <li>基盤モデルが国産LLM（Qwen / Doubao / ERNIE等）</li>
-            <li>中国語コードコメント・ドキュメントに強い</li>
-            <li>データが中国サーバー処理（グローバル企業は注意）</li>
-            <li>GitHub Copilot / Claude Code比でエージェント深度はまだ発展途上</li>
-            <li>一部はオンプレ展開が可能（Comate / CodeArts）</li>
-          </ul>
+    <!-- ===== 比較表 ===== -->
+    <div id="compare">
+      <div class="section-label">比較表</div>
+      <div class="section">
+        <h2>全ツール スペック比較</h2>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>ツール</th>
+                <th>最新版</th>
+                <th>形態</th>
+                <th>自律エージェント</th>
+                <th>MCP</th>
+                <th>OSS</th>
+                <th>Figma→Code</th>
+                <th>オンプレ</th>
+                <th>価格</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>通义灵码</strong></td>
+                <td>Quest Beta（2026/2）</td>
+                <td>プラグイン + IDE</td>
+                <td><span class="badge badge-green">Quest自律</span></td>
+                <td><span class="badge badge-green">あり</span></td>
+                <td><span class="badge badge-blue">モデルOSS</span></td>
+                <td><span class="badge badge-gold">部分的</span></td>
+                <td><span class="badge badge-gold">企業向け</span></td>
+                <td>無料〜</td>
+              </tr>
+              <tr>
+                <td><strong>Trae</strong></td>
+                <td>SOLO Mode（2026/4）</td>
+                <td>スタンドアロンIDE</td>
+                <td><span class="badge badge-green">SOLO完全自律</span></td>
+                <td><span class="badge badge-green">あり</span></td>
+                <td><span class="badge badge-red">なし</span></td>
+                <td><span class="badge badge-green">あり</span></td>
+                <td><span class="badge badge-red">なし</span></td>
+                <td>トークン課金</td>
+              </tr>
+              <tr>
+                <td><strong>Trae Plugin</strong><br><span style="font-size:11px;color:var(--muted);">旧MarsCode</span></td>
+                <td>Trae統合（2026）</td>
+                <td>VS Codeプラグイン</td>
+                <td><span class="badge badge-gold">部分的</span></td>
+                <td><span class="badge badge-gold">Trae準拠</span></td>
+                <td><span class="badge badge-red">なし</span></td>
+                <td><span class="badge badge-gold">部分的</span></td>
+                <td><span class="badge badge-red">なし</span></td>
+                <td>無料〜</td>
+              </tr>
+              <tr>
+                <td><strong>文心快码</strong></td>
+                <td>v4.2.0（2026/3/24）</td>
+                <td>プラグイン + IDE</td>
+                <td><span class="badge badge-green">5エージェント並列</span></td>
+                <td><span class="badge badge-gold">部分的</span></td>
+                <td><span class="badge badge-red">なし</span></td>
+                <td><span class="badge badge-green">98%忠実度</span></td>
+                <td><span class="badge badge-green">あり</span></td>
+                <td>無料〜企業</td>
+              </tr>
+              <tr>
+                <td><strong>CodeGeeX4</strong></td>
+                <td>4-ALL-9B（128K）</td>
+                <td>プラグイン</td>
+                <td><span class="badge badge-gold">部分的</span></td>
+                <td><span class="badge badge-red">なし</span></td>
+                <td><span class="badge badge-green">完全OSS</span></td>
+                <td><span class="badge badge-red">なし</span></td>
+                <td><span class="badge badge-green">あり</span></td>
+                <td>無料</td>
+              </tr>
+              <tr>
+                <td><strong>CodeArts Snap</strong></td>
+                <td>Huawei Cloud統合</td>
+                <td>プラットフォーム</td>
+                <td><span class="badge badge-gold">部分的</span></td>
+                <td><span class="badge badge-red">なし</span></td>
+                <td><span class="badge badge-red">なし</span></td>
+                <td><span class="badge badge-red">なし</span></td>
+                <td><span class="badge badge-green">完全対応</span></td>
+                <td>Huawei契約</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
 
-    <!-- 注意点 -->
-    <div class="note-box">
-      <strong>⚠ データ主権・利用規約の確認を</strong><br>
-      中国企業製ツールはデータが中国サーバーで処理される場合があります。グローバルプロジェクトや機密コードに使用する場合は、各サービスのデータポリシーと自社のコンプライアンス要件を必ず確認してください。Comate・CodeArts はオンプレミス展開オプションを提供しています。
+    <!-- ===== セットアップ ===== -->
+    <div id="setup">
+      <div class="section-label">VS Code セットアップガイド</div>
+      <div class="section">
+        <h2>主要ツールの導入手順</h2>
+        <div class="split">
+          <div>
+            <h3>通义灵码（Tongyi Lingma）</h3>
+            <div class="steps">
+              <div class="step"><div class="step-num">1</div><div><h4>VS Code 拡張機能を検索</h4><p>Extensions（Cmd+Shift+X）で「Tongyi Lingma」または「Alibaba」と検索</p></div></div>
+              <div class="step"><div class="step-num">2</div><div><h4>Alibaba Cloudアカウントでサインイン</h4><p>無料アカウント登録後、拡張機能からログイン</p></div></div>
+              <div class="step"><div class="step-num">3</div><div><h4>エージェントモードを有効化</h4><p>設定 → Lingma Agent Mode をオン。Quest Betaは別途申請が必要</p></div></div>
+            </div>
+            <div class="cmd">ext install Alibaba-Cloud.tongyi-lingma</div>
+          </div>
+          <div>
+            <h3>Trae（スタンドアロン）</h3>
+            <div class="steps">
+              <div class="step"><div class="step-num">1</div><div><h4>trae.ai からダウンロード</h4><p>macOS / Windows 対応。VS CodeのExtensions・設定は自動インポート可能</p></div></div>
+              <div class="step"><div class="step-num">2</div><div><h4>モデルを選択</h4><p>Claude 3.7 Sonnet / GPT-4o / DeepSeek R1 から選択（無料枠あり）</p></div></div>
+              <div class="step"><div class="step-num">3</div><div><h4>Builder / SOLO モードを使う</h4><p>チャットパネル上部でモード切替。SOLOは自律的にプランニング〜実装〜テストを実行</p></div></div>
+            </div>
+          </div>
+          <div>
+            <h3>CodeGeeX（OSS・ローカル実行も可）</h3>
+            <div class="steps">
+              <div class="step"><div class="step-num">1</div><div><h4>VS Code 拡張をインストール</h4><p>「CodeGeeX」で検索 → Zhipu AI 製のものを選択</p></div></div>
+              <div class="step"><div class="step-num">2</div><div><h4>サインインまたはローカルモード選択</h4><p>Z.ai アカウントでクラウド利用 or ローカルモデル（9B）をダウンロードして完全オフライン実行可</p></div></div>
+              <div class="step"><div class="step-num">3</div><div><h4>インタラクションモードを理解する</h4><p>Stealth / Interactive / Translation / Prompt の4モードを使い分け</p></div></div>
+            </div>
+            <div class="cmd">ext install aminer.codegeex</div>
+          </div>
+          <div>
+            <h3>文心快码（Baidu Comate）</h3>
+            <div class="steps">
+              <div class="step"><div class="step-num">1</div><div><h4>拡張機能をインストール</h4><p>「Baidu Comate」または「文心快码」で検索してインストール</p></div></div>
+              <div class="step"><div class="step-num">2</div><div><h4>Baiduアカウントでログイン</h4><p>comate.baidu.com でアカウント作成後、拡張機能から認証</p></div></div>
+              <div class="step"><div class="step-num">3</div><div><h4>マルチエージェントモードを試す</h4><p>Comate AI IDE（別製品）を使うとZuluオーケストレーターによる5エージェント並列が利用可能</p></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 用途別選び方 ===== -->
+    <div id="usecases">
+      <div class="section-label">用途別おすすめ</div>
+      <div class="section">
+        <h2>シチュエーション別 最適ツール</h2>
+        <div class="grid-3">
+          <div class="rec-card">
+            <h4>🆓 とにかく無料で試したい</h4>
+            <p>無料枠が最も広く、モデル選択肢も多い。Claude / GPT-4oも無料で使える。</p>
+            <span class="rec-winner">→ Trae</span>
+          </div>
+          <div class="rec-card">
+            <h4>🔌 今のVS Codeを変えたくない</h4>
+            <p>既存環境にプラグインとして入れるだけ。設定変更最小限。</p>
+            <span class="rec-winner">→ Trae Plugin / CodeGeeX</span>
+          </div>
+          <div class="rec-card">
+            <h4>🤖 Claude Code相当の完全自律が欲しい</h4>
+            <p>Quest（通义灵码）またはSOLO（Trae）が最も近い。MCP対応も両方あり。</p>
+            <span class="rec-winner">→ 通义灵码 / Trae</span>
+          </div>
+          <div class="rec-card">
+            <h4>🎨 Figmaデザインからコードを生成したい</h4>
+            <p>Comate v4のF2Cが98%忠実度で業界最高水準。TraeのFigma統合も有力。</p>
+            <span class="rec-winner">→ Baidu Comate / Trae</span>
+          </div>
+          <div class="rec-card">
+            <h4>🔒 完全OSS・ローカル実行したい</h4>
+            <p>9BモデルをローカルにDLしてオフライン実行可能。プライベートデプロイも対応。</p>
+            <span class="rec-winner">→ CodeGeeX4</span>
+          </div>
+          <div class="rec-card">
+            <h4>🏢 大企業・政府系・オンプレ必須</h4>
+            <p>完全ローカル展開・最高セキュリティ要件・国産インフラで動作。</p>
+            <span class="rec-winner">→ CodeArts Snap / Comate</span>
+          </div>
+          <div class="rec-card">
+            <h4>🇨🇳 中国語コメント・ドキュメント重視</h4>
+            <p>いずれも中国語に強いが、ERNIE Codeは中国語業務コードに特に最適化されている。</p>
+            <span class="rec-winner">→ Baidu Comate</span>
+          </div>
+          <div class="rec-card">
+            <h4>📊 複数モデルを切り替えて使いたい</h4>
+            <p>Claude / GPT-4o / DeepSeek / Doubaoを1つのIDEで切替可能。</p>
+            <span class="rec-winner">→ Trae</span>
+          </div>
+          <div class="rec-card">
+            <h4>🔬 研究・OSS貢献・学習目的</h4>
+            <p>モデル・コードが完全公開。Hugging Faceからモデルも取得可能。</p>
+            <span class="rec-winner">→ CodeGeeX4</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 2026トレンド ===== -->
+    <div id="trends">
+      <div class="section-label">2026年 最新トレンド</div>
+      <div class="section">
+        <h2>中国系AIコーディングの進化タイムライン</h2>
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-date">2026年4月</div>
+            <div class="timeline-body">
+              <h4>Trae — MCP対応 + SOLO自律モード</h4>
+              <p>エージェントシステム・MCPプロトコル・Figma→コード変換・SOLO完全自律を一斉実装。Windowsサポートも追加し普及が加速。</p>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-date">2026年3月</div>
+            <div class="timeline-body">
+              <h4>Baidu Comate v4.2 — 5エージェント並列 + Comate AI IDE</h4>
+              <p>Zuluオーケストレーターによる5専門エージェント並列実行・F2C 98%忠実度・業界初マルチエージェントAI IDEをリリース。</p>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-date">2026年2月</div>
+            <div class="timeline-body">
+              <h4>通义灵码 — Quest自律Beta + マルチエージェント並列セッション</h4>
+              <p>完全自律Quest・並列マルチエージェント・カスタムスキル/Hook機構を追加。Claude Code相当の機能水準に到達。</p>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-date">2025年10月</div>
+            <div class="timeline-body">
+              <h4>MarsCode — 画像・スケッチからWebページ生成</h4>
+              <p>マルチモーダル入力でWebページ自動生成。その後Traeエコシステムに統合。</p>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-date">2025年以降共通</div>
+            <div class="timeline-body">
+              <h4>業界全体トレンド：3つの方向性</h4>
+              <p><strong>① MCPプロトコル標準化</strong>：外部ツール連携が共通規格に収束。<br><strong>② Figma→コード</strong>：デザイン→実装の自動化が各社競争領域に。<br><strong>③ 完全自律モード</strong>：「指示→確認」型から「放置→完成」型へシフト。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 西側ツールとの比較 ===== -->
+    <div id="vs-west">
+      <div class="section-label">西側ツールとの比較</div>
+      <div class="section">
+        <h2>Claude Code / Cursor / Copilot との位置づけ</h2>
+        <div class="split">
+          <div>
+            <h3 style="color:var(--accent-2);">中国系ツールの強み</h3>
+            <ul>
+              <li><strong>コスト</strong>：無料枠が広い（Trae・CodeGeeX）、または大幅に安い</li>
+              <li><strong>中国語対応</strong>：コメント・ドキュメント・エラーメッセージが自然な中国語</li>
+              <li><strong>国産LLMの進化速度</strong>：Qwen3.6-Max・ERNIE等が急速に追いつき</li>
+              <li><strong>オンプレ対応</strong>：Comate・CodeArtsは完全ローカル展開で中国規制に対応</li>
+              <li><strong>Figma統合</strong>：ComatとTraeはデザイン→コード変換が西側より成熟</li>
+              <li><strong>エコシステム統合</strong>：Alibaba Cloud・Baidu Cloud・ByteDanceとの深い連携</li>
+            </ul>
+          </div>
+          <div>
+            <h3 style="color:var(--accent);">まだ西側が優位な領域</h3>
+            <ul>
+              <li><strong>エージェント深度</strong>：Claude CodeのMCP・ツール拡張の幅はまだ差がある</li>
+              <li><strong>グローバルOSSエコシステム</strong>：GitHub連携・英語ドキュメントの充実度</li>
+              <li><strong>モデル品質（コーディング上限）</strong>：GPT-5.5・Claude Opus 4.6との差は縮小中だが残存</li>
+              <li><strong>日本語対応</strong>：中国語に比べると日本語精度は劣る場合がある</li>
+              <li><strong>サードパーティプラグイン</strong>：VS Code Marketplace等での拡張エコシステム</li>
+            </ul>
+          </div>
+        </div>
+
+        <div style="margin-top:20px;">
+          <h3 style="color:var(--accent-2); margin-bottom:12px;">簡易スペック対照表</h3>
+          <div style="overflow-x:auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>ツール</th><th>開発元</th><th>完全自律</th><th>MCP</th><th>Figma</th><th>無料枠</th><th>日本語</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>Claude Code</strong></td><td>Anthropic（米）</td><td><span class="badge badge-green">◎</span></td><td><span class="badge badge-green">◎</span></td><td><span class="badge badge-gold">△</span></td><td><span class="badge badge-gold">△</span></td><td><span class="badge badge-green">◎</span></td></tr>
+                <tr><td><strong>Cursor</strong></td><td>Anysphere（米）</td><td><span class="badge badge-green">○</span></td><td><span class="badge badge-green">○</span></td><td><span class="badge badge-green">○</span></td><td><span class="badge badge-gold">△</span></td><td><span class="badge badge-green">○</span></td></tr>
+                <tr><td><strong>GitHub Copilot</strong></td><td>GitHub/MS（米）</td><td><span class="badge badge-gold">△</span></td><td><span class="badge badge-gold">△</span></td><td><span class="badge badge-red">×</span></td><td><span class="badge badge-red">×</span></td><td><span class="badge badge-green">○</span></td></tr>
+                <tr><td><strong>通义灵码</strong></td><td>Alibaba（中）</td><td><span class="badge badge-green">○</span></td><td><span class="badge badge-green">○</span></td><td><span class="badge badge-gold">△</span></td><td><span class="badge badge-green">◎</span></td><td><span class="badge badge-gold">△</span></td></tr>
+                <tr><td><strong>Trae</strong></td><td>ByteDance（中）</td><td><span class="badge badge-green">◎</span></td><td><span class="badge badge-green">◎</span></td><td><span class="badge badge-green">○</span></td><td><span class="badge badge-green">○</span></td><td><span class="badge badge-gold">△</span></td></tr>
+                <tr><td><strong>Baidu Comate</strong></td><td>Baidu（中）</td><td><span class="badge badge-green">○</span></td><td><span class="badge badge-gold">△</span></td><td><span class="badge badge-green">◎</span></td><td><span class="badge badge-green">○</span></td><td><span class="badge badge-gold">△</span></td></tr>
+                <tr><td><strong>CodeGeeX4</strong></td><td>Zhipu AI（中）</td><td><span class="badge badge-gold">△</span></td><td><span class="badge badge-red">×</span></td><td><span class="badge badge-red">×</span></td><td><span class="badge badge-green">◎</span></td><td><span class="badge badge-gold">△</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="font-size:12px; color:var(--muted); margin-top:8px;">◎ 優秀 / ○ 対応 / △ 部分的 / × 未対応</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== セキュリティ ===== -->
+    <div id="security">
+      <div class="section-label">データセキュリティ・コンプライアンス</div>
+      <div class="section">
+        <h2>利用前に確認すべきこと</h2>
+        <div class="split">
+          <div>
+            <h3>リスクの整理</h3>
+            <ul>
+              <li><strong>データ処理場所</strong>：クラウド版はコードが中国サーバーに送信される。機密コード・特許・未公開製品には注意。</li>
+              <li><strong>利用規約の確認</strong>：送信したコードが学習データに使われるかを各社ポリシーで確認。</li>
+              <li><strong>企業コンプライアンス</strong>：SOC2・GDPR・ISO27001などの認証取得状況を確認。</li>
+              <li><strong>輸出規制</strong>：米国の輸出規制（EAR）対象プロジェクトには使用不可の場合あり。</li>
+            </ul>
+          </div>
+          <div>
+            <h3>リスク低減策</h3>
+            <ul>
+              <li><strong>オンプレ展開</strong>：Comate・CodeArts・CodeGeeXはオンプレ対応。コードが外部に出ない。</li>
+              <li><strong>ローカルモデル実行</strong>：CodeGeeX4の9Bモデルをローカルで動かせばデータ送信なし。</li>
+              <li><strong>OSSコードのみ使用</strong>：公開予定のOSSプロジェクトなら機密性の問題が小さい。</li>
+              <li><strong>機密・社内コードは分離</strong>：学習・プロトタイプ用途に限定し、本番コードには別ツールを使う運用も有効。</li>
+            </ul>
+          </div>
+        </div>
+
+        <div style="margin-top:16px; display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px;">
+          <div class="warn-box">
+            <strong>⚠ グローバル企業</strong>
+            本番コード・IP・未発表製品への使用は法務・セキュリティ部門の承認を得てから。
+          </div>
+          <div class="note-box">
+            <strong>✅ OSSプロジェクト</strong>
+            公開コードへの使用はほぼ問題なし。無料で強力なコーディング支援が得られる。
+          </div>
+          <div class="note-box">
+            <strong>✅ オンプレ構築</strong>
+            Comate・CodeGeeX・CodeArtsはオンプレ対応。完全ローカルで最高水準のセキュリティ。
+          </div>
+        </div>
+      </div>
     </div>
 
   </div>
