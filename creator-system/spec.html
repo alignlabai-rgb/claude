@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>システム仕様書 | AI Creator Hub</title>
-  <meta name="description" content="AI Creator Hub の各モジュール仕様・API・データフロー定義">
+  <meta name="description" content="AI Creator Hub の各モジュール仕様・API・データフロー・デプロイ・環境変数・モニタリング定義">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -26,19 +26,37 @@
 <section class="hero" style="min-height: 60vh;">
   <div class="hero-bg"></div>
   <div class="hero-content">
-    <div class="hero-badge"><span class="dot-live"></span>仕様書 v0.1</div>
+    <div class="hero-badge"><span class="dot-live"></span>仕様書 v0.4 — 2026-05更新</div>
     <h1 class="fade-up">
       AI Creator Hub<br>
       <span class="gradient-text">システム仕様書</span>
     </h1>
     <p class="hero-desc fade-up-2">
-      各モジュールのインターフェース定義・データフロー・API仕様をまとめたリファレンスです。<br>
+      各モジュールのインターフェース・デプロイ・環境変数・ストレージ・認証・モニタリング仕様をまとめたリファレンスです。<br>
       実装時・連携設計時の一次情報源として利用します。
     </p>
     <div class="hero-cta fade-up-3">
-      <a href="#modules" class="btn btn-primary">モジュール一覧へ</a>
-      <a href="index.html" class="btn btn-outline">全体像に戻る</a>
+      <a href="#modules" class="btn btn-primary">モジュール一覧</a>
+      <a href="#deploy" class="btn btn-outline">デプロイ手順</a>
+      <a href="#envvars" class="btn btn-outline">環境変数</a>
     </div>
+  </div>
+</section>
+
+<!-- TOC -->
+<section style="background: var(--bg2); padding: 1.5rem 2rem; border-bottom: 1px solid var(--border);">
+  <div style="max-width: 1100px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; font-size: 0.85rem;">
+    <span style="color: var(--text-muted); font-weight: 700; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; margin-right: 0.5rem;">目次 →</span>
+    <a href="#modules" style="color: var(--accent);">モジュール構成</a>
+    <a href="#datatypes" style="color: var(--accent);">型定義</a>
+    <a href="#api" style="color: var(--accent);">APIエンドポイント</a>
+    <a href="#envvars" style="color: var(--accent);">環境変数</a>
+    <a href="#deploy" style="color: var(--accent);">デプロイ</a>
+    <a href="#storage" style="color: var(--accent);">ストレージ設計</a>
+    <a href="#auth" style="color: var(--accent);">認証・セキュリティ</a>
+    <a href="#monitoring" style="color: var(--accent);">モニタリング</a>
+    <a href="#errors" style="color: var(--accent);">エラーコード</a>
+    <a href="#changelog" style="color: var(--accent);">変更ログ</a>
   </div>
 </section>
 
@@ -47,9 +65,7 @@
   <div class="section-inner">
     <div class="section-label">モジュール構成</div>
     <h2 class="section-title">5つのコアモジュール</h2>
-    <p class="section-desc">
-      各モジュールは独立したOpenClaw Skillとして実装され、メッセージキューで非同期連携します。
-    </p>
+    <p class="section-desc">各モジュールは独立したOpenClaw Skillとして実装され、メッセージキューで非同期連携します。</p>
 
     <div class="card-grid">
       <div class="card">
@@ -58,7 +74,8 @@
         <p>ネタ文章を受け取り、ジャンル・ターゲット・難易度を分析してメタデータを付与する。</p>
         <div style="margin-top: 1rem; font-size: 0.82rem; color: var(--text-muted);">
           <strong>Input:</strong> raw_text: string<br>
-          <strong>Output:</strong> topic_data: TopicMeta
+          <strong>Output:</strong> topic_data: TopicMeta<br>
+          <strong>SLA:</strong> &lt;10秒
         </div>
       </div>
       <div class="card">
@@ -67,7 +84,8 @@
         <p>topic_data からスクリプト生成・画像生成・音声合成・動画合成を行う。</p>
         <div style="margin-top: 1rem; font-size: 0.82rem; color: var(--text-muted);">
           <strong>Input:</strong> topic_data: TopicMeta<br>
-          <strong>Output:</strong> video: ContentArtifact
+          <strong>Output:</strong> video: ContentArtifact<br>
+          <strong>SLA:</strong> ショート 8〜15分
         </div>
       </div>
       <div class="card">
@@ -76,7 +94,8 @@
         <p>topic_data からコマ割り・キャラ生成・セリフ配置・ページ合成を行う。</p>
         <div style="margin-top: 1rem; font-size: 0.82rem; color: var(--text-muted);">
           <strong>Input:</strong> topic_data: TopicMeta<br>
-          <strong>Output:</strong> manga: ContentArtifact
+          <strong>Output:</strong> manga: ContentArtifact<br>
+          <strong>SLA:</strong> 8ページ 20〜40分
         </div>
       </div>
       <div class="card">
@@ -85,7 +104,8 @@
         <p>生成コンテンツをスコアリングし、公開可否フラグと改善提案を返す。</p>
         <div style="margin-top: 1rem; font-size: 0.82rem; color: var(--text-muted);">
           <strong>Input:</strong> artifact: ContentArtifact<br>
-          <strong>Output:</strong> result: EvalResult
+          <strong>Output:</strong> result: EvalResult<br>
+          <strong>SLA:</strong> &lt;5秒
         </div>
       </div>
       <div class="card">
@@ -94,7 +114,8 @@
         <p>評価通過コンテンツを指定プラットフォームに投稿し、収益データを記録する。</p>
         <div style="margin-top: 1rem; font-size: 0.82rem; color: var(--text-muted);">
           <strong>Input:</strong> artifact: ContentArtifact, score: number<br>
-          <strong>Output:</strong> publish: PublishResult
+          <strong>Output:</strong> publish: PublishResult<br>
+          <strong>SLA:</strong> &lt;60秒
         </div>
       </div>
     </div>
@@ -102,7 +123,7 @@
 </section>
 
 <!-- Data Types -->
-<section class="section" style="background: var(--bg2);">
+<section class="section" id="datatypes" style="background: var(--bg2);">
   <div class="section-inner">
     <div class="section-label">型定義</div>
     <h2 class="section-title">共通データ型</h2>
@@ -111,12 +132,12 @@
         <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--text-muted);">TopicMeta</h3>
         <div class="code-block">
 <span class="fn">type</span> <span class="str">TopicMeta</span> = {
-  <span class="fn">id</span>: <span class="str">string</span>          <span class="cm">// UUID</span>
+  <span class="fn">id</span>: <span class="str">string</span>          <span class="cm">// UUID v4</span>
   <span class="fn">raw_text</span>: <span class="str">string</span>    <span class="cm">// 元ネタ文章</span>
   <span class="fn">genre</span>: <span class="str">string</span>       <span class="cm">// "comedy"|"horror"|...</span>
   <span class="fn">target_age</span>: <span class="str">string</span>  <span class="cm">// "teen"|"adult"|"all"</span>
   <span class="fn">difficulty</span>: <span class="str">number</span>  <span class="cm">// 1–5</span>
-  <span class="fn">keywords</span>: <span class="str">string[]</span>  <span class="cm">// タグ</span>
+  <span class="fn">keywords</span>: <span class="str">string[]</span>  <span class="cm">// タグ候補</span>
   <span class="fn">created_at</span>: <span class="str">string</span>  <span class="cm">// ISO 8601</span>
 }</div>
 
@@ -125,11 +146,12 @@
 <span class="fn">type</span> <span class="str">ContentArtifact</span> = {
   <span class="fn">id</span>: <span class="str">string</span>
   <span class="fn">type</span>: <span class="str">"video" | "manga"</span>
-  <span class="fn">file_path</span>: <span class="str">string</span>   <span class="cm">// ストレージパス</span>
+  <span class="fn">file_path</span>: <span class="str">string</span>   <span class="cm">// GCS / S3 パス</span>
   <span class="fn">thumbnail</span>: <span class="str">string</span>   <span class="cm">// サムネイルURL</span>
   <span class="fn">duration_sec</span>: <span class="str">number</span><span class="cm">// 動画の場合</span>
   <span class="fn">page_count</span>: <span class="str">number</span>  <span class="cm">// 漫画の場合</span>
   <span class="fn">topic_id</span>: <span class="str">string</span>    <span class="cm">// TopicMeta.id</span>
+  <span class="fn">size_bytes</span>: <span class="str">number</span>
   <span class="fn">created_at</span>: <span class="str">string</span>
 }</div>
       </div>
@@ -139,13 +161,17 @@
 <span class="fn">type</span> <span class="str">EvalResult</span> = {
   <span class="fn">artifact_id</span>: <span class="str">string</span>
   <span class="fn">score</span>: <span class="str">number</span>        <span class="cm">// 0–100</span>
-  <span class="fn">passed</span>: <span class="str">boolean</span>     <span class="cm">// score >= 85</span>
+  <span class="fn">decision</span>: <span class="str">string</span>    <span class="cm">// PUBLISH|IMPROVE
+                        //   |REVIEW|DISCARD</span>
   <span class="fn">breakdown</span>: {
-    <span class="fn">quality</span>: <span class="str">number</span>   <span class="cm">// 映像/画像品質</span>
-    <span class="fn">engagement</span>: <span class="str">number</span><span class="cm">// エンゲージメント予測</span>
-    <span class="fn">originality</span>: <span class="str">number</span>
+    <span class="fn">visual</span>: <span class="str">number</span>
+    <span class="fn">content</span>: <span class="str">number</span>
+    <span class="fn">seo</span>: <span class="str">number</span>
+    <span class="fn">safety</span>: <span class="str">number</span>
+    <span class="fn">engagement</span>: <span class="str">number</span>
   }
   <span class="fn">suggestions</span>: <span class="str">string[]</span>
+  <span class="fn">evaluated_at</span>: <span class="str">string</span>
 }</div>
 
         <h3 style="margin: 1.5rem 0 1rem; font-size: 1rem; color: var(--text-muted);">PublishResult</h3>
@@ -153,11 +179,13 @@
 <span class="fn">type</span> <span class="str">PublishResult</span> = {
   <span class="fn">artifact_id</span>: <span class="str">string</span>
   <span class="fn">platforms</span>: {
-    <span class="fn">name</span>: <span class="str">string</span>      <span class="cm">// "youtube"|"note"|...</span>
+    <span class="fn">name</span>: <span class="str">string</span>
     <span class="fn">url</span>: <span class="str">string</span>
     <span class="fn">published_at</span>: <span class="str">string</span>
+    <span class="fn">status</span>: <span class="str">"success"|"failed"</span>
   }[]
-  <span class="fn">revenue_est</span>: <span class="str">number</span> <span class="cm">// 初期収益試算 (JPY)</span>
+  <span class="fn">revenue_est_jpy</span>: <span class="str">number</span>
+  <span class="fn">tracking_id</span>: <span class="str">string</span>
 }</div>
       </div>
     </div>
@@ -165,7 +193,7 @@
 </section>
 
 <!-- API Endpoints -->
-<section class="section">
+<section class="section" id="api">
   <div class="section-inner">
     <div class="section-label">API エンドポイント</div>
     <h2 class="section-title">モジュール間インターフェース</h2>
@@ -173,9 +201,10 @@
     <div style="display: flex; flex-direction: column; gap: 1.25rem;">
 
       <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem;">
-        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap;">
           <span style="background: rgba(108,60,225,0.2); color: #a48cf5; font-size: 0.78rem; font-weight: 700; padding: 0.25rem 0.6rem; border-radius: 4px;">POST</span>
           <code style="font-size: 0.9rem;">/api/v1/topic-analyzer/analyze</code>
+          <span class="tag tag-green" style="margin-left: auto;">SLA: &lt;10s</span>
         </div>
         <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 0.75rem;">ネタ文章を解析してTopicMetaを返す。</p>
         <div class="code-block" style="margin: 0;">
@@ -183,27 +212,54 @@
 { <span class="fn">"raw_text"</span>: <span class="str">"ネタ文章をここに..."</span> }
 
 <span class="cm">// Response 200</span>
-{ <span class="fn">"topic_data"</span>: TopicMeta }</div>
+{ <span class="fn">"topic_data"</span>: TopicMeta }
+
+<span class="cm">// Response 422 — フィルタリング除外</span>
+{ <span class="fn">"error"</span>: <span class="str">"content_filtered"</span>, <span class="fn">"reason"</span>: <span class="str">"inappropriate"</span> }</div>
       </div>
 
       <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem;">
-        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap;">
           <span style="background: rgba(0,212,255,0.2); color: var(--accent); font-size: 0.78rem; font-weight: 700; padding: 0.25rem 0.6rem; border-radius: 4px;">POST</span>
           <code style="font-size: 0.9rem;">/api/v1/{video|manga}-pipeline/start</code>
+          <span class="tag tag-cyan" style="margin-left: auto;">非同期ジョブ</span>
         </div>
-        <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 0.75rem;">コンテンツ生成を開始する。非同期ジョブとして実行。</p>
+        <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 0.75rem;">コンテンツ生成を開始。非同期ジョブとして実行し、完了時にcallback_urlへPOST。</p>
         <div class="code-block" style="margin: 0;">
 <span class="cm">// Request</span>
-{ <span class="fn">"topic_data"</span>: TopicMeta, <span class="fn">"target_duration"</span>: <span class="str">60</span> }
+{
+  <span class="fn">"topic_data"</span>: TopicMeta,
+  <span class="fn">"target_duration"</span>: <span class="num">60</span>,
+  <span class="fn">"style_preset"</span>: <span class="str">"news_modern"</span>,
+  <span class="fn">"callback_url"</span>: <span class="str">"http://evaluator/ingest"</span>
+}
 
-<span class="cm">// Response 202</span>
-{ <span class="fn">"job_id"</span>: <span class="str">"string"</span>, <span class="fn">"status"</span>: <span class="str">"queued"</span> }</div>
+<span class="cm">// Response 202 — 受付</span>
+{ <span class="fn">"job_id"</span>: <span class="str">"job_abc123"</span>, <span class="fn">"status"</span>: <span class="str">"queued"</span>, <span class="fn">"eta_sec"</span>: <span class="num">540</span> }</div>
       </div>
 
       <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem;">
-        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap;">
+          <span style="background: rgba(0,212,255,0.15); color: var(--accent); font-size: 0.78rem; font-weight: 700; padding: 0.25rem 0.6rem; border-radius: 4px;">GET</span>
+          <code style="font-size: 0.9rem;">/api/v1/{video|manga}-pipeline/{job_id}/status</code>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 0.75rem;">生成ジョブの進捗を確認する。</p>
+        <div class="code-block" style="margin: 0;">
+<span class="cm">// Response 200</span>
+{
+  <span class="fn">"status"</span>: <span class="str">"composing"</span>,    <span class="cm">// queued|running|composing|done|failed</span>
+  <span class="fn">"progress"</span>: <span class="num">84</span>,
+  <span class="fn">"current_step"</span>: <span class="str">"ffmpeg_compose"</span>,
+  <span class="fn">"eta_sec"</span>: <span class="num">127</span>,
+  <span class="fn">"cost_so_far_usd"</span>: <span class="num">0.43</span>
+}</div>
+      </div>
+
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem;">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap;">
           <span style="background: rgba(0,220,130,0.2); color: #00DC82; font-size: 0.78rem; font-weight: 700; padding: 0.25rem 0.6rem; border-radius: 4px;">POST</span>
           <code style="font-size: 0.9rem;">/api/v1/evaluator/ingest</code>
+          <span class="tag tag-green" style="margin-left: auto;">SLA: &lt;5s</span>
         </div>
         <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 0.75rem;">生成済みコンテンツをスコアリングキューに投入する。</p>
         <div class="code-block" style="margin: 0;">
@@ -215,40 +271,520 @@
       </div>
 
       <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem;">
-        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap;">
           <span style="background: rgba(255,107,107,0.2); color: #FF6B6B; font-size: 0.78rem; font-weight: 700; padding: 0.25rem 0.6rem; border-radius: 4px;">POST</span>
           <code style="font-size: 0.9rem;">/api/v1/monetization/publish</code>
+          <span class="tag tag-orange" style="margin-left: auto;">SLA: &lt;60s</span>
         </div>
         <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 0.75rem;">評価通過コンテンツを指定プラットフォームに投稿する。</p>
         <div class="code-block" style="margin: 0;">
 <span class="cm">// Request</span>
-{ <span class="fn">"artifact"</span>: ContentArtifact, <span class="fn">"score"</span>: <span class="str">92</span>, <span class="fn">"platforms"</span>: [<span class="str">"youtube"</span>, <span class="str">"note"</span>] }
+{
+  <span class="fn">"artifact"</span>: ContentArtifact,
+  <span class="fn">"score"</span>: <span class="num">92</span>,
+  <span class="fn">"platforms"</span>: [<span class="str">"youtube"</span>, <span class="str">"note"</span>],
+  <span class="fn">"scheduled_at"</span>: <span class="str">"2026-05-12T20:00:00+09:00"</span>
+}
 
 <span class="cm">// Response 200</span>
 { <span class="fn">"publish_result"</span>: PublishResult }</div>
+      </div>
+
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem;">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap;">
+          <span style="background: rgba(108,60,225,0.2); color: #a48cf5; font-size: 0.78rem; font-weight: 700; padding: 0.25rem 0.6rem; border-radius: 4px;">POST</span>
+          <code style="font-size: 0.9rem;">/api/v1/topic-ai/feedback</code>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 0.75rem;">収益・評価データをネタ生成AIへフィードバックする。</p>
+        <div class="code-block" style="margin: 0;">
+<span class="cm">// Request</span>
+{
+  <span class="fn">"evaluation_id"</span>: <span class="str">"eval_20260321_001"</span>,
+  <span class="fn">"decision"</span>: <span class="str">"DISCARD"</span>,
+  <span class="fn">"failed_metrics"</span>: [<span class="str">"seo"</span>, <span class="str">"engagement"</span>],
+  <span class="fn">"topic_pattern"</span>: {
+    <span class="fn">"genre"</span>: <span class="str">"tech_news"</span>,
+    <span class="fn">"avoid_next_time"</span>: <span class="kw">true</span>
+  }
+}
+
+<span class="cm">// Response 200</span>
+{ <span class="fn">"feedback_id"</span>: <span class="str">"fb_xyz789"</span>, <span class="fn">"applied"</span>: <span class="kw">true</span> }</div>
       </div>
 
     </div>
   </div>
 </section>
 
+<!-- Environment Variables -->
+<section class="section" id="envvars" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-label">環境変数リファレンス</div>
+    <h2 class="section-title">全APIキー・設定値の一覧</h2>
+    <p class="section-desc">`.env` ファイルに設定する環境変数の完全リスト。<br>本番環境では必ずSecret Managerに格納すること。</p>
+
+    <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--text-muted);">コンテンツ生成 API</h3>
+    <div class="table-wrap" style="margin-bottom: 2rem;">
+      <table>
+        <thead>
+          <tr><th>変数名</th><th>説明</th><th>取得先</th><th>必須</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>OPENAI_API_KEY</code></td><td>GPT-5.5 スクリプト生成</td><td>platform.openai.com</td><td><span class="tag tag-orange">必須</span></td></tr>
+          <tr><td><code>ANTHROPIC_API_KEY</code></td><td>Claude Sonnet 4.6 代替生成</td><td>console.anthropic.com</td><td><span class="tag tag-orange">必須</span></td></tr>
+          <tr><td><code>GEMINI_API_KEY</code></td><td>Gemini 3.1 Pro 評価・長文</td><td>aistudio.google.com</td><td><span class="tag tag-orange">必須</span></td></tr>
+          <tr><td><code>MIDJOURNEY_API_KEY</code></td><td>シーン画像生成</td><td>midjourney.com/account</td><td><span class="tag tag-orange">必須</span></td></tr>
+          <tr><td><code>RUNWAYML_API_KEY</code></td><td>動画クリップ生成（メイン）</td><td>app.runwayml.com/settings</td><td><span class="tag tag-orange">必須</span></td></tr>
+          <tr><td><code>KLING_API_KEY</code></td><td>動画クリップ生成（フォールバック）</td><td>klingai.com/api</td><td><span class="tag tag-cyan">推奨</span></td></tr>
+          <tr><td><code>ELEVENLABS_API_KEY</code></td><td>ナレーション音声合成</td><td>elevenlabs.io/settings</td><td><span class="tag tag-orange">必須</span></td></tr>
+          <tr><td><code>SUNO_API_KEY</code></td><td>BGM生成</td><td>suno.com/account</td><td><span class="tag tag-cyan">推奨</span></td></tr>
+          <tr><td><code>DALLE_API_KEY</code></td><td>DALL-E 4 画像（Midjourneyフォールバック）</td><td>OpenAIと共通</td><td><span class="tag tag-green">任意</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--text-muted);">マネタイズ・配信 API</h3>
+    <div class="table-wrap" style="margin-bottom: 2rem;">
+      <table>
+        <thead>
+          <tr><th>変数名</th><th>説明</th><th>取得先</th><th>必須</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>YOUTUBE_API_KEY</code></td><td>YouTube Data API v3</td><td>console.cloud.google.com</td><td><span class="tag tag-orange">必須</span></td></tr>
+          <tr><td><code>YOUTUBE_CLIENT_ID</code></td><td>OAuth 2.0 クライアントID</td><td>同上</td><td><span class="tag tag-orange">必須</span></td></tr>
+          <tr><td><code>YOUTUBE_CLIENT_SECRET</code></td><td>OAuth 2.0 シークレット</td><td>同上</td><td><span class="tag tag-orange">必須</span></td></tr>
+          <tr><td><code>NOTE_SESSION_TOKEN</code></td><td>note 投稿セッショントークン</td><td>Cookieから取得</td><td><span class="tag tag-orange">必須</span></td></tr>
+          <tr><td><code>KDP_EMAIL</code></td><td>Kindle Direct Publishing ログインメール</td><td>kdp.amazon.co.jp</td><td><span class="tag tag-cyan">推奨</span></td></tr>
+          <tr><td><code>KDP_PASSWORD</code></td><td>KDP ログインパスワード</td><td>同上</td><td><span class="tag tag-cyan">推奨</span></td></tr>
+          <tr><td><code>BOOTH_API_TOKEN</code></td><td>Booth 販売API</td><td>manage.booth.pm</td><td><span class="tag tag-cyan">推奨</span></td></tr>
+          <tr><td><code>TWITTER_BEARER_TOKEN</code></td><td>X (Twitter) 自動投稿</td><td>developer.twitter.com</td><td><span class="tag tag-green">任意</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--text-muted);">インフラ・システム設定</h3>
+    <div class="table-wrap" style="margin-bottom: 2rem;">
+      <table>
+        <thead>
+          <tr><th>変数名</th><th>説明</th><th>デフォルト値</th><th>必須</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>GCS_BUCKET_NAME</code></td><td>Google Cloud Storage バケット名</td><td>—</td><td><span class="tag tag-orange">必須</span></td></tr>
+          <tr><td><code>REDIS_URL</code></td><td>ジョブキュー用Redis接続URL</td><td>redis://localhost:6379</td><td><span class="tag tag-orange">必須</span></td></tr>
+          <tr><td><code>COMFYUI_ENDPOINT</code></td><td>ComfyUI APIサーバーURL</td><td>http://localhost:8188</td><td><span class="tag tag-orange">必須</span></td></tr>
+          <tr><td><code>OPENCLAW_WEBHOOK_SECRET</code></td><td>OpenClaw Webhook署名検証キー</td><td>—</td><td><span class="tag tag-orange">必須</span></td></tr>
+          <tr><td><code>MONTHLY_COST_LIMIT_USD</code></td><td>月次API費用上限（超過で自動停止）</td><td>100</td><td><span class="tag tag-cyan">推奨</span></td></tr>
+          <tr><td><code>MAX_PARALLEL_JOBS</code></td><td>同時生成ジョブ数の上限</td><td>4</td><td><span class="tag tag-green">任意</span></td></tr>
+          <tr><td><code>EVAL_PASS_THRESHOLD</code></td><td>評価スコアの公開判定閾値</td><td>85</td><td><span class="tag tag-green">任意</span></td></tr>
+          <tr><td><code>SIGNAL_BOT_TOKEN</code></td><td>Signal通知ボットトークン</td><td>—</td><td><span class="tag tag-green">任意</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="code-block">
+<span class="cm"># .env.example — 本番環境ではSecret Managerへ移行すること</span>
+<span class="fn">OPENAI_API_KEY</span>=<span class="str">sk-proj-xxxxxxxxxxxx</span>
+<span class="fn">ANTHROPIC_API_KEY</span>=<span class="str">sk-ant-xxxxxxxxxxxx</span>
+<span class="fn">GEMINI_API_KEY</span>=<span class="str">AIzaSyxxxxxxxxxx</span>
+<span class="fn">MIDJOURNEY_API_KEY</span>=<span class="str">mj-xxxxxxxxxxxx</span>
+<span class="fn">RUNWAYML_API_KEY</span>=<span class="str">key_xxxxxxxxxxxx</span>
+<span class="fn">ELEVENLABS_API_KEY</span>=<span class="str">xxxxxxxxxxxxxxxx</span>
+
+<span class="fn">YOUTUBE_API_KEY</span>=<span class="str">AIzaSyxxxxxxxxxx</span>
+<span class="fn">NOTE_SESSION_TOKEN</span>=<span class="str">xxxxxxxxxxxxxxxx</span>
+
+<span class="fn">GCS_BUCKET_NAME</span>=<span class="str">ai-creator-hub-prod</span>
+<span class="fn">REDIS_URL</span>=<span class="str">redis://localhost:6379</span>
+<span class="fn">COMFYUI_ENDPOINT</span>=<span class="str">http://localhost:8188</span>
+<span class="fn">MONTHLY_COST_LIMIT_USD</span>=<span class="num">100</span>
+<span class="fn">EVAL_PASS_THRESHOLD</span>=<span class="num">85</span></div>
+  </div>
+</section>
+
+<!-- Deploy -->
+<section class="section" id="deploy">
+  <div class="section-inner">
+    <div class="section-label">デプロイ手順</div>
+    <h2 class="section-title">ローカル開発環境から<br>本番稼動まで</h2>
+
+    <div style="display: flex; flex-direction: column; gap: 1.5rem; margin-top: 1rem;">
+
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden;">
+        <div style="padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 0.75rem;">
+          <div class="step-num" style="margin:0; width:32px; height:32px; font-size:0.85rem;">1</div>
+          <h3 style="font-size: 1rem; margin: 0;">前提条件の確認</h3>
+        </div>
+        <div style="padding: 1.25rem 1.5rem;">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>ソフトウェア</th><th>バージョン</th><th>用途</th></tr></thead>
+              <tbody>
+                <tr><td>Python</td><td>3.11+</td><td>バックエンド全般</td></tr>
+                <tr><td>Node.js</td><td>20+</td><td>フロントエンド・一部Skill</td></tr>
+                <tr><td>Docker</td><td>24+</td><td>コンテナ実行</td></tr>
+                <tr><td>FFmpeg</td><td>6.0+</td><td>動画合成・エンコード</td></tr>
+                <tr><td>Redis</td><td>7.0+</td><td>ジョブキュー</td></tr>
+                <tr><td>ComfyUI</td><td>最新</td><td>漫画生成バックエンド</td></tr>
+                <tr><td>CUDA</td><td>12.0+ (GPU使用時)</td><td>LoRA / SD推論</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden;">
+        <div style="padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 0.75rem;">
+          <div class="step-num" style="margin:0; width:32px; height:32px; font-size:0.85rem;">2</div>
+          <h3 style="font-size: 1rem; margin: 0;">ローカル環境セットアップ</h3>
+        </div>
+        <div style="padding: 1.25rem 1.5rem;">
+          <div class="code-block" style="margin: 0;">
+<span class="cm"># リポジトリクローン</span>
+git clone git@github.com:alignlabai-rgb/openclaw.git
+<span class="kw">cd</span> openclaw/skills/creator-hub
+
+<span class="cm"># Python 依存関係</span>
+python -m venv venv && source venv/bin/activate
+pip install -r requirements.txt
+
+<span class="cm"># 環境変数設定</span>
+cp .env.example .env
+<span class="cm"># .env を編集して各APIキーを入力</span>
+
+<span class="cm"># Redis 起動 (Docker)</span>
+docker run -d -p 6379:6379 redis:7
+
+<span class="cm"># ComfyUI 起動 (別ターミナル)</span>
+python /path/to/ComfyUI/main.py --port 8188
+
+<span class="cm"># 全Skillサーバー起動</span>
+python manage.py runserver</div>
+        </div>
+      </div>
+
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden;">
+        <div style="padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 0.75rem;">
+          <div class="step-num" style="margin:0; width:32px; height:32px; font-size:0.85rem;">3</div>
+          <h3 style="font-size: 1rem; margin: 0;">本番デプロイ（GCP推奨構成）</h3>
+        </div>
+        <div style="padding: 1.25rem 1.5rem;">
+          <div class="two-col">
+            <div>
+              <div class="code-block">
+<span class="cm"># Docker イメージビルド</span>
+docker build -t creator-hub:latest .
+
+<span class="cm"># GCR (Google Container Registry) へプッシュ</span>
+docker tag creator-hub:latest \
+  gcr.io/PROJECT_ID/creator-hub:latest
+docker push gcr.io/PROJECT_ID/creator-hub:latest
+
+<span class="cm"># Cloud Run デプロイ</span>
+gcloud run deploy creator-hub \
+  --image gcr.io/PROJECT_ID/creator-hub:latest \
+  --region asia-northeast1 \
+  --memory 8Gi \
+  --cpu 4 \
+  --set-secrets=".env:creator-hub-secrets:latest"</div>
+            </div>
+            <div>
+              <h4 style="margin-bottom: 1rem; font-size: 0.9rem; color: var(--text-muted);">推奨インフラ構成</h4>
+              <div style="display: flex; flex-direction: column; gap: 0.6rem;">
+                <div style="background: var(--bg3); border-radius: 10px; padding: 0.875rem;">
+                  <div style="font-size: 0.78rem; color: var(--accent); font-weight: 700; margin-bottom: 0.2rem;">API / オーケストレーション</div>
+                  <div style="font-size: 0.82rem; color: var(--text-muted);">Cloud Run (n2-standard-4, 8GB RAM)</div>
+                </div>
+                <div style="background: var(--bg3); border-radius: 10px; padding: 0.875rem;">
+                  <div style="font-size: 0.78rem; color: #FF9E00; font-weight: 700; margin-bottom: 0.2rem;">動画合成サーバー</div>
+                  <div style="font-size: 0.82rem; color: var(--text-muted);">GCE n2-standard-8 (8vCPU, 32GB RAM, 500GB SSD)</div>
+                </div>
+                <div style="background: var(--bg3); border-radius: 10px; padding: 0.875rem;">
+                  <div style="font-size: 0.78rem; color: #4FFFB0; font-weight: 700; margin-bottom: 0.2rem;">漫画生成サーバー</div>
+                  <div style="font-size: 0.82rem; color: var(--text-muted);">GCE GPU (T4 x1, VRAM 16GB) または RunPod A100</div>
+                </div>
+                <div style="background: var(--bg3); border-radius: 10px; padding: 0.875rem;">
+                  <div style="font-size: 0.78rem; color: #A78BFA; font-weight: 700; margin-bottom: 0.2rem;">ジョブキュー / ストレージ</div>
+                  <div style="font-size: 0.82rem; color: var(--text-muted);">Cloud Memorystore (Redis) + GCS</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Storage Design -->
+<section class="section" id="storage" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-label">ストレージ設計</div>
+    <h2 class="section-title">ファイル管理と<br>GCS パス構造</h2>
+    <div class="two-col">
+      <div>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+          生成中ファイルはローカルSSD、完成後はGCSへ移動。
+          評価通過後のみ長期ストレージへ格納し、未通過ファイルは48時間で自動削除します。
+        </p>
+        <div class="code-block">
+<span class="cm"># GCS バケット パス構造</span>
+gs://ai-creator-hub-prod/
+  ├── <span class="str">tmp/</span>             <span class="cm"># 生成中ファイル（48h TTL）</span>
+  │   ├── <span class="str">video/{job_id}/</span>
+  │   └── <span class="str">manga/{job_id}/</span>
+  ├── <span class="str">artifacts/</span>       <span class="cm"># 評価待ちコンテンツ</span>
+  │   ├── <span class="str">video/{YYYY-MM}/{id}.mp4</span>
+  │   └── <span class="str">manga/{YYYY-MM}/{id}.pdf</span>
+  ├── <span class="str">published/</span>       <span class="cm"># 公開済み（永続保存）</span>
+  │   ├── <span class="str">video/{YYYY-MM}/{id}/</span>
+  │   │   ├── <span class="str">final.mp4</span>
+  │   │   └── <span class="str">thumbnail_{A,B,C}.jpg</span>
+  │   └── <span class="str">manga/{YYYY-MM}/{id}/</span>
+  │       ├── <span class="str">final.pdf</span>
+  │       └── <span class="str">final.epub</span>
+  └── <span class="str">lora/</span>            <span class="cm"># LoRAモデル（永続）</span>
+      └── <span class="str">characters/{name}_v{n}.safetensors</span></div>
+      </div>
+      <div>
+        <h4 style="margin-bottom: 1rem; font-size: 0.9rem; color: var(--text-muted);">ライフサイクルルール</h4>
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <div style="background: rgba(255,107,107,0.1); border: 1px solid rgba(255,107,107,0.3); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.78rem; color: #FF6B6B; font-weight: 700; margin-bottom: 0.3rem;">tmp/ — 48時間後に自動削除</div>
+            <div style="font-size: 0.82rem; color: var(--text-muted);">評価未通過・エラー終了ファイルを含む全一時ファイル。コスト削減のため厳格に管理。</div>
+          </div>
+          <div style="background: rgba(255,158,0,0.1); border: 1px solid rgba(255,158,0,0.3); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.78rem; color: #FF9E00; font-weight: 700; margin-bottom: 0.3rem;">artifacts/ — 評価後7日で移動 or 削除</div>
+            <div style="font-size: 0.82rem; color: var(--text-muted);">評価通過 → published/ へ移動。未通過 → 7日後に削除。</div>
+          </div>
+          <div style="background: rgba(0,220,130,0.1); border: 1px solid rgba(0,220,130,0.3); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.78rem; color: #4FFFB0; font-weight: 700; margin-bottom: 0.3rem;">published/ — 永続保存（Nearline Storage）</div>
+            <div style="font-size: 0.82rem; color: var(--text-muted);">収益化済みコンテンツ。90日後にColdlineへ自動移行してコスト削減。</div>
+          </div>
+          <div style="background: rgba(108,60,225,0.1); border: 1px solid rgba(108,60,225,0.3); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.78rem; color: #A78BFA; font-weight: 700; margin-bottom: 0.3rem;">lora/ — 永続保存（Standard）</div>
+            <div style="font-size: 0.82rem; color: var(--text-muted);">LoRAモデルは頻繁にアクセスされるため Standard Storage で保持。バージョン管理必須。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Auth & Security -->
+<section class="section" id="auth">
+  <div class="section-inner">
+    <div class="section-label">認証・セキュリティ</div>
+    <h2 class="section-title">API認証と<br>シークレット管理方針</h2>
+    <div class="two-col">
+      <div>
+        <h4 style="margin-bottom: 1rem; font-size: 0.95rem;">モジュール間認証</h4>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">
+          内部モジュール間の通信はJWT Bearer tokenで認証します。
+          OpenClawがマスターキーを管理し、各Skillの起動時に短期トークンを発行します。
+        </p>
+        <div class="code-block">
+<span class="cm"># 内部API認証ヘッダー</span>
+<span class="fn">Authorization</span>: Bearer &lt;JWT_TOKEN&gt;
+
+<span class="cm"># JWT payload</span>
+{
+  <span class="str">"sub"</span>: <span class="str">"skill:video-pipeline"</span>,
+  <span class="str">"aud"</span>: <span class="str">"skill:content-evaluator"</span>,
+  <span class="str">"exp"</span>: <span class="num">1748000000</span>,  <span class="cm">// 1時間有効</span>
+  <span class="str">"scope"</span>: [<span class="str">"ingest"</span>]
+}</div>
+
+        <h4 style="margin: 1.5rem 0 1rem; font-size: 0.95rem;">Webhook署名検証</h4>
+        <div class="code-block">
+<span class="cm"># OpenClaw → Skill へのWebhookを検証</span>
+<span class="kw">import</span> hmac, hashlib
+
+<span class="fn">def</span> <span class="fn">verify_webhook</span>(payload, signature, secret):
+    expected = hmac.<span class="fn">new</span>(
+        secret.<span class="fn">encode</span>(),
+        payload,
+        hashlib.sha256
+    ).<span class="fn">hexdigest</span>()
+    <span class="kw">return</span> hmac.<span class="fn">compare_digest</span>(
+        <span class="str">f"sha256={expected}"</span>, signature
+    )</div>
+      </div>
+      <div>
+        <h4 style="margin-bottom: 1rem; font-size: 0.95rem;">シークレット管理ルール</h4>
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <div style="background: rgba(255,107,107,0.08); border: 1px solid rgba(255,107,107,0.25); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; color: #FF6B6B; font-weight: 700; margin-bottom: 0.35rem;">🚫 絶対禁止</div>
+            <ul style="font-size: 0.82rem; color: var(--text-muted); padding-left: 1rem; display: flex; flex-direction: column; gap: 0.3rem;">
+              <li>APIキーをコードにハードコード</li>
+              <li>.env ファイルをGitにコミット</li>
+              <li>ログにシークレットを出力</li>
+              <li>Slackやメールでシークレットを共有</li>
+            </ul>
+          </div>
+          <div style="background: rgba(0,220,130,0.08); border: 1px solid rgba(0,220,130,0.25); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; color: #4FFFB0; font-weight: 700; margin-bottom: 0.35rem;">✅ 推奨</div>
+            <ul style="font-size: 0.82rem; color: var(--text-muted); padding-left: 1rem; display: flex; flex-direction: column; gap: 0.3rem;">
+              <li>GCP Secret Manager にAPIキーを集中管理</li>
+              <li>ローカルは .env のみ（.gitignore必須）</li>
+              <li>APIキーのローテーション: 90日ごと</li>
+              <li>最小権限原則: Skillごとに必要なキーのみ</li>
+            </ul>
+          </div>
+          <div style="background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.25); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; color: var(--accent); font-weight: 700; margin-bottom: 0.35rem;">📋 コスト監視</div>
+            <div style="font-size: 0.82rem; color: var(--text-muted);">月次API費用が <code>MONTHLY_COST_LIMIT_USD</code> の80%を超えたら Signal通知。100%到達で全生成ジョブを自動停止。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Monitoring -->
+<section class="section" id="monitoring" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-label">モニタリング・アラート</div>
+    <h2 class="section-title">システム稼働状況の<br>監視設計</h2>
+    <div class="two-col">
+      <div>
+        <h4 style="margin-bottom: 1rem; font-size: 0.95rem;">監視対象メトリクス</h4>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>メトリクス</th><th>閾値（警告）</th><th>閾値（重大）</th><th>通知先</th></tr></thead>
+            <tbody>
+              <tr><td>ジョブキュー滞留数</td><td>&gt;10件</td><td>&gt;30件</td><td>Signal</td></tr>
+              <tr><td>ジョブ失敗率</td><td>&gt;10%</td><td>&gt;30%</td><td>Signal + ログ</td></tr>
+              <tr><td>評価通過率（24h平均）</td><td>&lt;40%</td><td>&lt;20%</td><td>Signal</td></tr>
+              <tr><td>API月次コスト消費率</td><td>&gt;80%</td><td>&gt;100%（停止）</td><td>Signal</td></tr>
+              <tr><td>ComfyUI応答時間</td><td>&gt;60s</td><td>&gt;120s（再起動）</td><td>ログ</td></tr>
+              <tr><td>GCSエラー率</td><td>&gt;1%</td><td>&gt;5%</td><td>Signal</td></tr>
+              <tr><td>月間公開本数</td><td>&lt;月目標の50%</td><td>—</td><td>週次レポート</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div>
+        <h4 style="margin-bottom: 1rem; font-size: 0.95rem;">ヘルスチェックエンドポイント</h4>
+        <div class="code-block">
+<span class="cm"># 全モジュール共通</span>
+<span class="kw">GET</span> /health
+<span class="cm">// Response 200</span>
+{
+  <span class="str">"status"</span>: <span class="str">"ok"</span>,
+  <span class="str">"version"</span>: <span class="str">"2.1.0"</span>,
+  <span class="str">"uptime_sec"</span>: <span class="num">86400</span>,
+  <span class="str">"queue_depth"</span>: <span class="num">3</span>,
+  <span class="str">"last_job_at"</span>: <span class="str">"2026-05-11T14:32:00Z"</span>
+}
+
+<span class="cm"># システム全体サマリ</span>
+<span class="kw">GET</span> /api/v1/system/status
+{
+  <span class="str">"modules"</span>: {
+    <span class="str">"topic_analyzer"</span>: <span class="str">"ok"</span>,
+    <span class="str">"video_pipeline"</span>: <span class="str">"ok"</span>,
+    <span class="str">"manga_pipeline"</span>: <span class="str">"degraded"</span>,  <span class="cm">// GPU高負荷</span>
+    <span class="str">"evaluator"</span>: <span class="str">"ok"</span>,
+    <span class="str">"monetization"</span>: <span class="str">"ok"</span>
+  },
+  <span class="str">"cost_this_month_usd"</span>: <span class="num">43.7</span>,
+  <span class="str">"cost_limit_usd"</span>: <span class="num">100</span>
+}</div>
+
+        <div style="margin-top: 1rem; background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.25); border-radius: 12px; padding: 1rem; font-size: 0.82rem; color: var(--text-muted);">
+          OpenClawが1分ごとに全モジュールのヘルスチェックを実行。2回連続でエラーが返った場合、Signal通知 + 自動リトライを実施。5回連続で人間へ緊急アラート。
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- Error Codes -->
-<section class="section" style="background: var(--bg2);">
+<section class="section" id="errors">
   <div class="section-inner">
     <div class="section-label">エラーコード</div>
-    <h2 class="section-title">共通エラー定義</h2>
+    <h2 class="section-title">共通エラー定義と対処</h2>
     <div class="table-wrap">
       <table>
         <thead>
-          <tr><th>コード</th><th>意味</th><th>対処</th></tr>
+          <tr><th>コード</th><th>意味</th><th>原因</th><th>対処</th></tr>
         </thead>
         <tbody>
-          <tr><td>400</td><td>リクエスト不正（必須フィールド欠損）</td><td>ペイロードを確認する</td></tr>
-          <tr><td>422</td><td>コンテンツ生成失敗（AIエラー）</td><td>fallbackモデルに切り替え再試行</td></tr>
-          <tr><td>429</td><td>APIレート制限超過</td><td>exponential backoffで再試行</td></tr>
-          <tr><td>503</td><td>外部AIサービス障害</td><td>フォールバックサービスへ自動切替</td></tr>
+          <tr><td><span class="tag tag-orange">400</span></td><td>リクエスト不正</td><td>必須フィールド欠損・型不一致</td><td>ペイロードのバリデーションを確認</td></tr>
+          <tr><td><span class="tag tag-orange">401</span></td><td>認証失敗</td><td>JWTトークン無効・期限切れ</td><td>OpenClawから新しいトークンを取得</td></tr>
+          <tr><td><span class="tag tag-orange">422</span></td><td>コンテンツ生成失敗</td><td>AIサービスのエラー・プロンプト問題</td><td>fallbackモデルへ自動切り替え後リトライ</td></tr>
+          <tr><td><span class="tag tag-orange">429</span></td><td>APIレート制限</td><td>外部APIのquota超過</td><td>exponential backoff (最大5回) + フォールバック</td></tr>
+          <tr><td><span class="tag tag-orange">451</span></td><td>コンテンツフィルタ除外</td><td>不適切コンテンツ検知</td><td>ネタを修正して再投入。パターンをDBに記録</td></tr>
+          <tr><td><span class="tag tag-orange">503</span></td><td>外部サービス障害</td><td>RunwayML / ElevenLabs等の障害</td><td>代替サービスへ自動フォールバック</td></tr>
+          <tr><td><span class="tag tag-orange">507</span></td><td>ストレージ不足</td><td>GCSバケット上限 or ローカルディスク満杯</td><td>tmpファイルを即時クリーンアップ + アラート</td></tr>
         </tbody>
       </table>
+    </div>
+  </div>
+</section>
+
+<!-- Changelog -->
+<section class="section" id="changelog" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-label">変更ログ</div>
+    <h2 class="section-title">バージョン履歴</h2>
+
+    <div style="display: flex; flex-direction: column; gap: 1rem;">
+
+      <div style="background: var(--card); border: 1px solid rgba(0,212,255,0.4); border-radius: 14px; padding: 1.25rem 1.5rem;">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem; flex-wrap: wrap;">
+          <span style="font-size: 1rem; font-weight: 800; color: var(--accent);">v0.4</span>
+          <span style="font-size: 0.82rem; color: var(--text-muted);">2026-05-11</span>
+          <span class="tag tag-cyan" style="margin-left: auto;">現在</span>
+        </div>
+        <ul style="font-size: 0.85rem; color: var(--text-muted); padding-left: 1rem; display: flex; flex-direction: column; gap: 0.3rem;">
+          <li>環境変数リファレンスを追加（18変数）</li>
+          <li>GCS パス構造・ライフサイクルルールを追加</li>
+          <li>認証・セキュリティセクションを追加</li>
+          <li>モニタリング・アラート設計を追加</li>
+          <li>デプロイ手順（ローカル・GCP）を追加</li>
+          <li>エラーコード表を拡充（4→7種類）</li>
+          <li>全APIにSLA・レスポンス例を追加</li>
+        </ul>
+      </div>
+
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.25rem 1.5rem;">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem; flex-wrap: wrap;">
+          <span style="font-size: 1rem; font-weight: 800;">v0.3</span>
+          <span style="font-size: 0.82rem; color: var(--text-muted);">2026-03-20</span>
+        </div>
+        <ul style="font-size: 0.85rem; color: var(--text-muted); padding-left: 1rem; display: flex; flex-direction: column; gap: 0.3rem;">
+          <li>topic-ai/feedback エンドポイントを追加</li>
+          <li>PublishResult型に tracking_id フィールドを追加</li>
+          <li>monetization-manager の scheduled_at パラメータを追加</li>
+        </ul>
+      </div>
+
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.25rem 1.5rem;">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem; flex-wrap: wrap;">
+          <span style="font-size: 1rem; font-weight: 800;">v0.2</span>
+          <span style="font-size: 0.82rem; color: var(--text-muted);">2025-12-01</span>
+        </div>
+        <ul style="font-size: 0.85rem; color: var(--text-muted); padding-left: 1rem; display: flex; flex-direction: column; gap: 0.3rem;">
+          <li>content-evaluator の EvalResult に decision フィールドを追加</li>
+          <li>進捗確認 GET エンドポイントを追加</li>
+          <li>job_id ベースの非同期ジョブ管理に移行</li>
+        </ul>
+      </div>
+
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.25rem 1.5rem;">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem; flex-wrap: wrap;">
+          <span style="font-size: 1rem; font-weight: 800;">v0.1</span>
+          <span style="font-size: 0.82rem; color: var(--text-muted);">2025-09-15</span>
+        </div>
+        <ul style="font-size: 0.85rem; color: var(--text-muted); padding-left: 1rem; display: flex; flex-direction: column; gap: 0.3rem;">
+          <li>初版リリース</li>
+          <li>5モジュールの基本型定義・APIエンドポイントを定義</li>
+          <li>エラーコード基本セット（4種類）</li>
+        </ul>
+      </div>
+
     </div>
   </div>
 </section>
@@ -264,7 +800,7 @@
       <a href="evaluation.html">評価システム</a>
       <a href="openclaw.html">OpenClaw連携</a>
     </nav>
-    <p>AI Creator Hub — システム仕様書</p>
+    <p>AI Creator Hub — システム仕様書 v0.4</p>
   </div>
 </footer>
 
