@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>中国系 AI コーディングツール | Tech Workbench</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --panel: #0f1a28;
+      --muted: #9ca3af;
+      --text: #f3f4f6;
+      --accent: #e63946;
+      --accent-2: #f7b733;
+      --accent-grad: linear-gradient(135deg, #e63946, #f7b733);
+      --border: rgba(255, 255, 255, 0.1);
+      --radius: 16px;
+      --font-mono: "SF Mono", "Consolas", monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", "SF Pro Display", "Noto Sans JP", system-ui, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 10% 10%, rgba(230, 57, 70, 0.12), transparent 30%),
+        radial-gradient(circle at 85% 5%, rgba(247, 183, 51, 0.15), transparent 30%),
+        linear-gradient(145deg, #0b1220 0%, #0c1526 50%, #0a1020 100%);
+      padding: 32px 20px 64px;
+      line-height: 1.7;
+    }
+
+    .shell {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    .back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+      opacity: 0.6;
+      transition: opacity 0.2s;
+    }
+    .back:hover { opacity: 1; }
+
+    header.hero {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 48px 40px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+    }
+
+    header.hero::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 4px;
+      background: var(--accent-grad);
+    }
+
+    .role-badge {
+      display: inline-block;
+      background: rgba(230, 57, 70, 0.15);
+      color: #f7b733;
+      padding: 4px 12px;
+      border-radius: 99px;
+      font-size: 12px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+      border: 1px solid rgba(230, 57, 70, 0.35);
+    }
+
+    h1 {
+      margin: 0 0 16px;
+      font-size: 44px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      line-height: 1.1;
+      color: #fff;
+    }
+
+    .lead {
+      margin: 0 0 32px;
+      font-size: 18px;
+      color: var(--muted);
+      max-width: 760px;
+    }
+
+    .stats-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+    }
+
+    .stat {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .stat-val {
+      font-size: 28px;
+      font-weight: 800;
+      background: var(--accent-grad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    h2 {
+      margin: 0 0 20px;
+      font-size: 24px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    h3 {
+      margin: 0 0 10px;
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    p { margin: 0 0 14px; color: var(--muted); font-size: 15px; }
+
+    ul { margin: 0 0 16px; padding-left: 22px; color: var(--muted); }
+    li { margin-bottom: 7px; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.025);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 28px 24px;
+      transition: transform 0.2s, border-color 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(230, 57, 70, 0.35);
+    }
+
+    .card-accent {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 3px;
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 12px;
+    }
+
+    .chip {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+    }
+
+    .chip.accent {
+      background: rgba(230, 57, 70, 0.12);
+      border-color: rgba(230, 57, 70, 0.35);
+      color: #f7b733;
+    }
+
+    .section {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px 36px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    thead th {
+      text-align: left;
+      padding: 10px 14px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+    }
+
+    tbody td {
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      color: var(--muted);
+      vertical-align: top;
+    }
+
+    tbody tr:hover td { background: rgba(255,255,255,0.02); }
+
+    td strong { color: var(--text); }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .badge-red { background: rgba(230,57,70,0.15); color: #e63946; }
+    .badge-gold { background: rgba(247,183,51,0.15); color: #f7b733; }
+    .badge-blue { background: rgba(96,165,250,0.15); color: #60a5fa; }
+    .badge-green { background: rgba(52,211,153,0.15); color: #34d399; }
+    .badge-purple { background: rgba(167,139,250,0.15); color: #a78bfa; }
+
+    .note-box {
+      background: rgba(247, 183, 51, 0.07);
+      border: 1px solid rgba(247, 183, 51, 0.2);
+      border-radius: 12px;
+      padding: 16px 20px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .note-box strong { color: #f7b733; }
+
+    .split {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+
+    <a href="index.html" class="back">← Knowledge Hub</a>
+
+    <header class="hero">
+      <div class="role-badge">China AI Coding · 中国系AIコーディング</div>
+      <h1>中国系 AI コーディングツール</h1>
+      <p class="lead">
+        Alibaba・ByteDance・Baidu・Huawei・Zhipu AIが開発する、Claude Code / Codexと同等のエージェント型AIコーディング支援ツール。国産LLMを基盤に急速に進化している。
+      </p>
+      <div class="stats-row">
+        <div class="stat">
+          <span class="stat-val">6+</span>
+          <span class="stat-label">主要プレイヤー</span>
+        </div>
+        <div class="stat">
+          <span class="stat-val">2024–</span>
+          <span class="stat-label">エージェント化加速</span>
+        </div>
+        <div class="stat">
+          <span class="stat-val">OSS</span>
+          <span class="stat-label">一部オープンソース</span>
+        </div>
+        <div class="stat">
+          <span class="stat-val">VS Code</span>
+          <span class="stat-label">主要対応IDE</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- ツール一覧 -->
+    <div class="grid">
+
+      <!-- Tongyi Lingma -->
+      <div class="card">
+        <div class="card-accent" style="background: linear-gradient(90deg, #ff6a00, #ee0979);"></div>
+        <div style="font-size: 28px; margin-bottom: 10px;">🟠</div>
+        <h3>通义灵码 <span style="font-size:14px;color:var(--muted);">Tongyi Lingma</span></h3>
+        <p>Alibaba（阿里巴巴）製。Qwen系LLMを基盤とするコーディングエージェント。VS Code / JetBrains対応。コード補完・レビュー・テスト生成・CLIエージェントモードを持ち、Claude Code相当のターミナル操作が可能。</p>
+        <ul>
+          <li>開発元：Alibaba Cloud</li>
+          <li>基盤モデル：Qwen2.5-Coder</li>
+          <li>IDE：VS Code、JetBrains、Cloud IDE</li>
+          <li>エージェントモード：あり（ターミナル操作・マルチステップ）</li>
+          <li>価格：無料プランあり／Alibaba Cloud連携</li>
+        </ul>
+        <div class="chip-row">
+          <span class="chip accent">Agentic</span>
+          <span class="chip">VS Code</span>
+          <span class="chip">JetBrains</span>
+          <span class="chip">CLI</span>
+          <span class="chip">Qwen</span>
+        </div>
+      </div>
+
+      <!-- Trae -->
+      <div class="card">
+        <div class="card-accent" style="background: linear-gradient(90deg, #1a1a2e, #16213e, #0f3460, #533483);"></div>
+        <div style="font-size: 28px; margin-bottom: 10px;">🟣</div>
+        <h3>Trae <span style="font-size:14px;color:var(--muted);">by ByteDance</span></h3>
+        <p>ByteDance（抖音親会社）製のCursor対抗AI IDE。Doubao系モデルを搭載し、AIチャット・インラインEdit・エージェントモードを統合。無料で提供されCursor代替として急速に普及。</p>
+        <ul>
+          <li>開発元：ByteDance</li>
+          <li>基盤モデル：Doubao / Claude（外部モデル選択可）</li>
+          <li>形態：スタンドアロンIDE（VS Codeベース）</li>
+          <li>エージェントモード：Builder（複数ファイル編集）</li>
+          <li>価格：無料（2025年現在）</li>
+        </ul>
+        <div class="chip-row">
+          <span class="chip accent">Cursor代替</span>
+          <span class="chip">スタンドアロンIDE</span>
+          <span class="chip">無料</span>
+          <span class="chip">Doubao</span>
+        </div>
+      </div>
+
+      <!-- MarsCode -->
+      <div class="card">
+        <div class="card-accent" style="background: linear-gradient(90deg, #00b4d8, #0096c7);"></div>
+        <div style="font-size: 28px; margin-bottom: 10px;">🔵</div>
+        <h3>豆包 MarsCode <span style="font-size:14px;color:var(--muted);">by ByteDance</span></h3>
+        <p>ByteDanceの別プロダクト。クラウドIDE + VS Codeプラグインの二本立て。コード補完・バグ修正・ユニットテスト生成が中心。Traeとは異なりプラグイン型で既存環境に統合しやすい。</p>
+        <ul>
+          <li>開発元：ByteDance</li>
+          <li>基盤モデル：Doubao-1.5-pro</li>
+          <li>形態：VS Codeプラグイン + クラウドIDE</li>
+          <li>対応言語：100+</li>
+          <li>価格：無料プランあり</li>
+        </ul>
+        <div class="chip-row">
+          <span class="chip accent">プラグイン型</span>
+          <span class="chip">クラウドIDE</span>
+          <span class="chip">VS Code</span>
+          <span class="chip">Doubao</span>
+        </div>
+      </div>
+
+      <!-- Baidu Comate -->
+      <div class="card">
+        <div class="card-accent" style="background: linear-gradient(90deg, #2563eb, #1d4ed8);"></div>
+        <div style="font-size: 28px; margin-bottom: 10px;">🔷</div>
+        <h3>文心快码 <span style="font-size:14px;color:var(--muted);">Baidu Comate</span></h3>
+        <p>Baidu（百度）製。ERNIE（文心）系LLMを基盤とするコーディングアシスタント。コード補完・生成・ドキュメント自動生成が主機能。企業向けにオンプレ展開も可能。</p>
+        <ul>
+          <li>開発元：Baidu</li>
+          <li>基盤モデル：ERNIE Code</li>
+          <li>IDE：VS Code、JetBrains、Eclipse</li>
+          <li>企業向けオンプレ：対応</li>
+          <li>価格：無料プランあり</li>
+        </ul>
+        <div class="chip-row">
+          <span class="chip accent">エンタープライズ</span>
+          <span class="chip">オンプレ対応</span>
+          <span class="chip">VS Code</span>
+          <span class="chip">ERNIE</span>
+        </div>
+      </div>
+
+      <!-- CodeGeeX -->
+      <div class="card">
+        <div class="card-accent" style="background: linear-gradient(90deg, #7c3aed, #4f46e5);"></div>
+        <div style="font-size: 28px; margin-bottom: 10px;">🟤</div>
+        <h3>CodeGeeX <span style="font-size:14px;color:var(--muted);">by Zhipu AI</span></h3>
+        <p>清華大学発のZhipu AI（智谱AI）製。オープンソースのコーディングモデルCodeGeeXをベースにしたIDE拡張。GitHub Copilot代替として研究・開発コミュニティで人気。モデル自体もHugging Faceで公開。</p>
+        <ul>
+          <li>開発元：Zhipu AI / 清華大学</li>
+          <li>基盤モデル：CodeGeeX4-All-9B（OSS）</li>
+          <li>IDE：VS Code、JetBrains</li>
+          <li>オープンソース：モデル公開あり</li>
+          <li>価格：無料</li>
+        </ul>
+        <div class="chip-row">
+          <span class="chip accent">オープンソース</span>
+          <span class="chip">VS Code</span>
+          <span class="chip">JetBrains</span>
+          <span class="chip">GLM</span>
+        </div>
+      </div>
+
+      <!-- Huawei CodeArts Snap -->
+      <div class="card">
+        <div class="card-accent" style="background: linear-gradient(90deg, #dc2626, #991b1b);"></div>
+        <div style="font-size: 28px; margin-bottom: 10px;">🔴</div>
+        <h3>CodeArts Snap <span style="font-size:14px;color:var(--muted);">by Huawei</span></h3>
+        <p>Huawei（華為）のDevOpsプラットフォーム「CodeArts」に統合されたAIコーディング支援。Pangu（盤古）モデルを活用。エンタープライズ向けセキュリティ・コンプライアンス重視の設計。</p>
+        <ul>
+          <li>開発元：Huawei Cloud</li>
+          <li>基盤モデル：Pangu（盤古）Code</li>
+          <li>形態：Huawei CodeArtsプラットフォーム統合</li>
+          <li>対象：大企業・政府系</li>
+          <li>価格：Huawei Cloud契約ベース</li>
+        </ul>
+        <div class="chip-row">
+          <span class="chip accent">エンタープライズ</span>
+          <span class="chip">政府系対応</span>
+          <span class="chip">Pangu</span>
+          <span class="chip">DevOps統合</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 比較表 -->
+    <div class="section">
+      <h2>一覧比較表</h2>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>ツール</th>
+              <th>開発元</th>
+              <th>形態</th>
+              <th>エージェント</th>
+              <th>OSS</th>
+              <th>対象</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>通义灵码</strong></td>
+              <td>Alibaba</td>
+              <td>プラグイン + CLI</td>
+              <td><span class="badge badge-green">あり</span></td>
+              <td><span class="badge badge-blue">モデルOSS</span></td>
+              <td>個人〜企業</td>
+            </tr>
+            <tr>
+              <td><strong>Trae</strong></td>
+              <td>ByteDance</td>
+              <td>スタンドアロンIDE</td>
+              <td><span class="badge badge-green">あり</span></td>
+              <td><span class="badge badge-red">なし</span></td>
+              <td>個人・スタートアップ</td>
+            </tr>
+            <tr>
+              <td><strong>豆包 MarsCode</strong></td>
+              <td>ByteDance</td>
+              <td>プラグイン + クラウドIDE</td>
+              <td><span class="badge badge-gold">部分的</span></td>
+              <td><span class="badge badge-red">なし</span></td>
+              <td>個人〜中小企業</td>
+            </tr>
+            <tr>
+              <td><strong>文心快码 Comate</strong></td>
+              <td>Baidu</td>
+              <td>プラグイン</td>
+              <td><span class="badge badge-gold">部分的</span></td>
+              <td><span class="badge badge-red">なし</span></td>
+              <td>企業（オンプレ対応）</td>
+            </tr>
+            <tr>
+              <td><strong>CodeGeeX</strong></td>
+              <td>Zhipu AI / 清華大学</td>
+              <td>プラグイン</td>
+              <td><span class="badge badge-gold">部分的</span></td>
+              <td><span class="badge badge-green">あり</span></td>
+              <td>研究・個人・OSS</td>
+            </tr>
+            <tr>
+              <td><strong>CodeArts Snap</strong></td>
+              <td>Huawei</td>
+              <td>プラットフォーム統合</td>
+              <td><span class="badge badge-gold">部分的</span></td>
+              <td><span class="badge badge-red">なし</span></td>
+              <td>大企業・政府</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Claude Code / Codex との比較 -->
+    <div class="section">
+      <h2>Claude Code / Codex との位置づけ</h2>
+      <div class="split">
+        <div>
+          <h3 style="color: var(--accent-2);">共通点</h3>
+          <ul>
+            <li>VS Code / JetBrains等の主要IDEに対応</li>
+            <li>コード補完・生成・レビュー・テスト生成</li>
+            <li>自然言語による指示でコードを変更</li>
+            <li>マルチファイル編集（エージェントモード）</li>
+            <li>ターミナル / シェル操作（一部ツール）</li>
+          </ul>
+        </div>
+        <div>
+          <h3 style="color: var(--accent);">主な違い</h3>
+          <ul>
+            <li>基盤モデルが国産LLM（Qwen / Doubao / ERNIE等）</li>
+            <li>中国語コードコメント・ドキュメントに強い</li>
+            <li>データが中国サーバー処理（グローバル企業は注意）</li>
+            <li>GitHub Copilot / Claude Code比でエージェント深度はまだ発展途上</li>
+            <li>一部はオンプレ展開が可能（Comate / CodeArts）</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 注意点 -->
+    <div class="note-box">
+      <strong>⚠ データ主権・利用規約の確認を</strong><br>
+      中国企業製ツールはデータが中国サーバーで処理される場合があります。グローバルプロジェクトや機密コードに使用する場合は、各サービスのデータポリシーと自社のコンプライアンス要件を必ず確認してください。Comate・CodeArts はオンプレミス展開オプションを提供しています。
+    </div>
+
+  </div>
+</body>
+</html>

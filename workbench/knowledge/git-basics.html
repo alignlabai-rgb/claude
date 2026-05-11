@@ -2,185 +2,780 @@
 <html lang="ja">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Git (Time Control) | Knowledge Base</title>
-    <style>
-        :root {
-            --bg: #0b1220;
-            --panel: #1c1e24;
-            --muted: #abb2bf;
-            --text: #d7dae0;
-            --accent: #e06c75;
-            /* Git Red */
-            --accent-2: #98c379;
-            /* Green for add */
-            --border: rgba(255, 255, 255, 0.08);
-            --radius: 12px;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Git &amp; GitHub 完全ガイド | Tech Workbench</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --panel: #0f1a28;
+      --muted: #9ca3af;
+      --text: #f3f4f6;
+      --accent: #e06c75;
+      --accent-2: #98c379;
+      --accent-3: #61afef;
+      --accent-gold: #e5c07b;
+      --border: rgba(255, 255, 255, 0.08);
+      --radius: 14px;
+      --font-mono: "SF Mono", "JetBrains Mono", "Consolas", monospace;
+    }
 
-        * {
-            box-sizing: border-box;
-        }
+    * { box-sizing: border-box; }
 
-        body {
-            margin: 0;
-            min-height: 100vh;
-            font-family: "Segoe UI", "SF Pro Display", monospace, sans-serif;
-            color: var(--text);
-            background: var(--bg);
-            padding: 32px 20px 64px;
-            line-height: 1.6;
-        }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", "SF Pro Display", "Noto Sans JP", system-ui, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 5% 10%, rgba(224,108,117,0.1), transparent 28%),
+        radial-gradient(circle at 90% 5%, rgba(97,175,239,0.1), transparent 28%),
+        linear-gradient(145deg, #0b1220 0%, #0c1526 100%);
+      padding: 32px 20px 80px;
+      line-height: 1.7;
+    }
 
-        .shell {
-            max-width: 1000px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-        }
+    .shell {
+      max-width: 1080px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
 
-        header.hero {
-            background: var(--panel);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 32px;
-            position: relative;
-            overflow: hidden;
-        }
+    /* ナビ */
+    .back { display:inline-flex; align-items:center; gap:6px; color:var(--muted); text-decoration:none; font-size:14px; font-weight:600; transition:color 0.2s; }
+    .back:hover { color:var(--text); }
 
-        header.hero::after {
-            content: "";
-            position: absolute;
-            right: -20px;
-            bottom: -20px;
-            width: 150px;
-            height: 150px;
-            background: repeating-linear-gradient(45deg, rgba(224, 108, 117, 0.1), rgba(224, 108, 117, 0.1) 10px, transparent 10px, transparent 20px);
-            pointer-events: none;
-        }
+    /* ヒーロー */
+    header.hero {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 44px 40px 36px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+    }
+    header.hero::before {
+      content:"";
+      position:absolute; top:0; left:0; width:100%; height:4px;
+      background: linear-gradient(90deg, #e06c75, #61afef, #98c379);
+    }
 
-        .eyebrow {
-            font-family: monospace;
-            color: var(--accent);
-            font-size: 0.9em;
-            margin-bottom: 8px;
-            display: block;
-        }
+    .eyebrow {
+      display:inline-block;
+      font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:1px;
+      color: var(--accent); margin-bottom:12px;
+      background: rgba(224,108,117,0.1); border:1px solid rgba(224,108,117,0.3);
+      padding: 4px 12px; border-radius:99px;
+    }
+    h1 { margin:0 0 12px; font-size:40px; font-weight:800; letter-spacing:-1px; color:#fff; line-height:1.1; }
+    .lead { margin:0 0 24px; font-size:17px; color:var(--muted); max-width:720px; }
 
-        h1 {
-            margin: 0 0 16px;
-            font-size: 36px;
-            color: #fff;
-            letter-spacing: -0.5px;
-        }
+    .toc {
+      display:flex; flex-wrap:wrap; gap:8px;
+      margin-top:4px;
+    }
+    .toc a {
+      font-size:13px; color:var(--accent-3); text-decoration:none;
+      background: rgba(97,175,239,0.1); border:1px solid rgba(97,175,239,0.25);
+      padding: 4px 12px; border-radius:99px; transition:background 0.2s;
+    }
+    .toc a:hover { background: rgba(97,175,239,0.2); }
 
-        .lead {
-            margin: 0 0 20px;
-            font-size: 18px;
-            color: var(--muted);
-            max-width: 700px;
-        }
+    /* セクション見出し */
+    .section-label {
+      font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px;
+      color: var(--accent); margin-bottom:10px;
+      display:flex; align-items:center; gap:8px;
+    }
+    .section-label::after { content:""; flex:1; height:1px; background:var(--border); }
 
-        .back {
-            color: var(--accent);
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 14px;
-        }
+    /* カード */
+    .section {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 32px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    }
 
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 24px;
-        }
+    h2 { margin:0 0 18px; font-size:22px; font-weight:700; color:#fff; }
+    h3 { margin:16px 0 8px; font-size:17px; font-weight:700; color: var(--accent-gold); }
 
-        .card {
-            background: var(--panel);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 24px;
-            transition: transform 0.2s;
-        }
+    p { margin:0 0 12px; color:var(--muted); font-size:15px; }
+    ul { margin:0 0 14px; padding-left:20px; color:var(--muted); font-size:15px; }
+    li { margin-bottom:6px; }
+    strong { color:var(--text); }
 
-        .card:hover {
-            transform: translateY(-2px);
-            border-color: var(--muted);
-        }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(290px, 1fr)); gap:20px; }
+    .grid-3 { display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px; }
 
-        h2 {
-            margin: 0 0 12px;
-            font-size: 20px;
-            color: #fff;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 8px;
-        }
+    .card {
+      background: rgba(255,255,255,0.025);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 22px 22px 18px;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .card:hover { transform:translateY(-2px); border-color:rgba(255,255,255,0.18); }
+    .card h3 { margin:0 0 10px; font-size:16px; font-weight:700; color:#fff; }
+    .card p { font-size:14px; margin:0 0 10px; }
 
-        .cmd-box {
-            background: #111;
-            padding: 12px;
-            border-radius: 6px;
-            font-family: "Consolas", monospace;
-            color: var(--accent-2);
-            margin-bottom: 12px;
-            border: 1px solid var(--border);
-        }
+    /* コードブロック */
+    .cmd {
+      background: #0d1117;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-family: var(--font-mono);
+      font-size: 13.5px;
+      color: var(--accent-2);
+      margin: 6px 0 4px;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .cmd .c { color: #5c6370; }
+    .cmd .k { color: #c678dd; }
+    .cmd .s { color: var(--accent-gold); }
+    .cmd-desc { font-size:13px; color:var(--muted); margin:0 0 14px 2px; }
 
-        .cmd-desc {
-            font-size: 14px;
-            color: var(--muted);
-            margin-bottom: 16px;
-        }
+    .cmd-group { margin-bottom:18px; }
+    .cmd-group:last-child { margin-bottom:0; }
 
-        strong {
-            color: #fff;
-        }
-    </style>
+    /* ステップ */
+    .steps { display:flex; flex-direction:column; gap:10px; }
+    .step {
+      display:grid; grid-template-columns:32px 1fr; gap:12px; align-items:start;
+      background: rgba(255,255,255,0.03); border:1px solid var(--border);
+      border-radius:10px; padding:14px 16px;
+    }
+    .step-num {
+      width:28px; height:28px; border-radius:50%;
+      background: rgba(224,108,117,0.15); border:1px solid rgba(224,108,117,0.4);
+      color:var(--accent); font-weight:800; font-size:13px;
+      display:flex; align-items:center; justify-content:center;
+      flex-shrink:0;
+    }
+    .step-body h4 { margin:0 0 4px; font-size:15px; color:#fff; }
+    .step-body p { margin:0 0 6px; font-size:14px; }
+
+    /* バッジ */
+    .badge {
+      display:inline-block; padding:2px 8px; border-radius:6px; font-size:11px; font-weight:700;
+    }
+    .badge-red { background:rgba(224,108,117,0.15); color:#e06c75; }
+    .badge-green { background:rgba(152,195,121,0.15); color:#98c379; }
+    .badge-blue { background:rgba(97,175,239,0.15); color:#61afef; }
+    .badge-gold { background:rgba(229,192,123,0.15); color:#e5c07b; }
+
+    /* コール・アウト */
+    .callout {
+      border-radius:10px; padding:14px 18px; font-size:14px; margin:14px 0;
+    }
+    .callout.tip { background:rgba(152,195,121,0.08); border:1px solid rgba(152,195,121,0.25); }
+    .callout.warn { background:rgba(224,108,117,0.08); border:1px solid rgba(224,108,117,0.25); }
+    .callout.info { background:rgba(97,175,239,0.08); border:1px solid rgba(97,175,239,0.25); }
+    .callout strong { display:block; margin-bottom:4px; }
+    .callout.tip strong { color:#98c379; }
+    .callout.warn strong { color:#e06c75; }
+    .callout.info strong { color:#61afef; }
+
+    /* 概念図 */
+    .flow {
+      display:flex; align-items:center; flex-wrap:wrap; gap:6px;
+      background: #0d1117; border:1px solid var(--border); border-radius:10px;
+      padding: 16px 20px; margin:12px 0; font-size:13px; font-family:var(--font-mono);
+    }
+    .flow-box {
+      background: rgba(255,255,255,0.06); border:1px solid var(--border);
+      border-radius:6px; padding:6px 12px; color:var(--text); font-weight:600;
+    }
+    .flow-arrow { color:var(--accent); font-size:16px; }
+
+    /* 比較表 */
+    table { width:100%; border-collapse:collapse; font-size:14px; }
+    thead th { text-align:left; padding:10px 14px; font-size:12px; text-transform:uppercase; letter-spacing:0.5px; color:var(--muted); border-bottom:1px solid var(--border); }
+    tbody td { padding:11px 14px; border-bottom:1px solid rgba(255,255,255,0.04); color:var(--muted); vertical-align:top; }
+    tbody tr:hover td { background:rgba(255,255,255,0.02); }
+    td strong { color:var(--text); }
+
+    /* スプリット */
+    .split { display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:20px; }
+
+    @media(max-width:640px) {
+      h1 { font-size:28px; }
+      header.hero { padding:28px 20px 22px; }
+      .section { padding:20px 18px; }
+    }
+  </style>
 </head>
 
 <body>
-    <div class="shell">
-        <header class="hero">
-            <span class="eyebrow">ENVIRONMENT / VERSION CONTROL</span>
-            <h1>Git (Time Control)</h1>
-            <p class="lead">開発における「セーブポイント」作成ツール。失敗しても過去に戻れる安心感が、大胆な実験（Vibe Coding）を可能にします。</p>
-            <a class="back" href="../index.html">← Workbenchへ戻る</a>
-        </header>
+  <div class="shell">
 
-        <section class="grid">
-            <article class="card">
-                <h2>基本の3ステップ</h2>
+    <a href="index.html" class="back">← Knowledge Hub</a>
 
-                <div class="cmd-box">git add .</div>
-                <p class="cmd-desc"><strong>「ステージング」</strong>：変更したファイルを「次のセーブ対象」として選ぶ。</p>
+    <header class="hero">
+      <div class="eyebrow">Environment / Version Control</div>
+      <h1>Git &amp; GitHub 完全ガイド</h1>
+      <p class="lead">
+        Git はコードの「タイムマシン」、GitHub はその「クラウド保管庫 + チームワーク場所」。今日のセッションでもSSH設定からcloneまで実際に使ったので、その流れで理解を深めよう。
+      </p>
+      <nav class="toc">
+        <a href="#concept">概念を掴む</a>
+        <a href="#setup">初期設定</a>
+        <a href="#daily">毎日の操作</a>
+        <a href="#branch">ブランチ</a>
+        <a href="#github">GitHub操作</a>
+        <a href="#undo">ミスを直す</a>
+        <a href="#ssh">SSH設定</a>
+        <a href="#scenarios">よくある場面</a>
+        <a href="#ai">AIとの連携</a>
+      </nav>
+    </header>
 
-                <div class="cmd-box">git commit -m "機能追加"</div>
-                <p class="cmd-desc"><strong>「コミット」</strong>：セーブを実行する。メッセージは何をしたかのメモ。</p>
+    <!-- ===== 概念を掴む ===== -->
+    <div id="concept">
+      <div class="section-label">まず概念を掴む</div>
+      <div class="section">
+        <h2>Git と GitHub は別物</h2>
+        <div class="grid">
+          <div class="card">
+            <h3>🔧 Git（ツール）</h3>
+            <p>あなたのMac上で動くプログラム。ファイルの変更履歴をローカルで管理する。インターネット不要。</p>
+            <ul>
+              <li>変更を記録（commit）</li>
+              <li>過去に戻る（checkout / reset）</li>
+              <li>並行作業（branch）</li>
+              <li>履歴を確認（log）</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>☁️ GitHub（サービス）</h3>
+            <p>Gitのデータをクラウドに置いておける場所。共有・バックアップ・公開ができる。Microsoft傘下。</p>
+            <ul>
+              <li>コードを公開・非公開で保管</li>
+              <li>チームで共同編集</li>
+              <li>Pull Request（コードレビュー）</li>
+              <li>Issues（タスク管理）</li>
+            </ul>
+          </div>
+        </div>
 
-                <div class="cmd-box">git push</div>
-                <p class="cmd-desc"><strong>「プッシュ」</strong>：手元のセーブデータをクラウド（GitHub等）にアップロードする。</p>
-            </article>
+        <h3>ファイルが存在する3つの場所</h3>
+        <div class="flow">
+          <div class="flow-box">Working Directory<br><span style="color:var(--muted);font-size:11px;">今編集中のファイル</span></div>
+          <div class="flow-arrow">→ git add →</div>
+          <div class="flow-box">Staging Area<br><span style="color:var(--muted);font-size:11px;">次のコミット予定</span></div>
+          <div class="flow-arrow">→ git commit →</div>
+          <div class="flow-box">Local Repo<br><span style="color:var(--muted);font-size:11px;">ローカル履歴</span></div>
+          <div class="flow-arrow">→ git push →</div>
+          <div class="flow-box">GitHub (Remote)<br><span style="color:var(--muted);font-size:11px;">クラウド</span></div>
+        </div>
+        <p style="font-size:13px; color:var(--muted);">逆方向は：<code style="background:#0d1117;padding:2px 6px;border-radius:4px;font-size:12px;">git pull</code> または <code style="background:#0d1117;padding:2px 6px;border-radius:4px;font-size:12px;">git clone</code> でGitHub→ローカルに取得。</p>
 
-            <article class="card">
-                <h2>AIと使う Git</h2>
-                <p>難解なコマンド（rebase, cherry-pick等）を覚える必要はありません。複雑な操作が必要なときは、<strong>Claude Code</strong> や
-                    <strong>Cursor</strong> にこう頼んでください。</p>
-                <p style="background:rgba(255,255,255,0.05); padding:10px; border-radius:8px;">
-                    「直前のコミットを取り消して、変更内容はそのまま残しておいて（Soft Reset）」</p>
-                <p>AIは正確なコマンドを知っています。あなたは「時間をどう操作したいか」を指示するだけです。</p>
-            </article>
-        </section>
-
-        <section class="card">
-            <h2>困ったときの呪文</h2>
-            <div class="cmd-box">git status</div>
-            <p class="cmd-desc">現在の状況（変更されたファイル、ステージングの状態）を確認する。迷ったらまずはこれ。</p>
-
-            <div class="cmd-box">git log --oneline</div>
-            <p class="cmd-desc">過去のセーブポイント（コミット履歴）を一覧表示する。</p>
-        </section>
+        <h3>コミットとは何か</h3>
+        <p>コミット = ゲームのセーブポイント。「この時点のファイル全体」をスナップショットとして保存する。一度コミットすれば、いつでもその状態に戻れる。コミットには一意のID（ハッシュ）が付く。</p>
+        <div class="callout tip">
+          <strong>💡 コミット頻度の目安</strong>
+          「1つの作業が完了したら1コミット」が基本。ファイルを10個変えても、目的が1つなら1コミット。迷ったら細かくコミットする方が安全。
+        </div>
+      </div>
     </div>
-</body>
 
+    <!-- ===== 初期設定 ===== -->
+    <div id="setup">
+      <div class="section-label">初期設定（一度だけ）</div>
+      <div class="section">
+        <h2>Gitを使い始める前の設定</h2>
+        <div class="split">
+          <div>
+            <h3>ユーザー情報を登録</h3>
+            <p>コミットに「誰が」を記録するための設定。一度やれば永続する。</p>
+            <div class="cmd-group">
+              <div class="cmd">git config --global user.name <span class="s">"Your Name"</span>
+git config --global user.email <span class="s">"you@example.com"</span></div>
+              <p class="cmd-desc">設定確認は <code style="font-size:12px;">git config --list</code></p>
+            </div>
+          </div>
+          <div>
+            <h3>新しいリポジトリを作る</h3>
+            <p>既存のフォルダをGit管理下に置く（初期化）。</p>
+            <div class="cmd-group">
+              <div class="cmd"><span class="c"># フォルダに移動してから</span>
+git init
+git add .
+git commit -m <span class="s">"first commit"</span></div>
+              <p class="cmd-desc"><code>.git</code> という隠しフォルダが作られる。これがGitの本体。</p>
+            </div>
+          </div>
+        </div>
+
+        <h3>既存のリポジトリをコピーしてくる（clone）</h3>
+        <p>今日やった操作がこれ。GitHubにあるリポジトリをローカルに丸ごとコピーする。</p>
+        <div class="cmd-group">
+          <div class="cmd"><span class="c"># HTTPS方式（パスワードやトークンが必要）</span>
+git clone https://github.com/ユーザー名/リポジトリ名.git
+
+<span class="c"># SSH方式（SSHキー設定済みなら認証不要）← 今日設定した方法</span>
+git clone git@github.com:ユーザー名/リポジトリ名.git
+
+<span class="c"># フォルダ名を指定してclone</span>
+git clone git@github.com:ユーザー名/リポジトリ名.git 好きな名前</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 毎日の操作 ===== -->
+    <div id="daily">
+      <div class="section-label">毎日の基本操作</div>
+      <div class="section">
+        <h2>作業の基本サイクル</h2>
+
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <h4>状況を確認する</h4>
+              <p>何かする前にまずこれ。変更されたファイルが一覧で見える。</p>
+              <div class="cmd">git status</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <h4>変更をステージングする（add）</h4>
+              <p>「次のコミットに含めるファイル」を選ぶ。</p>
+              <div class="cmd">git add ファイル名.html      <span class="c"># 特定のファイルだけ</span>
+git add .                    <span class="c"># 全ての変更を対象に（注意して使う）</span>
+git add src/                 <span class="c"># フォルダごと</span></div>
+              <p class="cmd-desc">ステージング前後を確認：<code style="font-size:12px;">git diff</code>（未ステージ）、<code style="font-size:12px;">git diff --staged</code>（ステージ済み）</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <h4>コミットする（commit）</h4>
+              <p>ステージングしたものをセーブポイントとして記録する。</p>
+              <div class="cmd">git commit -m <span class="s">"メッセージ"</span>
+
+<span class="c"># add と commit を同時にやる（追跡済みファイルのみ）</span>
+git commit -am <span class="s">"メッセージ"</span></div>
+              <p class="cmd-desc">良いメッセージの書き方：「何をしたか」ではなく「なぜしたか」が伝わると最高。例：「ナビのリンク切れを修正」「中国系AIコーディングページを追加」</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-body">
+              <h4>GitHubへ送る（push）</h4>
+              <p>ローカルのコミット履歴をGitHubに反映させる。</p>
+              <div class="cmd">git push                     <span class="c"># 現在のブランチをpush</span>
+git push origin main         <span class="c"># mainブランチを明示的に指定</span></div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">5</div>
+            <div class="step-body">
+              <h4>GitHubから最新を取得する（pull）</h4>
+              <p>他の誰か（または別のPC）がpushした内容をローカルに反映する。</p>
+              <div class="cmd">git pull                     <span class="c"># fetch + merge を一括実行</span>
+git fetch                    <span class="c"># 取得だけ（マージしない）</span></div>
+              <div class="callout tip">
+                <strong>💡 作業前に pull する習慣を</strong>
+                特にチームで使う場合、作業前に <code>git pull</code> してから始めると衝突が減る。
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h3>履歴を見る</h3>
+        <div class="grid">
+          <div class="cmd-group">
+            <div class="cmd">git log --oneline          <span class="c"># コンパクト表示</span>
+git log --oneline --graph  <span class="c"># ブランチの分岐も視覚化</span>
+git log -10                <span class="c"># 最新10件だけ</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== ブランチ ===== -->
+    <div id="branch">
+      <div class="section-label">ブランチ — 並行して作業する</div>
+      <div class="section">
+        <h2>ブランチとは</h2>
+        <p>本番（main）を壊さずに「実験用のコピー」を作る仕組み。機能ごとにブランチを切って作業し、完成したらmainに合流（merge）させる。</p>
+
+        <div class="flow">
+          <div class="flow-box">main<br><span style="color:var(--muted);font-size:11px;">本番・安定版</span></div>
+          <div class="flow-arrow">→ branch →</div>
+          <div class="flow-box">feature/new-page<br><span style="color:var(--muted);font-size:11px;">開発中</span></div>
+          <div class="flow-arrow">→ merge →</div>
+          <div class="flow-box">main<br><span style="color:var(--muted);font-size:11px;">機能追加済み</span></div>
+        </div>
+
+        <div class="grid">
+          <div>
+            <h3>基本操作</h3>
+            <div class="cmd">git branch                 <span class="c"># 一覧（*が現在地）</span>
+git branch 新ブランチ名    <span class="c"># 作成</span>
+git switch 新ブランチ名    <span class="c"># 移動</span>
+
+<span class="c"># 作成と移動を同時に</span>
+git switch -c 新ブランチ名
+
+<span class="c"># ブランチを削除</span>
+git branch -d ブランチ名</div>
+          </div>
+          <div>
+            <h3>マージ</h3>
+            <p>別ブランチの内容を現在のブランチに取り込む。</p>
+            <div class="cmd"><span class="c"># mainブランチに戻ってから</span>
+git switch main
+git merge feature/new-page</div>
+            <div class="callout warn">
+              <strong>⚠ 競合（Conflict）が起きたら</strong>
+              同じファイルの同じ行を両ブランチで変えると競合する。Claude Codeに「競合を解決して」と頼むのが最速。
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== GitHub操作 ===== -->
+    <div id="github">
+      <div class="section-label">GitHub固有の操作</div>
+      <div class="section">
+        <h2>GitHub でよく使う操作</h2>
+
+        <div class="grid">
+          <div class="card">
+            <h3>📁 リポジトリ（Repository）</h3>
+            <p>プロジェクト1つ分のファイル群とその全履歴が入ったフォルダ。略して「リポ」。Public（公開）とPrivate（非公開）がある。</p>
+            <ul>
+              <li>今日のセッション：ALIGN_Lab / claude / gobd / Thinkers-700-reorg はすべてPrivateリポジトリ</li>
+              <li>GitHubのURL形式：<code style="font-size:12px;">github.com/ユーザー名/リポジトリ名</code></li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <h3>🍴 フォーク（Fork）</h3>
+            <p>他人のリポジトリを自分のアカウントにコピーする。クローンとの違いは、Forkは自分のGitHub上にコピーが作られる点。</p>
+            <ul>
+              <li>OSSに貢献するときに使う</li>
+              <li>Fork → clone → 修正 → PR が一般的な流れ</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <h3>🔀 Pull Request（PR）</h3>
+            <p>「このブランチをmainに取り込んでいいですか？」という提案。コードレビューの場でもある。一人作業でも使うとコミットの整理になる。</p>
+            <ul>
+              <li>GitHub上でブランチ → "Compare &amp; pull request"</li>
+              <li>タイトルと説明を書いて "Create pull request"</li>
+              <li>問題なければ "Merge pull request"</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <h3>🐛 Issues（イシュー）</h3>
+            <p>バグ報告・機能要望・TODO管理ができるチケット機能。リポジトリのタスクボードとして使える。</p>
+            <ul>
+              <li>コミットメッセージに <code style="font-size:12px;">#123</code> を書くと自動リンク</li>
+              <li><code style="font-size:12px;">fixes #123</code> と書くとPRマージ時にIssueが自動クローズ</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <h3>⭐ GitHub Pages</h3>
+            <p>リポジトリのHTMLをそのまま無料でWebサイトとして公開できる機能。</p>
+            <ul>
+              <li>Settings → Pages → Branch: main → Save</li>
+              <li>URL: <code style="font-size:12px;">ユーザー名.github.io/リポジトリ名</code></li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <h3>🔑 Personal Access Token（PAT）</h3>
+            <p>HTTPS接続時に使うパスワード代わりのトークン。SSHキーを使っていれば不要。</p>
+            <ul>
+              <li>Settings → Developer settings → Personal access tokens</li>
+              <li>スコープ：repo にチェックすれば大抵OK</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3>リモートの確認・変更</h3>
+        <p>「リモート」= GitHubなどのURL設定のこと。<code>origin</code>が標準的な名前。</p>
+        <div class="cmd">git remote -v              <span class="c"># 現在のリモートURL確認</span>
+git remote add origin git@github.com:ユーザー名/リポジトリ名.git  <span class="c"># 追加</span>
+git remote set-url origin git@github.com:新URL.git                <span class="c"># URL変更</span></div>
+      </div>
+    </div>
+
+    <!-- ===== ミスを直す ===== -->
+    <div id="undo">
+      <div class="section-label">ミスを直す — 安全なやり直し</div>
+      <div class="section">
+        <h2>やり直しコマンド一覧</h2>
+        <div class="callout info">
+          <strong>🔵 基本原則</strong>
+          pushする前のミスはいくらでも直せる。pushした後は少し慎重に。迷ったらClaude Codeに「〇〇を取り消したい」と説明して正しいコマンドを確認してもらう。
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>やりたいこと</th>
+              <th>コマンド</th>
+              <th>安全度</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>addを取り消す</strong>（ステージング解除）</td>
+              <td><code style="font-family:var(--font-mono);font-size:13px;">git restore --staged ファイル名</code></td>
+              <td><span class="badge badge-green">安全</span></td>
+            </tr>
+            <tr>
+              <td><strong>ファイルの変更を元に戻す</strong>（編集前に戻す）</td>
+              <td><code style="font-family:var(--font-mono);font-size:13px;">git restore ファイル名</code></td>
+              <td><span class="badge badge-gold">変更消える</span></td>
+            </tr>
+            <tr>
+              <td><strong>直前のコミットを取り消す</strong>（変更は残す）</td>
+              <td><code style="font-family:var(--font-mono);font-size:13px;">git reset --soft HEAD~1</code></td>
+              <td><span class="badge badge-green">安全</span></td>
+            </tr>
+            <tr>
+              <td><strong>直前のコミットを完全に消す</strong></td>
+              <td><code style="font-family:var(--font-mono);font-size:13px;">git reset --hard HEAD~1</code></td>
+              <td><span class="badge badge-red">変更も消える</span></td>
+            </tr>
+            <tr>
+              <td><strong>コミットメッセージだけ直す</strong>（push前のみ）</td>
+              <td><code style="font-family:var(--font-mono);font-size:13px;">git commit --amend -m "新メッセージ"</code></td>
+              <td><span class="badge badge-blue">push前のみ</span></td>
+            </tr>
+            <tr>
+              <td><strong>特定のコミットを打ち消す</strong>（履歴は残る）</td>
+              <td><code style="font-family:var(--font-mono);font-size:13px;">git revert コミットID</code></td>
+              <td><span class="badge badge-green">安全・push後もOK</span></td>
+            </tr>
+            <tr>
+              <td><strong>作業中の変更を一時保存</strong>（別ブランチに移るとき）</td>
+              <td><code style="font-family:var(--font-mono);font-size:13px;">git stash / git stash pop</code></td>
+              <td><span class="badge badge-green">安全</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ===== SSH設定 ===== -->
+    <div id="ssh">
+      <div class="section-label">SSH設定 — パスワード不要でGitHubと通信</div>
+      <div class="section">
+        <h2>SSH とは・なぜ必要か</h2>
+        <p>GitHubのPrivateリポジトリにアクセスするには「あなたが本人である」証明が必要。SSHキーは「電子的な身分証明書」で、一度設定すればパスワード入力なしにgit clone / push / pull できる。<strong>今日このMacでは設定済み。</strong></p>
+
+        <div class="split">
+          <div>
+            <h3>設定手順（今後別のMacで必要なとき）</h3>
+            <div class="steps">
+              <div class="step">
+                <div class="step-num">1</div>
+                <div class="step-body">
+                  <h4>キーを生成</h4>
+                  <div class="cmd">ssh-keygen -t ed25519 -C <span class="s">"your@email.com"</span></div>
+                  <p><code>~/.ssh/id_ed25519</code>（秘密鍵）と <code>~/.ssh/id_ed25519.pub</code>（公開鍵）が作られる。</p>
+                </div>
+              </div>
+              <div class="step">
+                <div class="step-num">2</div>
+                <div class="step-body">
+                  <h4>公開鍵をGitHubに登録</h4>
+                  <div class="cmd">cat ~/.ssh/id_ed25519.pub  <span class="c"># 内容をコピー</span></div>
+                  <p>GitHub → Settings → SSH and GPG keys → New SSH key に貼り付け。</p>
+                </div>
+              </div>
+              <div class="step">
+                <div class="step-num">3</div>
+                <div class="step-body">
+                  <h4>接続確認</h4>
+                  <div class="cmd">ssh -T git@github.com</div>
+                  <p>「Hi ユーザー名!」と返ってくれば成功。</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <h3>HTTPS vs SSH の違い</h3>
+            <table style="font-size:13px;">
+              <thead>
+                <tr><th></th><th>HTTPS</th><th>SSH</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>URL形式</strong></td>
+                  <td><code style="font-size:12px;">https://github.com/...</code></td>
+                  <td><code style="font-size:12px;">git@github.com:...</code></td>
+                </tr>
+                <tr>
+                  <td><strong>認証</strong></td>
+                  <td>トークン/パスワード</td>
+                  <td>SSHキー（自動）</td>
+                </tr>
+                <tr>
+                  <td><strong>設定</strong></td>
+                  <td>簡単</td>
+                  <td>一度だけ設定が必要</td>
+                </tr>
+                <tr>
+                  <td><strong>使いやすさ</strong></td>
+                  <td>毎回認証が面倒</td>
+                  <td>設定後はラク</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="callout tip" style="margin-top:14px;">
+              <strong>💡 推奨</strong>
+              長期的に使うMacにはSSHを設定するのが圧倒的にラク。今日のMacは設定済み。
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== よくある場面 ===== -->
+    <div id="scenarios">
+      <div class="section-label">よくある場面と対処法</div>
+      <div class="section">
+        <h2>実際にハマりやすいシチュエーション</h2>
+
+        <div class="grid">
+          <div class="card">
+            <h3>「pushが拒否された」</h3>
+            <p>GitHubに自分より新しい変更があるとき。</p>
+            <div class="cmd">git pull --rebase
+git push</div>
+            <p class="cmd-desc">pullしてから再pushする。</p>
+          </div>
+
+          <div class="card">
+            <h3>「間違えてmainで作業してしまった」</h3>
+            <p>pushする前ならブランチに移せる。</p>
+            <div class="cmd">git switch -c 新ブランチ名
+<span class="c"># mainの変更を新ブランチに持ち越せる</span></div>
+          </div>
+
+          <div class="card">
+            <h3>「特定のファイルだけ前のバージョンに戻したい」</h3>
+            <div class="cmd">git log --oneline  <span class="c"># コミットIDを確認</span>
+git restore --source=コミットID ファイル名</div>
+          </div>
+
+          <div class="card">
+            <h3>「既存フォルダをGitHubリポジトリに紐付けたい」</h3>
+            <p>今日のgobdフォルダのような状況。</p>
+            <div class="cmd">git init
+git remote add origin git@github.com:ユーザー名/リポジトリ名.git
+git add .
+git commit -m <span class="s">"initial commit"</span>
+git push -u origin main</div>
+          </div>
+
+          <div class="card">
+            <h3>「.gitignoreって何？」</h3>
+            <p>Gitで追跡しないファイルを指定するファイル。パスワードや大容量ファイルを誤ってpushしないように。</p>
+            <div class="cmd"><span class="c"># .gitignore の書き方例</span>
+.env              <span class="c"># 環境変数ファイル</span>
+node_modules/     <span class="c"># npmパッケージ</span>
+*.log             <span class="c"># ログファイル全般</span>
+.DS_Store         <span class="c"># Macのシステムファイル</span></div>
+          </div>
+
+          <div class="card">
+            <h3>「2台のPCで同じリポジトリを使いたい」</h3>
+            <p>両方のPCでSSHキーをGitHubに登録すれば使える。</p>
+            <ul>
+              <li>PC-A でpush → PC-B で <code>git pull</code></li>
+              <li>同時に編集すると競合する可能性あり</li>
+              <li>ブランチを分けると安全</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== AIとの連携 ===== -->
+    <div id="ai">
+      <div class="section-label">AIとの連携</div>
+      <div class="section">
+        <h2>Claude Code と Git を組み合わせる</h2>
+        <p>難しいGitコマンドを暗記する必要はない。Claude Codeに「日本語で何をしたいか」を伝えれば正確なコマンドを教えてくれる。</p>
+
+        <div class="grid">
+          <div class="card">
+            <h3>こんな頼み方が有効</h3>
+            <ul>
+              <li>「直前のコミットを取り消して、変更は残しておいて」</li>
+              <li>「index.htmlとstyle.cssだけコミットして」</li>
+              <li>「mainブランチに新しいfeatureブランチを切って」</li>
+              <li>「GitHubの最新をpullしてからpushして」</li>
+              <li>「コミット履歴を見やすく表示して」</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Claude Codeが自動でやること</h3>
+            <ul>
+              <li>ファイルを作成・編集したあとにgit add/commit/pushを提案</li>
+              <li>競合（conflict）が起きたら解決してくれる</li>
+              <li>Pull Requestの作成（gh コマンド経由）</li>
+              <li>不適切なコマンド（force push等）は確認を求める</li>
+            </ul>
+            <div class="callout info" style="margin-top:10px;">
+              <strong>🔵 今日の実例</strong>
+              SSHキー生成 → GitHub登録 → clone → pull → 整備 → pushの全フローをClaude Codeが実行した。
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== クイックリファレンス ===== -->
+    <div class="section">
+      <h2>クイックリファレンス</h2>
+      <div class="grid-3">
+        <div>
+          <p style="font-size:12px;font-weight:700;text-transform:uppercase;color:var(--accent);margin-bottom:8px;">確認系</p>
+          <div class="cmd" style="font-size:12px;">git status
+git log --oneline
+git diff
+git branch
+git remote -v</div>
+        </div>
+        <div>
+          <p style="font-size:12px;font-weight:700;text-transform:uppercase;color:var(--accent-2);margin-bottom:8px;">作業系</p>
+          <div class="cmd" style="font-size:12px;">git add .
+git commit -m "msg"
+git push
+git pull
+git switch -c branch</div>
+        </div>
+        <div>
+          <p style="font-size:12px;font-weight:700;text-transform:uppercase;color:var(--accent-gold);margin-bottom:8px;">修正系</p>
+          <div class="cmd" style="font-size:12px;">git restore --staged .
+git reset --soft HEAD~1
+git stash
+git stash pop
+git revert ID</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</body>
 </html>
