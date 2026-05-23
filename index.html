@@ -150,6 +150,92 @@
       line-height: 1.5;
     }
 
+    .daily-hub {
+      background:
+        linear-gradient(135deg, rgba(102,224,194,0.15), rgba(80,160,255,0.08)),
+        var(--panel);
+      border: 1px solid rgba(102,224,194,0.3);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 22px 24px;
+      margin-bottom: 20px;
+    }
+    .daily-hub-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .daily-hub-label {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 11px;
+      border-radius: 999px;
+      background: rgba(102,224,194,0.14);
+      color: var(--accent);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .daily-hub h2 {
+      font-size: 1.65rem;
+      margin-bottom: 4px;
+    }
+    .daily-hub p {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    .daily-hub-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .daily-news-link {
+      display: flex;
+      flex-direction: column;
+      min-height: 164px;
+      padding: 16px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.045);
+      color: var(--text);
+      text-decoration: none;
+      transition: transform 0.15s, border-color 0.15s, background 0.15s;
+    }
+    .daily-news-link:hover {
+      transform: translateY(-2px);
+      border-color: rgba(102,224,194,0.4);
+      background: rgba(255,255,255,0.07);
+    }
+    .daily-news-link .source {
+      color: var(--accent);
+      font-size: 0.76rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .daily-news-link strong {
+      font-size: 1.02rem;
+      line-height: 1.35;
+      margin-bottom: 8px;
+    }
+    .daily-news-link span {
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.55;
+    }
+    .daily-news-link .open-link {
+      margin-top: auto;
+      padding-top: 14px;
+      color: var(--accent);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+
     /* ─── 注目バナー（Claude Code デモ） ─── */
     .banner {
       background: linear-gradient(135deg, rgba(244,184,96,0.12), rgba(102,224,194,0.08));
@@ -182,6 +268,9 @@
     @media (max-width: 580px) { .grid { grid-template-columns: 1fr; } }
     @media (max-width: 860px) {
       .knowledge-spotlight { grid-template-columns: 1fr; }
+      .daily-hub-header { align-items: flex-start; flex-direction: column; }
+      .daily-hub-grid { grid-template-columns: 1fr; }
+      .daily-news-link { min-height: 0; }
     }
 
     .card {
@@ -255,6 +344,36 @@
 <body>
   <div class="shell">
 
+    <section class="daily-hub">
+      <div class="daily-hub-header">
+        <div>
+          <div class="daily-hub-label">Daily News Hub</div>
+          <h2>毎日のAIニュース入口</h2>
+          <p>Claude のトップから、3つの日次ニュースサイトへすぐ移動できます。</p>
+        </div>
+      </div>
+      <div class="daily-hub-grid">
+        <a class="daily-news-link" href="research/ai-news/index.html">
+          <div class="source">Claude</div>
+          <strong>AI News</strong>
+          <span>Claude / Anthropic / OpenClaw / Hermes / LLM 周辺を中心に、毎朝の総合まとめを確認します。</span>
+          <div class="open-link">ニュースを見る →</div>
+        </a>
+        <a class="daily-news-link" href="https://alignlabai-rgb.github.io/ai-news-from-x/">
+          <div class="source">X Tech News</div>
+          <strong>Xから拾った技術ニュース</strong>
+          <span>AI、Chinese AI、Agents、Hardware、Longevity、Generative AI をカテゴリ別に追えます。</span>
+          <div class="open-link">カテゴリを見る →</div>
+        </a>
+        <a class="daily-news-link" href="https://alignlabai-rgb.github.io/GrokPulse/">
+          <div class="source">GrokPulse</div>
+          <strong>Daily AI Trends</strong>
+          <span>Grok が作る日別のトレンド読み物。流れや反応をざっと掴む入口です。</span>
+          <div class="open-link">最新号を見る →</div>
+        </a>
+      </div>
+    </section>
+
     <!-- ヘッダー -->
     <section class="hero">
       <div class="eyebrow">Claude Workspace</div>
@@ -324,15 +443,6 @@
         <p>グループ海外事業統括部・M&amp;A企画チーム向けに、費用対効果・統制・実務適合性から整理した単体配布版 →</p>
       </div>
       <a href="demos/codex-claude-ma-adoption.html" class="banner-btn">比較資料を開く</a>
-    </div>
-
-    <div class="banner" style="border-color:rgba(102,224,194,0.3);background:linear-gradient(135deg,rgba(102,224,194,0.10),rgba(80,160,255,0.06));">
-      <div class="banner-icon">📰</div>
-      <div class="banner-text">
-        <strong style="color:var(--accent);">AI News — 毎日自動更新</strong>
-        <p>Claude Routines が毎朝収集するAIニュース。Claude・OpenClaw・Hermes・動画生成・中国LLM など制作・事業に関連する情報を日次アーカイブ →</p>
-      </div>
-      <a href="research/ai-news/index.html" class="banner-btn" style="background:rgba(102,224,194,0.18);border-color:rgba(102,224,194,0.4);color:var(--accent);">ニュースを見る</a>
     </div>
 
     <!-- カードグリッド -->
