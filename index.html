@@ -236,6 +236,23 @@
       font-weight: 800;
     }
 
+    /* ─── LLM 主要アップデートコーナー（daily-hub のバリエーション） ─── */
+    .daily-hub.llm-variant {
+      background:
+        linear-gradient(135deg, rgba(167,139,250,0.18), rgba(96,208,255,0.08)),
+        var(--panel);
+      border: 1px solid rgba(167,139,250,0.32);
+    }
+    .daily-hub.llm-variant .daily-hub-label {
+      background: rgba(167,139,250,0.2);
+      color: #d8b4fe;
+    }
+    .daily-hub.llm-variant .daily-news-link .source { color: #d8b4fe; }
+    .daily-hub.llm-variant .daily-news-link .open-link { color: #d8b4fe; }
+    .daily-hub.llm-variant .daily-news-link:hover {
+      border-color: rgba(167,139,250,0.45);
+    }
+
     /* ─── 注目バナー（Claude Code デモ） ─── */
     .banner {
       background: linear-gradient(135deg, rgba(244,184,96,0.12), rgba(102,224,194,0.08));
@@ -264,8 +281,62 @@
       gap: 16px;
       margin-bottom: 20px;
     }
-    @media (max-width: 900px) { .grid { grid-template-columns: repeat(2, 1fr); } }
-    @media (max-width: 580px) { .grid { grid-template-columns: 1fr; } }
+    .grid.grid-2 { grid-template-columns: repeat(2, 1fr); }
+    @media (max-width: 900px) { .grid, .grid.grid-2 { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 580px) { .grid, .grid.grid-2 { grid-template-columns: 1fr; } }
+
+    /* ─── カテゴリ見出し（3カテゴリ構造） ─── */
+    .category-section { margin-bottom: 24px; }
+    .category-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 4px 0 14px;
+      padding-left: 4px;
+    }
+    .category-header .category-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      padding: 4px 12px 4px 14px;
+      border-left: 3px solid var(--accent);
+      background: rgba(102,224,194,0.06);
+      border-radius: 0 8px 8px 0;
+    }
+    .category-header .category-sub {
+      color: var(--soft);
+      font-size: 0.82rem;
+    }
+
+    /* spotlight card（Creator System を全幅でハイライト） */
+    .card.spotlight {
+      grid-column: 1 / -1;
+      padding: 26px 28px;
+      background:
+        linear-gradient(135deg, rgba(244,184,96,0.10), rgba(102,224,194,0.06)),
+        var(--panel-2);
+      border-color: rgba(244,184,96,0.4);
+    }
+    .card.spotlight h3 { font-size: 22px; }
+    .card.spotlight .spotlight-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 24px;
+      margin-top: 6px;
+    }
+    .card.spotlight .spotlight-grid ul { padding-left: 16px; }
+    @media (max-width: 720px) {
+      .card.spotlight .spotlight-grid { grid-template-columns: 1fr; gap: 12px; }
+    }
+    .card.spotlight .tag {
+      background: rgba(244,184,96,0.22);
+      color: var(--accent-2);
+    }
     @media (max-width: 860px) {
       .knowledge-spotlight { grid-template-columns: 1fr; }
       .daily-hub-header { align-items: flex-start; flex-direction: column; }
@@ -426,125 +497,186 @@
       </div>
     </section>
 
-    <!-- 注目バナー：Claude Code デモ -->
-    <div class="banner">
-      <div class="banner-icon">🎯</div>
-      <div class="banner-text">
-        <strong>4/17（木）— MAチーム向け Claude デモ（30分）</strong>
-        <p>シナリオ・プロンプト例・想定Q&amp;A・準備チェックリストをまとめたデモ専用ページ →</p>
+    <!-- LLM 主要アップデートコーナー -->
+    <section class="daily-hub llm-variant">
+      <div class="daily-hub-header">
+        <div>
+          <div class="daily-hub-label">LLM Updates Hub</div>
+          <h2>LLM 主要アップデート</h2>
+          <p>Claude / ChatGPT / Gemini それぞれの最新動向を同じ粒度で追えるトラッカー群。モデル・プロダクト・事業面まで網羅。</p>
+        </div>
       </div>
-      <a href="demos/ma-demo-2026.html" class="banner-btn">デモ資料を開く</a>
-    </div>
-
-    <div class="banner">
-      <div class="banner-icon">⚖️</div>
-      <div class="banner-text">
-        <strong>第2回 — Codex / Claude Code 導入比較</strong>
-        <p>グループ海外事業統括部・M&amp;A企画チーム向けに、費用対効果・統制・実務適合性から整理した単体配布版 →</p>
+      <div class="daily-hub-grid">
+        <a class="daily-news-link" href="research/claude-recent-updates.html">
+          <div class="source">Claude / Anthropic</div>
+          <strong>Claude 最新アップデート</strong>
+          <span>Opus 4.7・Code with Claude London（5/19）・KPMG 276K 展開・$900B 調達ラウンド・Memory / Self-hosted sandboxes / MCP tunnels まで、2026年2〜5月の全動向を完全版で整理。</span>
+          <div class="open-link">Claude トラッカーを開く →</div>
+        </a>
+        <a class="daily-news-link" href="research/chatgpt-recent-updates.html">
+          <div class="source">ChatGPT / OpenAI</div>
+          <strong>ChatGPT 最新アップデート</strong>
+          <span>GPT-5.5 / 5.4・Workspace Agents 有償化・Codex モバイル / Dell オンプレ・Atlas + ChatGPT + Codex 統合・SEC への IPO 秘密申請まで、2025年10月〜2026年5月を網羅。</span>
+          <div class="open-link">ChatGPT トラッカーを開く →</div>
+        </a>
+        <a class="daily-news-link" href="research/gemini-recent-updates.html">
+          <div class="source">Gemini / Google</div>
+          <strong>Gemini 最新アップデート</strong>
+          <span>Gemini 3 Pro 〜 3.5・Omni / Spark・Antigravity 2.0・Gemma 4・Android XR・I/O 2026（5/19〜20）速報まで、2025年11月〜2026年5月を網羅。</span>
+          <div class="open-link">Gemini トラッカーを開く →</div>
+        </a>
       </div>
-      <a href="demos/codex-claude-ma-adoption.html" class="banner-btn">比較資料を開く</a>
-    </div>
+    </section>
 
-    <!-- カードグリッド -->
-    <section class="grid">
-
-      <div class="card">
-        <div class="tag">Foundations</div>
-        <h3><a class="card-main-link" href="foundations/index.html">前提と理念</a></h3>
-        <p>このハブの目的、ALIGN_Lab との関係、Claude に何を任せるかの前提をまとめます。</p>
-        <ul>
-          <li>技術ハブとしての役割</li>
-          <li>ALIGN_Lab との接続</li>
-          <li>運用原則</li>
-        </ul>
+    <!-- ━━━━━━ Category 1: 制作・技術コア ━━━━━━ -->
+    <section class="category-section">
+      <div class="category-header">
+        <span class="category-label">🎬 制作・技術コア</span>
+        <span class="category-sub">主軸。Creator System を中心に、エージェント基盤・実務操作・LLM 個別を並べる領域。</span>
       </div>
+      <section class="grid">
 
-      <div class="card">
-        <div class="tag">Strategy</div>
-        <h3><a class="card-main-link" href="strategy/index.html">事業との接続と優先順位</a></h3>
-        <p>この技術ハブが事業、制作、学習にどう効くかを整理し、優先順位を決めます。</p>
-        <ul>
-          <li>能力マップ</li>
-          <li>優先順位</li>
-          <li>中期ロードマップ</li>
-        </ul>
+        <div class="card spotlight">
+          <div class="tag">★ FOCUS — 制作システム本体</div>
+          <h3><a class="card-main-link" href="creator-system/index.html">Creator System — ネタ文章 → 動画・漫画 → 評価・マネタイズまで一気通貫</a></h3>
+          <div class="spotlight-grid">
+            <div>
+              <p>このハブで最も力を入れていく中心領域。ネタ文章を入れるだけで動画・漫画を生成し、自動評価・選別、マネタイズ管理まで完結するパイプライン群。OpenClaw 連携や仕様書・KPI ダッシュボードも整備中。</p>
+            </div>
+            <div>
+              <ul>
+                <li><a href="creator-system/video-pipeline.html">🎬 動画制作パイプライン</a></li>
+                <li><a href="creator-system/manga-pipeline.html">📖 漫画制作パイプライン</a></li>
+                <li><a href="creator-system/evaluation.html">⭐ 評価・選別システム</a></li>
+                <li><a href="creator-system/monetization.html">💰 マネタイズ管理</a></li>
+                <li><a href="creator-system/spec.html">📄 システム仕様書</a></li>
+                <li><a href="creator-system/openclaw.html">🔗 OpenClaw 連携</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="tag">Claw Stack</div>
+          <h3><a class="card-main-link" href="claw-stack/index.html">Claude / Pico / Nano / OpenClaw</a></h3>
+          <p>実験用エージェント基盤の比較、導入、運用判断のハブ。OpenClaw News もここから。</p>
+          <ul>
+            <li>PicoClaw / NanoClaw</li>
+            <li><a href="claw-stack/comparison.html">スタック比較表</a></li>
+            <li>OpenClaw 導線</li>
+            <li><a href="research/openclaw-news/index.html">OpenClaw News</a></li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="tag">Tech Workbench</div>
+          <h3><a class="card-main-link" href="workbench/index.html">実務知識と操作ガイド</a></h3>
+          <p>Claude Code・Docker・Git・Mac・VSCode などの<strong>開発実務</strong>に絞った操作系ハブ。</p>
+          <ul>
+            <li><a href="workbench/knowledge/index.html">Knowledge Index</a></li>
+            <li><a href="workbench/vibe-coding-guide/index.html">Vibe Coding ガイド</a></li>
+            <li><a href="workbench/knowledge/claude-code/index.html">Claude Code 操作</a></li>
+            <li><a href="workbench/knowledge/git-basics.html">git / docker / mac / VSCode</a></li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="tag">LLM Deep Dive</div>
+          <h3><a class="card-main-link" href="workbench/knowledge/index.html">LLM 個別深掘り</a></h3>
+          <p>LLM Updates Hub の<strong>深掘り側</strong>。ベンダー別の特性・使い分け・実装メモを置く場所。</p>
+          <ul>
+            <li><a href="workbench/knowledge/chatgpt.html">ChatGPT</a> / <a href="workbench/knowledge/gemini.html">Gemini</a> / <a href="workbench/knowledge/grok.html">Grok</a></li>
+            <li><a href="workbench/knowledge/deepseek.html">DeepSeek</a> / <a href="workbench/knowledge/kimi.html">Kimi</a> / <a href="workbench/knowledge/qwen.html">Qwen</a> / <a href="workbench/knowledge/glm.html">GLM</a></li>
+            <li><a href="workbench/knowledge/hermes-agent.html">Hermes Agent</a> / <a href="workbench/knowledge/openai-codex.html">OpenAI Codex</a> / <a href="workbench/knowledge/cursor.html">Cursor</a></li>
+            <li><a href="workbench/knowledge/intelligence-matrix.html">LLM 比較マトリクス</a> / <a href="workbench/knowledge/slm-guide.html">SLM ガイド</a></li>
+          </ul>
+        </div>
+
+      </section>
+    </section>
+
+    <!-- ━━━━━━ Category 2: ナレッジ・資料 ━━━━━━ -->
+    <section class="category-section">
+      <div class="category-header">
+        <span class="category-label">📚 ナレッジ・資料</span>
+        <span class="category-sub">業界トレンドの長文と、過去の配布資料・ブリーフィングの参照アーカイブ。</span>
       </div>
+      <section class="grid grid-2">
 
-      <div class="card">
-        <div class="tag">Creator System</div>
-        <h3><a class="card-main-link" href="creator-system/index.html">制作システム本体</a></h3>
-        <p>ネタ文章を入れるだけで動画・漫画を生成し、評価・マネタイズまで全自動で完結するパイプライン群。</p>
-        <ul>
-          <li><a href="creator-system/video-pipeline.html">🎬 動画制作パイプライン</a></li>
-          <li><a href="creator-system/manga-pipeline.html">📖 漫画制作パイプライン</a></li>
-          <li><a href="creator-system/evaluation.html">⭐ 評価・選別システム</a></li>
-          <li><a href="creator-system/monetization.html">💰 マネタイズ管理</a></li>
-          <li><a href="creator-system/spec.html">📄 システム仕様書</a></li>
-        </ul>
+        <div class="card">
+          <div class="tag">Industry Trends</div>
+          <h3><a class="card-main-link" href="research/industry-trends.html">業界トレンド（長文分析）</a></h3>
+          <p>上場競争・Big Four 提携・規制動向・研究者移動など、<strong>ベンダー横断</strong>でしか書けない長文をここに集約。Claude / ChatGPT / Gemini の各事業セクションを縦串で読み解く場所。</p>
+          <ul>
+            <li>AI 上場競争（Anthropic $900B / OpenAI $852B〜$1T）</li>
+            <li>Big Four × AI（KPMG・PwC）</li>
+            <li>Vatican × Anthropic「Magnifica Humanitas」</li>
+            <li>研究者移動（Karpathy → Anthropic ほか）</li>
+            <li><a href="research/highlights.html">重要記事ハイライト</a> / <a href="research/claude-timeline.html">Claude リリース年表</a></li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="tag">Briefings</div>
+          <h3><a class="card-main-link" href="demos/index.html">ブリーフィング & 配布資料</a></h3>
+          <p>過去のデモ・社内配布資料の<strong>参照アーカイブ</strong>。イベント自体は終了したが、資料としての価値は残っている長文群。</p>
+          <ul>
+            <li><a href="demos/codex-vs-opus.html">Codex vs Opus 徹底比較（長文）</a></li>
+            <li><a href="demos/codex-claude-ma-adoption.html">Codex / Claude Code 導入比較（M&amp;A企画チーム向け）</a></li>
+            <li><a href="demos/why-claude-code.html">Why Claude Code</a></li>
+            <li><a href="demos/agent-deep-dive.html">Agent Deep Dive</a> / <a href="demos/routines-deep-dive.html">Routines Deep Dive</a></li>
+          </ul>
+        </div>
+
+      </section>
+    </section>
+
+    <!-- ━━━━━━ Category 3: ハブ運用 ━━━━━━ -->
+    <section class="category-section">
+      <div class="category-header">
+        <span class="category-label">🛠 ハブ運用</span>
+        <span class="category-sub">前提・戦略・更新履歴。このハブ自体の運用に関する領域。</span>
       </div>
+      <section class="grid">
 
-      <div class="card">
-        <div class="tag">Claw Stack</div>
-        <h3><a class="card-main-link" href="claw-stack/index.html">Claude / Pico / Nano / OpenClaw</a></h3>
-        <p>実験用エージェント基盤の比較、導入、運用判断のハブです。</p>
-        <ul>
-          <li>PicoClaw / NanoClaw</li>
-          <li><a href="claw-stack/comparison.html">スタック比較表</a></li>
-          <li>OpenClaw 導線</li>
-        </ul>
-      </div>
+        <div class="card">
+          <div class="tag">Foundations</div>
+          <h3><a class="card-main-link" href="foundations/index.html">前提と理念</a></h3>
+          <p>このハブの目的、ALIGN_Lab との関係、Claude に何を任せるかの前提。</p>
+          <ul>
+            <li>技術ハブとしての役割</li>
+            <li>ALIGN_Lab との接続</li>
+            <li>運用原則</li>
+          </ul>
+        </div>
 
+        <div class="card">
+          <div class="tag">Strategy</div>
+          <h3><a class="card-main-link" href="strategy/index.html">事業との接続と優先順位</a></h3>
+          <p>この技術ハブが事業・制作・学習にどう効くかを整理し、優先順位を決める。</p>
+          <ul>
+            <li>能力マップ</li>
+            <li>優先順位</li>
+            <li>中期ロードマップ</li>
+          </ul>
+        </div>
 
-      <div class="card highlight">
-        <div class="tag">⭐ Research — 注目</div>
-        <h3><a class="card-main-link" href="research/claude-recent-updates.html">Claude 最新アップデート</a></h3>
-        <p>Opus 4.7・Claude Design・Cowork GA・Claude Code 主要更新まで含めた 2026年2〜4月の全情報。</p>
-        <ul>
-          <li>モデルラインナップ（Opus/Sonnet/Haiku）</li>
-          <li>Claude Code の最新機能詳細</li>
-          <li>Opus 4.7・Design・Cowork・Computer Use</li>
-          <li><a href="research/index.html">調査アーカイブへ</a></li>
-        </ul>
-      </div>
+        <div class="card">
+          <div class="tag">Logs</div>
+          <h3><a class="card-main-link" href="logs/index.html">更新履歴と実験ログ</a></h3>
+          <p>Claude や Codex による変更履歴、実験メモ、将来の TODO の置き場。</p>
+          <ul>
+            <li>更新ログ</li>
+            <li>実験メモ</li>
+            <li><a href="logs/next-actions.html">次の改善候補</a></li>
+          </ul>
+        </div>
 
-      <div class="card">
-        <div class="tag">Workbench</div>
-        <h3><a class="card-main-link" href="workbench/index.html">実務知識と学習</a></h3>
-        <p>Claude Code、各種LLM、ツール操作の学習ハブ。SLMガイドも追加済み。</p>
-        <ul>
-          <li><a href="workbench/knowledge/index.html">Knowledge Index</a></li>
-          <li><a href="workbench/knowledge/slm-guide.html">SLM ガイド（NEW）</a></li>
-          <li><a href="workbench/knowledge/intelligence-matrix.html">LLM 比較マトリクス</a></li>
-          <li>Vibe Coding ガイド</li>
-        </ul>
-      </div>
-
-      <div class="card">
-        <div class="tag">Research</div>
-        <h3><a class="card-main-link" href="research/index.html">調査アーカイブ</a></h3>
-        <p>OpenClaw 関連を中心に、継続的に拡張する調査・FAQ・用語集の置き場です。</p>
-        <ul>
-          <li><a href="research/ai-news/index.html">📰 AI News（日次自動更新）</a></li>
-          <li><a href="research/highlights.html">重要記事ハイライト</a></li>
-          <li><a href="research/claude-timeline.html">Claude リリース年表</a></li>
-        </ul>
-      </div>
-
-      <div class="card">
-        <div class="tag">Logs</div>
-        <h3><a class="card-main-link" href="logs/index.html">更新履歴と実験ログ</a></h3>
-        <p>Claude や Codex による変更履歴、実験メモ、将来の TODO を置く場所です。</p>
-        <ul>
-          <li>更新ログ</li>
-          <li>実験メモ</li>
-          <li>次の改善候補</li>
-        </ul>
-      </div>
-
+      </section>
     </section>
 
     <div class="footer-note">
-      最終更新: 2026-04-16 &nbsp;|&nbsp; Claude Knowledge Hub (alignlabai-rgb/claude) &nbsp;|&nbsp; 運用原則は <a href="CLAUDE.md" style="color:#66e0c2;">CLAUDE.md</a> を参照
+      最終更新: 2026-05-25 &nbsp;|&nbsp; Claude Knowledge Hub (alignlabai-rgb/claude) &nbsp;|&nbsp; 運用原則は <a href="CLAUDE.md" style="color:#66e0c2;">CLAUDE.md</a> を参照
     </div>
 
   </div>

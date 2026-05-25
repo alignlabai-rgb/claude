@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gemini / Google 最新アップデート完全版 | Research</title>
+  <style>
+    :root {
+      --bg: #07111d;
+      --panel: #0d1829;
+      --panel-2: #101f34;
+      --panel-3: #09131f;
+      --text: #e8eef9;
+      --muted: #b6c3da;
+      --soft: #7f92ac;
+      --border: rgba(255,255,255,0.08);
+      --accent: #66e0c2;
+      --accent-2: #f4b860;
+      --accent-3: #f7a87a;
+      --accent-4: #d8b4fe;
+      --shadow: 0 12px 36px rgba(0,0,0,0.28);
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 12% 14%, rgba(102,224,194,0.14), transparent 28%),
+        radial-gradient(circle at 88% 4%, rgba(244,184,96,0.12), transparent 24%),
+        linear-gradient(145deg, #07111d 0%, #0a1422 52%, #060d18 100%);
+      color: var(--text);
+      font-family: "Segoe UI", "Noto Sans JP", system-ui, sans-serif;
+      line-height: 1.72;
+      padding: 28px 18px 80px;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .shell { max-width: 1100px; margin: 0 auto; display: grid; gap: 18px; }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px 26px;
+    }
+    .hero {
+      background: linear-gradient(135deg, rgba(102,224,194,0.08), rgba(244,184,96,0.08)), var(--panel);
+    }
+    .breadcrumb { color: var(--soft); font-size: 0.82rem; margin-bottom: 8px; }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      background: rgba(102,224,194,0.12);
+      color: var(--accent);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    h1, h2, h3, h4 { margin: 0 0 10px; }
+    h1 { font-size: 2rem; }
+    h2 { font-size: 1.18rem; }
+    h3 { font-size: 1rem; }
+    h4 { font-size: 0.92rem; color: var(--text); }
+    p, li { color: var(--muted); font-size: 0.92rem; }
+    ul { margin: 8px 0 0; padding-left: 18px; }
+    li { margin-bottom: 6px; }
+    strong { color: var(--text); }
+    .last-update { color: var(--soft); font-size: 0.8rem; margin-top: 10px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    @media (max-width: 920px) {
+      .grid-4, .grid-3 { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 640px) {
+      .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; }
+    }
+    .card, .stat, .subpanel {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+    }
+    .subpanel.deep { background: var(--panel-3); }
+    .stat .value { font-size: 1.8rem; color: var(--accent); font-weight: 800; line-height: 1; }
+    .stat .label { color: var(--soft); font-size: 0.75rem; margin-top: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .tag {
+      display: inline-block;
+      padding: 3px 8px;
+      margin-right: 6px;
+      margin-bottom: 6px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+    .tag-model { background: rgba(167,139,250,0.18); color: var(--accent-4); }
+    .tag-product { background: rgba(96,208,255,0.16); color: #7dd3fc; }
+    .tag-code { background: rgba(247,168,122,0.16); color: #fdba74; }
+    .tag-api { background: rgba(244,184,96,0.16); color: #fcd34d; }
+    .tag-new { background: rgba(79,255,176,0.16); color: #4FFFB0; }
+    .tag-risk { background: rgba(255,107,107,0.16); color: #fca5a5; }
+    .summary {
+      border-left: 4px solid var(--accent);
+      padding-left: 14px;
+      margin-top: 8px;
+    }
+    .timeline {
+      position: relative;
+      display: grid;
+      gap: 14px;
+      padding-left: 28px;
+    }
+    .timeline::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 9px;
+      width: 2px;
+      background: rgba(255,255,255,0.08);
+    }
+    .item {
+      position: relative;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 18px;
+    }
+    .item::before {
+      content: "";
+      position: absolute;
+      left: -24px;
+      top: 18px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--panel);
+      border: 2px solid var(--accent);
+    }
+    .item.hot::before { border-color: var(--accent-2); }
+    .date { font-size: 0.76rem; color: var(--soft); font-weight: 700; margin-bottom: 4px; }
+    .note {
+      background: rgba(244,184,96,0.08);
+      border: 1px solid rgba(244,184,96,0.24);
+      border-radius: 12px;
+      padding: 14px 16px;
+    }
+    .sources li { margin-bottom: 8px; }
+    code {
+      font-family: "Fira Code", "Consolas", monospace;
+      background: rgba(255,255,255,0.06);
+      padding: 0.12rem 0.4rem;
+      border-radius: 6px;
+      color: #a5f3d0;
+    }
+    .small { font-size: 0.84rem; color: var(--soft); }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <section class="panel hero">
+      <div class="breadcrumb"><a href="index.html">Research</a> / <a href="../index.html">Hub Top</a></div>
+      <div class="eyebrow">Gemini / Google Update Tracker</div>
+      <h1>Gemini / Google 最新アップデート完全版</h1>
+      <p>
+        Google AI Blog、DeepMind、Gemini API Changelog、Google Cloud Documentation、主要メディア報道をもとに、
+        <strong>2025年11月（Gemini 3 Pro）〜2026年5月25日（I/O 2026）まで</strong>の動きを実務視点で整理したページです。
+        単なる年表ではなく、<strong>何が変わり、どこに効き、Claude / ChatGPT とどう違うか</strong>まで踏み込んでまとめています。
+      </p>
+      <div class="summary">
+        <p>
+          2026年前半の Google は、<strong>Gemini 3 Pro（2025/11/18 公開）を起点として、Flash → 3.2 Flash → 3.5 へと
+          性能と速度の両軸でモデルラインを拡張</strong>しながら、エージェント基盤として
+          <strong>Antigravity を CLI / SDK / Managed Agents に分割</strong>、
+          <strong>Gemini を Workspace の中核（Gmail / Docs / Sheets）に統合</strong>する方向を進めてきました。
+        </p>
+        <p>
+          5月の本質は、<strong>I/O 2026（5/19〜20）での「Agentic AI 一斉発表」</strong>です。
+          Gemini 3.5・<strong>Gemini Omni（動画生成統合）</strong>・<strong>Gemini Spark（汎用エージェント）</strong>・
+          <strong>Antigravity 2.0</strong>・Android XR スマートグラスを同時公開。
+          Anthropic（Claude）の「業務エージェント」、OpenAI（Codex）の「マルチサーフェス・スーパーアプリ」とは異なる、
+          <strong>「OS・検索・Workspace まで含めたシステムレベルのエージェント化」</strong>が Google の差別化軸。
+          AI Overviews は <strong>2.5B MAU</strong>、AI Mode は <strong>1B MAU</strong> 突破。
+        </p>
+      </div>
+      <p class="last-update">最終更新: 2026-05-25</p>
+    </section>
+
+    <section class="grid-4">
+      <div class="stat"><div class="value">2.5B</div><div class="label">AI Overviews MAU</div></div>
+      <div class="stat"><div class="value">1B</div><div class="label">AI Mode MAU</div></div>
+      <div class="stat"><div class="value">3.5</div><div class="label">Gemini 最新フラッグシップ</div></div>
+      <div class="stat"><div class="value">85+</div><div class="label">I/O 2026 セッション</div></div>
+    </section>
+
+    <section class="panel">
+      <h2>まず押さえる結論</h2>
+      <div class="grid-3">
+        <div class="card">
+          <span class="tag tag-model">Model</span>
+          <h3>Gemini 3 → 3.5 で「フロンティア性能 + 4倍速」</h3>
+          <p>
+            <strong>Gemini 3 Pro</strong>（2025/11/18）は推論ベンチ 1501 Elo・GPQA 91.9% で当時世界最高。
+            <strong>Gemini 3.5 Flash</strong>（2026/5/19）は同等性能を<strong>競合フロンティアモデルの 4 倍速</strong>で実現。
+            Gemini Omni / Omni Flash がテキスト→動画変換を統合し、<strong>マルチモーダル生成のフロンティア</strong>に。
+          </p>
+        </div>
+        <div class="card">
+          <span class="tag tag-product">Agent Platform</span>
+          <h3>Antigravity 2.0 が「Google 版エージェント開発基盤」</h3>
+          <p>
+            <strong>Desktop IDE + CLI + SDK + Managed Agents（Gemini API）+ Enterprise Agent Platform</strong>の5つに分かれた
+            総合エージェント開発基盤。<strong>Gemini CLI → Antigravity CLI</strong> へリブランド。
+            Anthropic の Claude Code + Managed Agents に正面対抗する構造。
+          </p>
+        </div>
+        <div class="card">
+          <span class="tag tag-product">Consumer Agent</span>
+          <h3>Gemini Spark は「24時間 personal AI agent」</h3>
+          <p>
+            <strong>Gmail / Docs / Slides にディープ統合</strong>された汎用エージェント。
+            <strong>Daily Brief</strong>でその日のメール・予定をまとめる先制動作、
+            指示なしで仕事を整える「proactive AI」を Google AI Ultra 向けに展開。
+            Claude / ChatGPT の「対話型」とは異なる<strong>「先回り型」</strong>。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>重要タイムライン</h2>
+      <div class="timeline">
+
+        <article class="item hot">
+          <div class="date">2026-05-19</div>
+          <h3>Google I/O 2026 — Gemini 3.5 / Omni / Spark / Antigravity 2.0 / Android XR を一斉公開</h3>
+          <p>
+            Sundar Pichai の基調講演で<strong>5つの大型発表</strong>が一斉公開：
+          </p>
+          <ul>
+            <li><strong>Gemini 3.5 / 3.5 Flash</strong>：フロンティア性能を 4 倍速で。Antigravity・Spark の高速エンジン</li>
+            <li><strong>Gemini Omni / Omni Flash</strong>：テキスト・画像・動画プロンプトを<strong>シネマティック動画</strong>に変換</li>
+            <li><strong>Gemini Spark</strong>：24時間動く personal AI agent。Daily Brief・Workspace ディープ統合</li>
+            <li><strong>Antigravity 2.0</strong>：Desktop IDE + CLI + SDK + Managed Agents + Enterprise の総合エージェント基盤に拡張</li>
+            <li><strong>Android XR スマートグラス</strong>：今年秋発売予告（intelligent eyewear）</li>
+          </ul>
+          <p>AI Overviews は <strong>2.5B MAU</strong>、AI Mode は <strong>1B MAU</strong>突破を発表。</p>
+        </article>
+
+        <article class="item hot">
+          <div class="date">2026-05-20</div>
+          <h3>Gemma 4 全ラインナップ公開 + Antigravity CLI へのリブランド</h3>
+          <p>
+            I/O Day 2 で <strong>Gemma 4</strong> の全サイズが公開：
+          </p>
+          <ul>
+            <li><strong>Effective 2B / 4B</strong>（端末向け）</li>
+            <li><strong>26B MoE</strong>（高スループット推論）</li>
+            <li><strong>31B Dense</strong>（高精度タスク）</li>
+          </ul>
+          <p>Apache 2.0 ライセンスで、クラウド・デスクトップ・モバイルをカバーするエンドツーエンドのデプロイツールチェーンも公開。<strong>Gemini CLI は Antigravity CLI へ移行</strong>することも同日発表。</p>
+        </article>
+
+        <article class="item hot">
+          <div class="date">2026-05-21</div>
+          <h3>Gemini Spark — Google AI Ultra 向けベータ展開開始</h3>
+          <p>
+            I/O 基調講演で発表された <strong>Gemini Spark</strong> が Google AI Ultra サブスクライバー向けにベータ展開を開始。
+            <strong>Gmail・カレンダー・ドキュメント</strong>などの接続アプリをまたいで横断推論し、ユーザーの指示のもと自律的に行動する汎用 AI エージェント。
+            Gemini 3.5 Flash で動作。<strong>Daily Brief</strong>でパーソナライズされた朝のブリーフィングを生成。一般公開は後日。
+          </p>
+        </article>
+
+        <article class="item">
+          <div class="date">2026-05-09</div>
+          <h3>Gemini API に Event-driven Webhooks 追加 — ポーリング不要に</h3>
+          <p>
+            Google が <strong>Gemini API に Event-driven Webhooks</strong> を導入。長時間タスクの完了時に
+            ポーリングなしで通知を受け取れるようになり、エージェント型ワークフローの構築効率が向上。
+          </p>
+        </article>
+
+        <article class="item">
+          <div class="date">2026-05-05</div>
+          <h3>Gemini 3.2 Flash がひっそりリリース — iOS app / AI Studio に出現</h3>
+          <p>
+            <strong>Gemini 3.2 Flash</strong> が公式 iOS Gemini アプリと Google AI Studio に静かに出現。
+            報道では <strong>GPT-5.5 の約 92% 性能</strong>と評価され、I/O 2026 直前の前哨戦と位置づけられた。
+          </p>
+        </article>
+
+        <article class="item">
+          <div class="date">2026-03〜04</div>
+          <h3>Gemini 3 Flash — グローバル展開（数百万ユーザー規模）</h3>
+          <p>
+            <strong>Gemini 3 Flash</strong> が 3 月から数百万ユーザー規模でグローバル展開開始。
+            <strong>Gemini 3 Pro グレードの推論</strong>を <strong>Flash レベルのレイテンシ・効率・コスト</strong>で提供。
+            Gemini API・Google AI Studio・Gemini CLI・Google Antigravity の全プラットフォームに展開。
+          </p>
+        </article>
+
+        <article class="item">
+          <div class="date">2026-01〜02</div>
+          <h3>Gemini 3 Deep Think モード — Google AI Ultra 向け展開</h3>
+          <p>
+            <strong>Gemini 3 Deep Think</strong> が Google AI Ultra サブスクライバー向けに展開。
+            Gemini の<strong>最も高度な推論モード</strong>として位置づけ。複雑な数理・科学・コーディング問題に対応。
+          </p>
+        </article>
+
+        <article class="item hot">
+          <div class="date">2025-12-18</div>
+          <h3>Gemini 3 Flash 公開 — 価格性能比でのフロンティア</h3>
+          <p>
+            <strong>Gemini 3 Flash</strong> を公開。Gemini 3 Pro のリリースから1ヶ月で、
+            <strong>フロンティアインテリジェンスを劇的に低いコスト</strong>で実現。Google Cloud Vertex AI 経由でエンタープライズ提供開始。
+          </p>
+        </article>
+
+        <article class="item hot">
+          <div class="date">2025-11-18</div>
+          <h3>Gemini 3 Pro 公開 — 推論で世界最高（GPQA 91.9%・Elo 1501）</h3>
+          <p>
+            <strong>Gemini 3 Pro</strong> を公開。<strong>推論ベンチで Elo 1501・GPQA 91.9%</strong>を達成し、
+            当時の世界最高クラスを更新。Gemini アプリ・AI Studio・Vertex AI で利用可能に。
+            その後の Gemini 3 系列（Flash・Deep Think・Omni）の全ての基盤となるモデル。
+          </p>
+        </article>
+
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Gemini モデル系統で何が変わったか</h2>
+      <p>2025年11月の Gemini 3 Pro 公開を起点に、Google は「速さ」「サイズ」「マルチモーダル」を軸にラインを拡張：</p>
+      <div class="grid-2">
+        <div class="subpanel">
+          <span class="tag tag-model">2025-11-18</span>
+          <h3>Gemini 3 Pro</h3>
+          <p>Elo 1501・GPQA 91.9%。Gemini 3 系列の基盤モデル。マルチモーダル理解とエージェント機能を強化。</p>
+        </div>
+        <div class="subpanel">
+          <span class="tag tag-model">2025-12-18</span>
+          <h3>Gemini 3 Flash</h3>
+          <p>Pro 性能を Flash レイテンシ・コストで提供。エンタープライズ向けに Vertex AI 経由で展開。</p>
+        </div>
+        <div class="subpanel">
+          <span class="tag tag-model">2026-01〜02</span>
+          <h3>Gemini 3 Deep Think</h3>
+          <p>最も高度な推論モード。Google AI Ultra 向け。複雑な数理・科学・コーディング問題に対応。</p>
+        </div>
+        <div class="subpanel">
+          <span class="tag tag-model">2026-03〜04</span>
+          <h3>Gemini 3 Flash グローバル展開</h3>
+          <p>数百万ユーザー規模に展開。Gemini API / AI Studio / Gemini CLI / Antigravity に統合。</p>
+        </div>
+        <div class="subpanel">
+          <span class="tag tag-model">2026-05-05</span>
+          <h3>Gemini 3.2 Flash</h3>
+          <p>iOS app / AI Studio に静かに出現。GPT-5.5 の約 92% 性能と評価。I/O 直前の前哨戦。</p>
+        </div>
+        <div class="subpanel">
+          <span class="tag tag-model">2026-05-19</span>
+          <h3>Gemini 3.5 / 3.5 Flash / Omni / Omni Flash</h3>
+          <p>I/O 2026 で公開。3.5 Flash は競合の 4 倍速。Omni は動画生成統合。Gemini AI Plus / Pro / Ultra 向け。</p>
+        </div>
+      </div>
+      <p class="small" style="margin-top: 14px;">※ Gemma 4 オープンウェイト系（2B / 4B / 26B MoE / 31B Dense）も 5/20 公開。Apache 2.0 で商用利用可。</p>
+    </section>
+
+    <section class="panel">
+      <h2>Antigravity 2.0 の意味 — Gemini 版「エージェント開発基盤」</h2>
+      <p>
+        Antigravity は当初「Gemini CLI 的なツール」でしたが、I/O 2026 で 5 つのコンポーネントを持つ<strong>総合エージェント開発基盤</strong>に拡張されました。
+      </p>
+      <div class="grid-3" style="margin-top: 14px;">
+        <div class="subpanel">
+          <h3>① Antigravity Desktop (IDE)</h3>
+          <p>GUI で managed / deployed agents を構築。Google の各 dev surface（Studio・Cloud）と統合。</p>
+        </div>
+        <div class="subpanel">
+          <h3>② Antigravity CLI</h3>
+          <p>ターミナル中心の開発者向け軽量サーフェス。<strong>Gemini CLI からリブランド</strong>。Android CLI も新規追加。</p>
+        </div>
+        <div class="subpanel">
+          <h3>③ Antigravity SDK</h3>
+          <p>Google 自身のプロダクトで使われているエージェント harness にプログラムでアクセス。カスタムエージェント定義・自社インフラ運用が可能。</p>
+        </div>
+        <div class="subpanel">
+          <h3>④ Managed Agents (Gemini API)</h3>
+          <p>単一の API コールで<strong>リモートサンドボックス付きのエージェント</strong>をプロビジョン。Linux 隔離環境でツール使用・コード実行。Claude Managed Agents への対抗。</p>
+        </div>
+        <div class="subpanel">
+          <h3>⑤ Gemini Enterprise Agent Platform</h3>
+          <p>Antigravity を Google Cloud プロジェクトに直接接続。エンタープライズワークロードを簡素化。</p>
+        </div>
+        <div class="subpanel">
+          <h3>⑥ Powered by Gemini 3.5 Flash</h3>
+          <p>Antigravity 2.0 のデフォルトエンジン。フロンティアインテリジェンスを <strong>4 倍速</strong>で動かす。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Gemini Spark / Workspace 統合の意味 — 「先回り型エージェント」戦略</h2>
+      <p>
+        Gemini Spark は<strong>対話型ではなく「先回り型」</strong>のエージェントとして設計されています。
+        ユーザーが指示する前に Daily Brief を作り、メール・予定・タスクの優先順位を提示する。
+      </p>
+      <ul>
+        <li><strong>Gmail / Docs / Slides / カレンダー</strong>とディープ統合。ユーザーの「過去の動き」から次のアクションを推測</li>
+        <li><strong>Docs Live</strong>：音声で「brain dump」して Gemini に整理させる。今夏ロールアウト</li>
+        <li><strong>Daily Brief</strong>：朝のパーソナライズブリーフィング。AI Ultra から先行</li>
+        <li><strong>Neural Expressive</strong>：Gemini の新しい視覚デザイン言語（dynamic・vibrant）</li>
+      </ul>
+      <p class="small">
+        Claude が「Cowork で業務を協働」、ChatGPT が「Workspace Agents で組織共有エージェント」と発展したのに対して、
+        Gemini は「<strong>Google が既に持っている個人データ資産（Gmail / カレンダー / 検索履歴）</strong>を活かした
+        proactive personal AI」という<strong>Google だけが取れる戦略</strong>。
+      </p>
+    </section>
+
+    <section class="panel">
+      <h2>Android XR と OS レベルの統合</h2>
+      <p>
+        I/O 2026 で Google が示した最大の差別化は、<strong>OS / ハードウェアレベルで Gemini を統合</strong>することです。
+      </p>
+      <ul>
+        <li><strong>Android XR スマートグラス</strong>（"intelligent eyewear"）：今年秋発売予告。Gemini が視界の中に存在する形へ</li>
+        <li><strong>Android 17</strong>：Gemini を OS にネイティブ統合。アプリ横断のエージェント実行</li>
+        <li><strong>Aluminum OS</strong>：新 OS の初公開（詳細は I/O での発表に基づく）</li>
+        <li><strong>Gemini Intelligence</strong>：Galaxy / Pixel 向けに今夏から段階展開</li>
+      </ul>
+      <p class="small">
+        Claude / ChatGPT が「アプリ / ブラウザ / CLI 上で動く」に対し、Gemini は<strong>「OS とハードウェアの中に組み込まれる」</strong>方向。
+        AI Overviews（検索内表示）が既に 2.5B MAU に到達していることがこの戦略の土台。
+      </p>
+    </section>
+
+    <section class="panel">
+      <h2>注意点とリスク</h2>
+      <div class="note">
+        <ul>
+          <li><strong>モデル名の混乱</strong>：Gemini 3 Pro / 3 Flash / 3 Deep Think / 3.1 / 3.2 Flash / 3.5 / 3.5 Flash / Omni / Omni Flash と数ヶ月で次々追加され、API のモデル ID 管理が複雑化。</li>
+          <li><strong>Gemini CLI → Antigravity CLI のリブランド</strong>：旧 CLI を使っている開発者は移行が必要。CLI スクリプト・CI 統合は要更新。</li>
+          <li><strong>Gemini Spark の権限粒度</strong>：Gmail / Docs / カレンダーへの広範なアクセスを前提とするため、エンタープライズでは IT ガバナンス審査が必要。</li>
+          <li><strong>マルチモデル戦略の負荷</strong>：Gemma 4 + Gemini 3.5 + Antigravity Managed Agents という多軸構成で、企業は「どこに何を使うか」判断が複雑に。</li>
+          <li><strong>Android XR スマートグラスのプライバシー</strong>：視界内 AI は EU の AI Act・GDPR との関係で慎重な展開が必要。Brussels は AI 'nudifier' アプリを禁止する動きも（教皇回勅の文脈と並行）。</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>5月後半のアップデート（2026-05-16 〜 05-25）</h2>
+      <p>I/O 2026 と一連の発表で、年間で最も濃いリリース週となった。</p>
+      <div class="timeline">
+
+        <article class="item">
+          <div class="date">2026-05-21</div>
+          <h3>Gemini Spark — Google AI Ultra 向けベータ展開・I/O 全 85+ セッションがオンデマンド公開 <span class="tag tag-new">NEW</span><span class="tag tag-product">プロダクト</span></h3>
+          <p>I/O で発表された <strong>Gemini Spark</strong> が Google AI Ultra 向けベータ展開を開始。Gmail・カレンダー・ドキュメントなどの接続アプリをまたいで横断推論し、自律的に行動する汎用 AI エージェント。<strong>Daily Brief</strong>などパーソナライズ機能を提供。Gemini 3.5 Flash で動作。同日、I/O の <strong>85+ セッション・コードラボがオンデマンド公開</strong>。</p>
+          <p class="small">Source: <a href="https://blog.google/innovation-and-ai/products/gemini-app/next-evolution-gemini-app/">Google Blog</a> / <a href="https://developers.googleblog.com/all-the-news-from-the-google-io-2026-developer-keynote/">Google Developers Blog</a> / CNBC / TechCrunch（2026-05-21）</p>
+        </article>
+
+        <article class="item hot">
+          <div class="date">2026-05-20</div>
+          <h3>Gemma 4 全ラインナップ公開 + Antigravity CLI へのリブランド <span class="tag tag-new">NEW</span><span class="tag tag-model">Model</span></h3>
+          <p>I/O Day 2 開発者セッションで <strong>Gemma 4</strong> の全サイズが公開：Effective 2B / 4B（端末向け）・<strong>26B MoE</strong>（高スループット推論）・<strong>31B Dense</strong>（高精度タスク）の 4 構成で <strong>Apache 2.0 ライセンス</strong>対応。クラウド・デスクトップ・モバイルをカバーするエンドツーエンドのデプロイツールチェーンも公開。<strong>Gemini CLI は Antigravity CLI へ移行</strong>することも同日発表。</p>
+          <p class="small">Source: <a href="https://developers.googleblog.com/an-important-update-transitioning-gemini-cli-to-antigravity-cli/">Google Developers Blog</a> / TechRadar（2026-05-20）</p>
+        </article>
+
+        <article class="item hot">
+          <div class="date">2026-05-19</div>
+          <h3>Google I/O 2026 基調講演 — Gemini 3.5 / Omni / Spark / Antigravity 2.0 / Android XR 一斉公開 <span class="tag tag-new">NEW</span><span class="tag tag-product">イベント</span></h3>
+          <p>Sundar Pichai 基調講演で 5 つの大型発表が一斉公開：</p>
+          <ul>
+            <li><strong>Gemini 3.5 / 3.5 Flash</strong>（フロンティア性能を 4 倍速で）</li>
+            <li><strong>Gemini Omni / Omni Flash</strong>（テキスト・画像・動画プロンプトを<strong>シネマティック動画</strong>に変換）</li>
+            <li><strong>Gemini Spark</strong>（24時間動く personal AI agent）</li>
+            <li><strong>Antigravity 2.0</strong>（Desktop IDE + CLI + SDK + Managed Agents + Enterprise の総合基盤）</li>
+            <li><strong>Android XR スマートグラス</strong>（今年秋発売予告）</li>
+          </ul>
+          <p>AI Overviews は <strong>2.5B MAU</strong>、AI Mode は <strong>1B MAU</strong>突破を発表。<strong>Managed Agents in the Gemini API</strong> によりインフラ設定不要で単一 API コールでエージェントをプロビジョン可能に。</p>
+          <p class="small">Source: <a href="https://blog.google/innovation-and-ai/sundar-pichai-io-2026/">Google Blog</a> / <a href="https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-5/">Gemini 3.5</a> / Tom's Guide（2026-05-19）</p>
+        </article>
+
+        <article class="item">
+          <div class="date">2026-05-18</div>
+          <h3>I/O 2026 直前 — Gemini Omni リーク・3.2 Flash 性能情報 <span class="tag tag-model">Model</span></h3>
+          <p>I/O 2026 キーノートを翌日に控え、テキスト・画像・動画生成を統合する「<strong>Gemini Omni</strong>」のリークと <strong>Gemini 3.2 Flash</strong>（GPT-5.5 の約 92% 性能と報道）の情報が出回る。Android 17 や Android XR メガネの発表も予告。</p>
+          <p class="small">Source: Android Authority / Phemex News / Android Central（2026-05-16〜18）</p>
+        </article>
+
+        <article class="item">
+          <div class="date">2026-05-17</div>
+          <h3>Google I/O 2026（5/19 開幕）— Gemini 4.0 と Android XR グラスが焦点 <span class="tag tag-product">イベント</span></h3>
+          <p>I/O 2026 開幕直前の最終予告。<strong>GPT-5.5 対抗の大型 Gemini モデル</strong>と <strong>Android XR グラスのプレビュー</strong>が最大の注目点。<strong>Gemini Intelligence</strong>（夏から Galaxy / Pixel 向け段階展開）など複数の発表が見込まれる。</p>
+          <p class="small">Source: Android Central / Nokia Power User（2026-05-17〜18）</p>
+        </article>
+
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>5月前半のアップデート（2026-05-01 〜 05-15）</h2>
+      <p>Gemini 3.2 Flash の静かなリリースと、I/O 前の Webhook 機能追加、I/O 予告。</p>
+      <div class="timeline">
+
+        <article class="item">
+          <div class="date">2026-05-12</div>
+          <h3>Apple、Claude / Gemini を Apple Intelligence の Extensions として準備中 <span class="tag tag-product">プロダクト</span></h3>
+          <p>Apple がサードパーティ AI プロバイダー（Claude・Gemini 等）を Apple Intelligence 機能として選択できる "<strong>Extensions</strong>" を開発中と報道。App Store アプリ経由で AI プロバイダーを統合できる仕組みで、Gemini の iOS ユーザーへの展開機会が大きく広がる見通し。</p>
+          <p class="small">Source: CNBC（2026-05-12）</p>
+        </article>
+
+        <article class="item">
+          <div class="date">2026-05-10〜11</div>
+          <h3>Google I/O 2026 全セッション公開 — Gemini 4.0・Agentic AI が中心 <span class="tag tag-product">イベント</span></h3>
+          <p>Google I/O 2026 の全セッションが公開され、キーノートは <strong>5/19（マウンテンビュー）</strong>に確定。Gemini 4.0 の発表・Agentic AI の大幅強化・Android 17・XR・Aluminium OS が主要テーマとして挙げられた。Gemini エージェント展開が英国・カナダ・オーストラリアほか 15 言語へ拡大の見通しも示された。</p>
+          <p class="small">Source: 9to5Google / Android Authority / Eastern Herald（2026-05-10〜11）</p>
+        </article>
+
+        <article class="item">
+          <div class="date">2026-05-09</div>
+          <h3>Gemini API に Event-driven Webhooks 追加 <span class="tag tag-new">NEW</span><span class="tag tag-api">API/開発</span></h3>
+          <p>Google が Gemini API に <strong>Event-driven Webhooks</strong> を導入。長時間タスクの完了時に<strong>ポーリングなしで通知</strong>を受け取れるようになり、エージェント型ワークフローの構築効率が向上。</p>
+          <p class="small">Source: Google（2026-05-09）</p>
+        </article>
+
+        <article class="item">
+          <div class="date">2026-05-09</div>
+          <h3>Google I/O 2026 公式発表 — 5/19 開催 <span class="tag tag-product">イベント</span></h3>
+          <p>Google が I/O 2026 の開催を <strong>5/19</strong> と発表。Gemini の大規模アップデート、Android XR の新機能、新 OS「<strong>Aluminum OS</strong>」の初公開が予定。</p>
+          <p class="small">Source: opentools.ai（2026-05-09）</p>
+        </article>
+
+        <article class="item">
+          <div class="date">2026-05-05</div>
+          <h3>Gemini 3.2 Flash がひっそりリリース — iOS app / AI Studio に出現 <span class="tag tag-model">Model</span></h3>
+          <p><strong>Gemini 3.2 Flash</strong> が公式 iOS Gemini アプリと Google AI Studio に静かに出現。<strong>GPT-5.5 の約 92% 性能</strong>と評価され、I/O 2026 直前の前哨戦と位置づけられた。</p>
+          <p class="small">Source: <a href="https://www.buildfastwithai.com/blogs/gemini-3-2-flash-release-2026">Build Fast with AI</a>（2026-05-05）</p>
+        </article>
+
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>3〜4月のアップデート（Gemini 3 Flash グローバル展開）</h2>
+      <p>Gemini 3 Flash が数百万ユーザー規模に展開され、エンタープライズ提供も本格化した時期。</p>
+      <div class="timeline">
+
+        <article class="item hot">
+          <div class="date">2026-03〜04</div>
+          <h3>Gemini 3 Flash グローバル展開 — Pro 性能 × Flash 速度 <span class="tag tag-new">NEW</span><span class="tag tag-model">Model</span></h3>
+          <p>3月から数百万ユーザー規模で <strong>Gemini 3 Flash</strong> がグローバル展開を開始。<strong>Gemini 3 Pro グレードの推論を Flash レベルのレイテンシ・効率・コスト</strong>で提供。Gemini API・Google AI Studio・Gemini CLI・Google Antigravity の全プラットフォームで利用可能。</p>
+          <p class="small">Source: <a href="https://blog.google/products/gemini/gemini-3-flash/">Google Blog</a> / <a href="https://cloud.google.com/blog/products/ai-machine-learning/gemini-3-flash-for-enterprises">Google Cloud Blog</a>（2026-03〜04）</p>
+        </article>
+
+        <article class="item">
+          <div class="date">2026-01〜02</div>
+          <h3>Gemini 3 Deep Think — Google AI Ultra 向け展開 <span class="tag tag-model">Model</span></h3>
+          <p><strong>Gemini 3 Deep Think</strong> が Google AI Ultra サブスクライバー向けに展開。Gemini の<strong>最も高度な推論モード</strong>として位置づけ。複雑な数理・科学・コーディング問題に対応。</p>
+          <p class="small">Source: Google（2026-01〜02）</p>
+        </article>
+
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>2025年後半の重要前提</h2>
+      <div class="timeline">
+
+        <article class="item hot">
+          <div class="date">2025-12-18</div>
+          <h3>Gemini 3 Flash 公開 — 価格性能比でのフロンティア <span class="tag tag-new">NEW</span><span class="tag tag-model">Model</span></h3>
+          <p><strong>Gemini 3 Flash</strong> を公開。Gemini 3 Pro のリリースから1ヶ月で、<strong>フロンティアインテリジェンスを劇的に低いコスト</strong>で実現。Google Cloud Vertex AI 経由でエンタープライズ提供開始。</p>
+          <p class="small">Source: <a href="https://www.axios.com/2025/12/17/google-gemini-3-flash-pro-model">Axios</a>（2025-12-18）</p>
+        </article>
+
+        <article class="item hot">
+          <div class="date">2025-11-18</div>
+          <h3>Gemini 3 Pro 公開 — 推論で世界最高（GPQA 91.9%・Elo 1501） <span class="tag tag-new">NEW</span><span class="tag tag-model">Model</span></h3>
+          <p><strong>Gemini 3 Pro</strong> を公開。<strong>推論ベンチで Elo 1501・GPQA 91.9%</strong>を達成し、当時の世界最高クラスを更新。Gemini アプリ・AI Studio・Vertex AI で利用可能に。その後の Gemini 3 系列（Flash・Deep Think・Omni）の全ての基盤となるモデル。</p>
+          <p class="small">Source: <a href="https://blog.google/products/gemini/gemini-3/">Google Blog</a> / <a href="https://www.infoq.com/news/2025/11/google-gemini-3/">InfoQ</a> / <a href="https://workspaceupdates.googleblog.com/2025/11/introducing-gemini-3-pro-for-gemini-app.html">Workspace Updates</a>（2025-11-18）</p>
+        </article>
+
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>公式ソース</h2>
+      <ul class="sources">
+        <li><a href="https://blog.google/products/gemini/gemini-3/">Gemini 3: Introducing the latest Gemini AI model</a> (Google, 2025-11-18)</li>
+        <li><a href="https://blog.google/products/gemini/gemini-3-flash/">Introducing Gemini 3 Flash</a> (Google)</li>
+        <li><a href="https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-5/">Gemini 3.5: frontier intelligence with action</a> (Google, 2026-05-19)</li>
+        <li><a href="https://deepmind.google/models/gemini/">Gemini 3.5 — Google DeepMind</a></li>
+        <li><a href="https://deepmind.google/models/gemini/flash/">Gemini 3.5 Flash — Google DeepMind</a></li>
+        <li><a href="https://ai.google.dev/gemini-api/docs/changelog">Gemini API Release Notes</a> (Google AI for Developers)</li>
+        <li><a href="https://gemini.google/release-notes/">Gemini Apps Release Updates</a></li>
+        <li><a href="https://docs.cloud.google.com/gemini/enterprise/docs/release-notes">Gemini Enterprise Release Notes</a> (Google Cloud)</li>
+        <li><a href="https://blog.google/innovation-and-ai/sundar-pichai-io-2026/">Google I/O 2026: Sundar Pichai's opening keynote</a> (2026-05-19)</li>
+        <li><a href="https://developers.googleblog.com/all-the-news-from-the-google-io-2026-developer-keynote/">All the news from the Google I/O 2026 Developer keynote</a> (Google Developers, 2026-05-19)</li>
+        <li><a href="https://blog.google/innovation-and-ai/technology/developers-tools/google-io-2026-developer-highlights/">I/O 2026 developer highlights: Antigravity, Gemini API, AI Studio</a></li>
+        <li><a href="https://developers.googleblog.com/an-important-update-transitioning-gemini-cli-to-antigravity-cli/">Transitioning Gemini CLI to Antigravity CLI</a></li>
+        <li><a href="https://blog.google/innovation-and-ai/products/gemini-app/next-evolution-gemini-app/">The next evolution of the Gemini app (Spark)</a> (Google)</li>
+        <li><a href="https://cloud.google.com/blog/products/ai-machine-learning/innovations-from-google-io-26-on-google-cloud">Innovations from Google I/O 26 on Google Cloud</a></li>
+        <li><a href="https://cloud.google.com/blog/topics/developers-practitioners/io26-news-for-agent-developers-on-google-cloud">I/O '26 news for agent developers on Google Cloud</a></li>
+        <li><a href="https://www.marktechpost.com/2026/05/19/google-launches-antigravity-2-0-at-i-o-2026-a-standalone-agent-first-platform-with-cli-sdk-managed-execution-and-enterprise-support/">Google Launches Antigravity 2.0 (MarkTechPost)</a></li>
+        <li><a href="https://www.tomsguide.com/news/live/google-io-2026-live-news-updates">Biggest Google I/O 2026 announcements (Tom's Guide)</a></li>
+      </ul>
+    </section>
+
+  </div>
+</body>
+</html>
