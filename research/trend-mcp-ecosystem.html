@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MCP エコシステムの 2026年中間総括 | Industry Trends</title>
+  <style>
+    :root {
+      --bg: #07111d;
+      --panel: #0d1829;
+      --panel-2: #101f34;
+      --panel-3: #09131f;
+      --text: #e8eef9;
+      --muted: #b6c3da;
+      --soft: #7f92ac;
+      --border: rgba(255,255,255,0.08);
+      --accent: #66e0c2;
+      --accent-2: #f4b860;
+      --accent-3: #f7a87a;
+      --accent-4: #d8b4fe;
+      --shadow: 0 12px 36px rgba(0,0,0,0.28);
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 12% 14%, rgba(102,224,194,0.14), transparent 28%),
+        radial-gradient(circle at 88% 4%, rgba(244,184,96,0.12), transparent 24%),
+        linear-gradient(145deg, #07111d 0%, #0a1422 52%, #060d18 100%);
+      color: var(--text);
+      font-family: "Segoe UI", "Noto Sans JP", system-ui, sans-serif;
+      line-height: 1.78;
+      padding: 28px 18px 80px;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .shell { max-width: 1100px; margin: 0 auto; display: grid; gap: 18px; }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 26px 28px;
+    }
+    .hero {
+      background: linear-gradient(135deg, rgba(167,139,250,0.10), rgba(244,184,96,0.08)), var(--panel);
+    }
+    .breadcrumb { color: var(--soft); font-size: 0.82rem; margin-bottom: 8px; }
+    .eyebrow {
+      display: inline-flex;
+      padding: 5px 12px;
+      border-radius: 999px;
+      background: rgba(167,139,250,0.16);
+      color: var(--accent-4);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    h1, h2, h3, h4 { margin: 0 0 12px; color: var(--text); }
+    h1 { font-size: 2rem; line-height: 1.35; }
+    h2 { font-size: 1.25rem; border-left: 4px solid var(--accent-4); padding-left: 12px; }
+    h3 { font-size: 1.05rem; color: var(--accent-2); }
+    h4 { font-size: 0.95rem; color: var(--accent); margin-top: 14px; }
+    p, li { color: var(--muted); font-size: 0.94rem; }
+    ul, ol { margin: 8px 0 12px; padding-left: 20px; }
+    li { margin-bottom: 6px; }
+    strong { color: var(--text); }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    @media (max-width: 920px) {
+      .grid-3, .grid-2 { grid-template-columns: 1fr; }
+    }
+    .card {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 20px;
+    }
+    .card.metric {
+      background: linear-gradient(135deg, rgba(102,224,194,0.08), rgba(244,184,96,0.04)), var(--panel-2);
+      border-color: rgba(102,224,194,0.2);
+    }
+    .metric .num {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--accent);
+      letter-spacing: -0.01em;
+      display: block;
+      margin-bottom: 4px;
+    }
+    .metric .label { font-size: 0.78rem; color: var(--soft); text-transform: uppercase; letter-spacing: 0.05em; }
+    .tldr {
+      background: linear-gradient(135deg, rgba(244,184,96,0.10), rgba(247,168,122,0.06)), var(--panel-2);
+      border: 1px solid rgba(244,184,96,0.22);
+      border-radius: 14px;
+      padding: 18px 22px;
+    }
+    .tldr h3 { color: var(--accent-2); margin-top: 0; }
+    .tag {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      background: rgba(167,139,250,0.18);
+      color: var(--accent-4);
+      margin-right: 4px;
+    }
+    .tag.warn { background: rgba(247,168,122,0.18); color: #fdba74; }
+    .tag.ok { background: rgba(79,255,176,0.16); color: #4FFFB0; }
+    .small { font-size: 0.82rem; color: var(--soft); }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0 6px;
+      font-size: 0.88rem;
+    }
+    th, td {
+      text-align: left;
+      padding: 9px 10px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+      color: var(--muted);
+    }
+    th { color: var(--text); background: var(--panel-3); font-size: 0.82rem; }
+    blockquote {
+      margin: 12px 0;
+      padding: 12px 18px;
+      border-left: 3px solid var(--accent-4);
+      background: rgba(167,139,250,0.06);
+      border-radius: 0 10px 10px 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+    .toc {
+      background: var(--panel-3);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 18px;
+    }
+    .toc ol { margin: 6px 0 0; padding-left: 22px; }
+    .toc li { font-size: 0.88rem; margin-bottom: 4px; }
+    code {
+      background: var(--panel-3);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 0.85em;
+      color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+
+    <section class="panel hero">
+      <div class="breadcrumb">
+        <a href="../index.html">Hub Top</a> / <a href="industry-trends.html">Industry Trends</a> / MCP エコシステム中間総括
+      </div>
+      <div class="eyebrow">Industry Trends — 長文分析</div>
+      <h1>MCP エコシステムの 2026年中間総括<br><span style="font-size:1.05rem; color:var(--muted); font-weight:500;">9,000 サーバー、月間 DL 9,700万、そして RCE 実証開示まで</span></h1>
+      <p>
+        Anthropic が 2024 年末に公開した <strong>Model Context Protocol（MCP）</strong>は、わずか 1 年半で
+        AI エージェントとツール間の<strong>事実上の標準プロトコル</strong>になりました。
+        2026 年 5 月時点で公式レジストリのサーバー登録は <strong>9,000 件超</strong>、
+        月間ダウンロードはローンチ比 <strong>4,750% 増の 9,700 万回超</strong>。
+        Claude / ChatGPT / Gemini のいずれも MCP を取り込み、JetBrains・Adobe・Intuit・Docusign など
+        主要ベンダーが公式コネクターを提供する状況にあります。
+      </p>
+      <p>
+        一方で 5/18、OX Security が <strong>6 つの本番プラットフォームで MCP の設計上の欠陥を悪用した RCE</strong>を実証開示し、
+        Anthropic は<strong>プロトコルレベルでの修正は行わない方針</strong>を表明しました。
+        本稿は、普及指標とリスク、そして Anthropic 側の周辺整備（MCP tunnels / Self-hosted sandboxes / Memory）を一度に並べ、
+        技術リードが「いま自社で MCP をどこまで踏み込んで使うか」を判断するための見取り図を提示します。
+      </p>
+      <p class="small">最終更新: 2026-05-25 / 著者: ALIGN Lab Research</p>
+    </section>
+
+    <section class="panel toc">
+      <h3 style="margin-top:0;">目次</h3>
+      <ol>
+        <li><a href="#tldr">TL;DR — 中間総括の要点</a></li>
+        <li><a href="#status">MCP の現在地 — 普及指標と対応モデル</a></li>
+        <li><a href="#vendors">Claude / ChatGPT / Gemini の MCP 対応比較</a></li>
+        <li><a href="#security">MCP RCE 脆弱性と Anthropic の判断</a></li>
+        <li><a href="#connectors">Connector エコシステムの構造</a></li>
+        <li><a href="#anthropic-side">Anthropic 側の周辺進化（Tunnels / Sandbox / Memory）</a></li>
+        <li><a href="#next">次の論点 — ガバナンス・標準・課金</a></li>
+        <li><a href="#playbook">技術リード向け実務メモ</a></li>
+        <li><a href="#refs">関連ページと出典</a></li>
+      </ol>
+    </section>
+
+    <section class="panel tldr" id="tldr">
+      <h3>TL;DR — 中間総括の要点</h3>
+      <ul>
+        <li><strong>普及面は勝負あり</strong>。公式レジストリ 9,000+ サーバー、月間 DL 9,700 万超、主要 LLM ベンダーすべてが MCP をネイティブサポート。「採用するか否か」ではなく「<strong>どこから入れるか</strong>」のフェーズへ移行。</li>
+        <li><strong>セキュリティ面は未解決</strong>。OX Security が本番 6 製品で RCE 実証、Anthropic はプロトコルレベルでは修正しない方針。<strong>接続側（サーバー実装・gateway・組織側）にガバナンス責任が降りてきている</strong>。</li>
+        <li><strong>Anthropic は「プロトコルは薄く、運用は厚く」</strong>。MCP tunnels（社内ネットワーク到達）・Self-hosted sandboxes（実行隔離）・Memory（状態保持）と、周辺レイヤを Managed Agents として揃えた。</li>
+        <li><strong>2026 後半の論点</strong>は、Connector の<strong>ガバナンス（誰が監査するか）</strong>と<strong>課金フロー（API 料金以外の経済圏）</strong>、そして<strong>エンタープライズ gateway 標準</strong>の三点に集約される。</li>
+        <li>技術リードへの実務メモは末尾参照。<strong>「公式コネクター」と「自前 MCP サーバー」の境界線</strong>を社内で線引きしておくことが、向こう半年で最大のレバレッジになる。</li>
+      </ul>
+    </section>
+
+    <section class="panel" id="status">
+      <h2>1. MCP の現在地 — 普及指標と対応モデル</h2>
+      <p>
+        まず、ベンチマークになる数字を並べます。MCP は 2024 年 11 月に Anthropic がオープンソースで公開したプロトコルで、
+        当初は「Claude Desktop 上で外部ツールを使えるようにする」程度の認識でした。それが 2026 年に入って、
+        以下のような<strong>クロスベンダーのデファクト</strong>に育っています。
+      </p>
+
+      <div class="grid-3" style="margin: 14px 0;">
+        <div class="card metric">
+          <span class="num">9,000+</span>
+          <span class="label">公式レジストリ登録サーバー数</span>
+          <p class="small" style="margin-top:8px;">2026-05-25 時点。JetBrains が TeamCity 2026.1 を投入したタイミングで MCP Ecosystem Report が達成を公表。</p>
+        </div>
+        <div class="card metric">
+          <span class="num">9,700 万 / 月</span>
+          <span class="label">MCP 関連パッケージ月間 DL</span>
+          <p class="small" style="margin-top:8px;">ローンチ時比 4,750% 増。Cyber Strategy Institute（2026-05-18）報告。</p>
+        </div>
+        <div class="card metric">
+          <span class="num">200+</span>
+          <span class="label">Claude 公式コネクター対応アプリ</span>
+          <p class="small" style="margin-top:8px;">Uber・Spotify・Instacart・Adobe・Booking.com など。コンシューマー＋エンタープライズの両層を含む。</p>
+        </div>
+      </div>
+
+      <h3>1.1 「採用するか」ではなく「どこから入れるか」</h3>
+      <p>
+        2025 年半ばまでは「MCP を採用するベンダーが増えるかどうか」が論点でした。2026 年 5 月時点では、
+        Anthropic（Claude）・OpenAI（ChatGPT / Codex）・Google（Gemini / Antigravity）・Microsoft（Copilot 系列）・
+        JetBrains・Atlassian・Adobe・Intuit・Docusign・Thomson Reuters など、AI 側もツール側もほぼ全員が MCP を実装済みです。
+        論点は<strong>「どのレイヤから MCP を組み込むか」</strong>に移りました。
+      </p>
+      <ul>
+        <li><strong>SaaS 利用者層</strong>：Claude / ChatGPT / Gemini のチャット UI から「公式コネクター」を有効化するだけ</li>
+        <li><strong>開発者層</strong>：Claude Code・Codex・Gemini CLI・Antigravity から自前 MCP サーバーを参照</li>
+        <li><strong>エンタープライズ層</strong>：Self-hosted sandboxes・MCP tunnels・社内 MCP gateway で、外部ネットを通さずに使う</li>
+      </ul>
+
+      <h3>1.2 なぜ 1 年半でデファクトになれたのか</h3>
+      <p>
+        MCP は<strong>意図的に薄いプロトコル</strong>です。JSON-RPC ベースで、リソース（read）・ツール（call）・プロンプト（template）の
+        3 種類のプリミティブしかなく、新しい認証スキームや独自のスキーマ言語は持ち込みません。
+        この「薄さ」が、競合ベンダーが追加実装する障壁を下げ、結果としてクロスベンダー採用を加速させました。
+      </p>
+      <blockquote>
+        MCP の本質は「ツールの呼び出し方法を統一する」というより、
+        「ツール側が自分自身の仕様を AI に自己申告するプロトコル」である点にあります。
+        従来の OpenAPI / Function Calling と違い、<strong>ツール側がランタイムに自己記述</strong>するため、
+        AI 側は事前に何も知らなくてもサーバーに接続した瞬間に使えるようになる。
+      </blockquote>
+    </section>
+
+    <section class="panel" id="vendors">
+      <h2>2. Claude / ChatGPT / Gemini の MCP 対応比較</h2>
+      <p>
+        三大ベンダーすべてが MCP をサポートしていますが、<strong>「MCP を中核に据える」</strong>のは Anthropic だけです。
+        OpenAI と Google は、自前のエコシステム（Codex プラグイン / Antigravity）を主軸に据えつつ MCP を
+        「外部ツール接続の標準口」として併用するスタイルを取っています。
+      </p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>ベンダー</th>
+            <th>MCP の位置づけ</th>
+            <th>主な接続経路</th>
+            <th>差別化</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Anthropic（Claude）</strong></td>
+            <td>プロトコルそのものの提唱者。<strong>全プロダクト共通の標準</strong>。</td>
+            <td>Claude Desktop / Claude.ai / Claude Code / Managed Agents / Cowork、全てで MCP がネイティブ。</td>
+            <td>200+ 公式コネクター。MCP tunnels で社内ネット到達。Self-hosted sandboxes で実行隔離。</td>
+          </tr>
+          <tr>
+            <td><strong>OpenAI（ChatGPT / Codex）</strong></td>
+            <td>Codex プラグインを主軸、MCP は「外部ツール接続の互換口」。</td>
+            <td>Codex から MCP サーバーを参照可能（Codex Changelog 5/10 で MCP diagnostics 強化）。Workspace Agents は独自プラグイン形式。</td>
+            <td>Atlassian Rovo・GitLab・CircleCI など 90+ プラグインを GPT-5.5 と同時追加。SaaS への直接接続は MCP と独自プラグインのハイブリッド。</td>
+          </tr>
+          <tr>
+            <td><strong>Google（Gemini / Antigravity）</strong></td>
+            <td>Antigravity の Managed Agents と Workspace ディープ統合が主軸。MCP は「外部ツール用」。</td>
+            <td>Gemini CLI / Antigravity Desktop（IDE）から MCP サーバーを参照。Workspace 統合は Google 独自の API レイヤ。</td>
+            <td>Gmail / Docs / Slides に Spark でディープ統合。OS レベル（Android 17 / Android XR）まで降りていく戦略。</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>2.1 「中核」と「互換口」の差は何を生むか</h3>
+      <p>
+        Anthropic にとって MCP は<strong>プロダクトの一部</strong>です。Claude for Legal（5/12）は 12 プラグインに加えて
+        Docusign / Box / Thomson Reuters（Westlaw）など <strong>20+ MCP コネクター</strong>を提供しており、
+        コネクター追加が「製品差別化そのもの」になっています。クリエイティブ系も同じ構造で、4/28 に
+        Adobe・Blender・Ableton など 9 本の MCP コネクターを<strong>一斉公開</strong>しています。
+      </p>
+      <p>
+        対照的に OpenAI と Google は、MCP に「外部接続の互換性」だけを求めています。コア体験は
+        Codex プラグイン（90+）や Workspace ディープ統合で作り、その外側に MCP を置く。
+        この差は、<strong>「サードパーティ MCP サーバーが増えれば増えるほど直接得をするのは Anthropic</strong>」
+        という構図を生みます。エコシステムの成長と自社製品の魅力が同期するのは、現状 Anthropic だけです。
+      </p>
+    </section>
+
+    <section class="panel" id="security">
+      <h2>3. MCP RCE 脆弱性と Anthropic の判断</h2>
+
+      <h3>3.1 5/18 の実証開示 — 何が起きたか</h3>
+      <p>
+        2026 年 5 月 18 日、セキュリティベンダーの <strong>OX Security</strong>が、本番運用されている <strong>6 つの MCP 対応プラットフォーム</strong>で、
+        MCP の設計上の欠陥を悪用したリモートコード実行（RCE）を実証する報告を公開しました。
+        詳細はベンダー間の協調修正が進む間は伏せられていますが、報告の核は次の三点です。
+      </p>
+      <ul>
+        <li><strong>ツール記述の信頼境界が曖昧</strong>：MCP サーバー側が AI に「ツール定義」を渡すとき、その内容を AI が無検証で取り込む構造。サーバー側を侵害すれば、AI に任意のプロンプトを実質的に注入できる。</li>
+        <li><strong>ツール出力からの indirect prompt injection</strong>：サーバーが返す結果テキストにエージェント向けの指示が混入していると、AI が後続ツールを呼び出して任意コードを実行しうる。</li>
+        <li><strong>接続ホスト側の権限管理が薄い</strong>：MCP の信頼モデルは「ユーザーが許可した接続は信頼する」が前提で、サンドボックス・最小権限化はホスト実装に委ねられている。</li>
+      </ul>
+
+      <h3>3.2 Anthropic の判断 — プロトコルレベルでは修正しない</h3>
+      <p>
+        Anthropic は、これに対し<strong>プロトコルレベルでは修正を行わない</strong>方針を表明しました。理由は表向きには示されていませんが、
+        構造から読み取れるロジックは次の通りです。
+      </p>
+      <ol>
+        <li><strong>プロトコルを厚くすると採用が止まる</strong>。MCP がここまで広がったのは「薄さ」が理由。認証や権限制御を本体に組み込むと、現在の 9,000 サーバーの多くが互換性を失う。</li>
+        <li><strong>脆弱性の根は「実装の信頼境界」</strong>。プロトコル仕様を変えても、ホスト実装がサンドボックス化していなければ同じ問題は再発する。本質的にはホスト責任。</li>
+        <li><strong>Anthropic 自身が「ホスト側」で答えを出している</strong>。Self-hosted sandboxes・MCP tunnels・Memory は、まさにこの問題への回答。プロトコルではなく Managed Agents 側で守る、という設計思想。</li>
+      </ol>
+
+      <blockquote>
+        この判断は<strong>「IETF 的な仕様主義」と「プラットフォーム的な運用主義」</strong>の分岐点と読めます。
+        Anthropic は明確に後者を選んだ。プロトコルは公開・共有財として薄く保ち、自社の差別化は<strong>ホストレイヤの安全運用</strong>で出す、という二層戦略。
+      </blockquote>
+
+      <h3>3.3 接続事業者・利用組織への影響</h3>
+      <p>
+        この方針が意味するのは、<strong>「MCP サーバーを公開する側」「MCP サーバーを使う組織」の双方が、独自にセキュリティ責任を負う</strong>ということです。
+        現状、運用上の最小ラインは以下です。
+      </p>
+      <ul>
+        <li><strong>MCP サーバー側</strong>：ツール出力に外部入力をそのまま含めない／署名付き応答／最小権限の API キー</li>
+        <li><strong>ホスト側</strong>：Self-hosted sandbox・コンテナ実行・ネットワーク隔離・人手承認ゲート（Claude Code の Auto Mode 承認フローなど）</li>
+        <li><strong>組織側</strong>：許可リスト方式の MCP gateway／コネクターの監査ログ集約／秘密情報の保持境界明示</li>
+      </ul>
+    </section>
+
+    <section class="panel" id="connectors">
+      <h2>4. Connector エコシステムの構造</h2>
+      <p>
+        Connector（コネクター）という呼称は Anthropic が広めましたが、実体は「公式に動作確認・配布された MCP サーバー」の通称です。
+        ここでは<strong>公式 / サードパーティ / エンタープライズ gateway</strong>の三層に整理します。
+      </p>
+
+      <div class="grid-3" style="margin: 14px 0;">
+        <div class="card">
+          <h3>① 公式コネクター</h3>
+          <p>Anthropic / OpenAI / Google が直接配布・保証するもの。Claude では 200+ アプリに対応。Adobe・Blender・Docusign・Westlaw・QuickBooks・Intuit などの<strong>業務基幹アプリ</strong>を網羅。</p>
+          <p class="small">保証範囲：基本動作・OAuth フロー・ベンダー側との合意。セキュリティ保証は限定的。</p>
+        </div>
+        <div class="card">
+          <h3>② サードパーティ MCP サーバー</h3>
+          <p>公式レジストリの 9,000 件超のうち、大多数はコミュニティ・スタートアップ・SaaS 各社による自前提供。<strong>「カタログには載っているが品質はバラバラ」</strong>な状態で、選定責任は利用組織側にある。</p>
+          <p class="small">選定軸：メンテナの継続性・依存パッケージのセキュリティ・出力サニタイズの実装。</p>
+        </div>
+        <div class="card">
+          <h3>③ エンタープライズ MCP gateway</h3>
+          <p>2026 年に立ち上がりつつあるレイヤ。社内の許可されたコネクターだけを束ね、AI からの呼び出しを<strong>監査ログ・レート制限・秘密情報マスキング</strong>付きで中継する。<strong>Big Four の Digital Gateway 系</strong>はこの設計思想に近い。</p>
+          <p class="small">参考：KPMG × Anthropic Digital Gateway / PwC × Anthropic 統合。</p>
+        </div>
+      </div>
+
+      <h3>4.1 公式コネクターの「2 種類」</h3>
+      <p>
+        Claude の 200+ コネクターは、実は機能的に大きく二系統に分かれます。
+      </p>
+      <ul>
+        <li><strong>コンシューマー寄り</strong>：Uber・Spotify・Instacart・Resy・StubHub・Tripadvisor・AllTrails など、Claude が文脈に合わせて<strong>「最適なアプリ」を自動提案</strong>するライフスタイル系（4/24 公開、5/23 拡張）。</li>
+        <li><strong>エンタープライズ寄り</strong>：Docusign・Box・Thomson Reuters（Westlaw）・QuickBooks・HubSpot・PayPal・Canva・Google Workspace・Microsoft 365 など、Claude for Legal / Claude for Small Business に紐づく業務系（5/12 / 5/13）。</li>
+      </ul>
+      <p>
+        この二層化は、<strong>MCP が「個人向け生活アプリ」と「業務基幹アプリ」の両方に同時に染み込んだ</strong>ことを示します。
+        2025 年までは開発者向けの色合いが強かったプロトコルが、半年で UX まで降りてきた点が今期最大の変化です。
+      </p>
+
+      <h3>4.2 課金フロー — 次の論点</h3>
+      <p>
+        現状、ほとんどの MCP コネクターは「<strong>AI 側の API 料金</strong>＋ツール側の既存課金（ユーザーが既に契約している SaaS）」で動いており、
+        コネクター自体は無償。しかし、Connector を提供することが集客に直結し始めると、
+        いずれ<strong>「コネクター経由のトランザクション課金」「優先表示の枠課金」</strong>といった経済圏が立ち上がる可能性が高い。
+        Uber / Booking.com / Tripadvisor のような「予約系」コネクターは、その最有力候補です。
+      </p>
+    </section>
+
+    <section class="panel" id="anthropic-side">
+      <h2>5. Anthropic 側の周辺進化 — MCP tunnels / Self-hosted sandboxes / Memory</h2>
+      <p>
+        前述したように、Anthropic は「プロトコルは薄く、ホストレイヤで守る」という二層戦略を取っています。
+        その「ホスト側」が、Code with Claude London（5/19〜20）で public beta に揃った 3 つの機能です。
+      </p>
+
+      <div class="grid-3" style="margin: 14px 0;">
+        <div class="card">
+          <h3>Memory <span class="tag ok">public beta</span></h3>
+          <p>セッションをまたぐファイルベースの記憶層。Netflix・Rakuten・Wisedocs・Ando などで<strong>初回エラー97%減・処理速度30%向上</strong>の実績。MCP 経由で取得した情報を「次回も覚えている」状態にすることで、毎回の MCP 呼び出し回数を構造的に減らす。</p>
+        </div>
+        <div class="card">
+          <h3>Self-hosted sandboxes <span class="tag ok">public beta</span></h3>
+          <p>機密データ・社内サービスを自社インフラに留めたまま、エージェントループのオーケストレーションのみ Anthropic 側で実行。<strong>MCP サーバーの実行を自社境界内に閉じ込められる</strong>。RCE リスクへの実質的な回答。</p>
+        </div>
+        <div class="card">
+          <h3>MCP tunnels <span class="tag warn">research preview</span></h3>
+          <p>パブリックインターネットを介さず、社内システムへ到達するセキュアトンネル。社内 ERP・CRM・コードベースに MCP 接続する際の「インターネット晒し」を回避できる。エンタープライズ採用の最大のブロッカーを外す機能。</p>
+        </div>
+      </div>
+
+      <h3>5.1 三点セットが解いている問題</h3>
+      <p>
+        この 3 機能は、それぞれ独立しているように見えますが、まとめて読むと<strong>「MCP を本番で使うときに残っていた 3 つの壁」</strong>に対応しています。
+      </p>
+      <ul>
+        <li><strong>状態の壁</strong> → Memory（毎回ゼロから始まらない）</li>
+        <li><strong>実行の壁</strong> → Self-hosted sandboxes（任意コード実行を自社境界に閉じる）</li>
+        <li><strong>到達の壁</strong> → MCP tunnels（社内ネットに公衆網を晒さず届く）</li>
+      </ul>
+      <p>
+        プロトコル本体には手を入れず、<strong>運用上の「壁」を Managed Agents 側で順に解いていく</strong>戦略は、
+        OpenAI が Codex のサンドボックス（Windows サンドボックス・Mac アプリ）で取っているアプローチと近い構造を持ちます。
+        違いは、Anthropic の場合<strong>これらが全て MCP を前提に組まれている</strong>点です。
+      </p>
+    </section>
+
+    <section class="panel" id="next">
+      <h2>6. 次の論点 — ガバナンス、セキュリティ標準、課金</h2>
+
+      <h3>6.1 ガバナンス — 誰が「公式」を保証するのか</h3>
+      <p>
+        9,000 サーバーが乱立する状態は、利用組織にとって「<strong>カタログにある</strong>＝<strong>安全</strong>」では決してありません。
+        公式レジストリは登録の場であって監査の場ではない。今後、以下のいずれかが必要になります。
+      </p>
+      <ul>
+        <li>Anthropic / Google / OpenAI 各社による<strong>「公式 verified」のティア分け</strong>と署名済みコネクター</li>
+        <li>第三者監査機関による<strong>MCP サーバー認証</strong>（SOC2 / ISO 27001 の MCP 版）</li>
+        <li>エンタープライズ gateway による<strong>許可リスト運用</strong>（事実上の私的監査）</li>
+      </ul>
+      <p>
+        5/18 の RCE 開示以降、この「監査」の不在は構造的リスクとして可視化されました。
+        2026 後半に、いずれかの形で着地点が見える可能性が高い。
+      </p>
+
+      <h3>6.2 セキュリティ標準 — MCP-Sec のような追加層</h3>
+      <p>
+        Anthropic がプロトコル本体に手を入れない以上、補完層が必要です。すでにコミュニティでは
+        <strong>署名付きツール定義・呼び出し ID の改ざん検証・呼び出しの監査トレース</strong>といった追加仕様が議論されています。
+        これらが「公式 MCP の派生」ではなく「<strong>MCP の上に乗る追加プロファイル</strong>」として標準化されると、
+        プロトコルの薄さを保ったまま運用安全性を上げられます。
+      </p>
+
+      <h3>6.3 課金フロー — Connector 経済圏</h3>
+      <p>
+        現状、AI 側のトークン課金しかマネタイズ経路がない MCP に対して、
+        Connector 経由の<strong>予約・購入・サブスクリプション</strong>のリベニューシェアは技術的に組み込み可能です。
+        Anthropic は Claude.ai 内で Uber・Spotify・Booking を提案するところまで来ており、
+        次の半年で「AI 経由のコンバージョンに対する手数料」フェーズに進むかどうかが注目されます。
+      </p>
+    </section>
+
+    <section class="panel" id="playbook">
+      <h2>7. 技術リード向け実務メモ</h2>
+      <p>
+        ここまでの整理を踏まえ、向こう 3〜6 ヶ月で技術リード・エンジニアリング企画担当が手を動かすべき項目を列挙します。
+      </p>
+
+      <h4>A. 「公式コネクター」と「自前 MCP サーバー」の境界線を決める</h4>
+      <ul>
+        <li>SaaS 系（Slack・Docusign・QuickBooks・Westlaw）は<strong>公式コネクター優先</strong>。OAuth と監査ログがベンダー側で整っている。</li>
+        <li>社内基幹システム（ERP・社内 CRM・社内ナレッジ）は<strong>自前 MCP サーバー</strong>を Self-hosted sandbox + MCP tunnels の組合せで隔離して提供。</li>
+        <li>コミュニティ製サーバーをそのまま本番投入しない。<strong>fork して依存をフリーズし、出力サニタイズを追加する</strong>運用を標準化。</li>
+      </ul>
+
+      <h4>B. ホスト側のセキュリティ最小ライン</h4>
+      <ul>
+        <li>サンドボックス実行（Self-hosted sandboxes / Windows サンドボックス / コンテナ）を<strong>デフォルト ON</strong>に。</li>
+        <li>ツール出力を AI に渡す前に<strong>HTML / コード / リンクのエスケープ</strong>を行う indirect prompt injection 対策。</li>
+        <li>Auto Mode などの自動承認パスを使う場合は<strong>呼び出し回数・予算上限・対象パス</strong>のハードリミットを必ず設定。</li>
+      </ul>
+
+      <h4>C. ガバナンス側</h4>
+      <ul>
+        <li>社内で<strong>「許可コネクターリスト」</strong>を明示し、CISO / 情シスがレビューするフローを整備。</li>
+        <li>MCP gateway を<strong>1 個に集約</strong>し、すべての AI クライアントはそこ経由でツールにアクセスする構成（gateway パターン）を推奨。</li>
+        <li>監査ログを既存の SIEM に流し込み、<strong>「いつ・誰の AI が・どのツールを・どのパラメータで呼んだか」</strong>を残す。</li>
+      </ul>
+
+      <h4>D. 開発側のスタンス</h4>
+      <ul>
+        <li>新規ツール統合は<strong>「MCP サーバーとして書く」</strong>を基本に。OpenAPI / Function Calling 専用実装は避ける（互換性が AI 側で失われる）。</li>
+        <li>社内向け MCP サーバーには<strong>「ツール定義の自己説明」</strong>を厚く書く。AI 側の精度がここで大きく変わる。</li>
+        <li>Claude Code・Codex・Gemini CLI のいずれでも動くように、<strong>クライアント非依存のサーバー実装</strong>を心がける。</li>
+      </ul>
+
+      <blockquote>
+        要するに、<strong>「プロトコルとしての MCP」は安定し、勝負はホスト側に移った</strong>。
+        2026 後半に差がつくのは、<strong>サンドボックス・gateway・監査ログ</strong>を当たり前に運用できる組織かどうかです。
+      </blockquote>
+    </section>
+
+    <section class="panel" id="refs">
+      <h2>8. 関連ページと出典</h2>
+
+      <h3>ハブ内の関連資料</h3>
+      <div class="grid-2">
+        <div class="card">
+          <h4 style="margin-top:0;">個別ベンダーの動き</h4>
+          <ul>
+            <li><a href="claude-recent-updates.html">Claude 最新アップデート完全版</a>（MCP tunnels / Self-hosted sandboxes / Memory / 200+ コネクター詳細）</li>
+            <li><a href="chatgpt-recent-updates.html">ChatGPT / OpenAI 最新アップデート完全版</a>（Codex MCP diagnostics / Workspace Agents）</li>
+            <li><a href="gemini-recent-updates.html">Gemini / Google 最新アップデート完全版</a>（Antigravity / Gemini Spark / Workspace 統合）</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4 style="margin-top:0;">テーマ別長文</h4>
+          <ul>
+            <li><a href="industry-trends.html">業界トレンド長文分析（インデックス）</a></li>
+            <li><a href="claude-timeline.html">Claude リリース年表</a></li>
+            <li><a href="highlights.html">重要記事ハイライト</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>主な出典</h3>
+      <ul>
+        <li>MCP Ecosystem Report（2026-05-25）— 公式レジストリ 9,000+ サーバー、JetBrains Blog 連動</li>
+        <li>Cyber Strategy Institute（2026-05-18）— OX Security による MCP RCE 実証開示、月間 DL 9,700 万報告</li>
+        <li><a href="https://claude.com/blog/connectors-for-everyday-life">Claude Blog: Connectors for everyday life</a> — 200+ アプリ対応</li>
+        <li><a href="https://9to5google.com/2026/04/24/claude-connectors-spotify-uber-turbotax-more/">9to5Google（2026-04-24）</a> — コンシューマー向けコネクター拡張</li>
+        <li><a href="https://9to5mac.com/2026/04/28/anthropic-releases-9-new-claude-connectors-for-creative-tools-including-blender-and-adobe/">9to5Mac（2026-04-28）</a> — Adobe・Blender・Ableton ほか 9 本のクリエイティブ系 MCP コネクター</li>
+        <li><a href="https://blog.adobe.com/en/publish/2026/04/28/adobe-for-creativity-connector">Adobe Blog（2026-04-28）</a> — Adobe for Creativity Connector</li>
+        <li><a href="https://fortune.com/2026/05/21/claude-code-london-anthropic-ai-software-engineering/">Fortune（2026-05-21）</a> — Code with Claude London / Self-hosted sandboxes・MCP tunnels 発表</li>
+        <li><a href="https://www.technologyreview.com/2026/05/21/1137735/anthropics-code-with-claude-showed-off-codings-future-whether-you-like-it-or-not/">MIT Technology Review（2026-05-21）</a> — Code with Claude London 取材</li>
+        <li><a href="https://www.edtechinnovationhub.com/news/anthropic-brings-persistent-memory-to-claude-managed-agents-in-public-beta">EdTech Innovation Hub（2026-05-19）</a> — Memory public beta</li>
+        <li><a href="https://www.artificiallawyer.com/2026/05/12/claude-for-legal-launches-may-reshape-the-legal-tech-world/">Artificial Lawyer（2026-05-12）</a> — Claude for Legal の 20+ MCP コネクター</li>
+        <li><a href="https://techcrunch.com/2026/05/12/the-ai-legal-services-industry-is-heating-up-anthropic-is-getting-in-on-the-action/">TechCrunch（2026-05-12）</a> — Claude for Legal 報道</li>
+        <li>JetBrains Blog（2026-05-25）— TeamCity 2026.1 / MCP ネイティブ対応</li>
+        <li>OpenAI Codex Changelog（2026-05-10）— MCP diagnostics 強化</li>
+      </ul>
+
+      <p class="small" style="margin-top:14px;">
+        本記事は ALIGN Lab 内部の Claude Knowledge Hub「業界トレンド長文分析」に属するベンダー横断記事です。
+        個別ベンダーのアップデートはトラッカーページを参照してください。次回の中間総括は、エンタープライズ MCP gateway 標準化の動きと、
+        Connector 経済圏の最初の事例が出たタイミングで更新予定。
+      </p>
+    </section>
+
+    <div style="text-align:center; color: var(--soft); font-size: 0.84rem; padding: 16px 0;">
+      <a href="industry-trends.html">← Industry Trends に戻る</a>　/　<a href="../index.html">Hub Top へ</a>
+    </div>
+
+  </div>
+</body>
+</html>

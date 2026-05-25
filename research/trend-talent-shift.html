@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Karpathy 移籍が示すもの — 研究者市場の三極化 | Industry Trends</title>
+  <style>
+    :root {
+      --bg: #07111d;
+      --panel: #0d1829;
+      --panel-2: #101f34;
+      --panel-3: #09131f;
+      --text: #e8eef9;
+      --muted: #b6c3da;
+      --soft: #7f92ac;
+      --border: rgba(255,255,255,0.08);
+      --accent: #66e0c2;
+      --accent-2: #f4b860;
+      --accent-3: #f7a87a;
+      --accent-4: #d8b4fe;
+      --shadow: 0 12px 36px rgba(0,0,0,0.28);
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 12% 14%, rgba(167,139,250,0.14), transparent 28%),
+        radial-gradient(circle at 88% 4%, rgba(244,184,96,0.10), transparent 24%),
+        linear-gradient(145deg, #07111d 0%, #0a1422 52%, #060d18 100%);
+      color: var(--text);
+      font-family: "Segoe UI", "Noto Sans JP", system-ui, sans-serif;
+      line-height: 1.78;
+      padding: 28px 18px 80px;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .shell { max-width: 1080px; margin: 0 auto; display: grid; gap: 18px; }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 26px 28px;
+    }
+    .hero {
+      background: linear-gradient(135deg, rgba(167,139,250,0.12), rgba(244,184,96,0.08)), var(--panel);
+    }
+    .breadcrumb { color: var(--soft); font-size: 0.82rem; margin-bottom: 8px; }
+    .eyebrow {
+      display: inline-flex;
+      padding: 5px 12px;
+      border-radius: 999px;
+      background: rgba(167,139,250,0.16);
+      color: var(--accent-4);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    h1, h2, h3 { margin: 0 0 12px; color: var(--text); }
+    h1 { font-size: 2rem; line-height: 1.35; }
+    h2 { font-size: 1.25rem; margin-top: 4px; }
+    h3 { font-size: 1rem; }
+    p, li { color: var(--muted); font-size: 0.94rem; }
+    ul { margin: 8px 0 0; padding-left: 20px; }
+    li { margin-bottom: 8px; }
+    strong { color: var(--text); }
+    .last-update { color: var(--soft); font-size: 0.8rem; margin-top: 12px; }
+    .lead {
+      border-left: 4px solid var(--accent-4);
+      padding-left: 14px;
+    }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    @media (max-width: 920px) {
+      .grid-3, .grid-2 { grid-template-columns: 1fr; }
+    }
+    .card, .subpanel {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 20px;
+    }
+    .subpanel.deep { background: var(--panel-3); }
+    .keypoints {
+      background: linear-gradient(135deg, rgba(102,224,194,0.08), rgba(167,139,250,0.06)), var(--panel-2);
+      border: 1px solid rgba(102,224,194,0.22);
+      border-radius: 14px;
+      padding: 18px 22px;
+    }
+    .keypoints h3 {
+      color: var(--accent);
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .keypoints li { margin-bottom: 8px; }
+    .tag {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      margin-right: 6px;
+      margin-bottom: 6px;
+    }
+    .tag-anthropic { background: rgba(247,168,122,0.18); color: #fdba74; }
+    .tag-openai { background: rgba(79,255,176,0.16); color: #4FFFB0; }
+    .tag-deepmind { background: rgba(96,208,255,0.16); color: #7dd3fc; }
+    .tag-other { background: rgba(167,139,250,0.18); color: var(--accent-4); }
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+      margin-top: 8px;
+    }
+    .table th {
+      text-align: left;
+      padding: 10px 12px;
+      color: var(--accent-3);
+      background: rgba(247,168,122,0.08);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      vertical-align: top;
+      font-weight: 700;
+    }
+    .table td {
+      padding: 10px 12px;
+      color: var(--muted);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      vertical-align: top;
+    }
+    .table tr:last-child td { border-bottom: none; }
+    .note {
+      background: rgba(244,184,96,0.08);
+      border: 1px solid rgba(244,184,96,0.24);
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-top: 14px;
+    }
+    .quote {
+      border-left: 3px solid var(--accent-4);
+      padding: 4px 0 4px 14px;
+      color: var(--text);
+      font-style: italic;
+      margin: 10px 0;
+    }
+    .small { font-size: 0.84rem; color: var(--soft); }
+    .sources li { margin-bottom: 8px; font-size: 0.86rem; }
+    .pole-card {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 20px;
+    }
+    .pole-card.anthropic { border-color: rgba(247,168,122,0.32); }
+    .pole-card.openai { border-color: rgba(79,255,176,0.28); }
+    .pole-card.deepmind { border-color: rgba(96,208,255,0.28); }
+    .pole-card h3 { margin-bottom: 8px; }
+    .pole-card .pole-meta {
+      color: var(--soft);
+      font-size: 0.78rem;
+      margin-bottom: 10px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+
+    <section class="panel hero">
+      <div class="breadcrumb">
+        <a href="../index.html">Hub Top</a> /
+        <a href="industry-trends.html">Industry Trends</a> /
+        Karpathy 移籍が示すもの
+      </div>
+      <div class="eyebrow">業界トレンド長文分析 — 人材・研究</div>
+      <h1>Karpathy 移籍が示すもの — 研究者市場の三極化</h1>
+      <div class="lead">
+        <p>
+          2026年5月19日、<strong>Andrej Karpathy</strong> 氏が Anthropic 入社を発表した。
+          OpenAI 共同創業者にして元 Tesla AI 責任者、教育系プロジェクト Eureka Labs を率いる
+          <strong>「フロンティア LLM 研究の象徴的存在」</strong>の合流は、単発の人事ニュースではない。
+          これは過去2年で続いてきた<strong>研究者市場の三極化</strong>
+          （OpenAI / Anthropic / Google DeepMind）の臨界点を示すものだ。
+          本稿では、Karpathy 移籍の経緯と意味、過去の代表事例、そして
+          <strong>「研究組織として動ける企業」が差別化軸になる</strong>含意までを整理する。
+        </p>
+      </div>
+      <p class="last-update">最終更新: 2026-05-25 / 想定読者: 事業企画・人事戦略・投資判断者</p>
+    </section>
+
+    <section class="panel">
+      <div class="keypoints">
+        <h3>要点</h3>
+        <ul>
+          <li><strong>5/19、Karpathy 氏が Anthropic プレトレーニングチームへ。</strong> Nick Joseph 配下で「Claude 自身を活用した事前学習研究」の新チーム立ち上げを担当（TechCrunch・CNBC・本人 X 発表）。</li>
+          <li><strong>過去2年で Anthropic に合流した高知名度研究者はこれで3例目。</strong> 2024年5月の Jan Leike（元 OpenAI Superalignment 共同リード）に始まる流れの延長線上にある。</li>
+          <li><strong>研究者市場は OpenAI / Anthropic / DeepMind の三極構造へ。</strong> 流動の中心は「賢いベンチを作れる人」ではなく「自律的に動くシステムの安全性と評価を設計できる人」に移っている。</li>
+          <li><strong>Anthropic に集まる理由は単一ではない。</strong> Safety を製品論理として運用する研究文化、$900B 規模の評価額に裏打ちされた報酬、そして「研究組織のまま事業会社になる」希少なポジショニング。</li>
+          <li><strong>事業会社・投資家の含意は明確。</strong> 計算資源と同じく <strong>研究人材の調達力</strong>が AI 企業の差別化軸になる。日本企業にとっては「自前で囲い込む」より「三極のどこに乗るか」を選ぶ局面に入った。</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>1. Karpathy 移籍 — 何が発表されたか</h2>
+      <p>
+        2026年5月19日、Andrej Karpathy 氏が自身の X アカウントで Anthropic への入社を発表した。
+        同氏は <strong>OpenAI 共同創業者（2015）</strong>、Tesla AI 部門責任者（2017〜2022）、
+        OpenAI への一時復帰（2023〜2024）、教育系スタートアップ Eureka Labs 創業（2024）と、
+        この10年の LLM 産業を象徴する経歴を持つ。今回の合流先は、Anthropic の
+        <strong>Nick Joseph 率いるプレトレーニングチーム</strong>で、ミッションは
+        「<strong>Claude 自身を活用した事前学習研究</strong>を加速する新チームの立ち上げ」とされている
+        （TechCrunch、CNBC、Bloomberg 報道）。
+      </p>
+      <p>
+        本人の発言で注目すべきは、ベンチマーク競争や製品開発ではなく
+        <strong>R&D 復帰そのもの</strong>を前面に置いた点だ。
+      </p>
+      <div class="quote">
+        “next few years at the frontier of LLMs will be especially formative.”
+        — Andrej Karpathy（X、2026-05-19）
+      </div>
+      <p>
+        Eureka Labs での教育事業は並行継続するため、これは「教育から研究へ転身」ではなく
+        <strong>「教育＋フロンティア研究」の二軸化</strong>を意味する。
+        裏返せば、Karpathy 氏自身が「<strong>今フロンティア研究をやるなら Anthropic が場として正しい</strong>」
+        と判断したというシグナルでもある。これが本稿の主題である三極化の現状を象徴する。
+      </p>
+      <p class="small">
+        参考：<a href="claude-recent-updates.html">Claude 最新アップデート完全版（2026-05-19 セクション）</a> /
+        <a href="ai-news/2026-05-20.html">AI News 2026-05-20</a>
+      </p>
+    </section>
+
+    <section class="panel">
+      <h2>2. 三極構造の輪郭 — OpenAI / Anthropic / DeepMind</h2>
+      <p>
+        2026年5月時点で、フロンティア LLM 研究の人材プールは事実上<strong>三極</strong>に再編されている。
+        Meta（Llama 系）、xAI（Grok 系）、中国系（DeepSeek・Qwen 等）は重要だが、
+        <strong>「フロンティア LLM の事前学習〜整合性〜評価」までを一つの研究組織として閉じられる</strong>のは
+        現状この3社に絞られる。
+      </p>
+      <div class="grid-3">
+        <div class="pole-card anthropic">
+          <div class="pole-meta">Pole 1 / Safety-first</div>
+          <h3>Anthropic</h3>
+          <p>
+            創業（2021）から OpenAI 出身研究者が中核。
+            Dario / Daniela Amodei、Jared Kaplan、Tom Brown、Sam McCandlish、Jack Clark、
+            <strong>Christopher Olah</strong>（interpretability リード）など、
+            「論文と製品が同じチームから出る」研究文化が一貫している。
+            $900B 規模の調達ラウンドが進行中で、研究者の株式評価額も急上昇。
+          </p>
+        </div>
+        <div class="pole-card openai">
+          <div class="pole-meta">Pole 2 / Product Velocity</div>
+          <h3>OpenAI</h3>
+          <p>
+            最大のユーザー基盤と消費者ブランドを持ち、製品速度では依然首位。
+            2023年11月の取締役会騒動、2024年の Sutskever / Leike 退社、
+            2024年末以降の Schulman・Pachocki 体制再編を経て、
+            研究組織としては「<strong>product-led</strong>」性格が強まった。
+            5/22 に SEC 秘密 IPO 申請、評価額 $852B〜$1T 規模。
+          </p>
+        </div>
+        <div class="pole-card deepmind">
+          <div class="pole-meta">Pole 3 / Big Tech Backed</div>
+          <h3>Google DeepMind</h3>
+          <p>
+            2023年4月の Google Brain × DeepMind 統合以降、
+            Demis Hassabis 体制下で Gemini 系を主軸に推進。
+            計算資源（TPU v5p/v6）と研究人材の厚みは三極で最大級だが、
+            <strong>Google 全体の製品意思決定に組み込まれている</strong>分、
+            研究の自律性で Anthropic に劣ると評する声もある。
+          </p>
+        </div>
+      </div>
+      <div class="note">
+        <p>
+          重要なのは三極の<strong>性格の違い</strong>であって、規模の優劣ではない。
+          研究者にとっての選択は「より大きい組織」より
+          <strong>「自分のテーマで動ける場所」</strong>になっている。
+          Karpathy の選択もこの軸で読むのが妥当である。
+        </p>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>3. 過去2-3年の代表的移籍 — 時系列で見る</h2>
+      <p>
+        Karpathy 移籍を孤立した事件として読まず、過去の高知名度移籍の文脈に置く。
+        以下は <strong>業界に方向感を与えた移籍</strong>を時系列で整理したものである。
+      </p>
+      <table class="table">
+        <thead>
+          <tr>
+            <th style="width: 110px;">時期</th>
+            <th>人物 / 概要</th>
+            <th>方向</th>
+            <th>意味</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>2021-01〜06</strong></td>
+            <td>Dario &amp; Daniela Amodei、Jared Kaplan、Tom Brown、Sam McCandlish、Jack Clark ほか、OpenAI の安全性・大規模モデル研究の中核が同時退社、<strong>Anthropic を共同創業</strong>。</td>
+            <td>OpenAI → Anthropic</td>
+            <td>「safety を製品論理として運用する」独立組織の誕生。三極構造の原型。</td>
+          </tr>
+          <tr>
+            <td><strong>2024-05</strong></td>
+            <td>OpenAI Superalignment チームの共同リード <strong>Jan Leike</strong> が辞任し、数日後に Anthropic 入社を発表（Ilya Sutskever の退社と同時期）。</td>
+            <td>OpenAI → Anthropic</td>
+            <td>「alignment 研究の重心が OpenAI から Anthropic へ移った」シグナルとして広く受け止められた。</td>
+          </tr>
+          <tr>
+            <td><strong>2024-夏〜2025</strong></td>
+            <td>Schulman の Anthropic 経由 → 復帰騒動、Pachocki Chief Scientist 就任、Murati / Brockman らの離散・新会社設立など、OpenAI 研究組織の再編が継続。</td>
+            <td>OpenAI 内部・流出</td>
+            <td>研究リーダー層の流動性そのものが上がり、移籍が常態化。</td>
+          </tr>
+          <tr>
+            <td><strong>2024〜2025</strong></td>
+            <td>Google DeepMind から interpretability・evaluation・agent 系の中堅研究者が複数 Anthropic に合流（個別名は公式発表ベースでは限定的だが、Anthropic の研究論文 author list の変化として観測可能）。</td>
+            <td>DeepMind → Anthropic</td>
+            <td>三極の中で<strong>「DeepMind → Anthropic」線も成立</strong>。Google 一強だった時代の終わり。</td>
+          </tr>
+          <tr>
+            <td><strong>2026-05-19</strong></td>
+            <td><strong>Andrej Karpathy</strong>、Anthropic プレトレーニングチームへ。Nick Joseph 配下で「Claude 自身を活用した事前学習研究」を担当。</td>
+            <td>OpenAI（過去）→ Anthropic</td>
+            <td>消費者ブランドの象徴が「研究組織」を選択。三極化の臨界点。</td>
+          </tr>
+          <tr>
+            <td><strong>2026-05-25</strong></td>
+            <td>Anthropic 共同創業者 <strong>Christopher Olah</strong>、教皇レオ14世の AI 回勅「Magnifica Humanitas」発表会に登壇。</td>
+            <td>—</td>
+            <td>研究者の影響力が産業内の人材獲得だけでなく、<strong>社会的議論の中心</strong>にも及ぶ段階へ。</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="small" style="margin-top: 10px;">
+        ※ Anthropic 創業メンバーや 2024年5月の Leike 移籍は OpenAI / Anthropic / 各メディアによる公式報道に基づく公知情報。
+        DeepMind 系の移籍は研究論文 author list の推移と各社の Career page アナウンスに基づく観測ベース。
+      </p>
+    </section>
+
+    <section class="panel">
+      <h2>4. なぜ Anthropic に集まるか — 4つの引力</h2>
+      <p>
+        過去2年の流れを見ると、Anthropic への合流には<strong>単一の理由</strong>が存在するわけではない。
+        報酬だけでも、安全性だけでも、文化だけでも説明できない。
+        4つの引力が重なって作用していると整理できる。
+      </p>
+      <div class="grid-2">
+        <div class="subpanel">
+          <h3>1. Safety を「研究テーマ」ではなく「製品論理」として運用</h3>
+          <p>
+            Anthropic は Constitutional AI、interpretability、alignment evaluation を、
+            論文公開だけでなく <strong>Claude 製品の意思決定プロセスそのもの</strong>に組み込んでいる。
+            研究者にとって「論文を出しても製品に反映されない」という大企業の典型的フラストレーションが小さい。
+            Karpathy のような自律性の高い研究者にとって、これは強い引力になる。
+          </p>
+        </div>
+        <div class="subpanel">
+          <h3>2. 研究組織のまま事業会社になっている希少性</h3>
+          <p>
+            $10.9B（Q2 2026 予測）の収益規模を持ちながら、創業者が依然として研究を率いる体制が保たれている。
+            「研究組織が大企業化して研究を失う」典型パターンを今のところ回避している。
+            OpenAI が product-led に移行した今、これは三極の中でも特異な位置だ。
+          </p>
+        </div>
+        <div class="subpanel">
+          <h3>3. 株式評価額の急上昇</h3>
+          <p>
+            $900B 規模の調達ラウンド進行（5月時点、OpenAI 3月時点 $852B を抜く可能性）、
+            10月の IPO 観測（CNBC・Fortune 報道）と、
+            創業期から在籍する研究者にとっての経済的リターンは桁違いに上がっている。
+            移籍時点でストックを獲得できる研究者層にも当然引力として働く。
+          </p>
+        </div>
+        <div class="subpanel">
+          <h3>4. 計算資源の確保</h3>
+          <p>
+            5/6 発表の SpaceX <strong>Colossus 1（300MW・220K+ GPU）</strong>全量契約、
+            月 $1.25B（2029年5月まで）の契約により、
+            少なくとも事前学習スケールでは OpenAI / DeepMind と同等以上の計算資源を持つ。
+            研究者にとって「計算が足りない」という基本制約が外れている意味は大きい。
+          </p>
+        </div>
+      </div>
+      <div class="note">
+        <p>
+          これら4つは独立して効くのではなく、<strong>連鎖的に作用する</strong>。
+          評価額が上がれば計算契約が組める。計算が確保できれば研究者が来る。
+          研究者が来れば次のモデルが出る。次のモデルが出れば評価額がさらに上がる。
+          この<strong>正のフィードバック</strong>が回り始めると、後追いはきわめて難しい。
+        </p>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>5. 三極化の含意 — 「研究組織として動ける企業」が差別化軸に</h2>
+      <p>
+        2023〜2024年までの AI 競争は<strong>「どのモデルが強いか」</strong>のベンチマーク競争だった。
+        2025〜2026年の中盤に入って、競争軸は静かに移行している。
+      </p>
+      <ul>
+        <li><strong>計算資源</strong>：GPU 単体ではなく <strong>電力契約</strong>（Colossus / Stargate / 各 Big Tech 自社建設）が新しい競争軸に。</li>
+        <li><strong>研究人材</strong>：「賢いベンチを作れる人」ではなく <strong>「自律的に動くシステムの安全性と評価を設計できる人」</strong>が希少化。</li>
+        <li><strong>製品 surface</strong>：チャット単体ではなく <strong>Cowork / Managed Agents / MCP エコシステム</strong>のような知識ワーク全面をカバーする面で勝負。</li>
+      </ul>
+      <p>
+        この3つを<strong>同時に</strong>持てるのは三極のいずれかになる、というのが現時点の構造である。
+        研究人材の集積はその中核に位置する。なぜなら、計算資源を買えてもそれを生かす研究人材がいなければ
+        モデルは作れず、製品 surface も設計できないからだ。
+        Karpathy の移籍は、「<strong>研究組織として動ける場所</strong>」が三極の中でも限定されている現実を、
+        単一の象徴で可視化した出来事と読むのが妥当である。
+      </p>
+    </section>
+
+    <section class="panel">
+      <h2>6. 日本企業・投資家視点での意味</h2>
+      <div class="grid-2">
+        <div class="subpanel deep">
+          <h3>事業会社視点：自前で囲うより「三極のどこに乗るか」</h3>
+          <p>
+            日本企業が独自 LLM を全工程で内製する選択は、計算・研究人材・運用全体のコスト構造を見ても
+            すでに非現実的に近い。代わりに重要なのは、
+            <strong>三極のどこをパートナーとして選び、どの工程で差別化するか</strong>の戦略設計だ。
+            Anthropic は Rakuten・Lawson など日本企業との接点を拡大中で、
+            6月の <strong>Code with Claude 東京（6/5〜6）</strong>がその試金石になる。
+          </p>
+        </div>
+        <div class="subpanel deep">
+          <h3>人事戦略視点：移籍は流れ、留めるなら別軸</h3>
+          <p>
+            日本の AI 研究者を「囲い込んで残す」ことは構造的に難しくなった。
+            むしろ三極とつながりを持ちながら、
+            <strong>応用領域（ロボティクス・素材・ヘルスケア・金融実務）に特化した研究組織</strong>を作る方が現実的。
+            「フロンティア LLM 研究」では負けるが、「日本特有のドメイン × LLM」では勝てる軸が残る。
+          </p>
+        </div>
+        <div class="subpanel deep">
+          <h3>投資家視点：人材集積を評価指標に</h3>
+          <p>
+            AI 企業の評価で、ベンチマークスコアや MAU と並んで
+            <strong>「過去12ヶ月に合流した著名研究者の数と質」</strong>が重要な評価指標になる。
+            これは公開情報（論文 author list、各社 Career アナウンス、X での本人発表）から
+            ある程度トラッキング可能で、上場後の<strong>持続的優位の先行指標</strong>になりうる。
+          </p>
+        </div>
+        <div class="subpanel deep">
+          <h3>政策視点：研究者の国内移動を考えるべき時期</h3>
+          <p>
+            米国三極への流出は止められないが、<strong>三極の研究者が日本拠点で働ける制度設計</strong>
+            （ビザ・税制・研究費・パートナー機関）は依然として手付かずに近い。
+            シンガポール・UAE・UK が同じ問題意識で先行しており、
+            日本の遅れは「数年単位で取り戻せない構造的ハンデ」になりかねない。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>7. まとめ — Karpathy 移籍を「単発の人事」と読まない</h2>
+      <p>
+        Karpathy 氏の Anthropic 入社は、ニュースとしては1日で消費される人事発表だ。
+        しかし構造として見れば、これは<strong>過去5年続いてきた研究者市場の三極化</strong>の臨界点である。
+      </p>
+      <ul>
+        <li>2021年の Anthropic 創業＝OpenAI 中核研究者の同時離脱</li>
+        <li>2024年 Leike 移籍＝alignment 研究の重心移動</li>
+        <li>2026年 Karpathy 移籍＝消費者ブランド象徴の研究組織への合流</li>
+      </ul>
+      <p>
+        この線の上に Karpathy がいる。次に来るのは
+        <strong>「もう一段の高知名度研究者の移動」</strong>か、
+        あるいは <strong>「三極の中での再シャッフル」</strong>か。
+        どちらにせよ、AI 産業の競争は「モデルの賢さ」から
+        <strong>「研究組織として持続的に動ける構造を持っているか」</strong>に移っている。
+        事業企画・人事・投資のいずれの視点でも、この軸を意識せずに今後の AI 戦略は組めない。
+      </p>
+      <p class="small" style="margin-top: 12px;">
+        次の観察ポイント：(1) Code with Claude 東京（6/5〜6）での日本市場アナウンス、
+        (2) OpenAI IPO 後の研究者ストック流動、
+        (3) DeepMind 内部の Gemini 系チーム再編動向。
+      </p>
+    </section>
+
+    <section class="panel">
+      <h2>関連ページ</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>このハブ内</h3>
+          <ul>
+            <li><a href="industry-trends.html">Industry Trends（業界トレンド長文分析トップ）</a></li>
+            <li><a href="claude-recent-updates.html">Claude 最新アップデート完全版</a></li>
+            <li><a href="chatgpt-recent-updates.html">ChatGPT / OpenAI 最新アップデート完全版</a></li>
+            <li><a href="gemini-recent-updates.html">Gemini / Google 最新アップデート完全版</a></li>
+            <li><a href="claude-timeline.html">Claude リリース年表</a></li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>一次出典・参照</h3>
+          <ul class="sources">
+            <li><a href="https://techcrunch.com/2026/05/19/openai-co-founder-andrej-karpathy-joins-anthropics-pre-training-team/">OpenAI co-founder Andrej Karpathy joins Anthropic's pre-training team</a>（TechCrunch, 2026-05-19）</li>
+            <li><a href="https://www.cnbc.com/2026/05/19/anthropic-hires-openai-cofounder-andrej-karpathy-former-tesla-ai-lead.html">Anthropic hires OpenAI cofounder Andrej Karpathy</a>（CNBC, 2026-05-19）</li>
+            <li><a href="https://x.com/karpathy/status/2056753169888334312">Karpathy 本人 X 発表</a>（2026-05-19）</li>
+            <li><a href="https://www.cnbc.com/2026/05/20/anthropic-revenue-explosive-growth-ipo-profitable-quarter.html">Anthropic Q2 2026 収益・IPO 観測</a>（CNBC, 2026-05-20）</li>
+            <li><a href="https://www.anthropic.com/news/anthropic-kpmg">KPMG × Anthropic 提携発表</a>（Anthropic, 2026-05-19）</li>
+            <li><a href="https://fortune.com/2026/05/21/claude-code-london-anthropic-ai-software-engineering/">Code with Claude London</a>（Fortune, 2026-05-21）</li>
+            <li><a href="https://www.pbs.org/newshour/world/pope-leo-xiv-to-launch-his-first-encylical-a-document-on-artificial-intelligence-with-anthropics-co-founder">Pope Leo XIV / Magnifica Humanitas + Olah</a>（PBS News, 2026-05-25）</li>
+            <li>※ 2021年 Anthropic 創業、2024年 Jan Leike 移籍に関する記述は当時の OpenAI・Anthropic 公式発表および各メディア（NYT, The Information, Wired 等）の公知情報に基づく。</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <div style="text-align:center; color: var(--soft); font-size: 0.82rem; padding: 16px 0;">
+      <a href="industry-trends.html">← Industry Trends に戻る</a>
+      &nbsp;|&nbsp;
+      <a href="../index.html">Hub Top</a>
+    </div>
+
+  </div>
+</body>
+</html>
