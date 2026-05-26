@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Archive Policy — 古いコンテンツの処理ルール | Foundations</title>
+  <style>
+    body { font-family: "Segoe UI", "Noto Sans JP", system-ui, sans-serif; margin: 0; background: #0b1220; color: #edf2fb; line-height: 1.7; padding: 28px 18px 56px; }
+    .shell { max-width: 1080px; margin: 0 auto; display: grid; gap: 18px; }
+    .panel { background: #111a2b; border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 22px 24px; }
+    a { color: #75d7c0; }
+    h1, h2, h3 { margin: 0 0 10px; }
+    h2 { color: #fcd34d; font-size: 1.15rem; border-bottom: 2px solid rgba(244,184,96,0.25); padding-bottom: 6px; margin-bottom: 14px; }
+    h3 { color: #75d7c0; font-size: 1rem; margin: 14px 0 6px; }
+    p, li { color: #c5d0e3; }
+    code { font-family: "Fira Code", "Consolas", monospace; background: rgba(255,255,255,0.06); padding: 1px 6px; border-radius: 5px; font-size: 0.86em; color: #a5f3d0; }
+    pre { background: rgba(0,0,0,0.45); padding: 12px 14px; border-radius: 10px; font-size: 0.84rem; color: #c5d0e3; overflow-x: auto; border-left: 3px solid #3dd8c5; }
+
+    .principle {
+      background: rgba(102,224,194,0.06);
+      border: 1px solid rgba(102,224,194,0.22);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin: 10px 0;
+    }
+    .principle strong { color: #3dd8c5; }
+    .danger {
+      background: rgba(255,107,107,0.06);
+      border: 1px solid rgba(255,107,107,0.25);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin: 10px 0;
+    }
+    .danger strong { color: #ff7070; }
+
+    .level {
+      border-left: 3px solid;
+      padding: 12px 0 12px 16px;
+      margin: 16px 0;
+    }
+    .level.l1 { border-left-color: #4FFFB0; }
+    .level.l2 { border-left-color: #fcd34d; }
+    .level.l3 { border-left-color: #f7a87a; }
+    .level.l4 { border-left-color: #ff7070; }
+    .level h3 { color: #edf2fb; font-size: 1rem; margin-bottom: 4px; }
+    .level .label {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 5px;
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      margin-right: 8px;
+    }
+    .label.l1 { background: rgba(79,255,176,0.16); color: #4FFFB0; }
+    .label.l2 { background: rgba(244,184,96,0.18); color: #fcd34d; }
+    .label.l3 { background: rgba(247,168,122,0.18); color: #fdba74; }
+    .label.l4 { background: rgba(255,107,107,0.18); color: #ff7070; }
+    .level p, .level li { font-size: 0.9rem; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    th { text-align: left; padding: 10px 12px; color: #f4b860; border-bottom: 2px solid rgba(244,184,96,0.3); font-size: 0.8rem; letter-spacing: 0.04em; text-transform: uppercase; }
+    td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="panel">
+      <p><a href="index.html">← Foundations</a> / <a href="../index.html">Hub Top</a></p>
+      <h1>Archive Policy — 古いコンテンツの処理ルール</h1>
+      <p>このハブで<strong>古くなった・終了した・役割を終えた</strong>コンテンツをどう扱うかを定めます。「削除すれば綺麗になる」は最も避けたい判断で、<strong>過去の情報も将来の判断材料になる</strong>という前提でアーカイブ運用を設計しています。</p>
+    </div>
+
+    <div class="panel">
+      <h2>大原則</h2>
+      <div class="principle">
+        <strong>① 削除より移動、移動より追記</strong>
+        <p>情報を消すと「<strong>あったこと自体</strong>」が失われる。可能な限り、追記や注記で「過去のもの」と明示する方を選ぶ。</p>
+      </div>
+      <div class="principle">
+        <strong>② リンク切れを作らない</strong>
+        <p>外部からそのページを参照していたリンクが死ぬ。物理的に移動する場合も<strong>リダイレクトページを残す</strong>か、内部参照を全て更新してから移動。</p>
+      </div>
+      <div class="principle">
+        <strong>③ 「アーカイブ」と「公開停止」は別物</strong>
+        <p>アーカイブは「<strong>現役ではないが残しておく</strong>」。公開停止は「<strong>外部からアクセスさせない</strong>」。本ハブは公開リポなので、後者をやるなら別リポへ移動する必要がある。</p>
+      </div>
+      <div class="danger">
+        <strong>④ git 履歴は最終バックアップ</strong>
+        <p>うっかり削除しても git log から復元できる。だからこそ「<strong>意図的な削除</strong>」と「<strong>事故</strong>」を区別できるよう、ADR か session log にコンテキストを残すこと。</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>4 段階のアーカイブレベル</h2>
+      <p>コンテンツの状態を 4 段階で扱います。状態が下がるほど目立たない位置に移し、最終的には物理削除も視野に入れる。</p>
+
+      <div class="level l1">
+        <h3><span class="label l1">L1: Active</span> 現役 — 通常運用</h3>
+        <p>常時更新される、または更新される可能性が高いコンテンツ。トップカードからリンクされ、Hub Health でも監視対象。</p>
+        <ul>
+          <li>例: LLM トラッカー 3 本 / AI News 日次 / Industry Trends 6 本 / Creator System</li>
+          <li>処理: 通常運用。Hub Health で鮮度を監視</li>
+        </ul>
+      </div>
+
+      <div class="level l2">
+        <h3><span class="label l2">L2: Stable Reference</span> 安定参照 — 更新は稀</h3>
+        <p>過去に確定した情報の記録。情報自体に変化はないが、参照価値が継続するもの。バッジに「参照」「年表」等が付くことが多い。</p>
+        <ul>
+          <li>例: <a href="../research/claude-timeline.html">claude-timeline.html</a> / 過去の ADR / <a href="../strategy/capability-map.html">capability-map.html</a> / <a href="../foundations/glossary.html">glossary.html</a></li>
+          <li>処理: トップカード上は active と同じ場所。鮮度判定は<strong>「内容が現状と乖離していないか」</strong>を基準にする（更新頻度ではなく）</li>
+          <li>四半期に 1 回、内容の妥当性を確認</li>
+        </ul>
+      </div>
+
+      <div class="level l3">
+        <h3><span class="label l3">L3: Archived</span> アーカイブ — 役割終了、参照価値あり</h3>
+        <p>役割を終えたが、過去の経緯として参照価値があるもの。トップカードからの直接導線は外し、専用のアーカイブセクション経由でアクセスさせる。</p>
+        <ul>
+          <li>例: <a href="../demos/ma-demo-2026.html">demos/ma-demo-2026.html</a>（4/17 MA デモ）/ 過去の四半期レビュー / SUPERSEDED な ADR</li>
+          <li>処理: <strong>「アーカイブ」バッジ</strong>を表示。親 index に「アーカイブセクション」を設けてそこから辿らせる。物理ファイルはそのまま、URL も変えない</li>
+          <li>ファイル冒頭に「<strong>これは過去のコンテンツです（YYYY-MM-DD 時点でアーカイブ）</strong>」のような注記を追加することも検討</li>
+        </ul>
+      </div>
+
+      <div class="level l4">
+        <h3><span class="label l4">L4: Retired</span> 退役 — 物理削除候補</h3>
+        <p>もう参照価値が無く、検索結果に出るとむしろ混乱を招くもの。物理削除を検討するが、必ず ADR で経緯を残してから実施する。</p>
+        <ul>
+          <li>例: 機密混入してしまったページ（ローテーションで作り直す）/ 完全にスタブのままだった実験ページ / 重大な誤りを含むまま放置されたページ</li>
+          <li>処理: 必ず ADR を書く → 削除を実施 → セッションログにも記録 → 内部から張られていたリンクを全て掃除</li>
+          <li>削除前に <code>git log -- &lt;file&gt;</code> で履歴の完全性を確認</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>レベル判定フロー</h2>
+      <pre>「これ古いかも？」と思ったページについて:
+
+  Q1. 今後も参照される可能性はあるか？
+       Yes → Q2 へ
+       No  → Q3 へ
+
+  Q2. 情報が現状と乖離していないか？
+       乖離なし → L2: Stable Reference のまま
+       乖離あり → 更新できるなら L1 として更新
+                  更新できないなら L3: Archived（注記付き）
+
+  Q3. 残しておくと混乱を招くか？
+       No  → L3: Archived（静かに残す）
+       Yes → L4: Retired（ADR を書いて物理削除）</pre>
+    </div>
+
+    <div class="panel">
+      <h2>カテゴリ別の運用</h2>
+
+      <table>
+        <thead>
+          <tr><th>カテゴリ</th><th>典型的なアーカイブ対象</th><th>処理</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>research/ai-news/</strong></td>
+            <td>古い日次ニュース（3 ヶ月以上前）</td>
+            <td>L2 のまま保持。日付付きの自然なアーカイブ。Site Map の AI News セクションは「直近 30 日」「過去」で分けると見やすい</td>
+          </tr>
+          <tr>
+            <td><strong>research/claude-recent-updates 等</strong></td>
+            <td>過去四半期分のタイムライン</td>
+            <td>同一ページ内で「新→古」順に保持。古い四半期は折りたたみ UI を検討</td>
+          </tr>
+          <tr>
+            <td><strong>research/trend-*</strong></td>
+            <td>記事化したテーマで状況が大きく変わったもの</td>
+            <td>原則 L1（更新可能）。更新コストが高すぎる場合は L3 にして「YYYY-MM 時点の分析」と注記</td>
+          </tr>
+          <tr>
+            <td><strong>demos/</strong></td>
+            <td>過去のイベント専用資料</td>
+            <td>L3 が標準。<a href="../demos/index.html">demos/index.html</a> 内の「アーカイブ」セクションで分離表示</td>
+          </tr>
+          <tr>
+            <td><strong>workbench/knowledge/&lt;vendor&gt;.html</strong></td>
+            <td>ディスコンになったプロダクトのページ</td>
+            <td>L3。ファイルは残し、冒頭に「YYYY-MM にサポート終了」の注記。後継があれば後継ページへのリンクを追加</td>
+          </tr>
+          <tr>
+            <td><strong>foundations/decisions.html</strong></td>
+            <td>覆された ADR</td>
+            <td>削除せず、ステータスを <code>superseded</code> に変更。新 ADR で「ADR-NNN を置き換える」と明示</td>
+          </tr>
+          <tr>
+            <td><strong>logs/sessions/</strong></td>
+            <td>古いセッションログ</td>
+            <td>L2 のまま全件保持。歴史資料として価値が高い</td>
+          </tr>
+          <tr>
+            <td><strong>logs/2026-q2-review.html</strong> 等</td>
+            <td>過去の四半期レビュー</td>
+            <td>L2 のまま全件保持。チェンジログとセットで運用</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel">
+      <h2>「アーカイブセクション」の作り方</h2>
+      <p>カテゴリ index に L3 のページを置く時は、本体とは分離した「アーカイブセクション」を設ける。実例: <a href="../demos/index.html">demos/index.html</a> の「イベント終了済み（アーカイブ）」セクション。</p>
+
+      <h3>テンプレ</h3>
+      <pre>&lt;div class="panel"&gt;
+  &lt;h2&gt;役割終了済み（アーカイブ）&lt;/h2&gt;
+  &lt;p class="small"&gt;下記は当時の文脈での資料です。物理ファイルは保持していますが、
+  トップからの直接導線は外しています。&lt;/p&gt;
+  &lt;ul&gt;
+    &lt;li&gt;
+      &lt;span class="badge archive"&gt;ARCHIVED&lt;/span&gt;
+      &lt;a href="..."&gt;ページタイトル&lt;/a&gt;
+      &lt;br&gt;&lt;span class="small"&gt;YYYY-MM-DD: 役割終了の経緯&lt;/span&gt;
+    &lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/div&gt;</pre>
+    </div>
+
+    <div class="panel">
+      <h2>物理削除のチェックリスト（L4 移行時）</h2>
+      <p>削除は<strong>慎重に・手順通りに</strong>。「整理」のつもりが事故になる典型例（AP-005 と同根のリスク）。</p>
+      <ol>
+        <li>削除理由を明記した ADR を書く（decisions.html）</li>
+        <li>内部の参照箇所を grep で全件洗い出し：
+          <pre>grep -rln "削除予定のファイル名" .</pre>
+        </li>
+        <li>参照を全て更新（リダイレクト先 or 削除）</li>
+        <li>外部の参照可能性を検討（SNS で言及・他リポからリンク等）</li>
+        <li>git rm でファイル削除 → commit メッセージに ADR 番号を明記
+          <pre>git rm path/to/file.html
+git commit -m "Retire path/to/file.html (ADR-NNN)"</pre>
+        </li>
+        <li><a href="../logs/sessions/">セッションログ</a>と<a href="../logs/site-changelog.html">サイトチェンジログ</a>に経緯を記録</li>
+        <li><a href="site-map.html">Site Map</a> から該当エントリを削除</li>
+      </ol>
+    </div>
+
+    <div class="panel">
+      <h2>「いつアーカイブを検討するか」のシグナル</h2>
+      <ul>
+        <li><strong>Hub Health で 60 日以上 ALERT</strong>: 単に古いだけなら L2、誰も更新できる人がいないなら L3 検討</li>
+        <li><strong>外部リンク先がほぼ全部死んだ</strong>: 情報の検証可能性が失われた → L3 にして注記</li>
+        <li><strong>後継ページが完成した</strong>: 旧ページに「→ 新ページへ」のリンクを残して L3 へ</li>
+        <li><strong>ユーザーから「これもう不要」の明示</strong>: L3 か L4 を判断</li>
+        <li><strong>機密情報の混入が判明</strong>: 即 L4（物理削除）+ git history も書き換え検討（force push が必要なら別 ADR）</li>
+      </ul>
+    </div>
+
+    <div class="panel">
+      <h2>例: 4/17 MA デモの扱い（実例）</h2>
+      <ol>
+        <li>イベント終了（2026-04-17）</li>
+        <li>1 ヶ月放置後（2026-05-25）、トップ中段バナー 2 本が陳腐化していることに気付く</li>
+        <li>選択肢を A/B/C で提示し、ユーザーが「バナー削除 + demos/ フォルダ自体は残す」を選択（ADR-005 / ADR-006）</li>
+        <li><a href="../demos/ma-demo-2026.html">demos/ma-demo-2026.html</a> は L3 として保持、<a href="../demos/index.html">demos/index.html</a> の「イベント終了済み」セクションに分離表示</li>
+        <li>物理リネームは見送り（リンク切れリスク回避）</li>
+      </ol>
+      <p>このパターンが本ハブのアーカイブ運用の<strong>典型例</strong>。</p>
+    </div>
+
+    <div class="panel">
+      <h2>関連</h2>
+      <ul>
+        <li><a href="decisions.html#005-demos-rename-skip">ADR-005 demos/ 物理リネーム見送り</a></li>
+        <li><a href="decisions.html#006-banners-removal">ADR-006 中段バナー 2 本削除</a></li>
+        <li><a href="anti-patterns.html">アンチパターン集</a> — 削除・移動絡みの過去事例</li>
+        <li><a href="../logs/site-changelog.html">Site Changelog</a> — リリース単位の変更記録</li>
+        <li><a href="../strategy/risk-register.html">Risk Register</a> — R-04（内部リンク腐敗）と関連</li>
+      </ul>
+    </div>
+
+    <p class="small" style="text-align:center; padding: 10px; color: #7f92ac; font-size: 0.84rem;">最終更新: 2026-05-26</p>
+  </div>
+</body>
+</html>

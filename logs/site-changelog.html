@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Site Changelog | Logs</title>
+  <style>
+    body { font-family: "Segoe UI", "Noto Sans JP", system-ui, sans-serif; margin: 0; background: #0b1220; color: #edf2fb; line-height: 1.7; padding: 28px 18px 56px; }
+    .shell { max-width: 1080px; margin: 0 auto; display: grid; gap: 18px; }
+    .panel { background: #111a2b; border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 22px 24px; }
+    a { color: #75d7c0; }
+    h1, h2, h3, h4 { margin: 0 0 10px; }
+    h2 { color: #fcd34d; font-size: 1.15rem; border-bottom: 2px solid rgba(244,184,96,0.25); padding-bottom: 6px; margin-bottom: 14px; }
+    p, li { color: #c5d0e3; }
+    code { font-family: "Fira Code", "Consolas", monospace; background: rgba(255,255,255,0.06); padding: 1px 6px; border-radius: 5px; font-size: 0.86em; color: #a5f3d0; }
+
+    .release {
+      background: rgba(255,255,255,0.03);
+      border-left: 3px solid #f4b860;
+      padding: 16px 18px;
+      border-radius: 10px;
+      margin: 16px 0;
+    }
+    .release.major { border-left-color: #4FFFB0; }
+    .release.minor { border-left-color: #fcd34d; }
+    .release.patch { border-left-color: #75d7c0; }
+    .release.upcoming { border-left-color: #d8b4fe; background: rgba(167,139,250,0.04); }
+
+    .release h3 {
+      color: #edf2fb;
+      font-size: 1.15rem;
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .release .ver {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      font-family: "Fira Code", "Consolas", monospace;
+    }
+    .ver.major { background: rgba(79,255,176,0.16); color: #4FFFB0; }
+    .ver.minor { background: rgba(244,184,96,0.18); color: #fcd34d; }
+    .ver.patch { background: rgba(102,224,194,0.16); color: #75d7c0; }
+    .ver.upcoming { background: rgba(167,139,250,0.18); color: #d8b4fe; }
+
+    .release .date { color: #7f92ac; font-size: 0.84rem; }
+    .release h4 { font-size: 0.86rem; color: #f4b860; margin: 12px 0 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .release ul { margin: 4px 0 0; padding-left: 20px; }
+    .release li { font-size: 0.9rem; }
+
+    .summary-box {
+      background: rgba(102,224,194,0.06);
+      border: 1px solid rgba(102,224,194,0.22);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin: 10px 0;
+    }
+    .summary-box strong { color: #3dd8c5; }
+
+    .vtable { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    .vtable th { text-align: left; padding: 10px 12px; color: #f4b860; border-bottom: 2px solid rgba(244,184,96,0.3); font-size: 0.8rem; letter-spacing: 0.04em; text-transform: uppercase; }
+    .vtable td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .vtable .vcode { font-family: "Fira Code", monospace; color: #75d7c0; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="panel">
+      <p><a href="index.html">← Logs</a> / <a href="../index.html">Hub Top</a></p>
+      <h1>Site Changelog — ハブ自身のリリースノート</h1>
+      <p>このリポジトリ自体を「ひとつのプロダクト」と見立てた時の<strong>バージョン履歴</strong>。git log が技術的な変更を全部記録するのに対し、ここは<strong>意味のある節目</strong>だけを版数付きで残します。読み手は「いつ何が変わったか」を 1 ページで把握できます。</p>
+      <div class="summary-box">
+        <strong>バージョン採番方針:</strong> セマンティックバージョニングを緩く採用。
+        <ul style="margin-top: 6px;">
+          <li><strong>major</strong>: トップ index の構造変更・カテゴリの追加削除</li>
+          <li><strong>minor</strong>: 新カテゴリ内のページ群追加・運用ルール追加</li>
+          <li><strong>patch</strong>: 個別ページの追加・修正・既存ページの大幅更新</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>バージョン早見表</h2>
+      <table class="vtable">
+        <thead>
+          <tr><th>版</th><th>リリース日</th><th>テーマ</th><th>主要追加</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="vcode">v1.3.0</td><td>2026-05-26</td><td>ハブ運用カテゴリの本格強化</td><td>Onboarding / 並走プロトコル / Template / Style / Site Map / ADR / Risk Register / Done / Glossary / Anti-patterns / Hub Health / Q2 Review / Session Logs / Site Changelog / Archive Policy</td></tr>
+          <tr><td class="vcode">v1.2.0</td><td>2026-05-25</td><td>3 カテゴリ構造への再編</td><td>制作・技術コア / ナレッジ・資料 / ハブ運用 の 3 カテゴリ化。Creator System を spotlight 化。Industry Trends 新設＋6 記事一括公開。</td></tr>
+          <tr><td class="vcode">v1.1.0</td><td>2026-05-25</td><td>LLM Updates Hub の新設</td><td>Claude / ChatGPT / Gemini の 3 社並列トラッカー。トップ index に専用コーナー追加。</td></tr>
+          <tr><td class="vcode">v1.0.0</td><td>2026-05-08 頃</td><td>初版完成</td><td>Daily News Hub・claude-recent-updates 完全版・8 カード grid トップ。</td></tr>
+          <tr><td class="vcode">v0.x</td><td>2026-02 〜 04</td><td>基盤構築期</td><td>Foundations / Strategy / Creator System の骨格・Claude 周辺の調査ベース。</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel">
+      <h2>v1.3.0 — 2026-05-26（major）</h2>
+      <div class="release major">
+        <h3><span class="ver major">v1.3.0</span> ハブ運用カテゴリの本格強化 <span class="date">— 2026-05-26</span></h3>
+
+        <h4>テーマ</h4>
+        <p>「<strong>運用に耐える</strong>」体制への移行。新セッション・並走・品質・履歴のすべてを文書化し、複数エージェント・複数 PC での非同期運用に耐える基盤を整備した。</p>
+
+        <h4>新規ページ（14 本 / 約 5,200 行）</h4>
+        <ul>
+          <li><a href="../foundations/onboarding-checklist.html">foundations/onboarding-checklist.html</a> — 新セッション 10 分標準</li>
+          <li><a href="../foundations/multi-instance-protocol.html">foundations/multi-instance-protocol.html</a> — 並走プロトコル</li>
+          <li><a href="../foundations/glossary.html">foundations/glossary.html</a> — 固有用語集</li>
+          <li><a href="../foundations/decisions.html">foundations/decisions.html</a> — ADR 8 件</li>
+          <li><a href="../foundations/anti-patterns.html">foundations/anti-patterns.html</a> — 失敗 6 + 救済 4</li>
+          <li><a href="../foundations/page-template.html">foundations/page-template.html</a> — Light/Rich boilerplate</li>
+          <li><a href="../foundations/style-guide.html">foundations/style-guide.html</a> — 13 章の執筆ルール</li>
+          <li><a href="../foundations/site-map.html">foundations/site-map.html</a> — 全 158+ ページ索引</li>
+          <li><a href="../foundations/definition-of-done.html">foundations/definition-of-done.html</a> — 完成基準</li>
+          <li><a href="../foundations/archive-policy.html">foundations/archive-policy.html</a> — アーカイブポリシー（Phase 4）</li>
+          <li><a href="../strategy/capability-evolution.html">strategy/capability-evolution.html</a> — 時系列の能力進化</li>
+          <li><a href="../strategy/risk-register.html">strategy/risk-register.html</a> — 前向きリスク 14 件</li>
+          <li><a href="hub-health.html">logs/hub-health.html</a> — 健全性ダッシュボード</li>
+          <li><a href="2026-q2-review.html">logs/2026-q2-review.html</a> — Q2 四半期レビュー</li>
+          <li><a href="sessions/2026-05-26.html">logs/sessions/2026-05-26.html</a> — セッションログ（運用復活）</li>
+          <li><a href="site-changelog.html">logs/site-changelog.html</a> — このページ</li>
+        </ul>
+
+        <h4>既存改修</h4>
+        <ul>
+          <li><code>CLAUDE.md</code> 全面更新：Folder Rules・初期読書リスト・並走前提ルール</li>
+          <li>top <code>index.html</code>：ハブ運用 3 カードに直リンク＋バッジ＋more-link 付与</li>
+          <li><code>foundations/index.html</code>：必読 / プロトコル / リファレンス / 標準化 / 品質基準の 5 段構成</li>
+          <li><code>logs/index.html</code>：ダッシュボード / 運用記録 / Recommended Usage の 3 層</li>
+          <li><code>strategy/index.html</code>：Risk Register 追加で 5 カード体制</li>
+        </ul>
+
+        <h4>関連 commit</h4>
+        <ul>
+          <li><code>006f183</code> — Phase 1-3（13 ページ + 5 index 改修）</li>
+          <li><code>（Phase 4 commit、本ページ作成時に追加予定）</code></li>
+        </ul>
+
+        <h4>セッション記録</h4>
+        <ul>
+          <li><a href="sessions/2026-05-26.html">2026-05-26 セッションログ</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>v1.2.0 — 2026-05-25（major）</h2>
+      <div class="release major">
+        <h3><span class="ver major">v1.2.0</span> 3 カテゴリ構造への再編 <span class="date">— 2026-05-25</span></h3>
+
+        <h4>テーマ</h4>
+        <p>横並びだった 8 カードを <strong>3 カテゴリ（制作・技術コア / ナレッジ・資料 / ハブ運用）</strong>に再編。Creator System を spotlight 表示にして主軸領域を明示。Research が薄い問題を Industry Trends として刷新。</p>
+
+        <h4>主な変更</h4>
+        <ul>
+          <li>トップ index.html を 3 カテゴリ構造に再構築（ADR-002）</li>
+          <li>Creator System の spotlight 化（全幅表示、ADR-007）</li>
+          <li>Workbench を「Tech Workbench」と「LLM 個別深掘り」の 2 カードに分割（ADR-004）</li>
+          <li>Research カードを「Industry Trends」に刷新（ADR-003）</li>
+          <li>demos/ 配下を「Briefings &amp; 配布資料」として再ラベル（物理リネームせず、ADR-005）</li>
+          <li>中段バナー 2 本を削除（4/17 MA デモ・Codex 比較、ADR-006）</li>
+          <li><a href="../research/industry-trends.html">research/industry-trends.html</a> 新規（テーマ別ナビゲーション）</li>
+          <li>Industry Trends の長文 6 本（trend-ipo-race / trend-big-four / trend-talent-shift / trend-ai-ethics / trend-power-race / trend-mcp-ecosystem、ADR-008）— 並走セッションで合計 3,021 行を一気立ち上げ</li>
+        </ul>
+
+        <h4>関連 ADR</h4>
+        <ul>
+          <li>ADR-002 〜 ADR-008（<a href="../foundations/decisions.html">decisions.html</a>）</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>v1.1.0 — 2026-05-25（minor）</h2>
+      <div class="release minor">
+        <h3><span class="ver minor">v1.1.0</span> LLM Updates Hub の新設 <span class="date">— 2026-05-25</span></h3>
+
+        <h4>テーマ</h4>
+        <p>Claude 一強の見せ方から脱却し、<strong>Claude / ChatGPT / Gemini の 3 社並列トラッカー</strong>として LLM Updates Hub を新設。</p>
+
+        <h4>主な変更</h4>
+        <ul>
+          <li><a href="../research/chatgpt-recent-updates.html">research/chatgpt-recent-updates.html</a> 新規（OpenAI 完全版、約 720 行）</li>
+          <li><a href="../research/gemini-recent-updates.html">research/gemini-recent-updates.html</a> 新規（Gemini 完全版、約 700 行）</li>
+          <li>トップ index.html に <strong>LLM Updates Hub</strong> コーナー追加（紫アクセントで Daily News Hub と差別化）</li>
+          <li>既存 claude-recent-updates.html の刷新（並走で 6 トレンド記事を同時立ち上げ）</li>
+        </ul>
+
+        <h4>関連 ADR</h4>
+        <ul>
+          <li>ADR-001（LLM Updates Hub を別建てにする、<a href="../foundations/decisions.html#001-llm-hub-spinoff">decisions.html</a>）</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>v1.0.0 — 2026-05-08 頃（初版）</h2>
+      <div class="release patch">
+        <h3><span class="ver patch">v1.0.0</span> 初版完成 <span class="date">— 2026-05-08 頃</span></h3>
+
+        <h4>テーマ</h4>
+        <p>Daily News Hub・claude-recent-updates 完全版・8 カード grid を備えたトップ index が確立された状態。「自分用の技術ハブ」として最低限の運用が回り始めた版。</p>
+
+        <h4>主な構成</h4>
+        <ul>
+          <li>トップ <a href="../index.html">index.html</a> — Daily News Hub + 8 カード grid（Foundations / Strategy / Creator System / Claw Stack / Research[highlight] / Workbench / Research-archive / Logs）</li>
+          <li><a href="../research/claude-recent-updates.html">research/claude-recent-updates.html</a> — Opus 4.7・Claude Design・Cowork・Computer Use を含む完全版</li>
+          <li><a href="../research/ai-news/">research/ai-news/</a> — 日次運用が定着</li>
+          <li><a href="../workbench/knowledge/">workbench/knowledge/</a> — vendor 別深掘り 30+ ページ</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>v0.x — 2026-02 〜 04（基盤構築期）</h2>
+      <div class="release patch">
+        <h3><span class="ver patch">v0.x</span> 基盤構築期 <span class="date">— 2026-02 〜 2026-04</span></h3>
+
+        <h4>テーマ</h4>
+        <p>Foundations / Strategy / Creator System の骨格構築。<a href="../foundations/align-lab-context.html">ALIGN Lab</a> との関係定義。Claude 周辺の調査ベースを準備。バージョン管理外（v1.0.0 以前）。</p>
+
+        <h4>主な動き</h4>
+        <ul>
+          <li>Foundations: agent-protocol / operating-principles / align-lab-context の原則 4 文書</li>
+          <li>Strategy: capability-map / priorities / roadmap の戦略 3 文書</li>
+          <li>Creator System: 動画・漫画パイプラインの仕様骨格</li>
+          <li>2026-04-17 の MA チーム向け Claude デモを契機に demos/ 配下を充実</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>今後のリリース予定（候補）</h2>
+      <div class="release upcoming">
+        <h3><span class="ver upcoming">v1.4 候補</span> Creator System 本格深化 <span class="date">— Q3（2026-07〜09）想定</span></h3>
+        <ul>
+          <li><a href="../strategy/risk-register.html#r-01">R-01（最重要リスク）</a>対応：動画・漫画パイプラインの実装反映、KPI ダッシュボード新設、評価/マネタイズの仕様改訂</li>
+          <li>Claw Stack の OpenClaw 再解禁反映（R-04）</li>
+        </ul>
+      </div>
+      <div class="release upcoming">
+        <h3><span class="ver upcoming">v1.5 候補</span> 外部公開準備 <span class="date">— 時期未定</span></h3>
+        <ul>
+          <li>公開向けトップページの整備（社内文脈・固有名詞のフィルタリング）</li>
+          <li>サイト内検索（クライアント側 JS、R-08 対応）</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>このページのメンテナンス</h2>
+      <ul>
+        <li>major / minor リリースに該当する変更を実施したら、ここに新セクションを追加</li>
+        <li>patch レベルは git log で十分なので、原則ここには追加しない（例外: 重要な単発リリース）</li>
+        <li>新バージョンは<strong>一番上</strong>に追加（新→古順）</li>
+        <li>バージョン早見表も同時に更新</li>
+        <li>四半期レビュー（<a href="2026-q2-review.html">Q2 review</a>）作成時に、その四半期のリリースをこのページから引用</li>
+      </ul>
+    </div>
+
+    <div class="panel">
+      <h2>関連</h2>
+      <ul>
+        <li><a href="sessions/">セッションログ一覧</a> — 各リリースの背景となる作業記録</li>
+        <li><a href="../foundations/decisions.html">決定ログ（ADR）</a> — リリースに紐づく判断記録</li>
+        <li><a href="hub-health.html">Hub Health Dashboard</a> — 現状の健全性</li>
+        <li><a href="2026-q2-review.html">2026 Q2 四半期レビュー</a> — Q2 リリースの総括</li>
+        <li><a href="../strategy/capability-evolution.html">Capability Evolution</a> — 能力進化（リリースとは別軸）</li>
+      </ul>
+    </div>
+
+    <p class="small" style="text-align:center; padding: 10px; color: #7f92ac; font-size: 0.84rem;">最終更新: 2026-05-26</p>
+  </div>
+</body>
+</html>

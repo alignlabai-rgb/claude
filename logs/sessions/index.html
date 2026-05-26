@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>セッションログ一覧 | Logs</title>
+  <style>
+    body { font-family: "Segoe UI", "Noto Sans JP", system-ui, sans-serif; margin: 0; background: #0b1220; color: #edf2fb; line-height: 1.7; padding: 28px 18px 56px; }
+    .shell { max-width: 1000px; margin: 0 auto; display: grid; gap: 18px; }
+    .panel { background: #111a2b; border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 22px 24px; }
+    a { color: #75d7c0; }
+    h1, h2, h3 { margin: 0 0 10px; }
+    h2 { color: #fcd34d; font-size: 1.15rem; border-bottom: 2px solid rgba(244,184,96,0.25); padding-bottom: 6px; margin-bottom: 14px; }
+    p, li { color: #c5d0e3; }
+    code { font-family: "Fira Code", "Consolas", monospace; background: rgba(255,255,255,0.06); padding: 1px 6px; border-radius: 5px; font-size: 0.86em; color: #a5f3d0; }
+    .log-list { list-style: none; padding: 0; }
+    .log-list li {
+      padding: 12px 14px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 10px;
+      margin: 8px 0;
+    }
+    .log-list .date {
+      color: #3dd8c5;
+      font-weight: 700;
+      font-family: "Fira Code", "Consolas", monospace;
+      margin-right: 12px;
+    }
+    .log-list .summary {
+      color: #c5d0e3;
+      display: block;
+      margin-top: 4px;
+      font-size: 0.88rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="panel">
+      <p><a href="../index.html">← Logs</a> / <a href="../../index.html">Hub Top</a></p>
+      <h1>セッションログ一覧</h1>
+      <p>このハブで実施した<strong>主要セッション</strong>の時系列ログ。ADR が「決断の記録」なのに対し、ここは「<strong>何をやったかの時系列記録</strong>」です。</p>
+      <p>大きな構造変更や 30 分以上の連続作業を含むセッションは、ここに <code>YYYY-MM-DD.html</code> 形式でログを残す運用です（<a href="../../foundations/multi-instance-protocol.html">並走プロトコル §7</a> で定めたメッセージボードの一つ）。</p>
+    </div>
+
+    <div class="panel">
+      <h2>ログ一覧</h2>
+      <ul class="log-list">
+        <li>
+          <span class="date">2026-05-26</span>
+          <a href="2026-05-26.html">ハブ運用カテゴリの本格強化（Phase 1-4）</a>
+          <span class="summary">14 ページ新設・5 ファイル改修。Onboarding / 並走 / Template / Style / Site Map / ADR / Risk / Done / セッションログ運用復活。</span>
+        </li>
+      </ul>
+      <p style="color: #7f92ac; font-size: 0.85rem; margin-top: 14px;">※ 2026-04-06 以降のセッションログは未記録のまま。git log で追跡可能だが時系列ログとしては欠落している。今後はここに集約していく。</p>
+    </div>
+
+    <div class="panel">
+      <h2>セッションログを書くタイミング</h2>
+      <ul>
+        <li>新規ページを3本以上作成・改修した</li>
+        <li>カテゴリ・フォルダ構造に手を入れた</li>
+        <li>大きな調査・裏取り作業を実施した</li>
+        <li>ADR を新規追加した（ADR 記録だけでなく、その作業の時系列も残したい場合）</li>
+        <li>1セッションが 30 分以上の連続作業になった</li>
+      </ul>
+      <p>小さい修正（typo・リンク追加・1ファイル軽微編集）はセッションログ化せず、git log と <a href="../next-actions.html">next-actions</a> 更新だけで十分。</p>
+    </div>
+
+    <div class="panel">
+      <h2>セッションログのテンプレート</h2>
+      <p>新規記録は既存ログ（<a href="2026-05-26.html">2026-05-26.html</a>）をコピーして、以下を更新:</p>
+      <ul>
+        <li><code>&lt;title&gt;</code> と <code>&lt;h1&gt;</code> の日付</li>
+        <li>meta-row のメタ情報（日付・主作業・関連 ADR・形式）</li>
+        <li>summary-tiles の数値</li>
+        <li>セッションの目的・実施内容・顕在化したこと・次のフォローアップ</li>
+        <li>commit ハッシュ</li>
+      </ul>
+      <p>詳細は <a href="../../foundations/page-template.html">Page Template</a> と <a href="../../foundations/style-guide.html">Style Guide</a> を参照。</p>
+    </div>
+
+    <div class="panel">
+      <h2>関連</h2>
+      <ul>
+        <li><a href="../index.html">Logs index</a></li>
+        <li><a href="../hub-health.html">Hub Health Dashboard</a></li>
+        <li><a href="../next-actions.html">Next Actions</a></li>
+        <li><a href="../../foundations/decisions.html">決定ログ（ADR）</a> — このログと役割分担する記録</li>
+        <li><a href="../../foundations/multi-instance-protocol.html">並走プロトコル</a> — セッションログがメッセージボードとして機能する根拠</li>
+      </ul>
+    </div>
+
+  </div>
+</body>
+</html>
