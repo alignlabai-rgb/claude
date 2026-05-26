@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Definition of Done — ページ完成基準 | Foundations</title>
+  <style>
+    body { font-family: "Segoe UI", "Noto Sans JP", system-ui, sans-serif; margin: 0; background: #0b1220; color: #edf2fb; line-height: 1.7; padding: 28px 18px 56px; }
+    .shell { max-width: 1080px; margin: 0 auto; display: grid; gap: 18px; }
+    .panel { background: #111a2b; border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 22px 24px; }
+    a { color: #75d7c0; }
+    h1, h2, h3 { margin: 0 0 10px; }
+    h2 { color: #fcd34d; font-size: 1.15rem; border-bottom: 2px solid rgba(244,184,96,0.25); padding-bottom: 6px; margin-bottom: 14px; }
+    h3 { color: #75d7c0; font-size: 1rem; margin: 14px 0 6px; }
+    p, li { color: #c5d0e3; }
+    code { font-family: "Fira Code", "Consolas", monospace; background: rgba(255,255,255,0.06); padding: 1px 6px; border-radius: 5px; font-size: 0.86em; color: #a5f3d0; }
+    pre { background: rgba(0,0,0,0.45); padding: 12px 14px; border-radius: 10px; font-size: 0.83rem; color: #c5d0e3; overflow-x: auto; border-left: 3px solid #3dd8c5; }
+
+    .check-list {
+      list-style: none;
+      padding-left: 0;
+      margin: 8px 0;
+    }
+    .check-list li {
+      padding: 8px 12px 8px 32px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.05);
+      margin: 6px 0;
+      position: relative;
+      font-size: 0.92rem;
+    }
+    .check-list li::before {
+      content: "☐";
+      position: absolute;
+      left: 10px;
+      top: 7px;
+      color: #4FFFB0;
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+    .check-list .why {
+      display: block;
+      color: #7f92ac;
+      font-size: 0.82rem;
+      font-style: italic;
+      margin-top: 4px;
+    }
+    .check-list .example {
+      display: block;
+      background: rgba(0,0,0,0.3);
+      padding: 6px 10px;
+      border-radius: 6px;
+      margin-top: 6px;
+      font-family: "Fira Code", "Consolas", monospace;
+      font-size: 0.82rem;
+      color: #a5f3d0;
+    }
+
+    .level-badge {
+      display: inline-block;
+      padding: 3px 9px;
+      border-radius: 5px;
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      margin-left: 8px;
+    }
+    .level-must { background: rgba(255,107,107,0.16); color: #ff7070; }
+    .level-should { background: rgba(244,184,96,0.16); color: #fcd34d; }
+    .level-nice { background: rgba(102,224,194,0.14); color: #75d7c0; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    th { text-align: left; padding: 10px 12px; color: #f4b860; border-bottom: 2px solid rgba(244,184,96,0.3); font-size: 0.8rem; letter-spacing: 0.04em; text-transform: uppercase; }
+    td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+
+    .summary-box {
+      background: rgba(102,224,194,0.06);
+      border: 1px solid rgba(102,224,194,0.22);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin: 10px 0;
+    }
+    .summary-box strong { color: #3dd8c5; }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="panel">
+      <p><a href="index.html">← Foundations</a> / <a href="../index.html">Hub Top</a></p>
+      <h1>Definition of Done — ページ完成基準</h1>
+      <p>このハブで作る・更新するページが<strong>「完成した」</strong>とみなされる条件を定義します。複数セッション・複数エージェントが書いても、最低限の品質が揃うようにするための判定基準です。</p>
+      <p>項目には <span class="level-badge level-must">MUST</span>（必須） <span class="level-badge level-should">SHOULD</span>（推奨） <span class="level-badge level-nice">NICE</span>（あれば良い）の3レベルがあります。MUST が満たされなければ「完成」とみなしません。</p>
+    </div>
+
+    <div class="panel">
+      <h2>1. 必須の構造要件 <span class="level-badge level-must">MUST</span></h2>
+      <p>HTML としての最低限の構造。これを満たさないと公開できない。</p>
+      <ul class="check-list">
+        <li>
+          <strong><code>&lt;title&gt;</code> が「ページ名 | カテゴリ名」形式</strong>
+          <span class="example">&lt;title&gt;Onboarding Checklist | Foundations&lt;/title&gt;</span>
+          <span class="why">→ なぜ：ブラウザタブ・履歴・検索結果で識別できる必要がある。</span>
+        </li>
+        <li>
+          <strong>breadcrumb が冒頭にある</strong>（親カテゴリ index と Hub Top へのリンク）
+          <span class="example">&lt;a href="index.html"&gt;← Foundations&lt;/a&gt; / &lt;a href="../index.html"&gt;Hub Top&lt;/a&gt;</span>
+          <span class="why">→ なぜ：迷子になっても上に戻れる経路を保証する。</span>
+        </li>
+        <li>
+          <strong><code>&lt;h1&gt;</code> が 1 回だけ存在</strong>
+          <span class="why">→ なぜ：見出し階層が崩れると、後で目次自動生成・検索が壊れる。</span>
+        </li>
+        <li>
+          <strong>最終更新日が <code>YYYY-MM-DD</code> 形式で記載</strong>
+          <span class="example">&lt;p class="last-update"&gt;最終更新: 2026-05-26&lt;/p&gt;</span>
+          <span class="why">→ なぜ：鮮度判定のため。Hub Health の自動計測対象。</span>
+        </li>
+        <li>
+          <strong>「関連」セクションが末尾にある</strong>（最低でも親カテゴリ・Hub Top へのリンク）
+          <span class="why">→ なぜ：ページを読んだ後の動線を保証する。孤立したページは情報の墓場になる。</span>
+        </li>
+        <li>
+          <strong>HTML が壊れていない</strong>（タグの閉じ忘れなし、エスケープ漏れなし）
+          <span class="why">→ なぜ：開いた瞬間にレイアウト崩壊する事態を防ぐ。</span>
+        </li>
+      </ul>
+    </div>
+
+    <div class="panel">
+      <h2>2. 内容品質 <span class="level-badge level-must">MUST</span></h2>
+      <ul class="check-list">
+        <li>
+          <strong>ページの目的が冒頭1-2段落で明示されている</strong>
+          <span class="why">→ なぜ：読み手が「自分が読むべきか」を3秒で判断できる必要がある。</span>
+        </li>
+        <li>
+          <strong>外部リンク（出典）は実 URL に張られている</strong>
+          <span class="why">→ なぜ：AP-002（推測 URL を書く失敗）の再発防止。WebSearch / WebFetch で実在確認してから書く。</span>
+        </li>
+        <li>
+          <strong>事実は断定、推測・未確定は明示</strong>
+          <span class="example">OK: 「2026-05-23 時点で複数メディアが報じている」 / NG: 「Anthropic の評価額は $900B です」</span>
+          <span class="why">→ なぜ：将来の読者を誤誘導しないため。情報の時点修飾は必須。</span>
+        </li>
+        <li>
+          <strong>機密情報・個人情報・取引先固有情報が混入していない</strong>
+          <span class="why">→ なぜ：このハブは公開リポ。R-06 リスクへの直接対処。</span>
+        </li>
+      </ul>
+    </div>
+
+    <div class="panel">
+      <h2>3. 動線・ナビゲーション <span class="level-badge level-must">MUST</span></h2>
+      <ul class="check-list">
+        <li>
+          <strong>親カテゴリの <code>index.html</code> からリンクが張られている</strong>
+          <span class="why">→ なぜ：誰かが「<a href="../foundations/">foundations/</a> 配下に何があるか」を見た時、辿り着ける必要がある。</span>
+        </li>
+        <li>
+          <strong>必要なら top <code>index.html</code> のカードからもリンク</strong>
+          <span class="why">→ なぜ：重要なページはトップから1クリックで到達できるべき。ただし全ページではない（カードが溢れる）。基準は「新セッションが知っておくべきか」。</span>
+        </li>
+        <li>
+          <strong><a href="site-map.html">Site Map</a> に追記されている</strong>
+          <span class="why">→ なぜ：158ページの全件索引は Site Map のみ。新規追加時は必ずここに登録。</span>
+        </li>
+        <li>
+          <strong>関連ページ（最低 2-3 ページ）への横リンクがある</strong>
+          <span class="why">→ なぜ：単独のページは孤立して死ぬ。意味的に近いページに相互リンクを張ることで生態系を作る。</span>
+        </li>
+      </ul>
+    </div>
+
+    <div class="panel">
+      <h2>4. スタイル準拠 <span class="level-badge level-should">SHOULD</span></h2>
+      <ul class="check-list">
+        <li>
+          <strong>カラーパレットを逸脱していない</strong>（<a href="style-guide.html#palette">スタイルガイド §3</a>）
+          <span class="why">→ なぜ：別系統の色を持ち込むと、ハブ全体の視覚的統一感が崩れる。</span>
+        </li>
+        <li>
+          <strong>テンプレート（Light / Rich）どちらかに準拠</strong>
+          <span class="example">Light = foundations/strategy/logs / Rich = research/ の長文</span>
+          <span class="why">→ なぜ：独自 CSS を毎回書くと差分が増え、後の一括変更が困難になる。</span>
+        </li>
+        <li>
+          <strong>見出し階層を飛ばしていない</strong>（h2 → h4 のような飛び級なし）
+          <span class="why">→ なぜ：目次の自動生成・スクリーンリーダーの読み上げが壊れる。</span>
+        </li>
+        <li>
+          <strong>バッジ運用ルールに沿っている</strong>（<a href="style-guide.html#badges">スタイルガイド §4</a>）
+          <span class="example">必読 / NEW / LIVE / アーカイブ / PROPOSED</span>
+          <span class="why">→ なぜ：恣意的バッジは読み手の認知負荷を上げる。</span>
+        </li>
+        <li>
+          <strong>日付書式が <code>YYYY-MM-DD</code> で統一</strong>
+          <span class="why">→ なぜ：ソート・grep・自動処理の標準化。</span>
+        </li>
+      </ul>
+    </div>
+
+    <div class="panel">
+      <h2>5. カテゴリ別の追加要件</h2>
+
+      <h3>LLM トラッカー（claude-recent-updates / chatgpt-recent-updates / gemini-recent-updates） <span class="level-badge level-must">MUST</span></h3>
+      <ul class="check-list">
+        <li>
+          <strong>3社で同じ粒度・構造を保つ</strong>（hero / stats / 重要タイムライン / diary / sources）
+          <span class="why">→ なぜ：LLM Updates Hub の差別化軸が「横並列比較」。1社だけ厚い/薄いとハブ全体の意義が薄れる。</span>
+        </li>
+        <li><strong>last-update が3社で同期している</strong>（同じカバー範囲）</li>
+        <li><strong>4タイル stats が現状の主要指標を反映している</strong></li>
+      </ul>
+
+      <h3>Industry Trends（trend-*） <span class="level-badge level-must">MUST</span></h3>
+      <ul class="check-list">
+        <li>
+          <strong>テーマがベンダー横断である</strong>（単一ベンダーで完結する話は LLM トラッカー側に書く）
+          <span class="why">→ なぜ：ADR-003 で定めた棲み分け。重複コンテンツを防ぐ。</span>
+        </li>
+        <li><strong>4本以上の独立した1次/2次ソースを引いている</strong></li>
+        <li><strong>「次の更新タイミング」が末尾に明記されている</strong>（例: 10月 IPO 実施後）</li>
+      </ul>
+
+      <h3>foundations/* の参照ドキュメント <span class="level-badge level-must">MUST</span></h3>
+      <ul class="check-list">
+        <li><strong>運用判断の根拠が明記されている</strong>（「なぜ」までセットで書く）</li>
+        <li><strong>陳腐化条件が明記されている</strong>（いつ・何で古くなるか）</li>
+      </ul>
+
+      <h3>logs/* のダッシュボード <span class="level-badge level-must">MUST</span></h3>
+      <ul class="check-list">
+        <li><strong>計測時点が明記されている</strong></li>
+        <li><strong>再計測手順が記載されている</strong>（スクリプトや手順）</li>
+      </ul>
+
+      <h3>ADR（decisions.html 内のエントリ） <span class="level-badge level-must">MUST</span></h3>
+      <ul class="check-list">
+        <li><strong>Context / Decision / Consequences の3要素が揃っている</strong></li>
+        <li><strong>ステータス（ACCEPTED / SUPERSEDED / PROPOSED）が明記されている</strong></li>
+        <li><strong>連番（ADR-NNN）がユニーク</strong></li>
+      </ul>
+    </div>
+
+    <div class="panel">
+      <h2>6. 検証手順</h2>
+      <p>ページを「完成」と判定する前のチェック手順。</p>
+      <pre># 1. 構造チェック
+grep -c "&lt;h1&gt;" your-page.html             # 1 であることを確認
+grep "最終更新\|last-update" your-page.html  # 最終更新日があるか
+
+# 2. リンクチェック（外部 URL）
+# WebSearch / WebFetch で各 URL を実在確認
+# 確認できないものはテキスト出典に置換
+
+# 3. 内部リンクチェック
+# 相対パスで張ったリンク先が存在するか
+grep -oE 'href="[^"]+\.html"' your-page.html
+
+# 4. 親 index からの導線確認
+grep "your-page.html" parent/index.html
+
+# 5. Site Map への登録確認
+grep "your-page" foundations/site-map.html</pre>
+    </div>
+
+    <div class="panel">
+      <h2>7. 「完成」と「公開」の違い</h2>
+      <p>このハブでは Pull Request レビューや承認フローを使わず、main 直接 commit が中心です。そのため<strong>「完成」 = 「公開」</strong>に近い。だからこそ Definition of Done の遵守が重要。</p>
+      <table>
+        <thead><tr><th>状態</th><th>条件</th><th>記録先</th></tr></thead>
+        <tbody>
+          <tr><td>WIP（作業中）</td><td>MUST 要件未達</td><td>git ステージ前 / フィーチャーブランチ</td></tr>
+          <tr><td>完成</td><td>MUST 全件クリア</td><td>main へ commit & push</td></tr>
+          <tr><td>洗練済み</td><td>MUST + SHOULD クリア</td><td>同上 + Hub Health で OK 判定</td></tr>
+          <tr><td>陳腐化</td><td>last-update から一定日数経過</td><td>Hub Health で WARN / ALERT 表示</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel">
+      <h2>8. Done 判定のクイックチェック（コピペ用）</h2>
+      <div class="summary-box">
+        <strong>これを書いた直後にコピペして確認:</strong>
+      </div>
+      <pre># 必須（MUST）
+☐ &lt;title&gt; が「ページ名 | カテゴリ名」形式
+☐ breadcrumb が冒頭にある（親 / Hub Top）
+☐ &lt;h1&gt; が 1 回
+☐ 最終更新日が YYYY-MM-DD 形式で記載
+☐ 「関連」セクションが末尾
+☐ HTML が壊れていない
+☐ ページ目的が冒頭で明示
+☐ 外部 URL は実在確認済み
+☐ 推測・未確定は時点修飾あり
+☐ 機密情報なし
+☐ 親 index からリンク済み
+☐ Site Map に追記済み
+☐ 関連ページに横リンク 2-3 本
+
+# 推奨（SHOULD）
+☐ カラーパレット準拠
+☐ Light / Rich テンプレに準拠
+☐ 見出し階層を飛ばしていない
+☐ バッジ運用ルール準拠
+☐ 日付書式 YYYY-MM-DD 統一
+
+# カテゴリ別（該当時のみ）
+☐ LLM トラッカー: 3社同期
+☐ Industry Trends: ベンダー横断テーマ
+☐ ADR: Context/Decision/Consequences
+☐ ダッシュボード: 計測時点と再計測手順</pre>
+    </div>
+
+    <div class="panel">
+      <h2>9. このページ自体の Done</h2>
+      <p>Definition of Done は<strong>常に最新の運用に合わせてアップデート</strong>する必要があります。以下のタイミングでこのページを更新:</p>
+      <ul>
+        <li>新しいカテゴリ別要件が必要になった時</li>
+        <li>失敗事例（anti-patterns）から学んだ要件を反映する時</li>
+        <li>四半期に1回、棚卸し</li>
+        <li>カラーパレット・命名規約等のスタイル変更があった時</li>
+      </ul>
+    </div>
+
+    <div class="panel">
+      <h2>関連</h2>
+      <ul>
+        <li><a href="page-template.html">Page Template</a> — 新規ページの boilerplate</li>
+        <li><a href="style-guide.html">Style Guide</a> — 文体・色・命名の統一ルール</li>
+        <li><a href="anti-patterns.html">アンチパターン集</a> — Done 判定漏れの過去事例（AP-001 / AP-004 / AP-005）</li>
+        <li><a href="decisions.html">決定ログ (ADR)</a> — 構造変更時の判断記録</li>
+        <li><a href="site-map.html">Site Map</a> — 全ページ索引</li>
+        <li><a href="../logs/hub-health.html">Hub Health Dashboard</a> — 完成後の鮮度監視</li>
+        <li><a href="../strategy/risk-register.html">Risk Register</a> — Done 漏れがリスクに直結する箇所</li>
+      </ul>
+    </div>
+
+  </div>
+</body>
+</html>

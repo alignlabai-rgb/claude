@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2026 Q2 四半期レビュー | Logs</title>
+  <style>
+    body { font-family: "Segoe UI", "Noto Sans JP", system-ui, sans-serif; margin: 0; background: #0b1220; color: #edf2fb; line-height: 1.7; padding: 28px 18px 48px; }
+    .shell { max-width: 1080px; margin: 0 auto; display: grid; gap: 18px; }
+    .panel { background: #111a2b; border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 24px 26px; }
+    a { color: #75d7c0; }
+    h1, h2, h3 { margin: 0 0 10px; }
+    p, li { color: #c5d0e3; }
+    .summary-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+      margin: 10px 0;
+    }
+    .summary-card {
+      background: rgba(102,224,194,0.06);
+      border: 1px solid rgba(102,224,194,0.2);
+      border-radius: 12px;
+      padding: 14px;
+    }
+    .summary-card .label { color: #7f92ac; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    .summary-card .value { color: #3dd8c5; font-size: 1.6rem; font-weight: 800; margin-top: 4px; }
+    .summary-card .detail { color: #c5d0e3; font-size: 0.82rem; margin-top: 4px; }
+    h2.section { border-bottom: 2px solid rgba(244,184,96,0.3); padding-bottom: 6px; color: #f4b860; margin: 22px 0 14px; }
+    .achievement, .miss, .lesson, .next {
+      border-left: 3px solid;
+      padding: 4px 0 4px 16px;
+      margin: 12px 0;
+    }
+    .achievement { border-left-color: #4FFFB0; }
+    .miss { border-left-color: #ff7070; }
+    .lesson { border-left-color: #fcd34d; }
+    .next { border-left-color: #d8b4fe; }
+    .achievement h3 { color: #4FFFB0; font-size: 0.96rem; }
+    .miss h3 { color: #ff7070; font-size: 0.96rem; }
+    .lesson h3 { color: #fcd34d; font-size: 0.96rem; }
+    .next h3 { color: #d8b4fe; font-size: 0.96rem; }
+    .achievement p, .miss p, .lesson p, .next p { font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="panel">
+      <p><a href="index.html">← Logs</a> / <a href="../index.html">Hub Top</a></p>
+      <h1>2026 Q2 四半期レビュー</h1>
+      <p>期間: <strong>2026年4月〜6月</strong>（6月は途中。本レビューは 5/26 時点での中間総括）</p>
+      <p>このリポジトリ（Claude Knowledge Hub）の Q2 における主要な進捗・課題・学び・次四半期方針を整理した記録です。</p>
+    </div>
+
+    <div class="panel">
+      <h2 class="section">Q2 数値サマリー</h2>
+      <div class="summary-row">
+        <div class="summary-card">
+          <div class="label">新規ページ</div>
+          <div class="value">~30+</div>
+          <div class="detail">LLM トラッカー2本・Trend 長文6本・ハブ運用6本・demos/index・industry-trends ほか</div>
+        </div>
+        <div class="summary-card">
+          <div class="label">追加行数</div>
+          <div class="value">~10,000+</div>
+          <div class="detail">Q1 末比で 1.2 倍前後の規模に拡張</div>
+        </div>
+        <div class="summary-card">
+          <div class="label">ADR 記録数</div>
+          <div class="value">8</div>
+          <div class="detail">構造変更の理由を全件文書化</div>
+        </div>
+        <div class="summary-card">
+          <div class="label">AI News 日次</div>
+          <div class="value">21日</div>
+          <div class="detail">5/6 開始、連続運用継続中</div>
+        </div>
+        <div class="summary-card">
+          <div class="label">LLM 並走</div>
+          <div class="value">3社</div>
+          <div class="detail">Claude / ChatGPT / Gemini 同期更新運用</div>
+        </div>
+        <div class="summary-card">
+          <div class="label">廃止/整理</div>
+          <div class="value">2バナー</div>
+          <div class="detail">4/17 MAデモ・第2回 Codex比較 終了に伴う整理</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2 class="section">🟢 達成した主要事項（Achievements）</h2>
+
+      <div class="achievement">
+        <h3>LLM 横並列追跡の枠組み確立</h3>
+        <p>Claude 単独だった LLM アップデート追跡を ChatGPT / Gemini に拡張。3 社を同じ粒度で並走更新する運用が成立した。トップに <strong>LLM Updates Hub</strong> として常設化。</p>
+      </div>
+
+      <div class="achievement">
+        <h3>Industry Trends カテゴリの新設と6記事一括立ち上げ</h3>
+        <p>個別ベンダー追跡では断片化していた「ベンダー横断トピック」を、Industry Trends として独立カテゴリ化。trend-ipo-race / trend-big-four / trend-talent-shift / trend-ai-ethics / trend-power-race / trend-mcp-ecosystem の<strong>6本同時立ち上げ（計 3,021行）</strong>を達成。</p>
+      </div>
+
+      <div class="achievement">
+        <h3>3 カテゴリ構造への再編とトップページの可視整理</h3>
+        <p>横並びだった 8 カードを「制作・技術コア / ナレッジ・資料 / ハブ運用」の 3 カテゴリに再編。Creator System を spotlight 化して<strong>主軸領域を明示</strong>。バナー2本も削除し、トップが整理された。</p>
+      </div>
+
+      <div class="achievement">
+        <h3>ハブ運用カテゴリの強化（運用に耐える状態へ）</h3>
+        <p>薄かった Foundations / Strategy / Logs を 5/26 集中強化：</p>
+        <ul>
+          <li>foundations/glossary.html（用語集）</li>
+          <li>foundations/decisions.html（ADR 8件記録）</li>
+          <li>foundations/anti-patterns.html（失敗6件・救済4件）</li>
+          <li>strategy/capability-evolution.html（時系列能力進化）</li>
+          <li>logs/hub-health.html（Health ダッシュボード）</li>
+          <li>logs/2026-q2-review.html（このページ）</li>
+        </ul>
+      </div>
+
+      <div class="achievement">
+        <h3>並走作業耐性のあるワークフロー</h3>
+        <p>Industry Trends 6記事は本セッション中に並走で完成（ADR-008）。<code>git fetch</code> → <code>git pull</code> → 確認のフローで衝突を回避できる運用が確立。<code>claude/laughing-cannon-*</code> 系の並走ブランチが複数走る前提の体制に。</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2 class="section">🔴 ミス・課題（Misses）</h2>
+
+      <div class="miss">
+        <h3>主軸宣言した Creator System の更新が止まっている</h3>
+        <p>「今後力を入れていく」と宣言し spotlight 表示まで実装したのに、配下ファイルは 45.6日前から更新されていない（4/10 前後）。<strong>表示と実体が乖離</strong>している状態。Q3 で最優先課題。</p>
+      </div>
+
+      <div class="miss">
+        <h3>Claw Stack 全ファイルが古い</h3>
+        <p>5/24 の OpenClaw 再解禁という重要な動きが反映されていない。<code>claw-stack/openclaw/index.html</code> は 33 行のスタブ状態。</p>
+      </div>
+
+      <div class="miss">
+        <h3>Session log が 4/6 以降書かれていない</h3>
+        <p>7週間分の活動記録が無く、Q2 後半に何があったかは git log を辿るしかない状態。ADR で意図は残せたが、時系列の手順記録は別途必要だった。</p>
+      </div>
+
+      <div class="miss">
+        <h3>推測 URL を実 URL のように書いた件（AP-002）</h3>
+        <p>claude-recent-updates の Source リスト 10件以上が架空 URL だった。後で WebSearch 裏取りで修正したが、初期段階で発生させてはいけないミス。<a href="../foundations/anti-patterns.html#AP-002">アンチパターン集</a>に記録済み。</p>
+      </div>
+
+      <div class="miss">
+        <h3>カテゴリ再編時の重複削除漏れ</h3>
+        <p>LLM Updates Hub 新設時に Research 内の Claude 重複カードを削除し忘れ（AP-005）。ユーザー指摘で発覚。「足したら同等のものを引く」運用ルールを確立。</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2 class="section">🟡 学び（Lessons）</h2>
+
+      <div class="lesson">
+        <h3>大規模変更前に「選択肢提示 → ユーザー確認」を挟むと事故が減る</h3>
+        <p>カテゴリ再編・demos リネーム検討で A/B/C 提示形式を導入。demos の物理リネームを<strong>「見送る」</strong>判断ができた（ADR-005）。即実行していたら大量のリンク切れ。</p>
+      </div>
+
+      <div class="lesson">
+        <h3>並走前提のワークフローが現実</h3>
+        <p>Industry Trends 6本が並走セッションで完成したのは予想外の好結果。今後は<strong>1人で全部書く前提を捨てる</strong>。タスク粒度を小さく切って並走可能にすることが効率を上げる。</p>
+      </div>
+
+      <div class="lesson">
+        <h3>カテゴリラベルと物理パスを分離すると変更コストが下がる</h3>
+        <p>ADR-004（Workbench 分割）・ADR-005（demos 見送り）はいずれも「<strong>物理は変えず、ラベルだけ変える</strong>」アプローチ。リンク切れリスクを排除しつつ意味を更新できる。</p>
+      </div>
+
+      <div class="lesson">
+        <h3>ADR は書くコスト < 後で読み返す価値</h3>
+        <p>1件あたり5-15分で書けるが、3ヶ月後に「なぜそうした？」を再構成するコストはその10倍以上。<strong>その場で書いてしまう</strong>のが最適。</p>
+      </div>
+
+      <div class="lesson">
+        <h3>「最終更新」の同期更新は機械的にやる</h3>
+        <p>ヒーロー部 last-update / footer date / 関連リスト等が分散していると同期漏れが起きる。編集前に <code>grep "最終更新\|last-update"</code> で全箇所確認することで AP-001 を防げる。</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2 class="section">🟣 Q3 方針（Next）</h2>
+
+      <div class="next">
+        <h3>1. Creator System の本格深化（最優先）</h3>
+        <p>主軸宣言と実態の乖離を解消する。動画パイプライン・漫画パイプライン・評価/マネタイズの実装状況を反映し、KPI ダッシュボードを新設。</p>
+      </div>
+
+      <div class="next">
+        <h3>2. Claw Stack 全面更新</h3>
+        <p>OpenClaw 再解禁（5/24）を反映。PicoClaw / NanoClaw / OpenClaw / Hermes Agent の関係整理。</p>
+      </div>
+
+      <div class="next">
+        <h3>3. Industry Trends の月次更新リズム化</h3>
+        <p>現状は単発記事の集合。月末に各記事の<strong>数値・最新動向を棚卸し</strong>する運用に。「10月 IPO 実施後」「Big Four の追加動き」「Power Race の新規契約」などタイムリーに更新。</p>
+      </div>
+
+      <div class="next">
+        <h3>4. Session log 運用の復活</h3>
+        <p>大規模変更時にはセッションログを書く運用に戻す。ADR は「決断」、セッションログは「<strong>時系列の手順</strong>」を残す役割分担に。</p>
+      </div>
+
+      <div class="next">
+        <h3>5. Hub Health の半自動化</h3>
+        <p>四半期ごとに手動再計測している hub-health を、Python スクリプト → GitHub Actions で半自動化。週次で数値だけ更新。</p>
+      </div>
+
+      <div class="next">
+        <h3>6. ALIGN_Lab 本体との接続再整理</h3>
+        <p><code>foundations/align-lab-context.html</code> を Q1 ベースから Q2 末時点に更新。LLM Hub・Industry Trends の存在を ALIGN_Lab 側でも認知してもらう。</p>
+      </div>
+
+      <div class="next">
+        <h3>7. AI 上場実施後の追跡準備</h3>
+        <p>Anthropic / OpenAI の 10月 IPO 観測に備え、trend-ipo-race を Q3 末から更新シーケンスに入れる。IPO 後の市場反応・財務開示の追跡計画を整備。</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2 class="section">関連ページ</h2>
+      <ul>
+        <li><a href="hub-health.html">Hub Health Dashboard</a></li>
+        <li><a href="../foundations/decisions.html">決定ログ（ADR）</a></li>
+        <li><a href="../foundations/anti-patterns.html">アンチパターン集</a></li>
+        <li><a href="../strategy/capability-evolution.html">Capability Evolution</a></li>
+        <li><a href="../strategy/roadmap.html">ロードマップ</a></li>
+        <li><a href="next-actions.html">Next Actions</a></li>
+      </ul>
+    </div>
+
+  </div>
+</body>
+</html>

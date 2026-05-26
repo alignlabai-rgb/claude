@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>用語集 | Foundations</title>
+  <style>
+    body { font-family: "Segoe UI", "Noto Sans JP", system-ui, sans-serif; margin: 0; background: #0b1220; color: #edf2fb; line-height: 1.75; padding: 28px 18px 48px; }
+    .shell { max-width: 1080px; margin: 0 auto; display: grid; gap: 18px; }
+    .panel { background: #111a2b; border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 26px; }
+    a { color: #75d7c0; }
+    h1, h2, h3 { margin: 0 0 10px; }
+    p, li { color: #c5d0e3; }
+    .toc { display: flex; flex-wrap: wrap; gap: 8px; }
+    .toc a {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(61,216,197,0.08);
+      border: 1px solid rgba(61,216,197,0.18);
+      color: #75d7c0;
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .toc a:hover { background: rgba(61,216,197,0.16); }
+    .term-group { margin: 22px 0; }
+    .term-group h2 {
+      font-size: 1.1rem;
+      color: #f4b860;
+      border-bottom: 2px solid rgba(244,184,96,0.3);
+      padding-bottom: 6px;
+      margin-bottom: 14px;
+    }
+    .term {
+      border-left: 3px solid #3dd8c5;
+      padding: 4px 0 4px 16px;
+      margin: 14px 0;
+    }
+    .term .name {
+      color: #edf2fb;
+      font-size: 1.02rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .term .aka {
+      color: #7f92ac;
+      font-size: 0.82rem;
+      margin-left: 8px;
+      font-weight: normal;
+    }
+    .term p {
+      margin: 4px 0;
+      font-size: 0.92rem;
+    }
+    .term .links {
+      font-size: 0.82rem;
+      color: #7f92ac;
+      margin-top: 6px;
+    }
+    .term .links a { font-size: 0.84rem; }
+    code {
+      font-family: "Fira Code", "Consolas", monospace;
+      background: rgba(255,255,255,0.06);
+      padding: 1px 6px;
+      border-radius: 5px;
+      font-size: 0.86em;
+      color: #a5f3d0;
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="panel">
+      <p><a href="index.html">← Foundations</a> / <a href="../index.html">Hub Top</a></p>
+      <h1>用語集（Glossary）</h1>
+      <p>このハブ内で頻出する固有用語と略語を、<strong>初めての人・新しい Claude / Codex セッション</strong>が一覧で押さえられるようにまとめたページです。各語に1-3段落の説明と関連ページへのリンクを付けています。</p>
+      <p><strong>編集方針:</strong> ベンダー外部用語（GPT-5 / Gemini 3 等の世間でも通る名前）は割愛し、<strong>ハブ内の議論で意味が固まる用語</strong>を優先します。</p>
+    </div>
+
+    <div class="panel">
+      <h2>カテゴリ早見</h2>
+      <div class="toc">
+        <a href="#stack">Claw Stack 系</a>
+        <a href="#anthropic">Claude / Anthropic 製品</a>
+        <a href="#openai">OpenAI 製品</a>
+        <a href="#google">Google / Gemini 製品</a>
+        <a href="#protocol">プロトコル・標準</a>
+        <a href="#hub">ハブ運用</a>
+        <a href="#business">事業・市場</a>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="term-group" id="stack">
+        <h2>Claw Stack 系</h2>
+
+        <div class="term">
+          <div class="name">Claw Stack</div>
+          <p>本ハブで「Claude を中心に運用するエージェント基盤群」を総称する造語。Claude / PicoClaw / NanoClaw / OpenClaw を1つのスタックとして比較・選択するための枠組み。</p>
+          <p class="links">→ <a href="../claw-stack/index.html">Claw Stack</a> / <a href="../claw-stack/comparison.html">比較表</a></p>
+        </div>
+
+        <div class="term">
+          <div class="name">PicoClaw / NanoClaw</div>
+          <p>軽量エージェント基盤の実験名。PicoClaw は最小構成、NanoClaw は中規模実験用。Claude Code や OpenClaw との組み合わせで使う。</p>
+          <p class="links">→ <a href="../claw-stack/picoclaw/">PicoClaw</a> / <a href="../claw-stack/nanoclaw/">NanoClaw</a></p>
+        </div>
+
+        <div class="term">
+          <div class="name">OpenClaw</div>
+          <p>サードパーティ CLI ハーネスのひとつ。Anthropic は2026/04/04 にサブスクリプション枠での利用を禁止したが、5/24 に方針撤回し再解禁。OpenClaw 形式の Claude CLI 利用がサブスクリプション枠内で再び許可された。</p>
+          <p class="links">→ <a href="../claw-stack/openclaw/">OpenClaw 詳細</a> / <a href="../workbench/knowledge/openclaw.html">使い方</a></p>
+        </div>
+
+        <div class="term">
+          <div class="name">Hermes Agent</div>
+          <p>もう一つのサードパーティ CLI ハーネス。<code>hermes.md</code> を読むだけで課金される問題が Hacker News で拡散し、OpenClaw とともに5/24に利用解禁された経緯がある。</p>
+          <p class="links">→ <a href="../workbench/knowledge/hermes-agent.html">Hermes Agent 詳細</a></p>
+        </div>
+      </div>
+
+      <div class="term-group" id="anthropic">
+        <h2>Claude / Anthropic 製品</h2>
+
+        <div class="term">
+          <div class="name">Claude Code</div>
+          <p>Anthropic 純正の CLI エージェント。実装支援＋レビュー＋長時間運転＋権限制御を含むエージェント基盤。2026年5月時点で v2.1.147（5/22リリース、Ctrl+T ピン留めバックグラウンドセッション搭載）。</p>
+          <p class="links">→ <a href="../workbench/knowledge/claude-code.html">Claude Code 詳細</a> / <a href="../workbench/knowledge/claude-code/">操作ガイド</a></p>
+        </div>
+
+        <div class="term">
+          <div class="name">Cowork</div>
+          <p>Claude Desktop 上で動く知識ワーク自動化エージェント。2026/04/09 に GA。「試す機能」から「組織で運用を考える機能」へ。Analytics API・OpenTelemetry・Enterprise role-based permissions 対応。</p>
+        </div>
+
+        <div class="term">
+          <div class="name">Managed Agents</div>
+          <p>Claude のクラウドホスト型エージェント基盤。dreaming / multiagent orchestration / Memory / Self-hosted sandboxes / MCP tunnels / outcomes / webhooks 等の機能を持つ。</p>
+        </div>
+
+        <div class="term">
+          <div class="name">Mythos / Mythos Preview</div>
+          <p>2026/05/06 に Code with Claude SF で公開された新モデルクラス。自律的脆弱性発見能力が突出（FreeBSD 17年前 RCE・OpenBSD 27年前脆弱性発見）。Project Glasswing と Claude Security を同時発表。</p>
+        </div>
+
+        <div class="term">
+          <div class="name">Project Glasswing</div>
+          <p>Mythos 公開と同時に発表された協調的脆弱性修正プログラム。Apple・Google・Microsoft・Linux Foundation・AWS・NVIDIA など約48組織に優先アクセスを付与。</p>
+        </div>
+
+        <div class="term">
+          <div class="name">Claude Design</div>
+          <p>2026/04/17 に Research Preview で公開された Anthropic Labs プロダクト。デザイン・プロトタイプ・スライド・ワンペーパー作成。PDF / PPTX / HTML / Canva 出力対応。</p>
+        </div>
+
+        <div class="term">
+          <div class="name">Memory（Claude Managed Agents）</div>
+          <p>2026/05/19 Code with Claude London で public beta 公開。<strong>セッションをまたいだファイルベース記憶</strong>。dreaming（過去セッション振り返り）と組み合わせてエージェントの自己改善を実現。</p>
+        </div>
+
+        <div class="term">
+          <div class="name">Self-hosted Sandboxes / MCP tunnels</div>
+          <p>機密ファイル・社内サービスを<strong>自社インフラ内に置きつつ</strong>、エージェントのオーケストレーションは Anthropic 側で実行するハイブリッド構成（self-hosted sandboxes）と、外部 MCP サーバーへのセキュアトンネル（MCP tunnels）。5/19 公開。</p>
+        </div>
+
+        <div class="term">
+          <div class="name">Claude Routines</div>
+          <p>Claude 周辺の定型作業を自動化する仕組み。`_routines/` ディレクトリ配下に置く運用パターン。</p>
+          <p class="links">→ <a href="../demos/routines-deep-dive.html">Routines Deep Dive</a></p>
+        </div>
+      </div>
+
+      <div class="term-group" id="openai">
+        <h2>OpenAI 製品</h2>
+
+        <div class="term">
+          <div class="name">Codex</div>
+          <p>OpenAI のコーディング・万能エージェント。2026年に「コーディング限定」から<strong>「ほぼすべてのタスク対応」</strong>に拡張。WAU 4M 超、Cerebras 上で 1000 token/秒の Codex-Spark も登場。</p>
+          <p class="links">→ <a href="../workbench/knowledge/openai-codex.html">Codex 詳細</a> / <a href="../research/chatgpt-recent-updates.html">ChatGPT 最新アップデート</a></p>
+        </div>
+
+        <div class="term">
+          <div class="name">Workspace Agents <span class="aka">（旧 Custom GPT）</span></div>
+          <p>2026/04/22 公開。Codex を中核に置く<strong>組織共有エージェント</strong>。Slack / Salesforce など主要 SaaS にプラグイン可能。5/6 無料期間終了 → クレジット課金制へ移行。Claude Managed Agents への正面回答。</p>
+        </div>
+
+        <div class="term">
+          <div class="name">ChatGPT Atlas</div>
+          <p>2025/10/21 公開の AI ブラウザ（Chromium ベース、macOS）。サイドバーアシスタント、ブラウザメモリ、有償ユーザーの Agent Mode を搭載。2026/03 に ChatGPT / Codex とのデスクトップアプリ統合方針を発表。</p>
+        </div>
+
+        <div class="term">
+          <div class="name">Frontier プラットフォーム</div>
+          <p>2026/02 発表。共有ビジネスコンテキスト・実行環境・評価・パーミッションを<strong>企業が一元管理</strong>できるエンタープライズ AI コワーカー基盤。Workspace Agents（4月）と Codex Cloud Agents の前提となる戦略的プラットフォーム。</p>
+        </div>
+
+        <div class="term">
+          <div class="name">GPT-5.4 / 5.5 / 5.5 Instant</div>
+          <p>2026年に月次ペースでリリースされた OpenAI フラッグシップ系列。5.4（3/5, 1M context・75% Computer Use）・5.5（4/23, エージェント型コーディング強化）・5.5 Instant（5/5 全展開, ハルシネ52.5%減）。</p>
+        </div>
+      </div>
+
+      <div class="term-group" id="google">
+        <h2>Google / Gemini 製品</h2>
+
+        <div class="term">
+          <div class="name">Gemini 3 / 3.5 系列</div>
+          <p>2025/11/18 Gemini 3 Pro 公開（Elo 1501・GPQA 91.9%）→ 12/18 Gemini 3 Flash → 1〜2月 Deep Think → 3〜4月 Flash グローバル展開 → 5/5 3.2 Flash → 5/19 Gemini 3.5（I/O 2026 で発表、競合の 4 倍速）。</p>
+          <p class="links">→ <a href="../research/gemini-recent-updates.html">Gemini 最新アップデート</a></p>
+        </div>
+
+        <div class="term">
+          <div class="name">Gemini Omni / Omni Flash</div>
+          <p>テキスト・画像・動画プロンプトを<strong>シネマティック動画</strong>に変換するマルチモーダル生成統合モデル。I/O 2026（5/19）で公開。</p>
+        </div>
+
+        <div class="term">
+          <div class="name">Gemini Spark</div>
+          <p>2026/05/19 I/O 公開の <strong>24時間動く personal AI agent</strong>。Gmail / Docs / Slides にディープ統合し、Daily Brief などの「先回り型」動作を担う。Google AI Ultra 向けベータ展開中（Gemini 3.5 Flash で動作）。</p>
+        </div>
+
+        <div class="term">
+          <div class="name">Antigravity / Antigravity 2.0</div>
+          <p>Google のエージェント開発基盤。Antigravity 2.0（I/O 2026 公開）は<strong>Desktop IDE + CLI + SDK + Managed Agents (Gemini API) + Enterprise Agent Platform</strong> の5構成。<strong>Gemini CLI から Antigravity CLI へリブランド</strong>。</p>
+          <p class="links">→ <a href="../workbench/knowledge/anti-gravity.html">Antigravity 詳細</a></p>
+        </div>
+
+        <div class="term">
+          <div class="name">Gemma 4</div>
+          <p>2026/05/20 公開のオープンウェイト系列。Effective 2B / 4B（端末向け）・26B MoE（高スループット）・31B Dense（高精度）の4構成。<strong>Apache 2.0 ライセンス</strong>。</p>
+        </div>
+
+        <div class="term">
+          <div class="name">Aluminum OS</div>
+          <p>2026/05/19 I/O で初公開された新 OS。Android XR スマートグラスとの組み合わせで、Gemini を OS レベルで統合する戦略の核。</p>
+        </div>
+      </div>
+
+      <div class="term-group" id="protocol">
+        <h2>プロトコル・標準</h2>
+
+        <div class="term">
+          <div class="name">MCP <span class="aka">（Model Context Protocol）</span></div>
+          <p>Anthropic が策定し業界標準化が進むエージェント・外部サービス連携プロトコル。2026/05 時点で<strong>レジストリのサーバー登録 9,000+、月間ダウンロード 9,700万超</strong>。Claude / ChatGPT / Gemini ほぼ全てがネイティブ対応。一方で MCP RCE 脆弱性も実証開示（5/18, OX Security）。</p>
+        </div>
+
+        <div class="term">
+          <div class="name">MCP Connector</div>
+          <p>MCP 経由で Claude / Gemini / その他クライアントから外部 SaaS にアクセスするためのアダプタ群。コンシューマーアプリ向け（Uber・Spotify・Instacart・Booking.com 等 200+）と業務向け（Salesforce・Box・Docusign・Thomson Reuters 等）に分かれる。</p>
+        </div>
+
+        <div class="term">
+          <div class="name">MCP Tunnel</div>
+          <p>外部 MCP サーバーへのセキュアトンネル接続。<strong>パブリックインターネットを介さず社内システムへ到達</strong>。Claude Managed Agents で 2026/05/19 から research preview。</p>
+        </div>
+
+        <div class="term">
+          <div class="name">ADR <span class="aka">（Architecture Decision Record）</span></div>
+          <p>「なぜそう決めたか」を残す決定記録のフォーマット。本ハブでは <a href="decisions.html">decisions.html</a> で軽量 ADR を採用している。</p>
+        </div>
+      </div>
+
+      <div class="term-group" id="hub">
+        <h2>ハブ運用</h2>
+
+        <div class="term">
+          <div class="name">LLM Updates Hub</div>
+          <p>トップページ上段の「Claude / ChatGPT / Gemini それぞれの最新アップデートを同じ粒度で追えるトラッカー群」。Daily News Hub と並列で配置。</p>
+        </div>
+
+        <div class="term">
+          <div class="name">Daily News Hub</div>
+          <p>トップ最上段の「毎日の AI ニュース入口」。3 つの日次ニュースサイト（本ハブ ai-news / X Tech News / GrokPulse）への入口。</p>
+          <p class="links">→ <a href="../research/ai-news/">AI News 日次アーカイブ</a></p>
+        </div>
+
+        <div class="term">
+          <div class="name">Industry Trends</div>
+          <p>ベンダー横断でしか書けない構造的トピック（上場・Big Four・人材・規制・電力・MCP エコシステム）の長文記事を集約する場所。2026/05 にカテゴリ再編で新設。</p>
+          <p class="links">→ <a href="../research/industry-trends.html">Industry Trends</a></p>
+        </div>
+
+        <div class="term">
+          <div class="name">3カテゴリ構造</div>
+          <p>本ハブのトップ index.html におけるカード配置の論理構造。「制作・技術コア」「ナレッジ・資料」「ハブ運用」の 3 カテゴリにカードをグルーピング。Creator System は spotlight 扱い。</p>
+          <p class="links">→ <a href="decisions.html#category-restructure">カテゴリ再編の決定</a></p>
+        </div>
+
+        <div class="term">
+          <div class="name">Spotlight Card</div>
+          <p>カードグリッドの全幅を占有する強調表示のカード。Creator System のように<strong>力を入れる主軸領域</strong>に使う。</p>
+        </div>
+      </div>
+
+      <div class="term-group" id="business">
+        <h2>事業・市場用語</h2>
+
+        <div class="term">
+          <div class="name">AI 上場競争（2026年秋）</div>
+          <p>Anthropic（$30B 調達中 / $900B 評価額・10月 IPO 観測）と OpenAI（5/22 SEC 秘密 IPO 申請・$852B〜$1T 規模）がほぼ同時期に上場準備を進めている市場状況。</p>
+          <p class="links">→ <a href="../research/trend-ipo-race.html">2026年秋の AI 上場競争</a></p>
+        </div>
+
+        <div class="term">
+          <div class="name">Big Four × AI</div>
+          <p>KPMG（Claude 統合 Digital Gateway / 276,000名展開）・PwC（Claude Code / Cowork、30,000名認定）・Deloitte / EY の AI 戦略総称。プロフェッショナルサービスのオペレーションが AI で再定義される時期。</p>
+          <p class="links">→ <a href="../research/trend-big-four.html">Big Four 戦略マップ</a></p>
+        </div>
+
+        <div class="term">
+          <div class="name">Power Race</div>
+          <p>GPU 数では足りず<strong>電力契約</strong>が新しい AI 競争軸になっている状況の総称。Anthropic × SpaceX Colossus 1（300MW・月 $1.25B、2029/5まで）・OpenAI Stargate・xAI Memphis 等。</p>
+          <p class="links">→ <a href="../research/trend-power-race.html">電力で決まる AI 競争</a></p>
+        </div>
+
+        <div class="term">
+          <div class="name">Magnifica Humanitas</div>
+          <p>ローマ教皇レオ14世の初の回勅（2026/05/25 発表）。「AI 時代における人の保護」を主題とし、Anthropic 共同創業者 Christopher Olah が発表会に登壇。カトリック教会として初めて AI 倫理を正式な教義文書として取り上げた。</p>
+          <p class="links">→ <a href="../research/trend-ai-ethics.html">Vatican 回勅と AI 倫理</a></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>メンテナンス方針</h2>
+      <ul>
+        <li>新しいプロダクト・概念が出てきたら、まずこのページに 2-3 行で追加する</li>
+        <li>各語の<strong>初出ページ</strong>へのリンクを必ず付ける</li>
+        <li>陳腐化した用語（例: 旧モデル名）は<strong>削除せず</strong>、「過去用語」セクションに移すか、説明文に「現在は X に置き換え」と注記する</li>
+        <li>用語間の関係（後継関係・対立関係・包含関係）は本文中で明示する</li>
+      </ul>
+    </div>
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>アンチパターン集 | Foundations</title>
+  <style>
+    body { font-family: "Segoe UI", "Noto Sans JP", system-ui, sans-serif; margin: 0; background: #0b1220; color: #edf2fb; line-height: 1.75; padding: 28px 18px 48px; }
+    .shell { max-width: 1080px; margin: 0 auto; display: grid; gap: 18px; }
+    .panel { background: #111a2b; border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 26px; }
+    a { color: #75d7c0; }
+    h1, h2, h3 { margin: 0 0 10px; }
+    p, li { color: #c5d0e3; }
+    .case {
+      background: rgba(255,255,255,0.03);
+      border-radius: 14px;
+      padding: 18px 20px;
+      margin: 16px 0;
+      border-left: 3px solid #ff7070;
+    }
+    .case.recovery { border-left-color: #4FFFB0; }
+    .case h3 {
+      color: #edf2fb;
+      font-size: 1.05rem;
+      margin-bottom: 6px;
+    }
+    .case .meta {
+      font-size: 0.78rem;
+      color: #7f92ac;
+      margin-bottom: 12px;
+      letter-spacing: 0.04em;
+    }
+    .case .meta .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 5px;
+      font-weight: 700;
+      margin-right: 6px;
+    }
+    .tag.bad { background: rgba(255,107,107,0.16); color: #ff7070; }
+    .tag.good { background: rgba(79,255,176,0.16); color: #4FFFB0; }
+    .tag.area { background: rgba(244,184,96,0.16); color: #fcd34d; }
+    .case h4 {
+      font-size: 0.88rem;
+      color: #f4b860;
+      margin: 12px 0 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .case p, .case li { font-size: 0.92rem; }
+    code {
+      font-family: "Fira Code", "Consolas", monospace;
+      background: rgba(255,255,255,0.06);
+      padding: 1px 6px;
+      border-radius: 5px;
+      font-size: 0.86em;
+      color: #a5f3d0;
+    }
+    .principle-box {
+      background: rgba(244,184,96,0.06);
+      border: 1px solid rgba(244,184,96,0.2);
+      border-radius: 12px;
+      padding: 16px 18px;
+      margin: 14px 0;
+    }
+    .principle-box h3 {
+      color: #f4b860;
+      font-size: 1rem;
+      margin-bottom: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="panel">
+      <p><a href="index.html">← Foundations</a> / <a href="../index.html">Hub Top</a></p>
+      <h1>アンチパターン集</h1>
+      <p>Claude / Codex 等のエージェントにこのハブの更新を任せた時に<strong>失敗した例</strong>と、<strong>救った例</strong>を蓄積する場所です。同じ失敗を繰り返さないための知識資産として運用します。</p>
+      <p><strong>編集方針:</strong> 抽象的な「気をつけよう」ではなく、<strong>具体的な事例＋発生条件＋対処</strong>を残す。良い事例（recovery）も同じ重みで記録する。</p>
+    </div>
+
+    <div class="panel">
+      <h2>導き出された原則</h2>
+      <div class="principle-box">
+        <h3>① エージェントは「実在しない情報を実在のように書く」</h3>
+        <p>Web検索の前提条件・URLパターン・人物発言など、<strong>「ありそう」な情報を確信を持って書く</strong>傾向がある。必ずソースリンクを実 URL で残し、後から検証できる状態にする。</p>
+      </div>
+      <div class="principle-box">
+        <h3>② エージェントは「フォルダ構造を勝手に変える」</h3>
+        <p>「整理して」と頼むと、物理リネームをしてしまい既存リンクを破壊する。<strong>カテゴリラベルと物理パスは別物として扱う</strong>方針を明示しないと、リンク切れが大量発生する。</p>
+      </div>
+      <div class="principle-box">
+        <h3>③ エージェントは「過去の更新を上書きしがち」</h3>
+        <p>「最新の状態に」と頼むと、過去の決断やコンテキストを<strong>削除</strong>して書き直してしまう。「追記」「移動」「廃止に注記」を明示しないと履歴が消える。</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>失敗事例（Anti-patterns）</h2>
+
+      <div class="case">
+        <h3>AP-001: 編集前にファイル全体を読まずに古い情報のまま追記</h3>
+        <div class="meta">
+          <span class="tag bad">FAILURE</span>
+          <span class="tag area">claude-recent-updates</span>
+          発生: 過去セッション
+        </div>
+
+        <h4>何が起きたか</h4>
+        <p>claude-recent-updates.html に「最新の」更新を追記する際、既存の「最終更新: 2026-04-XX」表記を見落として、新セクションを足した上で<strong>古いまま放置</strong>してしまった。読者は「最新」と書いてあるのに古い日付が下に残っている混乱状態に。</p>
+
+        <h4>発生条件</h4>
+        <ul>
+          <li>大きなファイル（500行以上）への部分編集</li>
+          <li>ヒーロー部・footer の日付メタ情報を見ずに本文だけ編集</li>
+        </ul>
+
+        <h4>対処</h4>
+        <ul>
+          <li>大きな更新の最初と最後に「<strong>last-update / 最終更新 / footer date</strong>」を grep して全て同期更新する</li>
+          <li>本セッションでは <code>grep -n "最終更新\|last-update" research/claude-recent-updates.html</code> で全箇所を確認してから編集する手順を確立</li>
+        </ul>
+      </div>
+
+      <div class="case">
+        <h3>AP-002: 推測 URL を実 URL のように書く</h3>
+        <div class="meta">
+          <span class="tag bad">FAILURE</span>
+          <span class="tag area">research/* sources</span>
+          発生: 2026-05-25
+        </div>
+
+        <h4>何が起きたか</h4>
+        <p>claude-recent-updates.html のソースリストに <code>anthropic.com/news/claude-for-legal</code> のような<strong>「ありそう」な URL</strong>を実在確認せず記載してしまった。後でWebSearchで裏取りした際、実際の URL が異なるケースが10件以上見つかった。</p>
+
+        <h4>発生条件</h4>
+        <ul>
+          <li>「ソース」セクションを後付けで埋める作業</li>
+          <li>WebFetch / WebSearch を使わずに記憶ベースで URL を生成</li>
+        </ul>
+
+        <h4>対処</h4>
+        <ul>
+          <li>外部 URL を書くときは<strong>必ず WebSearch / WebFetch で実在確認</strong>する</li>
+          <li>確認できない URL は「Source: メディア名（日付）」のみのテキスト形式で書き、リンクは張らない</li>
+          <li>本セッションでは10本の推測 URL を実 URL に差し替え修正済み</li>
+        </ul>
+      </div>
+
+      <div class="case">
+        <h3>AP-003: 日付の混同（announcement vs rollout vs coverage）</h3>
+        <div class="meta">
+          <span class="tag bad">FAILURE</span>
+          <span class="tag area">timeline entries</span>
+          発生: 2026-05-25
+        </div>
+
+        <h4>何が起きたか</h4>
+        <p>Karpathy 入社（実際は 5/19）を 5/20、KPMG 提携（実際は 5/19）を 5/22 と書いた。AI ニュース日次（5/20、5/22 の記事）に出てきた日付をそのままイベント日として扱ったため。</p>
+
+        <h4>発生条件</h4>
+        <ul>
+          <li>二次情報（ニュース記事）の<strong>掲載日</strong>と<strong>実際のイベント日</strong>を混同</li>
+          <li>「Anthropic <strong>announces</strong>」「Bloomberg <strong>reports</strong>」「The Verge <strong>covered</strong>」の使い分けが曖昧</li>
+        </ul>
+
+        <h4>対処</h4>
+        <ul>
+          <li>イベント日と報道日を明示的に書く（「5/19 公開、5/22 報道」など）</li>
+          <li>WebSearch の結果から1次ソース（公式発表・本人 X 投稿）を探す</li>
+          <li>本セッションでは Karpathy@X・KPMG プレスリリースで実日付を確認して修正</li>
+        </ul>
+      </div>
+
+      <div class="case">
+        <h3>AP-004: 旧情報を完全置換してしまう（履歴喪失）</h3>
+        <div class="meta">
+          <span class="tag bad">FAILURE</span>
+          <span class="tag area">claude-recent-updates hero</span>
+          発生: 過去セッション
+        </div>
+
+        <h4>何が起きたか</h4>
+        <p>ヒーロー部のサマリーを「最新の状態に」とお願いした際、以前のサマリー（4月時点の分析）を完全に置換してしまったケース。後で「4月の文脈はどうだったか」を読み返したくなった時、履歴が消えている。</p>
+
+        <h4>発生条件</h4>
+        <ul>
+          <li>「最新の状態にして」というオープンな指示</li>
+          <li>既存テキストの<strong>意図</strong>を理解せずに上書き</li>
+        </ul>
+
+        <h4>対処</h4>
+        <ul>
+          <li>サマリーは<strong>追記方式</strong>にする（「4月の本質は...」「5月の本質は...」と段落を足す）</li>
+          <li>履歴的価値のあるテキストは<strong>削除せず</strong>、必要なら「過去サマリー」セクションを別建てで持つ</li>
+          <li>本セッションでは「4月後半の本質」段落を残したまま「5月の本質」を追記する形に修正</li>
+        </ul>
+      </div>
+
+      <div class="case">
+        <h3>AP-005: 重複コンテンツを放置（同じものが2ヶ所に出る）</h3>
+        <div class="meta">
+          <span class="tag bad">FAILURE</span>
+          <span class="tag area">index.html</span>
+          発生: 2026-05-25
+        </div>
+
+        <h4>何が起きたか</h4>
+        <p>LLM Updates Hub を新設した際、既存の Research カード内にあった「Claude 最新アップデート」を<strong>削除し忘れて、同じリンクが2ヶ所に表示</strong>される状態に。ユーザーから指摘されて初めて気づいた。</p>
+
+        <h4>発生条件</h4>
+        <ul>
+          <li>新コーナーを追加するときに、既存コーナーとの重複を確認しない</li>
+          <li>「足す」ことに集中して「整理する」を忘れる</li>
+        </ul>
+
+        <h4>対処</h4>
+        <ul>
+          <li>新カード・新リンク追加時は、<strong>同じ目的のリンクが他にあるか</strong>を grep で確認する</li>
+          <li>「足したら同等のものを引く」を運用ルール化</li>
+        </ul>
+      </div>
+
+      <div class="case">
+        <h3>AP-006: HTML コメントの取り残し（陳腐化したラベル）</h3>
+        <div class="meta">
+          <span class="tag bad">FAILURE</span>
+          <span class="tag area">claude-recent-updates</span>
+          発生: 2026-05-25
+        </div>
+
+        <h4>何が起きたか</h4>
+        <p>セクションを「新→古」に並べ替えた後、各セクション直前にあった <code>&lt;!-- ===== 2月中旬〜4月中旬 補完追記 ===== --&gt;</code> のような<strong>HTMLコメントだけが古い順のまま残り</strong>、直後のセクション内容と不一致になった。</p>
+
+        <h4>発生条件</h4>
+        <ul>
+          <li>HTML 構造を機械的に並べ替える際、コメントを「内容の一部」とみなさない</li>
+          <li>Python 等の自動化スクリプトでセクション順を変えると、隣接コメントが取り残される</li>
+        </ul>
+
+        <h4>対処</h4>
+        <ul>
+          <li>並べ替え後に <code>grep "&lt;!-- ===="</code> でコメントの位置を確認する</li>
+          <li>陳腐化したセクションコメントは<strong>一律削除</strong>する判断を運用に組み込む</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>救った事例（Recovery patterns）</h2>
+
+      <div class="case recovery">
+        <h3>RP-001: 並走作業のセッション間で git pull を必ず先に行う</h3>
+        <div class="meta">
+          <span class="tag good">RECOVERY</span>
+          <span class="tag area">git workflow</span>
+          確立: 2026-05-26
+        </div>
+
+        <h4>何を救ったか</h4>
+        <p>本セッションで Industry Trends のスタブを作った直後、別セッション（または別エージェント）が長文記事6本（trend-* 計3,021行）を並走で完成させていた。再開時に <code>git pull</code> しないと、自分の作業ブランチで stale な状態で書き続けて<strong>衝突マージ祭り</strong>になる。</p>
+
+        <h4>運用パターン</h4>
+        <ul>
+          <li>セッション再開時は必ず <code>git fetch origin && git status</code> で差分を確認</li>
+          <li>「<strong>behind ahead</strong>」表示を見て、push 前に必ず pull</li>
+          <li>並走作業がある状態を前提とし、楽観的競合を避ける</li>
+        </ul>
+      </div>
+
+      <div class="case recovery">
+        <h3>RP-002: 大きな構造変更前にユーザー確認ステップを挟む</h3>
+        <div class="meta">
+          <span class="tag good">RECOVERY</span>
+          <span class="tag area">workflow</span>
+          確立: 2026-05-25</div>
+
+        <h4>何を救ったか</h4>
+        <p>カテゴリ再編・Research 刷新・demos リネーム検討など、<strong>後から戻すコストが大きい</strong>変更を行う前に、選択肢を A/B/C で提示してユーザーが選ぶ形にした。結果、demos の物理リネームを<strong>「見送る」</strong>判断ができた（ADR-005）。即実行していたら大量のリンク切れになっていた。</p>
+
+        <h4>運用パターン</h4>
+        <ul>
+          <li>カテゴリ構造変更・フォルダ移動・ファイル削除は、<strong>事前に選択肢を提示</strong>して確認</li>
+          <li>「リンク切れ・既存ブランチへの影響」を見積もって伝える</li>
+          <li>「決断を遅延させる選択肢」（リネームせず表記だけ変える等）を必ず含める</li>
+        </ul>
+      </div>
+
+      <div class="case recovery">
+        <h3>RP-003: 二段階の裏取り（既存資産 → 外部ソース）</h3>
+        <div class="meta">
+          <span class="tag good">RECOVERY</span>
+          <span class="tag area">research workflow</span>
+          確立: 2026-05-25
+        </div>
+
+        <h4>何を救ったか</h4>
+        <p>ChatGPT / Gemini ページを書く際、まず <code>research/ai-news/</code> の20日分から既存抽出して下書きし、その後 WebSearch で主要マイルストーンを裏取りした。結果、ai-news に出ていなかった重要事象（GPT-5.5 リリース日・Atlas 公開日・Gemini 3 Pro / Flash 公開日など）も補完できた。</p>
+
+        <h4>運用パターン</h4>
+        <ul>
+          <li>まず既存ハブ内のコンテンツを grep / Python 抽出で集める</li>
+          <li>次に WebSearch で「日付」「定量数値」「URL」を補強</li>
+          <li>二段階の出典で書くと一次/二次ソースが明示できる</li>
+        </ul>
+      </div>
+
+      <div class="case recovery">
+        <h3>RP-004: TaskCreate でステップ可視化</h3>
+        <div class="meta">
+          <span class="tag good">RECOVERY</span>
+          <span class="tag area">execution</span>
+          確立: 2026-05-25
+        </div>
+
+        <h4>何を救ったか</h4>
+        <p>「ChatGPT / Gemini ページ作成 + index 更新 + コーナー追加」の複合タスクで、TaskCreate / TaskUpdate を使って進捗を可視化した。ユーザーが途中でレビューしやすく、終わったタスクと残タスクが明示された。</p>
+
+        <h4>運用パターン</h4>
+        <ul>
+          <li>5ステップ以上ある作業は TaskCreate で全部出してから着手</li>
+          <li>各タスクを <code>in_progress</code> → <code>completed</code> で逐次更新</li>
+          <li>新規発見タスクは即座に TaskCreate で追加（後でまとめてやらない）</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>新規記録テンプレート</h2>
+      <pre style="background: rgba(255,255,255,0.04); padding: 16px; border-radius: 10px; font-size: 0.85rem; color: #c5d0e3; overflow-x: auto;">
+&lt;div class="case"&gt; (or "case recovery" for success cases)
+  &lt;h3&gt;AP-NNN: タイトル&lt;/h3&gt;
+  &lt;div class="meta"&gt;
+    &lt;span class="tag bad"&gt;FAILURE&lt;/span&gt; (or "good" RECOVERY)
+    &lt;span class="tag area"&gt;領域&lt;/span&gt;
+    発生: YYYY-MM-DD
+  &lt;/div&gt;
+  &lt;h4&gt;何が起きたか&lt;/h4&gt; &lt;p&gt;...&lt;/p&gt;
+  &lt;h4&gt;発生条件&lt;/h4&gt; &lt;ul&gt;...&lt;/ul&gt;
+  &lt;h4&gt;対処&lt;/h4&gt; &lt;ul&gt;...&lt;/ul&gt;
+&lt;/div&gt;</pre>
+    </div>
+
+  </div>
+</body>
+</html>

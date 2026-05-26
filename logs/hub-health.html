@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hub Health Dashboard | Logs</title>
+  <style>
+    body { font-family: "Segoe UI", "Noto Sans JP", system-ui, sans-serif; margin: 0; background: #0b1220; color: #edf2fb; line-height: 1.7; padding: 28px 18px 48px; }
+    .shell { max-width: 1100px; margin: 0 auto; display: grid; gap: 18px; }
+    .panel { background: #111a2b; border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 24px 26px; }
+    a { color: #75d7c0; }
+    h1, h2, h3 { margin: 0 0 10px; }
+    p, li { color: #c5d0e3; }
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      margin: 10px 0;
+    }
+    .kpi {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      padding: 14px;
+      text-align: center;
+    }
+    .kpi .value {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #3dd8c5;
+    }
+    .kpi.warn .value { color: #fcd34d; }
+    .kpi.alert .value { color: #ff7070; }
+    .kpi .label {
+      font-size: 0.72rem;
+      color: #7f92ac;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-top: 6px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+      margin-top: 10px;
+    }
+    th {
+      text-align: left;
+      padding: 10px 12px;
+      color: #f4b860;
+      border-bottom: 2px solid rgba(244,184,96,0.3);
+      font-weight: 700;
+      font-size: 0.82rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      color: #c5d0e3;
+    }
+    td.cat { font-weight: 700; color: #edf2fb; }
+    .bar {
+      height: 8px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+    .bar > div {
+      height: 100%;
+      background: linear-gradient(90deg, #3dd8c5, #75d7c0);
+    }
+    .health { padding: 2px 8px; border-radius: 5px; font-size: 0.75rem; font-weight: 700; }
+    .health.ok { background: rgba(79,255,176,0.16); color: #4FFFB0; }
+    .health.warn { background: rgba(244,184,96,0.16); color: #fcd34d; }
+    .health.alert { background: rgba(255,107,107,0.16); color: #ff7070; }
+    .alert-card {
+      background: rgba(255,107,107,0.06);
+      border: 1px solid rgba(255,107,107,0.3);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin: 10px 0;
+    }
+    .alert-card strong { color: #ff7070; }
+    .recommend-card {
+      background: rgba(79,255,176,0.04);
+      border: 1px solid rgba(79,255,176,0.2);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin: 10px 0;
+    }
+    .recommend-card strong { color: #4FFFB0; }
+    .info-card {
+      background: rgba(102,224,194,0.06);
+      border: 1px solid rgba(102,224,194,0.2);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="panel">
+      <p><a href="index.html">← Logs</a> / <a href="../index.html">Hub Top</a></p>
+      <h1>Hub Health Dashboard</h1>
+      <p>このハブ全体の<strong>運用健全性</strong>を可視化するページです。ページ数・最終更新からの経過日数・カテゴリカバレッジ・LLM トラッカー鮮度を一目で見えるようにし、「次に何を更新するか」の判断材料を提供します。</p>
+      <p><strong>計測時点:</strong> 2026-05-26 / <strong>計測対象:</strong> 全 .html ファイル（.git・node_modules を除く）</p>
+    </div>
+
+    <div class="panel">
+      <h2>全体サマリー</h2>
+      <div class="stat-grid">
+        <div class="kpi"><div class="value">150</div><div class="label">総ページ数</div></div>
+        <div class="kpi"><div class="value">59,234</div><div class="label">総行数</div></div>
+        <div class="kpi"><div class="value">10</div><div class="label">主要カテゴリ</div></div>
+        <div class="kpi"><div class="value">28.1</div><div class="label">平均 days old</div></div>
+        <div class="kpi"><div class="value">3</div><div class="label">LLM トラッカー</div></div>
+        <div class="kpi"><div class="value">6</div><div class="label">Trend 長文</div></div>
+        <div class="kpi"><div class="value">21+</div><div class="label">AI News 日次</div></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>カテゴリ別の状況</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>カテゴリ</th>
+            <th>ページ数</th>
+            <th>総行数</th>
+            <th>平均 days old</th>
+            <th>状態</th>
+            <th>備考</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="cat">workbench</td>
+            <td>60</td>
+            <td>24,918</td>
+            <td>37.8d</td>
+            <td><span class="health warn">WARN</span></td>
+            <td>32 vendor pages の鮮度管理が課題。LLM 更新ごとに古くなる構造。</td>
+          </tr>
+          <tr>
+            <td class="cat">research</td>
+            <td>57</td>
+            <td>19,158</td>
+            <td>21.6d</td>
+            <td><span class="health ok">OK</span></td>
+            <td>ai-news 日次 + LLM トラッカー3本 + trend長文6本で活発。</td>
+          </tr>
+          <tr>
+            <td class="cat">creator-system</td>
+            <td>7</td>
+            <td>4,611</td>
+            <td>29.4d</td>
+            <td><span class="health alert">ALERT</span></td>
+            <td>★ 主軸領域なのに <strong>大半が45日前のまま</strong>。最優先で更新必要。</td>
+          </tr>
+          <tr>
+            <td class="cat">demos</td>
+            <td>7</td>
+            <td>4,955</td>
+            <td>24.8d</td>
+            <td><span class="health ok">OK</span></td>
+            <td>イベント終了済みアーカイブ。今日 index.html を新設。</td>
+          </tr>
+          <tr>
+            <td class="cat">claw-stack</td>
+            <td>5</td>
+            <td>2,439</td>
+            <td>45.6d</td>
+            <td><span class="health alert">ALERT</span></td>
+            <td>全ファイルが45日以上更新なし。OpenClaw 再解禁などの反映が必要。</td>
+          </tr>
+          <tr>
+            <td class="cat">foundations</td>
+            <td>7</td>
+            <td>1,420</td>
+            <td>22.2d</td>
+            <td><span class="health ok">OK</span></td>
+            <td>今日 glossary / decisions / anti-patterns を追加。</td>
+          </tr>
+          <tr>
+            <td class="cat">strategy</td>
+            <td>5</td>
+            <td>591</td>
+            <td>33.8d</td>
+            <td><span class="health warn">WARN</span></td>
+            <td>capability-evolution を追加。capability-map / roadmap が古い。</td>
+          </tr>
+          <tr>
+            <td class="cat">logs</td>
+            <td>4</td>
+            <td>381</td>
+            <td>43.9d</td>
+            <td><span class="health alert">ALERT</span></td>
+            <td>session-log が 4/6 で止まっている。今日 hub-health / Q2 review 追加で改善中。</td>
+          </tr>
+          <tr>
+            <td class="cat">_routines</td>
+            <td>1</td>
+            <td>73</td>
+            <td>18.7d</td>
+            <td><span class="health warn">WARN</span></td>
+            <td>運用ルーティンが1ファイルのみ。</td>
+          </tr>
+          <tr>
+            <td class="cat">(root)</td>
+            <td>1</td>
+            <td>684</td>
+            <td>0.0d</td>
+            <td><span class="health ok">OK</span></td>
+            <td>index.html。今日3カテゴリ構造に再編。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel">
+      <h2>LLM トラッカー鮮度</h2>
+      <p class="info-card">LLM Updates Hub の3トラッカーの最終更新日。全社並走で同じ粒度を維持する運用方針。</p>
+      <table>
+        <thead>
+          <tr>
+            <th>ベンダー</th>
+            <th>ファイル</th>
+            <th>行数</th>
+            <th>最終更新</th>
+            <th>カバー範囲</th>
+            <th>状態</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="cat">Claude / Anthropic</td>
+            <td><a href="../research/claude-recent-updates.html">claude-recent-updates.html</a></td>
+            <td>~1,200</td>
+            <td>2026-05-25</td>
+            <td>2026-02 〜 05-25</td>
+            <td><span class="health ok">OK</span></td>
+          </tr>
+          <tr>
+            <td class="cat">ChatGPT / OpenAI</td>
+            <td><a href="../research/chatgpt-recent-updates.html">chatgpt-recent-updates.html</a></td>
+            <td>~720</td>
+            <td>2026-05-25</td>
+            <td>2025-10 〜 2026-05-25</td>
+            <td><span class="health ok">OK</span></td>
+          </tr>
+          <tr>
+            <td class="cat">Gemini / Google</td>
+            <td><a href="../research/gemini-recent-updates.html">gemini-recent-updates.html</a></td>
+            <td>~700</td>
+            <td>2026-05-25</td>
+            <td>2025-11 〜 2026-05-25</td>
+            <td><span class="health ok">OK</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel">
+      <h2>Industry Trends 鮮度</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>記事</th>
+            <th>行数</th>
+            <th>ステータス</th>
+            <th>備考</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><a href="../research/trend-ipo-race.html">2026年秋の AI 上場競争</a></td><td>433</td><td><span class="health ok">公開済</span></td><td>10月 IPO 実施後に更新が必要</td></tr>
+          <tr><td><a href="../research/trend-big-four.html">Big Four × AI 戦略マップ</a></td><td>549</td><td><span class="health ok">公開済</span></td><td>Deloitte / EY 動向追跡が継続必要</td></tr>
+          <tr><td><a href="../research/trend-talent-shift.html">研究者市場の三極化</a></td><td>533</td><td><span class="health ok">公開済</span></td><td>新規移籍があれば追記</td></tr>
+          <tr><td><a href="../research/trend-ai-ethics.html">Vatican 回勅と AI 倫理</a></td><td>405</td><td><span class="health ok">公開済</span></td><td>5/25 直後の反応追跡</td></tr>
+          <tr><td><a href="../research/trend-power-race.html">電力で決まる AI 競争</a></td><td>531</td><td><span class="health ok">公開済</span></td><td>四半期ごとに数値更新</td></tr>
+          <tr><td><a href="../research/trend-mcp-ecosystem.html">MCP エコシステム 2026年中間総括</a></td><td>570</td><td><span class="health ok">公開済</span></td><td>登録サーバー数の月次更新を検討</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel">
+      <h2>要対応リスト</h2>
+
+      <div class="alert-card">
+        <strong>🔴 ALERT — Creator System が主軸宣言なのに 45日前更新</strong>
+        <p>ユーザーから「今後力を入れていくのは Creator System」と明示されたが、配下ファイルの大半が 45.6日前（≒ 4/10 前後）から更新されていない。spotlight 表示まで実装したものの<strong>中身が追いついていない</strong>状態。</p>
+        <p><strong>次アクション:</strong> 動画パイプライン・漫画パイプラインの実装状況追記、評価/マネタイズの仕様改訂、KPI ダッシュボード追加など、Q3 Creator System 強化計画の起点としてここを更新する。</p>
+      </div>
+
+      <div class="alert-card">
+        <strong>🔴 ALERT — Claw Stack 全ファイル 45日以上未更新</strong>
+        <p>OpenClaw が 5/24 に再解禁された重要な動きが反映されていない。<a href="../claw-stack/openclaw/index.html">openclaw/index.html</a> は33行しかなくスタブ状態。</p>
+        <p><strong>次アクション:</strong> OpenClaw の最新状況（5/24 再解禁）・Hermes Agent との関係・サブスクリプション枠での再利用ガイドを追記。</p>
+      </div>
+
+      <div class="alert-card">
+        <strong>🔴 ALERT — Logs の session-log が4月で停止</strong>
+        <p><a href="2026-04-06-session-log.html">2026-04-06-session-log.html</a> 以降のセッションログが無い。7週間分の活動が未記録。</p>
+        <p><strong>次アクション:</strong> 今日（5/26）の大規模再編作業のセッションログを書く（ADR で意図は記録済みだが、時系列の手順記録は別）。</p>
+      </div>
+
+      <div class="recommend-card">
+        <strong>🟢 改善実施済 — Foundations / Logs を本日強化</strong>
+        <p>glossary・decisions・anti-patterns・hub-health（このページ）・Q2 review・capability-evolution の6本を新設。「ハブ運用」カテゴリが薄かった問題を解消。</p>
+      </div>
+
+      <div class="recommend-card">
+        <strong>🟢 改善実施済 — LLM トラッカー3社で同期</strong>
+        <p>Claude / ChatGPT / Gemini いずれも 2026-05-25 までカバー済み。LLM Updates Hub から1クリックで横比較できる状態。</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>運用ルール</h2>
+      <ul>
+        <li><strong>更新頻度の目安:</strong>
+          <ul>
+            <li>LLM トラッカー（claude / chatgpt / gemini）: <strong>週1回以上</strong>、主要マイルストーンがあれば即日</li>
+            <li>AI News 日次: <strong>毎日</strong></li>
+            <li>Industry Trends: <strong>四半期</strong>に1回は内容棚卸し、市場変動があれば随時</li>
+            <li>Creator System: <strong>主軸宣言領域</strong>として、月1回以上は進捗反映</li>
+            <li>Glossary / Decisions: <strong>大きな変更時</strong>に随時追記</li>
+            <li>Hub Health（このページ）: <strong>四半期</strong>に1回再計測</li>
+          </ul>
+        </li>
+        <li><strong>古さ判定の目安:</strong>
+          <ul>
+            <li><span class="health ok">OK</span> = 平均30日以内 / <span class="health warn">WARN</span> = 30〜45日 / <span class="health alert">ALERT</span> = 45日超</li>
+            <li>ただし「変動の少ない原則ページ」（foundations の一部など）は別基準</li>
+          </ul>
+        </li>
+        <li><strong>計測手順:</strong> Python で全 .html を walk し、行数・mtime を集計（このページ末尾のスクリプトを参照）</li>
+      </ul>
+    </div>
+
+    <div class="panel">
+      <h2>計測スクリプト（再現用）</h2>
+      <pre style="background: rgba(255,255,255,0.04); padding: 14px; border-radius: 10px; font-size: 0.82rem; color: #c5d0e3; overflow-x: auto;">
+import os, time
+now = time.time()
+cats = {}
+for root, dirs, files in os.walk('.'):
+    if '.git' in root or 'node_modules' in root: continue
+    for f in files:
+        if not f.endswith('.html'): continue
+        path = os.path.join(root, f).replace(os.sep, '/').lstrip('./')
+        cat = path.split('/')[0] if '/' in path else '(root)'
+        with open(path, encoding='utf-8', errors='ignore') as fh:
+            lines = sum(1 for _ in fh)
+        days_old = (now - os.path.getmtime(path)) / 86400
+        cats.setdefault(cat, []).append((path, lines, days_old))
+for c, files in sorted(cats.items()):
+    total = sum(f[1] for f in files)
+    ages = [f[2] for f in files]
+    print(f"{c:&lt;20}{len(files):&gt;6}p {total:&gt;7}lines  avg={sum(ages)/len(ages):.1f}d")</pre>
+      <p class="small">これを <code>logs/hub-stats.py</code> として置き、四半期ごとに実行 → このページを手動更新する想定。将来的には GitHub Actions で自動化できる。</p>
+    </div>
+
+  </div>
+</body>
+</html>

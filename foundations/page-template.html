@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Page Template — 新規ページ boilerplate | Foundations</title>
+  <style>
+    body { font-family: "Segoe UI", "Noto Sans JP", system-ui, sans-serif; margin: 0; background: #0b1220; color: #edf2fb; line-height: 1.7; padding: 28px 18px 56px; }
+    .shell { max-width: 1080px; margin: 0 auto; display: grid; gap: 18px; }
+    .panel { background: #111a2b; border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 22px 24px; }
+    a { color: #75d7c0; }
+    h1, h2, h3 { margin: 0 0 10px; }
+    h2 { color: #fcd34d; font-size: 1.15rem; border-bottom: 2px solid rgba(244,184,96,0.25); padding-bottom: 6px; margin-bottom: 14px; }
+    p, li { color: #c5d0e3; }
+    pre {
+      background: rgba(0,0,0,0.45);
+      padding: 14px 16px;
+      border-radius: 10px;
+      font-size: 0.82rem;
+      color: #c5d0e3;
+      overflow-x: auto;
+      border-left: 3px solid #3dd8c5;
+      line-height: 1.55;
+    }
+    code {
+      font-family: "Fira Code", "Consolas", monospace;
+      background: rgba(255,255,255,0.06);
+      padding: 1px 6px;
+      border-radius: 5px;
+      font-size: 0.86em;
+      color: #a5f3d0;
+    }
+    .variant {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 12px;
+      margin: 12px 0;
+    }
+    .variant .card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 14px 16px;
+    }
+    .variant .card h3 { color: #75d7c0; font-size: 0.96rem; }
+    .copy-hint {
+      background: rgba(102,224,194,0.06);
+      border: 1px solid rgba(102,224,194,0.22);
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin: 10px 0;
+      font-size: 0.88rem;
+    }
+    .copy-hint strong { color: #3dd8c5; }
+    .when-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    .when-table th { text-align:left; padding: 10px; color: #fcd34d; border-bottom: 2px solid rgba(244,184,96,0.3); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    .when-table td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .when-table code { font-size: 0.82em; }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="panel">
+      <p><a href="index.html">← Foundations</a> / <a href="../index.html">Hub Top</a></p>
+      <h1>Page Template — 新規ページの boilerplate</h1>
+      <p>このハブで新しいページを作る時の<strong>標準テンプレート</strong>です。コピペで使えるよう、HTML 全文・CSS・主要コンポーネントをこのページ内に置きました。あわせて <a href="style-guide.html">スタイルガイド</a> を読むと、執筆の細部ルールが揃います。</p>
+    </div>
+
+    <div class="panel">
+      <h2>テンプレートの選び方</h2>
+      <p>このハブには現状 2 系統の CSS スタイルが共存しています。<strong>用途で使い分け</strong>てください。</p>
+      <table class="when-table">
+        <thead>
+          <tr><th>系統</th><th>用途</th><th>既存例</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Light（明るめ #0b1220）</strong></td>
+            <td>ナビゲーション・運用ドキュメント・参照系（Foundations / Strategy / Logs）</td>
+            <td><a href="glossary.html">glossary.html</a> / <a href="decisions.html">decisions.html</a> / <a href="../logs/hub-health.html">hub-health.html</a></td>
+          </tr>
+          <tr>
+            <td><strong>Rich（深め #07111d、CSS 変数あり）</strong></td>
+            <td>長文記事・LLM トラッカー・トレンド分析（research/* の大半）</td>
+            <td><a href="../research/claude-recent-updates.html">claude-recent-updates.html</a> / <a href="../research/trend-ipo-race.html">trend-ipo-race.html</a></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="copy-hint">
+        <strong>判断基準:</strong> 「<strong>ハブ運用カテゴリ（Foundations / Strategy / Logs）の中の参照ドキュメント</strong>」なら Light。「<strong>外部に見せるかもしれない長文・分析・トラッカー</strong>」なら Rich。迷ったら Light（軽量・統一感優先）。
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>テンプレート A — Light（運用ドキュメント向け）</h2>
+      <p>foundations/strategy/logs 配下の参照ページ向け。シンプルなインライン CSS で軽量。</p>
+      <pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="ja"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+  &lt;title&gt;ページタイトル | カテゴリ名&lt;/title&gt;
+  &lt;style&gt;
+    body { font-family: "Segoe UI", "Noto Sans JP", system-ui, sans-serif; margin: 0; background: #0b1220; color: #edf2fb; line-height: 1.7; padding: 28px 18px 56px; }
+    .shell { max-width: 1080px; margin: 0 auto; display: grid; gap: 18px; }
+    .panel { background: #111a2b; border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 22px 24px; }
+    a { color: #75d7c0; }
+    h1, h2, h3 { margin: 0 0 10px; }
+    h2 { color: #fcd34d; font-size: 1.15rem; border-bottom: 2px solid rgba(244,184,96,0.25); padding-bottom: 6px; margin-bottom: 14px; }
+    p, li { color: #c5d0e3; }
+    code {
+      font-family: "Fira Code", "Consolas", monospace;
+      background: rgba(255,255,255,0.06);
+      padding: 1px 6px; border-radius: 5px; font-size: 0.86em; color: #a5f3d0;
+    }
+    .small { font-size: 0.84rem; color: #7f92ac; }
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;div class="shell"&gt;
+    &lt;div class="panel"&gt;
+      &lt;p&gt;&lt;a href="../foundations/index.html"&gt;← 親カテゴリ&lt;/a&gt; / &lt;a href="../index.html"&gt;Hub Top&lt;/a&gt;&lt;/p&gt;
+      &lt;h1&gt;ページタイトル&lt;/h1&gt;
+      &lt;p&gt;このページの目的を 1-2 段落で書く。何を提供して、誰のためのものか。&lt;/p&gt;
+      &lt;p class="small"&gt;最終更新: YYYY-MM-DD&lt;/p&gt;
+    &lt;/div&gt;
+
+    &lt;div class="panel"&gt;
+      &lt;h2&gt;セクション 1&lt;/h2&gt;
+      &lt;p&gt;本文&lt;/p&gt;
+    &lt;/div&gt;
+
+    &lt;div class="panel"&gt;
+      &lt;h2&gt;関連&lt;/h2&gt;
+      &lt;ul&gt;
+        &lt;li&gt;&lt;a href="..."&gt;関連ページ 1&lt;/a&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+    </div>
+
+    <div class="panel">
+      <h2>テンプレート B — Rich（長文記事・LLM トラッカー向け）</h2>
+      <p>research/* の長文ページ向け。CSS 変数で色をテーマ化、より装飾的なコンポーネント（timeline・stat・grid）が使える。</p>
+      <pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="ja"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+  &lt;title&gt;ページタイトル | Research&lt;/title&gt;
+  &lt;style&gt;
+    :root {
+      --bg: #07111d;
+      --panel: #0d1829;
+      --panel-2: #101f34;
+      --panel-3: #09131f;
+      --text: #e8eef9;
+      --muted: #b6c3da;
+      --soft: #7f92ac;
+      --border: rgba(255,255,255,0.08);
+      --accent: #66e0c2;
+      --accent-2: #f4b860;
+      --accent-3: #f7a87a;
+      --accent-4: #d8b4fe;
+      --shadow: 0 12px 36px rgba(0,0,0,0.28);
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 12% 14%, rgba(102,224,194,0.14), transparent 28%),
+        radial-gradient(circle at 88% 4%, rgba(244,184,96,0.12), transparent 24%),
+        linear-gradient(145deg, #07111d 0%, #0a1422 52%, #060d18 100%);
+      color: var(--text);
+      font-family: "Segoe UI", "Noto Sans JP", system-ui, sans-serif;
+      line-height: 1.72;
+      padding: 28px 18px 80px;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .shell { max-width: 1100px; margin: 0 auto; display: grid; gap: 18px; }
+    .panel {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px 26px;
+    }
+    .hero {
+      background: linear-gradient(135deg, rgba(102,224,194,0.08), rgba(244,184,96,0.08)), var(--panel);
+    }
+    .breadcrumb { color: var(--soft); font-size: 0.82rem; margin-bottom: 8px; }
+    .eyebrow {
+      display: inline-flex; padding: 5px 12px; border-radius: 999px;
+      background: rgba(102,224,194,0.12); color: var(--accent);
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.05em;
+      text-transform: uppercase; margin-bottom: 12px;
+    }
+    h1, h2, h3 { margin: 0 0 10px; }
+    h1 { font-size: 2rem; }
+    h2 { font-size: 1.18rem; }
+    h3 { font-size: 1rem; }
+    p, li { color: var(--muted); font-size: 0.92rem; }
+    strong { color: var(--text); }
+    .last-update { color: var(--soft); font-size: 0.8rem; margin-top: 10px; }
+    .summary { border-left: 4px solid var(--accent); padding-left: 14px; margin-top: 8px; }
+    code {
+      font-family: "Fira Code", "Consolas", monospace;
+      background: rgba(255,255,255,0.06); padding: 0.12rem 0.4rem;
+      border-radius: 6px; color: #a5f3d0;
+    }
+    .small { font-size: 0.84rem; color: var(--soft); }
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;div class="shell"&gt;
+    &lt;section class="panel hero"&gt;
+      &lt;div class="breadcrumb"&gt;&lt;a href="index.html"&gt;Research&lt;/a&gt; / &lt;a href="../index.html"&gt;Hub Top&lt;/a&gt;&lt;/div&gt;
+      &lt;div class="eyebrow"&gt;カテゴリラベル&lt;/div&gt;
+      &lt;h1&gt;ページタイトル&lt;/h1&gt;
+      &lt;p&gt;このページの目的を 1-2 段落で。&lt;/p&gt;
+      &lt;div class="summary"&gt;
+        &lt;p&gt;要点・主要結論を1段落で。&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;p class="last-update"&gt;最終更新: YYYY-MM-DD&lt;/p&gt;
+    &lt;/section&gt;
+
+    &lt;section class="panel"&gt;
+      &lt;h2&gt;セクション 1&lt;/h2&gt;
+      &lt;p&gt;本文&lt;/p&gt;
+    &lt;/section&gt;
+  &lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+    </div>
+
+    <div class="panel">
+      <h2>追加コンポーネント — Light 向け</h2>
+
+      <h3 style="color: #75d7c0; font-size: 0.96rem; margin: 14px 0 6px;">ステップ番号付きボックス（手順用）</h3>
+      <pre>&lt;style&gt;
+.step { background: rgba(255,255,255,0.03); border-radius: 12px;
+  padding: 14px 16px 14px 60px; margin: 12px 0; position: relative;
+  border-left: 3px solid #3dd8c5; }
+.step .num { position: absolute; left: 14px; top: 14px;
+  width: 32px; height: 32px; border-radius: 50%;
+  background: #3dd8c5; color: #07111d; font-weight: 800; font-size: 1rem;
+  display: flex; align-items: center; justify-content: center; }
+.step h3 { color: #edf2fb; font-size: 1.02rem; margin-bottom: 6px; }
+.step .why { color: #7f92ac; font-size: 0.85rem; font-style: italic; margin-top: 6px; }
+&lt;/style&gt;
+
+&lt;div class="step"&gt;
+  &lt;div class="num"&gt;1&lt;/div&gt;
+  &lt;h3&gt;ステップタイトル&lt;/h3&gt;
+  &lt;p&gt;やること&lt;/p&gt;
+  &lt;p class="why"&gt;→ なぜ：理由&lt;/p&gt;
+&lt;/div&gt;</pre>
+
+      <h3 style="color: #75d7c0; font-size: 0.96rem; margin: 14px 0 6px;">ADR / 決断記録</h3>
+      <pre>&lt;style&gt;
+.adr { border-left: 3px solid #f4b860; padding: 12px 0 12px 18px; margin: 22px 0; }
+.adr h3 { font-size: 1.1rem; color: #edf2fb; margin-bottom: 4px; }
+.adr .meta { font-size: 0.78rem; color: #7f92ac; margin-bottom: 12px; }
+.adr .meta .status { display: inline-block; padding: 2px 8px; border-radius: 5px;
+  font-weight: 700; margin-right: 8px; }
+.status.accepted { background: rgba(79,255,176,0.16); color: #4FFFB0; }
+.adr h4 { font-size: 0.92rem; color: #f4b860; margin: 12px 0 4px;
+  text-transform: uppercase; letter-spacing: 0.05em; }
+&lt;/style&gt;
+
+&lt;div class="adr" id="NNN-slug"&gt;
+  &lt;h3&gt;ADR-NNN: タイトル（動詞で）&lt;/h3&gt;
+  &lt;div class="meta"&gt;&lt;span class="status accepted"&gt;ACCEPTED&lt;/span&gt; YYYY-MM-DD&lt;/div&gt;
+  &lt;h4&gt;Context&lt;/h4&gt;&lt;p&gt;...&lt;/p&gt;
+  &lt;h4&gt;Decision&lt;/h4&gt;&lt;p&gt;...&lt;/p&gt;
+  &lt;h4&gt;Consequences&lt;/h4&gt;&lt;ul&gt;&lt;li&gt;+ ...&lt;/li&gt;&lt;li&gt;− ...&lt;/li&gt;&lt;/ul&gt;
+&lt;/div&gt;</pre>
+
+      <h3 style="color: #75d7c0; font-size: 0.96rem; margin: 14px 0 6px;">アラート / 注意ボックス</h3>
+      <pre>&lt;style&gt;
+.warn { background: rgba(255,107,107,0.06); border: 1px solid rgba(255,107,107,0.25);
+  border-radius: 10px; padding: 10px 14px; margin: 10px 0; }
+.warn strong { color: #ff7070; }
+.info { background: rgba(102,224,194,0.06); border: 1px solid rgba(102,224,194,0.2);
+  border-radius: 10px; padding: 10px 14px; margin: 10px 0; }
+.tip { background: rgba(244,184,96,0.05); border: 1px solid rgba(244,184,96,0.25);
+  border-radius: 10px; padding: 10px 14px; margin: 10px 0; }
+&lt;/style&gt;
+
+&lt;div class="warn"&gt;&lt;strong&gt;⚠️ 注意:&lt;/strong&gt; リスクの説明&lt;/div&gt;
+&lt;div class="info"&gt;💡 補足情報&lt;/div&gt;
+&lt;div class="tip"&gt;🟡 ヒント・推奨&lt;/div&gt;</pre>
+    </div>
+
+    <div class="panel">
+      <h2>追加コンポーネント — Rich 向け</h2>
+
+      <h3 style="color: #75d7c0; font-size: 0.96rem; margin: 14px 0 6px;">タイムライン（縦軸の時系列）</h3>
+      <pre>&lt;style&gt;
+.timeline { position: relative; display: grid; gap: 14px; padding-left: 28px; }
+.timeline::before { content: ""; position: absolute; top: 0; bottom: 0; left: 9px;
+  width: 2px; background: rgba(255,255,255,0.08); }
+.item { position: relative; background: var(--panel-2); border: 1px solid var(--border);
+  border-radius: 14px; padding: 16px 18px; }
+.item::before { content: ""; position: absolute; left: -24px; top: 18px;
+  width: 10px; height: 10px; border-radius: 50%; background: var(--panel);
+  border: 2px solid var(--accent); }
+.item.hot::before { border-color: var(--accent-2); }
+.date { font-size: 0.76rem; color: var(--soft); font-weight: 700; margin-bottom: 4px; }
+&lt;/style&gt;
+
+&lt;div class="timeline"&gt;
+  &lt;article class="item hot"&gt;
+    &lt;div class="date"&gt;2026-MM-DD&lt;/div&gt;
+    &lt;h3&gt;見出し&lt;/h3&gt;
+    &lt;p&gt;本文&lt;/p&gt;
+    &lt;p class="small"&gt;Source: ...&lt;/p&gt;
+  &lt;/article&gt;
+&lt;/div&gt;</pre>
+
+      <h3 style="color: #75d7c0; font-size: 0.96rem; margin: 14px 0 6px;">統計タイル（4列）</h3>
+      <pre>&lt;style&gt;
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.stat { background: var(--panel-2); border: 1px solid var(--border);
+  border-radius: 14px; padding: 16px; }
+.stat .value { font-size: 1.8rem; color: var(--accent); font-weight: 800; line-height: 1; }
+.stat .label { color: var(--soft); font-size: 0.75rem; margin-top: 8px;
+  text-transform: uppercase; letter-spacing: 0.05em; }
+@media (max-width: 920px) { .grid-4 { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 640px) { .grid-4 { grid-template-columns: 1fr; } }
+&lt;/style&gt;
+
+&lt;section class="grid-4"&gt;
+  &lt;div class="stat"&gt;&lt;div class="value"&gt;数字&lt;/div&gt;&lt;div class="label"&gt;ラベル&lt;/div&gt;&lt;/div&gt;
+&lt;/section&gt;</pre>
+
+      <h3 style="color: #75d7c0; font-size: 0.96rem; margin: 14px 0 6px;">タグ（カテゴリ表示）</h3>
+      <pre>&lt;style&gt;
+.tag { display: inline-block; padding: 3px 8px; border-radius: 6px;
+  font-size: 0.72rem; font-weight: 700; margin-right: 6px; }
+.tag-model { background: rgba(167,139,250,0.18); color: var(--accent-4); }
+.tag-product { background: rgba(96,208,255,0.16); color: #7dd3fc; }
+.tag-code { background: rgba(247,168,122,0.16); color: #fdba74; }
+.tag-api { background: rgba(244,184,96,0.16); color: #fcd34d; }
+.tag-new { background: rgba(79,255,176,0.16); color: #4FFFB0; }
+.tag-risk { background: rgba(255,107,107,0.16); color: #fca5a5; }
+&lt;/style&gt;
+
+&lt;h3&gt;見出し &lt;span class="tag tag-new"&gt;NEW&lt;/span&gt;&lt;span class="tag tag-product"&gt;プロダクト&lt;/span&gt;&lt;/h3&gt;</pre>
+    </div>
+
+    <div class="panel">
+      <h2>新規ページ作成のチェックリスト</h2>
+      <ol>
+        <li>カテゴリを決める（<a href="../CLAUDE.md">CLAUDE.md</a> の Folder Rules 参照）</li>
+        <li>Light / Rich のどちらかを判断（このページの選び方表）</li>
+        <li>テンプレートをコピー、<code>title</code> と breadcrumb を設定</li>
+        <li>本文を書く（<a href="style-guide.html">スタイルガイド</a> に従って）</li>
+        <li>末尾に<strong>「最終更新: YYYY-MM-DD」</strong>を明記（Light は <code>.small</code>、Rich は <code>.last-update</code>）</li>
+        <li>「関連」セクションで親カテゴリ・関連ページへの戻り導線を入れる</li>
+        <li>親カテゴリの index.html にこのページへのリンクを追加</li>
+        <li>必要なら top index.html のカードにも surface</li>
+        <li><a href="site-map.html">Site Map</a> に追記</li>
+        <li>大きな構造変更なら <a href="decisions.html">ADR</a> を書く</li>
+      </ol>
+    </div>
+
+    <div class="panel">
+      <h2>関連</h2>
+      <ul>
+        <li><a href="style-guide.html">スタイルガイド</a> — 文体・色・命名の統一ルール</li>
+        <li><a href="site-map.html">Site Map</a> — 全ページ索引（新規追加時の参照先）</li>
+        <li><a href="decisions.html">決定ログ (ADR)</a> — 構造変更の経緯</li>
+        <li><a href="onboarding-checklist.html">Onboarding Checklist</a> — セッション開始ルーチン</li>
+      </ul>
+    </div>
+
+  </div>
+</body>
+</html>

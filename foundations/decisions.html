@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>決定ログ（ADR） | Foundations</title>
+  <style>
+    body { font-family: "Segoe UI", "Noto Sans JP", system-ui, sans-serif; margin: 0; background: #0b1220; color: #edf2fb; line-height: 1.75; padding: 28px 18px 48px; }
+    .shell { max-width: 1080px; margin: 0 auto; display: grid; gap: 18px; }
+    .panel { background: #111a2b; border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 26px; }
+    a { color: #75d7c0; }
+    h1, h2, h3 { margin: 0 0 10px; }
+    p, li { color: #c5d0e3; }
+    .adr {
+      border-left: 3px solid #f4b860;
+      padding: 12px 0 12px 18px;
+      margin: 22px 0;
+    }
+    .adr.superseded { border-left-color: #7f92ac; opacity: 0.85; }
+    .adr.proposed { border-left-color: #d8b4fe; }
+    .adr h3 {
+      font-size: 1.1rem;
+      color: #edf2fb;
+      margin-bottom: 4px;
+    }
+    .adr .meta {
+      font-size: 0.78rem;
+      color: #7f92ac;
+      margin-bottom: 12px;
+      letter-spacing: 0.04em;
+    }
+    .adr .meta .status {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 5px;
+      font-weight: 700;
+      margin-right: 8px;
+    }
+    .status.accepted { background: rgba(79,255,176,0.16); color: #4FFFB0; }
+    .status.superseded { background: rgba(150,150,180,0.16); color: #b0b0c8; }
+    .status.proposed { background: rgba(167,139,250,0.16); color: #d8b4fe; }
+    .adr h4 {
+      font-size: 0.92rem;
+      color: #f4b860;
+      margin: 12px 0 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .adr p, .adr li { font-size: 0.92rem; }
+    .toc-list {
+      display: grid;
+      gap: 6px;
+      list-style: none;
+      padding-left: 0;
+    }
+    .toc-list li {
+      padding: 8px 12px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .toc-list .num {
+      color: #f4b860;
+      font-weight: 700;
+      font-size: 0.82rem;
+      margin-right: 8px;
+      letter-spacing: 0.03em;
+    }
+    .toc-list .date {
+      color: #7f92ac;
+      font-size: 0.78rem;
+      margin-left: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="panel">
+      <p><a href="index.html">← Foundations</a> / <a href="../index.html">Hub Top</a></p>
+      <h1>決定ログ（ADR）</h1>
+      <p>「なぜそう決めたか」を残す軽量版 Architecture Decision Record。ハブ構造・運用方針・カテゴリ分けなど、<strong>後から見返した時に意図が分からなくなる判断</strong>を記録します。</p>
+      <p><strong>運用方針:</strong> 大きな構造変更や、複数の選択肢から1つを選ぶ判断をした時に記録する。1件あたり5-15分で書ける軽量フォーマット。</p>
+    </div>
+
+    <div class="panel">
+      <h2>目次</h2>
+      <ul class="toc-list">
+        <li><a href="#001-llm-hub-spinoff"><span class="num">ADR-001</span> LLM Updates Hub を別建てにする<span class="date">2026-05-25</span></a></li>
+        <li><a href="#002-category-restructure"><span class="num">ADR-002</span> トップを3カテゴリ構造に再編する<span class="date">2026-05-25</span></a></li>
+        <li><a href="#003-industry-trends-split"><span class="num">ADR-003</span> Research を「Industry Trends」に刷新する<span class="date">2026-05-25</span></a></li>
+        <li><a href="#004-workbench-split"><span class="num">ADR-004</span> Workbench を「Tech Workbench」と「LLM 個別深掘り」に分割<span class="date">2026-05-25</span></a></li>
+        <li><a href="#005-demos-rename-skip"><span class="num">ADR-005</span> demos/ フォルダの物理リネームを見送る<span class="date">2026-05-25</span></a></li>
+        <li><a href="#006-banners-removal"><span class="num">ADR-006</span> 中段バナー2本を削除する<span class="date">2026-05-25</span></a></li>
+        <li><a href="#007-creator-spotlight"><span class="num">ADR-007</span> Creator System を spotlight 表示にする<span class="date">2026-05-25</span></a></li>
+        <li><a href="#008-trend-articles"><span class="num">ADR-008</span> Industry Trends の6記事を一気に立ち上げる<span class="date">2026-05-26</span></a></li>
+      </ul>
+    </div>
+
+    <div class="panel">
+      <h2>ADR本文</h2>
+
+      <div class="adr" id="001-llm-hub-spinoff">
+        <h3>ADR-001: LLM Updates Hub を別建てにする</h3>
+        <div class="meta"><span class="status accepted">ACCEPTED</span> 2026-05-25</div>
+
+        <h4>Context（背景）</h4>
+        <p>当初、Claude のアップデート情報は <code>research/</code> 配下の Research カード内に「⭐ 注目」として掲載していた。ChatGPT / Gemini も同等の粒度で追いたいというニーズが出た時、Research カード内に同列で並べると<strong>「ベンダー横断の調査」</strong>と<strong>「ベンダー個別のトラッカー」</strong>が混在してしまい、見つけにくくなる懸念があった。</p>
+
+        <h4>Decision（決定）</h4>
+        <p>トップ index.html の <strong>Daily News Hub の直下に「LLM Updates Hub」</strong>という独立コーナーを新設し、Claude / ChatGPT / Gemini の3カードを並列で配置する。Research カード内の「Claude 最新アップデート」は削除して重複を避ける。</p>
+
+        <h4>Consequences（結果）</h4>
+        <ul>
+          <li>+ ベンダー横断比較がトップから一目で可能になった</li>
+          <li>+ 3社の更新粒度を揃えるという運用が明示された</li>
+          <li>− 3社並走で更新コストが3倍になる（受け入れ済み）</li>
+          <li>− Research カードの「目玉コンテンツ」が無くなり、薄くなった → ADR-003 で別解決</li>
+        </ul>
+      </div>
+
+      <div class="adr" id="002-category-restructure">
+        <h3>ADR-002: トップを3カテゴリ構造に再編する</h3>
+        <div class="meta"><span class="status accepted">ACCEPTED</span> 2026-05-25</div>
+
+        <h4>Context</h4>
+        <p>7-8枚のカードが横並びで「全部同列」に見える状態だった。「Foundations / Strategy / Logs は性質が近い（ハブ運用系）」「Creator System は今後の力点」「Research が薄い」など、カードの<strong>役割の差</strong>が視覚的に伝わっていなかった。</p>
+
+        <h4>Decision</h4>
+        <p>カードを <strong>3つのカテゴリ（制作・技術コア / ナレッジ・資料 / ハブ運用）</strong>にグルーピングし、それぞれにカテゴリ見出しを付ける。<strong>Creator System は spotlight 化</strong>（全幅で目立たせる）。Logs を Foundations / Strategy と同列に並べる。</p>
+
+        <h4>Consequences</h4>
+        <ul>
+          <li>+ 「主軸はどこか」が一目で伝わるようになった</li>
+          <li>+ カテゴリごとにカード数を増やしやすくなった（拡張耐性）</li>
+          <li>− 3カテゴリの粒度が均等でない（コア4 / ナレッジ2 / 運用3） → 自然に受け入れ</li>
+        </ul>
+      </div>
+
+      <div class="adr" id="003-industry-trends-split">
+        <h3>ADR-003: Research を「Industry Trends」に刷新する</h3>
+        <div class="meta"><span class="status accepted">ACCEPTED</span> 2026-05-25</div>
+
+        <h4>Context</h4>
+        <p>LLM Updates Hub の新設（ADR-001）と Daily News Hub の存在により、<strong>Research カードの中身が空洞化</strong>した（ai-news・claude-recent-updates・各種timeline すべて他所に表出済み）。「調査アーカイブ」と漠然と置くのは弱い。</p>
+
+        <h4>Decision</h4>
+        <p>Research カードを「<strong>Industry Trends（業界トレンド長文）</strong>」に刷新。<strong>ベンダー横断でしか書けない構造的トピック</strong>（上場・Big Four・人材・規制・電力・MCP エコシステム）に絞った長文記事のホームとして再定義する。</p>
+
+        <h4>Consequences</h4>
+        <ul>
+          <li>+ 個別ベンダーページとの棲み分けが明確になった</li>
+          <li>+ 単体記事の存在意義が「ベンダー横断でないと書けないか？」で自問できる</li>
+          <li>− 新規長文の執筆コストが継続発生（ADR-008 で6本一括立ち上げ）</li>
+        </ul>
+      </div>
+
+      <div class="adr" id="004-workbench-split">
+        <h3>ADR-004: Workbench を「Tech Workbench」と「LLM 個別深掘り」に分割</h3>
+        <div class="meta"><span class="status accepted">ACCEPTED</span> 2026-05-25</div>
+
+        <h4>Context</h4>
+        <p>Workbench / knowledge 配下に32ページがあり、ベンダー別深掘り（ChatGPT / Gemini / Grok / DeepSeek / Kimi 等）と開発実務操作（Docker / Git / Mac / VSCode 等）が同じ「Workbench」というラベルで埋もれていた。性質が違うものを同じ括りで扱っていた。</p>
+
+        <h4>Decision</h4>
+        <p>カード上は2つに分ける：</p>
+        <ul>
+          <li><strong>Tech Workbench</strong>: 実務操作系（git / docker / mac / vscode / Claude Code 操作 / Vibe Coding ガイド）</li>
+          <li><strong>LLM 個別深掘り</strong>: ベンダー別ページ（ChatGPT / Gemini / Grok / DeepSeek / Kimi / Qwen / Mistral / GLM / Cursor / Hermes Agent / OpenAI Codex）</li>
+        </ul>
+        <p>物理フォルダは <code>workbench/knowledge/</code> のままで、カードのリンク先で出し分けるだけにする。</p>
+
+        <h4>Consequences</h4>
+        <ul>
+          <li>+ LLM 個別深掘りが LLM Updates Hub の「深掘り側」として機能</li>
+          <li>+ Tech Workbench が「開発実務に絞った」明確な領域になった</li>
+          <li>− 物理ファイル配置と表示カテゴリが乖離する（許容、ADR-005 と同じ思想）</li>
+        </ul>
+      </div>
+
+      <div class="adr" id="005-demos-rename-skip">
+        <h3>ADR-005: demos/ フォルダの物理リネームを見送る</h3>
+        <div class="meta"><span class="status accepted">ACCEPTED</span> 2026-05-25</div>
+
+        <h4>Context</h4>
+        <p>4/17 の MA デモが終了し、demos/ フォルダの内容は「過去のデモ＋現在も参照価値のある配布資料」が混在した状態に。フォルダ名「demos」が現状にそぐわなくなっていた。`briefings/` などへのリネームを検討。</p>
+
+        <h4>Decision</h4>
+        <p><strong>物理フォルダ名はリネームせず、index.html 表記だけ「ブリーフィング &amp; 配布資料」に変える</strong>。リンク切れリスク・既存ブランチへの影響・外部からの参照リンクへの影響を考慮した結果。</p>
+
+        <h4>Consequences</h4>
+        <ul>
+          <li>+ リンク切れゼロで切り替え完了</li>
+          <li>+ 後で気が向いたら物理リネーム可能（決断を遅延させる選択）</li>
+          <li>− URL とラベルが乖離する（ユーザーへの違和感を許容）</li>
+        </ul>
+      </div>
+
+      <div class="adr" id="006-banners-removal">
+        <h3>ADR-006: 中段バナー2本を削除する</h3>
+        <div class="meta"><span class="status accepted">ACCEPTED</span> 2026-05-25</div>
+
+        <h4>Context</h4>
+        <p>トップ中段に「4/17 MAデモ」「第2回 Codex/Claude 比較」のバナーが2本あった。両方ともイベント終了済み（4/17 は1ヶ月以上経過）。</p>
+
+        <h4>Decision</h4>
+        <p>バナー2本を削除。配布資料としての価値は「ブリーフィング &amp; 配布資料」カード経由で残す。</p>
+
+        <h4>Consequences</h4>
+        <ul>
+          <li>+ トップが整理され、現在進行中の主軸（Creator System、LLM Hub）が目立つようになった</li>
+          <li>− 過去のイベント告知が見えなくなった → 履歴は demos/ma-demo-2026.html で残存</li>
+        </ul>
+      </div>
+
+      <div class="adr" id="007-creator-spotlight">
+        <h3>ADR-007: Creator System を spotlight 表示にする</h3>
+        <div class="meta"><span class="status accepted">ACCEPTED</span> 2026-05-25</div>
+
+        <h4>Context</h4>
+        <p>ユーザーから「今後力を入れていくのは Creator System」というディレクションがあった。それまでは他カードと同じサイズで横並びだった。</p>
+
+        <h4>Decision</h4>
+        <p>Creator System カードを<strong>全幅 spotlight 表示</strong>に変更。サブリンクを2カラムで多めに表示。タグを「★ FOCUS」に変更。</p>
+
+        <h4>Consequences</h4>
+        <ul>
+          <li>+ 主軸領域が一目で伝わる</li>
+          <li>+ 他カテゴリのカードとは別格扱いになった</li>
+          <li>− 1行を占有するので、他カードの並びがやや崩れる（カテゴリ分けでカバー）</li>
+        </ul>
+      </div>
+
+      <div class="adr" id="008-trend-articles">
+        <h3>ADR-008: Industry Trends の6記事を一気に立ち上げる</h3>
+        <div class="meta"><span class="status accepted">ACCEPTED</span> 2026-05-26</div>
+
+        <h4>Context</h4>
+        <p>ADR-003 で Industry Trends を新設したが、当初は<strong>テーマカードと「執筆予定」スタブだけ</strong>のページだった。空のスタブは継続的なメンテナンスインセンティブが弱く、放置されやすい。</p>
+
+        <h4>Decision</h4>
+        <p>新設からほぼ即時で6本の長文記事（trend-ipo-race・trend-big-four・trend-talent-shift・trend-ai-ethics・trend-power-race・trend-mcp-ecosystem）を並走で立ち上げる。合計3,021行。スタブを「公開済」に置き換え。</p>
+
+        <h4>Consequences</h4>
+        <ul>
+          <li>+ Industry Trends が即座に実体を持つカテゴリになった</li>
+          <li>+ 個別ベンダーページの「事業」セクションを<strong>縦串で読み解く受け皿</strong>が出来た</li>
+          <li>− 6記事の継続更新責任が発生（鮮度管理の対象）</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>ADR テンプレート（新規記録用）</h2>
+      <pre style="background: rgba(255,255,255,0.04); padding: 16px; border-radius: 10px; font-size: 0.85rem; color: #c5d0e3; overflow-x: auto;">
+&lt;div class="adr" id="NNN-slug"&gt;
+  &lt;h3&gt;ADR-NNN: 決断のタイトル（動詞で書く）&lt;/h3&gt;
+  &lt;div class="meta"&gt;&lt;span class="status accepted"&gt;ACCEPTED&lt;/span&gt; YYYY-MM-DD&lt;/div&gt;
+
+  &lt;h4&gt;Context（背景）&lt;/h4&gt;
+  &lt;p&gt;何が問題だったか、なぜ判断が必要だったか。&lt;/p&gt;
+
+  &lt;h4&gt;Decision（決定）&lt;/h4&gt;
+  &lt;p&gt;何をすると決めたか。具体的に書く。&lt;/p&gt;
+
+  &lt;h4&gt;Consequences（結果）&lt;/h4&gt;
+  &lt;ul&gt;
+    &lt;li&gt;+ 良い側面&lt;/li&gt;
+    &lt;li&gt;− 悪い側面・トレードオフ&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/div&gt;</pre>
+      <p style="margin-top: 12px;"><strong>ステータス変更ルール:</strong> 後で覆された決断は「<code>superseded</code>」に変更し、上書きしない（履歴として残す）。提案段階のものは「<code>proposed</code>」を使う。</p>
+    </div>
+  </div>
+</body>
+</html>

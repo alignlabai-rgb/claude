@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Style Guide — 執筆・装飾の統一ルール | Foundations</title>
+  <style>
+    body { font-family: "Segoe UI", "Noto Sans JP", system-ui, sans-serif; margin: 0; background: #0b1220; color: #edf2fb; line-height: 1.7; padding: 28px 18px 56px; }
+    .shell { max-width: 1080px; margin: 0 auto; display: grid; gap: 18px; }
+    .panel { background: #111a2b; border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 22px 24px; }
+    a { color: #75d7c0; }
+    h1, h2, h3 { margin: 0 0 10px; }
+    h2 { color: #fcd34d; font-size: 1.15rem; border-bottom: 2px solid rgba(244,184,96,0.25); padding-bottom: 6px; margin-bottom: 14px; }
+    h3 { color: #75d7c0; font-size: 1rem; margin: 16px 0 6px; }
+    p, li { color: #c5d0e3; }
+    code { font-family: "Fira Code", "Consolas", monospace; background: rgba(255,255,255,0.06); padding: 1px 6px; border-radius: 5px; font-size: 0.86em; color: #a5f3d0; }
+    pre { background: rgba(0,0,0,0.45); padding: 12px 14px; border-radius: 10px; font-size: 0.84rem; color: #c5d0e3; overflow-x: auto; border-left: 3px solid #3dd8c5; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    th { text-align: left; padding: 10px 12px; color: #f4b860; border-bottom: 2px solid rgba(244,184,96,0.3); font-size: 0.82rem; letter-spacing: 0.04em; text-transform: uppercase; }
+    td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .do { background: rgba(79,255,176,0.06); border: 1px solid rgba(79,255,176,0.22); border-radius: 10px; padding: 10px 14px; margin: 10px 0; }
+    .do strong { color: #4FFFB0; }
+    .dont { background: rgba(255,107,107,0.06); border: 1px solid rgba(255,107,107,0.25); border-radius: 10px; padding: 10px 14px; margin: 10px 0; }
+    .dont strong { color: #ff7070; }
+    .palette {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+      margin: 12px 0;
+    }
+    .swatch {
+      padding: 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.1);
+      font-size: 0.82rem;
+    }
+    .swatch .name { font-weight: 700; margin-bottom: 4px; }
+    .swatch .hex { font-family: "Fira Code", monospace; font-size: 0.78rem; }
+    .swatch .use { color: #c5d0e3; font-size: 0.8rem; margin-top: 6px; }
+    .badge-demo {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 5px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      margin-right: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="panel">
+      <p><a href="index.html">← Foundations</a> / <a href="../index.html">Hub Top</a></p>
+      <h1>Style Guide — 執筆・装飾の統一ルール</h1>
+      <p>このハブで<strong>複数のセッション・エージェントが書いても一貫した品質</strong>を保つための執筆ルール集です。<a href="page-template.html">ページテンプレート</a>が「<strong>骨格</strong>」を提供するのに対して、このページは「<strong>細部の選択基準</strong>」を提供します。</p>
+    </div>
+
+    <div class="panel">
+      <h2>1. 文体・トーン</h2>
+
+      <h3>基本: です・ます調</h3>
+      <p>運用ドキュメント・解説ページは原則「<strong>です・ます調</strong>」。読み手は社内チーム・自分自身・将来の AI セッション。距離感はフラット・敬語ベース。</p>
+
+      <div class="do">
+        <strong>OK:</strong> 「このページは新セッションが最初に開きます。」
+      </div>
+      <div class="dont">
+        <strong>NG:</strong> 「このページは新セッションが最初に開く。」（突然の常体は読み手を不安にさせる）
+      </div>
+
+      <h3>例外: 長文記事・技術仕様は常体可</h3>
+      <p>research/* の長文（trend-* 等）や技術仕様書は、論文・新聞調の<strong>「である調」</strong>を許容。ただしページ内で混ぜない。</p>
+
+      <h3>主語の省略</h3>
+      <p>日本語の自然な主語省略は OK。ただし「<strong>誰がやったか</strong>」が変わる文脈では明示する（例: Anthropic / OpenAI / ユーザー / ハブ）。</p>
+
+      <h3>断定 vs 推測</h3>
+      <p>事実は断定、未確定は明示。「<strong>〜と報じられている</strong>」「<strong>〜の見通し</strong>」「<strong>2026年5月時点では</strong>」のような時点修飾を活用。</p>
+
+      <div class="do">
+        <strong>OK:</strong> 「Anthropic の評価額は $900B 規模と<strong>複数メディアが報じている</strong>（2026-05-23 時点・調達ラウンド進行中）。」
+      </div>
+      <div class="dont">
+        <strong>NG:</strong> 「Anthropic の評価額は $900B です。」（確定情報のように書かない）
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>2. 見出し階層</h2>
+      <p>1ページにつき <code>&lt;h1&gt;</code> は 1 回だけ。以下、明確な階層を保つ。</p>
+      <table>
+        <thead>
+          <tr><th>レベル</th><th>用途</th><th>サイズ目安</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>&lt;h1&gt;</code></td><td>ページタイトル。ヒーロー部に 1 回</td><td>1.9-2rem</td></tr>
+          <tr><td><code>&lt;h2&gt;</code></td><td>主要セクション。panel ごとに 1 個</td><td>1.15-1.2rem</td></tr>
+          <tr><td><code>&lt;h3&gt;</code></td><td>セクション内の小見出し</td><td>0.95-1.05rem</td></tr>
+          <tr><td><code>&lt;h4&gt;</code></td><td>必要な時のみ（普通は不要）</td><td>0.88-0.95rem</td></tr>
+        </tbody>
+      </table>
+      <p>飛ばし階層は禁止（<code>h2</code> の下に直接 <code>h4</code> など）。</p>
+    </div>
+
+    <div class="panel">
+      <h2>3. カラーパレット</h2>
+      <p>このハブは「<strong>濃紺背景＋ティールアクセント＋オレンジ強調</strong>」がベース。逸脱しない。</p>
+      <div class="palette">
+        <div class="swatch" style="background: #07111d;">
+          <div class="name" style="color:#e8eef9;">背景（最深）</div>
+          <div class="hex" style="color:#75d7c0;">#07111d</div>
+          <div class="use">Rich 系の body</div>
+        </div>
+        <div class="swatch" style="background: #0b1220;">
+          <div class="name" style="color:#e8eef9;">背景（標準）</div>
+          <div class="hex" style="color:#75d7c0;">#0b1220</div>
+          <div class="use">Light 系の body</div>
+        </div>
+        <div class="swatch" style="background: #111a2b;">
+          <div class="name" style="color:#e8eef9;">パネル</div>
+          <div class="hex" style="color:#75d7c0;">#111a2b</div>
+          <div class="use">.panel の背景</div>
+        </div>
+        <div class="swatch" style="background: rgba(102,224,194,0.18); border-color: #66e0c2;">
+          <div class="name" style="color:#66e0c2;">アクセント（ティール）</div>
+          <div class="hex" style="color:#66e0c2;">#66e0c2 / #3dd8c5 / #75d7c0</div>
+          <div class="use">リンク・主要 CTA・OK ステータス</div>
+        </div>
+        <div class="swatch" style="background: rgba(244,184,96,0.18); border-color: #f4b860;">
+          <div class="name" style="color:#f4b860;">アクセント 2（オレンジ）</div>
+          <div class="hex" style="color:#f4b860;">#f4b860 / #fcd34d</div>
+          <div class="use">セクション見出し・強調・WARN</div>
+        </div>
+        <div class="swatch" style="background: rgba(255,107,107,0.16); border-color: #ff7070;">
+          <div class="name" style="color:#ff7070;">アラート（赤）</div>
+          <div class="hex" style="color:#ff7070;">#ff7070 / #fca5a5</div>
+          <div class="use">ALERT・リスク・DON'T</div>
+        </div>
+        <div class="swatch" style="background: rgba(79,255,176,0.16); border-color: #4FFFB0;">
+          <div class="name" style="color:#4FFFB0;">グリーン（NEW・成功）</div>
+          <div class="hex" style="color:#4FFFB0;">#4FFFB0</div>
+          <div class="use">NEW バッジ・recovery・DO</div>
+        </div>
+        <div class="swatch" style="background: rgba(167,139,250,0.18); border-color: #d8b4fe;">
+          <div class="name" style="color:#d8b4fe;">パープル</div>
+          <div class="hex" style="color:#d8b4fe;">#d8b4fe / accent-4</div>
+          <div class="use">モデル系タグ・LLM Hub アクセント</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>4. バッジ運用</h2>
+      <p>バッジは<strong>「常識的に分かる範囲」</strong>に絞る。多用すると目が滑る。</p>
+      <table>
+        <thead><tr><th>バッジ</th><th>意味</th><th>残置ルール</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="badge-demo" style="background: rgba(102,224,194,0.18); color:#66e0c2;">必読</span></td>
+            <td>新セッションがまず読むべきページ</td>
+            <td>恒久。役割変更まで外さない</td>
+          </tr>
+          <tr>
+            <td><span class="badge-demo" style="background: rgba(79,255,176,0.16); color:#4FFFB0;">NEW</span></td>
+            <td>最近追加・大きく刷新されたページ</td>
+            <td>1ヶ月経過で外す</td>
+          </tr>
+          <tr>
+            <td><span class="badge-demo" style="background: rgba(244,184,96,0.18); color:#fcd34d;">LIVE</span></td>
+            <td>定期更新を続けるダッシュボード等</td>
+            <td>恒久。役割変更まで外さない</td>
+          </tr>
+          <tr>
+            <td><span class="badge-demo" style="background: rgba(150,150,180,0.16); color:#b0b0c8;">アーカイブ</span></td>
+            <td>過去の資料（イベント終了済み等）</td>
+            <td>恒久</td>
+          </tr>
+          <tr>
+            <td><span class="badge-demo" style="background: rgba(167,139,250,0.18); color:#d8b4fe;">PROPOSED</span></td>
+            <td>ADR で提案段階</td>
+            <td>採用 / 却下で外す</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel">
+      <h2>5. ファイル命名規約</h2>
+      <table>
+        <thead><tr><th>パターン</th><th>用途</th><th>例</th></tr></thead>
+        <tbody>
+          <tr><td><code>kebab-case.html</code></td><td>標準。全小文字・ハイフン区切り</td><td><code>onboarding-checklist.html</code></td></tr>
+          <tr><td><code>YYYY-MM-DD-name.html</code></td><td>日付付き（セッションログ・日次ニュース）</td><td><code>2026-04-06-session-log.html</code></td></tr>
+          <tr><td><code>YYYY-qN-name.html</code></td><td>四半期もの</td><td><code>2026-q2-review.html</code></td></tr>
+          <tr><td><code>trend-&lt;topic&gt;.html</code></td><td>Industry Trends 配下の長文</td><td><code>trend-ipo-race.html</code></td></tr>
+          <tr><td><code>NNN-slug.html</code></td><td>連番系（ADR を独立ファイル化する場合）</td><td><code>001-llm-hub-spinoff.html</code></td></tr>
+        </tbody>
+      </table>
+      <div class="dont">
+        <strong>NG:</strong> 大文字混在（<code>HubHealth.html</code>）、アンダースコア（<code>hub_health.html</code>）、日本語ファイル名、スペース入り
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>6. 日付・数値の書式</h2>
+      <ul>
+        <li><strong>日付:</strong> <code>YYYY-MM-DD</code> 統一（例: <code>2026-05-26</code>）</li>
+        <li><strong>日付範囲:</strong> 「<code>2026-05-19〜21</code>」「<code>2026年5月19〜21日</code>」どちらでも可、ページ内で統一</li>
+        <li><strong>四半期:</strong> 「<code>2026 Q2</code>」「<code>Q2 2026</code>」「<code>2026年Q2</code>」のどれでも可、ページ内で統一</li>
+        <li><strong>大きな数値:</strong> 「<code>$900B</code>」「<code>$10.9B</code>」（B = Billion）、和訳必要なら「<code>$900B（約135兆円）</code>」</li>
+        <li><strong>パーセント:</strong> 「<code>52.5%</code>」（半角％は使わない）</li>
+        <li><strong>バージョン:</strong> 「<code>v2.1.147</code>」「<code>Opus 4.7</code>」（ピリオド区切り）</li>
+      </ul>
+    </div>
+
+    <div class="panel">
+      <h2>7. リンクの張り方</h2>
+
+      <h3>原則: 出典は実 URL に張る</h3>
+      <p>外部リンクは必ず WebSearch / WebFetch で実在確認してから書く（<a href="anti-patterns.html#AP-002">AP-002</a> 参照）。</p>
+
+      <div class="do">
+        <strong>OK:</strong> <code>&lt;a href="https://techcrunch.com/2026/05/19/..."&gt;TechCrunch&lt;/a&gt;（2026-05-19）</code>
+      </div>
+      <div class="dont">
+        <strong>NG:</strong> 推測 URL を確認せずに書く / 「<code>~/article-name</code>」のような形式の架空 URL
+      </div>
+
+      <h3>原則: 内部リンクは相対パス</h3>
+      <p><code>../foundations/glossary.html</code> のように、リポジトリルートからの絶対パスは使わない（GitHub Pages 等のサブパスデプロイで壊れる）。</p>
+
+      <h3>「関連」セクションのテンプレ</h3>
+      <p>ページの最後に必ず「関連」セクションを置く。最低限「親カテゴリ index」「Hub Top」「明らかに関連する2-3ページ」へのリンク。</p>
+    </div>
+
+    <div class="panel">
+      <h2>8. 強調表現の使い分け</h2>
+      <table>
+        <thead><tr><th>記法</th><th>用途</th><th>頻度</th></tr></thead>
+        <tbody>
+          <tr><td><code>&lt;strong&gt;</code></td><td>キーワード・数値・結論</td><td>1段落 0-3 個程度</td></tr>
+          <tr><td><code>&lt;code&gt;</code></td><td>コマンド・ファイル名・コード片</td><td>必要なだけ</td></tr>
+          <tr><td><code>&lt;em&gt;</code></td><td>使わない（イタリックは日本語で読みにくい）</td><td>—</td></tr>
+          <tr><td>全文 <strong>太字</strong></td><td>禁止</td><td>—</td></tr>
+        </tbody>
+      </table>
+      <div class="do">
+        <strong>OK:</strong> 「Anthropic は <strong>5月23日週にクローズ見込み</strong>の調達で、評価額は <strong>$900B 規模</strong>と報じられている。」（強調 2 箇所）
+      </div>
+      <div class="dont">
+        <strong>NG:</strong> 全部 <strong>太字</strong> にしたり、<strong>1段落</strong> に <strong>5箇所</strong> も <strong>strong</strong> を <strong>使う</strong>こと
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>9. リスト・テーブルの選び方</h2>
+      <table>
+        <thead><tr><th>形式</th><th>使い時</th></tr></thead>
+        <tbody>
+          <tr><td><code>&lt;ul&gt;</code></td><td>列挙（順序に意味なし）。3-7 項目が目安</td></tr>
+          <tr><td><code>&lt;ol&gt;</code></td><td>手順・ステップ（順序に意味あり）</td></tr>
+          <tr><td><code>&lt;table&gt;</code></td><td>2軸の比較・分類（列＝属性、行＝対象）</td></tr>
+          <tr><td>段落散文</td><td>1-2 項目の場合は無理にリスト化しない</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel">
+      <h2>10. コード・コマンドブロック</h2>
+      <p><code>&lt;pre&gt;</code> の左に必ず<strong>3px ティール枠</strong>を付ける（既存パターン）。シンタックスハイライトはしない（軽量さ優先）。</p>
+      <pre>git fetch origin
+git status
+git log --oneline -10</pre>
+      <p>1行コマンドは <code>&lt;code&gt;</code> インラインで。複数行・出力例は <code>&lt;pre&gt;</code>。</p>
+    </div>
+
+    <div class="panel">
+      <h2>11. ページ末尾の必須要件</h2>
+      <ol>
+        <li><strong>最終更新日</strong>: <code>YYYY-MM-DD</code> 形式で必ず記載</li>
+        <li><strong>関連リンク</strong>: 親カテゴリ index へ・Hub Top へ・関連 2-3 ページ</li>
+        <li><strong>ソース表記</strong>: 外部情報を引いた場合は出典を実 URL 付きで明記</li>
+      </ol>
+
+      <h3>例（Light 系）</h3>
+      <pre>&lt;p class="small"&gt;最終更新: 2026-05-26&lt;/p&gt;
+
+&lt;div class="panel"&gt;
+  &lt;h2&gt;関連&lt;/h2&gt;
+  &lt;ul&gt;
+    &lt;li&gt;&lt;a href="..."&gt;...&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/div&gt;</pre>
+
+      <h3>例（Rich 系）</h3>
+      <pre>&lt;p class="last-update"&gt;最終更新: 2026-05-26&lt;/p&gt;</pre>
+    </div>
+
+    <div class="panel">
+      <h2>12. ページ長の目安</h2>
+      <table>
+        <thead><tr><th>用途</th><th>目安行数</th><th>例</th></tr></thead>
+        <tbody>
+          <tr><td>カテゴリ index</td><td>40-100行</td><td><a href="../strategy/index.html">strategy/index.html</a></td></tr>
+          <tr><td>参照ドキュメント（短）</td><td>100-300行</td><td><a href="anti-patterns.html">anti-patterns.html</a></td></tr>
+          <tr><td>運用プロトコル（中）</td><td>300-500行</td><td><a href="multi-instance-protocol.html">multi-instance-protocol.html</a></td></tr>
+          <tr><td>長文記事（長）</td><td>400-700行</td><td><a href="../research/trend-ipo-race.html">trend-ipo-race.html</a></td></tr>
+          <tr><td>完全版トラッカー</td><td>700-1200行</td><td><a href="../research/claude-recent-updates.html">claude-recent-updates.html</a></td></tr>
+        </tbody>
+      </table>
+      <p>1500行を超える単一ページは<strong>分割を検討</strong>。読み込み・編集・スクロール全てが重くなる。</p>
+    </div>
+
+    <div class="panel">
+      <h2>13. 「Done の定義」（簡易）</h2>
+      <p>ページを「完成」とみなす最低条件:</p>
+      <ul>
+        <li>☑ <code>&lt;title&gt;</code> が「<code>ページ名 | カテゴリ名</code>」形式</li>
+        <li>☑ breadcrumb がある（親カテゴリ・Hub Top へのリンク）</li>
+        <li>☑ <code>&lt;h1&gt;</code> が 1 回</li>
+        <li>☑ 最終更新日が記載</li>
+        <li>☑ 関連セクションがある</li>
+        <li>☑ 外部リンクは実在確認済み</li>
+        <li>☑ 親カテゴリ index からリンクが張られている</li>
+        <li>☑ コンソールエラー（broken markup）が無い</li>
+      </ul>
+      <p>※ 詳細な「Done 定義」は Phase 3 で <code>foundations/definition-of-done.html</code> として別建て予定。</p>
+    </div>
+
+    <div class="panel">
+      <h2>関連</h2>
+      <ul>
+        <li><a href="page-template.html">Page Template</a> — 新規ページの boilerplate</li>
+        <li><a href="site-map.html">Site Map</a> — 全 158 ページ索引</li>
+        <li><a href="onboarding-checklist.html">Onboarding Checklist</a> — 新セッションの最初の10分</li>
+        <li><a href="anti-patterns.html">アンチパターン集</a> — 過去の失敗例（執筆ミスを避けるため）</li>
+        <li><a href="glossary.html">用語集</a> — 固有用語の表記統一</li>
+      </ul>
+    </div>
+
+  </div>
+</body>
+</html>

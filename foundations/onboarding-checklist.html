@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Onboarding Checklist | Foundations</title>
+  <style>
+    body { font-family: "Segoe UI", "Noto Sans JP", system-ui, sans-serif; margin: 0; background: #0b1220; color: #edf2fb; line-height: 1.72; padding: 28px 18px 56px; }
+    .shell { max-width: 1080px; margin: 0 auto; display: grid; gap: 18px; }
+    .panel { background: #111a2b; border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 24px 26px; }
+    a { color: #75d7c0; }
+    h1, h2, h3 { margin: 0 0 10px; }
+    p, li { color: #c5d0e3; }
+    code {
+      font-family: "Fira Code", "Consolas", monospace;
+      background: rgba(255,255,255,0.06);
+      padding: 1px 6px;
+      border-radius: 5px;
+      font-size: 0.86em;
+      color: #a5f3d0;
+    }
+    pre {
+      background: rgba(0,0,0,0.4);
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      color: #c5d0e3;
+      overflow-x: auto;
+      border-left: 3px solid #3dd8c5;
+    }
+    .step {
+      background: rgba(255,255,255,0.03);
+      border-radius: 12px;
+      padding: 14px 16px 14px 60px;
+      margin: 12px 0;
+      position: relative;
+      border-left: 3px solid #3dd8c5;
+    }
+    .step .num {
+      position: absolute;
+      left: 14px;
+      top: 14px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #3dd8c5;
+      color: #07111d;
+      font-weight: 800;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .step h3 { color: #edf2fb; font-size: 1.02rem; margin-bottom: 6px; }
+    .step .why { color: #7f92ac; font-size: 0.85rem; font-style: italic; margin-top: 6px; }
+    .phase-header {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      margin: 20px 0 6px;
+      padding-left: 4px;
+    }
+    .phase-header .label {
+      padding: 4px 10px;
+      border-radius: 5px;
+      background: rgba(244,184,96,0.16);
+      color: #fcd34d;
+      font-weight: 800;
+      font-size: 0.74rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .phase-header .time { color: #7f92ac; font-size: 0.82rem; }
+    .flow-box {
+      background: rgba(244,184,96,0.05);
+      border: 1px solid rgba(244,184,96,0.25);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin: 12px 0;
+    }
+    .flow-box h3 { color: #fcd34d; font-size: 0.98rem; }
+    .flow-box .if {
+      font-size: 0.82rem;
+      color: #fcd34d;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      margin-right: 4px;
+    }
+    .checkbox {
+      color: #4FFFB0;
+      margin-right: 6px;
+      font-weight: 800;
+    }
+    .warn {
+      background: rgba(255,107,107,0.06);
+      border: 1px solid rgba(255,107,107,0.25);
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin: 10px 0;
+      font-size: 0.88rem;
+    }
+    .warn strong { color: #ff7070; }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="panel">
+      <p><a href="index.html">← Foundations</a> / <a href="../index.html">Hub Top</a></p>
+      <h1>Onboarding Checklist — 新セッションの最初の10分</h1>
+      <p>
+        新しい Claude / Codex セッション（または久しぶりに戻ってきた人）が、<strong>このハブで作業を始めるまで</strong>に踏むべき具体ステップです。
+        <code>CLAUDE.md</code> が「<strong>何を読むべきか</strong>」を示すのに対して、このページは「<strong>何をするか</strong>」を時系列で示します。
+      </p>
+      <p>所要時間: 通常作業前で <strong>5-10分</strong>。大きな構造変更の前は + 5-10分。</p>
+    </div>
+
+    <div class="panel">
+      <div class="phase-header"><span class="label">Phase A</span><span class="time">最初の 3 分 — Git とブランチ状態の把握</span></div>
+
+      <div class="step">
+        <div class="num">1</div>
+        <h3>作業ディレクトリと git の状態を確認</h3>
+        <pre>git status
+git fetch origin
+git log --oneline -10</pre>
+        <ul>
+          <li><strong>untracked / modified が残っていないか</strong> — 前回作業の残骸がないか確認</li>
+          <li><strong>"behind" 表示があれば即 pull</strong> — 並走作業の取り込み（→ <a href="multi-instance-protocol.html">並走プロトコル</a>）</li>
+          <li><strong>最近10コミットの傾向</strong> — 誰が・何を更新中か把握</li>
+        </ul>
+        <p class="why">→ なぜ：自分の作業が古い状態で進んで、後でコンフリクトする事故を防ぐ。AP-001 / RP-001 で実証済み。</p>
+      </div>
+
+      <div class="step">
+        <div class="num">2</div>
+        <h3>並走ブランチの存在を確認</h3>
+        <pre>git branch -r | grep "claude/"</pre>
+        <ul>
+          <li><code>claude/laughing-cannon-*</code> 等の自動命名ブランチがあれば、別セッションが同時稼働している可能性</li>
+          <li>並走を検出したら <a href="multi-instance-protocol.html">並走プロトコル</a> を必ず読む</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="phase-header"><span class="label">Phase B</span><span class="time">最初の 5 分 — このハブの「現在地点」を把握</span></div>
+
+      <div class="step">
+        <div class="num">3</div>
+        <h3>必読ファイル 4 点をチェック</h3>
+        <ul>
+          <li><a href="../CLAUDE.md">CLAUDE.md</a> — 目的・フォルダ規則・編集方針</li>
+          <li><a href="align-lab-context.html">ALIGN Lab Context</a> — ハブが何のために存在するか（ALIGN_Lab レポは別。<strong>このページが ALIGN_Lab の自己紹介を兼ねている</strong>）</li>
+          <li><a href="agent-protocol.html">Agent Protocol</a> — エージェントとして作業する時のルール</li>
+          <li><a href="../logs/next-actions.html">Next Actions</a> — 直近の TODO・優先タスク</li>
+        </ul>
+        <p class="why">→ なぜ：このハブの「<strong>何を達成しようとしているか</strong>」が変わることがある。前回の前提のまま動くと、すでに変わった方針と衝突する。</p>
+      </div>
+
+      <div class="step">
+        <div class="num">4</div>
+        <h3>運用ダッシュボードで全体の健全性を確認</h3>
+        <ul>
+          <li><a href="../logs/hub-health.html">Hub Health Dashboard</a> — 各カテゴリの鮮度・要対応 ALERT を一目で</li>
+          <li><a href="../logs/2026-q2-review.html">直近の四半期レビュー</a> — Q の達成・ミス・次方針</li>
+        </ul>
+        <p class="why">→ なぜ：「次に何を更新するか」は気分で決めない。ダッシュボードで <strong>ALERT が出ているカテゴリ</strong>を最優先に。</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="phase-header"><span class="label">Phase C</span><span class="time">最初の 10 分 — 過去の判断と失敗を把握</span></div>
+
+      <div class="step">
+        <div class="num">5</div>
+        <h3>直近の決定ログ（ADR）を斜め読み</h3>
+        <ul>
+          <li><a href="decisions.html">decisions.html</a> の上から 3-5 件を読む</li>
+          <li>「<strong>なぜ今この構造なのか</strong>」を理解する。納得できなくても、まずは現状を尊重</li>
+          <li>覆したくなったら、新しい ADR を書く（既存を上書きしない）</li>
+        </ul>
+        <p class="why">→ なぜ：構造はだいたい意図的にそうなっている。背景を知らずに「整理」すると、過去の決断を踏み潰す。</p>
+      </div>
+
+      <div class="step">
+        <div class="num">6</div>
+        <h3>アンチパターンと用語集に目を通す</h3>
+        <ul>
+          <li><a href="anti-patterns.html">anti-patterns.html</a> の AP-001〜006 を斜め読み（5分以内）— 過去エージェントの典型ミス</li>
+          <li><a href="glossary.html">glossary.html</a> — 知らない用語が出たら都度ここを引く</li>
+        </ul>
+        <p class="why">→ なぜ：同じ失敗を繰り返さない。「ありそうな URL を書く」「日付を混同する」等の典型ミスは避けられる。</p>
+      </div>
+
+      <div class="step">
+        <div class="num">7</div>
+        <h3>今やる作業のカテゴリを決める</h3>
+        <ul>
+          <li>変更が <strong>制作・技術コア</strong>（Creator System / Claw Stack / Tech Workbench / LLM 個別深掘り）か</li>
+          <li><strong>ナレッジ・資料</strong>（Industry Trends / Briefings）か</li>
+          <li><strong>ハブ運用</strong>（Foundations / Strategy / Logs）か</li>
+        </ul>
+        <p class="why">→ なぜ：カテゴリを決めずに変更すると、トップ index.html での配置がブレる。<a href="../CLAUDE.md">CLAUDE.md</a> のフォルダ規則を参照。</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>状況別フロー — 迷ったらここ</h2>
+
+      <div class="flow-box">
+        <h3><span class="if">IF</span> リンク切れを見つけた</h3>
+        <ol>
+          <li>該当ページを<strong>消さない</strong>。代わりに正しいリンクに修正する</li>
+          <li>修正できないなら、いったん <code>logs/next-actions.html</code> に「TODO: <code>X.html</code> リンク切れ修正」として残す</li>
+          <li>リンク先を勝手にリネームしない（<a href="decisions.html#005-demos-rename-skip">ADR-005</a> 参照）</li>
+        </ol>
+      </div>
+
+      <div class="flow-box">
+        <h3><span class="if">IF</span> どこに置くか分からない</h3>
+        <ol>
+          <li><a href="../CLAUDE.md">CLAUDE.md</a> の Folder Rules を見る</li>
+          <li>該当しなければ、<a href="glossary.html">用語集</a> で類似カテゴリを探す</li>
+          <li>それでも分からなければ、<strong>カテゴリを新設せず</strong>、いったん近いカテゴリの下に置いて ADR で「暫定配置」と記録</li>
+          <li>新カテゴリ追加判断は ADR-002（3カテゴリ構造）を参照してから</li>
+        </ol>
+      </div>
+
+      <div class="flow-box">
+        <h3><span class="if">IF</span> 並走を見つけた</h3>
+        <ol>
+          <li>即 <a href="multi-instance-protocol.html">並走プロトコル</a> を読む</li>
+          <li>相手の作業ブランチを<strong>消さない・上書きしない</strong></li>
+          <li>自分の作業が重複している可能性を疑う（同じトピックを書いてないか）</li>
+        </ol>
+      </div>
+
+      <div class="flow-box">
+        <h3><span class="if">IF</span> 大きな構造変更をしたくなった</h3>
+        <ol>
+          <li>その変更が「<strong>戻せるか</strong>」を考える。物理リネーム・フォルダ削除・カテゴリ統合は要注意</li>
+          <li>選択肢を 2-3 個用意してユーザーに提示（A/B/C 形式）</li>
+          <li>決まったら<strong>必ず ADR を書く</strong>。書くコストより後で読み返す価値の方が大きい</li>
+        </ol>
+      </div>
+
+      <div class="flow-box">
+        <h3><span class="if">IF</span> 情報の鮮度が分からない（古いかも？）</h3>
+        <ol>
+          <li>ページ末尾の <code>最終更新: YYYY-MM-DD</code> を確認</li>
+          <li>無い場合は <code>git log -1 --format="%ai" -- &lt;file&gt;</code> で確認</li>
+          <li><a href="../logs/hub-health.html">Hub Health</a> で対応するカテゴリの ALERT 状況を見る</li>
+        </ol>
+      </div>
+
+      <div class="flow-box">
+        <h3><span class="if">IF</span> URL や外部情報が必要</h3>
+        <ol>
+          <li><strong>記憶ベースで URL を書かない</strong>（AP-002 の典型ミス）</li>
+          <li>WebSearch / WebFetch で実在確認してから記載</li>
+          <li>確認できないなら <code>「Source: メディア名（日付）」</code>のテキストだけにしてリンクを張らない</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>セッション終了前のチェック</h2>
+      <p>作業を切り上げる前に以下を確認すると、次のセッションが困らない。</p>
+
+      <div class="step" style="border-left-color: #f4b860;">
+        <div class="num" style="background:#f4b860; color:#07111d;">✓</div>
+        <h3>編集したファイルの整合性チェック</h3>
+        <ul>
+          <li><span class="checkbox">☑</span> <code>最終更新</code> / <code>last-update</code> の日付を更新したか（grep で全箇所同期）</li>
+          <li><span class="checkbox">☑</span> 新規ファイルは親 index からリンクされているか</li>
+          <li><span class="checkbox">☑</span> 重複コンテンツが残っていないか（AP-005 防止）</li>
+          <li><span class="checkbox">☑</span> 外部リンクは実在確認済みか</li>
+        </ul>
+      </div>
+
+      <div class="step" style="border-left-color: #f4b860;">
+        <div class="num" style="background:#f4b860; color:#07111d;">✓</div>
+        <h3>意図を残す</h3>
+        <ul>
+          <li><span class="checkbox">☑</span> 構造変更があれば <a href="decisions.html">decisions.html</a> に ADR 追加</li>
+          <li><span class="checkbox">☑</span> 失敗・救済の事例があれば <a href="anti-patterns.html">anti-patterns.html</a> に記録</li>
+          <li><span class="checkbox">☑</span> 新用語が出たら <a href="glossary.html">glossary.html</a> に 1-2 行追加</li>
+          <li><span class="checkbox">☑</span> 重い作業をしたら <code>logs/sessions/YYYY-MM-DD.html</code> でセッションログ（Phase 4 で運用復活予定）</li>
+        </ul>
+      </div>
+
+      <div class="step" style="border-left-color: #f4b860;">
+        <div class="num" style="background:#f4b860; color:#07111d;">✓</div>
+        <h3>残作業を引き継ぐ</h3>
+        <ul>
+          <li><span class="checkbox">☑</span> 途中で止めたタスクは <a href="../logs/next-actions.html">next-actions.html</a> に追加</li>
+          <li><span class="checkbox">☑</span> commit する場合、明確なメッセージで（雑な「update」は禁止）</li>
+          <li><span class="checkbox">☑</span> push する前に必ず <code>git fetch && git status</code> で並走確認</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>クイックリンク（このページから直接遷移）</h2>
+      <ul>
+        <li><a href="../CLAUDE.md">CLAUDE.md</a> — 目的・フォルダ規則</li>
+        <li><a href="align-lab-context.html">ALIGN Lab Context</a> — ハブの存在理由</li>
+        <li><a href="agent-protocol.html">Agent Protocol</a> — 作業ルール</li>
+        <li><a href="operating-principles.html">運用原則</a> — なぜそうするか</li>
+        <li><a href="glossary.html">用語集</a> — 知らない単語が出たら</li>
+        <li><a href="decisions.html">決定ログ（ADR）</a> — なぜこの構造か</li>
+        <li><a href="anti-patterns.html">アンチパターン集</a> — 過去の失敗から学ぶ</li>
+        <li><a href="multi-instance-protocol.html">並走プロトコル</a> — 並列セッションの作法</li>
+        <li><a href="../logs/hub-health.html">Hub Health Dashboard</a> — 全体の健全性</li>
+        <li><a href="../logs/next-actions.html">Next Actions</a> — 直近 TODO</li>
+      </ul>
+    </div>
+
+    <div class="warn">
+      <strong>このページ自体が古くなる可能性:</strong> ハブの構造が大きく変わった時はこのチェックリストも更新する必要があります。<a href="../logs/hub-health.html">Hub Health</a> で <code>foundations/onboarding-checklist.html</code> の鮮度を四半期ごとに確認してください。
+    </div>
+
+  </div>
+</body>
+</html>

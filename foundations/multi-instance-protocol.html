@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>並走プロトコル | Foundations</title>
+  <style>
+    body { font-family: "Segoe UI", "Noto Sans JP", system-ui, sans-serif; margin: 0; background: #0b1220; color: #edf2fb; line-height: 1.72; padding: 28px 18px 56px; }
+    .shell { max-width: 1080px; margin: 0 auto; display: grid; gap: 18px; }
+    .panel { background: #111a2b; border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 24px 26px; }
+    a { color: #75d7c0; }
+    h1, h2, h3 { margin: 0 0 10px; }
+    p, li { color: #c5d0e3; }
+    code {
+      font-family: "Fira Code", "Consolas", monospace;
+      background: rgba(255,255,255,0.06);
+      padding: 1px 6px;
+      border-radius: 5px;
+      font-size: 0.86em;
+      color: #a5f3d0;
+    }
+    pre {
+      background: rgba(0,0,0,0.4);
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      color: #c5d0e3;
+      overflow-x: auto;
+      border-left: 3px solid #3dd8c5;
+    }
+    .rule {
+      background: rgba(102,224,194,0.05);
+      border: 1px solid rgba(102,224,194,0.22);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin: 12px 0;
+    }
+    .rule h3 { color: #3dd8c5; font-size: 1rem; }
+    .rule .why { color: #7f92ac; font-size: 0.86rem; font-style: italic; margin-top: 6px; }
+    .danger {
+      background: rgba(255,107,107,0.06);
+      border: 1px solid rgba(255,107,107,0.3);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin: 12px 0;
+    }
+    .danger h3 { color: #ff7070; font-size: 1rem; }
+    .scenario {
+      border-left: 3px solid #f4b860;
+      padding: 10px 0 10px 16px;
+      margin: 14px 0;
+    }
+    .scenario h3 { color: #fcd34d; font-size: 1rem; }
+    .scenario .role {
+      font-size: 0.78rem;
+      color: #7f92ac;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    th { text-align: left; padding: 10px 12px; color: #fcd34d; border-bottom: 2px solid rgba(244,184,96,0.3); font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 5px;
+      font-size: 0.74rem;
+      font-weight: 700;
+    }
+    .pill.do { background: rgba(79,255,176,0.16); color: #4FFFB0; }
+    .pill.dont { background: rgba(255,107,107,0.16); color: #ff7070; }
+    .pill.case { background: rgba(167,139,250,0.16); color: #d8b4fe; }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="panel">
+      <p><a href="index.html">← Foundations</a> / <a href="../index.html">Hub Top</a></p>
+      <h1>並走プロトコル — マルチインスタンス運用</h1>
+      <p>
+        このハブは<strong>複数の Claude / Codex セッションが非同期で同時稼働</strong>することを前提に運用されています。
+        本ページは、並走を検出した時の振る舞い・ブランチ命名規約・コンフリクト解消手順・コミュニケーション方法を定めます。
+      </p>
+      <p>並走が現実であることは <a href="decisions.html#008-trend-articles">ADR-008</a>（Trend 記事6本の並走立ち上げ）と <a href="anti-patterns.html#RP-001">RP-001</a>（pull 漏れによるコンフリクトの回避パターン）で実証済み。</p>
+    </div>
+
+    <div class="panel">
+      <h2>なぜこのプロトコルが必要か</h2>
+      <p>並走を放置すると以下のような問題が起きる:</p>
+      <ul>
+        <li><strong>同じファイルを別々に編集</strong> → push 時にコンフリクト、最悪片方の作業が失われる</li>
+        <li><strong>同じトピックを別々に書く</strong> → 重複コンテンツがハブ内に存在することになる（AP-005 の重複問題と同根）</li>
+        <li><strong>古い前提で意思決定</strong> → 別セッションがすでに ADR を書いた構造を踏み潰してしまう</li>
+        <li><strong>並走ブランチを発見できない</strong> → 自分の作業が無効化されていることに気付かない</li>
+      </ul>
+      <p>これらは「<strong>一人で書いている前提</strong>」を捨てるだけで、ほぼ防げる。</p>
+    </div>
+
+    <div class="panel">
+      <h2>1. 並走の検出</h2>
+
+      <div class="rule">
+        <h3>セッション開始時に必ず実行</h3>
+        <pre>git fetch origin
+git status
+git branch -r | grep -E "claude/|codex/"</pre>
+        <ul>
+          <li><code>"behind N commits"</code> 表示があれば、<strong>即 <code>git pull</code></strong>。差分を取り込んでから作業</li>
+          <li><code>claude/laughing-cannon-*</code> 等の自動命名ブランチがリモートに複数あれば並走の証拠</li>
+          <li>直近のコミット（<code>git log --oneline -10</code>）で誰が何をしているか把握</li>
+        </ul>
+        <p class="why">→ 並走作業の取り込みなしに編集を始めると、コンフリクトが確定する。事前に必ず確認。</p>
+      </div>
+
+      <div class="rule">
+        <h3>大きな編集の前にも再 fetch</h3>
+        <pre>git fetch origin
+git log HEAD..origin/main --oneline</pre>
+        <p>セッション開始から30分以上経った場合、<strong>編集前にもう一度 fetch</strong> して別セッションの新着コミットを確認する。長時間作業中に並走作業が降ってくることがある。</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>2. ブランチ命名規約</h2>
+      <table>
+        <thead>
+          <tr><th>パターン</th><th>用途</th><th>例</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>main</code></td>
+            <td>公開状態。直接コミット可（小さな修正・即時反映）</td>
+            <td>—</td>
+          </tr>
+          <tr>
+            <td><code>claude/&lt;auto&gt;</code></td>
+            <td>Claude 自動命名のフィーチャーブランチ（並走作業用）</td>
+            <td><code>claude/laughing-cannon-bKOHI</code></td>
+          </tr>
+          <tr>
+            <td><code>codex/&lt;auto&gt;</code></td>
+            <td>Codex 自動命名のフィーチャーブランチ</td>
+            <td><code>codex/feature-xxx</code></td>
+          </tr>
+          <tr>
+            <td><code>feat/&lt;slug&gt;</code></td>
+            <td>人手でつける明示的なフィーチャーブランチ</td>
+            <td><code>feat/sitemap</code></td>
+          </tr>
+          <tr>
+            <td><code>fix/&lt;slug&gt;</code></td>
+            <td>小さな修正系</td>
+            <td><code>fix/broken-link</code></td>
+          </tr>
+          <tr>
+            <td><code>experiment/&lt;slug&gt;</code></td>
+            <td>戻すことを前提とした実験</td>
+            <td><code>experiment/new-css</code></td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="margin-top: 12px;">
+        <strong>原則:</strong> 自動命名ブランチ（<code>claude/*</code> / <code>codex/*</code>）は<strong>消さない</strong>。手動 push したブランチも、リモートに残っていれば「別セッションが使用中の可能性」を疑う。
+      </p>
+    </div>
+
+    <div class="panel">
+      <h2>3. 並走に遭遇した時の振る舞い</h2>
+
+      <div class="scenario">
+        <div class="role"><span class="pill case">CASE A</span></div>
+        <h3>リモートに「behind」が出た（自分が古い）</h3>
+        <ol>
+          <li><code>git pull</code> で差分を取り込む</li>
+          <li>取り込まれたコミットの内容を <code>git log -p HEAD@{1}..HEAD</code> で確認</li>
+          <li>自分が編集しようとしていたファイルが含まれていないか確認</li>
+          <li>含まれていれば、自分のタスクをやり直しか、既に解決済みかを判定</li>
+        </ol>
+      </div>
+
+      <div class="scenario">
+        <div class="role"><span class="pill case">CASE B</span></div>
+        <h3>同じファイルを別セッションが編集中</h3>
+        <ol>
+          <li>自分の編集を新規ブランチ（<code>fix/...</code> 等）に隔離</li>
+          <li>相手の作業が main に着地するのを待つ（短時間なら）</li>
+          <li>長引くなら、相手の編集箇所と<strong>衝突しない</strong>部分だけ先にコミット</li>
+          <li>同じ行を編集する必要があるなら、ユーザーに判断を仰ぐ</li>
+        </ol>
+      </div>
+
+      <div class="scenario">
+        <div class="role"><span class="pill case">CASE C</span></div>
+        <h3>並走作業が完了して main に取り込まれた（自分の作業が無効化）</h3>
+        <ol>
+          <li>慌てず差分を確認（自分の作業が完全に置き換わったか、部分的か）</li>
+          <li>並走側の出力の方が品質が高ければ、自分の作業は捨てる</li>
+          <li>並走側に欠けている観点があれば、追記する形で再開</li>
+          <li>ADR にこの経緯を残す（ADR-008 のように「並走で立ち上がった」記録は資産）</li>
+        </ol>
+      </div>
+
+      <div class="scenario">
+        <div class="role"><span class="pill case">CASE D</span></div>
+        <h3>同じトピックを別々に書いていた</h3>
+        <ol>
+          <li>両方の成果物を比較（行数・取材深さ・ソース）</li>
+          <li>片方を「正本」とし、もう片方の独自情報を吸収</li>
+          <li>「ベンダー横断は Industry Trends、個別は LLM トラッカー」のような<strong>役割分担</strong>を ADR で定める</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>4. やってはいけないこと（Don'ts）</h2>
+
+      <div class="danger">
+        <h3><span class="pill dont">DON'T</span> 並走ブランチを勝手に削除</h3>
+        <p><code>claude/*</code> / <code>codex/*</code> のリモートブランチを <code>git push --delete</code> しない。他セッションがまだ使っている可能性。<strong>削除はユーザーが明示的に指示した時のみ</strong>。</p>
+      </div>
+
+      <div class="danger">
+        <h3><span class="pill dont">DON'T</span> force push を main へ</h3>
+        <p><code>git push --force</code> / <code>--force-with-lease</code> を <code>main</code> ブランチに対して行わない。他セッションの作業を消す。フィーチャーブランチでも、相手が pull していたら force は事故の元。</p>
+      </div>
+
+      <div class="danger">
+        <h3><span class="pill dont">DON'T</span> 別セッションのコミットを revert</h3>
+        <p>「自分のと違う」と感じても、即座に revert しない。意図が分からないなら<a href="decisions.html">decisions.html</a> の最近の ADR を確認、または next-actions に「TODO: 〇〇 のコミット意図確認」として残す。</p>
+      </div>
+
+      <div class="danger">
+        <h3><span class="pill dont">DON'T</span> long-lived branch を放置</h3>
+        <p>自分のフィーチャーブランチが 1週間以上 unmerged のまま放置されたら、<strong>消すか main にマージするか</strong>決める。放置すると他セッションが「これは何？」と混乱する。</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>5. やるべきこと（Do's）</h2>
+
+      <div class="rule">
+        <h3><span class="pill do">DO</span> 小さく頻繁にコミット</h3>
+        <p>1ページ完成 = 1コミットくらいの粒度で。大きな塊を抱え続けるとコンフリクトリスクが上がる。</p>
+      </div>
+
+      <div class="rule">
+        <h3><span class="pill do">DO</span> コミットメッセージで「何のタスクか」を明示</h3>
+        <p>「update」「fix」だけのメッセージは禁止。「<code>foundations/multi-instance-protocol を新規作成（Phase 1）</code>」のように、後で別セッションが見て分かるレベルで書く。</p>
+      </div>
+
+      <div class="rule">
+        <h3><span class="pill do">DO</span> 並走を予告する</h3>
+        <p>長時間ロックする作業（同じファイルを30分以上編集する等）の場合、<strong>事前にコミット</strong>して状態を明示。または <code>logs/next-actions.html</code> に「作業中: foundations/* を再構成中（claude-XXX セッション）」と書いておく。</p>
+      </div>
+
+      <div class="rule">
+        <h3><span class="pill do">DO</span> 並走で発生した事象を ADR に残す</h3>
+        <p>ADR-008（Trend 記事の並走立ち上げ）のように、並走で起きたことは ADR で記録。後でパターンとして再利用できる。</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>6. コンフリクト解消の標準手順</h2>
+
+      <ol>
+        <li>
+          <strong>まず落ち着く</strong> — コンフリクトは「両方の作業が残るチャンス」。慌ててどちらかを捨てない。
+        </li>
+        <li>
+          <strong>コンフリクト箇所を全部リストアップ</strong>
+          <pre>git status                  # コンフリクト発生ファイル
+git diff --name-only --diff-filter=U</pre>
+        </li>
+        <li>
+          <strong>各コンフリクトを意味的に解消</strong>
+          <ul>
+            <li>テキストの追加同士なら、<strong>両方残す</strong>のが原則</li>
+            <li>同じ箇所の置換同士は、ユーザーに判断を仰ぐか、両方の意図を読んで統合</li>
+            <li>機械的な解消（行マージ）はしない</li>
+          </ul>
+        </li>
+        <li>
+          <strong>解消後に検証</strong>
+          <pre>git diff --check            # コンフリクトマーカー残存チェック
+grep -rn "<<<<<<\|>>>>>>" .  # 念のため二重チェック</pre>
+        </li>
+        <li>
+          <strong>コミットメッセージにコンフリクトを記録</strong>
+          <pre>Merge: foundations/ への並走編集を統合
+- claude/laughing-cannon-XXX の用語集追加
+- 自分の glossary レイアウト調整
+- 両方の意図を保持</pre>
+        </li>
+        <li>
+          <strong>解消パターンを記録</strong> — 大きなコンフリクトだったら ADR か <a href="anti-patterns.html">anti-patterns</a> に追加。
+        </li>
+      </ol>
+    </div>
+
+    <div class="panel">
+      <h2>7. 「明示的コミュニケーション」のしくみ</h2>
+      <p>並走セッションは互いに直接話せない。代わりに以下のファイルが<strong>メッセージボード</strong>として機能する:</p>
+
+      <table>
+        <thead>
+          <tr><th>媒体</th><th>用途</th><th>レイテンシ</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><a href="../logs/next-actions.html">logs/next-actions.html</a></td>
+            <td>「これから何をやる」「作業中」の宣言</td>
+            <td>編集と同時に反映</td>
+          </tr>
+          <tr>
+            <td><a href="decisions.html">foundations/decisions.html</a> (ADR)</td>
+            <td>「こう決めた」の記録。覆す時は新 ADR で</td>
+            <td>編集と同時</td>
+          </tr>
+          <tr>
+            <td><code>logs/sessions/YYYY-MM-DD.html</code></td>
+            <td>「何をやったか」の時系列ログ（Phase 4 で運用復活予定）</td>
+            <td>セッション終了時</td>
+          </tr>
+          <tr>
+            <td>コミットメッセージ</td>
+            <td>細かい変更の意図</td>
+            <td>コミット時</td>
+          </tr>
+          <tr>
+            <td><a href="anti-patterns.html">foundations/anti-patterns.html</a></td>
+            <td>「これは失敗パターン」の警告</td>
+            <td>編集と同時</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p style="margin-top: 12px;"><strong>原則:</strong> 並走相手に伝えたいことは、すべて<strong>テキストとしてリポにコミット</strong>する。記憶や思考の中に留めない。</p>
+    </div>
+
+    <div class="panel">
+      <h2>8. クイックリファレンス（コマンド集）</h2>
+      <pre># 開始時のチェック
+git fetch origin
+git status
+git branch -r | grep -E "claude/|codex/"
+git log --oneline -10
+
+# 別セッションの最近の作業を確認
+git log HEAD..origin/main --oneline
+
+# 自分の作業中のブランチを整理
+git branch --merged main      # 削除可能なローカルブランチ
+git branch -d &lt;branch&gt;        # マージ済みブランチを削除
+
+# コンフリクト発生時
+git status
+git diff --name-only --diff-filter=U
+grep -rn "&lt;&lt;&lt;&lt;&lt;&lt;" .
+
+# push 前の最終確認
+git fetch origin
+git status                    # behind になっていないか
+git log origin/main..HEAD     # これから push するコミット一覧</pre>
+    </div>
+
+    <div class="panel">
+      <h2>関連ドキュメント</h2>
+      <ul>
+        <li><a href="onboarding-checklist.html">Onboarding Checklist</a> — 新セッションの最初の10分</li>
+        <li><a href="agent-protocol.html">Agent Protocol</a> — 単独セッション時の作業ルール</li>
+        <li><a href="decisions.html">決定ログ（ADR）</a> — 並走で生まれた決断の記録</li>
+        <li><a href="anti-patterns.html">アンチパターン集</a> — RP-001（pull 漏れ防止パターン）</li>
+        <li><a href="../logs/hub-health.html">Hub Health Dashboard</a> — ハブ全体の健全性</li>
+      </ul>
+    </div>
+
+  </div>
+</body>
+</html>
