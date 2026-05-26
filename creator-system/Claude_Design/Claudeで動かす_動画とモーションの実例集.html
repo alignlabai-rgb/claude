@@ -1,0 +1,1906 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1480">
+<title>Claudeで動かす｜動画とモーションの実例集</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Yusei+Magic&family=Zen+Maru+Gothic:wght@500;700;900&family=Kaisei+Decol:wght@400;700&family=Shippori+Mincho:wght@400;700&family=DotGothic16&family=Reenie+Beanie&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --paper: #FBF6E9;
+    --paper-2: #F4ECD2;
+    --ink: #1C1B1A;
+    --ink-soft: #4A453E;
+    --red: #E63946;
+    --red-soft: #FBD6D9;
+    --yellow: #FFD23F;
+    --yellow-dk: #C99500;
+    --yellow-soft: #FFF1B8;
+    --blue: #3B82C4;
+    --blue-soft: #D6E6F4;
+    --green: #5BA84A;
+    --green-soft: #DCEEDA;
+    --orange: #F2994A;
+    --orange-soft: #FCE3CC;
+    --purple: #8B5CB6;
+    --purple-soft: #E5DAF2;
+    --pink: #F4B6C2;
+    --pink-soft: #FBDDE3;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    background-image:
+      linear-gradient(rgba(28,27,26,0.055) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(28,27,26,0.055) 1px, transparent 1px),
+      radial-gradient(circle at 90% 8%, rgba(242,153,74,0.16), transparent 38%),
+      radial-gradient(circle at 6% 96%, rgba(255,210,63,0.14), transparent 42%);
+    background-size: 32px 32px, 32px 32px, 100% 100%, 100% 100%;
+    line-height: 1.65;
+    font-weight: 500;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page {
+    max-width: 1480px;
+    margin: 0 auto;
+    padding: 56px 56px 120px;
+    position: relative;
+  }
+
+  .tape {
+    position: absolute;
+    background: rgba(255, 210, 63, 0.78);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    width: 140px; height: 28px;
+    border-left: 1px dashed rgba(0,0,0,0.15);
+    border-right: 1px dashed rgba(0,0,0,0.15);
+    z-index: 50; pointer-events: none;
+  }
+  .tape.pink { background: rgba(244, 182, 194, 0.85); }
+  .tape.blue { background: rgba(214, 230, 244, 0.92); }
+  .tape.green { background: rgba(91, 168, 74, 0.7); }
+  .tape.red  { background: rgba(230, 57, 70, 0.6); }
+  .tape.purple { background: rgba(139,92,182,0.6); }
+  .tape.orange { background: rgba(242,153,74,0.65); }
+
+  /* ---------- COVER ---------- */
+  .cover {
+    position: relative;
+    padding: 36px 40px 32px;
+    border: 3px solid var(--ink);
+    background: var(--paper);
+    border-radius: 18px;
+    box-shadow: 8px 8px 0 var(--ink);
+    margin-bottom: 64px;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: "";
+    position: absolute; inset: 8px;
+    border: 1.5px dashed var(--ink);
+    border-radius: 12px;
+    pointer-events: none;
+  }
+  .cover .tape.t1 { top: -14px; left: 80px; transform: rotate(-4deg); background: rgba(242,153,74,0.6);}
+  .cover .tape.t2 { top: -14px; right: 120px; transform: rotate(3deg); }
+  .cover-grid { display: grid; grid-template-columns: 1fr 380px; gap: 30px; align-items: center; }
+
+  .chapter-tag {
+    display: inline-block;
+    font-family: "DotGothic16", monospace;
+    background: var(--ink); color: var(--paper);
+    padding: 6px 14px; border-radius: 4px;
+    font-size: 14px; letter-spacing: 0.12em;
+    margin-bottom: 18px;
+  }
+  .chapter-tag .vol {
+    background: var(--orange);
+    color: var(--ink);
+    padding: 2px 8px;
+    border-radius: 3px;
+    margin-right: 8px;
+    font-weight: 700;
+  }
+  .cover h1 {
+    font-family: "Yusei Magic", "Zen Maru Gothic", sans-serif;
+    font-weight: 400; font-size: 76px;
+    margin: 0 0 6px;
+    letter-spacing: 0.02em; line-height: 1.05;
+    color: var(--ink);
+    text-shadow: 4px 4px 0 var(--orange);
+  }
+  .cover h1 .acc { color: var(--red); text-shadow: 4px 4px 0 var(--ink); }
+  .cover .subtitle {
+    font-family: "Kaisei Decol", "Zen Maru Gothic", serif;
+    font-size: 26px; font-weight: 700;
+    margin: 6px 0 22px;
+    color: var(--ink-soft);
+  }
+  .cover .lede {
+    font-size: 16.5px;
+    max-width: 720px;
+    color: var(--ink-soft);
+    margin: 16px 0 0;
+  }
+  .cover-meta {
+    display: flex; gap: 14px; flex-wrap: wrap;
+    font-family: "DotGothic16", monospace;
+    font-size: 13px; color: var(--ink-soft);
+    margin-top: 14px;
+  }
+  .cover-meta span {
+    background: var(--paper-2);
+    padding: 6px 12px;
+    border: 1.5px solid var(--ink);
+    border-radius: 999px;
+  }
+
+  /* cover illustration: filmstrip with motion */
+  .cover-illu {
+    position: relative;
+    height: 240px;
+    background: var(--ink);
+    border: 2.5px solid var(--ink);
+    border-radius: 14px;
+    padding: 20px 18px;
+    box-shadow: 4px 4px 0 var(--ink);
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    gap: 8px;
+  }
+  .cover-illu::before, .cover-illu::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0;
+    height: 18px;
+    background-image: radial-gradient(circle, var(--paper) 4px, transparent 4.5px);
+    background-size: 22px 18px;
+    background-position: center;
+    z-index: 2;
+  }
+  .cover-illu::before { top: 0; }
+  .cover-illu::after { bottom: 0; }
+  .cover-illu .strip {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    align-items: stretch;
+  }
+  .cover-illu .fr {
+    background: var(--paper-2);
+    border: 2px solid var(--paper);
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .cover-illu .fr .ball {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: 2.5px solid var(--ink);
+  }
+  .cover-illu .fr:nth-child(1) .ball { background: var(--red); transform: translateX(-30%);}
+  .cover-illu .fr:nth-child(2) .ball { background: var(--yellow); transform: translateX(0);}
+  .cover-illu .fr:nth-child(3) .ball { background: var(--green); transform: translateX(30%);}
+  .cover-illu .fr .tc {
+    position: absolute;
+    bottom: 4px; left: 4px;
+    font-family: "DotGothic16", monospace;
+    font-size: 9px;
+    color: var(--ink-soft);
+    letter-spacing: 0.1em;
+    background: rgba(255,255,255,0.7);
+    padding: 1px 4px;
+    border-radius: 2px;
+  }
+
+  /* SECTION HEAD */
+  .section-head {
+    display: flex; align-items: baseline; gap: 18px;
+    margin: 24px 0 28px;
+  }
+  .section-num {
+    font-family: "Yusei Magic", sans-serif;
+    font-size: 64px; line-height: 1;
+    color: var(--ink); background: var(--yellow);
+    border: 3px solid var(--ink); border-radius: 14px;
+    padding: 6px 18px 2px;
+    box-shadow: 4px 4px 0 var(--ink);
+    transform: rotate(-2deg);
+  }
+  .section-head h2 {
+    font-family: "Yusei Magic", sans-serif;
+    font-weight: 400; font-size: 40px;
+    margin: 0; color: var(--ink);
+  }
+  .section-head .lead {
+    font-size: 16px; color: var(--ink-soft);
+    margin-left: auto; max-width: 460px;
+    border-left: 4px solid var(--ink);
+    padding: 4px 14px;
+    background: var(--paper-2);
+  }
+
+  /* ---------- GALLERY ---------- */
+  .gallery { margin-bottom: 90px; }
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 22px;
+  }
+  .gcard {
+    background: var(--paper);
+    border: 3px solid var(--ink);
+    border-radius: 12px;
+    box-shadow: 5px 5px 0 var(--ink);
+    overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .gcard .preview {
+    aspect-ratio: 4/3;
+    background: var(--paper-2);
+    border-bottom: 3px solid var(--ink);
+    position: relative;
+    overflow: hidden;
+  }
+  .gcard .meta { padding: 12px 14px 14px; }
+  .gcard .meta .num {
+    font-family: "DotGothic16", monospace;
+    font-size: 11px; letter-spacing: 0.18em;
+    color: var(--ink-soft);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .gcard .meta .num .gly {
+    width: 22px; height: 22px;
+    border: 2px solid var(--ink);
+    background: var(--orange);
+    color: var(--paper);
+    border-radius: 4px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: "Kaisei Decol", serif;
+    font-weight: 700;
+    font-size: 13px;
+  }
+  .gcard .meta h3 {
+    font-family: "Kaisei Decol", serif;
+    font-size: 17px; font-weight: 700;
+    margin: 4px 0 6px;
+    line-height: 1.25;
+  }
+  .gcard .meta p {
+    margin: 0;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    font-weight: 600;
+    line-height: 1.5;
+  }
+
+  /* Mini motion-mocks */
+  .mp { height: 100%; padding: 10px; display: flex; flex-direction: column; gap: 5px;}
+  .mp-sb { background: var(--paper); padding: 8px; display: grid; grid-template-columns: repeat(3,1fr); gap: 4px;}
+  .mp-sb .fr { background: var(--paper-2); border: 1.5px solid var(--ink); border-radius: 3px; position: relative; aspect-ratio: 4/3; padding: 4px;}
+  .mp-sb .fr::after { content: ""; position: absolute; border-radius: 50%; border: 1.5px solid var(--ink); background: var(--red); width: 10px; height: 10px;}
+  .mp-sb .fr:nth-child(1)::after { left: 4px; top: 4px;}
+  .mp-sb .fr:nth-child(2)::after { left: 50%; top: 50%; transform: translate(-50%,-50%); background: var(--orange);}
+  .mp-sb .fr:nth-child(3)::after { right: 4px; bottom: 4px; background: var(--yellow);}
+  .mp-sb .fr .num {
+    position: absolute; top: 2px; left: 3px;
+    font-family: "DotGothic16", monospace; font-size: 7px;
+    background: var(--ink); color: var(--paper);
+    padding: 0 3px; border-radius: 2px;
+    letter-spacing: 0.1em;
+  }
+  .mp-nar { background: var(--paper); padding: 10px 12px; }
+  .mp-nar .row { display: grid; grid-template-columns: 30px 1fr; gap: 6px; align-items: start; padding: 2px 0;}
+  .mp-nar .row .tc { font-family: "DotGothic16", monospace; font-size: 8.5px; color: var(--red); padding-top: 2px;}
+  .mp-nar .row .txt { font-family: "Shippori Mincho", serif; font-size: 10.5px; line-height: 1.4;}
+  .mp-sub { background: var(--ink); color: var(--paper); padding: 14px 12px; display: flex; flex-direction: column; justify-content: flex-end; gap: 4px;}
+  .mp-sub .l1 { font-family: "Kaisei Decol", serif; font-weight: 700; font-size: 14px; text-align: center; line-height: 1.2;}
+  .mp-sub .tc { font-family: "DotGothic16", monospace; font-size: 8.5px; text-align: center; color: var(--yellow); letter-spacing: 0.14em;}
+  .mp-time { background: var(--paper); padding: 12px 10px; display: flex; flex-direction: column; justify-content: center; gap: 6px;}
+  .mp-time .lane { display: grid; grid-template-columns: 30px 1fr; gap: 6px; align-items: center;}
+  .mp-time .lane .lbl { font-family: "DotGothic16", monospace; font-size: 8.5px; color: var(--ink-soft); letter-spacing: 0.1em;}
+  .mp-time .lane .bar { height: 8px; background: var(--paper-2); border: 1.5px solid var(--ink); border-radius: 4px; position: relative; overflow: hidden;}
+  .mp-time .lane .bar i { display: block; height: 100%;}
+  .mp-time .lane:nth-child(1) i { background: var(--red); width: 70%;}
+  .mp-time .lane:nth-child(2) i { background: var(--orange); width: 45%; margin-left: 20%;}
+  .mp-time .lane:nth-child(3) i { background: var(--yellow); width: 30%; margin-left: 50%;}
+  .mp-time .lane:nth-child(4) i { background: var(--green); width: 55%; margin-left: 30%;}
+  .mp-comp { background: var(--paper-2); padding: 8px; display:flex; flex-direction:column; gap:4px;}
+  .mp-comp .seg {
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+    border-radius: 4px;
+    padding: 4px 7px;
+    font-family: "DotGothic16", monospace;
+    font-size: 8.5px;
+    letter-spacing: 0.1em;
+    display: flex; justify-content: space-between;
+  }
+  .mp-comp .seg .t { color: var(--ink-soft);}
+  .mp-comp .seg.h { background: var(--red); color: var(--paper); border-color: var(--ink);}
+  .mp-comp .seg.h .t { color: rgba(255,255,255,0.7);}
+  .mp-bgm { background: var(--ink); color: var(--paper); padding: 10px 12px; display: flex; flex-direction: column; gap: 6px;}
+  .mp-bgm .ttl { font-family: "Kaisei Decol", serif; font-weight: 700; font-size: 12px; color: var(--yellow);}
+  .mp-bgm .wave { display: flex; align-items: flex-end; gap: 2px; height: 30px;}
+  .mp-bgm .wave i { display: block; width: 4px; background: var(--paper);}
+  .mp-bgm .wave i:nth-child(1) { height: 30%;}
+  .mp-bgm .wave i:nth-child(2) { height: 60%;}
+  .mp-bgm .wave i:nth-child(3) { height: 80%;}
+  .mp-bgm .wave i:nth-child(4) { height: 50%;}
+  .mp-bgm .wave i:nth-child(5) { height: 70%;}
+  .mp-bgm .wave i:nth-child(6) { height: 90%;}
+  .mp-bgm .wave i:nth-child(7) { height: 40%;}
+  .mp-bgm .wave i:nth-child(8) { height: 60%;}
+  .mp-bgm .wave i:nth-child(9) { height: 30%;}
+  .mp-bgm .wave i:nth-child(10) { height: 50%;}
+  .mp-bgm .wave i:nth-child(11) { height: 40%;}
+  .mp-bgm .wave i:nth-child(12) { height: 70%;}
+  .mp-bgm .tag { font-family: "DotGothic16", monospace; font-size: 8.5px; color: rgba(255,255,255,0.6); letter-spacing: 0.15em;}
+  .mp-char { background: var(--paper); padding: 10px; display: flex; flex-direction: column; gap: 5px;}
+  .mp-char .name { font-family: "Kaisei Decol", serif; font-weight: 700; font-size: 13px;}
+  .mp-char .meta { font-family: "DotGothic16", monospace; font-size: 9px; color: var(--ink-soft); letter-spacing: 0.1em;}
+  .mp-char .line { background: var(--paper-2); border: 1.5px solid var(--ink); border-radius: 8px 8px 8px 2px; padding: 4px 8px; font-family: "Shippori Mincho", serif; font-size: 10px; line-height: 1.4; margin-top: 2px;}
+  .mp-open { background: var(--ink); color: var(--paper); padding: 14px 10px; position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 6px; overflow: hidden;}
+  .mp-open::before, .mp-open::after { content: ""; position: absolute; background: var(--yellow); border-radius: 50%; opacity: 0.85;}
+  .mp-open::before { width: 40px; height: 40px; top: -10px; right: -10px;}
+  .mp-open::after { width: 24px; height: 24px; bottom: -6px; left: -6px; background: var(--red);}
+  .mp-open .ttl { font-family: "Yusei Magic", sans-serif; font-size: 18px; line-height: 1.1; text-align: center; color: var(--paper); position: relative; z-index: 2;}
+  .mp-open .ttl .y { color: var(--yellow);}
+  .mp-open .sub { font-family: "DotGothic16", monospace; font-size: 8.5px; letter-spacing: 0.16em; color: rgba(255,255,255,0.65); position: relative; z-index: 2;}
+  .mp-inter { background: var(--paper-2); padding: 10px; display: grid; grid-template-rows: 1fr auto; gap: 4px;}
+  .mp-inter .scr { background: var(--ink); border-radius: 6px; position: relative; overflow: hidden;}
+  .mp-inter .scr::after { content: "▶"; position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); color: var(--paper); font-size: 14px;}
+  .mp-inter .btn { display: flex; gap: 4px;}
+  .mp-inter .btn span { flex: 1; background: var(--paper); border: 1.5px solid var(--ink); border-radius: 3px; height: 12px; font-family: "DotGothic16", monospace; font-size: 7px; display: flex; align-items: center; justify-content: center; color: var(--ink-soft);}
+  .mp-inter .btn span.a { background: var(--orange); color: var(--paper);}
+  .mp-thumb { background: var(--paper-2); padding: 10px; display: flex; align-items: center; justify-content: center;}
+  .mp-thumb .card { background: var(--red); color: var(--paper); padding: 10px 14px; font-family: "Yusei Magic", sans-serif; font-size: 16px; line-height: 1.1; border: 2.5px solid var(--ink); border-radius: 6px; box-shadow: 3px 3px 0 var(--ink); transform: rotate(-2deg); text-align: center; max-width: 90%;}
+  .mp-thumb .card .y { color: var(--yellow);}
+  .mp-thumb .card small { display: block; font-family: "DotGothic16", monospace; font-size: 7.5px; margin-top: 4px; letter-spacing: 0.15em; color: rgba(255,255,255,0.8);}
+
+  /* ---------- CASES ---------- */
+  .cases { margin-bottom: 90px; }
+  .case {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    background: var(--paper);
+    border: 3px solid var(--ink);
+    border-radius: 18px;
+    box-shadow: 8px 8px 0 var(--ink);
+    padding: 28px;
+    margin-bottom: 60px;
+    position: relative;
+  }
+  .case.reverse .case-text { order: 2; }
+  .case.reverse .case-visual { order: 1; }
+  .case .tape { top: -14px; left: 50px; }
+  .case .case-text { display: flex; flex-direction: column; gap: 14px; }
+  .case .case-num {
+    font-family: "DotGothic16", monospace;
+    background: var(--ink); color: var(--paper);
+    padding: 4px 12px; border-radius: 4px;
+    font-size: 12px; letter-spacing: 0.16em;
+    align-self: flex-start;
+  }
+  .case h3 {
+    font-family: "Yusei Magic", sans-serif;
+    font-weight: 400;
+    font-size: 36px; line-height: 1.15;
+    margin: 0;
+  }
+  .case .scenario {
+    background: var(--paper-2);
+    border: 2px solid var(--ink);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 14.5px;
+    font-weight: 600;
+  }
+  .case .scenario b {
+    font-family: "Kaisei Decol", serif;
+    display: inline-block;
+    background: var(--ink); color: var(--paper);
+    padding: 1px 8px; border-radius: 4px;
+    margin-right: 6px;
+    font-size: 12px; letter-spacing: 0.1em;
+  }
+  .prompt-box {
+    background: var(--ink);
+    border-radius: 10px;
+    color: var(--paper);
+    padding: 14px 16px;
+    font-family: "JetBrains Mono", "DotGothic16", monospace;
+    font-size: 12.5px;
+    line-height: 1.65;
+    border: 3px solid var(--ink);
+    box-shadow: 4px 4px 0 var(--orange);
+    position: relative;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+  }
+  .prompt-box::before {
+    content: "PROMPT";
+    position: absolute;
+    top: -10px; left: 12px;
+    font-family: "DotGothic16", monospace;
+    font-size: 10px; letter-spacing: 0.2em;
+    background: var(--orange); color: var(--ink);
+    padding: 2px 8px; border: 2px solid var(--ink);
+    border-radius: 4px;
+  }
+  .prompt-box .ph { color: var(--yellow); }
+  .case .reflect {
+    background: var(--green-soft);
+    border: 2px solid var(--ink);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 13.5px;
+    font-weight: 600;
+    line-height: 1.55;
+  }
+  .case .reflect b {
+    font-family: "Kaisei Decol", serif;
+    display: block;
+    margin-bottom: 4px;
+    color: var(--green);
+  }
+  .visual-frame {
+    background: var(--paper-2);
+    border: 2.5px solid var(--ink);
+    border-radius: 12px;
+    padding: 18px;
+    box-shadow: inset 0 0 0 2px var(--paper);
+    min-height: 420px;
+    position: relative;
+    overflow: hidden;
+  }
+  .visual-frame::before {
+    content: "OUTPUT";
+    position: absolute;
+    top: -10px; right: 14px;
+    font-family: "DotGothic16", monospace;
+    font-size: 10px; letter-spacing: 0.2em;
+    background: var(--orange); color: var(--ink);
+    padding: 2px 10px; border: 2px solid var(--ink);
+    border-radius: 4px;
+    z-index: 5;
+  }
+
+  /* ---- BIG STORYBOARD ---- */
+  .big-sb {
+    background: var(--paper);
+    border: 2.5px solid var(--ink);
+    border-radius: 8px;
+    padding: 16px 18px;
+    height: 100%;
+  }
+  .big-sb h5 {
+    font-family: "DotGothic16", monospace;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    color: var(--ink-soft);
+    margin: 0 0 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--ink);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .big-sb h5 b { background: var(--orange); color: var(--paper); padding: 2px 8px; border-radius: 4px;}
+  .big-sb .frames {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+  .big-sb .frame {
+    border: 2px solid var(--ink);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--paper-2);
+  }
+  .big-sb .frame .pic {
+    background: var(--paper);
+    aspect-ratio: 16/9;
+    border-bottom: 2px solid var(--ink);
+    position: relative;
+    overflow: hidden;
+  }
+  .big-sb .frame .meta {
+    padding: 8px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.45;
+  }
+  .big-sb .frame .meta .top {
+    display: flex;
+    justify-content: space-between;
+    font-family: "DotGothic16", monospace;
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    color: var(--ink-soft);
+    margin-bottom: 4px;
+  }
+  .big-sb .frame .meta .top .cut { background: var(--ink); color: var(--paper); padding: 1px 6px; border-radius: 2px; font-weight: 700;}
+  .big-sb .frame .meta .desc { font-family: "Shippori Mincho", serif; font-size: 11.5px; line-height: 1.5;}
+  .big-sb .frame .meta .dir { font-family: "Reenie Beanie", cursive; font-size: 14px; color: var(--red); margin-top: 4px;}
+
+  /* frame illustrations */
+  .sbpic-1, .sbpic-2, .sbpic-3, .sbpic-4 {
+    width: 100%; height: 100%;
+    position: relative;
+  }
+  .sbpic-1 { background: linear-gradient(180deg, #FFF1B8, var(--paper));}
+  .sbpic-1::before {
+    content: "";
+    position: absolute;
+    left: 50%; top: 60%;
+    transform: translate(-50%,-50%);
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: var(--red);
+    border: 2px solid var(--ink);
+  }
+  .sbpic-2 { background: linear-gradient(135deg, var(--orange-soft), var(--yellow-soft));}
+  .sbpic-2::before {
+    content: "";
+    position: absolute;
+    left: 30%; top: 50%;
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--red);
+    border: 2px solid var(--ink);
+  }
+  .sbpic-2::after {
+    content: "→";
+    position: absolute;
+    right: 16%; top: 50%;
+    transform: translateY(-50%);
+    font-family: "Yusei Magic", sans-serif;
+    font-size: 24px;
+    color: var(--ink);
+  }
+  .sbpic-3 { background: linear-gradient(135deg, var(--red-soft), var(--paper));}
+  .sbpic-3::before {
+    content: "";
+    position: absolute;
+    right: 25%; top: 50%;
+    transform: translateY(-50%);
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: var(--red);
+    border: 2px solid var(--ink);
+  }
+  .sbpic-3::after {
+    content: "✦";
+    position: absolute;
+    right: 14%; top: 40%;
+    color: var(--yellow);
+    font-size: 18px;
+    text-shadow: 1px 1px 0 var(--ink);
+  }
+  .sbpic-4 { background: var(--ink); display: flex; align-items: center; justify-content: center;}
+  .sbpic-4::before {
+    content: "Inkbird";
+    font-family: "Kaisei Decol", serif;
+    color: var(--paper);
+    font-weight: 700;
+    font-size: 22px;
+    letter-spacing: -0.02em;
+  }
+  .sbpic-4::after {
+    content: "";
+    position: absolute;
+    bottom: 16%; left: 50%;
+    transform: translateX(-50%);
+    width: 50px; height: 3px;
+    background: var(--yellow);
+    border-radius: 2px;
+  }
+
+  /* ---- BIG NARRATION SCRIPT ---- */
+  .big-nar {
+    background: var(--paper);
+    border: 2.5px solid var(--ink);
+    border-radius: 8px;
+    padding: 18px 20px;
+    height: 100%;
+  }
+  .big-nar h5 {
+    font-family: "DotGothic16", monospace;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    color: var(--ink-soft);
+    margin: 0 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--ink);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .big-nar h5 b { background: var(--blue); color: var(--paper); padding: 2px 8px; border-radius: 4px;}
+  .big-nar h5 .total { margin-left: auto; font-weight: 700; color: var(--ink);}
+  .big-nar .row {
+    display: grid;
+    grid-template-columns: 70px 1fr;
+    gap: 14px;
+    padding: 10px 0;
+    border-top: 1.5px dashed rgba(0,0,0,0.2);
+  }
+  .big-nar .row:first-of-type { border-top: none;}
+  .big-nar .row .tc {
+    font-family: "DotGothic16", monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--red);
+    font-weight: 700;
+  }
+  .big-nar .row .tc small { display: block; font-size: 9px; color: var(--ink-soft); font-weight: 500; margin-top: 2px; letter-spacing: 0.08em;}
+  .big-nar .row .body { font-size: 12.5px; line-height: 1.6; font-weight: 600;}
+  .big-nar .row .body .spk {
+    font-family: "Kaisei Decol", serif;
+    font-weight: 700;
+    font-size: 11px;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 1px 6px;
+    border-radius: 3px;
+    margin-right: 6px;
+    letter-spacing: 0.06em;
+  }
+  .big-nar .row .body .line {
+    font-family: "Shippori Mincho", serif;
+    margin: 4px 0;
+    line-height: 1.7;
+  }
+  .big-nar .row .body .dir {
+    font-family: "DotGothic16", monospace;
+    font-size: 9.5px;
+    color: var(--ink-soft);
+    background: var(--paper-2);
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1.5px dashed var(--ink);
+    display: inline-block;
+    margin-top: 4px;
+  }
+
+  /* ---- BIG TIMELINE ---- */
+  .big-time {
+    background: var(--paper);
+    border: 2.5px solid var(--ink);
+    border-radius: 8px;
+    padding: 18px 20px;
+    height: 100%;
+  }
+  .big-time h5 {
+    font-family: "DotGothic16", monospace;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    color: var(--ink-soft);
+    margin: 0 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--ink);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .big-time h5 b { background: var(--purple); color: var(--paper); padding: 2px 8px; border-radius: 4px;}
+  .big-time .ruler {
+    display: grid;
+    grid-template-columns: 90px 1fr;
+    gap: 12px;
+    margin-bottom: 8px;
+    font-family: "DotGothic16", monospace;
+    font-size: 9.5px;
+    color: var(--ink-soft);
+    letter-spacing: 0.12em;
+  }
+  .big-time .ruler .ticks {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    border-bottom: 1.5px solid var(--ink);
+    padding-bottom: 4px;
+  }
+  .big-time .ruler .ticks span {
+    text-align: left;
+    border-left: 1.5px solid var(--ink);
+    padding-left: 4px;
+    font-weight: 700;
+  }
+  .big-time .ruler .ticks span:first-child { border-left: none;}
+  .big-time .lane {
+    display: grid;
+    grid-template-columns: 90px 1fr;
+    gap: 12px;
+    align-items: center;
+    padding: 8px 0;
+    border-top: 1.5px dashed rgba(0,0,0,0.2);
+  }
+  .big-time .lane:first-of-type { border-top: none;}
+  .big-time .lane .lbl {
+    font-family: "Kaisei Decol", serif;
+    font-weight: 700;
+    font-size: 12px;
+    display: flex;
+    flex-direction: column;
+  }
+  .big-time .lane .lbl small {
+    font-family: "DotGothic16", monospace;
+    font-size: 9px;
+    color: var(--ink-soft);
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    margin-top: 1px;
+  }
+  .big-time .lane .track {
+    position: relative;
+    height: 20px;
+    background: var(--paper-2);
+    border: 1.5px solid var(--ink);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .big-time .lane .clip {
+    position: absolute;
+    top: 2px; bottom: 2px;
+    border: 1.5px solid var(--ink);
+    border-radius: 3px;
+    font-family: "DotGothic16", monospace;
+    font-size: 9px;
+    padding: 0 6px;
+    display: flex; align-items: center;
+    color: var(--paper);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  .big-time .notes {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1.5px dashed var(--ink);
+    font-size: 12.5px;
+    line-height: 1.55;
+    font-weight: 600;
+    color: var(--ink-soft);
+  }
+  .big-time .notes b {
+    font-family: "Kaisei Decol", serif;
+    color: var(--ink);
+    font-weight: 700;
+    margin-right: 4px;
+  }
+
+  /* ---- BIG SUBTITLE TABLE ---- */
+  .big-sub {
+    background: var(--paper);
+    border: 2.5px solid var(--ink);
+    border-radius: 8px;
+    padding: 18px 20px;
+    height: 100%;
+  }
+  .big-sub h5 {
+    font-family: "DotGothic16", monospace;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    color: var(--ink-soft);
+    margin: 0 0 14px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--ink);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .big-sub h5 b { background: var(--green); color: var(--paper); padding: 2px 8px; border-radius: 4px;}
+  .big-sub .tbl {
+    display: grid;
+    grid-template-columns: 60px 90px 1fr;
+    gap: 0;
+  }
+  .big-sub .tbl > div {
+    padding: 8px 10px;
+    border-bottom: 1.5px dashed rgba(0,0,0,0.18);
+    font-size: 12px;
+  }
+  .big-sub .tbl .h {
+    background: var(--paper-2);
+    font-family: "DotGothic16", monospace;
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    color: var(--ink-soft);
+    border-bottom: 2px solid var(--ink);
+    font-weight: 700;
+  }
+  .big-sub .tbl .id {
+    font-family: "DotGothic16", monospace;
+    color: var(--ink-soft);
+    font-weight: 700;
+  }
+  .big-sub .tbl .tc {
+    font-family: "DotGothic16", monospace;
+    color: var(--red);
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .big-sub .tbl .tx {
+    font-family: "Shippori Mincho", serif;
+    line-height: 1.5;
+    font-weight: 600;
+  }
+  .big-sub .tbl .tx .em {
+    background: var(--yellow);
+    padding: 0 3px;
+    font-weight: 700;
+  }
+  .big-sub .tbl .tx .note {
+    display: block;
+    font-family: "DotGothic16", monospace;
+    font-size: 9px;
+    color: var(--ink-soft);
+    margin-top: 2px;
+    letter-spacing: 0.1em;
+    font-weight: 500;
+  }
+  .big-sub .rules {
+    margin-top: 12px;
+    padding: 10px 12px;
+    background: var(--green-soft);
+    border: 1.5px solid var(--ink);
+    border-radius: 6px;
+    font-size: 11.5px;
+    line-height: 1.55;
+    font-weight: 600;
+  }
+  .big-sub .rules b {
+    font-family: "Kaisei Decol", serif;
+    color: var(--green);
+    font-weight: 700;
+    margin-right: 4px;
+  }
+
+  /* ---------- TEMPLATES ---------- */
+  .templates { margin-bottom: 90px; }
+  .tmpl-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+  .tmpl {
+    background: var(--paper);
+    border: 3px solid var(--ink);
+    border-radius: 14px;
+    box-shadow: 5px 5px 0 var(--ink);
+    padding: 20px 22px 22px;
+  }
+  .tmpl .tmpl-tag {
+    display: inline-block;
+    font-family: "DotGothic16", monospace;
+    font-size: 11px; letter-spacing: 0.16em;
+    padding: 3px 10px;
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    background: var(--yellow);
+  }
+  .tmpl.t-red .tmpl-tag { background: var(--red-soft);}
+  .tmpl.t-blue .tmpl-tag { background: var(--blue-soft);}
+  .tmpl.t-green .tmpl-tag { background: var(--green-soft);}
+  .tmpl.t-purple .tmpl-tag { background: var(--purple-soft);}
+  .tmpl.t-orange .tmpl-tag { background: var(--orange-soft);}
+  .tmpl.t-pink .tmpl-tag { background: var(--pink-soft);}
+  .tmpl h3 {
+    font-family: "Yusei Magic", sans-serif;
+    font-weight: 400;
+    font-size: 28px;
+    margin: 10px 0 6px;
+  }
+  .tmpl .when {
+    font-size: 13px; color: var(--ink-soft);
+    margin: 0 0 12px;
+    font-weight: 600;
+  }
+  .tmpl pre {
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-family: "JetBrains Mono", "DotGothic16", monospace;
+    font-size: 12.5px;
+    line-height: 1.7;
+    margin: 0;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+  }
+  .tmpl pre .ph { color: var(--yellow); }
+  .tmpl pre .cm { color: rgba(255,255,255,0.45); }
+
+  /* ---------- STRENGTHS ---------- */
+  .strengths { margin-bottom: 90px; }
+  .sg { display: grid; grid-template-columns: 1fr 1fr; gap: 30px;}
+  .sg-col {
+    border: 3px solid var(--ink);
+    border-radius: 14px;
+    padding: 22px 24px;
+    box-shadow: 5px 5px 0 var(--ink);
+    background: var(--paper);
+  }
+  .sg-col.good { background: var(--green-soft); }
+  .sg-col.bad { background: var(--red-soft); }
+  .sg-col h3 {
+    font-family: "Yusei Magic", sans-serif;
+    font-weight: 400;
+    font-size: 32px;
+    margin: 0 0 4px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .sg-col h3 .badge {
+    font-family: "Kaisei Decol", serif;
+    width: 44px; height: 44px;
+    display: inline-flex; align-items: center; justify-content: center;
+    border: 2.5px solid var(--ink); border-radius: 50%;
+    font-size: 24px; font-weight: 700;
+  }
+  .sg-col.good h3 .badge { background: var(--green); color: var(--paper); }
+  .sg-col.bad h3 .badge { background: var(--red); color: var(--paper); }
+  .sg-col .sub {
+    font-family: "DotGothic16", monospace;
+    font-size: 11px; letter-spacing: 0.16em;
+    color: var(--ink-soft);
+    margin-bottom: 14px;
+  }
+  .sg-col ul { list-style: none; padding: 0; margin: 0;}
+  .sg-col li {
+    padding: 8px 0 8px 26px;
+    border-top: 1.5px dashed var(--ink);
+    position: relative;
+    font-size: 14.5px;
+    font-weight: 700;
+    line-height: 1.45;
+  }
+  .sg-col li:first-child { border-top: none; }
+  .sg-col li::before {
+    position: absolute;
+    left: 0; top: 9px;
+    font-family: "Kaisei Decol", serif;
+    font-size: 16px; line-height: 1;
+    font-weight: 700;
+  }
+  .sg-col.good li::before { content: "◯"; color: var(--green); }
+  .sg-col.bad li::before { content: "△"; color: var(--red); }
+  .sg-col li small {
+    display: block;
+    font-weight: 500;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    padding-top: 2px;
+    line-height: 1.5;
+  }
+
+  /* ---------- RHYTHM (production cycle) ---------- */
+  .rhythm {
+    background: var(--paper);
+    border: 3px solid var(--ink);
+    border-radius: 18px;
+    box-shadow: 8px 8px 0 var(--ink);
+    padding: 28px 32px;
+    margin-bottom: 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .rhythm .tape { top: -14px; right: 100px; transform: rotate(3deg); background: rgba(244,182,194,0.85);}
+  .rhythm-head {
+    display: flex; align-items: baseline; gap: 18px;
+    margin-bottom: 24px;
+  }
+  .rhythm-head h2 {
+    font-family: "Yusei Magic", sans-serif;
+    font-size: 32px; font-weight: 400;
+    margin: 0;
+  }
+  .rhythm-head .num {
+    font-family: "DotGothic16", monospace;
+    background: var(--ink); color: var(--paper);
+    padding: 4px 10px; border-radius: 4px;
+    font-size: 12px;
+  }
+
+  .pipeline {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+    position: relative;
+  }
+  .stage {
+    background: var(--paper-2);
+    border: 2.5px solid var(--ink);
+    border-radius: 12px;
+    padding: 16px 14px;
+    box-shadow: 4px 4px 0 var(--ink);
+    position: relative;
+  }
+  .stage .num {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--paper);
+    display: flex; align-items: center; justify-content: center;
+    font-family: "Yusei Magic", sans-serif;
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+  .stage:nth-child(1) { background: var(--purple-soft);}
+  .stage:nth-child(2) { background: var(--red-soft);}
+  .stage:nth-child(3) { background: var(--orange-soft);}
+  .stage:nth-child(4) { background: var(--yellow-soft);}
+  .stage:nth-child(5) { background: var(--green-soft);}
+  .stage:nth-child(1) .num { background: var(--purple);}
+  .stage:nth-child(2) .num { background: var(--red);}
+  .stage:nth-child(3) .num { background: var(--orange);}
+  .stage:nth-child(4) .num { background: var(--yellow); color: var(--ink);}
+  .stage:nth-child(5) .num { background: var(--green);}
+  .stage h4 {
+    font-family: "Yusei Magic", sans-serif;
+    font-weight: 400;
+    font-size: 22px;
+    margin: 0 0 2px;
+  }
+  .stage .tag {
+    font-family: "DotGothic16", monospace;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    color: var(--ink-soft);
+    margin-bottom: 10px;
+  }
+  .stage .desc {
+    font-size: 12.5px;
+    line-height: 1.55;
+    font-weight: 600;
+    color: var(--ink-soft);
+  }
+  .stage .desc b {
+    font-family: "Kaisei Decol", serif;
+    color: var(--ink);
+    display: block;
+    margin-bottom: 3px;
+    font-weight: 700;
+  }
+
+  footer {
+    margin-top: 60px;
+    border-top: 3px dashed var(--ink);
+    padding-top: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: "DotGothic16", monospace;
+    font-size: 12px;
+    color: var(--ink-soft);
+    letter-spacing: 0.12em;
+  }
+  footer .page-num {
+    font-size: 14px;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 4px 10px;
+    border-radius: 4px;
+  }
+</style>
+</head>
+<body>
+
+<template id="__bundler_thumbnail" data-bg-color="#FBF6E9">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#FBF6E9"/>
+    <g transform="translate(120 200)">
+      <rect width="960" height="400" rx="14" fill="#1C1B1A"/>
+      <g fill="#FBF6E9" opacity="0.95">
+        <circle cx="40" cy="40" r="14"/><circle cx="100" cy="40" r="14"/><circle cx="160" cy="40" r="14"/><circle cx="220" cy="40" r="14"/>
+        <circle cx="280" cy="40" r="14"/><circle cx="340" cy="40" r="14"/><circle cx="400" cy="40" r="14"/><circle cx="460" cy="40" r="14"/>
+        <circle cx="520" cy="40" r="14"/><circle cx="580" cy="40" r="14"/><circle cx="640" cy="40" r="14"/><circle cx="700" cy="40" r="14"/>
+        <circle cx="760" cy="40" r="14"/><circle cx="820" cy="40" r="14"/><circle cx="880" cy="40" r="14"/><circle cx="940" cy="40" r="14"/>
+        <circle cx="40" cy="360" r="14"/><circle cx="100" cy="360" r="14"/><circle cx="160" cy="360" r="14"/><circle cx="220" cy="360" r="14"/>
+        <circle cx="280" cy="360" r="14"/><circle cx="340" cy="360" r="14"/><circle cx="400" cy="360" r="14"/><circle cx="460" cy="360" r="14"/>
+        <circle cx="520" cy="360" r="14"/><circle cx="580" cy="360" r="14"/><circle cx="640" cy="360" r="14"/><circle cx="700" cy="360" r="14"/>
+        <circle cx="760" cy="360" r="14"/><circle cx="820" cy="360" r="14"/><circle cx="880" cy="360" r="14"/><circle cx="940" cy="360" r="14"/>
+      </g>
+      <g>
+        <rect x="40" y="80" width="280" height="240" rx="8" fill="#FBF6E9"/>
+        <circle cx="180" cy="200" r="60" fill="#E63946" stroke="#1C1B1A" stroke-width="4"/>
+        <rect x="340" y="80" width="280" height="240" rx="8" fill="#FFD23F"/>
+        <circle cx="480" cy="200" r="60" fill="#F2994A" stroke="#1C1B1A" stroke-width="4"/>
+        <rect x="640" y="80" width="280" height="240" rx="8" fill="#5BA84A"/>
+        <circle cx="780" cy="200" r="60" fill="#FFD23F" stroke="#1C1B1A" stroke-width="4"/>
+      </g>
+    </g>
+    <text x="120" y="120" font-family="monospace" font-size="22" fill="#1C1B1A">VOL.02 / CHAPTER 01 — MOTION</text>
+    <text x="120" y="700" font-family="serif" font-size="56" font-weight="700" fill="#1C1B1A">動かす。</text>
+  </svg>
+</template>
+
+<div class="page">
+
+  <!-- COVER -->
+  <header class="cover">
+    <div class="tape t1"></div>
+    <div class="tape t2"></div>
+    <div class="cover-grid">
+      <div>
+        <div class="chapter-tag"><span class="vol">VOL.02</span>CHAPTER 01 / ALIGNLAB NOTE</div>
+        <h1>Claudeで<span class="acc">動かす</span>。</h1>
+        <p class="subtitle">動画とモーションの実例集</p>
+        <p class="lede">
+          動画は、時間という素材を扱う仕事だ。
+          1秒の中に何を入れて、次の1秒で何を変えるか。
+          Claudeはピクセルを描くのは苦手だが、<b>時間の設計図</b> を引くのは滅法うまい。
+          このノートでは、絵コンテ・ナレーション・モーションの動き・字幕を起点に、
+          動画づくりにClaudeをどう編み込むかを実例で追いかける。
+        </p>
+        <div class="cover-meta">
+          <span>個人用リファレンス</span>
+          <span>2026.05</span>
+          <span>by AlignLab</span>
+          <span>creator-system</span>
+          <span>VOL.02 開始</span>
+        </div>
+      </div>
+      <div class="cover-illu">
+        <div class="strip">
+          <div class="fr"><div class="ball"></div><div class="tc">00:00</div></div>
+          <div class="fr"><div class="ball"></div><div class="tc">00:15</div></div>
+          <div class="fr"><div class="ball"></div><div class="tc">00:30</div></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 01 GALLERY -->
+  <section class="gallery">
+    <div class="section-head">
+      <div class="section-num" style="background: var(--orange);">01</div>
+      <h2>Claudeで動かせる 10種</h2>
+      <p class="lead">どれも「絵を描かない部分」が大半。台本・タイミング・進行を整えてもらう仕事だ。</p>
+    </div>
+
+    <div class="gallery-grid">
+
+      <div class="gcard">
+        <div class="preview">
+          <div class="mp mp-sb">
+            <div class="fr"><span class="num">1</span></div>
+            <div class="fr"><span class="num">2</span></div>
+            <div class="fr"><span class="num">3</span></div>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="num"><span class="gly">絵</span>01 / STORYBOARD</div>
+          <h3>絵コンテ・カット割</h3>
+          <p>カット番号・尺・構図・動きを4列で書き出す。ラフ画はあなたが添えればいい。</p>
+        </div>
+      </div>
+
+      <div class="gcard">
+        <div class="preview">
+          <div class="mp mp-nar">
+            <div class="row"><span class="tc">00:00</span><span class="txt">「みなさん、こんにちは。」</span></div>
+            <div class="row"><span class="tc">00:04</span><span class="txt">今日は、書くことについて</span></div>
+            <div class="row"><span class="tc">00:08</span><span class="txt">話したいと思います。</span></div>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="num"><span class="gly">声</span>02 / NARRATION</div>
+          <h3>ナレーション原稿</h3>
+          <p>秒数を伴った台本。書き言葉ではなく「読んで自然」な口語に直してもらう。</p>
+        </div>
+      </div>
+
+      <div class="gcard">
+        <div class="preview">
+          <div class="mp mp-sub">
+            <div class="l1">時間という素材を、<br>あなたの手で。</div>
+            <div class="tc">00:14 — 00:18</div>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="num"><span class="gly">字</span>03 / SUBTITLE</div>
+          <h3>字幕・テロップ</h3>
+          <p>「1行○文字以内」「読み切れる秒数」のルールを最初に渡せば、量産できる。</p>
+        </div>
+      </div>
+
+      <div class="gcard">
+        <div class="preview">
+          <div class="mp mp-time">
+            <div class="lane"><span class="lbl">LOGO</span><div class="bar"><i></i></div></div>
+            <div class="lane"><span class="lbl">TEXT</span><div class="bar"><i></i></div></div>
+            <div class="lane"><span class="lbl">BG</span><div class="bar"><i></i></div></div>
+            <div class="lane"><span class="lbl">AUDIO</span><div class="bar"><i></i></div></div>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="num"><span class="gly">動</span>04 / MOTION</div>
+          <h3>動き設計</h3>
+          <p>「いつ何が動くか」のタイムライン。秒・イージング・遅延までClaudeに任せる。</p>
+        </div>
+      </div>
+
+      <div class="gcard">
+        <div class="preview">
+          <div class="mp mp-comp">
+            <div class="seg h"><span>OP</span><span class="t">0-5秒</span></div>
+            <div class="seg"><span>本編1</span><span class="t">5-25秒</span></div>
+            <div class="seg"><span>本編2</span><span class="t">25-45秒</span></div>
+            <div class="seg"><span>ED</span><span class="t">45-60秒</span></div>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="num"><span class="gly">構</span>05 / STRUCTURE</div>
+          <h3>構成・シーン割</h3>
+          <p>全体尺を、目的別の段に分ける。OP/本編/ED の比率も決めてもらう。</p>
+        </div>
+      </div>
+
+      <div class="gcard">
+        <div class="preview">
+          <div class="mp mp-bgm">
+            <div class="ttl">BGM — Calm</div>
+            <div class="wave"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <div class="tag">120 BPM · 5/8 拍子 · ピアノ主体</div>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="num"><span class="gly">音</span>06 / SOUND</div>
+          <h3>BGM・SEイメージ</h3>
+          <p>「冬の朝の喫茶店みたいな曲」を、テンポ・拍子・楽器・尺の言葉に翻訳。</p>
+        </div>
+      </div>
+
+      <div class="gcard">
+        <div class="preview">
+          <div class="mp mp-char">
+            <div class="name">ナホさん</div>
+            <div class="meta">AGE 62 · 元書店員</div>
+            <div class="line">「あら、雨ね。今日は…」</div>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="num"><span class="gly">演</span>07 / CHARACTER</div>
+          <h3>キャラ・声色</h3>
+          <p>人物像と典型的な台詞をClaudeに作らせると、声優・収録の方向性が定まる。</p>
+        </div>
+      </div>
+
+      <div class="gcard">
+        <div class="preview">
+          <div class="mp mp-open">
+            <div class="ttl">未来は、<br><span class="y">動く人</span>のもの。</div>
+            <div class="sub">2026 OPENING — 8 SEC</div>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="num"><span class="gly">開</span>08 / OPENING</div>
+          <h3>OP演出</h3>
+          <p>「最初の8秒に何を出すか」を5案。視聴離脱率はここで決まる。</p>
+        </div>
+      </div>
+
+      <div class="gcard">
+        <div class="preview">
+          <div class="mp mp-inter">
+            <div class="scr"></div>
+            <div class="btn"><span class="a">A</span><span>B</span><span>C</span></div>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="num"><span class="gly">触</span>09 / INTERACTIVE</div>
+          <h3>触れる動画</h3>
+          <p>選択肢で進む動画・ホットスポット動画など、分岐構成の設計図づくり。</p>
+        </div>
+      </div>
+
+      <div class="gcard">
+        <div class="preview">
+          <div class="mp mp-thumb">
+            <div class="card">これ、知ってる？<br><span class="y">クリエイター必見</span><small>30秒で分かる</small></div>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="num"><span class="gly">看</span>10 / TITLE</div>
+          <h3>タイトル・サムネ</h3>
+          <p>動画タイトル20案・サムネ文字3案。クリック率の入り口を一気に量産。</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 02 CASES -->
+  <section class="cases">
+    <div class="section-head">
+      <div class="section-num" style="background: var(--orange); transform: rotate(2deg);">02</div>
+      <h2>実例集：プロンプト → 出力</h2>
+      <p class="lead">動画づくりの4つの工程に、Claudeを差し込んでみる。出力は「絵」じゃなく <b>設計図</b> だ。</p>
+    </div>
+
+    <!-- CASE A: 絵コンテ -->
+    <div class="case">
+      <div class="tape orange"></div>
+      <div class="case-text">
+        <div class="case-num">CASE A · STORYBOARD</div>
+        <h3>30秒の商品紹介<br>絵コンテ4カット</h3>
+        <div class="scenario">
+          <b>場面</b>新サービス「Inkbird」のSNS用30秒動画。
+          ラフ画は自分で描く前提で、<b>カット割と内容</b>だけ先に決めたい。
+        </div>
+        <div class="prompt-box">あなたは映像ディレクターです。
+30秒のSNS動画の絵コンテを <span class="ph">4カット</span> で。
+
+# プロダクト
+"Inkbird" — 書く人のための静かなツール
+
+# 制約
+- 縦9:16
+- 字幕主体（音なしで成立）
+- 「静けさ」を視覚的に表現
+- 最初の<span class="ph">3秒</span>で離脱させない強い絵
+
+# 出力フォーマット（必須）
+各カットに：
+- カット番号 / 尺（秒）
+- 構図（カメラ・距離・動き）
+- 画面内の動き
+- 字幕テキスト（最大15字 × 2行）
+- 演出ノート（1行・なぜそうするか）
+
+# トーン
+詩的・余白多め・コピーは <span class="ph">短く</span>。</div>
+        <div class="reflect">
+          <b>振り返り</b>「ラフ画は自分で描く」と <b>前提を切り分ける</b> と、Claudeは余計な絵描きをせず、構成と言葉に集中する。
+          縦9:16・無音前提のような <b>制約</b> を最初に書くと、出力の精度が一段上がる。
+        </div>
+      </div>
+      <div class="case-visual">
+        <div class="visual-frame">
+          <div class="big-sb">
+            <h5><b>STORYBOARD</b>Inkbird / 30s · 9:16</h5>
+            <div class="frames">
+              <div class="frame">
+                <div class="pic"><div class="sbpic-1"></div></div>
+                <div class="meta">
+                  <div class="top"><span>CUT 01 / 0-5s</span><span class="cut">寄り</span></div>
+                  <div class="desc">真上から見た真っ白な机。スッと紙が落ちてくる。</div>
+                  <div class="dir">— 静けさを「無音」と「白」で。</div>
+                </div>
+              </div>
+              <div class="frame">
+                <div class="pic"><div class="sbpic-2"></div></div>
+                <div class="meta">
+                  <div class="top"><span>CUT 02 / 5-15s</span><span class="cut">引き</span></div>
+                  <div class="desc">紙の上をペンがゆっくり動く。字は読めない。「書く」という行為だけ。</div>
+                  <div class="dir">— 顔も手も見せない。</div>
+                </div>
+              </div>
+              <div class="frame">
+                <div class="pic"><div class="sbpic-3"></div></div>
+                <div class="meta">
+                  <div class="top"><span>CUT 03 / 15-22s</span><span class="cut">寄り</span></div>
+                  <div class="desc">画面端にそっと現れる小さな星印。「相棒」のメタファー。</div>
+                  <div class="dir">— 音は鈴音のみ。</div>
+                </div>
+              </div>
+              <div class="frame">
+                <div class="pic"><div class="sbpic-4"></div></div>
+                <div class="meta">
+                  <div class="top"><span>CUT 04 / 22-30s</span><span class="cut">タイトル</span></div>
+                  <div class="desc">黒地に「Inkbird」と現れる。下に「書く人に、静けさを。」</div>
+                  <div class="dir">— ロゴ着地で着信音1回。</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CASE B: ナレーション -->
+    <div class="case reverse">
+      <div class="tape blue" style="right: 60px; left: auto;"></div>
+      <div class="case-text">
+        <div class="case-num">CASE B · NARRATION</div>
+        <h3>教材動画の<br>語り台本</h3>
+        <div class="scenario">
+          <b>場面</b>3分の社内教材動画「Claudeの基本」。
+          原稿を <b>読んで自然に響く</b> 日本語に整える。書き言葉のまま読むと、固くて聞いていられない。
+        </div>
+        <div class="prompt-box">下の原稿を、ナレーション用に書き直して。
+
+# 原稿（書き言葉）
+（記事を貼る）
+
+# 直し方
+- <span class="ph">1文を25字以内</span>を目安に
+- 漢字を減らして、ひらがなを増やす
+- 「〜である」「〜という」を避ける
+- 「、」より「。」で切る
+- 数字は読み上げ可能な形に（百分率・年月）
+
+# 出力フォーマット
+| TIME | 話者 | 台詞 | 演出メモ |
+
+各セクションに：
+- TIME（00:00形式）
+- 話者（NARRATOR）
+- 台詞
+- 演出メモ（呼吸の置き場所・抑揚）
+
+# 全体尺
+<span class="ph">3分</span>。1分につき約 <span class="ph">250-300字</span> が目安。</div>
+        <div class="reflect">
+          <b>振り返り</b>ナレーション台本は <b>読むための文章ではない</b>。
+          「1文25字」「ひらがな増やす」「、より。」のような <b>口語化のルール</b> を渡すと、読み上げ済みの聞き心地がぐっと変わる。
+          演出メモ欄も同時に作らせると、収録現場での迷いが消える。
+        </div>
+      </div>
+      <div class="case-visual">
+        <div class="visual-frame">
+          <div class="big-nar">
+            <h5><b>NARRATION</b>Claudeの基本<span class="total">3:00 / 約820字</span></h5>
+            <div class="row">
+              <div class="tc">00:00<small>5s</small></div>
+              <div class="body">
+                <span class="spk">NARR</span>
+                <span class="line">こんにちは。今日は、Claudeの話を、します。</span>
+                <span class="dir">→ 笑顔で。最初の「こんにちは」は、ゆっくり。</span>
+              </div>
+            </div>
+            <div class="row">
+              <div class="tc">00:05<small>10s</small></div>
+              <div class="body">
+                <span class="spk">NARR</span>
+                <span class="line">「書く」「つくる」「決める」。<br>そのどれにも、力を貸してくれる相棒です。</span>
+                <span class="dir">→ 三つの動詞を、ひと粒ずつ。</span>
+              </div>
+            </div>
+            <div class="row">
+              <div class="tc">00:15<small>15s</small></div>
+              <div class="body">
+                <span class="spk">NARR</span>
+                <span class="line">使い方は、シンプル。<br>話しかける。それだけ。</span>
+                <span class="dir">→ 「それだけ。」で一拍、息を吸う。</span>
+              </div>
+            </div>
+            <div class="row">
+              <div class="tc">00:30<small>10s</small></div>
+              <div class="body">
+                <span class="spk">NARR</span>
+                <span class="line">でも、話しかけ方で、返ってくるものは、変わります。</span>
+                <span class="dir">→ 抑揚は <b>「変わります」</b> に。</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CASE C: タイムライン -->
+    <div class="case">
+      <div class="tape purple"></div>
+      <div class="case-text">
+        <div class="case-num">CASE C · MOTION TIMING</div>
+        <h3>ロゴアニメの<br>5秒タイムライン</h3>
+        <div class="scenario">
+          <b>場面</b>サービスロゴが現れる「OP 5秒」のアニメ。
+          いつ何が動くか、Claudeに <b>表で</b> 出してもらってから手を動かす。
+        </div>
+        <div class="prompt-box">5秒のロゴアニメ用に、タイムラインを書いて。
+
+# 素材
+- ロゴ: "Inkbird"（文字のみ・色は黒）
+- 背景: クリーム（#FBF6E9）
+- アクセント: 黄色の小さな星
+
+# やりたいこと
+- 0-2秒: 背景フェードイン
+- 2-3.5秒: ロゴが下から滑り込み
+- 3.5-4秒: 星がポップで現れる
+- 4-5秒: 全体が0.5秒静止して終わる
+
+# 出力フォーマット
+| レイヤー | 入り | 出る | プロパティ | イージング | 備考 |
+
+各動きに：
+- レイヤー名
+- 開始秒・終了秒
+- 動くプロパティ（opacity / y / scale）
+- イージング（easeOut, easeInOut, spring）
+- 備考（注意点1行）
+
+# おまけ
+最後に「<span class="ph">CSS / GSAP / After Effects</span>で書くなら」の一言メモ。</div>
+        <div class="reflect">
+          <b>振り返り</b>動きの設計は、図より <b>表</b> のほうが圧倒的に速い。
+          「いつ・何が・どう動くか」を1行ずつ並べると、見た目を考えずに <b>構造</b> から決められる。
+          CSS/After Effectsへの落とし込みのヒントも一緒に頼んでおくと、実装で迷わない。
+        </div>
+      </div>
+      <div class="case-visual">
+        <div class="visual-frame">
+          <div class="big-time">
+            <h5><b>TIMELINE</b>Inkbird Logo OP / 5.0s</h5>
+            <div class="ruler">
+              <div class="lbl">LAYER</div>
+              <div class="ticks"><span>0s</span><span>0.5</span><span>1.0</span><span>1.5</span><span>2.0</span><span>2.5</span><span>3.0</span><span>3.5</span><span>4.0</span><span>4.5</span></div>
+            </div>
+            <div class="lane">
+              <div class="lbl">背景<small>FADE</small></div>
+              <div class="track"><div class="clip" style="left:0%; right:60%; background: var(--purple);">opacity 0→1</div></div>
+            </div>
+            <div class="lane">
+              <div class="lbl">ロゴ<small>SLIDE UP</small></div>
+              <div class="track"><div class="clip" style="left:40%; right:30%; background: var(--red);">y 40→0 · ease</div></div>
+            </div>
+            <div class="lane">
+              <div class="lbl">★ 星<small>POP</small></div>
+              <div class="track"><div class="clip" style="left:70%; right:20%; background: var(--orange);">scale 0→1 · spring</div></div>
+            </div>
+            <div class="lane">
+              <div class="lbl">静止<small>HOLD</small></div>
+              <div class="track"><div class="clip" style="left:80%; right:0%; background: var(--green);">all · stay</div></div>
+            </div>
+            <div class="notes">
+              <b>CSS:</b> @keyframes と animation-delay で組める。<br>
+              <b>GSAP:</b> timeline().to() のチェーンで、上から順に書けばそのまま。<br>
+              <b>AE:</b> 各レイヤーのキーフレームを、上の秒数のまま打てばOK。
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CASE D: 字幕 -->
+    <div class="case reverse">
+      <div class="tape green" style="right: 50px; left: auto;"></div>
+      <div class="case-text">
+        <div class="case-num">CASE D · SUBTITLE</div>
+        <h3>インタビュー字幕<br>20分を整える</h3>
+        <div class="scenario">
+          <b>場面</b>20分のインタビュー動画。文字起こしはあるが、そのまま字幕にすると <b>読み切れない</b>。
+          字幕用のルールを渡して、整え直す。
+        </div>
+        <div class="prompt-box">下の文字起こしを、字幕用に整えて。
+
+# ルール
+- 1行 <span class="ph">最大15字</span>、最大 <span class="ph">2行</span>
+- 1枚あたり最低 <span class="ph">1.5秒</span>、最大 <span class="ph">4秒</span>
+- 言い淀み（「えーと」「あの」）は削除
+- 助詞の途中で改行しない（「が、」で次行に行かない）
+- 数字は半角
+
+# 出力フォーマット
+| ID | 開始 | 終了 | テキスト |
+
+# 注意
+意味を変えるほどの編集はしない。
+「言い切り」のところで切るのが基本。
+「ね」「よ」などの語尾は <span class="ph">残して</span>。
+
+# 字幕外
+最後に、強調したい <span class="ph">3-5箇所</span> を「テロップ候補」として別ファイルで。</div>
+        <div class="reflect">
+          <b>振り返り</b>字幕は <b>映像の中の文章</b> ではなく、<b>映像のための文字組み</b>。
+          1行15字・1.5-4秒のような <b>物理ルール</b> を先に決めれば、Claudeは退屈なほど正確に分割してくれる。
+          テロップ候補を別建てで頼むと、編集ソフト上の作業が一気に楽になる。
+        </div>
+      </div>
+      <div class="case-visual">
+        <div class="visual-frame">
+          <div class="big-sub">
+            <h5><b>SUBTITLE</b>Interview / 20:00 · 自動分割済み</h5>
+            <div class="tbl">
+              <div class="h">ID</div><div class="h">TIME</div><div class="h">TEXT</div>
+
+              <div class="id">001</div>
+              <div class="tc">00:05<br>→ 00:08</div>
+              <div class="tx">書くことが、<br>急に楽になりました。</div>
+
+              <div class="id">002</div>
+              <div class="tc">00:09<br>→ 00:12</div>
+              <div class="tx">きっかけは、Claudeとの<br>出会いだった気がします。</div>
+
+              <div class="id">003</div>
+              <div class="tc">00:13<br>→ 00:16</div>
+              <div class="tx"><span class="em">最初の30分</span>の重さが、<br>なくなったんですよ。
+                <span class="note">→ テロップ候補</span>
+              </div>
+
+              <div class="id">004</div>
+              <div class="tc">00:17<br>→ 00:20</div>
+              <div class="tx">白紙との戦いが、<br>消えるって感覚で。</div>
+
+              <div class="id">005</div>
+              <div class="tc">00:21<br>→ 00:23</div>
+              <div class="tx">書くより、<br><span class="em">直すほうが楽しい</span>。
+                <span class="note">→ テロップ候補</span>
+              </div>
+            </div>
+            <div class="rules">
+              <b>RULES</b>1行15字・1枚1.5〜4秒・助詞改行禁止・言い淀み削除。
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- 03 TEMPLATES -->
+  <section class="templates">
+    <div class="section-head">
+      <div class="section-num" style="background: var(--blue); color: var(--paper); transform: rotate(-1.5deg);">03</div>
+      <h2>動画づくりのプロンプト 6つ</h2>
+      <p class="lead">そのまま使える土台。動画づくりは段取りが命なので、テンプレ化の効きが大きい。</p>
+    </div>
+
+    <div class="tmpl-grid">
+
+      <div class="tmpl t-orange">
+        <span class="tmpl-tag">STORYBOARD</span>
+        <h3>① 絵コンテ起こし</h3>
+        <p class="when">構成を絵にする前に、言葉でカット割を決める。ラフ画はあなたが描く前提。</p>
+        <pre>あなたは映像ディレクターです。
+<span class="ph">[N]</span>秒の動画の絵コンテを <span class="ph">[M]</span>カットで。
+
+# プロダクト / テーマ
+<span class="ph">[1行]</span>
+
+# 制約
+- アスペクト: <span class="ph">[9:16 / 16:9]</span>
+- 音声: <span class="ph">[字幕主体 / ナレあり]</span>
+- 最初の<span class="ph">3秒</span>: 離脱させない強い絵
+
+# 各カットの記述
+- カット番号 / 尺
+- 構図（カメラ・距離・動き）
+- 画面内の動き
+- 字幕 <span class="ph">[15字×2行まで]</span>
+- 演出ノート1行
+
+# ラフ画は不要
+構成と言葉だけに集中して。</pre>
+      </div>
+
+      <div class="tmpl t-blue">
+        <span class="tmpl-tag">NARRATION</span>
+        <h3>② ナレーション原稿</h3>
+        <p class="when">読んで自然な日本語に整える。書き言葉のまま読むと固くて聞いていられない。</p>
+        <pre>下の原稿をナレーション用に書き直して。
+
+# 原稿
+<span class="ph">[書き言葉の原稿]</span>
+
+# 直し方
+- 1文 <span class="ph">25字以内</span>
+- 漢字を減らし、ひらがな増やす
+- 「である」「という」を避ける
+- 「、」より「。」で切る
+- 数字は読み上げ可能な形に
+
+# 出力
+| TIME | 話者 | 台詞 | 演出メモ |
+
+演出メモには、呼吸の場所と抑揚を1行。
+全体尺 <span class="ph">[N]</span> 分。
+1分につき 250-300字 が目安。</pre>
+      </div>
+
+      <div class="tmpl t-purple">
+        <span class="tmpl-tag">TIMING</span>
+        <h3>③ 動きのタイミング表</h3>
+        <p class="when">いつ何が動くかを表で書き出す。CSS / GSAP / AE どれにも落とし込める形に。</p>
+        <pre><span class="ph">[N]</span>秒のモーション用に、
+タイムラインを書いて。
+
+# 素材
+- <span class="ph">[要素A]</span>
+- <span class="ph">[要素B]</span>
+
+# やりたいこと（時間順）
+- 0〜X秒: <span class="ph">[何が起きる]</span>
+- X〜Y秒: <span class="ph">[何が起きる]</span>
+
+# 出力
+| レイヤー | 入り | 出る | プロパティ | イージング | 備考 |
+
+# 落とし込み
+最後に <span class="ph">[CSS / GSAP / AE]</span>
+で書くなら、の一言メモ。</pre>
+      </div>
+
+      <div class="tmpl t-green">
+        <span class="tmpl-tag">SUBTITLE</span>
+        <h3>④ 字幕を整える</h3>
+        <p class="when">文字起こしを「読める字幕」に変える。物理ルールを最初に決める。</p>
+        <pre>下の文字起こしを、字幕用に整えて。
+
+# 物理ルール
+- 1行 最大 <span class="ph">15字</span>、最大 2行
+- 1枚 最低 <span class="ph">1.5秒</span>、最大 4秒
+- 助詞の途中で改行しない
+- 言い淀み（「えーと」「あの」）削除
+- 語尾の「ね」「よ」は <span class="ph">残す</span>
+
+# 出力
+| ID | 開始 | 終了 | テキスト |
+
+# おまけ
+強調したい <span class="ph">3-5箇所</span> を
+「テロップ候補」として別建てで。</pre>
+      </div>
+
+      <div class="tmpl t-red">
+        <span class="tmpl-tag">SOUND</span>
+        <h3>⑤ BGM・SE要望書</h3>
+        <p class="when">「冬の朝みたいな曲」を、テンポ・拍子・楽器の言葉に翻訳。発注書に化ける。</p>
+        <pre>動画用のBGMとSEのイメージを、
+作曲家への発注書にしてください。
+
+# 雰囲気の言葉
+<span class="ph">[例: 冬の朝の喫茶店]</span>
+
+# 動画情報
+- 全体尺: <span class="ph">[N秒]</span>
+- 場面ごとの感情変化:
+  - 0-X秒: <span class="ph">[感情]</span>
+  - X-Y秒: <span class="ph">[感情]</span>
+
+# 出力（BGM）
+- テンポ / 拍子
+- 主楽器・伴奏
+- 構成 / ループの可否
+- 参考曲ジャンル <span class="ph">3つ</span>
+
+# 出力（SE）
+- 必要な効果音 <span class="ph">3-5個</span>
+- 出るタイミング（秒数）
+- 質感の形容詞2語</pre>
+      </div>
+
+      <div class="tmpl t-pink">
+        <span class="tmpl-tag">TITLE/THUMB</span>
+        <h3>⑥ タイトル＆サムネ案</h3>
+        <p class="when">クリック率の入り口。タイトルとサムネは別の脳で考える。</p>
+        <pre>動画のタイトルとサムネ文字を作って。
+
+# 動画内容
+<span class="ph">[要約 3行]</span>
+
+# タイトル <span class="ph">20</span>案
+- 短い詩 5案
+- ベネフィット明示 5案
+- 数字入り 5案
+- 反語・問いかけ 5案
+
+各案に <span class="ph">クリック率予測（高/中/低）</span> と
+なぜそう思うか1行。
+
+# サムネ文字 <span class="ph">5</span>案
+- 大文字 1行（最大 8字）
+- 補足 1行（最大 15字）
+- 配色提案（背景 / 文字 / アクセント）
+
+煽りすぎない。<span class="ph">嘘は書かない</span>。</pre>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 04 STRENGTHS -->
+  <section class="strengths">
+    <div class="section-head">
+      <div class="section-num" style="background: var(--green); color: var(--paper); transform: rotate(1.5deg);">04</div>
+      <h2>動画づくりでの得意・不得意</h2>
+      <p class="lead">Claudeは絵を描けない。けれど、絵を <b>描く前</b> と <b>描いた後</b> の仕事は、ほぼ全部できる。</p>
+    </div>
+
+    <div class="sg">
+      <div class="sg-col good">
+        <h3><span class="badge">◯</span>得意なこと</h3>
+        <div class="sub">CLAUDE DIRECTS — 任せて速い領域</div>
+        <ul>
+          <li>絵コンテ・カット割<small>カット番号・尺・構図・字幕を表で量産。ラフ画は人が描く</small></li>
+          <li>ナレーション原稿の口語化<small>書き言葉→読み言葉。1文短く・ひらがな増やしの整え</small></li>
+          <li>タイムライン設計<small>「いつ何が動くか」の表化。CSS/GSAP/AEへの落とし込み付き</small></li>
+          <li>字幕の物理整形<small>文字数・秒数・改行位置のルールに従って機械的に</small></li>
+          <li>構成・尺配分の議論<small>OP/本編/EDの比率や、シーン入れ替えのシミュレーション</small></li>
+          <li>BGM・SE要望書<small>雰囲気の言葉を、テンポ・拍子・楽器に翻訳して発注書に</small></li>
+          <li>タイトル・サムネ大量案出し<small>20案・50案レベルの量産はClaudeの十八番</small></li>
+        </ul>
+      </div>
+
+      <div class="sg-col bad">
+        <h3><span class="badge">△</span>苦手なこと（人がやる）</h3>
+        <div class="sub">YOU SHOOT — 譲ってはいけない領域</div>
+        <ul>
+          <li>絵そのもの<small>写真・実写・複雑なイラストの生成は別ツール／人の仕事</small></li>
+          <li>動画ファイルの生成<small>音声合成や動画書き出しは別系統。Claudeは台本担当</small></li>
+          <li>カット同士の繋がり感覚<small>「次のカットへの引きが弱い」みたいな身体感覚は人が判断</small></li>
+          <li>声優の声色・トーン選び<small>「この役の声」は文字で説明しきれない。サンプル試聴は人</small></li>
+          <li>音と映像の最終ミックス<small>ピーク管理・タイミングの追い込みは編集ソフトと人の耳</small></li>
+          <li>権利関係の判断<small>BGM・引用・肖像。Claudeは答えるが、最終確認は人と弁護士</small></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 PIPELINE -->
+  <section class="rhythm">
+    <div class="tape"></div>
+    <div class="rhythm-head">
+      <span class="num">05 / PIPELINE</span>
+      <h2>動画づくり、5段の流れ。</h2>
+    </div>
+
+    <div class="pipeline">
+      <div class="stage">
+        <div class="num">1</div>
+        <h4>構想</h4>
+        <div class="tag">PHASE 01</div>
+        <div class="desc">
+          <b>Claudeの役</b>
+          壁打ち相手。ターゲット・尺・媒体・狙いを、問い返してもらいながら定める。
+        </div>
+      </div>
+      <div class="stage">
+        <div class="num">2</div>
+        <h4>設計</h4>
+        <div class="tag">PHASE 02</div>
+        <div class="desc">
+          <b>Claudeの役</b>
+          台本ライター。絵コンテ・ナレーション・字幕・BGM要望書を、テンプレで一気に。
+        </div>
+      </div>
+      <div class="stage">
+        <div class="num">3</div>
+        <h4>撮影</h4>
+        <div class="tag">PHASE 03</div>
+        <div class="desc">
+          <b>Claudeの役</b>
+          ここはお休み。カメラ・声・音は人の仕事。Claudeはチェックリストだけ用意。
+        </div>
+      </div>
+      <div class="stage">
+        <div class="num">4</div>
+        <h4>編集</h4>
+        <div class="tag">PHASE 04</div>
+        <div class="desc">
+          <b>Claudeの役</b>
+          タイムライン・字幕・テロップの整え役。「短くしすぎてない？」と聞ける相棒。
+        </div>
+      </div>
+      <div class="stage">
+        <div class="num">5</div>
+        <h4>公開</h4>
+        <div class="tag">PHASE 05</div>
+        <div class="desc">
+          <b>Claudeの役</b>
+          タイトル・サムネ・概要欄・SNS告知。同じ素材を <b>何度も収穫</b>。
+        </div>
+      </div>
+    </div>
+
+    <p style="margin-top: 26px; font-size: 14px; color: var(--ink-soft); font-weight: 600; line-height: 1.65;">
+      <b style="font-family:'Kaisei Decol',serif; color: var(--ink);">📐 コツ</b>
+      ・撮影中はClaudeに頼らない。撮影前と撮影後で、徹底的に手を抜く。
+      ・台本の修正は <b>1段ずつ</b>。「全部直して」より「3カット目だけ」のほうが速い。
+      ・公開後の派生展開も最初から考えておくと、本編に「使いやすい絵」を仕込める。
+    </p>
+  </section>
+
+  <footer>
+    <div>AlignLab / creator-system &nbsp;◆&nbsp; Claude Motion Cookbook</div>
+    <div class="page-num">VOL.2 — P. 01</div>
+  </footer>
+
+</div>
+
+</body>
+</html>

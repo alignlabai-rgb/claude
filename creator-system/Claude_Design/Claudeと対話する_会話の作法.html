@@ -1,0 +1,1457 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1480">
+<title>Claudeと対話する｜会話の作法</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Yusei+Magic&family=Zen+Maru+Gothic:wght@500;700;900&family=Kaisei+Decol:wght@400;700&family=Shippori+Mincho:wght@400;700&family=DotGothic16&family=Reenie+Beanie&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --paper: #FBF6E9;
+    --paper-2: #F4ECD2;
+    --ink: #1C1B1A;
+    --ink-soft: #4A453E;
+    --red: #E63946;
+    --red-soft: #FBD6D9;
+    --yellow: #FFD23F;
+    --yellow-dk: #C99500;
+    --yellow-soft: #FFF1B8;
+    --blue: #3B82C4;
+    --blue-soft: #D6E6F4;
+    --green: #5BA84A;
+    --green-soft: #DCEEDA;
+    --orange: #F2994A;
+    --orange-soft: #FCE3CC;
+    --purple: #8B5CB6;
+    --purple-soft: #E5DAF2;
+    --pink: #F4B6C2;
+    --pink-soft: #FBDDE3;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    background-image:
+      linear-gradient(rgba(28,27,26,0.055) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(28,27,26,0.055) 1px, transparent 1px),
+      radial-gradient(circle at 10% 10%, rgba(59,130,196,0.14), transparent 38%),
+      radial-gradient(circle at 90% 90%, rgba(139,92,182,0.13), transparent 42%);
+    background-size: 32px 32px, 32px 32px, 100% 100%, 100% 100%;
+    line-height: 1.65;
+    font-weight: 500;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page {
+    max-width: 1480px;
+    margin: 0 auto;
+    padding: 56px 56px 120px;
+    position: relative;
+  }
+
+  .tape {
+    position: absolute;
+    background: rgba(255, 210, 63, 0.78);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    width: 140px; height: 28px;
+    border-left: 1px dashed rgba(0,0,0,0.15);
+    border-right: 1px dashed rgba(0,0,0,0.15);
+    z-index: 50; pointer-events: none;
+  }
+  .tape.pink { background: rgba(244, 182, 194, 0.85); }
+  .tape.blue { background: rgba(214, 230, 244, 0.92); }
+  .tape.green { background: rgba(91, 168, 74, 0.7); }
+  .tape.red  { background: rgba(230, 57, 70, 0.6); }
+  .tape.purple { background: rgba(139,92,182,0.6); }
+
+  /* ---------- COVER ---------- */
+  .cover {
+    position: relative;
+    padding: 36px 40px 32px;
+    border: 3px solid var(--ink);
+    background: var(--paper);
+    border-radius: 18px;
+    box-shadow: 8px 8px 0 var(--ink);
+    margin-bottom: 64px;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: "";
+    position: absolute; inset: 8px;
+    border: 1.5px dashed var(--ink);
+    border-radius: 12px;
+    pointer-events: none;
+  }
+  .cover .tape.t1 { top: -14px; left: 80px; transform: rotate(-4deg); background: rgba(59,130,196,0.6);}
+  .cover .tape.t2 { top: -14px; right: 120px; transform: rotate(3deg); background: rgba(139,92,182,0.6);}
+  .cover-grid { display: grid; grid-template-columns: 1fr 380px; gap: 30px; align-items: center; }
+
+  .chapter-tag {
+    display: inline-block;
+    font-family: "DotGothic16", monospace;
+    background: var(--ink); color: var(--paper);
+    padding: 6px 14px; border-radius: 4px;
+    font-size: 14px; letter-spacing: 0.12em;
+    margin-bottom: 18px;
+  }
+  .cover h1 {
+    font-family: "Yusei Magic", "Zen Maru Gothic", sans-serif;
+    font-weight: 400; font-size: 76px;
+    margin: 0 0 6px;
+    letter-spacing: 0.02em; line-height: 1.05;
+    color: var(--ink);
+    text-shadow: 4px 4px 0 var(--purple);
+  }
+  .cover h1 .acc { color: var(--blue); text-shadow: 4px 4px 0 var(--ink); }
+  .cover .subtitle {
+    font-family: "Kaisei Decol", "Zen Maru Gothic", serif;
+    font-size: 26px; font-weight: 700;
+    margin: 6px 0 22px;
+    color: var(--ink-soft);
+  }
+  .cover .lede {
+    font-size: 16.5px;
+    max-width: 720px;
+    color: var(--ink-soft);
+    margin: 16px 0 0;
+  }
+  .cover-meta {
+    display: flex; gap: 14px; flex-wrap: wrap;
+    font-family: "DotGothic16", monospace;
+    font-size: 13px; color: var(--ink-soft);
+    margin-top: 14px;
+  }
+  .cover-meta span {
+    background: var(--paper-2);
+    padding: 6px 12px;
+    border: 1.5px solid var(--ink);
+    border-radius: 999px;
+  }
+
+  /* cover illustration: chat bubbles */
+  .cover-illu {
+    position: relative;
+    height: 240px;
+    background: var(--paper-2);
+    border: 2.5px solid var(--ink);
+    border-radius: 14px;
+    padding: 18px;
+    box-shadow: 4px 4px 0 var(--ink);
+    overflow: hidden;
+  }
+  .cover-illu .b {
+    position: absolute;
+    padding: 10px 14px;
+    border: 2.5px solid var(--ink);
+    border-radius: 14px;
+    background: var(--paper);
+    font-family: "Kaisei Decol", serif;
+    font-weight: 700;
+    box-shadow: 3px 3px 0 var(--ink);
+    font-size: 14px;
+    line-height: 1.3;
+  }
+  .cover-illu .b1 { top: 14px; left: 18px; background: var(--red-soft); transform: rotate(-3deg); max-width: 200px;}
+  .cover-illu .b2 { top: 70px; right: 18px; background: var(--blue-soft); transform: rotate(2deg); max-width: 200px;}
+  .cover-illu .b3 { bottom: 50px; left: 36px; background: var(--yellow); transform: rotate(-2deg); max-width: 160px;}
+  .cover-illu .b4 { bottom: 14px; right: 24px; background: var(--green-soft); transform: rotate(3deg); max-width: 150px;}
+  .cover-illu .b small {
+    display:block;
+    font-family: "DotGothic16", monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    color: var(--ink-soft);
+    margin-bottom: 2px;
+    font-weight: 500;
+  }
+
+  /* SECTION HEAD */
+  .section-head {
+    display: flex; align-items: baseline; gap: 18px;
+    margin: 24px 0 28px;
+  }
+  .section-num {
+    font-family: "Yusei Magic", sans-serif;
+    font-size: 64px; line-height: 1;
+    color: var(--ink); background: var(--yellow);
+    border: 3px solid var(--ink); border-radius: 14px;
+    padding: 6px 18px 2px;
+    box-shadow: 4px 4px 0 var(--ink);
+    transform: rotate(-2deg);
+  }
+  .section-head h2 {
+    font-family: "Yusei Magic", sans-serif;
+    font-weight: 400; font-size: 40px;
+    margin: 0; color: var(--ink);
+  }
+  .section-head .lead {
+    font-size: 16px; color: var(--ink-soft);
+    margin-left: auto; max-width: 460px;
+    border-left: 4px solid var(--ink);
+    padding: 4px 14px;
+    background: var(--paper-2);
+  }
+
+  /* ---------- GALLERY ---------- */
+  .gallery { margin-bottom: 90px; }
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 22px;
+  }
+  .gcard {
+    background: var(--paper);
+    border: 3px solid var(--ink);
+    border-radius: 12px;
+    box-shadow: 5px 5px 0 var(--ink);
+    overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .gcard .preview {
+    aspect-ratio: 4/3;
+    background: var(--paper-2);
+    border-bottom: 3px solid var(--ink);
+    position: relative;
+    overflow: hidden;
+  }
+  .gcard .meta { padding: 12px 14px 14px; }
+  .gcard .meta .num {
+    font-family: "DotGothic16", monospace;
+    font-size: 11px; letter-spacing: 0.18em;
+    color: var(--ink-soft);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .gcard .meta .num .gly {
+    width: 22px; height: 22px;
+    border: 2px solid var(--ink);
+    border-radius: 4px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: "Kaisei Decol", serif;
+    font-weight: 700;
+    font-size: 13px;
+  }
+  .gcard .meta h3 {
+    font-family: "Kaisei Decol", serif;
+    font-size: 17px; font-weight: 700;
+    margin: 4px 0 6px;
+    line-height: 1.25;
+  }
+  .gcard .meta p {
+    margin: 0;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    font-weight: 600;
+    line-height: 1.5;
+  }
+
+  /* Mini chat-mocks for gallery */
+  .mp-chat {
+    height: 100%;
+    padding: 10px;
+    display: flex; flex-direction: column;
+    gap: 6px;
+    justify-content: center;
+  }
+  .mp-bub {
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+    border-radius: 8px;
+    padding: 5px 8px;
+    font-size: 9.5px;
+    line-height: 1.35;
+    font-weight: 600;
+    max-width: 78%;
+  }
+  .mp-bub.me { background: var(--red-soft); align-self: flex-end; border-radius: 8px 8px 2px 8px; }
+  .mp-bub.cl { background: var(--paper); align-self: flex-start; border-radius: 8px 8px 8px 2px; }
+  .mp-bub b { font-family:"DotGothic16",monospace; font-size: 8px; color: var(--ink-soft); display:block; letter-spacing: 0.1em; }
+
+  /* per-category preview bg */
+  .mp-learn { background: var(--yellow-soft); }
+  .mp-bounce { background: var(--blue-soft); }
+  .mp-coCreate { background: var(--green-soft); }
+  .mp-crit { background: var(--red-soft); }
+  .mp-organize { background: var(--paper-2); }
+  .mp-compare { background: var(--orange-soft); display:grid; grid-template-columns:1fr 1fr; gap:6px; padding:8px;}
+  .mp-compare .col { background: var(--paper); border: 1.5px solid var(--ink); border-radius: 6px; padding: 5px; display:flex; flex-direction:column; gap:3px;}
+  .mp-compare .col i { display:block; height:3px; background: var(--ink-soft); border-radius:1.5px;}
+  .mp-compare .col i.short { width:60%;}
+  .mp-compare .col .ttl { font-family:"DotGothic16",monospace; font-size:8px; letter-spacing:0.1em; color: var(--ink); font-weight: 700;}
+  .mp-compare .col.a .ttl { color: var(--red);}
+  .mp-compare .col.b .ttl { color: var(--blue);}
+  .mp-role { background: var(--purple-soft); padding: 10px; display:flex; flex-direction:column; gap:6px;}
+  .mp-role .tag { background: var(--ink); color: var(--paper); padding: 2px 8px; border-radius: 4px; font-family:"DotGothic16",monospace; font-size:9px; letter-spacing:0.1em; align-self:flex-start;}
+  .mp-role .bub { background: var(--paper); border: 1.5px solid var(--ink); border-radius: 8px 8px 8px 2px; padding: 6px 8px; font-family:"Shippori Mincho",serif; font-size:10px; line-height: 1.4;}
+  .mp-role .bub b { font-weight: 700;}
+  .mp-argue { background: var(--paper-2); padding: 10px; display:flex; flex-direction:column; gap:6px; position:relative;}
+  .mp-argue .a, .mp-argue .b { background: var(--paper); border:1.5px solid var(--ink); border-radius:8px; padding:5px 8px; font-size:9.5px; line-height:1.3; font-weight:600;}
+  .mp-argue .a { background: var(--red-soft); align-self:flex-start; max-width:75%;}
+  .mp-argue .b { background: var(--blue-soft); align-self:flex-end; max-width:75%;}
+  .mp-argue::after { content: "⚡"; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 16px;}
+  .mp-cont { background: var(--paper); padding:10px; display:flex; flex-direction:column; gap:4px;}
+  .mp-cont .ln { height:3px; background: var(--ink-soft); border-radius:1.5px; opacity:0.6;}
+  .mp-cont .ln.s { width:60%; }
+  .mp-cont .ln.dim { opacity:0.25;}
+  .mp-cont .more { font-family:"DotGothic16",monospace; font-size:9px; color: var(--blue); text-align:center; margin-top:6px; font-weight:700; letter-spacing:0.15em;}
+  .mp-close { background: var(--ink); padding:10px; color: var(--paper); display:flex; flex-direction:column; gap:5px; align-items:center; justify-content:center; height:100%;}
+  .mp-close .stamp { width:70px; height:70px; border-radius:50%; border: 2.5px solid var(--yellow); display:flex; align-items:center; justify-content:center; font-family:"Kaisei Decol",serif; font-size: 28px; color: var(--yellow); transform: rotate(-10deg); font-weight: 700;}
+  .mp-close .tag { font-family:"DotGothic16",monospace; font-size:9.5px; letter-spacing:0.2em; color: var(--yellow);}
+
+  /* ---------- CASES ---------- */
+  .cases { margin-bottom: 90px; }
+  .case {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    background: var(--paper);
+    border: 3px solid var(--ink);
+    border-radius: 18px;
+    box-shadow: 8px 8px 0 var(--ink);
+    padding: 28px;
+    margin-bottom: 60px;
+    position: relative;
+  }
+  .case.reverse .case-text { order: 2; }
+  .case.reverse .case-visual { order: 1; }
+  .case .tape { top: -14px; left: 50px; }
+  .case .case-text { display: flex; flex-direction: column; gap: 14px; }
+  .case .case-num {
+    font-family: "DotGothic16", monospace;
+    background: var(--ink); color: var(--paper);
+    padding: 4px 12px; border-radius: 4px;
+    font-size: 12px; letter-spacing: 0.16em;
+    align-self: flex-start;
+  }
+  .case h3 {
+    font-family: "Yusei Magic", sans-serif;
+    font-weight: 400;
+    font-size: 36px; line-height: 1.15;
+    margin: 0;
+  }
+  .case .scenario {
+    background: var(--paper-2);
+    border: 2px solid var(--ink);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 14.5px;
+    font-weight: 600;
+  }
+  .case .scenario b {
+    font-family: "Kaisei Decol", serif;
+    display: inline-block;
+    background: var(--ink); color: var(--paper);
+    padding: 1px 8px; border-radius: 4px;
+    margin-right: 6px;
+    font-size: 12px; letter-spacing: 0.1em;
+  }
+  .prompt-box {
+    background: var(--ink);
+    border-radius: 10px;
+    color: var(--paper);
+    padding: 14px 16px;
+    font-family: "JetBrains Mono", "DotGothic16", monospace;
+    font-size: 12.5px;
+    line-height: 1.65;
+    border: 3px solid var(--ink);
+    box-shadow: 4px 4px 0 var(--yellow);
+    position: relative;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+  }
+  .prompt-box::before {
+    content: "MOVE";
+    position: absolute;
+    top: -10px; left: 12px;
+    font-family: "DotGothic16", monospace;
+    font-size: 10px; letter-spacing: 0.2em;
+    background: var(--yellow); color: var(--ink);
+    padding: 2px 8px; border: 2px solid var(--ink);
+    border-radius: 4px;
+  }
+  .prompt-box .ph { color: var(--yellow); }
+  .case .reflect {
+    background: var(--green-soft);
+    border: 2px solid var(--ink);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 13.5px;
+    font-weight: 600;
+    line-height: 1.55;
+  }
+  .case .reflect b {
+    font-family: "Kaisei Decol", serif;
+    display: block;
+    margin-bottom: 4px;
+    color: var(--green);
+  }
+  .visual-frame {
+    background: var(--paper-2);
+    border: 2.5px solid var(--ink);
+    border-radius: 12px;
+    padding: 18px;
+    box-shadow: inset 0 0 0 2px var(--paper);
+    min-height: 420px;
+    position: relative;
+    overflow: hidden;
+  }
+  .visual-frame::before {
+    content: "CONVERSATION";
+    position: absolute;
+    top: -10px; right: 14px;
+    font-family: "DotGothic16", monospace;
+    font-size: 10px; letter-spacing: 0.2em;
+    background: var(--blue); color: var(--paper);
+    padding: 2px 10px; border: 2px solid var(--ink);
+    border-radius: 4px;
+    z-index: 5;
+  }
+
+  /* ---- chat thread big ---- */
+  .thread {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    height: 100%;
+    overflow: hidden;
+  }
+  .thread .turn {
+    display: grid;
+    grid-template-columns: 36px 1fr;
+    gap: 10px;
+    align-items: start;
+    position: relative;
+  }
+  .thread .turn.me { grid-template-columns: 1fr 36px;}
+  .thread .turn.me .bubble { order: 1; }
+  .thread .turn.me .av { order: 2;}
+  .thread .av {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: 2.5px solid var(--ink);
+    display: flex; align-items: center; justify-content: center;
+    font-family: "Kaisei Decol", serif;
+    font-weight: 700;
+    font-size: 16px;
+    box-shadow: 2px 2px 0 var(--ink);
+    flex-shrink: 0;
+  }
+  .thread .me .av { background: var(--red); color: var(--paper);}
+  .thread .cl .av { background: var(--blue); color: var(--paper);}
+  .thread .bubble {
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-size: 12.5px;
+    line-height: 1.55;
+    font-weight: 600;
+    position: relative;
+    box-shadow: 3px 3px 0 var(--ink);
+  }
+  .thread .me .bubble {
+    background: var(--red-soft);
+    border-radius: 12px 12px 4px 12px;
+    text-align: left;
+  }
+  .thread .cl .bubble {
+    background: var(--paper);
+    border-radius: 12px 12px 12px 4px;
+  }
+  .thread .bubble .ts {
+    font-family: "DotGothic16", monospace;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    color: var(--ink-soft);
+    margin-bottom: 4px;
+    font-weight: 500;
+  }
+  .thread .bubble b.hl { background: var(--yellow); padding: 0 3px; font-weight: 700;}
+  .thread .bubble em.qt { font-style: italic; color: var(--ink-soft); display: block; padding: 4px 0 4px 10px; border-left: 2.5px solid var(--ink-soft); margin: 4px 0; font-weight: 500;}
+  .thread .annot {
+    position: absolute;
+    background: var(--yellow);
+    border: 2px solid var(--ink);
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-family: "Reenie Beanie", cursive;
+    font-size: 18px;
+    color: var(--ink);
+    box-shadow: 2px 2px 0 var(--ink);
+    z-index: 3;
+  }
+
+  /* ---------- TEMPLATES ---------- */
+  .templates { margin-bottom: 90px; }
+  .tmpl-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+  .tmpl {
+    background: var(--paper);
+    border: 3px solid var(--ink);
+    border-radius: 14px;
+    box-shadow: 5px 5px 0 var(--ink);
+    padding: 20px 22px 22px;
+  }
+  .tmpl .tmpl-tag {
+    display: inline-block;
+    font-family: "DotGothic16", monospace;
+    font-size: 11px; letter-spacing: 0.16em;
+    padding: 3px 10px;
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    background: var(--yellow);
+  }
+  .tmpl.t-red .tmpl-tag { background: var(--red-soft);}
+  .tmpl.t-blue .tmpl-tag { background: var(--blue-soft);}
+  .tmpl.t-green .tmpl-tag { background: var(--green-soft);}
+  .tmpl.t-purple .tmpl-tag { background: var(--purple-soft);}
+  .tmpl.t-orange .tmpl-tag { background: var(--orange-soft);}
+  .tmpl.t-pink .tmpl-tag { background: var(--pink-soft);}
+  .tmpl h3 {
+    font-family: "Yusei Magic", sans-serif;
+    font-weight: 400;
+    font-size: 28px;
+    margin: 10px 0 6px;
+  }
+  .tmpl .when {
+    font-size: 13px; color: var(--ink-soft);
+    margin: 0 0 12px;
+    font-weight: 600;
+  }
+  .tmpl pre {
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-family: "JetBrains Mono", "DotGothic16", monospace;
+    font-size: 12.5px;
+    line-height: 1.7;
+    margin: 0;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+  }
+  .tmpl pre .ph { color: var(--yellow); }
+  .tmpl pre .cm { color: rgba(255,255,255,0.45); }
+
+  /* ---------- STRENGTHS ---------- */
+  .strengths { margin-bottom: 90px; }
+  .sg { display: grid; grid-template-columns: 1fr 1fr; gap: 30px;}
+  .sg-col {
+    border: 3px solid var(--ink);
+    border-radius: 14px;
+    padding: 22px 24px;
+    box-shadow: 5px 5px 0 var(--ink);
+    background: var(--paper);
+  }
+  .sg-col.good { background: var(--green-soft); }
+  .sg-col.bad { background: var(--red-soft); }
+  .sg-col h3 {
+    font-family: "Yusei Magic", sans-serif;
+    font-weight: 400;
+    font-size: 32px;
+    margin: 0 0 4px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .sg-col h3 .badge {
+    font-family: "Kaisei Decol", serif;
+    width: 44px; height: 44px;
+    display: inline-flex; align-items: center; justify-content: center;
+    border: 2.5px solid var(--ink); border-radius: 50%;
+    font-size: 24px; font-weight: 700;
+  }
+  .sg-col.good h3 .badge { background: var(--green); color: var(--paper); }
+  .sg-col.bad h3 .badge { background: var(--red); color: var(--paper); }
+  .sg-col .sub {
+    font-family: "DotGothic16", monospace;
+    font-size: 11px; letter-spacing: 0.16em;
+    color: var(--ink-soft);
+    margin-bottom: 14px;
+  }
+  .sg-col ul { list-style: none; padding: 0; margin: 0;}
+  .sg-col li {
+    padding: 8px 0 8px 26px;
+    border-top: 1.5px dashed var(--ink);
+    position: relative;
+    font-size: 14.5px;
+    font-weight: 700;
+    line-height: 1.45;
+  }
+  .sg-col li:first-child { border-top: none; }
+  .sg-col li::before {
+    position: absolute;
+    left: 0; top: 9px;
+    font-family: "Kaisei Decol", serif;
+    font-size: 16px; line-height: 1;
+    font-weight: 700;
+  }
+  .sg-col.good li::before { content: "◯"; color: var(--green); }
+  .sg-col.bad li::before { content: "△"; color: var(--red); }
+  .sg-col li small {
+    display: block;
+    font-weight: 500;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    padding-top: 2px;
+    line-height: 1.5;
+  }
+
+  /* ---------- RHYTHM (long convo timeline) ---------- */
+  .rhythm {
+    background: var(--paper);
+    border: 3px solid var(--ink);
+    border-radius: 18px;
+    box-shadow: 8px 8px 0 var(--ink);
+    padding: 28px 32px;
+    margin-bottom: 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .rhythm .tape { top: -14px; right: 100px; transform: rotate(3deg); background: rgba(244,182,194,0.85);}
+  .rhythm-head {
+    display: flex; align-items: baseline; gap: 18px;
+    margin-bottom: 24px;
+  }
+  .rhythm-head h2 {
+    font-family: "Yusei Magic", sans-serif;
+    font-size: 32px; font-weight: 400;
+    margin: 0;
+  }
+  .rhythm-head .num {
+    font-family: "DotGothic16", monospace;
+    background: var(--ink); color: var(--paper);
+    padding: 4px 10px; border-radius: 4px;
+    font-size: 12px;
+  }
+
+  /* horizontal timeline */
+  .timeline {
+    position: relative;
+    padding: 30px 0 10px;
+  }
+  .timeline::before {
+    content: "";
+    position: absolute;
+    top: 56px; left: 30px; right: 30px;
+    height: 4px;
+    background: var(--ink);
+    border-radius: 2px;
+  }
+  .timeline-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0;
+    position: relative;
+  }
+  .ev {
+    text-align: center;
+    padding: 0 8px;
+    position: relative;
+  }
+  .ev .dot {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 3px solid var(--ink);
+    margin: 0 auto 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: "Kaisei Decol", serif;
+    font-weight: 700;
+    font-size: 14px;
+    background: var(--paper);
+    box-shadow: 2px 2px 0 var(--ink);
+    position: relative;
+    z-index: 2;
+  }
+  .ev:nth-child(1) .dot { background: var(--yellow); }
+  .ev:nth-child(2) .dot { background: var(--orange); color: var(--paper);}
+  .ev:nth-child(3) .dot { background: var(--red); color: var(--paper);}
+  .ev:nth-child(4) .dot { background: var(--purple); color: var(--paper);}
+  .ev:nth-child(5) .dot { background: var(--blue); color: var(--paper);}
+  .ev:nth-child(6) .dot { background: var(--green); color: var(--paper);}
+  .ev .ph {
+    font-family: "Kaisei Decol", serif;
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 4px;
+  }
+  .ev .tag {
+    font-family: "DotGothic16", monospace;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    color: var(--ink-soft);
+    margin-bottom: 8px;
+  }
+  .ev .note {
+    background: var(--paper-2);
+    border: 1.5px solid var(--ink);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 12px;
+    line-height: 1.5;
+    font-weight: 600;
+    color: var(--ink-soft);
+    text-align: left;
+  }
+
+  footer {
+    margin-top: 60px;
+    border-top: 3px dashed var(--ink);
+    padding-top: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: "DotGothic16", monospace;
+    font-size: 12px;
+    color: var(--ink-soft);
+    letter-spacing: 0.12em;
+  }
+  footer .page-num {
+    font-size: 14px;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 4px 10px;
+    border-radius: 4px;
+  }
+</style>
+</head>
+<body>
+
+<template id="__bundler_thumbnail" data-bg-color="#FBF6E9">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#FBF6E9"/>
+    <g>
+      <rect x="120" y="180" width="380" height="120" rx="20" fill="#FBD6D9" stroke="#1C1B1A" stroke-width="6" transform="rotate(-3 310 240)"/>
+      <text x="160" y="245" font-family="serif" font-size="34" font-weight="700" fill="#1C1B1A" transform="rotate(-3 310 240)">これってどう?</text>
+      <rect x="640" y="320" width="420" height="120" rx="20" fill="#D6E6F4" stroke="#1C1B1A" stroke-width="6" transform="rotate(2 850 380)"/>
+      <text x="680" y="385" font-family="serif" font-size="32" font-weight="700" fill="#1C1B1A" transform="rotate(2 850 380)">3案出してみますね</text>
+      <rect x="180" y="480" width="360" height="120" rx="20" fill="#FFD23F" stroke="#1C1B1A" stroke-width="6" transform="rotate(-2 360 540)"/>
+      <text x="220" y="545" font-family="serif" font-size="32" font-weight="700" fill="#1C1B1A" transform="rotate(-2 360 540)">2番で進めて</text>
+      <text x="80" y="100" font-family="monospace" font-size="22" fill="#1C1B1A">CHAPTER 04 — DIALOGUE</text>
+    </g>
+  </svg>
+</template>
+
+<div class="page">
+
+  <!-- COVER -->
+  <header class="cover">
+    <div class="tape t1"></div>
+    <div class="tape t2"></div>
+    <div class="cover-grid">
+      <div>
+        <div class="chapter-tag">CHAPTER 04 / ALIGNLAB NOTE</div>
+        <h1>Claudeと<span class="acc">対話</span>する。</h1>
+        <p class="subtitle">会話の作法</p>
+        <p class="lede">
+          プロンプトは一発で決まらない。書く・作る・直すは、ぜんぶ会話の上に乗っている。
+          だから本当に効くのは「上手な依頼文」より「上手な往復」のほうだ。
+          このノートでは、Claudeとの対話を10のパターンに分け、
+          壁打ち・引き継ぎ・反論・リセットの4実例で会話の中身まで覗き込む。
+          最後に、いつでも使える「会話の手筋」テンプレを6つ置いた。
+        </p>
+        <div class="cover-meta">
+          <span>個人用リファレンス</span>
+          <span>2026.05</span>
+          <span>by AlignLab</span>
+          <span>creator-system</span>
+        </div>
+      </div>
+      <div class="cover-illu">
+        <div class="b b1"><small>YOU</small>書くのが、苦しい。</div>
+        <div class="b b2"><small>CLAUDE</small>何が苦しい？<br>テーマ？読者？時間？</div>
+        <div class="b b3"><small>YOU</small>……読者かも。</div>
+        <div class="b b4"><small>CLAUDE</small>じゃあ、<br>そこから話そう。</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 01 GALLERY -->
+  <section class="gallery">
+    <div class="section-head">
+      <div class="section-num">01</div>
+      <h2>対話の10パターン</h2>
+      <p class="lead">Claudeとの会話には「型」がある。場面に合わせて型を切り替えられると、引き出せる答えが一段深くなる。</p>
+    </div>
+
+    <div class="gallery-grid">
+
+      <div class="gcard">
+        <div class="preview">
+          <div class="mp-chat mp-learn">
+            <div class="mp-bub me"><b>YOU</b>NLPって、ざっくり何？</div>
+            <div class="mp-bub cl"><b>CLAUDE</b>「文章を計算可能に<br>する技術」です。例えば…</div>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="num"><span class="gly">学</span>01 / LEARN</div>
+          <h3>教えてもらう</h3>
+          <p>知識を引き出す対話。前提知識のレベルを最初に伝えると、語彙が合う。</p>
+        </div>
+      </div>
+
+      <div class="gcard">
+        <div class="preview">
+          <div class="mp-chat mp-bounce">
+            <div class="mp-bub me"><b>YOU</b>新サービスの方向性<br>に迷っていて…</div>
+            <div class="mp-bub cl"><b>CLAUDE</b>もう少し聞かせて。<br>誰の何を解く？</div>
+            <div class="mp-bub me"><b>YOU</b>うーん、つまり…</div>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="num"><span class="gly">壁</span>02 / BOUNCE</div>
+          <h3>壁打ち</h3>
+          <p>答えではなく問いを返してもらう。考えがほどけて言語化が進む。</p>
+        </div>
+      </div>
+
+      <div class="gcard">
+        <div class="preview">
+          <div class="mp-chat mp-coCreate">
+            <div class="mp-bub me"><b>YOU</b>続きを書いて。</div>
+            <div class="mp-bub cl"><b>CLAUDE</b>2案で書きました。<br>A=静かに B=力強く</div>
+            <div class="mp-bub me"><b>YOU</b>Aの3段落目だけ直して。</div>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="num"><span class="gly">共</span>03 / CO-CREATE</div>
+          <h3>共作する</h3>
+          <p>たたき台→修正→たたき台の連打。Claudeの強みがいちばん出る場面。</p>
+        </div>
+      </div>
+
+      <div class="gcard">
+        <div class="preview">
+          <div class="mp-chat mp-crit">
+            <div class="mp-bub me"><b>YOU</b>辛口で読んで</div>
+            <div class="mp-bub cl"><b>CLAUDE</b>導入が弱い。冗長。<br>結論が記憶に残らない。</div>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="num"><span class="gly">批</span>04 / CRITIQUE</div>
+          <h3>批評させる</h3>
+          <p>「役を変える」が肝。優しい相棒では出てこない指摘を引き出す。</p>
+        </div>
+      </div>
+
+      <div class="gcard">
+        <div class="preview">
+          <div class="mp-chat mp-organize">
+            <div class="mp-bub me"><b>YOU</b>これ、メモぐちゃぐちゃ<br>で…整理して。</div>
+            <div class="mp-bub cl"><b>CLAUDE</b>3つの論点に分かれます。<br>① ② ③</div>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="num"><span class="gly">整</span>05 / ORGANIZE</div>
+          <h3>整理させる</h3>
+          <p>散らかったメモを、表・見出し・箇条書きに編み直す。掃除担当としても優秀。</p>
+        </div>
+      </div>
+
+      <div class="gcard">
+        <div class="preview">
+          <div class="mp-compare">
+            <div class="col a"><div class="ttl">A案</div><i></i><i class="short"></i><i></i></div>
+            <div class="col b"><div class="ttl">B案</div><i></i><i></i><i class="short"></i></div>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="num"><span class="gly">較</span>06 / COMPARE</div>
+          <h3>比較させる</h3>
+          <p>「2-3案で並べて」と頼むと、選びやすい。1案では迷うものも、横並びにすると決まる。</p>
+        </div>
+      </div>
+
+      <div class="gcard">
+        <div class="preview">
+          <div class="mp-role">
+            <div class="tag">ROLE : 編集者</div>
+            <div class="bub">…ここの<b>導入</b>が弱いですね。<br>削るなら、最初の3行から。</div>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="num"><span class="gly">演</span>07 / ROLEPLAY</div>
+          <h3>演じさせる</h3>
+          <p>役名・職業・性格を与えると、語彙・着眼点・口調まで変わる。</p>
+        </div>
+      </div>
+
+      <div class="gcard">
+        <div class="preview">
+          <div class="mp-argue">
+            <div class="a">この案、いいと思う。</div>
+            <div class="b">でも、ここに穴がある。</div>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="num"><span class="gly">反</span>08 / ARGUE</div>
+          <h3>反論させる</h3>
+          <p>「賛同しないで、反対側から」と頼む。盲点が一気に浮かび上がる。</p>
+        </div>
+      </div>
+
+      <div class="gcard">
+        <div class="preview">
+          <div class="mp-cont">
+            <div class="ln"></div><div class="ln s"></div>
+            <div class="ln"></div><div class="ln"></div>
+            <div class="ln dim s"></div><div class="ln dim"></div>
+            <div class="more">… 続く</div>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="num"><span class="gly">続</span>09 / CONTINUE</div>
+          <h3>続きを頼む</h3>
+          <p>「同じ調子で次の段落」「あと500字」のような連続生成。会話を温め続ける。</p>
+        </div>
+      </div>
+
+      <div class="gcard">
+        <div class="preview">
+          <div class="mp-close">
+            <div class="stamp">締</div>
+            <div class="tag">SUMMARIZE &amp; CLOSE</div>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="num"><span class="gly">締</span>10 / CLOSE</div>
+          <h3>締める</h3>
+          <p>会話の最後に「ここまでの結論を3行で」。次に再開する時の自分への申し送り書になる。</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 02 CASES -->
+  <section class="cases">
+    <div class="section-head">
+      <div class="section-num" style="background: var(--orange); transform: rotate(2deg);">02</div>
+      <h2>実例集：会話の中身まで覗く</h2>
+      <p class="lead">きれいな依頼1発より、ぐねぐね曲がりながら進む会話のほうが現実だ。4つの典型を、吹き出しで追いかける。</p>
+    </div>
+
+    <!-- CASE A: 壁打ち -->
+    <div class="case">
+      <div class="tape blue"></div>
+      <div class="case-text">
+        <div class="case-num">CASE A · WALL-BOUNCE</div>
+        <h3>もやもやを<br>言葉にする壁打ち</h3>
+        <div class="scenario">
+          <b>場面</b>新サービスの方向性に迷っている。何が嫌で何がしたいかも、自分でうまく言えない。
+          Claudeに答えを聞くのではなく、自分の考えを <b>引き出してもらう</b> 使い方。
+        </div>
+        <div class="prompt-box">あなたは、優れたコーチです。
+今から私の思考整理に付き合ってください。
+
+# お願い
+- 私が言うことに対して、<span class="ph">答えを返さないで</span>ください
+- 代わりに、<span class="ph">問い</span>を返してください
+- 1往復に、問いは1つだけ
+- 私が同じ言葉を繰り返したら、その言葉を「定義してみて」と促してください
+
+# 最初の一言
+「新しいサービスの方向性に迷っています。
+何がしたいか、自分でもうまく言えない感じです。」
+
+ではどうぞ。</div>
+        <div class="reflect">
+          <b>振り返り</b>「答えを返さないで」「問いだけ返して」の制約が決定的に効く。
+          一人で考えるよりも、誰かに「それってどういうこと？」と聞かれるだけで、頭は整う。
+          Claudeを <b>鏡</b> として使う型。
+        </div>
+      </div>
+      <div class="case-visual">
+        <div class="visual-frame">
+          <div class="thread">
+            <div class="turn me">
+              <div class="bubble">
+                <div class="ts">14:02 · あなた</div>
+                新しいサービスの方向性に迷っています。何がしたいか、自分でもうまく言えない感じです。
+              </div>
+              <div class="av">私</div>
+            </div>
+            <div class="turn cl">
+              <div class="av">C</div>
+              <div class="bubble">
+                <div class="ts">14:02 · Claude</div>
+                では、ひとつだけ。<br>「迷っている」というとき、頭の中で <b class="hl">どんな選択肢</b> がぶつかり合っていますか？
+              </div>
+            </div>
+            <div class="turn me">
+              <div class="bubble">
+                <div class="ts">14:04 · あなた</div>
+                えーと…「広く誰でも使えるもの」と「少数の人にめちゃくちゃ刺さるもの」、どっちにするかで揺れている、かも。
+              </div>
+              <div class="av">私</div>
+            </div>
+            <div class="turn cl">
+              <div class="av">C</div>
+              <div class="bubble">
+                <div class="ts">14:04 · Claude</div>
+                揺れているとき、あなたの <b class="hl">気持ちはどちらに先に動きます</b>か？「正しい」ではなく、「やりたい」のほう。
+              </div>
+            </div>
+            <div class="turn me">
+              <div class="bubble">
+                <div class="ts">14:06 · あなた</div>
+                …少数のほう、たぶん。でも「広く」のほうが安全だから、と思って引き戻している気がする。
+              </div>
+              <div class="av">私</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CASE B: 引き継ぎ -->
+    <div class="case reverse">
+      <div class="tape green" style="right: 60px; left: auto;"></div>
+      <div class="case-text">
+        <div class="case-num">CASE B · HANDOFF</div>
+        <h3>長期プロジェクトを<br>引き継ぐ</h3>
+        <div class="scenario">
+          <b>場面</b>連載エッセイ「窓辺ノート」を3か月書いてきた。今日は新しい会話。
+          前回までの設定・人物・トーンを、最小手数でClaudeに思い出させたい。
+        </div>
+        <div class="prompt-box">これから「窓辺ノート」の <span class="ph">第8回</span> を書きます。
+まず前提だけ確認させてください。
+
+# シリーズ概要
+- タイトル：窓辺ノート
+- 文体：一人称・現在形・短文・季語をひとつ入れる
+- 主人公：60代の元書店員「ナホさん」
+- 舞台：路面電車のある架空の街
+- 主題：日常の中の<span class="ph">小さな決心</span>
+
+# これまでの回（要点だけ）
+- 1回: 喫茶店で本を捨てる決心
+- 2-7回: <span class="ph">過去のあらすじ短く</span>
+
+# 今回（第8回）
+- 季語: <span class="ph">夏</span>
+- できごと: ナホさんが、ずっと避けていた古い同僚に電話をかける
+- 結末: <span class="ph">電話に出ない</span>
+
+このまま書ける状態か、足りない設定があるか、先に確認して。
+足りなければ私に聞いて。</div>
+        <div class="reflect">
+          <b>振り返り</b>長く続けたい仕事は、<b>「再開テンプレート」</b>を1つ持っておくと急に楽になる。
+          シリーズ概要・直近のあらすじ・今回の指示の3ブロックで再起動できる。
+          毎回これを貼り付ければ、Claudeは何度でも同じ文体で続きを書ける。
+        </div>
+      </div>
+      <div class="case-visual">
+        <div class="visual-frame">
+          <div class="thread">
+            <div class="turn me">
+              <div class="bubble">
+                <div class="ts">10:12 · あなた</div>
+                これから「窓辺ノート」第8回を書きます。<br>まず前提だけ確認させてください。<br><em class="qt">（前提を貼る）</em>
+              </div>
+              <div class="av">私</div>
+            </div>
+            <div class="turn cl">
+              <div class="av">C</div>
+              <div class="bubble">
+                <div class="ts">10:12 · Claude</div>
+                前提、確認しました。書ける状態ですが、念のため2点だけ。<br>
+                ① 「古い同僚」は、ナホさんと何があった人ですか？<b class="hl">関係の温度</b>を一行ください。<br>
+                ② 電話に出ない、はナホさん側の安心 or 不安、どちらに振りますか？
+              </div>
+            </div>
+            <div class="turn me">
+              <div class="bubble">
+                <div class="ts">10:14 · あなた</div>
+                ① 仲は悪くなかったけど、引退したときに何も言わずに辞めた相手。<br>
+                ② 不安寄り。でも、最後に静かな安堵が混じる感じ。
+              </div>
+              <div class="av">私</div>
+            </div>
+            <div class="turn cl">
+              <div class="av">C</div>
+              <div class="bubble">
+                <div class="ts">10:15 · Claude</div>
+                了解しました。<br>では <b class="hl">第8回「夏、留守番電話」</b> としてドラフトします。1段落ずつ、合意を取りながら進めましょうか？それとも一気に？
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CASE C: 反論 -->
+    <div class="case">
+      <div class="tape red"></div>
+      <div class="case-text">
+        <div class="case-num">CASE C · DISAGREE</div>
+        <h3>あえて<br>反論させる</h3>
+        <div class="scenario">
+          <b>場面</b>自分の企画に手応えがある。だからこそ、見落としを潰したい。
+          Claudeに「賛同しないで、本気で反論して」と頼んで、 <b>悪魔の代弁者</b> をやってもらう。
+        </div>
+        <div class="prompt-box">これから企画を説明します。
+あなたは、<span class="ph">この企画に強く反対する</span> 役を演じてください。
+
+# ルール
+- 賛同・お世辞は禁止
+- 「いい点もある」と一切添えないで
+- 攻撃ではなく、<span class="ph">具体的な反論</span>を出して
+- 3つの観点（市場 / 実現性 / 倫理）から、1つずつ強い反論
+- 各反論の最後に、私が答えるべき「鋭い質問」を1つ
+
+# 企画
+（ここに企画書）
+
+ではどうぞ。容赦は要りません。</div>
+        <div class="reflect">
+          <b>振り返り</b>Claudeは <b>協調寄り</b> なので、放っておくと褒めてくる。
+          「賛同・お世辞は禁止」「いい点も一切添えるな」と明示してはじめて、本気の反論が出る。
+          一人ブレストの最強の使い道のひとつ。
+        </div>
+      </div>
+      <div class="case-visual">
+        <div class="visual-frame">
+          <div class="thread">
+            <div class="turn me">
+              <div class="bubble">
+                <div class="ts">21:08 · あなた</div>
+                書く人のための静かなノートアプリ「Inkbird」を出そうと思ってる。<br><em class="qt">（企画書を貼る）</em><br>本気で反対してくれ。
+              </div>
+              <div class="av">私</div>
+            </div>
+            <div class="turn cl">
+              <div class="av">C</div>
+              <div class="bubble">
+                <div class="ts">21:08 · Claude</div>
+                では、徹底的に。<br>
+                ◆ <b class="hl">市場</b>：「静かに書きたい人」は確かにいる。だが、その層は既に紙のノートに戻っている。あなたのプロダクトは、紙に勝てる根拠が薄い。<br>
+                <em class="qt">問：紙を超える「静けさ」とは何か、一語で言えますか？</em>
+              </div>
+            </div>
+            <div class="turn cl">
+              <div class="av">C</div>
+              <div class="bubble">
+                <div class="ts">21:09 · Claude</div>
+                ◆ <b class="hl">実現性</b>：「相棒AI」を載せる時点で、もう静かではない。集中したい人にとって、選択肢があること自体がノイズになる。<br>
+                <em class="qt">問：AIをONにする頻度の <b class="hl">理想値</b> は、いくつですか？</em>
+              </div>
+            </div>
+            <div class="turn cl">
+              <div class="av">C</div>
+              <div class="bubble">
+                <div class="ts">21:09 · Claude</div>
+                ◆ <b class="hl">倫理</b>：「書く人を守る」と言いながら、AIに下書きを学習されることに抵抗を持つ層こそ顧客だ。あなたの主張は、その層の懸念と矛盾する。<br>
+                <em class="qt">問：学習はOFFがデフォルト、と言い切れますか？</em>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CASE D: リセット -->
+    <div class="case reverse">
+      <div class="tape purple" style="right: 50px; left: auto;"></div>
+      <div class="case-text">
+        <div class="case-num">CASE D · RESET</div>
+        <h3>方向違いを<br>巻き戻す</h3>
+        <div class="scenario">
+          <b>場面</b>会話が脱線して、Claudeの出力が「だんだん遠く」なってきた。
+          全部やり直しをする前に、<b>一段だけ戻る</b> リセットのやり方。
+        </div>
+        <div class="prompt-box">いったん止めてください。
+
+# 振り返り
+ここまでの会話で、私が <span class="ph">本当に</span> 欲しかったのは
+「<span class="ph">3行の要約</span>」でした。
+
+途中から、章立てや見出し案の話に進んでしまいました。
+それは別タスクとして、また後で。
+
+# やり直し
+2つ前の、私のメッセージ <em class="qt">（"原文ここから"〜"原文ここまで"）</em>
+について、<span class="ph">3行の要約だけ</span> 改めて出してください。
+それ以外の提案や装飾は要らない。
+
+短く。装飾不要。</div>
+        <div class="reflect">
+          <b>振り返り</b>「全部やり直し」より、<b>「N個前に戻る」</b>のほうが速い。
+          会話の中で、自分が <b>本当は何が欲しかったか</b> を1行で書き直すと、Claudeは正確に戻ってくる。
+          リセットは失敗ではなく、技。
+        </div>
+      </div>
+      <div class="case-visual">
+        <div class="visual-frame">
+          <div class="thread">
+            <div class="turn cl">
+              <div class="av">C</div>
+              <div class="bubble">
+                <div class="ts">15:42 · Claude</div>
+                では章立てを5つに整理してみました。第1章は…
+              </div>
+            </div>
+            <div class="turn me">
+              <div class="bubble">
+                <div class="ts">15:43 · あなた</div>
+                いったん止めて。私が欲しかったのは <b class="hl">3行の要約</b> だけ。<br>章立ては別タスクで後ほど。
+              </div>
+              <div class="av">私</div>
+            </div>
+            <div class="turn cl">
+              <div class="av">C</div>
+              <div class="bubble">
+                <div class="ts">15:43 · Claude</div>
+                失礼しました。本来のお願いに戻ります。
+              </div>
+            </div>
+            <div class="turn cl">
+              <div class="av">C</div>
+              <div class="bubble">
+                <div class="ts">15:44 · Claude</div>
+                <b class="hl">3行要約：</b><br>
+                ① 書く人の集中を守る、静かなツール。<br>
+                ② AIは「下書きの相棒」止まり、書くのは人。<br>
+                ③ 学習はOFFが初期値、書いたものは端末に残る。
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- 03 TEMPLATES -->
+  <section class="templates">
+    <div class="section-head">
+      <div class="section-num" style="background: var(--blue); color: var(--paper); transform: rotate(-1.5deg);">03</div>
+      <h2>会話の手筋 6つ</h2>
+      <p class="lead">プロンプトじゃなく <b>会話のなかで使う一手</b>。覚えておくと、どんな脱線も巻き戻せる。</p>
+    </div>
+
+    <div class="tmpl-grid">
+
+      <div class="tmpl t-red">
+        <span class="tmpl-tag">CONTEXT</span>
+        <h3>① 文脈をひとまとめに渡す</h3>
+        <p class="when">会話の頭で投げる「再起動テンプレ」。長期プロジェクトを再開するときの定番。</p>
+        <pre># 私について
+<span class="ph">[呼び方 / 仕事 / 文体の好み]</span>
+
+# プロジェクト
+- 名前: <span class="ph">[名前]</span>
+- 目的: <span class="ph">[一行]</span>
+- これまで: <span class="ph">[直近の進捗3行]</span>
+
+# 今日やりたいこと
+<span class="ph">[1行で]</span>
+
+# ふるまい方
+- <span class="ph">[例: 質問は1つずつ]</span>
+- <span class="ph">[例: 提案は3案セットで]</span>
+
+準備できたら、最初の質問を1つだけください。</pre>
+      </div>
+
+      <div class="tmpl t-blue">
+        <span class="tmpl-tag">REFLECT</span>
+        <h3>② いまどこにいるか確認する</h3>
+        <p class="when">話が散らかってきた時に投げる。1分の停止で、5分の脱線が防げる。</p>
+        <pre>いったん止まりたい。
+
+# 確認
+- ここまでに合意したこと: <span class="ph">[N個]</span> 列挙して
+- いま議論中のテーマ: 1行で
+- 次に決めるべきこと: 1つだけ
+
+それぞれ、私の発言から拾って <span class="ph">引用</span> をつけて。
+
+長くなくていい。私が頷ければそれでいい。</pre>
+      </div>
+
+      <div class="tmpl t-green">
+        <span class="tmpl-tag">QUESTIONS</span>
+        <h3>③ 問いだけ返してもらう</h3>
+        <p class="when">壁打ちモード起動。Claudeに答えさせない設定がコツ。</p>
+        <pre>今から私の思考を整理したい。
+
+# ルール
+- 私の発言に <span class="ph">答えない</span>
+- 代わりに <span class="ph">問いだけ</span> 返す
+- 1往復に問いは1つ
+- 同じ言葉を私が3回繰り返したら、
+  「それを定義してみて」と促す
+
+ではどうぞ。
+最初に、私から一言。</pre>
+      </div>
+
+      <div class="tmpl t-purple">
+        <span class="tmpl-tag">ANTAGONIST</span>
+        <h3>④ 反対側を演じてもらう</h3>
+        <p class="when">企画・主張・選択を磨くとき。Claudeの「協調」を意図的に外す。</p>
+        <pre>今から、私の <span class="ph">[企画 / 主張 / 案]</span> を共有します。
+
+あなたは、これに <span class="ph">強く反対する立場</span> を演じてください。
+
+# ルール
+- 賛同・お世辞は<span class="ph">禁止</span>
+- 「いい点」は<span class="ph">一切添えない</span>
+- 攻撃ではなく <span class="ph">具体的な反論</span>
+- 観点 <span class="ph">[市場/実現性/倫理]</span> から各1つ
+- 各反論に、私への <span class="ph">鋭い質問</span> を1つずつ
+
+容赦は要りません。
+ではお願いします。</pre>
+      </div>
+
+      <div class="tmpl t-orange">
+        <span class="tmpl-tag">RESET</span>
+        <h3>⑤ ひと段だけ巻き戻す</h3>
+        <p class="when">脱線したとき。「全部やり直し」より、必ずこちらを試す。</p>
+        <pre>いったん止めて。
+
+# 振り返り
+ここまでの会話で、私が <span class="ph">本当に</span> 欲しかったのは
+「<span class="ph">[本来の欲しいもの]</span>」でした。
+
+途中から <span class="ph">[ズレた話題]</span> に進みました。
+それは別タスクとして、また後で。
+
+# やり直し
+<span class="ph">[N]</span> 個前の私のメッセージについて、
+<span class="ph">[本来の依頼を1行で]</span> だけ、改めて出してください。
+
+それ以外は要らない。短く。</pre>
+      </div>
+
+      <div class="tmpl t-pink">
+        <span class="tmpl-tag">CLOSE</span>
+        <h3>⑥ 会話を「畳む」</h3>
+        <p class="when">セッションを終える前に、自分への <b>申し送り</b> を作る。次回が一気に楽になる。</p>
+        <pre>今日の会話を畳みたい。
+
+# 残してほしいもの
+1. ここまでで決まったこと <span class="ph">[3つ]</span>
+2. まだ決まっていない宿題 <span class="ph">[3つ]</span>
+3. 次回再開するときの、私から私への一言 <span class="ph">[1文]</span>
+
+# 体裁
+- 箇条書き
+- 私が <span class="ph">来週</span> 読んでも分かる粒度
+- 余計な締めの言葉は不要
+
+短く。プロジェクトファイルに貼り付けます。</pre>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 04 STRENGTHS -->
+  <section class="strengths">
+    <div class="section-head">
+      <div class="section-num" style="background: var(--green); color: var(--paper); transform: rotate(1.5deg);">04</div>
+      <h2>会話の得意・不得意</h2>
+      <p class="lead">Claudeとの会話には、得意なリズムがある。逆にどれだけ言葉を尽くしても、向いていない領域もある。</p>
+    </div>
+
+    <div class="sg">
+      <div class="sg-col good">
+        <h3><span class="badge">◯</span>得意な会話</h3>
+        <div class="sub">CLAUDE TALKS WELL — 得意なリズム</div>
+        <ul>
+          <li>役の切り替え<small>編集者・コーチ・反対派・初学者の読者。役名ひとつで語彙と着眼点が動く</small></li>
+          <li>短い往復の連打<small>1往復ずつ細かく合意を取る進め方。長い独白より速い</small></li>
+          <li>整理と圧縮<small>散らかった会話を「ここまでの結論を3行で」と畳ませる</small></li>
+          <li>問いを返すこと<small>「答えるな、問え」と頼めば、コーチング相手として優秀</small></li>
+          <li>異なる立場の代弁<small>賛成派・反対派・第三者の3視点を同時に出してもらえる</small></li>
+          <li>記憶の代行<small>毎回前提を渡せば、長期プロジェクトを思い出してくれる</small></li>
+        </ul>
+      </div>
+
+      <div class="sg-col bad">
+        <h3><span class="badge">△</span>苦手な会話（人が補う）</h3>
+        <div class="sub">YOU GUIDE — 譲ってはいけない手綱</div>
+        <ul>
+          <li>長すぎる文脈の保持<small>1セッションで膨らみすぎると、最初の指示を見失う。畳むのが大事</small></li>
+          <li>自分の感情の話<small>共感的に応じるが、本当の意味で受け止めているわけではない。深い相談は人へ</small></li>
+          <li>「忖度なし」のデフォルト<small>放っておくと協調的になる。辛口・反対は明示しないと出ない</small></li>
+          <li>記憶の連続性<small>会話をまたぐと忘れる。Projects機能や、自分でテンプレを貼る習慣が必要</small></li>
+          <li>事実関係の保証<small>もっともらしい嘘を会話で言うことがある。固有名詞は別途確認</small></li>
+          <li>沈黙と「待つ」こと<small>必ず何か返してくる。「考えないで」「黙って」を理解しない</small></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 RHYTHM (long timeline) -->
+  <section class="rhythm">
+    <div class="tape"></div>
+    <div class="rhythm-head">
+      <span class="num">05 / RHYTHM</span>
+      <h2>長い会話の、ひと呼吸の例。</h2>
+    </div>
+
+    <div class="timeline">
+      <div class="timeline-grid">
+        <div class="ev">
+          <div class="dot">1</div>
+          <div class="ph">起動</div>
+          <div class="tag">CONTEXT</div>
+          <div class="note">前提テンプレを貼って、Claudeに「最初の問い」を1つだけ返させる。</div>
+        </div>
+        <div class="ev">
+          <div class="dot">2</div>
+          <div class="ph">発散</div>
+          <div class="tag">BOUNCE</div>
+          <div class="note">問いに答えるうちに、自分の中の「本当に気になっていること」が浮上。</div>
+        </div>
+        <div class="ev">
+          <div class="dot">3</div>
+          <div class="ph">仮置き</div>
+          <div class="tag">DRAFT</div>
+          <div class="note">「ここまでで一度たたき台を」と頼む。Claudeが3案を並べて出す。</div>
+        </div>
+        <div class="ev">
+          <div class="dot">4</div>
+          <div class="ph">反論</div>
+          <div class="tag">ANTAGONIST</div>
+          <div class="note">「2案で進めるなら、本気で反対して」。穴を3つに絞って炙り出す。</div>
+        </div>
+        <div class="ev">
+          <div class="dot">5</div>
+          <div class="ph">確定</div>
+          <div class="tag">REFINE</div>
+          <div class="note">反論を踏まえて、Claudeに最終版を1つだけ書かせる。差分の理由付き。</div>
+        </div>
+        <div class="ev">
+          <div class="dot">6</div>
+          <div class="ph">畳む</div>
+          <div class="tag">CLOSE</div>
+          <div class="note">「決まったこと3 / 宿題3 / 次回の自分への一言1」を残して、終わる。</div>
+        </div>
+      </div>
+    </div>
+
+    <p style="margin-top: 26px; font-size: 14px; color: var(--ink-soft); font-weight: 600; line-height: 1.65;">
+      <b style="font-family:'Kaisei Decol',serif; color: var(--ink);">📐 コツ</b>
+      ・最初に「ふるまい方」を1度だけ宣言すれば、会話の通り道が決まる。
+      ・脱線したら「いったん止めて」を恐れない。プロのMTGと同じ。
+      ・終わるときは <b>必ず畳む</b>。畳まなかった会話は、次回もう一度ゼロから始まる。
+    </p>
+  </section>
+
+  <footer>
+    <div>AlignLab / creator-system &nbsp;◆&nbsp; Claude Dialogue Cookbook</div>
+    <div class="page-num">P. 04</div>
+  </footer>
+
+</div>
+
+</body>
+</html>

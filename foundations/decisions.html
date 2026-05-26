@@ -93,6 +93,7 @@
         <li><a href="#006-banners-removal"><span class="num">ADR-006</span> 中段バナー2本を削除する<span class="date">2026-05-25</span></a></li>
         <li><a href="#007-creator-spotlight"><span class="num">ADR-007</span> Creator System を spotlight 表示にする<span class="date">2026-05-25</span></a></li>
         <li><a href="#008-trend-articles"><span class="num">ADR-008</span> Industry Trends の6記事を一気に立ち上げる<span class="date">2026-05-26</span></a></li>
+        <li><a href="#009-claude-design-workflow"><span class="num">ADR-009</span> Claude Design の出力受け入れフォルダと standalone 除外運用<span class="date">2026-05-26</span></a></li>
       </ul>
     </div>
 
@@ -245,6 +246,34 @@
           <li>+ Industry Trends が即座に実体を持つカテゴリになった</li>
           <li>+ 個別ベンダーページの「事業」セクションを<strong>縦串で読み解く受け皿</strong>が出来た</li>
           <li>− 6記事の継続更新責任が発生（鮮度管理の対象）</li>
+        </ul>
+      </div>
+    </div>
+
+      <div class="adr" id="009-claude-design-workflow">
+        <h3>ADR-009: Claude Design の出力受け入れフォルダと standalone 除外運用</h3>
+        <div class="meta"><span class="status accepted">ACCEPTED</span> 2026-05-26</div>
+
+        <h4>Context（背景）</h4>
+        <p>ユーザーが <strong>Claude Design</strong>（Anthropic Labs プロダクト、2026-04-17 GA）で Creator System 向けの素材コンテンツを 8 ファイル生成。Claude Design の仕組み上、出力は<strong>ユーザーの手元環境にしか生成されず、リポの既存フォルダに直接書き込めない</strong>。さらに各テーマで「通常版（30-80 KB）」と「standalone 版（15-28 MB、base64 でアセット全埋め込み）」の 2 系統が出力される。</p>
+        <p>standalone 版を全部 commit するとリポが約 200 MB 肥大化し、git clone が重くなる・diff が追えない・GitHub Pages では不要、というデメリットが大きい。</p>
+
+        <h4>Decision（決定）</h4>
+        <ol>
+          <li><strong>受け入れフォルダの確定</strong>: <code>creator-system/Claude_Design/</code> を Claude Design 出力の正式置き場とする。ユーザーがここに配置 → 次回 Claude セッションで整理・統合のワークフロー。</li>
+          <li><strong>standalone 版は <code>.gitignore</code> で除外</strong>: <code>creator-system/Claude_Design/*_standalone.html</code> をパターン指定。配布が必要な時はローカルで都度再生成。</li>
+          <li><strong>通常版のみ commit</strong>: 軽量で diff 追跡可能。GitHub Pages 配信前提で十分。</li>
+          <li><strong>Claude_Design/index.html を作成</strong>: 8 ファイルの索引、既存パイプライン（video/manga/evaluation/monetization/spec）への対応マップ、運用ルールを記述。フォルダの正式入口として機能させる。</li>
+        </ol>
+
+        <h4>Consequences（結果）</h4>
+        <ul>
+          <li>+ リポ容量を約 200 MB 節約（commit せず、ローカルにも残さず）</li>
+          <li>+ ユーザー（curate） → Claude（integrate）のワークフローが明文化された</li>
+          <li>+ Creator System の主軸宣言（R-01 リスク）に対する具体的素材源が確立</li>
+          <li>+ 今後の Claude Design 出力も同パターンで受け入れ可能</li>
+          <li>− standalone 版は配布が必要なたびに再生成が必要（受け入れ）</li>
+          <li>− ファイル名が日本語＋アンダースコア形式で、shell からの操作が一部やりにくい（受け入れ。Windows パス指定や PowerShell で対処可能）</li>
         </ul>
       </div>
     </div>

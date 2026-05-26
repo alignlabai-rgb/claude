@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1480">
+<title>Claudeでつくる｜クリエイティブ・ワークフロー大全</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Yusei+Magic&family=Zen+Maru+Gothic:wght@500;700;900&family=Kaisei+Decol:wght@700&family=DotGothic16&family=Reenie+Beanie&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --paper: #FBF6E9;
+    --paper-2: #F4ECD2;
+    --ink: #1C1B1A;
+    --ink-soft: #4A453E;
+    --red: #E63946;
+    --red-soft: #FBD6D9;
+    --yellow: #FFD23F;
+    --yellow-dk: #C99500;
+    --yellow-soft: #FFF1B8;
+    --blue: #3B82C4;
+    --blue-soft: #D6E6F4;
+    --green: #5BA84A;
+    --green-soft: #DCEEDA;
+    --orange: #F2994A;
+    --orange-soft: #FCE3CC;
+    --purple: #8B5CB6;
+    --purple-soft: #E5DAF2;
+    --pink: #F4B6C2;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    background-image:
+      linear-gradient(rgba(28,27,26,0.055) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(28,27,26,0.055) 1px, transparent 1px),
+      radial-gradient(circle at 18% 8%, rgba(255,210,63,0.18), transparent 38%),
+      radial-gradient(circle at 88% 92%, rgba(139,92,182,0.14), transparent 42%);
+    background-size: 32px 32px, 32px 32px, 100% 100%, 100% 100%;
+    line-height: 1.65;
+    font-weight: 500;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page {
+    max-width: 1480px;
+    margin: 0 auto;
+    padding: 56px 56px 120px;
+    position: relative;
+  }
+
+  /* ---------- decorative bits ---------- */
+  .tape {
+    position: absolute;
+    background: rgba(255, 210, 63, 0.78);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    width: 140px;
+    height: 28px;
+    border-left: 1px dashed rgba(0,0,0,0.15);
+    border-right: 1px dashed rgba(0,0,0,0.15);
+    z-index: 50;
+    pointer-events: none;
+  }
+  .tape.pink { background: rgba(244, 182, 194, 0.85); }
+  .tape.blue { background: rgba(214, 230, 244, 0.92); }
+  .tape.green { background: rgba(220, 238, 218, 0.92); }
+  .doodle { position: absolute; pointer-events: none; }
+  .star {
+    display: inline-block;
+    width: 1em; height: 1em;
+    vertical-align: -0.12em;
+  }
+
+  /* ---------- COVER ---------- */
+  .cover {
+    position: relative;
+    padding: 36px 40px 32px;
+    border: 3px solid var(--ink);
+    background: var(--paper);
+    border-radius: 18px;
+    box-shadow: 8px 8px 0 var(--ink);
+    margin-bottom: 64px;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: "";
+    position: absolute;
+    inset: 8px;
+    border: 1.5px dashed var(--ink);
+    border-radius: 12px;
+    pointer-events: none;
+  }
+  .cover .tape.t1 { top: -14px; left: 60px; transform: rotate(-4deg); }
+  .cover .tape.t2 { top: -14px; right: 120px; transform: rotate(3deg); }
+
+  .chapter-tag {
+    display: inline-block;
+    font-family: "DotGothic16", monospace;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 6px 14px;
+    border-radius: 4px;
+    font-size: 14px;
+    letter-spacing: 0.12em;
+    margin-bottom: 18px;
+  }
+  .cover h1 {
+    font-family: "Yusei Magic", "Zen Maru Gothic", sans-serif;
+    font-weight: 400;
+    font-size: 84px;
+    margin: 0 0 6px;
+    letter-spacing: 0.02em;
+    line-height: 1.05;
+    color: var(--ink);
+    text-shadow: 4px 4px 0 var(--yellow);
+  }
+  .cover h1 .accent-red { color: var(--red); text-shadow: 4px 4px 0 var(--ink); }
+  .cover .subtitle {
+    font-family: "Kaisei Decol", "Zen Maru Gothic", serif;
+    font-size: 28px;
+    font-weight: 700;
+    margin: 6px 0 22px;
+    color: var(--ink-soft);
+  }
+  .cover .lede {
+    font-size: 17px;
+    max-width: 880px;
+    margin: 18px 0 0;
+    color: var(--ink-soft);
+  }
+  .cover-meta {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    font-family: "DotGothic16", monospace;
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin-top: 10px;
+  }
+  .cover-meta span {
+    background: var(--paper-2);
+    padding: 6px 12px;
+    border: 1.5px solid var(--ink);
+    border-radius: 999px;
+  }
+  .cover-key {
+    display: flex;
+    gap: 10px;
+    margin-top: 28px;
+    flex-wrap: wrap;
+  }
+  .key-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 14px;
+    background: white;
+  }
+  .key-chip .dot { width: 10px; height: 10px; border-radius: 50%; }
+
+  /* ---------- SECTION HEADER ---------- */
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    gap: 18px;
+    margin: 24px 0 28px;
+    position: relative;
+  }
+  .section-num {
+    font-family: "Yusei Magic", sans-serif;
+    font-size: 64px;
+    line-height: 1;
+    color: var(--ink);
+    background: var(--yellow);
+    border: 3px solid var(--ink);
+    border-radius: 14px;
+    padding: 6px 18px 2px;
+    box-shadow: 4px 4px 0 var(--ink);
+    transform: rotate(-2deg);
+  }
+  .section-head h2 {
+    font-family: "Yusei Magic", sans-serif;
+    font-weight: 400;
+    font-size: 40px;
+    margin: 0;
+    color: var(--ink);
+  }
+  .section-head .lead {
+    font-size: 16px;
+    color: var(--ink-soft);
+    margin-left: auto;
+    max-width: 460px;
+    border-left: 4px solid var(--ink);
+    padding: 4px 14px;
+    background: var(--paper-2);
+  }
+
+  /* ---------- MINDMAP ---------- */
+  .mindmap-wrap {
+    position: relative;
+    background: var(--paper);
+    border: 3px solid var(--ink);
+    border-radius: 20px;
+    padding: 32px 24px;
+    box-shadow: 8px 8px 0 var(--ink);
+    margin-bottom: 90px;
+    background-image:
+      radial-gradient(circle, rgba(28,27,26,0.10) 1.2px, transparent 1.4px);
+    background-size: 22px 22px;
+    background-position: 0 0;
+  }
+  .mindmap-wrap .tape.mm1 { top: -14px; left: 80px; transform: rotate(-2deg); background: rgba(91,168,74,0.7);}
+  .mindmap-wrap .tape.mm2 { bottom: -14px; right: 90px; transform: rotate(2deg); background: rgba(230,57,70,0.6);}
+
+  .mindmap {
+    position: relative;
+    width: 1400px;
+    height: 1180px;
+    margin: 0 auto;
+  }
+  .branches { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  .branches line { fill: none; stroke-width: 6; stroke-linecap: round; stroke-dasharray: 16 9; }
+
+  .center-node {
+    position: absolute;
+    left: 580px;
+    top: 460px;
+    width: 240px;
+    height: 240px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--paper);
+    border: 4px solid var(--ink);
+    box-shadow: 6px 6px 0 var(--yellow), 6px 6px 0 4px var(--ink);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    z-index: 10;
+  }
+  .center-node .pre {
+    font-family: "DotGothic16", monospace;
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    color: var(--yellow);
+    margin-bottom: 4px;
+  }
+  .center-node .big {
+    font-family: "Yusei Magic", sans-serif;
+    font-size: 56px;
+    line-height: 1;
+    color: var(--paper);
+  }
+  .center-node .small {
+    font-size: 15px;
+    margin-top: 8px;
+    color: var(--yellow-soft);
+    font-weight: 700;
+  }
+  .center-node .burst {
+    position: absolute;
+    width: 280px; height: 280px;
+    top: -20px; left: -20px;
+    z-index: -1;
+  }
+
+  .branch-card {
+    position: absolute;
+    width: 290px;
+    background: var(--paper);
+    border: 3px solid var(--ink);
+    border-radius: 14px;
+    box-shadow: 5px 5px 0 var(--ink);
+    overflow: hidden;
+    z-index: 5;
+  }
+  .branch-card .hd {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-bottom: 3px solid var(--ink);
+    color: var(--ink);
+  }
+  .branch-card .glyph {
+    width: 54px;
+    height: 54px;
+    border-radius: 12px;
+    background: var(--paper);
+    border: 2.5px solid var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "Kaisei Decol", serif;
+    font-size: 32px;
+    font-weight: 700;
+    flex-shrink: 0;
+    box-shadow: 2px 2px 0 var(--ink);
+  }
+  .branch-card .hd-text { line-height: 1.1; }
+  .branch-card .cat {
+    font-family: "DotGothic16", monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    opacity: 0.75;
+  }
+  .branch-card .title {
+    font-family: "Yusei Magic", sans-serif;
+    font-size: 26px;
+    font-weight: 400;
+  }
+  .branch-card ul {
+    list-style: none;
+    margin: 0;
+    padding: 14px 16px 16px;
+    background: var(--paper);
+  }
+  .branch-card li {
+    font-size: 14.5px;
+    padding: 5px 0 5px 22px;
+    position: relative;
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .branch-card li::before {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: 13px;
+    width: 10px;
+    height: 10px;
+    border: 2px solid var(--ink);
+    background: var(--bullet, var(--paper));
+    border-radius: 2px;
+    transform: rotate(45deg);
+  }
+  .branch-card li small {
+    display: block;
+    font-size: 12px;
+    color: var(--ink-soft);
+    font-weight: 500;
+    padding-top: 2px;
+    line-height: 1.4;
+  }
+
+  /* Per-category colors */
+  .c-purple .hd { background: var(--purple-soft); }
+  .c-purple .glyph { color: var(--purple); }
+  .c-purple { --bullet: var(--purple); }
+
+  .c-red .hd { background: var(--red-soft); }
+  .c-red .glyph { color: var(--red); }
+  .c-red { --bullet: var(--red); }
+
+  .c-orange .hd { background: var(--orange-soft); }
+  .c-orange .glyph { color: var(--orange); }
+  .c-orange { --bullet: var(--orange); }
+
+  .c-yellow .hd { background: var(--yellow-soft); }
+  .c-yellow .glyph { color: var(--yellow-dk); }
+  .c-yellow { --bullet: var(--yellow); }
+
+  .c-green .hd { background: var(--green-soft); }
+  .c-green .glyph { color: var(--green); }
+  .c-green { --bullet: var(--green); }
+
+  .c-blue .hd { background: var(--blue-soft); }
+  .c-blue .glyph { color: var(--blue); }
+  .c-blue { --bullet: var(--blue); }
+
+  /* Card position helpers (radial around center 700,580 r~440) */
+  .pos-top    { top:   0px; left: 565px; }       /* リサーチ 12時 */
+  .pos-tr     { top: 220px; left: 946px; }       /* ライティング 2時 */
+  .pos-br     { top: 660px; left: 946px; }       /* デザイン 4時 */
+  .pos-bot    { top: 880px; left: 565px; }       /* 動画 6時 */
+  .pos-bl     { top: 660px; left: 184px; }       /* コード 8時 */
+  .pos-tl     { top: 220px; left: 184px; }       /* 編集 10時 */
+
+  /* small stickers */
+  .point-note {
+    position: absolute;
+    background: var(--yellow);
+    border: 2.5px solid var(--ink);
+    padding: 10px 14px;
+    font-family: "Kaisei Decol", serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--ink);
+    transform: rotate(-3deg);
+    box-shadow: 3px 3px 0 var(--ink);
+    border-radius: 6px;
+    z-index: 20;
+    max-width: 200px;
+    line-height: 1.5;
+  }
+  .point-note .label {
+    font-family: "DotGothic16", monospace;
+    font-size: 11px;
+    background: var(--ink);
+    color: var(--yellow);
+    padding: 2px 8px;
+    border-radius: 3px;
+    margin-right: 6px;
+    letter-spacing: 0.1em;
+  }
+  .point-note.pink { background: var(--pink); }
+  .point-note.pink .label { color: var(--pink); }
+  .point-note.blue { background: var(--blue-soft); }
+  .point-note.blue .label { color: var(--blue-soft); }
+
+  /* ---------- WORKFLOW ---------- */
+  .workflow {
+    margin-bottom: 90px;
+    position: relative;
+  }
+  .flow {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    position: relative;
+  }
+  .flow-step {
+    background: var(--paper);
+    border: 3px solid var(--ink);
+    border-radius: 14px;
+    padding: 20px 22px 22px;
+    box-shadow: 5px 5px 0 var(--ink);
+    position: relative;
+  }
+  .flow-step .step-num {
+    position: absolute;
+    top: -20px;
+    left: -16px;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--paper);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "Yusei Magic", sans-serif;
+    font-size: 28px;
+    border: 3px solid var(--paper);
+    box-shadow: 0 0 0 3px var(--ink);
+  }
+  .flow-step h3 {
+    font-family: "Yusei Magic", sans-serif;
+    font-weight: 400;
+    font-size: 26px;
+    margin: 6px 0 4px;
+  }
+  .flow-step .sub {
+    font-family: "DotGothic16", monospace;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    color: var(--ink-soft);
+    margin-bottom: 12px;
+  }
+  .flow-step ul {
+    list-style: none;
+    margin: 8px 0 0;
+    padding: 0;
+  }
+  .flow-step li {
+    font-size: 14px;
+    padding: 4px 0 4px 18px;
+    position: relative;
+    font-weight: 600;
+  }
+  .flow-step li::before {
+    content: "→";
+    position: absolute;
+    left: 0;
+    font-weight: 900;
+  }
+  .flow-step.s1 { background: var(--purple-soft); }
+  .flow-step.s2 { background: var(--red-soft); }
+  .flow-step.s3 { background: var(--orange-soft); }
+  .flow-step.s4 { background: var(--blue-soft); }
+  .flow-step .claude-says {
+    margin-top: 14px;
+    padding: 10px 12px;
+    background: var(--paper);
+    border: 2px dashed var(--ink);
+    border-radius: 10px;
+    font-size: 13px;
+    color: var(--ink-soft);
+    font-weight: 600;
+    line-height: 1.55;
+  }
+  .flow-step .claude-says b {
+    color: var(--ink);
+    font-family: "Kaisei Decol", serif;
+  }
+  .flow-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: "Yusei Magic", sans-serif;
+    font-size: 40px;
+    color: var(--ink);
+    z-index: 6;
+  }
+
+  /* ---------- TIPS ---------- */
+  .tips {
+    margin-bottom: 90px;
+  }
+  .tips-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 18px;
+  }
+  .tip {
+    background: var(--paper);
+    border: 3px solid var(--ink);
+    border-radius: 12px;
+    padding: 18px 16px 18px;
+    box-shadow: 5px 5px 0 var(--ink);
+    position: relative;
+  }
+  .tip:nth-child(1) { background: var(--yellow-soft); }
+  .tip:nth-child(2) { background: var(--red-soft); }
+  .tip:nth-child(3) { background: var(--green-soft); }
+  .tip:nth-child(4) { background: var(--blue-soft); }
+  .tip:nth-child(5) { background: var(--purple-soft); }
+  .tip:nth-child(odd) { transform: rotate(-1deg); }
+  .tip:nth-child(even) { transform: rotate(1deg); }
+  .tip .n {
+    font-family: "Yusei Magic", sans-serif;
+    font-size: 50px;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .tip .n::after {
+    content: "."; color: var(--ink);
+  }
+  .tip h3 {
+    font-family: "Kaisei Decol", serif;
+    font-size: 19px;
+    font-weight: 700;
+    margin: 4px 0 8px;
+    line-height: 1.3;
+  }
+  .tip p {
+    margin: 0;
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    font-weight: 600;
+    line-height: 1.55;
+  }
+  .tip .ex {
+    margin-top: 10px;
+    padding: 8px 10px;
+    background: rgba(255,255,255,0.55);
+    border: 1.5px dashed var(--ink);
+    border-radius: 8px;
+    font-family: "DotGothic16", monospace;
+    font-size: 11.5px;
+    color: var(--ink);
+    line-height: 1.5;
+  }
+  .tip .ex::before {
+    content: "EX) ";
+    font-weight: 700;
+    color: var(--red);
+  }
+
+  /* ---------- FEATURES ---------- */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 22px;
+  }
+  .feat {
+    background: var(--paper);
+    border: 3px solid var(--ink);
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 5px 5px 0 var(--ink);
+    position: relative;
+  }
+  .feat .icon-box {
+    width: 56px; height: 56px;
+    border: 2.5px solid var(--ink);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: "Kaisei Decol", serif;
+    font-size: 30px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    box-shadow: 2px 2px 0 var(--ink);
+  }
+  .feat:nth-child(1) .icon-box { background: var(--yellow); color: var(--ink); }
+  .feat:nth-child(2) .icon-box { background: var(--green); color: var(--paper); }
+  .feat:nth-child(3) .icon-box { background: var(--orange); color: var(--ink); }
+  .feat:nth-child(4) .icon-box { background: var(--purple); color: var(--paper); }
+  .feat h3 {
+    font-family: "Yusei Magic", sans-serif;
+    font-size: 24px;
+    margin: 0 0 4px;
+    font-weight: 400;
+  }
+  .feat .tag {
+    font-family: "DotGothic16", monospace;
+    font-size: 11px;
+    color: var(--ink-soft);
+    letter-spacing: 0.12em;
+    margin-bottom: 12px;
+  }
+  .feat p {
+    margin: 0 0 10px;
+    font-size: 14px;
+    color: var(--ink-soft);
+    font-weight: 600;
+    line-height: 1.55;
+  }
+  .feat .when {
+    margin-top: 12px;
+    padding: 8px 10px;
+    background: var(--paper-2);
+    border-radius: 8px;
+    border: 2px solid var(--ink);
+    font-size: 12.5px;
+    line-height: 1.4;
+  }
+  .feat .when b {
+    display: block;
+    font-family: "Kaisei Decol", serif;
+    color: var(--ink);
+    margin-bottom: 3px;
+  }
+
+  /* ---------- footer ---------- */
+  footer {
+    margin-top: 80px;
+    border-top: 3px dashed var(--ink);
+    padding-top: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: "DotGothic16", monospace;
+    font-size: 12px;
+    color: var(--ink-soft);
+    letter-spacing: 0.12em;
+  }
+  footer .page-num {
+    font-size: 14px;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 4px 10px;
+    border-radius: 4px;
+  }
+
+  /* ---------- handwritten margin scribbles ---------- */
+  .scribble {
+    position: absolute;
+    font-family: "Reenie Beanie", "Yusei Magic", cursive;
+    font-size: 22px;
+    color: var(--red);
+    transform: rotate(-6deg);
+    pointer-events: none;
+    line-height: 1.2;
+  }
+  .arrow-svg {
+    position: absolute;
+    pointer-events: none;
+    width: 60px;
+    height: 60px;
+  }
+</style>
+</head>
+<body>
+
+<template id="__bundler_thumbnail" data-bg-color="#FBF6E9">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#FBF6E9"/>
+    <circle cx="600" cy="400" r="120" fill="#1C1B1A"/>
+    <text x="600" y="430" font-family="serif" font-size="120" font-weight="700" text-anchor="middle" fill="#FFD23F">C</text>
+    <g stroke="#1C1B1A" stroke-width="6" stroke-dasharray="14 8" stroke-linecap="round" fill="none">
+      <line x1="600" y1="280" x2="600" y2="140"/>
+      <line x1="704" y1="340" x2="900" y2="220"/>
+      <line x1="704" y1="460" x2="900" y2="580"/>
+      <line x1="600" y1="520" x2="600" y2="660"/>
+      <line x1="496" y1="460" x2="300" y2="580"/>
+      <line x1="496" y1="340" x2="300" y2="220"/>
+    </g>
+    <g font-family="serif" font-size="44" font-weight="700">
+      <circle cx="600" cy="120" r="44" fill="#8B5CB6"/>
+      <text x="600" y="135" text-anchor="middle" fill="#FBF6E9">案</text>
+      <circle cx="900" cy="200" r="44" fill="#E63946"/>
+      <text x="900" y="215" text-anchor="middle" fill="#FBF6E9">書</text>
+      <circle cx="900" cy="600" r="44" fill="#F2994A"/>
+      <text x="900" y="615" text-anchor="middle" fill="#FBF6E9">描</text>
+      <circle cx="600" cy="680" r="44" fill="#FFD23F"/>
+      <text x="600" y="695" text-anchor="middle" fill="#1C1B1A">動</text>
+      <circle cx="300" cy="600" r="44" fill="#5BA84A"/>
+      <text x="300" y="615" text-anchor="middle" fill="#FBF6E9">作</text>
+      <circle cx="300" cy="200" r="44" fill="#3B82C4"/>
+      <text x="300" y="215" text-anchor="middle" fill="#FBF6E9">整</text>
+    </g>
+  </svg>
+</template>
+
+<div class="page">
+
+  <!-- ============ COVER ============ -->
+  <header class="cover">
+    <div class="tape t1"></div>
+    <div class="tape t2 pink"></div>
+
+    <div class="chapter-tag">CHAPTER 01 / ALIGNLAB NOTE</div>
+    <h1>Claudeで<span class="accent-red">つくる</span>。</h1>
+    <p class="subtitle">クリエイティブ・ワークフロー大全</p>
+    <p class="lede">
+      ライティング、デザイン、動画、コード——あらゆる「つくる」作業に寄り添う相棒、それがClaude。
+      このノートは、自分の創作プロセスにClaudeをどう編み込むかを描いた地図である。
+      6つのカテゴリを起点に、頭の中の手順を一枚に書き出す。
+    </p>
+
+    <div class="cover-key">
+      <span class="key-chip"><span class="dot" style="background:var(--purple)"></span>リサーチ・企画</span>
+      <span class="key-chip"><span class="dot" style="background:var(--red)"></span>ライティング</span>
+      <span class="key-chip"><span class="dot" style="background:var(--orange)"></span>デザイン</span>
+      <span class="key-chip"><span class="dot" style="background:var(--yellow)"></span>動画・モーション</span>
+      <span class="key-chip"><span class="dot" style="background:var(--green)"></span>コード・プロト</span>
+      <span class="key-chip"><span class="dot" style="background:var(--blue)"></span>編集・改善</span>
+    </div>
+
+    <div class="cover-meta">
+      <span>個人用リファレンス</span>
+      <span>2026.05</span>
+      <span>by AlignLab</span>
+      <span>creator-system</span>
+    </div>
+  </header>
+
+  <!-- ============ MINDMAP ============ -->
+  <div class="section-head">
+    <div class="section-num">01</div>
+    <h2>創作の見取り図</h2>
+    <p class="lead">中央に「Claude」を置き、6つの方角に得意分野を伸ばす。困ったら自分が今どの枝にいるか確かめよう。</p>
+  </div>
+
+  <div class="mindmap-wrap">
+    <div class="tape mm1"></div>
+    <div class="tape mm2"></div>
+
+    <div class="mindmap">
+
+      <!-- SVG branches -->
+      <svg class="branches" viewBox="0 0 1400 1180" preserveAspectRatio="none">
+        <!-- 12時: リサーチ (purple) -->
+        <path d="M 700 460 Q 700 360 700 280" stroke="#8B5CB6" stroke-width="6" stroke-dasharray="16 9" stroke-linecap="round" fill="none"/>
+        <!-- 2時: ライティング (red) -->
+        <path d="M 804 520 Q 920 450 986 415" stroke="#E63946" stroke-width="6" stroke-dasharray="16 9" stroke-linecap="round" fill="none"/>
+        <!-- 4時: デザイン (orange) -->
+        <path d="M 804 640 Q 920 700 986 745" stroke="#F2994A" stroke-width="6" stroke-dasharray="16 9" stroke-linecap="round" fill="none"/>
+        <!-- 6時: 動画 (yellow-dk) -->
+        <path d="M 700 700 Q 700 800 700 880" stroke="#C99500" stroke-width="6" stroke-dasharray="16 9" stroke-linecap="round" fill="none"/>
+        <!-- 8時: コード (green) -->
+        <path d="M 596 640 Q 480 700 414 745" stroke="#5BA84A" stroke-width="6" stroke-dasharray="16 9" stroke-linecap="round" fill="none"/>
+        <!-- 10時: 編集 (blue) -->
+        <path d="M 596 520 Q 480 450 414 415" stroke="#3B82C4" stroke-width="6" stroke-dasharray="16 9" stroke-linecap="round" fill="none"/>
+
+        <!-- small stars on branches -->
+        <g fill="#FFD23F" stroke="#1C1B1A" stroke-width="2">
+          <polygon points="700,370 706,386 723,386 709,396 714,412 700,402 686,412 691,396 677,386 694,386"/>
+        </g>
+      </svg>
+
+      <!-- Center node -->
+      <div class="center-node">
+        <div class="pre">★ CORE ★</div>
+        <div class="big">Claude</div>
+        <div class="small">創作の相棒</div>
+      </div>
+
+      <!-- リサーチ・企画 (12時) -->
+      <div class="branch-card c-purple pos-top">
+        <div class="hd">
+          <div class="glyph">案</div>
+          <div class="hd-text">
+            <div class="cat">RESEARCH / IDEA</div>
+            <div class="title">リサーチ・企画</div>
+          </div>
+        </div>
+        <ul>
+          <li>アイデア出し・ブレスト<small>「30個出して」で発散→絞る</small></li>
+          <li>競合・市場リサーチ整理</li>
+          <li>ターゲット・ペルソナ設計</li>
+          <li>企画書ドラフト</li>
+          <li>コンセプトの言語化</li>
+        </ul>
+      </div>
+
+      <!-- ライティング (2時) -->
+      <div class="branch-card c-red pos-tr">
+        <div class="hd">
+          <div class="glyph">書</div>
+          <div class="hd-text">
+            <div class="cat">WRITING</div>
+            <div class="title">ライティング</div>
+          </div>
+        </div>
+        <ul>
+          <li>記事・ブログ本文<small>骨子→肉付けの2段階で</small></li>
+          <li>キャッチコピー・タイトル案</li>
+          <li>小説・物語・キャラ設定</li>
+          <li>脚本・シナリオ・対話</li>
+          <li>翻訳・要約・リライト</li>
+          <li>メール・告知・SNS文</li>
+        </ul>
+      </div>
+
+      <!-- デザイン (4時) -->
+      <div class="branch-card c-orange pos-br">
+        <div class="hd">
+          <div class="glyph">描</div>
+          <div class="hd-text">
+            <div class="cat">DESIGN</div>
+            <div class="title">デザイン</div>
+          </div>
+        </div>
+        <ul>
+          <li>HTML/CSSプロトタイプ<small>artifactsで即見える</small></li>
+          <li>カラーパレット提案</li>
+          <li>レイアウト・構図案</li>
+          <li>スライド・プレゼン制作</li>
+          <li>図解・インフォグラフィック</li>
+          <li>SVGアイコン下書き</li>
+        </ul>
+      </div>
+
+      <!-- 動画・モーション (6時) -->
+      <div class="branch-card c-yellow pos-bot">
+        <div class="hd">
+          <div class="glyph">動</div>
+          <div class="hd-text">
+            <div class="cat">VIDEO / MOTION</div>
+            <div class="title">動画・モーション</div>
+          </div>
+        </div>
+        <ul>
+          <li>絵コンテ・構成案<small>秒数つきで書いてもらう</small></li>
+          <li>ナレーション原稿</li>
+          <li>字幕・テロップ整理</li>
+          <li>アニメーション動き設計</li>
+          <li>BGM・SEイメージ言語化</li>
+        </ul>
+      </div>
+
+      <!-- コード・プロトタイプ (8時) -->
+      <div class="branch-card c-green pos-bl">
+        <div class="hd">
+          <div class="glyph">作</div>
+          <div class="hd-text">
+            <div class="cat">CODE / PROTOTYPE</div>
+            <div class="title">コード・プロト</div>
+          </div>
+        </div>
+        <ul>
+          <li>インタラクティブ試作<small>ボタン押せる状態まで一気に</small></li>
+          <li>小さなツール自作</li>
+          <li>データ可視化・図表</li>
+          <li>ゲーム的な体験</li>
+          <li>API連携サンプル</li>
+        </ul>
+      </div>
+
+      <!-- 編集・改善 (10時) -->
+      <div class="branch-card c-blue pos-tl">
+        <div class="hd">
+          <div class="glyph">整</div>
+          <div class="hd-text">
+            <div class="cat">EDIT / REFINE</div>
+            <div class="title">編集・改善</div>
+          </div>
+        </div>
+        <ul>
+          <li>校正・推敲・誤字探し</li>
+          <li>構造の整理・章立て見直し</li>
+          <li>フィードバック役（読者目線）</li>
+          <li>トーン・文体の調整</li>
+          <li>長文の要約・短縮</li>
+        </ul>
+      </div>
+
+      <!-- floating sticky notes -->
+      <div class="point-note" style="top: 260px; left: 510px; transform: rotate(-5deg);">
+        <span class="label">POINT</span>困ったら<br>「相棒」と話す感覚で
+      </div>
+      <div class="point-note pink" style="top: 800px; left: 1080px; transform: rotate(4deg);">
+        <span class="label">TIP</span>枝をまたぐ仕事こそ<br>Claudeの本領
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ WORKFLOW ============ -->
+  <section class="workflow">
+    <div class="section-head">
+      <div class="section-num" style="background: var(--orange); transform: rotate(2deg);">02</div>
+      <h2>制作の4ステップ</h2>
+      <p class="lead">どんなジャンルでも、創作はこの4段に大別できる。各段でClaudeの使い方は微妙に変わる。</p>
+    </div>
+
+    <div class="flow">
+      <div class="flow-step s1">
+        <div class="step-num">1</div>
+        <div class="sub">PHASE 01</div>
+        <h3>構想</h3>
+        <ul>
+          <li>何を作る？誰のため？</li>
+          <li>ねらい・期待を言葉に</li>
+          <li>参考事例を集める</li>
+        </ul>
+        <div class="claude-says">
+          <b>Claudeの役：</b>壁打ち相手・リサーチ補助。「素人質問していい？」と聞かせると盲点が出る。
+        </div>
+      </div>
+
+      <div class="flow-step s2">
+        <div class="step-num">2</div>
+        <div class="sub">PHASE 02</div>
+        <h3>下書き</h3>
+        <ul>
+          <li>骨組み・章立て</li>
+          <li>たたき台を一気に</li>
+          <li>方向を3案ふらせる</li>
+        </ul>
+        <div class="claude-says">
+          <b>Claudeの役：</b>第一稿の即席ドラフター。荒くてもいいから速く出す。完璧主義は禁物。
+        </div>
+      </div>
+
+      <div class="flow-step s3">
+        <div class="step-num">3</div>
+        <div class="sub">PHASE 03</div>
+        <h3>制作</h3>
+        <ul>
+          <li>本番の手を動かす</li>
+          <li>部分ごとに磨く</li>
+          <li>素材・コードを書く</li>
+        </ul>
+        <div class="claude-says">
+          <b>Claudeの役：</b>共作者。一段落ずつ「ここをこう変えて」と細かく往復する。
+        </div>
+      </div>
+
+      <div class="flow-step s4">
+        <div class="step-num">4</div>
+        <div class="sub">PHASE 04</div>
+        <h3>仕上げ</h3>
+        <ul>
+          <li>校正・整理</li>
+          <li>第三者視点でレビュー</li>
+          <li>派生展開（SNS・要約）</li>
+        </ul>
+        <div class="claude-says">
+          <b>Claudeの役：</b>編集者・批評家。「厳しめに読んで」と頼んで本気を引き出す。
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TIPS ============ -->
+  <section class="tips">
+    <div class="section-head">
+      <div class="section-num" style="background: var(--red); color: var(--paper); transform: rotate(-2deg);">03</div>
+      <h2>プロンプトの5つのコツ</h2>
+      <p class="lead">同じClaudeでも、頼み方ひとつで返ってくるものが変わる。創作で効くお守り的な5箇条。</p>
+    </div>
+
+    <div class="tips-grid">
+      <div class="tip">
+        <div class="n">01</div>
+        <h3>役を与える</h3>
+        <p>「君は◯◯のプロです」と冒頭で配役。視点と語彙がそろう。</p>
+        <div class="ex">あなたは絵本作家です。5歳児向けに3場面で物語を書いて。</div>
+      </div>
+      <div class="tip">
+        <div class="n">02</div>
+        <h3>文脈を渡す</h3>
+        <p>誰に・何のため・前提条件を全部書く。情報過多のほうが質は上がる。</p>
+        <div class="ex">読者は◯◯、媒体は◯◯、長さは800字、トーンは皮肉まじり。</div>
+      </div>
+      <div class="tip">
+        <div class="n">03</div>
+        <h3>例を見せる</h3>
+        <p>言葉で説明するより、好きな見本を貼るほうが速く伝わる。</p>
+        <div class="ex">こういう雰囲気で書いて：｜（参考文章を貼る）｜</div>
+      </div>
+      <div class="tip">
+        <div class="n">04</div>
+        <h3>形を決める</h3>
+        <p>箇条書き/表/HTML/JSON など、出力フォーマットを先に指定する。</p>
+        <div class="ex">表形式で、列は「場面・台詞・演出」の3つで。</div>
+      </div>
+      <div class="tip">
+        <div class="n">05</div>
+        <h3>反復で磨く</h3>
+        <p>一発で完成は狙わない。短く「ここをこう」を何度も重ねる。</p>
+        <div class="ex">3段落目だけ、もっと淡々と。比喩は半分に減らして。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FEATURES ============ -->
+  <section class="features">
+    <div class="section-head">
+      <div class="section-num" style="background: var(--green); color: var(--paper); transform: rotate(1.5deg);">04</div>
+      <h2>機能の使い分け</h2>
+      <p class="lead">「どこで作業するか」も大事。場面で道具を切り替える。</p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feat">
+        <div class="icon-box">A</div>
+        <div class="tag">ARTIFACTS</div>
+        <h3>その場で見える</h3>
+        <p>HTML・コード・ドキュメントを別パネルで生成。即プレビューでき、編集を往復しやすい。</p>
+        <div class="when"><b>こんなとき</b>プロトタイプ／資料／スライド／図解</div>
+      </div>
+      <div class="feat">
+        <div class="icon-box">P</div>
+        <div class="tag">PROJECTS</div>
+        <h3>文脈を貯める</h3>
+        <p>資料・設定・ファイルを束ねて、長期プロジェクトを継続。会話をまたいで覚えてくれる場所。</p>
+        <div class="when"><b>こんなとき</b>連載／本／長編動画／継続案件</div>
+      </div>
+      <div class="feat">
+        <div class="icon-box">F</div>
+        <div class="tag">FILES</div>
+        <h3>資料を渡す</h3>
+        <p>PDF・画像・テキストをそのまま添付。読ませて要約・転用・参照させる。</p>
+        <div class="when"><b>こんなとき</b>原稿レビュー／画像説明／資料整理</div>
+      </div>
+      <div class="feat">
+        <div class="icon-box">C</div>
+        <div class="tag">CHAT</div>
+        <h3>対話で考える</h3>
+        <p>一番素朴で一番強い。書いては返す、書いては返すの呼吸が、頭の中を耕す。</p>
+        <div class="when"><b>こんなとき</b>ブレスト／壁打ち／決断の整理</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- footer -->
+  <footer>
+    <div>AlignLab / creator-system &nbsp;◆&nbsp; Claude Creative Workflow Map</div>
+    <div class="page-num">P. 01</div>
+  </footer>
+
+</div>
+
+</body>
+</html>

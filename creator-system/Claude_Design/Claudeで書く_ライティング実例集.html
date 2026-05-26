@@ -1,0 +1,1703 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1480">
+<title>Claudeで書く｜ライティング実例集</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Yusei+Magic&family=Zen+Maru+Gothic:wght@500;700;900&family=Kaisei+Decol:wght@400;700&family=Shippori+Mincho:wght@400;700&family=DotGothic16&family=Reenie+Beanie&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --paper: #FBF6E9;
+    --paper-2: #F4ECD2;
+    --ink: #1C1B1A;
+    --ink-soft: #4A453E;
+    --red: #E63946;
+    --red-soft: #FBD6D9;
+    --yellow: #FFD23F;
+    --yellow-dk: #C99500;
+    --yellow-soft: #FFF1B8;
+    --blue: #3B82C4;
+    --blue-soft: #D6E6F4;
+    --green: #5BA84A;
+    --green-soft: #DCEEDA;
+    --orange: #F2994A;
+    --orange-soft: #FCE3CC;
+    --purple: #8B5CB6;
+    --purple-soft: #E5DAF2;
+    --pink: #F4B6C2;
+    --pink-soft: #FBDDE3;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    background-image:
+      linear-gradient(rgba(28,27,26,0.055) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(28,27,26,0.055) 1px, transparent 1px),
+      radial-gradient(circle at 92% 8%, rgba(91,168,74,0.13), transparent 38%),
+      radial-gradient(circle at 8% 92%, rgba(242,153,74,0.14), transparent 42%);
+    background-size: 32px 32px, 32px 32px, 100% 100%, 100% 100%;
+    line-height: 1.65;
+    font-weight: 500;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page {
+    max-width: 1480px;
+    margin: 0 auto;
+    padding: 56px 56px 120px;
+    position: relative;
+  }
+
+  .tape {
+    position: absolute;
+    background: rgba(255, 210, 63, 0.78);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    width: 140px; height: 28px;
+    border-left: 1px dashed rgba(0,0,0,0.15);
+    border-right: 1px dashed rgba(0,0,0,0.15);
+    z-index: 50; pointer-events: none;
+  }
+  .tape.pink { background: rgba(244, 182, 194, 0.85); }
+  .tape.blue { background: rgba(214, 230, 244, 0.92); }
+  .tape.green { background: rgba(91, 168, 74, 0.7); }
+  .tape.red  { background: rgba(230, 57, 70, 0.6); }
+  .tape.purple { background: rgba(139,92,182,0.6); }
+
+  /* ---------- COVER ---------- */
+  .cover {
+    position: relative;
+    padding: 36px 40px 32px;
+    border: 3px solid var(--ink);
+    background: var(--paper);
+    border-radius: 18px;
+    box-shadow: 8px 8px 0 var(--ink);
+    margin-bottom: 64px;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: "";
+    position: absolute; inset: 8px;
+    border: 1.5px dashed var(--ink);
+    border-radius: 12px;
+    pointer-events: none;
+  }
+  .cover .tape.t1 { top: -14px; left: 80px; transform: rotate(-4deg); background: rgba(230,57,70,0.6);}
+  .cover .tape.t2 { top: -14px; right: 120px; transform: rotate(3deg); }
+  .cover-grid { display: grid; grid-template-columns: 1fr 380px; gap: 30px; align-items: center; }
+
+  .chapter-tag {
+    display: inline-block;
+    font-family: "DotGothic16", monospace;
+    background: var(--ink); color: var(--paper);
+    padding: 6px 14px; border-radius: 4px;
+    font-size: 14px; letter-spacing: 0.12em;
+    margin-bottom: 18px;
+  }
+  .cover h1 {
+    font-family: "Yusei Magic", "Zen Maru Gothic", sans-serif;
+    font-weight: 400; font-size: 76px;
+    margin: 0 0 6px;
+    letter-spacing: 0.02em; line-height: 1.05;
+    color: var(--ink);
+    text-shadow: 4px 4px 0 var(--red);
+  }
+  .cover h1 .acc { color: var(--blue); text-shadow: 4px 4px 0 var(--ink); }
+  .cover .subtitle {
+    font-family: "Kaisei Decol", "Zen Maru Gothic", serif;
+    font-size: 26px; font-weight: 700;
+    margin: 6px 0 22px;
+    color: var(--ink-soft);
+  }
+  .cover .lede {
+    font-size: 16.5px;
+    max-width: 720px;
+    color: var(--ink-soft);
+    margin: 16px 0 0;
+  }
+  .cover-meta {
+    display: flex; gap: 14px; flex-wrap: wrap;
+    font-family: "DotGothic16", monospace;
+    font-size: 13px; color: var(--ink-soft);
+    margin-top: 14px;
+  }
+  .cover-meta span {
+    background: var(--paper-2);
+    padding: 6px 12px;
+    border: 1.5px solid var(--ink);
+    border-radius: 999px;
+  }
+
+  /* cover decorative — pen on paper */
+  .cover-illu {
+    position: relative;
+    height: 240px;
+    background: var(--paper-2);
+    border: 2.5px solid var(--ink);
+    border-radius: 14px;
+    padding: 18px 22px;
+    box-shadow: 4px 4px 0 var(--ink);
+    overflow: hidden;
+  }
+  .cover-illu .ln {
+    height: 1.5px;
+    background: var(--ink-soft);
+    opacity: 0.3;
+    margin: 16px 0;
+  }
+  .cover-illu .ln.short { width: 60%; }
+  .cover-illu .ln.med { width: 80%; }
+  .cover-illu .ln.full { width: 100%; }
+  .cover-illu .quote {
+    font-family: "Shippori Mincho", serif;
+    font-size: 24px;
+    line-height: 1.4;
+    color: var(--ink);
+  }
+  .cover-illu .quote .red { color: var(--red); }
+  .cover-illu .penmark {
+    position: absolute;
+    bottom: 14px; right: 20px;
+    font-family: "Reenie Beanie", cursive;
+    font-size: 30px;
+    color: var(--red);
+    transform: rotate(-6deg);
+  }
+  .cover-illu .star-stamp {
+    position: absolute;
+    top: 10px; right: 14px;
+    width: 60px; height: 60px;
+    background: var(--yellow);
+    border: 2.5px solid var(--ink);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: "Kaisei Decol", serif;
+    font-weight: 700;
+    font-size: 28px;
+    transform: rotate(-12deg);
+    box-shadow: 2px 2px 0 var(--ink);
+  }
+
+  /* SECTION HEAD */
+  .section-head {
+    display: flex; align-items: baseline; gap: 18px;
+    margin: 24px 0 28px;
+  }
+  .section-num {
+    font-family: "Yusei Magic", sans-serif;
+    font-size: 64px; line-height: 1;
+    color: var(--ink); background: var(--yellow);
+    border: 3px solid var(--ink); border-radius: 14px;
+    padding: 6px 18px 2px;
+    box-shadow: 4px 4px 0 var(--ink);
+    transform: rotate(-2deg);
+  }
+  .section-head h2 {
+    font-family: "Yusei Magic", sans-serif;
+    font-weight: 400; font-size: 40px;
+    margin: 0; color: var(--ink);
+  }
+  .section-head .lead {
+    font-size: 16px; color: var(--ink-soft);
+    margin-left: auto; max-width: 460px;
+    border-left: 4px solid var(--ink);
+    padding: 4px 14px;
+    background: var(--paper-2);
+  }
+
+  /* ---------- GALLERY ---------- */
+  .gallery { margin-bottom: 90px; }
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 22px;
+  }
+  .gcard {
+    background: var(--paper);
+    border: 3px solid var(--ink);
+    border-radius: 12px;
+    box-shadow: 5px 5px 0 var(--ink);
+    overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .gcard .preview {
+    aspect-ratio: 4/3;
+    background: var(--paper-2);
+    border-bottom: 3px solid var(--ink);
+    position: relative;
+    overflow: hidden;
+  }
+  .gcard .meta { padding: 12px 14px 14px; }
+  .gcard .meta .num {
+    font-family: "DotGothic16", monospace;
+    font-size: 11px; letter-spacing: 0.18em;
+    color: var(--ink-soft);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .gcard .meta .num .gly {
+    width: 22px; height: 22px;
+    border: 2px solid var(--ink);
+    border-radius: 4px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: "Kaisei Decol", serif;
+    font-weight: 700;
+    font-size: 13px;
+  }
+  .gcard .meta h3 {
+    font-family: "Kaisei Decol", serif;
+    font-size: 17px; font-weight: 700;
+    margin: 4px 0 6px;
+    line-height: 1.25;
+  }
+  .gcard .meta p {
+    margin: 0;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    font-weight: 600;
+    line-height: 1.5;
+  }
+
+  /* Mini text-mocks for gallery */
+  .mp-base {
+    height: 100%;
+    padding: 12px 14px;
+    background: var(--paper);
+    display: flex; flex-direction: column;
+    gap: 4px;
+  }
+  .mp-base .ln {
+    height: 4px;
+    background: var(--ink-soft);
+    opacity: 0.65;
+    border-radius: 2px;
+  }
+  .mp-base .ln.head {
+    height: 8px;
+    background: var(--ink);
+    width: 65%;
+    opacity: 1;
+    border-radius: 3px;
+    margin-bottom: 4px;
+  }
+  .mp-base .ln.short { width: 50%; }
+  .mp-base .ln.med   { width: 80%; }
+  .mp-base .ln.color1 { background: var(--red); opacity: 1; height: 5px; }
+  .mp-base .ln.color2 { background: var(--blue); opacity: 1; height: 5px; }
+
+  /* per-category preview bg */
+  .mp-article { background: var(--paper); }
+  .mp-copy { background: var(--orange-soft); padding: 10px; display: flex; flex-direction: column; gap: 5px; }
+  .mp-copy .cline {
+    background: var(--paper); border: 1.5px solid var(--ink);
+    padding: 3px 6px; font-family: "Kaisei Decol", serif;
+    font-weight: 700; font-size: 11px; border-radius: 4px;
+    line-height: 1.1;
+  }
+  .mp-novel { background: #f8f3e0; padding: 12px 14px; }
+  .mp-novel .t {
+    font-family: "Shippori Mincho", serif;
+    font-size: 11px;
+    line-height: 1.55;
+    color: var(--ink);
+  }
+  .mp-novel .t b { font-weight: 700; }
+  .mp-script { background: var(--yellow-soft); padding: 10px 12px; font-family: "DotGothic16", monospace; font-size: 9.5px; line-height: 1.55;}
+  .mp-script b { font-weight: 700; }
+  .mp-script .stg { color: var(--red); font-style: italic;}
+  .mp-essay { background: var(--green-soft); padding: 12px 14px; }
+  .mp-essay .t {
+    font-family: "Shippori Mincho", serif;
+    font-size: 10.5px; line-height: 1.6;
+  }
+  .mp-essay .t .indent { padding-left: 1em; display: block; }
+  .mp-tr { background: var(--blue-soft); padding: 10px; display: grid; grid-template-columns: 1fr 18px 1fr; gap: 6px; align-items: center; }
+  .mp-tr .pane { background: var(--paper); border: 1.5px solid var(--ink); padding: 5px; border-radius: 4px; min-height: 80%;}
+  .mp-tr .pane span { display:block; height: 3px; background: var(--ink-soft); margin: 3px 0; border-radius: 1.5px;}
+  .mp-tr .pane span.s { width: 60%;}
+  .mp-tr .arr { font-family: "Yusei Magic", sans-serif; font-size: 14px; text-align: center; color: var(--ink); }
+  .mp-sum { background: var(--paper-2); padding: 10px 12px; display: flex; flex-direction: column; gap: 5px;}
+  .mp-sum .blk1 { background: var(--paper); border: 1.5px solid var(--ink); padding: 4px; border-radius: 3px; opacity: 0.7;}
+  .mp-sum .blk1 .ln { height: 3px; background: var(--ink-soft); border-radius: 1.5px; margin: 2px 0; width: 90%;}
+  .mp-sum .blk1 .ln:nth-child(2) { width: 60%;}
+  .mp-sum .arr { text-align: center; font-family: "Yusei Magic", sans-serif; font-size: 13px;}
+  .mp-sum .blk2 { background: var(--ink); border-radius: 3px; padding: 5px; }
+  .mp-sum .blk2 .ln { height: 4px; background: var(--yellow); border-radius: 1.5px; margin: 3px 0;}
+  .mp-sum .blk2 .ln.s { width: 55%; }
+  .mp-mail { background: var(--paper); padding: 10px 12px; }
+  .mp-mail .hdr { font-family: "DotGothic16", monospace; font-size: 9px; color: var(--ink-soft); border-bottom: 1.5px dashed var(--ink); padding-bottom: 4px; margin-bottom: 6px;}
+  .mp-mail .bdy { font-family: "Shippori Mincho", serif; font-size: 10.5px; line-height: 1.5;}
+  .mp-sns { background: var(--pink-soft); padding: 10px; display: flex; flex-direction: column; gap: 5px;}
+  .mp-sns .post { background: var(--paper); border: 1.5px solid var(--ink); border-radius: 6px; padding: 6px 8px; font-size: 10.5px; line-height: 1.4; font-weight: 600;}
+  .mp-sns .post:nth-child(1) { transform: rotate(-1deg);}
+  .mp-sns .post:nth-child(2) { transform: rotate(1deg); background: var(--yellow-soft);}
+  .mp-speech { background: var(--red-soft); padding: 12px 14px;}
+  .mp-speech .t {
+    font-family: "Kaisei Decol", serif;
+    font-size: 12px; font-weight: 700;
+    line-height: 1.35;
+  }
+  .mp-speech .t small {
+    display: block;
+    font-family: "DotGothic16", monospace;
+    font-size: 8.5px; color: var(--ink-soft);
+    margin-top: 4px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+  }
+
+  /* ---------- CASES ---------- */
+  .cases { margin-bottom: 90px; }
+  .case {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    background: var(--paper);
+    border: 3px solid var(--ink);
+    border-radius: 18px;
+    box-shadow: 8px 8px 0 var(--ink);
+    padding: 28px;
+    margin-bottom: 60px;
+    position: relative;
+  }
+  .case.reverse .case-text { order: 2; }
+  .case.reverse .case-visual { order: 1; }
+  .case .tape { top: -14px; left: 50px; }
+  .case .case-text { display: flex; flex-direction: column; gap: 14px; }
+  .case .case-num {
+    font-family: "DotGothic16", monospace;
+    background: var(--ink); color: var(--paper);
+    padding: 4px 12px; border-radius: 4px;
+    font-size: 12px; letter-spacing: 0.16em;
+    align-self: flex-start;
+  }
+  .case h3 {
+    font-family: "Yusei Magic", sans-serif;
+    font-weight: 400;
+    font-size: 36px; line-height: 1.15;
+    margin: 0;
+  }
+  .case .scenario {
+    background: var(--paper-2);
+    border: 2px solid var(--ink);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 14.5px;
+    font-weight: 600;
+  }
+  .case .scenario b {
+    font-family: "Kaisei Decol", serif;
+    display: inline-block;
+    background: var(--ink); color: var(--paper);
+    padding: 1px 8px; border-radius: 4px;
+    margin-right: 6px;
+    font-size: 12px; letter-spacing: 0.1em;
+  }
+  .prompt-box {
+    background: var(--ink);
+    border-radius: 10px;
+    color: var(--paper);
+    padding: 14px 16px;
+    font-family: "JetBrains Mono", "DotGothic16", monospace;
+    font-size: 12.5px;
+    line-height: 1.65;
+    border: 3px solid var(--ink);
+    box-shadow: 4px 4px 0 var(--yellow);
+    position: relative;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+  }
+  .prompt-box::before {
+    content: "PROMPT";
+    position: absolute;
+    top: -10px; left: 12px;
+    font-family: "DotGothic16", monospace;
+    font-size: 10px; letter-spacing: 0.2em;
+    background: var(--yellow); color: var(--ink);
+    padding: 2px 8px; border: 2px solid var(--ink);
+    border-radius: 4px;
+  }
+  .prompt-box .ph { color: var(--yellow); }
+  .case .reflect {
+    background: var(--green-soft);
+    border: 2px solid var(--ink);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 13.5px;
+    font-weight: 600;
+    line-height: 1.55;
+  }
+  .case .reflect b {
+    font-family: "Kaisei Decol", serif;
+    display: block;
+    margin-bottom: 4px;
+    color: var(--green);
+  }
+  .visual-frame {
+    background: var(--paper-2);
+    border: 2.5px solid var(--ink);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: inset 0 0 0 2px var(--paper);
+    min-height: 380px;
+    position: relative;
+    overflow: hidden;
+  }
+  .visual-frame::before {
+    content: "OUTPUT";
+    position: absolute;
+    top: -10px; right: 14px;
+    font-family: "DotGothic16", monospace;
+    font-size: 10px; letter-spacing: 0.2em;
+    background: var(--red); color: var(--paper);
+    padding: 2px 10px; border: 2px solid var(--ink);
+    border-radius: 4px;
+    z-index: 5;
+  }
+
+  /* --- Big article mock --- */
+  .big-article {
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 8px;
+    padding: 22px 26px;
+    font-family: "Shippori Mincho", serif;
+    height: 100%;
+  }
+  .big-article .meta-row {
+    font-family: "DotGothic16", monospace;
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    color: var(--ink-soft);
+    margin-bottom: 10px;
+    display: flex; gap: 12px;
+  }
+  .big-article .meta-row .cat { background: var(--red); color: var(--paper); padding: 2px 8px; border-radius: 3px;}
+  .big-article h4 {
+    font-family: "Kaisei Decol", serif;
+    font-size: 22px;
+    line-height: 1.3;
+    margin: 0 0 4px;
+    font-weight: 700;
+  }
+  .big-article .dek {
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    margin-bottom: 14px;
+    line-height: 1.55;
+  }
+  .big-article hr {
+    border: none;
+    border-top: 1.5px solid var(--ink);
+    margin: 10px 0 12px;
+  }
+  .big-article .toc {
+    background: var(--paper-2);
+    border-left: 4px solid var(--ink);
+    padding: 8px 12px;
+    margin: 10px 0;
+    font-family: "Zen Maru Gothic", sans-serif;
+    font-size: 11.5px;
+    font-weight: 700;
+  }
+  .big-article .toc b {
+    font-family: "DotGothic16", monospace;
+    font-size: 9px; letter-spacing: 0.16em;
+    display: block; margin-bottom: 4px;
+    color: var(--ink-soft);
+    font-weight: 500;
+  }
+  .big-article .toc ol { margin: 0; padding-left: 18px; }
+  .big-article .toc li { line-height: 1.6; }
+  .big-article h5 {
+    font-family: "Kaisei Decol", serif;
+    font-size: 15px;
+    margin: 12px 0 4px;
+    font-weight: 700;
+    position: relative;
+    padding-left: 12px;
+  }
+  .big-article h5::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 4px; bottom: 4px;
+    width: 4px;
+    background: var(--red);
+    border-radius: 2px;
+  }
+  .big-article p {
+    font-size: 12px;
+    line-height: 1.75;
+    margin: 0 0 6px;
+  }
+  .big-article .more {
+    font-family: "DotGothic16", monospace;
+    font-size: 10px;
+    color: var(--ink-soft);
+    margin-top: 6px;
+    text-align: right;
+  }
+
+  /* --- Copy list mock --- */
+  .big-copy {
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 8px;
+    padding: 18px 22px;
+    height: 100%;
+  }
+  .big-copy h5 {
+    font-family: "DotGothic16", monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    color: var(--ink-soft);
+    margin: 0 0 14px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--ink);
+  }
+  .big-copy h5 b { color: var(--red); }
+  .big-copy ol {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex; flex-direction: column;
+    gap: 10px;
+    counter-reset: copy;
+  }
+  .big-copy ol li {
+    counter-increment: copy;
+    display: grid;
+    grid-template-columns: 28px 1fr;
+    gap: 10px;
+    align-items: start;
+    padding-bottom: 8px;
+    border-bottom: 1.5px dashed rgba(0,0,0,0.2);
+  }
+  .big-copy ol li::before {
+    content: counter(copy, decimal-leading-zero);
+    font-family: "DotGothic16", monospace;
+    font-size: 12px;
+    color: var(--ink-soft);
+    padding-top: 4px;
+  }
+  .big-copy ol li .head {
+    font-family: "Kaisei Decol", serif;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+  .big-copy ol li .head .em { color: var(--red); }
+  .big-copy ol li .head .em2 { color: var(--blue); }
+  .big-copy ol li .note {
+    font-size: 11px;
+    color: var(--ink-soft);
+    line-height: 1.4;
+    margin-top: 2px;
+    font-weight: 600;
+  }
+  .big-copy ol li .note b {
+    font-family: "DotGothic16", monospace;
+    font-size: 9px;
+    background: var(--yellow);
+    padding: 1px 5px;
+    border-radius: 3px;
+    margin-right: 4px;
+    font-weight: 700;
+  }
+
+  /* --- Novel scene mock --- */
+  .big-novel {
+    background: #f8f3e0;
+    border: 2px solid var(--ink);
+    border-radius: 8px;
+    padding: 24px 28px 22px;
+    height: 100%;
+    position: relative;
+    background-image:
+      linear-gradient(rgba(28,27,26,0.04) 1px, transparent 1px);
+    background-size: 100% 26px;
+    background-position: 0 14px;
+  }
+  .big-novel .title-row {
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1.5px solid var(--ink);
+    display: flex; align-items: baseline; gap: 12px;
+  }
+  .big-novel .title-row h5 {
+    font-family: "Kaisei Decol", serif;
+    font-size: 19px;
+    margin: 0;
+    font-weight: 700;
+  }
+  .big-novel .title-row .ch {
+    font-family: "DotGothic16", monospace;
+    font-size: 10px;
+    color: var(--ink-soft);
+    letter-spacing: 0.16em;
+  }
+  .big-novel .body {
+    font-family: "Shippori Mincho", serif;
+    font-size: 12.5px;
+    line-height: 2;
+    text-indent: 1em;
+  }
+  .big-novel .body p {
+    margin: 0;
+  }
+  .big-novel .body .gap { display: block; height: 14px; }
+  .big-novel .stamp {
+    position: absolute;
+    bottom: 14px; right: 18px;
+    width: 70px; height: 70px;
+    background: var(--red);
+    border-radius: 50%;
+    color: var(--paper);
+    display: flex; align-items: center; justify-content: center;
+    font-family: "Kaisei Decol", serif;
+    font-weight: 700;
+    font-size: 14px;
+    transform: rotate(-12deg);
+    text-align: center;
+    line-height: 1.2;
+    border: 2.5px solid var(--ink);
+    box-shadow: 2px 2px 0 var(--ink);
+    flex-direction: column;
+  }
+  .big-novel .stamp small { font-size: 8px; opacity: 0.85; }
+
+  /* --- SNS thread mock --- */
+  .big-thread {
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 10px;
+    padding: 16px 18px;
+    height: 100%;
+  }
+  .big-thread h5 {
+    font-family: "DotGothic16", monospace;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    color: var(--ink-soft);
+    margin: 0 0 14px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--ink);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .big-thread h5 b {
+    background: var(--blue); color: var(--paper);
+    padding: 2px 8px; border-radius: 4px;
+  }
+  .big-thread .posts {
+    display: flex; flex-direction: column;
+    gap: 10px;
+    position: relative;
+  }
+  .big-thread .post {
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 10px;
+    padding: 10px 14px;
+    position: relative;
+    display: grid;
+    grid-template-columns: 34px 1fr;
+    gap: 10px;
+    box-shadow: 3px 3px 0 var(--ink);
+  }
+  .big-thread .post .av {
+    width: 34px; height: 34px;
+    background: var(--ink);
+    border-radius: 50%;
+    color: var(--paper);
+    display: flex; align-items: center; justify-content: center;
+    font-family: "Kaisei Decol", serif;
+    font-size: 16px;
+    font-weight: 700;
+  }
+  .big-thread .post .num {
+    font-family: "DotGothic16", monospace;
+    font-size: 9.5px;
+    color: var(--ink-soft);
+    letter-spacing: 0.14em;
+    margin-bottom: 3px;
+  }
+  .big-thread .post .text {
+    font-size: 12.5px;
+    line-height: 1.6;
+    font-weight: 600;
+  }
+  .big-thread .post .text b.hl {
+    background: var(--yellow);
+    padding: 0 3px;
+    font-weight: 700;
+  }
+  .big-thread .post:nth-child(2) { margin-left: 14px; transform: rotate(-0.5deg);}
+  .big-thread .post:nth-child(3) { margin-left: 8px; transform: rotate(0.4deg);}
+  .big-thread .post:nth-child(4) { margin-left: 18px; }
+
+  /* ---------- TEMPLATES ---------- */
+  .templates { margin-bottom: 90px; }
+  .tmpl-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+  .tmpl {
+    background: var(--paper);
+    border: 3px solid var(--ink);
+    border-radius: 14px;
+    box-shadow: 5px 5px 0 var(--ink);
+    padding: 20px 22px 22px;
+  }
+  .tmpl .tmpl-tag {
+    display: inline-block;
+    font-family: "DotGothic16", monospace;
+    font-size: 11px; letter-spacing: 0.16em;
+    padding: 3px 10px;
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    background: var(--yellow);
+  }
+  .tmpl.t-red .tmpl-tag { background: var(--red-soft);}
+  .tmpl.t-blue .tmpl-tag { background: var(--blue-soft);}
+  .tmpl.t-green .tmpl-tag { background: var(--green-soft);}
+  .tmpl.t-purple .tmpl-tag { background: var(--purple-soft);}
+  .tmpl.t-orange .tmpl-tag { background: var(--orange-soft);}
+  .tmpl.t-pink .tmpl-tag { background: var(--pink-soft);}
+  .tmpl h3 {
+    font-family: "Yusei Magic", sans-serif;
+    font-weight: 400;
+    font-size: 28px;
+    margin: 10px 0 6px;
+  }
+  .tmpl .when {
+    font-size: 13px; color: var(--ink-soft);
+    margin: 0 0 12px;
+    font-weight: 600;
+  }
+  .tmpl pre {
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-family: "JetBrains Mono", "DotGothic16", monospace;
+    font-size: 12.5px;
+    line-height: 1.7;
+    margin: 0;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+  }
+  .tmpl pre .ph { color: var(--yellow); }
+  .tmpl pre .cm { color: rgba(255,255,255,0.45); }
+
+  /* ---------- STRENGTHS / WEAKNESSES ---------- */
+  .strengths { margin-bottom: 90px; }
+  .sg {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+  }
+  .sg-col {
+    border: 3px solid var(--ink);
+    border-radius: 14px;
+    padding: 22px 24px;
+    box-shadow: 5px 5px 0 var(--ink);
+    background: var(--paper);
+  }
+  .sg-col.good { background: var(--green-soft); }
+  .sg-col.bad { background: var(--red-soft); }
+  .sg-col h3 {
+    font-family: "Yusei Magic", sans-serif;
+    font-weight: 400;
+    font-size: 32px;
+    margin: 0 0 4px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .sg-col h3 .badge {
+    font-family: "Kaisei Decol", serif;
+    width: 44px; height: 44px;
+    display: inline-flex; align-items: center; justify-content: center;
+    border: 2.5px solid var(--ink); border-radius: 50%;
+    font-size: 24px; font-weight: 700;
+  }
+  .sg-col.good h3 .badge { background: var(--green); color: var(--paper); }
+  .sg-col.bad h3 .badge { background: var(--red); color: var(--paper); }
+  .sg-col .sub {
+    font-family: "DotGothic16", monospace;
+    font-size: 11px; letter-spacing: 0.16em;
+    color: var(--ink-soft);
+    margin-bottom: 14px;
+  }
+  .sg-col ul { list-style: none; padding: 0; margin: 0;}
+  .sg-col li {
+    padding: 8px 0 8px 26px;
+    border-top: 1.5px dashed var(--ink);
+    position: relative;
+    font-size: 14.5px;
+    font-weight: 700;
+    line-height: 1.45;
+  }
+  .sg-col li:first-child { border-top: none; }
+  .sg-col li::before {
+    position: absolute;
+    left: 0; top: 9px;
+    font-family: "Kaisei Decol", serif;
+    font-size: 16px; line-height: 1;
+    font-weight: 700;
+  }
+  .sg-col.good li::before { content: "◯"; color: var(--green); }
+  .sg-col.bad li::before { content: "△"; color: var(--red); }
+  .sg-col li small {
+    display: block;
+    font-weight: 500;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    padding-top: 2px;
+    line-height: 1.5;
+  }
+
+  /* ---------- RHYTHM ---------- */
+  .rhythm {
+    background: var(--paper);
+    border: 3px solid var(--ink);
+    border-radius: 18px;
+    box-shadow: 8px 8px 0 var(--ink);
+    padding: 28px 32px;
+    margin-bottom: 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .rhythm .tape { top: -14px; right: 100px; transform: rotate(3deg); background: rgba(244,182,194,0.85);}
+  .rhythm-head {
+    display: flex; align-items: baseline; gap: 18px;
+    margin-bottom: 20px;
+  }
+  .rhythm-head h2 {
+    font-family: "Yusei Magic", sans-serif;
+    font-size: 32px; font-weight: 400;
+    margin: 0;
+  }
+  .rhythm-head .num {
+    font-family: "DotGothic16", monospace;
+    background: var(--ink); color: var(--paper);
+    padding: 4px 10px; border-radius: 4px;
+    font-size: 12px;
+  }
+  .turns {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  .turn {
+    background: var(--paper-2);
+    border: 2.5px solid var(--ink);
+    border-radius: 12px;
+    padding: 14px 16px;
+    position: relative;
+  }
+  .turn .who {
+    font-family: "Kaisei Decol", serif;
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+  .turn.me .who { color: var(--red);}
+  .turn.cl .who { color: var(--blue);}
+  .turn .said {
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.55;
+    color: var(--ink-soft);
+  }
+  .turn .who::before {
+    content: "";
+    display: inline-block;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    margin-right: 6px;
+  }
+  .turn.me .who::before { background: var(--red); }
+  .turn.cl .who::before { background: var(--blue); }
+  .turn .arrow {
+    position: absolute;
+    right: -18px; top: 50%;
+    transform: translateY(-50%);
+    font-family: "Yusei Magic", sans-serif;
+    font-size: 30px;
+    z-index: 2;
+  }
+  .turn:last-child .arrow { display: none; }
+
+  footer {
+    margin-top: 60px;
+    border-top: 3px dashed var(--ink);
+    padding-top: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: "DotGothic16", monospace;
+    font-size: 12px;
+    color: var(--ink-soft);
+    letter-spacing: 0.12em;
+  }
+  footer .page-num {
+    font-size: 14px;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 4px 10px;
+    border-radius: 4px;
+  }
+
+</style>
+</head>
+<body>
+
+<template id="__bundler_thumbnail" data-bg-color="#FBF6E9">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#FBF6E9"/>
+    <rect x="200" y="180" width="480" height="440" rx="14" fill="#FBF6E9" stroke="#1C1B1A" stroke-width="6"/>
+    <g stroke="#1C1B1A" stroke-width="3" opacity="0.4">
+      <line x1="230" y1="260" x2="640" y2="260"/>
+      <line x1="230" y1="320" x2="600" y2="320"/>
+      <line x1="230" y1="380" x2="640" y2="380"/>
+      <line x1="230" y1="440" x2="520" y2="440"/>
+      <line x1="230" y1="500" x2="620" y2="500"/>
+      <line x1="230" y1="560" x2="480" y2="560"/>
+    </g>
+    <text x="240" y="230" font-family="serif" font-size="36" font-weight="700" fill="#E63946">書</text>
+    <text x="290" y="230" font-family="serif" font-size="28" font-weight="700" fill="#1C1B1A">| CHAPTER 03</text>
+    <g transform="translate(720 220)">
+      <circle cx="100" cy="100" r="100" fill="#E63946" stroke="#1C1B1A" stroke-width="5"/>
+      <text x="100" y="125" font-family="serif" font-size="100" font-weight="700" text-anchor="middle" fill="#FBF6E9">書</text>
+      <circle cx="240" cy="220" r="60" fill="#FFD23F" stroke="#1C1B1A" stroke-width="4"/>
+      <text x="240" y="245" font-family="serif" font-size="56" font-weight="700" text-anchor="middle" fill="#1C1B1A">A</text>
+      <circle cx="60" cy="300" r="60" fill="#3B82C4" stroke="#1C1B1A" stroke-width="4"/>
+      <text x="60" y="325" font-family="serif" font-size="56" font-weight="700" text-anchor="middle" fill="#FBF6E9">あ</text>
+    </g>
+  </svg>
+</template>
+
+<div class="page">
+
+  <!-- COVER -->
+  <header class="cover">
+    <div class="tape t1"></div>
+    <div class="tape t2"></div>
+    <div class="cover-grid">
+      <div>
+        <div class="chapter-tag">CHAPTER 03 / ALIGNLAB NOTE</div>
+        <h1>Claudeで<span class="acc">書く</span>。</h1>
+        <p class="subtitle">ライティング実例集</p>
+        <p class="lede">
+          書くことは、考えること。だから書くのが苦しいときは、たいてい考えがまだ整っていない。
+          Claudeはその「整える」ところに、何度でも付き合ってくれる。
+          このノートでは、書く仕事を10カテゴリに分け、ブログ・コピー・小説・SNSの4実例を追いかけ、
+          すぐ使い回せるプロンプトを6つ並べた。最後に、書く現場でClaudeにどう頼るかの早見表を置いた。
+        </p>
+        <div class="cover-meta">
+          <span>個人用リファレンス</span>
+          <span>2026.05</span>
+          <span>by AlignLab</span>
+          <span>creator-system</span>
+        </div>
+      </div>
+      <div class="cover-illu">
+        <div class="star-stamp">書</div>
+        <div class="quote">
+          書けない<br>
+          のではない、<br>
+          <span class="red">まだ</span>考えて<br>
+          いないだけ。
+        </div>
+        <div class="penmark">— Claude.</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 01 GALLERY -->
+  <section class="gallery">
+    <div class="section-head">
+      <div class="section-num">01</div>
+      <h2>Claudeで書ける 10種</h2>
+      <p class="lead">書き仕事は形を変えても、骨は似ている。ジャンルごとの「型」をClaudeが先に出してくれる。</p>
+    </div>
+
+    <div class="gallery-grid">
+
+      <div class="gcard">
+        <div class="preview">
+          <div class="mp-base mp-article">
+            <div class="ln head"></div>
+            <div class="ln short"></div>
+            <div class="ln color1"></div>
+            <div class="ln"></div>
+            <div class="ln med"></div>
+            <div class="ln"></div>
+            <div class="ln med"></div>
+            <div class="ln short"></div>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="num"><span class="gly">記</span>01 / ARTICLE</div>
+          <h3>記事・ブログ</h3>
+          <p>構成案→見出し→本文。導入と結論を先に決めると速い。</p>
+        </div>
+      </div>
+
+      <div class="gcard">
+        <div class="preview">
+          <div class="mp-copy">
+            <div class="cline">未来は、書く人のもの。</div>
+            <div class="cline">ことばは、ちいさな技術だ。</div>
+            <div class="cline">3行で、ひとを動かせ。</div>
+            <div class="cline">考えてから、書こう。</div>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="num"><span class="gly">売</span>02 / COPY</div>
+          <h3>キャッチコピー</h3>
+          <p>5案・10案・30案と桁を変えて発注。バリエの幅で選ぶ。</p>
+        </div>
+      </div>
+
+      <div class="gcard">
+        <div class="preview">
+          <div class="mp-novel">
+            <div class="t">
+              　雨はもう、何時間も降りつづけていた。<br>
+              　駅前のロータリーは灰色に沈み、<br>
+              彼女は一本の傘も持たないまま、<br>
+              ただ、立っていた。<br>
+              　「来ないかもしれませんね」<br>
+              　声は、後ろから聞こえた。
+            </div>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="num"><span class="gly">物</span>03 / FICTION</div>
+          <h3>小説・物語</h3>
+          <p>場面・視点・文体を指定して、短い場面から組み上げる。</p>
+        </div>
+      </div>
+
+      <div class="gcard">
+        <div class="preview">
+          <div class="mp-script">
+            <b>カナエ</b>「もう寝ようよ」<br>
+            <span class="stg">（沈黙）</span><br>
+            <b>ハルキ</b>「……たぶん明日も<br>　　　　雨だってさ」<br>
+            <b>カナエ</b>「うん」<br>
+            <span class="stg">（窓を閉める音）</span>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="num"><span class="gly">劇</span>04 / SCRIPT</div>
+          <h3>脚本・対話</h3>
+          <p>役名・ト書き・尺の指定で、舞台が立ち上がる。</p>
+        </div>
+      </div>
+
+      <div class="gcard">
+        <div class="preview">
+          <div class="mp-essay">
+            <div class="t">
+              <span class="indent">むかし、わたしの父は、</span>
+              夜に冷蔵庫を開ける癖があった。<br>
+              <span class="indent">何も食べないのに、</span>
+              ただ眺めて、閉める。<br>
+              <span class="indent">あれはきっと、</span>
+              眠れない夜の儀式だったのだ。
+            </div>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="num"><span class="gly">随</span>05 / ESSAY</div>
+          <h3>エッセイ・コラム</h3>
+          <p>小さな観察→気づき→普遍化。3段構造の型で書ける。</p>
+        </div>
+      </div>
+
+      <div class="gcard">
+        <div class="preview">
+          <div class="mp-tr">
+            <div class="pane"><span></span><span class="s"></span><span></span><span class="s"></span></div>
+            <div class="arr">→</div>
+            <div class="pane"><span></span><span class="s"></span><span></span><span class="s"></span></div>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="num"><span class="gly">訳</span>06 / TRANSLATE</div>
+          <h3>翻訳・リライト</h3>
+          <p>直訳→意訳→自分の文体へ。3段階で精度を上げる。</p>
+        </div>
+      </div>
+
+      <div class="gcard">
+        <div class="preview">
+          <div class="mp-sum">
+            <div class="blk1"><div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div></div>
+            <div class="arr">↓ 要約</div>
+            <div class="blk2"><div class="ln"></div><div class="ln s"></div></div>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="num"><span class="gly">要</span>07 / SUMMARY</div>
+          <h3>要約・抜粋</h3>
+          <p>長文→3行／30秒スピーチ／SNS1投稿。粒度を選んで。</p>
+        </div>
+      </div>
+
+      <div class="gcard">
+        <div class="preview">
+          <div class="mp-mail">
+            <div class="hdr">FROM : 山田 / TO : 田中様<br>SUBJECT : 来週のお打合せ</div>
+            <div class="bdy">田中様<br><br>　平素より大変お世話<br>　になっております。<br>　来週の件、下記の通り…</div>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="num"><span class="gly">信</span>08 / EMAIL</div>
+          <h3>メール・告知</h3>
+          <p>相手・温度・本題・お願いの4つだけ伝えれば成立する。</p>
+        </div>
+      </div>
+
+      <div class="gcard">
+        <div class="preview">
+          <div class="mp-sns">
+            <div class="post">書くのが苦しいときは、<br>たいてい考えが整ってない。<br>順番が、逆。</div>
+            <div class="post">「3行で書ける？」と<br>自分に聞くだけで、<br>頭がほどける。</div>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="num"><span class="gly">短</span>09 / SHORT</div>
+          <h3>SNS・短文</h3>
+          <p>140字・改行・引きの一行。「短くする」のはClaude得意。</p>
+        </div>
+      </div>
+
+      <div class="gcard">
+        <div class="preview">
+          <div class="mp-speech">
+            <div class="t">
+              「みなさん、こんにちは。<br>
+              今日は、書くこと について<br>
+              話したいと思います。」
+              <small>OPEN — 3秒間／笑顔／会場をひと舐め</small>
+            </div>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="num"><span class="gly">声</span>10 / SPEECH</div>
+          <h3>スピーチ・ナレーション</h3>
+          <p>「読んで自然な日本語」に書き直すのが、いちばん効く。</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 02 CASES -->
+  <section class="cases">
+    <div class="section-head">
+      <div class="section-num" style="background: var(--orange); transform: rotate(2deg);">02</div>
+      <h2>実例集：プロンプト → 出力</h2>
+      <p class="lead">頼み方によって、返ってくる文章の表情が変わる。4つの典型で型を盗む。</p>
+    </div>
+
+    <!-- CASE A: ブログ記事 -->
+    <div class="case">
+      <div class="tape red"></div>
+      <div class="case-text">
+        <div class="case-num">CASE A · BLOG ARTICLE</div>
+        <h3>ブログ記事を<br>骨組みから書く</h3>
+        <div class="scenario">
+          <b>場面</b>「Claudeで毎日の文章仕事がどう変わったか」というテーマで、媒体「働く人のためのノート」に寄稿。3,000字、読了7分。
+        </div>
+        <div class="prompt-box">あなたは熟練のWeb編集者です。
+下のテーマで、3,000字のブログ記事を書いて。
+
+# テーマ
+Claudeで毎日の文章仕事がどう変わったか
+
+# 媒体
+「働く人のためのノート」/ 読者は30-40代の会社員
+
+# 構成
+1. まず<span class="ph">構成案</span>だけ出して（H2見出し5つ、各H2の要点3行）
+2. OKしたら本文を書く
+
+# トーン
+語り口は親しみやすく、断定しすぎない。
+「結論先・具体例・小さな提案」の順で。
+1段落は3-4文。
+
+ではまず構成案から。</div>
+        <div class="reflect">
+          <b>振り返り</b>「まず構成だけ」「OKしたら本文」と2段にすると、方向違いで丸ごと書き直す事故が消える。
+          構成のH2が5つ出てきたら、気になる順に並べ替えて返すだけで、記事の骨は決まる。
+        </div>
+      </div>
+      <div class="case-visual">
+        <div class="visual-frame">
+          <div class="big-article">
+            <div class="meta-row">
+              <span class="cat">WORK</span>
+              <span>2026.05.26</span>
+              <span>READ 7min</span>
+            </div>
+            <h4>毎日の文章仕事を、もう一度好きになるまで</h4>
+            <p class="dek">書くことが、いつのまにか「片付ける作業」になっていた。Claudeと半年並走して、それがまた「考える時間」に戻ってきた話。</p>
+            <hr>
+            <div class="toc">
+              <b>もくじ</b>
+              <ol>
+                <li>書くのが嫌いになっていた頃のこと</li>
+                <li>「叩き台が一瞬」がもたらしたもの</li>
+                <li>編集者役を、もう一人雇った気分</li>
+                <li>うまくいかなかった日もある</li>
+                <li>これからの「書く」の意味</li>
+              </ol>
+            </div>
+            <h5>書くのが嫌いになっていた頃</h5>
+            <p>正直に言うと、去年の秋ごろから、書くのが面倒だった。会議メモ、議事録、企画書、社内向けの告知…。「書く」という行為が、頭で考えるよりも先に、フォーマットに流し込む作業になっていた。</p>
+            <p>その頃に出会ったのが、Claudeだ。</p>
+            <div class="more">― 続く ―</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CASE B: コピー -->
+    <div class="case reverse">
+      <div class="tape" style="right: 60px; left: auto; background: rgba(242,153,74,0.6);"></div>
+      <div class="case-text">
+        <div class="case-num">CASE B · CATCH COPY</div>
+        <h3>キャッチコピーを<br>10案ふらせる</h3>
+        <div class="scenario">
+          <b>場面</b>新サービス「Inkbird」のキャッチコピー候補がほしい。「書く人のための静かなツール」というコンセプトを軸に、方向の違う10案を比較したい。
+        </div>
+        <div class="prompt-box">あなたは凄腕のコピーライターです。
+新サービス「Inkbird」のキャッチコピーを10案。
+
+# コンセプト
+書く人のための、静かなツール。
+気が散らない場所と、いつでも頼れる相棒。
+
+# 出し分けの軸
+- 短い詩のような3案
+- 機能を匂わせる3案
+- 挑発的・反語的な3案
+- ユーザーの内側の声1案
+
+# 出力フォーマット
+番号 / コピー本文 / 30字以内 / 狙い1行
+
+「静寂」「ひとりの時間」「考える」あたりの語彙を活かしつつ、
+被らないように。<span class="ph">無難なのは捨てて</span>、振り切ったやつを混ぜて。</div>
+        <div class="reflect">
+          <b>振り返り</b>「出し分けの軸」を3-4方向に区切るのが効く。
+          並べて読むと、自分が反応したのが「詩寄り」か「機能寄り」か分かる。それが今の自分の気分。
+        </div>
+      </div>
+      <div class="case-visual">
+        <div class="visual-frame">
+          <div class="big-copy">
+            <h5>INKBIRD — TAGLINE DRAFT <b>10 / 10</b></h5>
+            <ol>
+              <li>
+                <div>
+                  <div class="head">書く人に、<span class="em">静けさ</span>を。</div>
+                  <div class="note"><b>詩</b>余白の多さで、ブランドの世界観を示す。</div>
+                </div>
+              </li>
+              <li>
+                <div>
+                  <div class="head">ことばが、また<span class="em">じぶん</span>に追いつく。</div>
+                  <div class="note"><b>詩</b>「追いつく」で書き手の内側を描く。</div>
+                </div>
+              </li>
+              <li>
+                <div>
+                  <div class="head">気が散らないことが、機能だ。</div>
+                  <div class="note"><b>機能</b>引き算をベネフィットに反転。</div>
+                </div>
+              </li>
+              <li>
+                <div>
+                  <div class="head">下書きを、ひとりにしない。</div>
+                  <div class="note"><b>機能</b>相棒機能をやわらかく示唆。</div>
+                </div>
+              </li>
+              <li>
+                <div>
+                  <div class="head">速く書くより、<span class="em2">深く</span>書こう。</div>
+                  <div class="note"><b>挑発</b>「速さ偏重」の時代へのカウンター。</div>
+                </div>
+              </li>
+              <li>
+                <div>
+                  <div class="head">SNSの逆を、ゆこう。</div>
+                  <div class="note"><b>挑発</b>静かに書きたい層への旗印。</div>
+                </div>
+              </li>
+              <li>
+                <div>
+                  <div class="head">今日も、書けなかった。</div>
+                  <div class="note"><b>内省</b>失敗から始める一行。共感を引く。</div>
+                </div>
+              </li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CASE C: 小説 -->
+    <div class="case">
+      <div class="tape purple"></div>
+      <div class="case-text">
+        <div class="case-num">CASE C · NOVEL OPENING</div>
+        <h3>短編小説の<br>冒頭を書く</h3>
+        <div class="scenario">
+          <b>場面</b>「雨の駅で誰かを待っている女性」を起点に、短編の冒頭3段落を書きたい。視点・文体・空気感を細かく指定する。
+        </div>
+        <div class="prompt-box">あなたは静かな短編を書く小説家です。
+
+# 場面
+雨の夕方、私鉄の小さな駅前ロータリー。
+30代後半の女性「美里」が、傘も持たず、誰かを待っている。
+
+# 視点
+三人称・美里の内面に寄った視点。
+
+# 文体
+- 一文短め、しかし詩的に
+- 比喩は1段落に1つまで
+- 漢字とひらがなのバランス重視
+- 句点で止めて余韻
+
+# お願い
+冒頭の3段落だけ書いて。
+状況説明より、空気の重さを先に伝えて。
+
+タイトル候補も3つ添えて。タイトルだけは<span class="ph">名詞ひとつ</span>。</div>
+        <div class="reflect">
+          <b>振り返り</b>「比喩は1段落に1つまで」のような <b>禁則</b> を入れると、Claudeの文章は途端に締まる。
+          書き手は「足す」より「引く」を指示するほうが、文体が育つ。
+        </div>
+      </div>
+      <div class="case-visual">
+        <div class="visual-frame">
+          <div class="big-novel">
+            <div class="title-row">
+              <h5>『傘』</h5>
+              <div class="ch">CH.01 — OPENING</div>
+            </div>
+            <div class="body">
+              <p>　雨はもう、何時間も降りつづけていた。駅前のロータリーは灰色に沈み、車のヘッドライトだけが、いやに鮮やかだった。</p>
+              <span class="gap"></span>
+              <p>　美里は、傘を持っていなかった。持って出るのを忘れたのではなく、持たずに来たのだ。今日くらいは、濡れていたかった。誰かに「どうしたの」と聞かれたい、と願う自分が、少しだけ恥ずかしかった。</p>
+              <span class="gap"></span>
+              <p>　駅の改札から、ひとり、またひとりと、傘の花がひらいてゆく。美里は数えるのをやめて、空を見上げた。雨粒がまつ毛に触れて、視界が、ほんの少しだけ、にじんだ。</p>
+            </div>
+            <div class="stamp">CH.01<small>OPENING</small></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CASE D: 要約→SNSスレッド -->
+    <div class="case reverse">
+      <div class="tape blue" style="right: 50px; left: auto;"></div>
+      <div class="case-text">
+        <div class="case-num">CASE D · LONG → THREAD</div>
+        <h3>3,000字の記事を<br>4ポストに圧縮</h3>
+        <div class="scenario">
+          <b>場面</b>CASE Aで書いたブログ記事を、X(Twitter)で告知したい。140字×4投稿のスレッド形式に。要点を残しつつ、最後で記事に誘導する。
+        </div>
+        <div class="prompt-box">下のブログ記事を、X用のスレッド4ポストに要約して。
+
+# ルール
+- 各ポストは140字以内
+- 1ポストめは「フック」になる一文から
+- 2-3ポストめで主要な気づきを2つ
+- 4ポストめは「続きは記事で」の誘導
+- ポスト間で <span class="ph">改行</span> をうまく使って
+- 絵文字は1ポストに1つまで（控えめに）
+
+# 原文
+（ここに記事本文）
+
+# 出力
+番号付き4ポスト。スレッド構造の説明はいらない。</div>
+        <div class="reflect">
+          <b>振り返り</b>「絵文字は1つまで」「改行をうまく使って」のような <b>媒体に固有のルール</b> を最初に書く。
+          Xでもメルマガでも、媒体の作法を1度書いてしまえば、あとは横展開がほぼ自動になる。
+        </div>
+      </div>
+      <div class="case-visual">
+        <div class="visual-frame">
+          <div class="big-thread">
+            <h5><b>THREAD</b>X / 4 POSTS</h5>
+            <div class="posts">
+              <div class="post">
+                <div class="av">本</div>
+                <div>
+                  <div class="num">1 / 4</div>
+                  <div class="text">書くのが嫌いになっていた頃に、<b class="hl">Claudeに半年並走</b>してもらった話を書きました。<br><br>結論：書くことが、また「考える時間」に戻ってきた。</div>
+                </div>
+              </div>
+              <div class="post">
+                <div class="av">本</div>
+                <div>
+                  <div class="num">2 / 4</div>
+                  <div class="text">いちばん変わったのは「叩き台が一瞬で出る」こと。<br><br>白紙との戦いがなくなって、最初の30分の重さが消えた。書くより、<b class="hl">直すほうが楽しい</b>。</div>
+                </div>
+              </div>
+              <div class="post">
+                <div class="av">本</div>
+                <div>
+                  <div class="num">3 / 4</div>
+                  <div class="text">もう一つは「編集者役」を、もう一人雇った気分。<br><br>「厳しめに読んで」と頼むと、自分では気づかない冗長さが浮き上がる。書いて、読まれて、また書く。</div>
+                </div>
+              </div>
+              <div class="post">
+                <div class="av">本</div>
+                <div>
+                  <div class="num">4 / 4</div>
+                  <div class="text">うまくいかなかった日や、Claudeに「全部やり直し」させた失敗も書きました。<br><br>続きは記事で ↓</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- 03 TEMPLATES -->
+  <section class="templates">
+    <div class="section-head">
+      <div class="section-num" style="background: var(--blue); color: var(--paper); transform: rotate(-1.5deg);">03</div>
+      <h2>書く人のためのプロンプト6つ</h2>
+      <p class="lead">そのまま使える土台。空欄を埋めて投げるだけで、文章仕事の8割が片付く。</p>
+    </div>
+
+    <div class="tmpl-grid">
+      <div class="tmpl t-red">
+        <span class="tmpl-tag">OUTLINE</span>
+        <h3>① 構成から始める</h3>
+        <p class="when">本文を書く前に、骨だけ作る。書きながら迷子になるのを防ぐ最強の習慣。</p>
+        <pre>あなたは <span class="ph">[役割: 編集者など]</span> です。
+
+# テーマ
+<span class="ph">[何を書くか]</span>
+
+# 読者
+<span class="ph">[誰のため・前提知識]</span>
+
+# 目的
+<span class="ph">[読んだあとの行動・気持ち]</span>
+
+まず構成案だけ出して：
+- H2見出し <span class="ph">[5]</span> 個
+- 各H2の要点3行
+- 全体の論の流れを最後に1行
+
+本文はOKを出してから書いて。</pre>
+      </div>
+
+      <div class="tmpl t-orange">
+        <span class="tmpl-tag">N IDEAS</span>
+        <h3>② N案ふらせる</h3>
+        <p class="when">タイトル・コピー・冒頭の一行など、選択肢が要る場面で。桁を変えると質も変わる。</p>
+        <pre><span class="ph">[コピー/タイトル/書き出し]</span> を <span class="ph">[10]</span> 案。
+
+# 出し分けの軸
+- 短く詩的な3案
+- 機能を匂わせる3案
+- 挑発的・逆張りの3案
+- 内省・本音の1案
+
+# 出力
+番号 / 本文 / 字数 / 狙い1行
+
+無難なのは捨てて、振り切ったやつを混ぜて。
+似た案は2つ並べないで。</pre>
+      </div>
+
+      <div class="tmpl t-green">
+        <span class="tmpl-tag">VOICE</span>
+        <h3>③ 文体を移植する</h3>
+        <p class="when">自分の文章をClaudeに「お手本」として渡すと、出力の文体が一気に近づく。</p>
+        <pre>下の文章を <span class="ph">お手本</span> として、
+私の文体を真似て書いて。
+
+# 観察ポイント
+- 一文の長さ
+- 漢字／ひらがなのバランス
+- 比喩の頻度と種類
+- 句読点のクセ
+- 段落の切り方
+
+# お手本
+（自分の過去の文章をここに貼る）
+
+# お題
+お手本と同じ文体で、<span class="ph">[テーマ]</span> について
+<span class="ph">[文字数]</span> 字で書いて。</pre>
+      </div>
+
+      <div class="tmpl t-blue">
+        <span class="tmpl-tag">CUT</span>
+        <h3>④ 削るレビュー</h3>
+        <p class="when">書いた後、削るのは難しい。Claudeに「冗長さ探し」だけを頼むと、容赦なくやってくれる。</p>
+        <pre>下の文章を、意味を変えずに <span class="ph">2割短く</span> して。
+
+# 削る優先順
+1. 重複している説明
+2. 「〜について」「〜という」などのクッション
+3. 形容詞・副詞の盛り
+4. 接続詞の連続
+
+# お願い
+- 削った場所と理由を、行ごとにマーカーで示して
+- 言葉のリズムは崩さないで
+- ためらわなくていい
+
+# 本文
+<span class="ph">[ここに原稿]</span></pre>
+      </div>
+
+      <div class="tmpl t-purple">
+        <span class="tmpl-tag">CRITIC</span>
+        <h3>⑤ 辛口レビュー</h3>
+        <p class="when">「いい感じです」と褒められても、文章は伸びない。役を変えて、辛口を引き出す。</p>
+        <pre>あなたは口の悪い名物編集者です。
+下の原稿を、辛口で講評して。
+
+# 観点
+- 導入のフックは効いているか
+- 主張は1つに絞れているか
+- 具体例は足りているか
+- 結論は記憶に残るか
+- 読み終えた後の感情
+
+各観点に「○ / × / 直すなら」の3行で。
+忖度はいらない。<span class="ph">直すべき1箇所</span> だけ赤字で。
+
+# 原稿
+<span class="ph">[ここに原稿]</span></pre>
+      </div>
+
+      <div class="tmpl t-pink">
+        <span class="tmpl-tag">REUSE</span>
+        <h3>⑥ 横展開する</h3>
+        <p class="when">1本書いたら、媒体を変えて何度も収穫する。書くたびに肉付けされていく。</p>
+        <pre>下のブログ記事を、別フォーマットへ展開して：
+
+1. X(Twitter)スレッド 4投稿（各140字）
+2. メルマガ冒頭 200字
+3. プレゼン1枚（タイトル＋3行）
+4. LinkedIn投稿 5行
+5. 社内Slack向け 3行サマリ
+
+# ルール
+- 各媒体の作法に合わせて
+- 主張のいちばん強い1行は <span class="ph">全部に</span> 残す
+- 媒体ごとに「捨てた要素」を1つ書いて
+
+# 原文
+<span class="ph">[ここに記事]</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 STRENGTHS -->
+  <section class="strengths">
+    <div class="section-head">
+      <div class="section-num" style="background: var(--green); color: var(--paper); transform: rotate(1.5deg);">04</div>
+      <h2>書く現場での得意・不得意</h2>
+      <p class="lead">Claudeは万能の書き手ではない。とくに「書く」は人間の領分が大きい。だから付き合い方が肝心。</p>
+    </div>
+
+    <div class="sg">
+      <div class="sg-col good">
+        <h3><span class="badge">◯</span>得意なこと</h3>
+        <div class="sub">CLAUDE WRITES — 任せて速い領域</div>
+        <ul>
+          <li>叩き台の量産<small>白紙からの最初の30分を、ほぼ消してくれる</small></li>
+          <li>構成の組み替え<small>「H2を5つから3つに」「順番を入れ替えて」が一瞬</small></li>
+          <li>言い換え・別案出し<small>「もう少しやさしく」「もっと硬く」が無限にやれる</small></li>
+          <li>削る・短くする<small>長文を3行・1行に圧縮するのが極めて得意</small></li>
+          <li>翻訳とリライト<small>直訳→意訳→自分の文体への3段階移植</small></li>
+          <li>校正と整合チェック<small>てにをは・敬語・固有名詞の表記揺れ</small></li>
+          <li>役を変えての批評<small>「厳しめ編集者」「初学者の読者」など、視点を借りられる</small></li>
+        </ul>
+      </div>
+
+      <div class="sg-col bad">
+        <h3><span class="badge">△</span>苦手なこと（人がやる）</h3>
+        <div class="sub">YOU WRITE — 譲ってはいけない領域</div>
+        <ul>
+          <li>原体験を語ること<small>本当に自分が見た風景・触れた肌触り・痛みは、本人にしか書けない</small></li>
+          <li>固有名詞と最新情報<small>学習以降のことは知らない・人や店の細部は確認が必要</small></li>
+          <li>「振り切り」の判断<small>無難な平均点を出すのは得意。尖らせるのは人が決める</small></li>
+          <li>本人の声色を最初から持つこと<small>お手本を渡してはじめて近づく。最初の数行は人が書く</small></li>
+          <li>事実関係の最終責任<small>もっともらしく嘘を書くことがある。固有名詞は必ず確認</small></li>
+          <li>「書かないほうがいい」判断<small>頼まれれば書く。書かないという編集判断は人の仕事</small></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 RHYTHM -->
+  <section class="rhythm">
+    <div class="tape"></div>
+    <div class="rhythm-head">
+      <span class="num">05 / RHYTHM</span>
+      <h2>書く往復、ひと呼吸の例。</h2>
+    </div>
+
+    <div class="turns">
+      <div class="turn me">
+        <div class="who">あなた</div>
+        <div class="said">「『書くのが苦しい人へ』というタイトルでエッセイを書きたい。まず構成案だけ。読了3分。」</div>
+        <div class="arrow">→</div>
+      </div>
+      <div class="turn cl">
+        <div class="who">Claude</div>
+        <div class="said">H2を5つ提案。各見出しに要点を3行ずつ添えて返す。</div>
+        <div class="arrow">→</div>
+      </div>
+      <div class="turn me">
+        <div class="who">あなた</div>
+        <div class="said">「3番だけ違う気がする。『書く前に整える』に差し替えて、順番も2→4→3→5→1にして。」</div>
+        <div class="arrow">→</div>
+      </div>
+      <div class="turn cl">
+        <div class="who">Claude</div>
+        <div class="said">差し替え＆並び替え版を提示。「順番が変わったことで、結論の重みが増しました」と1行コメント付き。</div>
+      </div>
+    </div>
+
+    <p style="margin-top: 22px; font-size: 14px; color: var(--ink-soft); font-weight: 600; line-height: 1.65;">
+      <b style="font-family:'Kaisei Decol',serif; color: var(--ink);">✎ コツ</b>
+      ・本文を書く前に、必ず構成だけで一度合意する。
+      ・気に入らない見出しは「番号で名指し」して直す。
+      ・並び替えはClaudeに頼んでもいいが、最終判断は自分の感覚で。
+    </p>
+  </section>
+
+  <footer>
+    <div>AlignLab / creator-system &nbsp;◆&nbsp; Claude Writing Cookbook</div>
+    <div class="page-num">P. 03</div>
+  </footer>
+
+</div>
+
+</body>
+</html>
