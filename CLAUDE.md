@@ -12,12 +12,12 @@
 ## Purpose
 
 - 自分用の技術ハブとして機能させる
-- ALIGN_Lab の理念・制作を支える技術・運用知識を蓄積する
+- Claude を使う方法論・公開情報の整理を蓄積する
 - 外出中でも Claude に非同期で更新を依頼できる基盤にする
 - 必要に応じて Codex でも同じ構造を理解できる状態を保つ
 - 複数のセッション（Claude / Codex の並走）が同時稼働しても破綻しないこと
 
-このハブは公開リポジトリです（外部から見られても問題ない設計）。一方で参照する `ALIGN_Lab` 本体は非公開・ローカル運用なので、このハブ内に取り込んだ抜粋（`foundations/align-lab-context.html`）でコンテキストを担保しています。
+このハブは<strong>公開リポジトリ</strong>です（外部から見られても問題ない設計）。`ALIGN_Lab` 本体は<strong>非公開の別レポ</strong>で、本ハブには ALIGN_Lab の中身は書きません。AI セッションが方向性を理解する必要がある時は、ローカルの `../ALIGN_Lab/` を直接参照します。詳細は [`foundations/align-lab-context.html`](foundations/align-lab-context.html) と [ADR-010](foundations/decisions.html#010-align-lab-decouple) を参照。
 
 ---
 
@@ -26,7 +26,7 @@
 1. このファイル（**CLAUDE.md**）
 2. **[foundations/onboarding-checklist.html](foundations/onboarding-checklist.html)** — 最初の10分の具体ステップ（Phase A: git 確認 / Phase B: 必読チェック / Phase C: 過去判断確認）
 3. **[foundations/multi-instance-protocol.html](foundations/multi-instance-protocol.html)** — 並走セッションの作法（並走は常態）
-4. [foundations/align-lab-context.html](foundations/align-lab-context.html) — ALIGN Lab のミッション・資産・AI協働方針
+4. [foundations/align-lab-context.html](foundations/align-lab-context.html) — ALIGN_Lab 道しるべ（非公開別レポへのポインタ）
 5. [foundations/agent-protocol.html](foundations/agent-protocol.html) — エージェントとして作業する際のプロトコル・ルール
 6. [logs/next-actions.html](logs/next-actions.html) — 直近の TODO と優先タスク
 7. [logs/hub-health.html](logs/hub-health.html) — ハブ全体の鮮度・ALERT 確認
@@ -158,9 +158,11 @@
 
 ## ALIGN_Lab との関係
 
-ALIGN_Lab 本体レポジトリは<strong>非公開・ローカル運用</strong>で、このマシンには pull されていません。本ハブ内では `foundations/align-lab-context.html`（154行）で ALIGN_Lab のミッション・データ資産・役割分担を抜粋しており、それで本ハブの作業に必要なコンテキストは担保されます。
+ALIGN_Lab は<strong>非公開の別レポ</strong>で、作品・IP コンテンツ・戦略・固有資産が置かれています。本ハブには ALIGN_Lab の中身を直接書きません。
 
-ALIGN_Lab 本体の更新が必要な作業（戦略再整合・ALIGN_Lab 側の機能と紐付くタスク）は、別マシン（ALIGN_Lab がローカルにあるマシン）で実行することを前提とします。
+AI セッション（Claude / Codex）が方向性を理解する必要がある時は、ローカルの `../ALIGN_Lab/` を sibling フォルダとして参照します（読むだけ）。存在しなければ `git clone https://github.com/alignlabai-rgb/ALIGN_Lab.git` で取得。
+
+詳細・運用ワークフローは [foundations/align-lab-context.html](foundations/align-lab-context.html)、決定経緯は [ADR-010](foundations/decisions.html#010-align-lab-decouple) を参照。
 
 ---
 

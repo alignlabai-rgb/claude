@@ -94,6 +94,7 @@
         <li><a href="#007-creator-spotlight"><span class="num">ADR-007</span> Creator System を spotlight 表示にする<span class="date">2026-05-25</span></a></li>
         <li><a href="#008-trend-articles"><span class="num">ADR-008</span> Industry Trends の6記事を一気に立ち上げる<span class="date">2026-05-26</span></a></li>
         <li><a href="#009-claude-design-workflow"><span class="num">ADR-009</span> Claude Design の出力受け入れフォルダと standalone 除外運用<span class="date">2026-05-26</span></a></li>
+        <li><a href="#010-align-lab-decouple"><span class="num">ADR-010</span> ALIGN_Lab を道しるべ化、Hub は方法論ハブに純化<span class="date">2026-05-26</span></a></li>
       </ul>
     </div>
 
@@ -274,6 +275,45 @@
           <li>+ 今後の Claude Design 出力も同パターンで受け入れ可能</li>
           <li>− standalone 版は配布が必要なたびに再生成が必要（受け入れ）</li>
           <li>− ファイル名が日本語＋アンダースコア形式で、shell からの操作が一部やりにくい（受け入れ。Windows パス指定や PowerShell で対処可能）</li>
+        </ul>
+      </div>
+    </div>
+
+      <div class="adr" id="010-align-lab-decouple">
+        <h3>ADR-010: ALIGN_Lab を道しるべ化、Hub は方法論ハブに純化</h3>
+        <div class="meta"><span class="status accepted">ACCEPTED</span> 2026-05-26</div>
+
+        <h4>Context（背景）</h4>
+        <p>これまで Claude Hub の <code>foundations/align-lab-context.html</code>（154行）には ALIGN_Lab のミッション・データ資産・役割分担を厚めに紹介していた。トップ index の Hero quicklinks にも <code>../ALIGN_Lab/index.html</code> へのリンクがあり、CLAUDE.md・各 index・Q2 review でも ALIGN_Lab に多数言及。</p>
+        <p>ところが ALIGN_Lab を clone して中身を確認したところ、ALIGN_Lab は<strong>哲学的知識を IP コンテンツ化する事業</strong>で、キャラクター IP・戦略文書・固有資産が並ぶ非公開リポであることが判明。これらは商品候補であり、Claude Hub（公開リポ）に抜粋を書き続けると IP 露出リスクが高まる。</p>
+        <p>同時に、Claude Hub の性格は「<strong>Claude を使うノウハウは結局のところ公開情報の整理に過ぎず、商品作成に支障はない</strong>」というユーザーの整理により、<strong>方法論ハブとして純化</strong>すべきと判断された。</p>
+
+        <h4>Decision（決定）</h4>
+        <ol>
+          <li><strong>Claude Hub は ALIGN_Lab の中身を書かない</strong> — 中身の抜粋・要約・戦略言及はすべて Claude Hub から撤去。残すのは「道しるべ的存在感」のみ</li>
+          <li><strong><code>align-lab-context.html</code> を道しるべ化</strong> — 154行 → 約 80行に圧縮。役割分担と AI セッションのローカル参照ワークフローのみ記述</li>
+          <li><strong>AI セッションの参照ワークフロー確立</strong> — Onboarding Checklist Phase B に「<code>ls ../ALIGN_Lab/</code> 確認 → あれば直接読む（書かない）／なければ clone」のステップを追加</li>
+          <li><strong>「AlignLab Note」呼称を Studio Notes にリブランド</strong> — Claude Design 制作物の書架名を Studio Notes に変更し、AlignLab ブランドを Claude Hub の表に出さない</li>
+          <li><strong>Hero quicklink の <code>../ALIGN_Lab/index.html</code> を <code>foundations/align-lab-context.html</code> に振替</strong> — 公開URLで 404 にならないようにし、道しるべページへ誘導</li>
+          <li><strong>既存の重い言及を整理</strong> — CLAUDE.md・各 index・Q2 review・next-actions の ALIGN_Lab 言及を「道しるべ的最小言及」に統一</li>
+        </ol>
+
+        <h4>Consequences（結果）</h4>
+        <ul>
+          <li>+ <strong>IP 露出リスクの大幅低減</strong> — 哲学者キャラクター名・戦略・ターゲット情報などが Claude Hub に書かれない</li>
+          <li>+ <strong>Claude Hub のアイデンティティが明確</strong> — 「Claude をどう使うか」の方法論ハブとして純化、外部から見ても何のハブか分かりやすい</li>
+          <li>+ <strong>AI セッションは必要時にだけ ALIGN_Lab を参照</strong> — sibling フォルダから直接読むので情報の鮮度も担保</li>
+          <li>+ <strong>Studio Notes ブランドで Note シリーズの汎用性が増す</strong> — AlignLab に紐づかない出版インプリントとして育つ余地</li>
+          <li>− <strong>ALIGN_Lab がローカルにない PC では方向性把握ができない</strong> — Creator System 深化作業は ALIGN_Lab を clone してから行う必要がある（Onboarding で誘導）</li>
+          <li>− <strong>過去の「ALIGN_Lab 接続再整理」Q3 タスクは性質が変わった</strong> — 「接続再整理」ではなく「ローカル参照運用の観察」へ書き換え</li>
+        </ul>
+
+        <h4>関連</h4>
+        <ul>
+          <li><a href="align-lab-context.html">align-lab-context.html</a>（道しるべ化後）</li>
+          <li><a href="onboarding-checklist.html">Onboarding Checklist Phase B (3b)</a></li>
+          <li><a href="#001-llm-hub-spinoff">ADR-001</a>（公開ハブとしての性格決定）</li>
+          <li><a href="#009-claude-design-workflow">ADR-009</a>（Claude Design 運用、Studio Notes リブランドはこの拡張）</li>
         </ul>
       </div>
     </div>
