@@ -3,155 +3,468 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Claude Design 制作物アーカイブ | Creator System</title>
+  <title>AlignLab Note 書架 — Claude Design シリーズ | Creator System</title>
   <style>
     body { font-family: "Segoe UI", "Noto Sans JP", system-ui, sans-serif; margin: 0; background: #0b1220; color: #edf2fb; line-height: 1.7; padding: 28px 18px 56px; }
-    .shell { max-width: 1100px; margin: 0 auto; display: grid; gap: 18px; }
+    .shell { max-width: 1180px; margin: 0 auto; display: grid; gap: 20px; }
     .panel { background: #111a2b; border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 22px 24px; }
     a { color: #75d7c0; }
-    h1, h2, h3 { margin: 0 0 10px; }
-    h2 { color: #fcd34d; font-size: 1.15rem; border-bottom: 2px solid rgba(244,184,96,0.25); padding-bottom: 6px; margin-bottom: 14px; }
-    h3 { color: #75d7c0; font-size: 1rem; margin: 14px 0 6px; }
+    h1, h2, h3, h4 { margin: 0 0 10px; }
     p, li { color: #c5d0e3; }
     code { font-family: "Fira Code", "Consolas", monospace; background: rgba(255,255,255,0.06); padding: 1px 6px; border-radius: 5px; font-size: 0.86em; color: #a5f3d0; }
+    .small { font-size: 0.84rem; color: #7f92ac; }
 
-    .doc-list { display: grid; grid-template-columns: 1fr; gap: 10px; }
-    .doc {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 12px;
-      padding: 14px 18px;
+    /* ─── 巻ヘッダー ─── */
+    .vol-header {
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 6px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid rgba(255,255,255,0.08);
     }
-    .doc h3 { color: #edf2fb; font-size: 1rem; margin-bottom: 4px; }
-    .doc h3 a { color: #75d7c0; text-decoration: none; }
-    .doc h3 a:hover { text-decoration: underline; }
-    .doc .meta { font-size: 0.78rem; color: #7f92ac; margin-bottom: 8px; letter-spacing: 0.03em; }
-    .doc .meta .pill {
+    .vol-badge {
       display: inline-block;
-      padding: 2px 8px;
-      border-radius: 5px;
-      font-weight: 700;
-      margin-right: 6px;
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-weight: 800;
+      font-size: 0.82rem;
+      letter-spacing: 0.06em;
+      font-family: "Fira Code", "Consolas", monospace;
+    }
+    .vol-badge.v1 { background: rgba(244,184,96,0.18); color: #fcd34d; border: 1px solid rgba(244,184,96,0.35); }
+    .vol-badge.v2 { background: rgba(102,224,194,0.18); color: #66e0c2; border: 1px solid rgba(102,224,194,0.35); }
+    .vol-badge.v3 { background: rgba(167,139,250,0.18); color: #d8b4fe; border: 1px solid rgba(167,139,250,0.35); }
+    .vol-title { font-size: 1.3rem; color: #edf2fb; font-weight: 700; margin: 0; }
+    .vol-status { color: #7f92ac; font-size: 0.82rem; margin-left: auto; }
+    .vol-theme { color: #c5d0e3; font-size: 0.9rem; width: 100%; margin-top: 4px; }
+
+    /* ─── 章カードグリッド ─── */
+    .chapter-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .chapter {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      position: relative;
+      transition: border-color 0.15s, transform 0.15s;
+    }
+    .chapter:hover { transform: translateY(-2px); }
+
+    /* テーマカラー帯（上端の細い色帯） */
+    .chapter::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 16px;
+      right: 16px;
+      height: 3px;
+      border-radius: 0 0 3px 3px;
+      background: var(--accent, #66e0c2);
+    }
+    .chapter.c-yellow  { --accent: #FFD23F; }
+    .chapter.c-red     { --accent: #E63946; }
+    .chapter.c-blue    { --accent: #3B82C4; }
+    .chapter.c-orange  { --accent: #F2994A; }
+    .chapter.c-gray    { --accent: #8a8a96; }
+    .chapter.c-green   { --accent: #5BA84A; }
+    .chapter.c-purple  { --accent: #8B5CB6; }
+    .chapter.c-pink    { --accent: #F4B6C2; }
+    .chapter.c-empty   { --accent: rgba(167,139,250,0.4); border-style: dashed; background: rgba(167,139,250,0.04); }
+
+    .chapter .pnum {
+      font-family: "Fira Code", "Consolas", monospace;
+      font-weight: 800;
+      color: var(--accent);
+      font-size: 0.84rem;
+      letter-spacing: 0.06em;
+      margin-top: 4px;
+    }
+    .chapter h4 {
+      color: #edf2fb;
+      font-size: 1rem;
+      margin: 2px 0;
+    }
+    .chapter h4 a {
+      color: #edf2fb;
+      text-decoration: none;
+    }
+    .chapter h4 a:hover { text-decoration: underline; color: var(--accent); }
+    .chapter .sub { color: #b6c3da; font-size: 0.82rem; line-height: 1.45; }
+    .chapter .gist { color: #7f92ac; font-size: 0.78rem; margin-top: auto; padding-top: 4px; }
+    .chapter .status {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 0.66rem;
+      font-weight: 800;
       letter-spacing: 0.04em;
       text-transform: uppercase;
-      font-size: 0.7rem;
+      align-self: flex-start;
     }
-    .pill.video    { background: rgba(247,168,122,0.18); color: #fdba74; }
-    .pill.manga    { background: rgba(167,139,250,0.18); color: #d8b4fe; }
-    .pill.eval     { background: rgba(244,184,96,0.18); color: #fcd34d; }
-    .pill.money    { background: rgba(79,255,176,0.16); color: #4FFFB0; }
-    .pill.cross    { background: rgba(96,208,255,0.16); color: #7dd3fc; }
-    .pill.foundation { background: rgba(102,224,194,0.18); color: #66e0c2; }
-    .pill.risk     { background: rgba(255,107,107,0.18); color: #ff7070; }
-    .doc p { font-size: 0.9rem; margin: 4px 0; }
-    .doc .map { color: #7f92ac; font-size: 0.85rem; margin-top: 6px; }
-    .doc .map strong { color: #c5d0e3; }
+    .status.done    { background: rgba(79,255,176,0.16); color: #4FFFB0; }
+    .status.pending { background: rgba(244,184,96,0.18); color: #fcd34d; }
+    .status.tbd     { background: rgba(167,139,250,0.18); color: #d8b4fe; }
 
-    .ops-box {
-      background: rgba(102,224,194,0.05);
-      border: 1px solid rgba(102,224,194,0.22);
-      border-radius: 10px;
-      padding: 14px 16px;
-      margin: 10px 0;
+    /* ─── 来週メモ ─── */
+    .memo {
+      background: linear-gradient(135deg, rgba(244,184,96,0.08), rgba(102,224,194,0.05));
+      border: 1px solid rgba(244,184,96,0.3);
+      border-radius: 14px;
+      padding: 18px 22px;
     }
-    .ops-box strong { color: #3dd8c5; }
-    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
-    th { text-align: left; padding: 10px 12px; color: #f4b860; border-bottom: 2px solid rgba(244,184,96,0.3); font-size: 0.8rem; letter-spacing: 0.04em; text-transform: uppercase; }
+    .memo h2 {
+      color: #fcd34d;
+      border-bottom: none;
+      padding-bottom: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .memo h2::before { content: "📌"; }
+    .memo h3 { color: #f4b860; font-size: 0.96rem; margin-top: 14px; }
+    .memo ol, .memo ul { margin: 6px 0 10px; padding-left: 22px; }
+    .memo li { font-size: 0.9rem; margin-bottom: 4px; }
+    .memo pre {
+      background: rgba(0,0,0,0.4);
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      color: #c5d0e3;
+      overflow-x: auto;
+      border-left: 3px solid #fcd34d;
+      margin: 6px 0;
+    }
+
+    /* ─── 通常 h2 ─── */
+    h2.section-title {
+      color: #fcd34d;
+      font-size: 1.15rem;
+      border-bottom: 2px solid rgba(244,184,96,0.25);
+      padding-bottom: 6px;
+      margin-bottom: 14px;
+    }
+
+    /* ─── パイプライン対応マップ（補助） ─── */
+    table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+    th { text-align: left; padding: 10px 12px; color: #f4b860; border-bottom: 2px solid rgba(244,184,96,0.3); font-size: 0.78rem; letter-spacing: 0.04em; text-transform: uppercase; }
     td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-    .small { font-size: 0.84rem; color: #7f92ac; }
   </style>
 </head>
 <body>
   <div class="shell">
+
+    <!-- ─── ヒーロー ─── -->
     <div class="panel">
       <p><a href="../index.html">← Creator System</a> / <a href="../../index.html">Hub Top</a></p>
-      <h1>Claude Design 制作物アーカイブ</h1>
+      <h1>AlignLab Note 書架</h1>
       <p>
-        <strong>Claude Design</strong>（Anthropic Labs の Research Preview プロダクト、2026-04-17 GA）に作ってもらった、
-        Creator System の素材コンテンツを格納するフォルダです。各ファイルは特定の制作テーマに沿って書かれており、
-        既存の動画パイプライン・漫画パイプライン・評価・マネタイズへの<strong>素材源</strong>として活用します。
+        <strong>Claude Design</strong>（Anthropic Labs 製、2026-04-17 GA）で制作している
+        AlignLab の自製シリーズ書 <strong>「AlignLab Note」</strong> の書架です。
+        Creator System の素材源かつ、Claude を創作にどう編み込むかの実例集として運用します。
       </p>
-      <p class="small">最終更新: 2026-05-26 / 初期素材 8 ファイル投入時点</p>
+      <p>
+        現状は <strong>VOL.1（完結・5章）＋ VOL.2（進行中・3/5章）</strong>の構成。
+        VOL.1 が「<em>始め方</em>」、VOL.2 が「<em>続け方・広げ方</em>」を扱い、各章ごとにテーマカラーを変えた zine ライクな造本になっています。
+      </p>
+      <p class="small">最終更新: 2026-05-26 / 次回更新予定: 2026-06-01 以降（Claude Design usage limit リセット後）</p>
     </div>
 
+    <!-- ─── VOL.1 書架 ─── -->
     <div class="panel">
-      <h2>素材ドキュメント一覧（8 ファイル）</h2>
-      <p class="small">各ドキュメントは <strong>「Claudeで○○する」「Claudeと○○する」「Claudeとはたらく」</strong> のネーミング規則。
-      テーマ ⇄ 既存パイプラインの対応を併記しています。</p>
+      <div class="vol-header">
+        <span class="vol-badge v1">VOL.1</span>
+        <h2 class="vol-title">Claudeで始める個人の創作</h2>
+        <span class="vol-status">完結 ✅ 5/5 章</span>
+        <p class="vol-theme">テーマ: <strong>個人の創作に Claude をどう編み込むか</strong>。全体地図 → 深掘り×2 → メタ → 反省の流れで、Claude を制作プロセスに組み込む「始め方」を扱う巻。</p>
+      </div>
 
-      <div class="doc-list">
-        <div class="doc">
-          <div class="meta"><span class="pill cross">横断・基礎</span></div>
-          <h3><a href="Claudeでつくる_クリエイティブ・ワークフロー大全.html">Claudeでつくる｜クリエイティブ・ワークフロー大全</a></h3>
-          <p>Creator System 全体を貫く<strong>クリエイティブワークフローの総論</strong>。各論ドキュメントへの入口的位置づけ。</p>
-          <div class="map">→ <strong>creator-system/index.html</strong> / <a href="../spec.html">spec.html</a> の補強素材</div>
+      <div class="chapter-grid">
+
+        <div class="chapter c-yellow">
+          <span class="status done">完成</span>
+          <div class="pnum">P.01</div>
+          <h4><a href="Claudeでつくる_クリエイティブ・ワークフロー大全.html">Claudeでつくる</a></h4>
+          <div class="sub">クリエイティブ・ワークフロー大全</div>
+          <div class="gist">シリーズの全体地図。各章への入口・全体観を提供。</div>
         </div>
 
-        <div class="doc">
-          <div class="meta"><span class="pill foundation">基礎・対話</span></div>
-          <h3><a href="Claudeと対話する_会話の作法.html">Claudeと対話する｜会話の作法</a></h3>
-          <p>Claude との対話・プロンプト設計の基礎。<strong>全パイプラインに横断的に効く</strong>会話設計論。</p>
-          <div class="map">→ 動画・漫画・評価の各パイプライン共通の前提知識</div>
+        <div class="chapter c-red">
+          <span class="status done">完成</span>
+          <div class="pnum">P.02</div>
+          <h4><a href="Claudeでデザインする_実例とプロンプトの教科書.html">Claudeでデザインする</a></h4>
+          <div class="sub">実例とプロンプトの教科書</div>
+          <div class="gist">ビジュアル・コマ割・配色などデザイン領域の深掘り。</div>
         </div>
 
-        <div class="doc">
-          <div class="meta"><span class="pill video">動画</span><span class="pill manga">漫画</span></div>
-          <h3><a href="Claudeで書く_ライティング実例集.html">Claudeで書く｜ライティング実例集</a></h3>
-          <p>原稿・脚本・ナレーション・台詞などの<strong>テキスト生成段</strong>の実例集。</p>
-          <div class="map">→ <a href="../video-pipeline.html">video-pipeline.html</a> の原稿生成段 / <a href="../manga-pipeline.html">manga-pipeline.html</a> の台詞段</div>
+        <div class="chapter c-blue">
+          <span class="status done">完成</span>
+          <div class="pnum">P.03</div>
+          <h4><a href="Claudeで書く_ライティング実例集.html">Claudeで書く</a></h4>
+          <div class="sub">ライティング実例集</div>
+          <div class="gist">原稿・脚本・ナレーションなどテキスト生成の深掘り。</div>
         </div>
 
-        <div class="doc">
-          <div class="meta"><span class="pill manga">漫画</span></div>
-          <h3><a href="Claudeでデザインする_実例とプロンプトの教科書.html">Claudeでデザインする｜実例とプロンプトの教科書</a></h3>
-          <p>ビジュアル生成・キャラクター・コマ割り・配色設計など、<strong>デザイン領域</strong>の実例とプロンプト集。</p>
-          <div class="map">→ <a href="../manga-pipeline.html">manga-pipeline.html</a> のビジュアル段</div>
+        <div class="chapter c-orange">
+          <span class="status done">完成</span>
+          <div class="pnum">P.04</div>
+          <h4><a href="Claudeと対話する_会話の作法.html">Claudeと対話する</a></h4>
+          <div class="sub">会話の作法</div>
+          <div class="gist">プロンプト設計・対話術。全章に横断的に効くメタ章。</div>
         </div>
 
-        <div class="doc">
-          <div class="meta"><span class="pill video">動画</span></div>
-          <h3><a href="Claudeで動かす_動画とモーションの実例集.html">Claudeで動かす｜動画とモーションの実例集</a></h3>
-          <p>動画生成・モーション・編集の<strong>動画パイプライン本体</strong>素材。</p>
-          <div class="map">→ <a href="../video-pipeline.html">video-pipeline.html</a> 本体素材</div>
+        <div class="chapter c-gray">
+          <span class="status done">完成</span>
+          <div class="pnum">P.05</div>
+          <h4><a href="Claudeでしくじる_落とし穴とアンチパターン.html">Claudeでしくじる</a></h4>
+          <div class="sub">落とし穴とアンチパターン</div>
+          <div class="gist">失敗事例の反省編。「ALIGNLAB NOTE — VOL.1」明記の締め章。</div>
         </div>
 
-        <div class="doc">
-          <div class="meta"><span class="pill eval">評価</span><span class="pill money">マネタイズ</span></div>
-          <h3><a href="Claudeで仕組み化する_反復と継続の設計.html">Claudeで仕組み化する｜反復と継続の設計</a></h3>
-          <p>反復生成・継続評価・自動化の設計論。<strong>評価選別とマネタイズ</strong>の両方に効く。</p>
-          <div class="map">→ <a href="../evaluation.html">evaluation.html</a> / <a href="../monetization.html">monetization.html</a></div>
+      </div>
+    </div>
+
+    <!-- ─── VOL.2 書架 ─── -->
+    <div class="panel">
+      <div class="vol-header">
+        <span class="vol-badge v2">VOL.2</span>
+        <h2 class="vol-title">Claudeで拡がる</h2>
+        <span class="vol-status">進行中 🚧 3/5 章</span>
+        <p class="vol-theme">テーマ: <strong>個人創作から「続ける・広げる・任せる」へスケールアウト</strong>。VOL.1 が「始め方」だったのに対し、VOL.2 は「続け方・広げ方」を扱う続編。VOL.1 で残した宿題（動画・モーション）の回収も含む。</p>
+      </div>
+
+      <div class="chapter-grid">
+
+        <div class="chapter c-orange">
+          <span class="status done">完成</span>
+          <div class="pnum">VOL.2 P.01</div>
+          <h4><a href="Claudeで動かす_動画とモーションの実例集.html">Claudeで動かす</a></h4>
+          <div class="sub">動画とモーションの実例集</div>
+          <div class="gist">10カテゴリ / 実例4本 / プロンプト6つ / 5段パイプライン。VOL.1 の宿題回収。</div>
         </div>
 
-        <div class="doc">
-          <div class="meta"><span class="pill cross">チーム運用</span></div>
-          <h3><a href="Claudeとはたらく_チームと共有の作法.html">Claudeとはたらく｜チームと共有の作法</a></h3>
-          <p>Cowork・チーム運用・共有・権限管理の作法。<strong>運用フェーズ</strong>の素材。</p>
-          <div class="map">→ <a href="../spec.html">spec.html</a> / <a href="../../workbench/knowledge/claude-code/cowork.html">claude-code/cowork.html</a></div>
+        <div class="chapter c-green">
+          <span class="status done">完成</span>
+          <div class="pnum">VOL.2 P.02</div>
+          <h4><a href="Claudeで仕組み化する_反復と継続の設計.html">Claudeで仕組み化する</a></h4>
+          <div class="sub">反復と継続の設計</div>
+          <div class="gist">Projects・テンプレ・自動化。礎/型/役/蔵/復/検/規/継/録/観の10カテゴリ。</div>
         </div>
 
-        <div class="doc">
-          <div class="meta"><span class="pill risk">失敗集</span></div>
-          <h3><a href="Claudeでしくじる_落とし穴とアンチパターン.html">Claudeでしくじる｜落とし穴とアンチパターン</a></h3>
-          <p>Claude を使った制作で陥りがちな失敗・アンチパターン集。<strong>制作領域の anti-patterns</strong>として独立。</p>
-          <div class="map">→ <a href="../../foundations/anti-patterns.html">foundations/anti-patterns.html</a> の制作版として併存</div>
+        <div class="chapter c-blue">
+          <span class="status done">完成</span>
+          <div class="pnum">VOL.2 P.03</div>
+          <h4><a href="Claudeとはたらく_チームと共有の作法.html">Claudeとはたらく</a></h4>
+          <div class="sub">チームと共有の作法</div>
+          <div class="gist">Cowork・引き継ぎ・社内導入。実例4本 + テンプレ + 段階導入ステップ。</div>
+        </div>
+
+        <div class="chapter c-yellow c-empty">
+          <span class="status pending">未刊</span>
+          <div class="pnum">VOL.2 P.04</div>
+          <h4>Claudeで100本</h4>
+          <div class="sub">100の具体ユースケースを辞典的に列挙</div>
+          <div class="gist">来週 Claude Design 制作予定（usage limit リセット 6/1 以降）</div>
+        </div>
+
+        <div class="chapter c-purple c-empty">
+          <span class="status pending">未刊</span>
+          <div class="pnum">VOL.2 P.05</div>
+          <h4>Claudeで続ける</h4>
+          <div class="sub">連載・1冊の本・長期プロジェクトの走らせ方</div>
+          <div class="gist">来週 Claude Design 制作予定（VOL.2 完結章）</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ─── VOL.3 候補（構想中） ─── -->
+    <div class="panel">
+      <div class="vol-header">
+        <span class="vol-badge v3">VOL.3</span>
+        <h2 class="vol-title">（タイトル未定）</h2>
+        <span class="vol-status">構想中 ✏️ 0/5 章</span>
+        <p class="vol-theme">VOL.1 = 始め方・VOL.2 = 拡げ方 と来た流れを踏まえ、第3巻の方向性を VOL.2 完結後に決定。次セッションで候補3案を提示予定。</p>
+      </div>
+
+      <div class="chapter-grid">
+        <div class="chapter c-empty">
+          <span class="status tbd">未定</span>
+          <div class="pnum">VOL.3 P.01</div>
+          <h4>—</h4>
+          <div class="sub">構想中</div>
+        </div>
+        <div class="chapter c-empty">
+          <span class="status tbd">未定</span>
+          <div class="pnum">VOL.3 P.02</div>
+          <h4>—</h4>
+          <div class="sub">構想中</div>
+        </div>
+        <div class="chapter c-empty">
+          <span class="status tbd">未定</span>
+          <div class="pnum">VOL.3 P.03</div>
+          <h4>—</h4>
+          <div class="sub">構想中</div>
+        </div>
+        <div class="chapter c-empty">
+          <span class="status tbd">未定</span>
+          <div class="pnum">VOL.3 P.04</div>
+          <h4>—</h4>
+          <div class="sub">構想中</div>
+        </div>
+        <div class="chapter c-empty">
+          <span class="status tbd">未定</span>
+          <div class="pnum">VOL.3 P.05</div>
+          <h4>—</h4>
+          <div class="sub">構想中</div>
         </div>
       </div>
     </div>
 
+    <!-- ─── 来週の作業メモ ─── -->
+    <div class="panel memo">
+      <h2>来週の作業メモ（2026-06-01 以降）</h2>
+      <p class="small" style="color:#c5d0e3;">Claude Design の usage limit が <strong>6/1（月）</strong> にリセットされる。リセット後、以下の順番で進める。</p>
+
+      <h3>① VOL.2 P.04「Claudeで100本」生成</h3>
+      <p>ユーザーが Claude Design に投げるプロンプト（Claude 側で準備）:</p>
+      <pre>VOL.2 CH.04「Claudeで100本」、いきます。
+テーマカラーは yellow 寄り（辞典・蓄積・厚み）にして、
+視覚モチーフは付箋／カード／インデックスに振ります。
+
+収録方針:
+- 100 の具体ユースケースを <strong>辞典的</strong>に列挙
+- VOL.1 / VOL.2 P.01〜P.03 で扱った領域から横断的に拾う
+- 1ユースケース = タイトル + 30〜60字の説明 + 推奨プロンプト1行
+- 10カテゴリ × 10ケース、または 5カテゴリ × 20ケース のグリッド設計
+- 巻末に「自分の100本リストを作るテンプレ」</pre>
+
+      <h3>② VOL.2 P.05「Claudeで続ける」生成</h3>
+      <p>VOL.2 締めの章。プロンプト案:</p>
+      <pre>VOL.2 CH.05「Claudeで続ける」、いきます。
+テーマカラーは purple 寄り（持続・蓄積・年輪）にして、
+視覚モチーフは年表／積層／灯台 に振ります。
+
+収録方針:
+- 連載・1冊の本・長期プロジェクトの「走らせ方」
+- 1日のリズム → 1週間のリズム → 1ヶ月 → 1年の入れ子構造
+- 続かない原因（飽き・成果不明・燃え尽き）と Claude での処方
+- 実例3-4本（連載ブログ / 1冊の本 / 動画チャンネル / 業務日誌）
+- 「ALIGNLAB NOTE — VOL.2」明記の締め
+- VOL.1 P.05 と並列に置ける「反省ではなく持続」の対の章</pre>
+
+      <h3>③ VOL.2 完結後の作業</h3>
+      <ul>
+        <li>この書架の VOL.2 セクションを「完結 ✅ 5/5 章」に更新</li>
+        <li>新規 2 章を Site Map（<code>foundations/site-map.html</code>）に追記</li>
+        <li>Site Changelog（<code>logs/site-changelog.html</code>）に v1.4 リリースとして記録</li>
+        <li>creator-system パイプライン側に内容反映（特に P.04 100本は video / manga / evaluation に分散吸収）</li>
+      </ul>
+
+      <h3>④ VOL.3 方向性検討（Claude 主導）</h3>
+      <p>VOL.1 = 始め方、VOL.2 = 拡げ方 を踏まえた次の軸。Claude が3案を提示してユーザーが選定する想定:</p>
+      <ul>
+        <li><strong>案 A「Claudeで磨く」</strong> — 深掘り・改稿・推敲。1作品の質を上げる巻</li>
+        <li><strong>案 B「Claudeで挑む」</strong> — 未踏領域・実験・新ジャンル開拓</li>
+        <li><strong>案 C「Claudeで遺す」</strong> — 長期資産化・ライブラリ化・継承</li>
+      </ul>
+      <p class="small">他案: 「Claudeで稼ぐ」「Claudeで集める」「Claudeで対話する（VOL.1 P.04 拡張）」など。VOL.2 完結時に再検討。</p>
+
+      <h3>⑤ 本書架自体のメンテ</h3>
+      <ul>
+        <li>新章が追加されたら、対応する <code>.chapter</code> カードの <code>c-empty</code> を外し、<code>status</code> を <code>done</code> に変更</li>
+        <li>テーマカラーは Claude Design の chapter 内 <code>--primary</code> 等から拾って <code>c-yellow / c-red / c-blue / c-orange / c-green / c-purple / c-pink / c-gray</code> から該当を割り当て</li>
+      </ul>
+
+      <p style="margin-top: 14px; color:#fcd34d; font-weight: 700;">→ このメモは Claude_Design 配下に置いているので、来週セッションで Onboarding Checklist 経由でここに辿り着ける。<code>next-actions.html</code> からもポインタを張ってある。</p>
+    </div>
+
+    <!-- ─── パイプライン対応マップ（補助セクション） ─── -->
     <div class="panel">
-      <h2>Claude Design 運用ルール（ADR-009）</h2>
-      <p>このフォルダは <strong>Claude Design からの新規出力を受け入れる正式な置き場</strong>です。仕組み上 Claude Design は直接既存フォルダに書き込めないため、ユーザーがここに置く → 次回セッションで Claude が整理・統合する、というワークフローを採用します。</p>
+      <h2 class="section-title">既存パイプラインへの対応マップ（補助）</h2>
+      <p class="small">シリーズ書架とは別軸。「特定のパイプライン（動画/漫画/評価/マネタイズ）に効く章はどれか」で引きたい時の早見表。</p>
 
-      <div class="ops-box">
-        <strong>3 ステップワークフロー:</strong>
-        <ol>
-          <li><strong>制作</strong>: ユーザーが Claude Design に依頼。出力は手元の Claude Design 環境に生成される</li>
-          <li><strong>投入</strong>: ユーザーが生成物を <code>creator-system/Claude_Design/</code> 配下に配置（軽量版だけで OK）</li>
-          <li><strong>整理</strong>: 次回 Claude セッションで、ここに新着があるか確認 → このページに索引追加 → 既存パイプラインへの統合提案</li>
-        </ol>
-      </div>
+      <table>
+        <thead>
+          <tr><th>章</th><th>主な対応先</th><th>用途</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>V1 P.01 つくる</td>
+            <td><a href="../index.html">Creator System Top</a> / <a href="../spec.html">spec.html</a></td>
+            <td>全体地図として補強</td>
+          </tr>
+          <tr>
+            <td>V1 P.02 デザインする</td>
+            <td><a href="../manga-pipeline.html">manga-pipeline.html</a></td>
+            <td>ビジュアル段の素材</td>
+          </tr>
+          <tr>
+            <td>V1 P.03 書く</td>
+            <td><a href="../video-pipeline.html">video-pipeline.html</a> / <a href="../manga-pipeline.html">manga-pipeline.html</a></td>
+            <td>原稿・台詞・ナレーション段</td>
+          </tr>
+          <tr>
+            <td>V1 P.04 対話する</td>
+            <td>全パイプライン横断</td>
+            <td>プロンプト設計の前提知識</td>
+          </tr>
+          <tr>
+            <td>V1 P.05 しくじる</td>
+            <td><a href="../../foundations/anti-patterns.html">foundations/anti-patterns.html</a> の制作版</td>
+            <td>失敗パターン補強</td>
+          </tr>
+          <tr>
+            <td>V2 P.01 動かす</td>
+            <td><a href="../video-pipeline.html">video-pipeline.html</a> 本体</td>
+            <td>動画パイプライン素材</td>
+          </tr>
+          <tr>
+            <td>V2 P.02 仕組み化</td>
+            <td><a href="../evaluation.html">evaluation.html</a> / <a href="../monetization.html">monetization.html</a></td>
+            <td>反復評価・自動化の設計</td>
+          </tr>
+          <tr>
+            <td>V2 P.03 はたらく</td>
+            <td><a href="../spec.html">spec.html</a> / <a href="../../workbench/knowledge/claude-code/cowork.html">cowork.html</a></td>
+            <td>チーム運用・Cowork</td>
+          </tr>
+          <tr>
+            <td>V2 P.04 100本（予定）</td>
+            <td>全パイプラインに分散</td>
+            <td>ユースケース辞典として横断参照</td>
+          </tr>
+          <tr>
+            <td>V2 P.05 続ける（予定）</td>
+            <td><a href="../monetization.html">monetization.html</a> / <a href="../../strategy/roadmap.html">strategy/roadmap.html</a></td>
+            <td>長期運用の設計</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-      <h3>軽量版 vs standalone 版の扱い</h3>
+    <!-- ─── 運用ルール ─── -->
+    <div class="panel">
+      <h2 class="section-title">Claude Design 運用ルール（ADR-009）</h2>
+      <p>このフォルダは <strong>Claude Design の出力を受け入れる正式な置き場</strong>。Claude Design は直接既存フォルダに書き込めないため、ユーザーがここに置く → 次回 Claude セッションで整理・統合のワークフロー。</p>
+
+      <h3 style="color:#75d7c0; font-size: 0.96rem; margin: 12px 0 6px;">3 ステップワークフロー</h3>
+      <ol>
+        <li><strong>制作</strong>: ユーザーが Claude Design に依頼。出力は手元の Claude Design 環境に生成</li>
+        <li><strong>投入</strong>: ユーザーが軽量版だけをこのフォルダに配置（standalone 版は不要、<code>.gitignore</code> で除外済）</li>
+        <li><strong>整理</strong>: 次回 Claude セッションでこの書架に章を追加 → ステータス更新 → Site Map と Changelog に反映</li>
+      </ol>
+
+      <h3 style="color:#75d7c0; font-size: 0.96rem; margin: 12px 0 6px;">軽量版 vs standalone 版</h3>
       <table>
         <thead><tr><th>種類</th><th>サイズ目安</th><th>リポへの扱い</th></tr></thead>
         <tbody>
@@ -159,33 +472,20 @@
           <tr><td>standalone 版（重い）</td><td>15-28 MB</td><td><code>.gitignore</code> で除外。配布が必要なら都度ローカルで再生成</td></tr>
         </tbody>
       </table>
-      <p class="small">詳細は <a href="../../foundations/decisions.html#009-claude-design-workflow">ADR-009</a> 参照。</p>
+      <p class="small">詳細: <a href="../../foundations/decisions.html#009-claude-design-workflow">ADR-009</a></p>
     </div>
 
+    <!-- ─── 関連 ─── -->
     <div class="panel">
-      <h2>新規追加時のチェックリスト</h2>
-      <p>新しい Claude Design 出力をここに置いた時、次回セッションで以下を確認:</p>
-      <ul>
-        <li>☐ ファイル名はネーミング規則「Claudeで○○する」「Claudeと○○する」「Claudeとはたらく」に沿っているか</li>
-        <li>☐ standalone 版を誤って commit していないか（<code>.gitignore</code> 効いているか確認）</li>
-        <li>☐ このページの「素材ドキュメント一覧」に索引追加</li>
-        <li>☐ 既存パイプライン（video / manga / evaluation / monetization / spec）への対応マッピング</li>
-        <li>☐ <a href="../../foundations/site-map.html">Site Map</a> の Creator System セクションに追記</li>
-        <li>☐ 必要なら <a href="../../foundations/anti-patterns.html">anti-patterns</a> や用語集に内容を反映</li>
-      </ul>
-    </div>
-
-    <div class="panel">
-      <h2>関連</h2>
+      <h2 class="section-title">関連</h2>
       <ul>
         <li><a href="../index.html">Creator System Top</a></li>
-        <li><a href="../video-pipeline.html">動画パイプライン</a></li>
-        <li><a href="../manga-pipeline.html">漫画パイプライン</a></li>
-        <li><a href="../evaluation.html">評価・選別システム</a></li>
-        <li><a href="../monetization.html">マネタイズ管理</a></li>
-        <li><a href="../spec.html">システム仕様書</a></li>
+        <li><a href="../video-pipeline.html">動画パイプライン</a> / <a href="../manga-pipeline.html">漫画パイプライン</a></li>
+        <li><a href="../evaluation.html">評価・選別</a> / <a href="../monetization.html">マネタイズ管理</a> / <a href="../spec.html">仕様書</a></li>
         <li><a href="../../foundations/decisions.html#009-claude-design-workflow">ADR-009: Claude Design 運用方針</a></li>
-        <li><a href="../../workbench/knowledge/claude-code/cowork.html">Cowork（チーム運用）</a></li>
+        <li><a href="../../foundations/anti-patterns.html">foundations/anti-patterns.html</a>（V1 P.05 と関係）</li>
+        <li><a href="../../workbench/knowledge/claude-code/cowork.html">Cowork（V2 P.03 と関係）</a></li>
+        <li><a href="../../logs/next-actions.html">Next Actions</a>（来週 TODO への入口）</li>
       </ul>
     </div>
 
