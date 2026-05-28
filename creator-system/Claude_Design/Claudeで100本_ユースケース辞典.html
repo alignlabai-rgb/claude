@@ -1,0 +1,1352 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1480">
+<title>Claudeで100本｜ユースケース辞典</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Yusei+Magic&family=Zen+Maru+Gothic:wght@500;700;900&family=Kaisei+Decol:wght@400;700&family=Shippori+Mincho:wght@400;700&family=DotGothic16&family=Reenie+Beanie&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --paper: #FBF6E9;
+    --paper-2: #F4ECD2;
+    --ink: #1C1B1A;
+    --ink-soft: #4A453E;
+    --red: #E63946;
+    --red-soft: #FBD6D9;
+    --yellow: #FFD23F;
+    --yellow-dk: #C99500;
+    --yellow-soft: #FFF1B8;
+    --blue: #3B82C4;
+    --blue-soft: #D6E6F4;
+    --green: #5BA84A;
+    --green-soft: #DCEEDA;
+    --orange: #F2994A;
+    --orange-soft: #FCE3CC;
+    --purple: #8B5CB6;
+    --purple-soft: #E5DAF2;
+    --pink: #F4B6C2;
+    --pink-soft: #FBDDE3;
+    --brown: #8B6F47;
+    --brown-soft: #E8DDC9;
+    --teal: #3FA8A0;
+    --teal-soft: #D2EAE7;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    background-image:
+      linear-gradient(rgba(28,27,26,0.055) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(28,27,26,0.055) 1px, transparent 1px);
+    background-size: 32px 32px, 32px 32px;
+    line-height: 1.6;
+    font-weight: 500;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page {
+    max-width: 1480px;
+    margin: 0 auto;
+    padding: 56px 56px 120px;
+    position: relative;
+  }
+
+  .tape {
+    position: absolute;
+    background: rgba(255, 210, 63, 0.78);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    width: 140px; height: 28px;
+    border-left: 1px dashed rgba(0,0,0,0.15);
+    border-right: 1px dashed rgba(0,0,0,0.15);
+    z-index: 50; pointer-events: none;
+  }
+
+  /* ---------- COVER ---------- */
+  .cover {
+    position: relative;
+    padding: 36px 40px 32px;
+    border: 3px solid var(--ink);
+    background: var(--paper);
+    border-radius: 18px;
+    box-shadow: 8px 8px 0 var(--ink);
+    margin-bottom: 60px;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: "";
+    position: absolute; inset: 8px;
+    border: 1.5px dashed var(--ink);
+    border-radius: 12px;
+    pointer-events: none;
+  }
+  .cover .tape.t1 { top: -14px; left: 80px; transform: rotate(-4deg); background: rgba(244,182,194,0.85);}
+  .cover .tape.t2 { top: -14px; right: 120px; transform: rotate(3deg); background: rgba(255,210,63,0.78);}
+  .cover-grid { display: grid; grid-template-columns: 1fr 380px; gap: 30px; align-items: center; }
+
+  .chapter-tag {
+    display: inline-block;
+    font-family: "DotGothic16", monospace;
+    background: var(--ink); color: var(--paper);
+    padding: 6px 14px; border-radius: 4px;
+    font-size: 14px; letter-spacing: 0.12em;
+    margin-bottom: 18px;
+  }
+  .chapter-tag .vol {
+    background: var(--red);
+    color: var(--paper);
+    padding: 2px 8px;
+    border-radius: 3px;
+    margin-right: 8px;
+    font-weight: 700;
+  }
+  .cover h1 {
+    font-family: "Yusei Magic", "Zen Maru Gothic", sans-serif;
+    font-weight: 400; font-size: 76px;
+    margin: 0 0 6px;
+    letter-spacing: 0.02em; line-height: 1.05;
+    color: var(--ink);
+    text-shadow: 4px 4px 0 var(--red);
+  }
+  .cover h1 .big {
+    font-family: "Kaisei Decol", serif;
+    font-size: 110px;
+    color: var(--red);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    text-shadow: 4px 4px 0 var(--ink);
+  }
+  .cover .subtitle {
+    font-family: "Kaisei Decol", "Zen Maru Gothic", serif;
+    font-size: 26px; font-weight: 700;
+    margin: 6px 0 22px;
+    color: var(--ink-soft);
+  }
+  .cover .lede {
+    font-size: 16px;
+    max-width: 720px;
+    color: var(--ink-soft);
+    margin: 16px 0 0;
+    line-height: 1.7;
+  }
+  .cover-meta {
+    display: flex; gap: 14px; flex-wrap: wrap;
+    font-family: "DotGothic16", monospace;
+    font-size: 13px; color: var(--ink-soft);
+    margin-top: 14px;
+  }
+  .cover-meta span {
+    background: var(--paper-2);
+    padding: 6px 12px;
+    border: 1.5px solid var(--ink);
+    border-radius: 999px;
+  }
+
+  /* cover illustration: counter / tally marks */
+  .cover-illu {
+    position: relative;
+    height: 240px;
+    background: var(--paper-2);
+    border: 2.5px solid var(--ink);
+    border-radius: 14px;
+    padding: 18px;
+    box-shadow: 4px 4px 0 var(--ink);
+    overflow: hidden;
+  }
+  .cover-illu .count {
+    font-family: "Kaisei Decol", serif;
+    font-size: 130px;
+    font-weight: 700;
+    color: var(--ink);
+    text-align: center;
+    line-height: 1;
+    margin-top: 8px;
+    letter-spacing: -0.02em;
+    text-shadow: 5px 5px 0 var(--yellow);
+  }
+  .cover-illu .label {
+    font-family: "Yusei Magic", sans-serif;
+    text-align: center;
+    font-size: 22px;
+    margin-top: 14px;
+    color: var(--ink);
+  }
+  .cover-illu .tally {
+    display: flex; gap: 6px;
+    justify-content: center;
+    margin-top: 12px;
+    font-family: "Reenie Beanie", cursive;
+    font-size: 30px;
+    color: var(--red);
+    letter-spacing: 0.05em;
+  }
+
+  /* ---------- INDEX MAP ---------- */
+  .index-map {
+    background: var(--paper);
+    border: 3px solid var(--ink);
+    border-radius: 14px;
+    box-shadow: 5px 5px 0 var(--ink);
+    padding: 24px 26px;
+    margin-bottom: 60px;
+    position: relative;
+  }
+  .index-map .tape { top: -14px; right: 80px; transform: rotate(2deg); background: rgba(214,230,244,0.92);}
+  .index-map h2 {
+    font-family: "Yusei Magic", sans-serif;
+    font-weight: 400;
+    font-size: 28px;
+    margin: 0 0 14px;
+    display: flex; align-items: baseline; gap: 12px;
+  }
+  .index-map h2 .badge {
+    font-family: "DotGothic16", monospace;
+    background: var(--ink); color: var(--paper);
+    padding: 3px 10px; border-radius: 4px;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+  }
+  .index-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+  }
+  .idx {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--paper-2);
+    border: 2px solid var(--ink);
+    border-radius: 8px;
+    padding: 10px 12px;
+    text-decoration: none;
+    color: var(--ink);
+    transition: transform 0.1s;
+  }
+  .idx:hover { transform: translate(-2px, -2px); box-shadow: 3px 3px 0 var(--ink);}
+  .idx .num {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--paper);
+    display: flex; align-items: center; justify-content: center;
+    font-family: "Yusei Magic", sans-serif;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .idx .name {
+    font-family: "Kaisei Decol", serif;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 1.1;
+    flex: 1;
+  }
+  .idx .name small {
+    display: block;
+    font-family: "DotGothic16", monospace;
+    font-size: 9px;
+    color: var(--ink-soft);
+    margin-top: 2px;
+    letter-spacing: 0.1em;
+    font-weight: 500;
+  }
+  .idx .count {
+    font-family: "DotGothic16", monospace;
+    font-size: 11px;
+    font-weight: 700;
+    background: var(--paper);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1.5px solid var(--ink);
+  }
+  /* per-category index colors */
+  .idx.c1 { background: var(--blue-soft);} .idx.c1 .num { background: var(--blue);}
+  .idx.c2 { background: var(--purple-soft);} .idx.c2 .num { background: var(--purple);}
+  .idx.c3 { background: var(--red-soft);} .idx.c3 .num { background: var(--red);}
+  .idx.c4 { background: var(--orange-soft);} .idx.c4 .num { background: var(--orange);}
+  .idx.c5 { background: var(--green-soft);} .idx.c5 .num { background: var(--green);}
+  .idx.c6 { background: var(--yellow-soft);} .idx.c6 .num { background: var(--yellow); color: var(--ink);}
+  .idx.c7 { background: var(--pink-soft);} .idx.c7 .num { background: var(--pink); color: var(--ink);}
+  .idx.c8 { background: var(--teal-soft);} .idx.c8 .num { background: var(--teal);}
+  .idx.c9 { background: var(--brown-soft);} .idx.c9 .num { background: var(--brown);}
+  .idx.c10 { background: var(--ink); color: var(--paper);} .idx.c10 .num { background: var(--yellow); color: var(--ink);}
+  .idx.c10 .name small { color: var(--yellow);}
+  .idx.c10 .count { background: var(--paper); color: var(--ink); border-color: var(--paper);}
+
+  /* ---------- SECTION ---------- */
+  .sec {
+    margin-bottom: 56px;
+    position: relative;
+  }
+  .sec-head {
+    display: grid;
+    grid-template-columns: 80px 1fr auto;
+    gap: 18px;
+    align-items: center;
+    margin-bottom: 22px;
+    padding-bottom: 12px;
+    border-bottom: 3px solid var(--ink);
+  }
+  .sec-head .big {
+    width: 80px; height: 80px;
+    border-radius: 16px;
+    border: 3px solid var(--ink);
+    display: flex; align-items: center; justify-content: center;
+    font-family: "Yusei Magic", sans-serif;
+    font-size: 40px;
+    color: var(--paper);
+    box-shadow: 4px 4px 0 var(--ink);
+    transform: rotate(-2deg);
+  }
+  .sec-head .meta h3 {
+    font-family: "Yusei Magic", sans-serif;
+    font-weight: 400;
+    font-size: 38px;
+    margin: 0;
+    line-height: 1.05;
+  }
+  .sec-head .meta .sub {
+    font-family: "DotGothic16", monospace;
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    color: var(--ink-soft);
+    margin-top: 4px;
+    font-weight: 700;
+  }
+  .sec-head .range {
+    font-family: "Kaisei Decol", serif;
+    font-weight: 700;
+    font-size: 24px;
+    color: var(--ink-soft);
+    padding: 6px 14px;
+    background: var(--paper-2);
+    border: 2px solid var(--ink);
+    border-radius: 8px;
+  }
+
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
+  }
+  .card {
+    background: var(--paper);
+    border: 2.5px solid var(--ink);
+    border-radius: 10px;
+    padding: 14px 14px 14px;
+    box-shadow: 3px 3px 0 var(--ink);
+    position: relative;
+    min-height: 180px;
+    display: flex; flex-direction: column;
+  }
+  .card .top {
+    display: flex; align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .card .top .n {
+    font-family: "Kaisei Decol", serif;
+    font-weight: 700;
+    font-size: 22px;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .card .top .tag {
+    font-family: "DotGothic16", monospace;
+    font-size: 9px;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 1px 6px;
+    border-radius: 3px;
+    letter-spacing: 0.12em;
+    margin-left: auto;
+    font-weight: 700;
+  }
+  .card h4 {
+    font-family: "Kaisei Decol", serif;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 1.25;
+    margin: 0 0 6px;
+  }
+  .card p {
+    font-size: 11.5px;
+    line-height: 1.5;
+    color: var(--ink-soft);
+    margin: 0 0 8px;
+    font-weight: 600;
+    flex: 1;
+  }
+  .card .prompt {
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 6px;
+    padding: 7px 9px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10px;
+    line-height: 1.5;
+    margin-top: auto;
+  }
+  .card .prompt .ph { color: var(--yellow);}
+  .card .prompt .lbl {
+    display: block;
+    font-family: "DotGothic16", monospace;
+    font-size: 8.5px;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 0.15em;
+    margin-bottom: 3px;
+  }
+
+  /* per-section card variants */
+  .sec.c1 .sec-head .big { background: var(--blue);}
+  .sec.c1 .cards .card { background: var(--blue-soft);}
+  .sec.c2 .sec-head .big { background: var(--purple);}
+  .sec.c2 .cards .card { background: var(--purple-soft);}
+  .sec.c3 .sec-head .big { background: var(--red);}
+  .sec.c3 .cards .card { background: var(--red-soft);}
+  .sec.c4 .sec-head .big { background: var(--orange);}
+  .sec.c4 .cards .card { background: var(--orange-soft);}
+  .sec.c5 .sec-head .big { background: var(--green);}
+  .sec.c5 .cards .card { background: var(--green-soft);}
+  .sec.c6 .sec-head .big { background: var(--yellow); color: var(--ink);}
+  .sec.c6 .cards .card { background: var(--yellow-soft);}
+  .sec.c7 .sec-head .big { background: var(--pink); color: var(--ink);}
+  .sec.c7 .cards .card { background: var(--pink-soft);}
+  .sec.c8 .sec-head .big { background: var(--teal);}
+  .sec.c8 .cards .card { background: var(--teal-soft);}
+  .sec.c9 .sec-head .big { background: var(--brown);}
+  .sec.c9 .cards .card { background: var(--brown-soft);}
+  .sec.c10 .sec-head .big { background: var(--ink); color: var(--yellow);}
+  .sec.c10 .cards .card { background: var(--paper-2);}
+
+  /* ---------- HOWTO PANEL ---------- */
+  .howto {
+    background: var(--paper);
+    border: 3px solid var(--ink);
+    border-radius: 18px;
+    box-shadow: 8px 8px 0 var(--ink);
+    padding: 28px 32px;
+    margin-top: 60px;
+    margin-bottom: 60px;
+    position: relative;
+    overflow: hidden;
+  }
+  .howto .tape { top: -14px; right: 100px; transform: rotate(3deg); background: rgba(244,182,194,0.85);}
+  .howto h2 {
+    font-family: "Yusei Magic", sans-serif;
+    font-weight: 400;
+    font-size: 32px;
+    margin: 0 0 18px;
+    display: flex; align-items: baseline; gap: 14px;
+  }
+  .howto h2 .num {
+    font-family: "DotGothic16", monospace;
+    background: var(--ink); color: var(--paper);
+    padding: 4px 10px; border-radius: 4px;
+    font-size: 12px;
+  }
+  .howto-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+  }
+  .howto .tip {
+    background: var(--paper-2);
+    border: 2.5px solid var(--ink);
+    border-radius: 12px;
+    padding: 18px 20px;
+    box-shadow: 4px 4px 0 var(--ink);
+  }
+  .howto .tip h4 {
+    font-family: "Kaisei Decol", serif;
+    font-weight: 700;
+    font-size: 18px;
+    margin: 0 0 6px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .howto .tip h4 .ico {
+    width: 32px; height: 32px;
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: "Kaisei Decol", serif;
+    font-size: 16px;
+  }
+  .howto .tip:nth-child(1) h4 .ico { background: var(--blue);}
+  .howto .tip:nth-child(2) h4 .ico { background: var(--orange);}
+  .howto .tip:nth-child(3) h4 .ico { background: var(--green);}
+  .howto .tip p {
+    margin: 6px 0 0;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    font-weight: 600;
+  }
+  .howto .tip p b {
+    font-family: "Kaisei Decol", serif;
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  footer {
+    margin-top: 60px;
+    border-top: 3px dashed var(--ink);
+    padding-top: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: "DotGothic16", monospace;
+    font-size: 12px;
+    color: var(--ink-soft);
+    letter-spacing: 0.12em;
+  }
+  footer .page-num {
+    font-size: 14px;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 4px 10px;
+    border-radius: 4px;
+  }
+</style>
+</head>
+<body>
+
+<template id="__bundler_thumbnail" data-bg-color="#FBF6E9">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#FBF6E9"/>
+    <text x="80" y="120" font-family="monospace" font-size="22" fill="#1C1B1A">VOL.02 / CHAPTER 04 — 100 USE CASES</text>
+    <text x="120" y="420" font-family="serif" font-size="320" font-weight="700" fill="#E63946">100</text>
+    <text x="660" y="380" font-family="serif" font-size="80" font-weight="700" fill="#1C1B1A">本ノック。</text>
+    <g fill="#1C1B1A" font-family="serif" font-size="32">
+      <text x="660" y="450">仕事 / 学ぶ / 書く</text>
+      <text x="660" y="500">つくる / 整える / 決める</text>
+      <text x="660" y="550">暮らす / 遊ぶ / 関わる</text>
+      <text x="660" y="600">続ける</text>
+    </g>
+  </svg>
+</template>
+
+<div class="page">
+
+  <!-- COVER -->
+  <header class="cover">
+    <div class="tape t1"></div>
+    <div class="tape t2"></div>
+    <div class="cover-grid">
+      <div>
+        <div class="chapter-tag"><span class="vol">VOL.02</span>CHAPTER 04 / ALIGNLAB NOTE</div>
+        <h1>Claudeで<span class="big">100</span><br>本ノック。</h1>
+        <p class="subtitle">ユースケース辞典</p>
+        <p class="lede">
+          原則やテンプレを覚えても、いざ手が止まることがある。
+          そんなときは <b>事例の山</b> から似たものを探すのがいちばん速い。
+          仕事・学ぶ・書く・つくる・整える・決める・暮らす・遊ぶ・関わる・続ける——
+          10のジャンルに10本ずつ、合計100の使い道。
+          順番に読まなくていい。困ったときの逆引きに使ってほしい。
+        </p>
+        <div class="cover-meta">
+          <span>個人用リファレンス</span>
+          <span>2026.05</span>
+          <span>by AlignLab</span>
+          <span>creator-system</span>
+        </div>
+      </div>
+      <div class="cover-illu">
+        <div class="count">100</div>
+        <div class="label">ユースケース</div>
+        <div class="tally">/// /// /// /// /// /// /// /// /// ///</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- INDEX -->
+  <div class="index-map">
+    <div class="tape"></div>
+    <h2><span class="badge">INDEX</span>10ジャンル × 10本</h2>
+    <div class="index-grid">
+      <a class="idx c1" href="#sec1"><div class="num">1</div><div class="name">仕事<small>WORK</small></div><div class="count">10</div></a>
+      <a class="idx c2" href="#sec2"><div class="num">2</div><div class="name">学ぶ<small>LEARN</small></div><div class="count">10</div></a>
+      <a class="idx c3" href="#sec3"><div class="num">3</div><div class="name">書く<small>WRITE</small></div><div class="count">10</div></a>
+      <a class="idx c4" href="#sec4"><div class="num">4</div><div class="name">つくる<small>MAKE</small></div><div class="count">10</div></a>
+      <a class="idx c5" href="#sec5"><div class="num">5</div><div class="name">整える<small>ORGANIZE</small></div><div class="count">10</div></a>
+      <a class="idx c6" href="#sec6"><div class="num">6</div><div class="name">決める<small>DECIDE</small></div><div class="count">10</div></a>
+      <a class="idx c7" href="#sec7"><div class="num">7</div><div class="name">暮らす<small>LIVE</small></div><div class="count">10</div></a>
+      <a class="idx c8" href="#sec8"><div class="num">8</div><div class="name">遊ぶ<small>PLAY</small></div><div class="count">10</div></a>
+      <a class="idx c9" href="#sec9"><div class="num">9</div><div class="name">関わる<small>RELATE</small></div><div class="count">10</div></a>
+      <a class="idx c10" href="#sec10"><div class="num">10</div><div class="name">続ける<small>SUSTAIN</small></div><div class="count">10</div></a>
+    </div>
+  </div>
+
+  <!-- ========== 01 仕事 ========== -->
+  <section class="sec c1" id="sec1">
+    <div class="sec-head">
+      <div class="big">仕</div>
+      <div class="meta">
+        <h3>仕事</h3>
+        <div class="sub">01 / WORK · 通勤して帰るまでの100の小さな救い</div>
+      </div>
+      <div class="range">001 — 010</div>
+    </div>
+    <div class="cards">
+      <div class="card">
+        <div class="top"><span class="n">01</span><span class="tag">MEETING</span></div>
+        <h4>議事録を整える</h4>
+        <p>箇条書きのメモを、決定／宿題／論点の3部構成に。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下の生メモを、決定・宿題・論点に分けて整理して。<span class="ph">[メモ]</span></div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">02</span><span class="tag">EMAIL</span></div>
+        <h4>角の立たない断り</h4>
+        <p>「無理です」を、関係を壊さず伝える1パラグラフ。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下の依頼を、関係を保ちつつ断るメールに。<span class="ph">[本文]</span></div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">03</span><span class="tag">REPORT</span></div>
+        <h4>週報の自動下書き</h4>
+        <p>1週間のメモから、200字の上司向けサマリ。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下のメモを週報用に200字で。「やったこと/詰まったこと/相談」の順で。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">04</span><span class="tag">SLIDE</span></div>
+        <h4>スライドの骨子</h4>
+        <p>10分プレゼンの章立て＋各章で言うこと3行。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>10分のプレゼンで「<span class="ph">[テーマ]</span>」を伝えたい。章立てを5つ、各章3行で。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">05</span><span class="tag">PROPOSAL</span></div>
+        <h4>提案書のたたき</h4>
+        <p>「課題→解決→効果」の3部構成で、初稿を一気に。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下の状況に対して、A4一枚の提案書を「課題/解決/効果」の3部で。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">06</span><span class="tag">PRESS</span></div>
+        <h4>プレスリリース</h4>
+        <p>事実だけで構成。煽らない、嘘をつかない型。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下の発表を、煽らないプレスリリースに。誇張禁止。事実だけ。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">07</span><span class="tag">JOB-DESC</span></div>
+        <h4>求人票の文面</h4>
+        <p>業務内容を、応募者の言葉で言い換える。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下の業務内容を、応募者目線の求人票に。「1日の流れ」も入れて。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">08</span><span class="tag">INTERVIEW</span></div>
+        <h4>面接質問の準備</h4>
+        <p>履歴書から、深掘りすべき質問を5つ用意。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下の履歴書を読み、面接で聞きたい深掘り質問を5つ。なぜ聞くか付き。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">09</span><span class="tag">1ON1</span></div>
+        <h4>1on1の話題出し</h4>
+        <p>マンネリ防止に、今週の問いかけを3つ。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>1on1で今週聞く問い3つ。「成長/関係/詰まり」から1つずつ。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">10</span><span class="tag">EXIT</span></div>
+        <h4>退職メッセージ</h4>
+        <p>感謝と未来を、3段落で。湿っぽくしすぎない。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>退職時の社内メッセージを3段落で。湿っぽさ控えめ。前向きに。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 02 学ぶ ========== -->
+  <section class="sec c2" id="sec2">
+    <div class="sec-head">
+      <div class="big">学</div>
+      <div class="meta">
+        <h3>学ぶ</h3>
+        <div class="sub">02 / LEARN · 教えてもらうのも、教えるのも</div>
+      </div>
+      <div class="range">011 — 020</div>
+    </div>
+    <div class="cards">
+      <div class="card">
+        <div class="top"><span class="n">11</span><span class="tag">EXPLAIN</span></div>
+        <h4>5歳児向け解説</h4>
+        <p>難しい概念を、たとえ話で言い直してもらう。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>「<span class="ph">[概念]</span>」を、5歳児にもわかるたとえ話で。3つ例を出して。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">12</span><span class="tag">QUIZ</span></div>
+        <h4>暗記用クイズ</h4>
+        <p>覚えたい内容から、出題と解答を10問。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下の資料から、暗記用の10問クイズ。解答と理由つき。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">13</span><span class="tag">SUMMARY</span></div>
+        <h4>本の要約</h4>
+        <p>章ごとに3行＋全体結論を3行で。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>この本（章タイトル付き）を、各章3行＋全体結論3行で要約。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">14</span><span class="tag">DISCUSS</span></div>
+        <h4>本のディスカッション</h4>
+        <p>読書会のための3つの問いを用意。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>「<span class="ph">[本]</span>」を読書会で議論する。3つの深い問いを作って。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">15</span><span class="tag">LANG</span></div>
+        <h4>外国語の壁打ち</h4>
+        <p>言いたいことを伝える、3レベルの言い方。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>「<span class="ph">[日本語]</span>」を、英語で簡単/普通/丁寧の3レベルに。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">16</span><span class="tag">TEACH</span></div>
+        <h4>教える練習相手</h4>
+        <p>説明を聞いて、つまずきそうな点を返してくれる。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>これから「<span class="ph">[テーマ]</span>」を私が説明する。聞いて、初学者がつまずく所3つを指摘。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">17</span><span class="tag">PLAN</span></div>
+        <h4>3か月学習計画</h4>
+        <p>到達目標と、毎週やることのカレンダー。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>「<span class="ph">[スキル]</span>」を3か月で身につける計画。毎週30分でできる範囲で。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">18</span><span class="tag">QA</span></div>
+        <h4>素朴な質問</h4>
+        <p>「いまさら聞けない」を、誰にも知られず解消。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>素人質問していい？「<span class="ph">[いまさら聞けないこと]</span>」って結局なに？</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">19</span><span class="tag">NOTE</span></div>
+        <h4>学習ノート作成</h4>
+        <p>調べたことを、復習可能な形に編む。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下のメモを、後で復習可能な学習ノートに。<span class="ph">[要点/具体例/問い]</span></div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">20</span><span class="tag">DEBATE</span></div>
+        <h4>賛否両論を聞く</h4>
+        <p>論点ごとに「賛成派」と「反対派」を演じてもらう。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>「<span class="ph">[論点]</span>」について、賛成派と反対派をそれぞれ最強の論で演じて。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 03 書く ========== -->
+  <section class="sec c3" id="sec3">
+    <div class="sec-head">
+      <div class="big">書</div>
+      <div class="meta">
+        <h3>書く</h3>
+        <div class="sub">03 / WRITE · ことばを動かす100の手</div>
+      </div>
+      <div class="range">021 — 030</div>
+    </div>
+    <div class="cards">
+      <div class="card">
+        <div class="top"><span class="n">21</span><span class="tag">DIARY</span></div>
+        <h4>日記の壁打ち</h4>
+        <p>「今日何があった？」と聞き返してもらう日記法。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>これから日記を書く。あなたは聞き役。3つ問いを返して、私の言葉を引き出して。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">22</span><span class="tag">LETTER</span></div>
+        <h4>手紙の下書き</h4>
+        <p>感情を整理してから、書きたいことだけ残す。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下のメモから、相手への手紙の下書き。感情過多な部分は削って。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">23</span><span class="tag">POEM</span></div>
+        <h4>詩の種を増やす</h4>
+        <p>1行の種から、5方向に展開してもらう。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>「<span class="ph">[一行]</span>」から始まる詩を、5方向で展開して。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">24</span><span class="tag">EULOGY</span></div>
+        <h4>弔辞・追悼文</h4>
+        <p>故人とのエピソードから、3分のスピーチに。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下のエピソードから、3分の追悼スピーチを。湿りすぎず、笑える瞬間も。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">25</span><span class="tag">SPEECH</span></div>
+        <h4>結婚式スピーチ</h4>
+        <p>新郎新婦との関係から、3分にまとめる。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下のエピソードから結婚式スピーチを3分で。笑い1つ・涙1つ・祝福1つ。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">26</span><span class="tag">REVIEW</span></div>
+        <h4>映画・本のレビュー</h4>
+        <p>ネタバレなしで、刺さった一点を語る形に。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>「<span class="ph">[作品]</span>」を見た感想。ネタバレなしで、刺さった一点だけ300字で。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">27</span><span class="tag">PORTFOLIO</span></div>
+        <h4>ポートフォリオ文</h4>
+        <p>自分の仕事を、第三者目線で言語化。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下の経歴を、ポートフォリオサイト用に300字で。「私」を主語にしない。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">28</span><span class="tag">BIO</span></div>
+        <h4>3種類の自己紹介</h4>
+        <p>30秒/3分/3行の3バージョンで持っておく。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下のプロフから、30秒/3分/3行の3パターンの自己紹介を。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">29</span><span class="tag">RIME</span></div>
+        <h4>韻を踏む遊び</h4>
+        <p>名前や言葉から、5つの韻を提案してもらう。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>「<span class="ph">[言葉]</span>」と韻を踏む日本語の言葉を5つ。意味も近いものを。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">30</span><span class="tag">REVOICE</span></div>
+        <h4>文体を真似る</h4>
+        <p>好きな文章の癖を、自分の文に移植する。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下のお手本の文体（一文の長さ・比喩の頻度）で、私のテーマを書き直して。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 04 つくる ========== -->
+  <section class="sec c4" id="sec4">
+    <div class="sec-head">
+      <div class="big">作</div>
+      <div class="meta">
+        <h3>つくる</h3>
+        <div class="sub">04 / MAKE · 形にする100の手段</div>
+      </div>
+      <div class="range">031 — 040</div>
+    </div>
+    <div class="cards">
+      <div class="card">
+        <div class="top"><span class="n">31</span><span class="tag">LAYOUT</span></div>
+        <h4>ポスターの構図案</h4>
+        <p>言葉だけで、3案のレイアウトを提案。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>「<span class="ph">[テーマ]</span>」のA3ポスター、3つのレイアウト案を言葉で。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">32</span><span class="tag">PALETTE</span></div>
+        <h4>カラーパレット</h4>
+        <p>雰囲気の言葉から、5色＋HEXコード。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>「<span class="ph">[雰囲気]</span>」を表す5色パレット。HEXコードと使い分け1行ずつ。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">33</span><span class="tag">FONT</span></div>
+        <h4>書体ペア提案</h4>
+        <p>見出し用と本文用の組み合わせ3案。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>「<span class="ph">[ブランド]</span>」用の書体ペア3案。見出し・本文の役割つき。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">34</span><span class="tag">NAMING</span></div>
+        <h4>商品・サービス名</h4>
+        <p>20案を、方向の違いで4分類して出してもらう。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>「<span class="ph">[コンセプト]</span>」の商品名を20案。詩的5/機能5/造語5/直球5。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">35</span><span class="tag">LOGO</span></div>
+        <h4>ロゴの方向性</h4>
+        <p>ワードマーク／シンボル／組み合わせの3方向。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>「<span class="ph">[ブランド]</span>」のロゴ。ワードマーク/シンボル/組み合わせの3案を文章で。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">36</span><span class="tag">STORY</span></div>
+        <h4>創業ストーリー</h4>
+        <p>起承転結ではなく、「困り→気づき→決意」で。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下の事実から、創業ストーリーを「困り/気づき/決意」の3段で500字に。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">37</span><span class="tag">RECIPE</span></div>
+        <h4>レシピ考案</h4>
+        <p>冷蔵庫の中身から、作れる3品を提案。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>冷蔵庫に <span class="ph">[材料]</span> がある。30分以内で作れる3品を、和洋中で1つずつ。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">38</span><span class="tag">GAME</span></div>
+        <h4>ゲームルール考案</h4>
+        <p>家族・少人数で遊べる新ルールを発明。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>カード/紙とペンだけで遊べる、4人用ゲームのルールを3案。10分で終わるもの。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">39</span><span class="tag">PROTO</span></div>
+        <h4>HTML試作</h4>
+        <p>触れるプロトタイプの初稿を1ファイルで。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>「<span class="ph">[機能]</span>」を試すHTML1ファイル。ボタンが押せて画面遷移する形で。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">40</span><span class="tag">CRAFT</span></div>
+        <h4>工作の手順書</h4>
+        <p>子どもと作れる工作を、材料と手順で。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>家にあるもので6歳児と作れる工作3案。各々、材料リストと10ステップで。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 05 整える ========== -->
+  <section class="sec c5" id="sec5">
+    <div class="sec-head">
+      <div class="big">整</div>
+      <div class="meta">
+        <h3>整える</h3>
+        <div class="sub">05 / ORGANIZE · 散らかったものを地図にする</div>
+      </div>
+      <div class="range">041 — 050</div>
+    </div>
+    <div class="cards">
+      <div class="card">
+        <div class="top"><span class="n">41</span><span class="tag">MEMO</span></div>
+        <h4>メモの整理</h4>
+        <p>ぐちゃっと貼ったメモを、テーマ別の表に。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下のメモを、テーマ別に分類して表に。重複は1つにまとめて。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">42</span><span class="tag">TODO</span></div>
+        <h4>ToDoの並べ替え</h4>
+        <p>緊急度／重要度の2軸でマトリクス化。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下のToDoを、緊急/重要のマトリクスに配置して。捨ててよさそうなのに印を。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">43</span><span class="tag">SHELF</span></div>
+        <h4>本棚の整理ルール</h4>
+        <p>蔵書リストから、分類ルールを提案。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下の蔵書リストを、自宅の本棚に並べる分類ルールを3案。本数の偏りも考慮。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">44</span><span class="tag">FOLDER</span></div>
+        <h4>フォルダ構成案</h4>
+        <p>仕事PCの中身を、検索しやすい階層に。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下のファイル一覧を、3階層以内のフォルダ構造に。命名ルール付き。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">45</span><span class="tag">CALENDAR</span></div>
+        <h4>1週間の見取り図</h4>
+        <p>用事を時間帯で配置し、無理を発見。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下の1週間の予定を時間帯で並べ替え、無理な詰め込みを3つ指摘。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">46</span><span class="tag">BUDGET</span></div>
+        <h4>家計の分類</h4>
+        <p>支出明細を、固定／変動／浪費に分けて。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下の支出を、固定/変動/浪費に分類。浪費は減らすコツも1行ずつ。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">47</span><span class="tag">CONTACT</span></div>
+        <h4>連絡先の棚卸し</h4>
+        <p>会う頻度と関係性で4象限に整理。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下の連絡先を「頻度/関係性」の4象限に分類。再連絡したい人を3人。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">48</span><span class="tag">DATA</span></div>
+        <h4>表データの整形</h4>
+        <p>バラバラの記録を、共通フォーマットに揃える。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下のバラバラな表を、共通カラムに揃えてMarkdown表で。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">49</span><span class="tag">FAQ</span></div>
+        <h4>FAQの作成</h4>
+        <p>サポート履歴から、共通質問を抽出。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下のサポート履歴から、よくある質問10個と回答を作って。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">50</span><span class="tag">MIND</span></div>
+        <h4>頭の中の見える化</h4>
+        <p>ぐるぐる悩んでいることを、地図にする。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下の悩みを、関係を線で結んだマインドマップ風の文章に。中心は何？</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 06 決める ========== -->
+  <section class="sec c6" id="sec6">
+    <div class="sec-head">
+      <div class="big">決</div>
+      <div class="meta">
+        <h3>決める</h3>
+        <div class="sub">06 / DECIDE · 揺れている自分の背中を押す</div>
+      </div>
+      <div class="range">051 — 060</div>
+    </div>
+    <div class="cards">
+      <div class="card">
+        <div class="top"><span class="n">51</span><span class="tag">PROS-CONS</span></div>
+        <h4>賛否表で見る</h4>
+        <p>選択肢ごとに、メリットと痛みを並列で。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下の選択肢A/Bを、メリット/痛み/未確定要素の3軸で表に。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">52</span><span class="tag">REGRET</span></div>
+        <h4>後悔最小化</h4>
+        <p>80歳の自分から見たら、と問い直す型。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下の選択について、80歳の私から見た「後悔の少ない方」を理由付きで。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">53</span><span class="tag">DEVIL</span></div>
+        <h4>悪魔の代弁者</h4>
+        <p>気に入っている案に、本気で反対してもらう。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下の案に、賛同禁止で本気の反論を3つ。各々に私への鋭い質問つき。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">54</span><span class="tag">PREMORTEM</span></div>
+        <h4>失敗から逆算</h4>
+        <p>1年後に失敗していたら、原因は何か。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>この計画が1年後に失敗したと仮定。考えられる原因トップ5を。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">55</span><span class="tag">VOTE</span></div>
+        <h4>3人で投票</h4>
+        <p>3つの違う立場（A/B/C）から、それぞれ評価。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下の選択を、保守派/革新派/中道派の3人格でそれぞれ評価。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">56</span><span class="tag">RIVER</span></div>
+        <h4>選ばなかった道</h4>
+        <p>選ばないほうを選んだ場合の未来を、3行で。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下の選択について、選ばなかった方の3か月後の自分を3行で描いて。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">57</span><span class="tag">CRITERIA</span></div>
+        <h4>判断基準の言語化</h4>
+        <p>選ぶ前に、自分の基準を3つ書き出す。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下の選択をする前に、私の判断基準を3つ言語化させてくれる問いを返して。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">58</span><span class="tag">COIN</span></div>
+        <h4>コインを投げる</h4>
+        <p>結果を見たときの自分の反応で、本音を知る。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下の選択をコイン投げで決めた、と仮定。結果が「A」だったら、私の本音は？</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">59</span><span class="tag">REVERSE</span></div>
+        <h4>逆から考える</h4>
+        <p>ゴールから逆算した、必要なステップ。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>「<span class="ph">[ゴール]</span>」から逆算して、いま週末にやるべき小さな一歩を3つ。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">60</span><span class="tag">SLEEP</span></div>
+        <h4>一晩寝かせる</h4>
+        <p>明日の自分への申し送り書を、今夜書く。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下の判断を一晩寝かせる。明日の朝の自分が読む申し送り書を1ページで。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 07 暮らす ========== -->
+  <section class="sec c7" id="sec7">
+    <div class="sec-head">
+      <div class="big">暮</div>
+      <div class="meta">
+        <h3>暮らす</h3>
+        <div class="sub">07 / LIVE · 平日の夜と週末の朝のための10本</div>
+      </div>
+      <div class="range">061 — 070</div>
+    </div>
+    <div class="cards">
+      <div class="card">
+        <div class="top"><span class="n">61</span><span class="tag">DINNER</span></div>
+        <h4>今日の夕飯</h4>
+        <p>気分と材料から、3択を提案してもらう。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>今日の気分は <span class="ph">[気分]</span>、冷蔵庫に <span class="ph">[材料]</span>。30分で作れる夕飯3案。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">62</span><span class="tag">TRIP</span></div>
+        <h4>3日間の旅程</h4>
+        <p>行き先・人数から、無理ない旅程を組む。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span><span class="ph">[人数・行き先]</span> の3日2泊。1日3スポットまで、無理ない旅程を。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">63</span><span class="tag">GIFT</span></div>
+        <h4>贈り物の候補</h4>
+        <p>関係性と予算から、5案＋なぜそれか1行。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span><span class="ph">[相手・関係・予算]</span> への贈り物5案。それぞれ「なぜ刺さるか」を1行。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">64</span><span class="tag">PARTY</span></div>
+        <h4>パーティ進行表</h4>
+        <p>挨拶・余興・締めまでのタイムテーブル。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>15人で2時間の <span class="ph">[テーマ]</span> パーティ。挨拶/余興/締めの進行表を。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">65</span><span class="tag">CLEAN</span></div>
+        <h4>15分掃除リスト</h4>
+        <p>今日の15分でいちばん効くポイントを3つ。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>家の <span class="ph">[場所]</span> を15分で掃除するとき、優先すべき3か所と順番。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">66</span><span class="tag">SHOPPING</span></div>
+        <h4>家電比較表</h4>
+        <p>商品候補を、用途軸で比較。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下の家電候補3つを、価格/省エネ/サイズ/評判で表に。私の用途では <span class="ph">[用途]</span>。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">67</span><span class="tag">HEALTH</span></div>
+        <h4>体調記録の解釈</h4>
+        <p>日々の記録から、傾向と相談どころを抽出。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下の体調メモから傾向を3つ。医師に相談すべき点があれば指摘して。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">68</span><span class="tag">RECEIPT</span></div>
+        <h4>レシート振り返り</h4>
+        <p>月のレシートから、買いすぎ・買い忘れを把握。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下のレシート集計から、買いすぎ3つと買い忘れ3つを推測。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">69</span><span class="tag">ROOM</span></div>
+        <h4>部屋の配置替え</h4>
+        <p>家具リストと部屋サイズから、3案。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span><span class="ph">[家具一覧]</span> を <span class="ph">[部屋サイズ]</span> に配置。3つの違うレイアウト案を文章で。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">70</span><span class="tag">RITUAL</span></div>
+        <h4>朝のルーティン設計</h4>
+        <p>30分の枠に、5つの要素を最適順に。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>朝の30分で <span class="ph">[要素5つ]</span> をこなす順番を提案。理由つき。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 08 遊ぶ ========== -->
+  <section class="sec c8" id="sec8">
+    <div class="sec-head">
+      <div class="big">遊</div>
+      <div class="meta">
+        <h3>遊ぶ</h3>
+        <div class="sub">08 / PLAY · 退屈の時間を、創作の時間に</div>
+      </div>
+      <div class="range">071 — 080</div>
+    </div>
+    <div class="cards">
+      <div class="card">
+        <div class="top"><span class="n">71</span><span class="tag">RPG</span></div>
+        <h4>テキストRPG</h4>
+        <p>あなたが主人公の、選択肢付き物語。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>私が主人公のテキストRPG開始。<span class="ph">[ジャンル]</span>。毎ターン選択肢3つ。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">72</span><span class="tag">MURDER</span></div>
+        <h4>マーダーミステリ</h4>
+        <p>3人で遊べる、20分の即席シナリオ。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>3人で20分のマーダーミステリ脚本。役柄カード・進行・真相含めて。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">73</span><span class="tag">RIDDLE</span></div>
+        <h4>謎解き</h4>
+        <p>子どもと一緒に挑戦できる謎を5問。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>小学生と楽しめる謎解き5問。難易度別・ヒント付き・解説付き。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">74</span><span class="tag">STORY</span></div>
+        <h4>寝る前の物語</h4>
+        <p>5分で読める、子ども向け短編。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>5歳児に5分で読み聞かせる物語。主人公の名前と教訓を <span class="ph">[指定]</span> で。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">75</span><span class="tag">WHATIF</span></div>
+        <h4>もしも問答</h4>
+        <p>「もし◯◯だったら」を世界観ごと作る。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>「もし <span class="ph">[条件]</span> だったら」の世界を、1ページの設定資料で。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">76</span><span class="tag">PARODY</span></div>
+        <h4>名作パロディ</h4>
+        <p>有名作品の文体で、日常を書いてみる。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span><span class="ph">[作家]</span> 風の文体で、今日の私の通勤を300字で描いて。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">77</span><span class="tag">DEBATE</span></div>
+        <h4>くだらない論争</h4>
+        <p>たけのこの里 vs きのこの山、本気で。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span><span class="ph">[A vs B]</span> について、両陣営それぞれ本気の論を300字ずつ。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">78</span><span class="tag">DICTIONARY</span></div>
+        <h4>架空の辞書</h4>
+        <p>存在しない言葉を、定義から作る。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span><span class="ph">[テーマ]</span> に関する架空の言葉を5つ作り、辞書風に定義。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">79</span><span class="tag">SPECIES</span></div>
+        <h4>新種を発明</h4>
+        <p>動物の特徴を組み合わせて、生態を妄想。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span><span class="ph">[動物2種]</span> を掛け合わせた新種。名前・生態・食べ物・天敵を。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">80</span><span class="tag">SHOW</span></div>
+        <h4>仮想テレビ番組</h4>
+        <p>架空の番組の番組表を、半日分。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span><span class="ph">[テーマ]</span> 専門チャンネルの土曜午後の番組表を3時間分。番組名と概要。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 09 関わる ========== -->
+  <section class="sec c9" id="sec9">
+    <div class="sec-head">
+      <div class="big">関</div>
+      <div class="meta">
+        <h3>関わる</h3>
+        <div class="sub">09 / RELATE · ひとと関わる、その前の準備</div>
+      </div>
+      <div class="range">081 — 090</div>
+    </div>
+    <div class="cards">
+      <div class="card">
+        <div class="top"><span class="n">81</span><span class="tag">ROLEPLAY</span></div>
+        <h4>難しい会話のリハ</h4>
+        <p>相手役を演じてもらい、本番前に練習。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span><span class="ph">[相手]</span> 役を演じて。私が <span class="ph">[話題]</span> を切り出すので、本気で反応して。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">82</span><span class="tag">APOLOGY</span></div>
+        <h4>謝罪文の準備</h4>
+        <p>言い訳を削った、すっきりした文面。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下の状況の謝罪文。言い訳ゼロで。「ごめんなさい」と「これからどうする」だけ。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">83</span><span class="tag">THANKS</span></div>
+        <h4>感謝の伝え方</h4>
+        <p>形式的にならない、相手仕様の言葉に。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span><span class="ph">[相手・状況]</span> への感謝。形式的じゃない、相手にだけ刺さる一言を5つ。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">84</span><span class="tag">CONFLICT</span></div>
+        <h4>もめごとの整理</h4>
+        <p>論点と感情を分けて、地図にしてもらう。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下のもめごとを「論点/感情/事実」に分けて整理。論点だけ残してくれる？</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">85</span><span class="tag">FEEDBACK</span></div>
+        <h4>フィードバックの言い方</h4>
+        <p>事実→影響→提案のサンドイッチに整える。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下のフィードバックを「事実/影響/提案」の3層に。攻撃にならない言い方で。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">86</span><span class="tag">NO</span></div>
+        <h4>「NO」を3種</h4>
+        <p>断る言い方を、強さの違いで3案用意。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下の依頼を断る言い方。やわらかい/普通/きっぱりの3パターン。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">87</span><span class="tag">SMALLTALK</span></div>
+        <h4>雑談の切り口</h4>
+        <p>会う相手の情報から、話題3つを準備。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span><span class="ph">[相手のプロフ]</span> に会う前。共通点になりそうな雑談ネタを3つ用意。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">88</span><span class="tag">LISTEN</span></div>
+        <h4>聞き返す問い</h4>
+        <p>相手の話を深めるための、問いを引き出す。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下の発言に、深掘りする問いを3つ。「なぜ」より「いつ」「どこで」を中心に。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">89</span><span class="tag">LOVE</span></div>
+        <h4>告白の言葉</h4>
+        <p>セリフを書かせるのではなく、芯を整理。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>告白する前に、なぜその人が好きかを言語化したい。5つの問いをぶつけて。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">90</span><span class="tag">FAMILY</span></div>
+        <h4>家族会議の議題</h4>
+        <p>溜まった話題を、優先度つきで整理。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下の家族の懸案を、緊急/重要/お金の3軸で並べて、議論順を提案。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 10 続ける ========== -->
+  <section class="sec c10" id="sec10">
+    <div class="sec-head">
+      <div class="big">続</div>
+      <div class="meta">
+        <h3>続ける</h3>
+        <div class="sub">10 / SUSTAIN · 三日坊主の救済、長期戦の同伴</div>
+      </div>
+      <div class="range">091 — 100</div>
+    </div>
+    <div class="cards">
+      <div class="card">
+        <div class="top"><span class="n">91</span><span class="tag">HABIT</span></div>
+        <h4>習慣の設計</h4>
+        <p>「いつ・どこで・何分」を細かく決める。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span><span class="ph">[習慣]</span> を始めたい。いつ/どこで/何分やるか、3パターン提案して。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">92</span><span class="tag">DROP</span></div>
+        <h4>三日坊主の検視</h4>
+        <p>続かなかった理由を、自分を責めずに分解。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下の習慣が3日で終わった。私を責めず、構造的に5つ原因を探って。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">93</span><span class="tag">STREAK</span></div>
+        <h4>記録のサマリ</h4>
+        <p>1か月の記録から、続けた事実だけを抽出。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下の1か月の記録から、続けたこと/中断した日を集計。励まし不要・事実だけ。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">94</span><span class="tag">REWARD</span></div>
+        <h4>ご褒美の設計</h4>
+        <p>続けた人専用の、自分が本当に嬉しいもの。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下の習慣を <span class="ph">[N]</span> 回続けた時のご褒美を、私が本当に嬉しい形で3案。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">95</span><span class="tag">SERIES</span></div>
+        <h4>連載の伴走</h4>
+        <p>書きためた回を、次回の助走に繋ぐ。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>連載 <span class="ph">[N回まで]</span> を踏まえ、次回の話題を3つ提案。直近の伏線回収あり。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">96</span><span class="tag">REVIEW</span></div>
+        <h4>四半期の振り返り</h4>
+        <p>3か月分のメモから、続けたい/手放すを抽出。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下の3か月のメモから、「続けたい3」と「手放す3」を抽出。理由つき。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">97</span><span class="tag">VOW</span></div>
+        <h4>今年の誓い</h4>
+        <p>年初の誓いを、季節ごとに再検討する。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下の年初の誓い3つを、今の状況に合わせて再調整して。優先度も変更可。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">98</span><span class="tag">FUTURE</span></div>
+        <h4>未来の手紙</h4>
+        <p>1年後の自分への手紙を、今日の自分から。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下のメモから、1年後の私への手紙を書いて。「思い出させてほしい」を3つ。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">99</span><span class="tag">ARCHIVE</span></div>
+        <h4>過去の自分の棚卸し</h4>
+        <p>10年前の記録から、変わらないものを発見。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下の10年前の記録から、「変わったもの」「変わらないもの」を3つずつ。</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="n">100</span><span class="tag">FAREWELL</span></div>
+        <h4>長いプロジェクトの幕引き</h4>
+        <p>何年も続けたことを、無理なく終わらせる。</p>
+        <div class="prompt"><span class="lbl">PROMPT</span>下の長期プロジェクトを終わらせたい。「やり残し/手放し方/最後の儀式」を提案。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------- HOWTO ---------- -->
+  <section class="howto">
+    <div class="tape"></div>
+    <h2><span class="num">∞ / HOWTO</span>この辞典の使い方</h2>
+    <div class="howto-grid">
+      <div class="tip">
+        <h4><span class="ico">索</span>逆引きで使う</h4>
+        <p>頭から読まなくていい。<b>困った場面の最寄りジャンル</b>を見て、近い項目から型をパクる。100本ぜんぶ覚える必要はない、自分用の10本だけで十分。</p>
+      </div>
+      <div class="tip">
+        <h4><span class="ico">改</span>自分仕様に書き換える</h4>
+        <p>各カードのPROMPTは <b>そのままより、書き換えて使う</b> ほうが効く。<span class="ph">[ ]</span>の中だけでなく、語尾・トーン・出力形式も自分の好みに整える。</p>
+      </div>
+      <div class="tip">
+        <h4><span class="ico">育</span>自作の101本目を追加する</h4>
+        <p>使ってみて「これは効いた」と思った頼み方は、メモにして <b>101本目以降</b>に足していく。半年で自分のための私家版辞典になる。</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div>AlignLab / creator-system &nbsp;◆&nbsp; Claude 100 Use Cases</div>
+    <div class="page-num">VOL.2 — P. 04</div>
+  </footer>
+
+</div>
+
+</body>
+</html>

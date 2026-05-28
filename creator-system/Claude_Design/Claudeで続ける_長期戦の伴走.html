@@ -1,0 +1,2299 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1480">
+<title>Claudeで続ける｜長期戦の伴走</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Yusei+Magic&family=Zen+Maru+Gothic:wght@500;700;900&family=Kaisei+Decol:wght@400;700&family=Shippori+Mincho:wght@400;700&family=DotGothic16&family=Reenie+Beanie&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --paper: #FBF6E9;
+    --paper-2: #F4ECD2;
+    --ink: #1C1B1A;
+    --ink-soft: #4A453E;
+    --red: #E63946;
+    --red-soft: #FBD6D9;
+    --yellow: #FFD23F;
+    --yellow-dk: #C99500;
+    --yellow-soft: #FFF1B8;
+    --gold: #B8860B;
+    --gold-soft: #F1E5C0;
+    --blue: #3B82C4;
+    --blue-soft: #D6E6F4;
+    --green: #5BA84A;
+    --green-soft: #DCEEDA;
+    --orange: #F2994A;
+    --orange-soft: #FCE3CC;
+    --purple: #8B5CB6;
+    --purple-dk: #5C3D7B;
+    --purple-soft: #E5DAF2;
+    --pink: #F4B6C2;
+    --pink-soft: #FBDDE3;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    background-image:
+      linear-gradient(rgba(28,27,26,0.055) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(28,27,26,0.055) 1px, transparent 1px),
+      radial-gradient(circle at 88% 8%, rgba(139,92,182,0.16), transparent 38%),
+      radial-gradient(circle at 8% 92%, rgba(184,134,11,0.14), transparent 42%);
+    background-size: 32px 32px, 32px 32px, 100% 100%, 100% 100%;
+    line-height: 1.65;
+    font-weight: 500;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page {
+    max-width: 1480px;
+    margin: 0 auto;
+    padding: 56px 56px 120px;
+    position: relative;
+  }
+
+  .tape {
+    position: absolute;
+    background: rgba(255, 210, 63, 0.78);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    width: 140px; height: 28px;
+    border-left: 1px dashed rgba(0,0,0,0.15);
+    border-right: 1px dashed rgba(0,0,0,0.15);
+    z-index: 50; pointer-events: none;
+  }
+  .tape.pink { background: rgba(244, 182, 194, 0.85); }
+  .tape.blue { background: rgba(214, 230, 244, 0.92); }
+  .tape.green { background: rgba(91, 168, 74, 0.7); }
+  .tape.red  { background: rgba(230, 57, 70, 0.6); }
+  .tape.purple { background: rgba(139,92,182,0.6); }
+  .tape.gold { background: rgba(184,134,11,0.5); }
+
+  /* ---------- COVER ---------- */
+  .cover {
+    position: relative;
+    padding: 36px 40px 32px;
+    border: 3px solid var(--ink);
+    background: var(--paper);
+    border-radius: 18px;
+    box-shadow: 8px 8px 0 var(--ink);
+    margin-bottom: 64px;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: "";
+    position: absolute; inset: 8px;
+    border: 1.5px dashed var(--ink);
+    border-radius: 12px;
+    pointer-events: none;
+  }
+  .cover .tape.t1 { top: -14px; left: 80px; transform: rotate(-4deg); background: rgba(139,92,182,0.6);}
+  .cover .tape.t2 { top: -14px; right: 120px; transform: rotate(3deg); background: rgba(184,134,11,0.5);}
+  .cover-grid { display: grid; grid-template-columns: 1fr 380px; gap: 30px; align-items: center; }
+
+  .chapter-tag {
+    display: inline-block;
+    font-family: "DotGothic16", monospace;
+    background: var(--ink); color: var(--paper);
+    padding: 6px 14px; border-radius: 4px;
+    font-size: 14px; letter-spacing: 0.12em;
+    margin-bottom: 18px;
+  }
+  .chapter-tag .vol {
+    background: var(--purple);
+    color: var(--paper);
+    padding: 2px 8px;
+    border-radius: 3px;
+    margin-right: 8px;
+    font-weight: 700;
+  }
+  .chapter-tag .final {
+    background: var(--gold);
+    color: var(--paper);
+    padding: 2px 8px;
+    border-radius: 3px;
+    margin-left: 8px;
+    font-weight: 700;
+  }
+  .cover h1 {
+    font-family: "Yusei Magic", "Zen Maru Gothic", sans-serif;
+    font-weight: 400; font-size: 76px;
+    margin: 0 0 6px;
+    letter-spacing: 0.02em; line-height: 1.05;
+    color: var(--ink);
+    text-shadow: 4px 4px 0 var(--purple);
+  }
+  .cover h1 .acc { color: var(--gold); text-shadow: 4px 4px 0 var(--ink); }
+  .cover .subtitle {
+    font-family: "Kaisei Decol", "Zen Maru Gothic", serif;
+    font-size: 26px; font-weight: 700;
+    margin: 6px 0 22px;
+    color: var(--ink-soft);
+  }
+  .cover .lede {
+    font-size: 16.5px;
+    max-width: 720px;
+    color: var(--ink-soft);
+    margin: 16px 0 0;
+  }
+  .cover-meta {
+    display: flex; gap: 14px; flex-wrap: wrap;
+    font-family: "DotGothic16", monospace;
+    font-size: 13px; color: var(--ink-soft);
+    margin-top: 14px;
+  }
+  .cover-meta span {
+    background: var(--paper-2);
+    padding: 6px 12px;
+    border: 1.5px solid var(--ink);
+    border-radius: 999px;
+  }
+
+  /* cover illustration: rings of years */
+  .cover-illu {
+    position: relative;
+    height: 240px;
+    background: var(--paper-2);
+    border: 2.5px solid var(--ink);
+    border-radius: 14px;
+    padding: 18px;
+    box-shadow: 4px 4px 0 var(--ink);
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .cover-illu .rings {
+    position: relative;
+    width: 200px; height: 200px;
+  }
+  .cover-illu .rings .ring {
+    position: absolute;
+    inset: 0;
+    border: 2.5px solid var(--ink);
+    border-radius: 50%;
+  }
+  .cover-illu .rings .r1 { background: var(--purple); inset: 0;}
+  .cover-illu .rings .r2 { background: var(--paper); inset: 20px;}
+  .cover-illu .rings .r3 { background: var(--gold); inset: 40px;}
+  .cover-illu .rings .r4 { background: var(--paper); inset: 60px;}
+  .cover-illu .rings .r5 { background: var(--purple-dk); inset: 80px;}
+  .cover-illu .rings .core {
+    position: absolute;
+    inset: 80px;
+    border: 2.5px solid var(--ink);
+    border-radius: 50%;
+    background: var(--yellow);
+    display: flex; align-items: center; justify-content: center;
+    font-family: "Kaisei Decol", serif;
+    font-weight: 700;
+    font-size: 24px;
+    color: var(--ink);
+  }
+  .cover-illu .labels {
+    position: absolute;
+    font-family: "Reenie Beanie", cursive;
+    font-size: 18px;
+    color: var(--ink-soft);
+  }
+  .cover-illu .l1 { top: 18px; left: 30px;}
+  .cover-illu .l2 { bottom: 20px; right: 36px;}
+
+  /* SECTION HEAD */
+  .section-head {
+    display: flex; align-items: baseline; gap: 18px;
+    margin: 24px 0 28px;
+  }
+  .section-num {
+    font-family: "Yusei Magic", sans-serif;
+    font-size: 64px; line-height: 1;
+    color: var(--ink); background: var(--yellow);
+    border: 3px solid var(--ink); border-radius: 14px;
+    padding: 6px 18px 2px;
+    box-shadow: 4px 4px 0 var(--ink);
+    transform: rotate(-2deg);
+  }
+  .section-head h2 {
+    font-family: "Yusei Magic", sans-serif;
+    font-weight: 400; font-size: 40px;
+    margin: 0; color: var(--ink);
+  }
+  .section-head .lead {
+    font-size: 16px; color: var(--ink-soft);
+    margin-left: auto; max-width: 460px;
+    border-left: 4px solid var(--ink);
+    padding: 4px 14px;
+    background: var(--paper-2);
+  }
+
+  /* ---------- GALLERY ---------- */
+  .gallery { margin-bottom: 90px; }
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 22px;
+  }
+  .gcard {
+    background: var(--paper);
+    border: 3px solid var(--ink);
+    border-radius: 12px;
+    box-shadow: 5px 5px 0 var(--ink);
+    overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .gcard .preview {
+    aspect-ratio: 4/3;
+    background: var(--paper-2);
+    border-bottom: 3px solid var(--ink);
+    position: relative;
+    overflow: hidden;
+  }
+  .gcard .meta { padding: 12px 14px 14px; }
+  .gcard .meta .num {
+    font-family: "DotGothic16", monospace;
+    font-size: 11px; letter-spacing: 0.18em;
+    color: var(--ink-soft);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .gcard .meta .num .gly {
+    width: 22px; height: 22px;
+    border: 2px solid var(--ink);
+    background: var(--purple);
+    color: var(--paper);
+    border-radius: 4px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: "Kaisei Decol", serif;
+    font-weight: 700;
+    font-size: 13px;
+  }
+  .gcard .meta h3 {
+    font-family: "Kaisei Decol", serif;
+    font-size: 17px; font-weight: 700;
+    margin: 4px 0 6px;
+    line-height: 1.25;
+  }
+  .gcard .meta p {
+    margin: 0;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    font-weight: 600;
+    line-height: 1.5;
+  }
+
+  /* Mini long-project mocks */
+  .mp { height: 100%; padding: 10px; display: flex; flex-direction: column; gap: 5px;}
+
+  .mp-plan { background: var(--paper); padding: 10px 12px;}
+  .mp-plan .ttl { font-family: "Kaisei Decol", serif; font-weight: 700; font-size: 11px;}
+  .mp-plan .row { display: grid; grid-template-columns: 36px 1fr; gap: 6px; align-items: center; font-family: "DotGothic16", monospace; font-size: 8.5px; padding: 2px 0;}
+  .mp-plan .row .q { background: var(--purple); color: var(--paper); padding: 1px 4px; border-radius: 2px; font-weight: 700; text-align: center;}
+  .mp-plan .row .v { color: var(--ink); font-weight: 700;}
+
+  .mp-torch { background: var(--purple-soft); padding: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;}
+  .mp-torch .flame { width: 50px; height: 60px; background: var(--yellow); border: 2.5px solid var(--ink); border-radius: 50% 50% 30% 30%; position: relative; box-shadow: 2px 2px 0 var(--ink);}
+  .mp-torch .flame::before { content: ""; position: absolute; left: 50%; bottom: -8px; transform: translateX(-50%); width: 24px; height: 10px; background: var(--purple); border: 2px solid var(--ink); border-radius: 3px;}
+  .mp-torch .lbl { font-family: "Kaisei Decol", serif; font-weight: 700; font-size: 11px; color: var(--ink);}
+
+  .mp-log { background: var(--paper); padding: 10px 12px;}
+  .mp-log .day { display: grid; grid-template-columns: 36px 1fr; gap: 6px; font-family: "DotGothic16", monospace; font-size: 8.5px; padding: 2px 0; border-bottom: 1px dashed rgba(0,0,0,0.2);}
+  .mp-log .day:last-child { border-bottom: none;}
+  .mp-log .day .d { background: var(--ink); color: var(--paper); padding: 1px 4px; border-radius: 2px; text-align: center; font-weight: 700;}
+  .mp-log .day .t { color: var(--ink); font-weight: 600;}
+  .mp-log .day .t b { background: var(--gold); color: var(--paper); padding: 0 3px; border-radius: 2px; font-size: 8px;}
+
+  .mp-rhythm { background: var(--gold-soft); padding: 10px; display: grid; grid-template-columns: repeat(7,1fr); gap: 3px; align-content: center;}
+  .mp-rhythm .d {
+    aspect-ratio: 1;
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+    border-radius: 3px;
+    font-family: "DotGothic16", monospace;
+    font-size: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--ink-soft);
+  }
+  .mp-rhythm .d.on { background: var(--gold); color: var(--paper); font-weight: 700;}
+  .mp-rhythm .d.rest { background: var(--purple-soft); color: var(--purple);}
+
+  .mp-archive { background: var(--paper); padding: 10px;}
+  .mp-archive .shelf {
+    display: flex; gap: 3px; align-items: flex-end;
+    padding-bottom: 4px;
+    border-bottom: 3px solid var(--ink);
+    margin-bottom: 4px;
+  }
+  .mp-archive .b { width: 8px; background: var(--purple); border: 1.5px solid var(--ink); border-radius: 1px 1px 0 0;}
+  .mp-archive .b:nth-child(2) { background: var(--gold); height: 30px;}
+  .mp-archive .b:nth-child(3) { background: var(--purple-dk); height: 26px;}
+  .mp-archive .b:nth-child(4) { background: var(--yellow); height: 32px;}
+  .mp-archive .b:nth-child(5) { background: var(--purple); height: 28px;}
+  .mp-archive .b:nth-child(6) { background: var(--blue); height: 30px;}
+  .mp-archive .b:nth-child(7) { background: var(--red); height: 24px;}
+  .mp-archive .b:nth-child(8) { background: var(--purple); height: 32px;}
+  .mp-archive .b:first-child { height: 28px;}
+  .mp-archive .lbl { font-family: "DotGothic16", monospace; font-size: 9px; color: var(--ink-soft); letter-spacing: 0.14em; text-align: center;}
+
+  .mp-support { background: var(--blue-soft); padding: 10px; display: flex; flex-direction: column; gap: 5px;}
+  .mp-support .row { display: grid; grid-template-columns: 22px 1fr; gap: 6px; align-items: center; background: var(--paper); border: 1.5px solid var(--ink); padding: 3px 6px; border-radius: 4px; font-family: "DotGothic16", monospace; font-size: 9px;}
+  .mp-support .row .av { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--ink); display: flex; align-items: center; justify-content: center; font-family: "Kaisei Decol", serif; font-size: 11px; font-weight: 700;}
+  .mp-support .row:nth-child(1) .av { background: var(--blue); color: var(--paper);}
+  .mp-support .row:nth-child(2) .av { background: var(--green); color: var(--paper);}
+  .mp-support .row:nth-child(3) .av { background: var(--orange); color: var(--paper);}
+  .mp-support .row .nm { font-family: "Kaisei Decol", serif; font-weight: 700; font-size: 10px; color: var(--ink);}
+
+  .mp-slump { background: var(--red-soft); padding: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;}
+  .mp-slump .heavy {
+    width: 50px; height: 50px;
+    background: var(--ink); color: var(--paper);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: "Kaisei Decol", serif; font-weight: 700; font-size: 18px;
+    box-shadow: 3px 3px 0 var(--ink);
+    transform: rotate(-3deg);
+  }
+  .mp-slump .arr {
+    font-family: "Yusei Magic", sans-serif;
+    font-size: 20px;
+    color: var(--ink);
+  }
+  .mp-slump .light {
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 4px;
+    padding: 3px 8px;
+    font-family: "Kaisei Decol", serif;
+    font-weight: 700;
+    font-size: 11px;
+    box-shadow: 2px 2px 0 var(--ink);
+  }
+
+  .mp-revise { background: var(--paper); padding: 10px;}
+  .mp-revise .v { font-family: "DotGothic16", monospace; font-size: 9px; padding: 3px 6px; background: var(--paper-2); border: 1.5px solid var(--ink); border-radius: 4px; margin-bottom: 3px; display: flex; justify-content: space-between;}
+  .mp-revise .v b { color: var(--purple);}
+  .mp-revise .v.cur { background: var(--gold); color: var(--paper); border-color: var(--ink);}
+  .mp-revise .v.cur b { color: var(--paper);}
+
+  .mp-end { background: var(--ink); color: var(--paper); padding: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; height: 100%;}
+  .mp-end .seal { width: 60px; height: 60px; border-radius: 50%; border: 3px solid var(--gold); display: flex; align-items: center; justify-content: center; font-family: "Kaisei Decol", serif; font-weight: 700; font-size: 26px; color: var(--gold); transform: rotate(-10deg);}
+  .mp-end .lbl { font-family: "DotGothic16", monospace; font-size: 9px; color: var(--gold); letter-spacing: 0.18em;}
+
+  .mp-handoff { background: var(--paper-2); padding: 10px; display: flex; flex-direction: column; gap: 6px;}
+  .mp-handoff .stamp { font-family: "Kaisei Decol", serif; font-weight: 700; font-size: 11px; background: var(--purple); color: var(--paper); padding: 3px 8px; border: 1.5px solid var(--ink); border-radius: 4px; align-self: flex-start;}
+  .mp-handoff .ln { height: 4px; background: var(--ink-soft); border-radius: 2px; opacity: 0.5;}
+  .mp-handoff .ln.s { width: 60%;}
+  .mp-handoff .sig { font-family: "Reenie Beanie", cursive; font-size: 18px; color: var(--gold); align-self: flex-end; transform: rotate(-4deg); margin-top: 2px;}
+
+  /* ---------- CASES ---------- */
+  .cases { margin-bottom: 90px; }
+  .case {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    background: var(--paper);
+    border: 3px solid var(--ink);
+    border-radius: 18px;
+    box-shadow: 8px 8px 0 var(--ink);
+    padding: 28px;
+    margin-bottom: 60px;
+    position: relative;
+  }
+  .case.reverse .case-text { order: 2; }
+  .case.reverse .case-visual { order: 1; }
+  .case .tape { top: -14px; left: 50px; }
+  .case .case-text { display: flex; flex-direction: column; gap: 14px; }
+  .case .case-num {
+    font-family: "DotGothic16", monospace;
+    background: var(--ink); color: var(--paper);
+    padding: 4px 12px; border-radius: 4px;
+    font-size: 12px; letter-spacing: 0.16em;
+    align-self: flex-start;
+  }
+  .case h3 {
+    font-family: "Yusei Magic", sans-serif;
+    font-weight: 400;
+    font-size: 36px; line-height: 1.15;
+    margin: 0;
+  }
+  .case .scenario {
+    background: var(--paper-2);
+    border: 2px solid var(--ink);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 14.5px;
+    font-weight: 600;
+  }
+  .case .scenario b {
+    font-family: "Kaisei Decol", serif;
+    display: inline-block;
+    background: var(--ink); color: var(--paper);
+    padding: 1px 8px; border-radius: 4px;
+    margin-right: 6px;
+    font-size: 12px; letter-spacing: 0.1em;
+  }
+  .prompt-box {
+    background: var(--ink);
+    border-radius: 10px;
+    color: var(--paper);
+    padding: 14px 16px;
+    font-family: "JetBrains Mono", "DotGothic16", monospace;
+    font-size: 12.5px;
+    line-height: 1.65;
+    border: 3px solid var(--ink);
+    box-shadow: 4px 4px 0 var(--purple);
+    position: relative;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+  }
+  .prompt-box::before {
+    content: "RITUAL";
+    position: absolute;
+    top: -10px; left: 12px;
+    font-family: "DotGothic16", monospace;
+    font-size: 10px; letter-spacing: 0.2em;
+    background: var(--purple); color: var(--paper);
+    padding: 2px 8px; border: 2px solid var(--ink);
+    border-radius: 4px;
+  }
+  .prompt-box .ph { color: var(--yellow); }
+  .prompt-box .cm { color: rgba(255,255,255,0.5);}
+  .case .reflect {
+    background: var(--gold-soft);
+    border: 2px solid var(--ink);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 13.5px;
+    font-weight: 600;
+    line-height: 1.55;
+  }
+  .case .reflect b {
+    font-family: "Kaisei Decol", serif;
+    display: block;
+    margin-bottom: 4px;
+    color: var(--gold);
+  }
+  .visual-frame {
+    background: var(--paper-2);
+    border: 2.5px solid var(--ink);
+    border-radius: 12px;
+    padding: 18px;
+    box-shadow: inset 0 0 0 2px var(--paper);
+    min-height: 440px;
+    position: relative;
+    overflow: hidden;
+  }
+  .visual-frame::before {
+    content: "ARTIFACT";
+    position: absolute;
+    top: -10px; right: 14px;
+    font-family: "DotGothic16", monospace;
+    font-size: 10px; letter-spacing: 0.2em;
+    background: var(--purple); color: var(--paper);
+    padding: 2px 10px; border: 2px solid var(--ink);
+    border-radius: 4px;
+    z-index: 5;
+  }
+
+  /* --- BIG SERIES TIMELINE --- */
+  .big-series {
+    background: var(--paper);
+    border: 2.5px solid var(--ink);
+    border-radius: 8px;
+    padding: 20px 22px;
+    height: 100%;
+  }
+  .big-series h5 {
+    font-family: "DotGothic16", monospace;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    color: var(--ink-soft);
+    margin: 0 0 14px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--ink);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .big-series h5 b { background: var(--purple); color: var(--paper); padding: 2px 8px; border-radius: 4px;}
+  .big-series h5 .total { margin-left: auto; font-family: "Kaisei Decol", serif; font-weight: 700; color: var(--ink);}
+  .big-series .series-grid {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+  .big-series .ep {
+    aspect-ratio: 1;
+    border: 1.5px solid var(--ink);
+    border-radius: 4px;
+    background: var(--paper-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "DotGothic16", monospace;
+    font-size: 10px;
+    color: var(--ink-soft);
+    font-weight: 700;
+    position: relative;
+  }
+  .big-series .ep.done { background: var(--purple); color: var(--paper);}
+  .big-series .ep.done::after { content: "✓"; position: absolute; top: -6px; right: -6px; background: var(--gold); color: var(--paper); width: 14px; height: 14px; border-radius: 50%; font-size: 9px; display: flex; align-items: center; justify-content: center; border: 1.5px solid var(--ink); font-family: serif;}
+  .big-series .ep.current { background: var(--gold); color: var(--paper); box-shadow: 0 0 0 2px var(--gold-soft), 0 0 0 4px var(--ink);}
+  .big-series .ep.future { background: var(--paper); color: var(--ink-soft); opacity: 0.6;}
+  .big-series .panel {
+    background: var(--purple-soft);
+    border: 1.5px solid var(--ink);
+    border-radius: 6px;
+    padding: 10px 12px;
+    margin: 12px 0;
+    font-size: 12px;
+    line-height: 1.6;
+    font-weight: 600;
+  }
+  .big-series .panel b {
+    font-family: "Kaisei Decol", serif;
+    color: var(--purple);
+    font-weight: 700;
+    margin-right: 4px;
+  }
+  .big-series h6 {
+    font-family: "Kaisei Decol", serif;
+    font-size: 14px;
+    margin: 12px 0 6px;
+    padding-left: 10px;
+    position: relative;
+    font-weight: 700;
+  }
+  .big-series h6::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 4px; bottom: 4px;
+    width: 4px;
+    background: var(--purple);
+    border-radius: 2px;
+  }
+  .big-series ul {
+    list-style: none;
+    margin: 6px 0;
+    padding: 0;
+    font-size: 12px;
+    line-height: 1.6;
+    font-weight: 600;
+  }
+  .big-series ul li {
+    padding: 3px 0 3px 18px;
+    position: relative;
+  }
+  .big-series ul li::before {
+    content: "→";
+    position: absolute;
+    left: 0; top: 3px;
+    color: var(--purple);
+    font-weight: 700;
+  }
+
+  /* --- BIG BOOK MAP --- */
+  .big-book {
+    background: var(--paper);
+    border: 2.5px solid var(--ink);
+    border-radius: 8px;
+    padding: 20px 22px;
+    height: 100%;
+  }
+  .big-book h5 {
+    font-family: "DotGothic16", monospace;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    color: var(--ink-soft);
+    margin: 0 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--ink);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .big-book h5 b { background: var(--gold); color: var(--paper); padding: 2px 8px; border-radius: 4px;}
+  .big-book .toc {
+    display: flex; flex-direction: column;
+    gap: 8px;
+  }
+  .big-book .chap {
+    display: grid;
+    grid-template-columns: 50px 1fr 120px;
+    gap: 12px;
+    padding: 10px 14px;
+    background: var(--paper-2);
+    border: 1.5px solid var(--ink);
+    border-radius: 8px;
+    align-items: center;
+  }
+  .big-book .chap.done { background: var(--gold-soft);}
+  .big-book .chap.current { background: var(--yellow); border-color: var(--ink); border-width: 2.5px; box-shadow: 3px 3px 0 var(--ink);}
+  .big-book .chap.future { opacity: 0.6;}
+  .big-book .chap .n {
+    font-family: "Kaisei Decol", serif;
+    font-weight: 700;
+    font-size: 20px;
+    text-align: center;
+    color: var(--ink);
+  }
+  .big-book .chap.done .n { color: var(--gold);}
+  .big-book .chap.done .n::after { content: " ✓"; color: var(--green); font-family: serif;}
+  .big-book .chap .title {
+    font-family: "Kaisei Decol", serif;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 1.3;
+  }
+  .big-book .chap .title small {
+    display: block;
+    font-family: "Zen Maru Gothic", sans-serif;
+    font-size: 11px;
+    color: var(--ink-soft);
+    font-weight: 600;
+    margin-top: 2px;
+    line-height: 1.4;
+  }
+  .big-book .chap .progress {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    font-family: "DotGothic16", monospace;
+    font-size: 9.5px;
+    color: var(--ink-soft);
+    letter-spacing: 0.1em;
+  }
+  .big-book .chap .progress .bar {
+    height: 6px;
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .big-book .chap .progress .bar i {
+    display: block;
+    height: 100%;
+    background: var(--gold);
+  }
+  .big-book .panel {
+    margin-top: 14px;
+    padding: 10px 12px;
+    background: var(--purple-soft);
+    border: 1.5px solid var(--ink);
+    border-radius: 6px;
+    font-size: 12px;
+    line-height: 1.55;
+    font-weight: 600;
+  }
+  .big-book .panel b {
+    font-family: "DotGothic16", monospace;
+    font-size: 9.5px;
+    background: var(--purple); color: var(--paper);
+    padding: 1px 6px;
+    border-radius: 3px;
+    margin-right: 6px;
+    letter-spacing: 0.12em;
+  }
+
+  /* --- BIG SLUMP NOTE --- */
+  .big-slump {
+    background: var(--paper);
+    border: 2.5px solid var(--ink);
+    border-radius: 8px;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+  }
+  .big-slump .shead {
+    background: var(--red-soft);
+    padding: 14px 18px;
+    border-bottom: 2px solid var(--ink);
+  }
+  .big-slump .shead h6 {
+    margin: 0;
+    font-family: "Yusei Magic", sans-serif;
+    font-size: 22px;
+    color: var(--ink);
+    font-weight: 400;
+  }
+  .big-slump .shead .date {
+    font-family: "DotGothic16", monospace;
+    font-size: 10.5px;
+    color: var(--ink-soft);
+    letter-spacing: 0.16em;
+    margin-top: 3px;
+  }
+  .big-slump .sbody {
+    padding: 18px 20px;
+  }
+  .big-slump .row {
+    display: grid;
+    grid-template-columns: 90px 1fr;
+    gap: 14px;
+    padding: 10px 0;
+    border-top: 1.5px dashed rgba(0,0,0,0.2);
+    align-items: start;
+  }
+  .big-slump .row:first-of-type { border-top: none;}
+  .big-slump .row .lbl {
+    font-family: "DotGothic16", monospace;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    color: var(--ink-soft);
+    padding-top: 2px;
+    font-weight: 700;
+  }
+  .big-slump .row .v {
+    font-size: 13px;
+    line-height: 1.6;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .big-slump .row .v.q {
+    font-family: "Shippori Mincho", serif;
+    font-style: italic;
+    background: var(--paper-2);
+    padding: 6px 10px;
+    border-left: 3px solid var(--ink);
+    border-radius: 4px;
+  }
+  .big-slump .row .v ol {
+    margin: 0;
+    padding-left: 16px;
+  }
+  .big-slump .row .v ol li {
+    margin: 2px 0;
+    line-height: 1.55;
+  }
+  .big-slump .row .v .em {
+    background: var(--yellow);
+    padding: 0 3px;
+  }
+  .big-slump .footer {
+    margin: 14px 20px 18px;
+    padding: 10px 12px;
+    background: var(--green-soft);
+    border: 1.5px solid var(--ink);
+    border-radius: 6px;
+    font-size: 12px;
+    line-height: 1.55;
+    font-weight: 600;
+  }
+  .big-slump .footer b {
+    font-family: "Kaisei Decol", serif;
+    color: var(--green);
+    font-weight: 700;
+    margin-right: 4px;
+  }
+
+  /* --- BIG FAREWELL --- */
+  .big-end {
+    background: var(--paper);
+    border: 2.5px solid var(--ink);
+    border-radius: 8px;
+    padding: 22px 26px;
+    height: 100%;
+    position: relative;
+  }
+  .big-end .top-meta {
+    display: flex; justify-content: space-between; align-items: center;
+    padding-bottom: 14px;
+    border-bottom: 2px solid var(--ink);
+    margin-bottom: 16px;
+  }
+  .big-end .top-meta h6 {
+    font-family: "Kaisei Decol", serif;
+    font-weight: 700;
+    font-size: 18px;
+    margin: 0;
+  }
+  .big-end .top-meta .stamp {
+    font-family: "DotGothic16", monospace;
+    background: var(--gold); color: var(--paper);
+    padding: 3px 10px; border-radius: 4px;
+    font-size: 11px; letter-spacing: 0.16em;
+  }
+  .big-end .lead {
+    font-family: "Shippori Mincho", serif;
+    font-size: 13.5px;
+    line-height: 1.85;
+    margin-bottom: 14px;
+  }
+  .big-end .lead .em {
+    background: var(--yellow);
+    padding: 0 3px;
+  }
+  .big-end h6 {
+    font-family: "Kaisei Decol", serif;
+    font-size: 14px;
+    margin: 14px 0 6px;
+    padding-left: 10px;
+    position: relative;
+    font-weight: 700;
+  }
+  .big-end h6::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 4px; bottom: 4px;
+    width: 4px;
+    background: var(--purple);
+    border-radius: 2px;
+  }
+  .big-end .three {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 10px;
+  }
+  .big-end .three .box {
+    background: var(--paper-2);
+    border: 1.5px solid var(--ink);
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+  .big-end .three .box .h {
+    font-family: "DotGothic16", monospace;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    color: var(--ink-soft);
+    margin-bottom: 4px;
+    font-weight: 700;
+  }
+  .big-end .three .box .v {
+    font-family: "Kaisei Decol", serif;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.4;
+  }
+  .big-end .three .box .v small {
+    display: block;
+    font-family: "Zen Maru Gothic", sans-serif;
+    font-size: 11px;
+    color: var(--ink-soft);
+    font-weight: 500;
+    margin-top: 4px;
+    line-height: 1.5;
+  }
+  .big-end .three .box.keep { background: var(--green-soft);}
+  .big-end .three .box.let-go { background: var(--purple-soft);}
+  .big-end .three .box.next { background: var(--gold-soft);}
+  .big-end .seal-end {
+    position: absolute;
+    bottom: 14px; right: 18px;
+    width: 90px; height: 90px;
+    border: 4px solid var(--gold);
+    border-radius: 50%;
+    color: var(--gold);
+    background: rgba(255,255,255,0.7);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    font-family: "Kaisei Decol", serif;
+    font-weight: 700;
+    transform: rotate(-12deg);
+    box-shadow: 3px 3px 0 rgba(184,134,11,0.3);
+  }
+  .big-end .seal-end .big { font-size: 28px; line-height: 1;}
+  .big-end .seal-end .small { font-family: "DotGothic16", monospace; font-size: 8px; margin-top: 4px; letter-spacing: 0.15em;}
+
+  /* ---------- TEMPLATES ---------- */
+  .templates { margin-bottom: 90px; }
+  .tmpl-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+  .tmpl {
+    background: var(--paper);
+    border: 3px solid var(--ink);
+    border-radius: 14px;
+    box-shadow: 5px 5px 0 var(--ink);
+    padding: 20px 22px 22px;
+  }
+  .tmpl .tmpl-tag {
+    display: inline-block;
+    font-family: "DotGothic16", monospace;
+    font-size: 11px; letter-spacing: 0.16em;
+    padding: 3px 10px;
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    background: var(--yellow);
+  }
+  .tmpl.t-purple .tmpl-tag { background: var(--purple-soft);}
+  .tmpl.t-gold .tmpl-tag { background: var(--gold-soft);}
+  .tmpl.t-blue .tmpl-tag { background: var(--blue-soft);}
+  .tmpl.t-red .tmpl-tag { background: var(--red-soft);}
+  .tmpl.t-green .tmpl-tag { background: var(--green-soft);}
+  .tmpl.t-pink .tmpl-tag { background: var(--pink-soft);}
+  .tmpl h3 {
+    font-family: "Yusei Magic", sans-serif;
+    font-weight: 400;
+    font-size: 28px;
+    margin: 10px 0 6px;
+  }
+  .tmpl .when {
+    font-size: 13px; color: var(--ink-soft);
+    margin: 0 0 12px;
+    font-weight: 600;
+  }
+  .tmpl pre {
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-family: "JetBrains Mono", "DotGothic16", monospace;
+    font-size: 12.5px;
+    line-height: 1.7;
+    margin: 0;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+  }
+  .tmpl pre .ph { color: var(--yellow); }
+  .tmpl pre .cm { color: rgba(255,255,255,0.45); }
+
+  /* ---------- STRENGTHS ---------- */
+  .strengths { margin-bottom: 90px; }
+  .sg { display: grid; grid-template-columns: 1fr 1fr; gap: 30px;}
+  .sg-col {
+    border: 3px solid var(--ink);
+    border-radius: 14px;
+    padding: 22px 24px;
+    box-shadow: 5px 5px 0 var(--ink);
+    background: var(--paper);
+  }
+  .sg-col.good { background: var(--green-soft); }
+  .sg-col.bad { background: var(--purple-soft); }
+  .sg-col h3 {
+    font-family: "Yusei Magic", sans-serif;
+    font-weight: 400;
+    font-size: 32px;
+    margin: 0 0 4px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .sg-col h3 .badge {
+    font-family: "Kaisei Decol", serif;
+    width: 44px; height: 44px;
+    display: inline-flex; align-items: center; justify-content: center;
+    border: 2.5px solid var(--ink); border-radius: 50%;
+    font-size: 24px; font-weight: 700;
+  }
+  .sg-col.good h3 .badge { background: var(--green); color: var(--paper); }
+  .sg-col.bad h3 .badge { background: var(--purple); color: var(--paper); }
+  .sg-col .sub {
+    font-family: "DotGothic16", monospace;
+    font-size: 11px; letter-spacing: 0.16em;
+    color: var(--ink-soft);
+    margin-bottom: 14px;
+  }
+  .sg-col ul { list-style: none; padding: 0; margin: 0;}
+  .sg-col li {
+    padding: 8px 0 8px 26px;
+    border-top: 1.5px dashed var(--ink);
+    position: relative;
+    font-size: 14.5px;
+    font-weight: 700;
+    line-height: 1.45;
+  }
+  .sg-col li:first-child { border-top: none; }
+  .sg-col li::before {
+    position: absolute;
+    left: 0; top: 9px;
+    font-family: "Kaisei Decol", serif;
+    font-size: 16px; line-height: 1;
+    font-weight: 700;
+  }
+  .sg-col.good li::before { content: "◯"; color: var(--green); }
+  .sg-col.bad li::before { content: "△"; color: var(--purple); }
+  .sg-col li small {
+    display: block;
+    font-weight: 500;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    padding-top: 2px;
+    line-height: 1.5;
+  }
+
+  /* ---------- 5 LIFE STAGES ---------- */
+  .stages {
+    background: var(--paper);
+    border: 3px solid var(--ink);
+    border-radius: 18px;
+    box-shadow: 8px 8px 0 var(--ink);
+    padding: 28px 32px;
+    margin-bottom: 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .stages .tape { top: -14px; right: 100px; transform: rotate(3deg); background: rgba(184,134,11,0.5);}
+  .stages-head {
+    display: flex; align-items: baseline; gap: 18px;
+    margin-bottom: 24px;
+  }
+  .stages-head h2 {
+    font-family: "Yusei Magic", sans-serif;
+    font-size: 32px; font-weight: 400;
+    margin: 0;
+  }
+  .stages-head .num {
+    font-family: "DotGothic16", monospace;
+    background: var(--ink); color: var(--paper);
+    padding: 4px 10px; border-radius: 4px;
+    font-size: 12px;
+  }
+  .stages-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
+    position: relative;
+  }
+  .stage {
+    background: var(--paper-2);
+    border: 2.5px solid var(--ink);
+    border-radius: 12px;
+    padding: 16px 14px;
+    box-shadow: 4px 4px 0 var(--ink);
+    position: relative;
+  }
+  .stage:nth-child(1) { background: var(--yellow-soft);}
+  .stage:nth-child(2) { background: var(--orange-soft);}
+  .stage:nth-child(3) { background: var(--red-soft);}
+  .stage:nth-child(4) { background: var(--purple-soft);}
+  .stage:nth-child(5) { background: var(--gold-soft);}
+  .stage .num {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--paper);
+    display: flex; align-items: center; justify-content: center;
+    font-family: "Yusei Magic", sans-serif;
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+  .stage:nth-child(1) .num { background: var(--yellow); color: var(--ink);}
+  .stage:nth-child(2) .num { background: var(--orange);}
+  .stage:nth-child(3) .num { background: var(--red);}
+  .stage:nth-child(4) .num { background: var(--purple);}
+  .stage:nth-child(5) .num { background: var(--gold);}
+  .stage h4 {
+    font-family: "Yusei Magic", sans-serif;
+    font-weight: 400;
+    font-size: 22px;
+    margin: 0 0 2px;
+  }
+  .stage .tag {
+    font-family: "DotGothic16", monospace;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    color: var(--ink-soft);
+    margin-bottom: 10px;
+  }
+  .stage .desc {
+    font-size: 12.5px;
+    line-height: 1.55;
+    font-weight: 600;
+    color: var(--ink-soft);
+  }
+  .stage .desc b {
+    font-family: "Kaisei Decol", serif;
+    color: var(--ink);
+    font-weight: 700;
+    display: block;
+    margin-bottom: 3px;
+  }
+
+  /* ---------- COMPLETE INDEX (VOL.1+2) ---------- */
+  .full-index {
+    background: var(--ink);
+    color: var(--paper);
+    border: 3px solid var(--ink);
+    border-radius: 18px;
+    box-shadow: 8px 8px 0 var(--gold);
+    padding: 36px 40px;
+    margin-bottom: 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .full-index::before {
+    content: "";
+    position: absolute; inset: 10px;
+    border: 1.5px dashed rgba(255,255,255,0.2);
+    border-radius: 12px;
+    pointer-events: none;
+  }
+  .full-index .tape { top: -14px; left: 100px; transform: rotate(-3deg); background: rgba(255,210,63,0.95);}
+  .full-index h2 {
+    font-family: "Yusei Magic", sans-serif;
+    font-weight: 400;
+    font-size: 36px;
+    margin: 0 0 6px;
+    color: var(--paper);
+    text-align: center;
+  }
+  .full-index .subtitle {
+    text-align: center;
+    font-family: "DotGothic16", monospace;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    color: var(--yellow);
+    margin-bottom: 30px;
+  }
+  .full-index .vols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+  }
+  .full-index .vol-block .vol-label {
+    font-family: "Kaisei Decol", serif;
+    font-size: 20px;
+    color: var(--yellow);
+    margin-bottom: 4px;
+    font-weight: 700;
+  }
+  .full-index .vol-block .vol-name {
+    font-family: "Yusei Magic", sans-serif;
+    font-size: 28px;
+    margin: 0 0 14px;
+    color: var(--paper);
+  }
+  .full-index .ch-list {
+    display: flex; flex-direction: column;
+    gap: 8px;
+  }
+  .full-index .ch {
+    display: grid;
+    grid-template-columns: 40px 1fr auto;
+    gap: 12px;
+    background: rgba(255,255,255,0.04);
+    border: 1.5px solid rgba(255,255,255,0.15);
+    border-radius: 8px;
+    padding: 12px 14px;
+    align-items: center;
+  }
+  .full-index .ch .n {
+    font-family: "Yusei Magic", sans-serif;
+    font-size: 24px;
+    color: var(--yellow);
+    text-align: center;
+    line-height: 1;
+  }
+  .full-index .ch .ttl {
+    font-family: "Kaisei Decol", serif;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--paper);
+    line-height: 1.3;
+  }
+  .full-index .ch .ttl small {
+    display: block;
+    font-family: "Zen Maru Gothic", sans-serif;
+    font-size: 11px;
+    color: rgba(255,255,255,0.55);
+    font-weight: 500;
+    margin-top: 2px;
+    line-height: 1.4;
+  }
+  .full-index .ch .pg {
+    font-family: "DotGothic16", monospace;
+    font-size: 10px;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 0.12em;
+    text-align: right;
+  }
+
+  /* ---------- END SEAL ---------- */
+  .end-stamp {
+    margin-top: 60px;
+    text-align: center;
+    padding: 40px 20px;
+    position: relative;
+  }
+  .end-stamp .seal {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 180px; height: 180px;
+    border: 6px solid var(--gold);
+    border-radius: 50%;
+    color: var(--gold);
+    font-family: "Kaisei Decol", serif;
+    font-weight: 700;
+    transform: rotate(-10deg);
+    background: var(--paper);
+    box-shadow: 5px 5px 0 rgba(184,134,11,0.3);
+    position: relative;
+    z-index: 2;
+  }
+  .end-stamp .seal::before {
+    content: "";
+    position: absolute;
+    inset: 8px;
+    border: 2px solid var(--gold);
+    border-radius: 50%;
+  }
+  .end-stamp .seal .big { font-size: 56px; line-height: 1;}
+  .end-stamp .seal .small { font-family: "DotGothic16", monospace; font-size: 11px; margin-top: 8px; letter-spacing: 0.18em;}
+  .end-stamp .scribble {
+    margin-top: 30px;
+    font-family: "Reenie Beanie", cursive;
+    font-size: 28px;
+    color: var(--ink-soft);
+    transform: rotate(-2deg);
+  }
+
+  footer {
+    margin-top: 40px;
+    border-top: 3px dashed var(--ink);
+    padding-top: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: "DotGothic16", monospace;
+    font-size: 12px;
+    color: var(--ink-soft);
+    letter-spacing: 0.12em;
+  }
+  footer .page-num {
+    font-size: 14px;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 4px 10px;
+    border-radius: 4px;
+  }
+</style>
+</head>
+<body>
+
+<template id="__bundler_thumbnail" data-bg-color="#FBF6E9">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#FBF6E9"/>
+    <text x="80" y="100" font-family="monospace" font-size="22" fill="#1C1B1A">VOL.02 / CHAPTER 05 — SUSTAIN · FINAL</text>
+    <g transform="translate(700 400)">
+      <circle r="200" fill="#8B5CB6" stroke="#1C1B1A" stroke-width="6"/>
+      <circle r="160" fill="#FBF6E9" stroke="#1C1B1A" stroke-width="4"/>
+      <circle r="120" fill="#B8860B" stroke="#1C1B1A" stroke-width="4"/>
+      <circle r="80" fill="#FBF6E9" stroke="#1C1B1A" stroke-width="3"/>
+      <circle r="40" fill="#FFD23F" stroke="#1C1B1A" stroke-width="3"/>
+      <text x="0" y="14" font-family="serif" font-size="44" font-weight="700" text-anchor="middle" fill="#1C1B1A">続</text>
+    </g>
+    <text x="80" y="500" font-family="serif" font-size="120" font-weight="700" fill="#8B5CB6">続ける。</text>
+    <text x="80" y="600" font-family="monospace" font-size="22" fill="#1C1B1A">— ALIGNLAB NOTE 完 —</text>
+  </svg>
+</template>
+
+<div class="page">
+
+  <!-- COVER -->
+  <header class="cover">
+    <div class="tape t1"></div>
+    <div class="tape t2"></div>
+    <div class="cover-grid">
+      <div>
+        <div class="chapter-tag">
+          <span class="vol">VOL.02</span>CHAPTER 05 / ALIGNLAB NOTE
+          <span class="final">FINAL</span>
+        </div>
+        <h1>Claudeで<span class="acc">続ける</span>。</h1>
+        <p class="subtitle">長期戦の伴走</p>
+        <p class="lede">
+          短距離は気合いで走れるが、長距離はそうもいかない。
+          連載・1冊の本・5年かけるプロジェクト——
+          続けるために必要なのは、才能でも根性でもなく、
+          <b>毎週の儀式</b>と <b>過去の自分への信頼</b>と <b>抜けてもいい仕組み</b>だ。
+          このノートでは、長期戦をいっしょに走るClaudeの使い方を、
+          連載・書籍・スランプ・終わらせ方の4実例で追いかける。
+          シリーズの終わりに、はじめての <b>「終わらせる」</b> 章を置いた。
+        </p>
+        <div class="cover-meta">
+          <span>個人用リファレンス</span>
+          <span>2026.05</span>
+          <span>by AlignLab</span>
+          <span>creator-system</span>
+          <span>VOL.02 FINAL</span>
+        </div>
+      </div>
+      <div class="cover-illu">
+        <div class="rings">
+          <div class="ring r1"></div>
+          <div class="ring r2"></div>
+          <div class="ring r3"></div>
+          <div class="ring r4"></div>
+          <div class="ring r5"></div>
+          <div class="core">続</div>
+        </div>
+        <div class="labels l1">10年。</div>
+        <div class="labels l2">続けた。</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 01 GALLERY -->
+  <section class="gallery">
+    <div class="section-head">
+      <div class="section-num" style="background: var(--purple); color: var(--paper);">01</div>
+      <h2>続けるための10の道具</h2>
+      <p class="lead">短い仕事はテンプレで足りる。長い仕事は <b>道具立て</b> がいる。1つでも自分のものにできれば、もう1年は走れる。</p>
+    </div>
+
+    <div class="gallery-grid">
+
+      <div class="gcard">
+        <div class="preview">
+          <div class="mp mp-plan">
+            <div class="ttl">3-YEAR PLAN</div>
+            <div class="row"><span class="q">Y1</span><span class="v">準備の年</span></div>
+            <div class="row"><span class="q">Y2</span><span class="v">骨を立てる</span></div>
+            <div class="row"><span class="q">Y3</span><span class="v">形にする</span></div>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="num"><span class="gly">計</span>01 / PLAN</div>
+          <h3>長期計画</h3>
+          <p>3年・5年単位で「ここまで」を決める。細かい計画より、大きな矢印を持つ。</p>
+        </div>
+      </div>
+
+      <div class="gcard">
+        <div class="preview">
+          <div class="mp mp-torch">
+            <div class="flame"></div>
+            <div class="lbl">なぜ、これをやる？</div>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="num"><span class="gly">灯</span>02 / TORCH</div>
+          <h3>核の灯火</h3>
+          <p>「なぜやるか」を1行で文章にして、何度でも見返す。続ける理由は薄れていく。</p>
+        </div>
+      </div>
+
+      <div class="gcard">
+        <div class="preview">
+          <div class="mp mp-log">
+            <div class="day"><span class="d">月</span><span class="t">構成2本</span></div>
+            <div class="day"><span class="d">火</span><span class="t">下書き</span></div>
+            <div class="day"><span class="d">水</span><span class="t"><b>休</b></span></div>
+            <div class="day"><span class="d">木</span><span class="t">推敲</span></div>
+            <div class="day"><span class="d">金</span><span class="t">提出</span></div>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="num"><span class="gly">帳</span>03 / LOG</div>
+          <h3>進捗日誌</h3>
+          <p>毎日の進捗をClaudeに1行で渡す。1か月貯まると、自分の癖が見えてくる。</p>
+        </div>
+      </div>
+
+      <div class="gcard">
+        <div class="preview">
+          <div class="mp mp-rhythm">
+            <div class="d">月</div><div class="d on">火</div><div class="d">水</div><div class="d on">木</div><div class="d on">金</div><div class="d rest">土</div><div class="d rest">日</div>
+            <div class="d">月</div><div class="d on">火</div><div class="d">水</div><div class="d on">木</div><div class="d on">金</div><div class="d rest">土</div><div class="d rest">日</div>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="num"><span class="gly">周</span>04 / RHYTHM</div>
+          <h3>週次の儀式</h3>
+          <p>「やる日」と「やらない日」を、最初から両方決める。休む日こそ設計する。</p>
+        </div>
+      </div>
+
+      <div class="gcard">
+        <div class="preview">
+          <div class="mp mp-archive">
+            <div class="shelf">
+              <div class="b"></div><div class="b"></div><div class="b"></div><div class="b"></div>
+              <div class="b"></div><div class="b"></div><div class="b"></div><div class="b"></div>
+            </div>
+            <div class="lbl">PAST WORKS</div>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="num"><span class="gly">蔵</span>05 / ARCHIVE</div>
+          <h3>過去の蔵</h3>
+          <p>書いたもの・作ったものを全部Claudeに読ませる。自分自身を、いちばんの教材に。</p>
+        </div>
+      </div>
+
+      <div class="gcard">
+        <div class="preview">
+          <div class="mp mp-support">
+            <div class="row"><div class="av">編</div><span class="nm">編集者・冬野</span></div>
+            <div class="row"><div class="av">読</div><span class="nm">読者役・夏川</span></div>
+            <div class="row"><div class="av">伴</div><span class="nm">伴走者・春田</span></div>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="num"><span class="gly">助</span>06 / SUPPORT</div>
+          <h3>外部の役</h3>
+          <p>編集者・読者・伴走者のロールを常駐させる。長い仕事ほど「人の目」が要る。</p>
+        </div>
+      </div>
+
+      <div class="gcard">
+        <div class="preview">
+          <div class="mp mp-slump">
+            <div class="heavy">重</div>
+            <div class="arr">→</div>
+            <div class="light">小さく</div>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="num"><span class="gly">倦</span>07 / SLUMP</div>
+          <h3>スランプの抜け方</h3>
+          <p>「やる気が出ない」ではなく「重すぎる」と捉え、Claudeに <b>細かく切ってもらう</b>。</p>
+        </div>
+      </div>
+
+      <div class="gcard">
+        <div class="preview">
+          <div class="mp mp-revise">
+            <div class="v">v1.0 <b>初稿</b></div>
+            <div class="v">v1.5 <b>章立て直し</b></div>
+            <div class="v cur">v2.0 <b>今ここ</b></div>
+            <div class="v">v3.0 <b>?</b></div>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="num"><span class="gly">改</span>08 / REVISE</div>
+          <h3>節目の改訂</h3>
+          <p>3ヶ月・半年で、構造そのものを見直す。Claudeに「今のバージョン」を要約させて捨てる。</p>
+        </div>
+      </div>
+
+      <div class="gcard">
+        <div class="preview">
+          <div class="mp mp-end">
+            <div class="seal">完</div>
+            <div class="lbl">FAREWELL</div>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="num"><span class="gly">結</span>09 / CONCLUDE</div>
+          <h3>終わらせる</h3>
+          <p>始めるより難しい、終わりの設計。「未練3つ・残すもの3つ・次のもの1つ」で結ぶ。</p>
+        </div>
+      </div>
+
+      <div class="gcard">
+        <div class="preview">
+          <div class="mp mp-handoff">
+            <div class="stamp">FOR Y+1</div>
+            <div class="ln"></div>
+            <div class="ln s"></div>
+            <div class="ln"></div>
+            <div class="sig">→ 未来の自分へ</div>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="num"><span class="gly">譲</span>10 / HAND-OFF</div>
+          <h3>未来への引継ぎ</h3>
+          <p>続けるか終わるかと別に、<b>「もし次があるなら」</b>のメモを書き残す。1年後の自分への手紙。</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 02 CASES -->
+  <section class="cases">
+    <div class="section-head">
+      <div class="section-num" style="background: var(--gold); color: var(--paper); transform: rotate(2deg);">02</div>
+      <h2>実例集：長く続けるための4典型</h2>
+      <p class="lead">「続ける」と「終わらせる」の両方を扱う。途中の3か月のスランプも、ちゃんと組み込んだ。</p>
+    </div>
+
+    <!-- CASE A: 連載 -->
+    <div class="case">
+      <div class="tape purple"></div>
+      <div class="case-text">
+        <div class="case-num">CASE A · SERIES</div>
+        <h3>エッセイ連載<br>50回を走る</h3>
+        <div class="scenario">
+          <b>場面</b>月刊エッセイ「窓辺ノート」を、5年・50回続ける計画。
+          毎回ゼロから話さない。<b>「シリーズ憲章」</b> をProjectsに置き、Claudeを連載編集者として常駐させる。
+        </div>
+        <div class="prompt-box"><span class="cm"># --- SERIES CHARTER: 窓辺ノート ---</span>
+
+あなたは "窓辺ノート" 連載の <span class="ph">専属編集者</span> です。
+毎回の原稿に、シリーズ全体の文脈で講評を返してください。
+
+<span class="cm"># シリーズ憲章</span>
+- 主題: 日常の中の <span class="ph">小さな決心</span>
+- 主人公: 元書店員ナホさん（60代）
+- 文体: 一人称・現在形・短文・季語1つ
+- 1回 <span class="ph">1,200字</span>
+- 全 <span class="ph">50回</span> / 月1回 / 5年
+
+<span class="cm"># 連載編集者としての任務</span>
+1. 今回の原稿を、シリーズの <span class="ph">どの位置</span> に置くか1行
+2. これまでの伏線で <span class="ph">回収できそう</span> なものを1つ
+3. 次回以降に <span class="ph">仕込める種</span> を1つ
+4. 「これは毎回言っちゃってる」表現を3つ指摘
+
+<span class="cm"># 禁則</span>
+- 「素晴らしい」「いいですね」禁句
+- 全体の主題から外れた指摘はしない
+- まだ書いてない回について先回りしない
+
+<span class="cm"># 添付資料</span>
+- 過去全回（vol_01_..._vol_N.md）
+- キャラクター設定 / 街の地図 / 季語リスト</div>
+        <div class="reflect">
+          <b>振り返り</b>連載の肝は <b>シリーズ憲章</b> と <b>過去全回の常駐</b>。
+          毎回貼り直さなくていい状態を作ると、Claudeは <b>本物の連載編集者</b> として動ける。
+          「種を仕込む」「伏線を回収する」のような <b>連続性</b> の仕事は、人より得意な領分。
+        </div>
+      </div>
+      <div class="case-visual">
+        <div class="visual-frame">
+          <div class="big-series">
+            <h5><b>SERIES</b>窓辺ノート / 5年・全50回<span class="total">22 / 50</span></h5>
+
+            <div class="series-grid">
+              <div class="ep done">01</div>
+              <div class="ep done">02</div>
+              <div class="ep done">03</div>
+              <div class="ep done">04</div>
+              <div class="ep done">05</div>
+              <div class="ep done">06</div>
+              <div class="ep done">07</div>
+              <div class="ep done">08</div>
+              <div class="ep done">09</div>
+              <div class="ep done">10</div>
+              <div class="ep done">11</div>
+              <div class="ep done">12</div>
+              <div class="ep done">13</div>
+              <div class="ep done">14</div>
+              <div class="ep done">15</div>
+              <div class="ep done">16</div>
+              <div class="ep done">17</div>
+              <div class="ep done">18</div>
+              <div class="ep done">19</div>
+              <div class="ep done">20</div>
+              <div class="ep done">21</div>
+              <div class="ep current">22</div>
+              <div class="ep future">23</div>
+              <div class="ep future">24</div>
+              <div class="ep future">25</div>
+              <div class="ep future">26</div>
+              <div class="ep future">27</div>
+              <div class="ep future">28</div>
+              <div class="ep future">29</div>
+              <div class="ep future">30</div>
+              <div class="ep future">31</div>
+              <div class="ep future">32</div>
+              <div class="ep future">33</div>
+              <div class="ep future">34</div>
+              <div class="ep future">35</div>
+              <div class="ep future">36</div>
+              <div class="ep future">37</div>
+              <div class="ep future">38</div>
+              <div class="ep future">39</div>
+              <div class="ep future">40</div>
+              <div class="ep future">41</div>
+              <div class="ep future">42</div>
+              <div class="ep future">43</div>
+              <div class="ep future">44</div>
+              <div class="ep future">45</div>
+              <div class="ep future">46</div>
+              <div class="ep future">47</div>
+              <div class="ep future">48</div>
+              <div class="ep future">49</div>
+              <div class="ep future">50</div>
+            </div>
+
+            <div class="panel">
+              <b>編集者より</b>第22回「夏、留守番電話」は、第7回「秋、駅前の傘」の <b>反響</b>になっています。「ひとに声をかけられなかった」テーマが、5回越しに <b>もう一度の挑戦</b> に転じた。良い回。
+            </div>
+
+            <h6>仕込めそうな種（次回以降）</h6>
+            <ul>
+              <li>第15回で出てきた「銀杏の並木道」を、第30回前後で再訪する</li>
+              <li>「電話に出ない」が今回。次は「電話をかけ直す」もありえる</li>
+            </ul>
+
+            <h6>毎回言いがちな表現（要注意）</h6>
+            <ul>
+              <li>「ふと」 — 過去22回で <b>17回</b> 使用。次回は禁則にしてみる？</li>
+              <li>「ような気がした」 — 11回使用。半分は削れる</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CASE B: BOOK -->
+    <div class="case reverse">
+      <div class="tape gold" style="right: 60px; left: auto;"></div>
+      <div class="case-text">
+        <div class="case-num">CASE B · BOOK</div>
+        <h3>1冊の本を<br>1年かけて書く</h3>
+        <div class="scenario">
+          <b>場面</b>長らく構想だけがあった本を、本気で書き切る1年計画。
+          Claudeに <b>章ごとの進捗マップ</b> を管理させ、毎週金曜に <b>「次に書く章」</b> を1つだけ示してもらう。
+          全部を見ない。次の1章だけに集中する仕組み。
+        </div>
+        <div class="prompt-box"><span class="cm"># --- BOOK PROJECT: 「書くことと、待つこと」---</span>
+
+あなたは私の本の <span class="ph">伴走編集者</span> です。
+
+<span class="cm"># 構成（全7章 + 序章・終章）</span>
+- 序章 / 1章: 書けない朝のこと
+- 2章: 道具の話
+- 3章: 文体の発見
+- 4章: 読者という存在
+- 5章: 待つことの効用
+- 6章: 書き終わらない原稿
+- 7章: 最後の段落
+- 終章
+
+<span class="cm"># あなたの毎週の任務（毎週金曜）</span>
+1. 進捗マップを <span class="ph">更新</span>
+2. 次の1週間で書く章を <span class="ph">1つだけ</span> 提案
+3. その章の <span class="ph">最初の一段落</span> の方向性を3案
+4. 詰まりそうな箇所を予測 → 対策1つ
+5. 「今週はここまでで十分」のラインを引く
+
+<span class="cm"># 鉄則</span>
+- 全部を見せない。<span class="ph">次の1章</span> だけ
+- 「もっとできる」と煽らない
+- 進度の遅れを <span class="ph">責めない</span>
+- 「来週も書けなくていい」と必ず添える
+
+<span class="cm"># 緊急時</span>
+2週続けて進まなかったら、「執筆中止」も選択肢として提示してください。
+無理に続ける本は、たいてい <span class="ph">良い本</span>にならない。</div>
+        <div class="reflect">
+          <b>振り返り</b>1冊の本は <b>全貌が見えすぎると</b> 書けなくなる。
+          Claudeに <b>「次の1章だけ」</b> を見せてもらう仕組みが、いちばん効く。
+          そして肝は <b>「やめる選択肢」を最初から組み込む</b> こと。書き続けることが目的ではない。
+        </div>
+      </div>
+      <div class="case-visual">
+        <div class="visual-frame">
+          <div class="big-book">
+            <h5><b>BOOK MAP</b>「書くことと、待つこと」 / 進捗 38%</h5>
+
+            <div class="toc">
+              <div class="chap done">
+                <div class="n">序</div>
+                <div class="title">書く前に<small>3,200字 / 完了 (2026-01)</small></div>
+                <div class="progress">
+                  <span>DONE</span>
+                  <div class="bar"><i style="width:100%"></i></div>
+                </div>
+              </div>
+              <div class="chap done">
+                <div class="n">1</div>
+                <div class="title">書けない朝のこと<small>9,800字 / 完了 (2026-02)</small></div>
+                <div class="progress">
+                  <span>DONE</span>
+                  <div class="bar"><i style="width:100%"></i></div>
+                </div>
+              </div>
+              <div class="chap done">
+                <div class="n">2</div>
+                <div class="title">道具の話<small>11,200字 / 完了 (2026-03)</small></div>
+                <div class="progress">
+                  <span>DONE</span>
+                  <div class="bar"><i style="width:100%"></i></div>
+                </div>
+              </div>
+              <div class="chap current">
+                <div class="n">3</div>
+                <div class="title">文体の発見<small>4,400字 / 執筆中 — 今週のフォーカス</small></div>
+                <div class="progress">
+                  <span>40%</span>
+                  <div class="bar"><i style="width:40%"></i></div>
+                </div>
+              </div>
+              <div class="chap future">
+                <div class="n">4</div>
+                <div class="title">読者という存在<small>来月着手予定</small></div>
+                <div class="progress">
+                  <span>—</span>
+                  <div class="bar"><i style="width:0%"></i></div>
+                </div>
+              </div>
+              <div class="chap future">
+                <div class="n">5</div>
+                <div class="title">待つことの効用<small>夏ごろ</small></div>
+                <div class="progress">
+                  <span>—</span>
+                  <div class="bar"><i style="width:0%"></i></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel">
+              <b>今週</b>第3章「文体の発見」だけ。残り 6,000字。<b>「読んでもらえなかった頃」</b>のエピソードを軸に。<br>来週も書けなくていい。1段落ずつでいい。
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CASE C: SLUMP -->
+    <div class="case">
+      <div class="tape red"></div>
+      <div class="case-text">
+        <div class="case-num">CASE C · SLUMP</div>
+        <h3>2か月止まった<br>連載を救う</h3>
+        <div class="scenario">
+          <b>場面</b>連載が2か月空いた。書けない理由を、自分でもうまく言えない。
+          Claudeに <b>「書けない検査」</b> をしてもらう。原因を分解し、再開のための <b>最小の一歩</b> を引き出す。
+          「もうやめてもいい」を、選択肢として机に乗せたうえで。
+        </div>
+        <div class="prompt-box"><span class="cm"># --- SLUMP TRIAGE ---</span>
+
+連載が2か月止まっています。
+原因を <span class="ph">構造的に</span> 検査してください。
+
+<span class="cm"># 進め方</span>
+- 私を責めないこと
+- 「気合い」「やる気」を答えに使わないこと
+- 5つの観点で原因を探って：
+  1. 重さ（テーマが大きすぎる？）
+  2. 距離（自分の経験から離れすぎ？）
+  3. 速度（書く速度が現実離れ？）
+  4. 環境（机・時間・心の状態）
+  5. <span class="ph">そもそも</span>（書く理由が薄れてる？）
+
+<span class="cm"># 出力</span>
+1. 各観点について、私への <span class="ph">問い</span> を1つ
+2. 私の答えを受けて、原因の <span class="ph">最有力候補</span> を1つだけ
+3. その原因への、<span class="ph">明日できる</span> 最小の一手
+4. 「もう、やめてもいい」という選択肢の説明
+   - やめると失うもの 3つ
+   - やめて得られるもの 3つ
+
+<span class="cm"># 注意</span>
+- 私を励まさない
+- 「がんばろう」「待ってます」禁句
+- 中立な検査官のように
+
+最後に一言だけ：<span class="ph">どちらを選んでも、私は私</span>。</div>
+        <div class="reflect">
+          <b>振り返り</b>スランプを「やる気の欠如」で片付けない。
+          <b>5つの観点</b>で構造的に検査すると、たいてい原因は1つに絞れる。
+          そして <b>「やめる選択肢」を机に乗せる</b> のが大事。
+          続けたほうがいいかどうかは、その天秤を一度しっかり見てから決めればいい。
+          自分を責めない伴走者を、Claudeにやってもらう型。
+        </div>
+      </div>
+      <div class="case-visual">
+        <div class="visual-frame">
+          <div class="big-slump">
+            <div class="shead">
+              <h6>書けない検査</h6>
+              <div class="date">2026-05-26 · 連載 "窓辺ノート" 第23回 (2か月空白)</div>
+            </div>
+            <div class="sbody">
+              <div class="row">
+                <div class="lbl">① 重さ</div>
+                <div class="v q">第23回は「父の介護」を扱おうとしている。テーマが、いつもの「日常」より <b style="background:var(--yellow);padding:0 3px">2段階重い</b>。それでも書きますか？</div>
+              </div>
+              <div class="row">
+                <div class="lbl">② 距離</div>
+                <div class="v q">あなたの今の父の状態と、書こうとしている場面は、どのくらい近いですか？ <b style="background:var(--yellow);padding:0 3px">距離が近すぎる</b>と、文章になりません。</div>
+              </div>
+              <div class="row">
+                <div class="lbl">③ 速度</div>
+                <div class="v q">過去22回は平均 <b style="background:var(--yellow);padding:0 3px">10日</b> で1回書いていた。今回はもう60日。スピードが現実離れしていません？</div>
+              </div>
+              <div class="row">
+                <div class="lbl">④ 環境</div>
+                <div class="v q">3月以降、机に向かう時間が <b style="background:var(--yellow);padding:0 3px">週2時間以下</b> になっています。これは「書けない」より「書く時間がない」状態です。</div>
+              </div>
+              <div class="row">
+                <div class="lbl">⑤ そもそも</div>
+                <div class="v q">「窓辺ノート」を始めた最初の1行を、いま、書き直すとしたら、同じ言葉が出てきますか？</div>
+              </div>
+              <div class="row">
+                <div class="lbl">最有力</div>
+                <div class="v">② <b class="em">距離が近すぎる</b>。今書くべきは父の介護ではなく、もっと前か後の話かもしれない。</div>
+              </div>
+              <div class="row">
+                <div class="lbl">明日の一手</div>
+                <div class="v"><ol><li>第23回のテーマを「介護」→「父が元気だった頃の喫茶店」に <b class="em">変更</b></li><li>800字でいい。1,200字を目指さない</li><li>金曜までに <b class="em">1段落</b> だけ書く</li></ol></div>
+              </div>
+            </div>
+            <div class="footer">
+              <b>選択肢</b>① 1か月だけ休載を発表してみる。② 連載を23回で <b>終わらせる</b> 選択も机の上に。失うもの「読者の期待・自分の節目」、得られるもの「次の本の時間・余白・違うテーマ」。どちらを選んでも、あなたはあなたです。
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CASE D: FAREWELL -->
+    <div class="case reverse">
+      <div class="tape gold" style="right: 50px; left: auto;"></div>
+      <div class="case-text">
+        <div class="case-num">CASE D · FAREWELL</div>
+        <h3>長く続けたものを<br>美しく終わらせる</h3>
+        <div class="scenario">
+          <b>場面</b>10年続けたプロジェクトを、ついに終わらせる。
+          続けるのが惜しい、けれど、終わるのにも作法がいる。
+          Claudeに <b>「最終回プランナー」</b> 役で、感謝・残すもの・次のもの、の3つに分けて整理してもらう。
+        </div>
+        <div class="prompt-box"><span class="cm"># --- FAREWELL PLANNER ---</span>
+
+あなたは私の <span class="ph">「最終回プランナー」</span> です。
+10年続けたプロジェクト「<span class="ph">[名前]</span>」を、よい形で終わらせたい。
+
+<span class="cm"># 私から</span>
+- 主観的な「やり切った感」: <span class="ph">[10段階]</span>
+- 終わらせたい理由 3つ
+- 未練 3つ
+- 関わった人の数: <span class="ph">[N]</span>
+
+<span class="cm"># 出力</span>
+1. <span class="ph">最終回</span>でやることリスト
+   - 感謝を伝える相手 5名（誰にどう）
+   - 公開する最後の1本（テーマ提案3つ）
+   - 後始末（連絡・更新停止・ファイル整理）
+
+2. 終わったあとの <span class="ph">3つの箱</span> に仕分け
+   - 残すもの: 次に持っていく
+   - 手放すもの: 心置きなく忘れる
+   - 種にするもの: 次のプロジェクトの素材
+
+3. <span class="ph">10年前の自分</span> への手紙を、私の代わりに下書き
+   - 「あなたが始めてくれてよかった」を中心に
+   - 説教調にしない
+   - 800字以内
+
+<span class="cm"># 禁則</span>
+- 「お疲れさま」を <span class="ph">使いすぎない</span>
+- 「卒業」「節目」のような便利語を避ける
+- 大げさにしない。淡々と。
+
+最後に、「次のプロジェクト」を急かさないでください。
+<span class="ph">何もしない期間</span>もまた、立派な仕事です。</div>
+        <div class="reflect">
+          <b>振り返り</b>終わらせ方は、続け方より <b>難しい</b>。
+          ポイントは「<b>3つの箱に仕分ける</b>」こと——残すもの・手放すもの・種にするもの。
+          すべてを次へ持っていこうとすると、新しい一歩が重くなる。
+          「お疲れさま」「卒業」のような便利な言葉に逃げず、自分の言葉で締めることが、いちばんの慰め。
+        </div>
+      </div>
+      <div class="case-visual">
+        <div class="visual-frame">
+          <div class="big-end">
+            <div class="top-meta">
+              <h6>窓辺ノート / 最終回プラン</h6>
+              <div class="stamp">FAREWELL · v1</div>
+            </div>
+
+            <p class="lead">
+              10年。<span class="em">50回</span>続いた連載を、第50回で結びます。<br>
+              急がず、過去22年（読者として＋執筆10年）を、ちゃんと畳んでから次に行きましょう。
+            </p>
+
+            <h6>3つの箱</h6>
+            <div class="three">
+              <div class="box keep">
+                <div class="h">残すもの</div>
+                <div class="v">文体<small>このリズムは、次の本にそのまま持っていく。</small></div>
+              </div>
+              <div class="box let-go">
+                <div class="h">手放すもの</div>
+                <div class="v">月1の締切<small>毎月の重さは、ここで終わり。</small></div>
+              </div>
+              <div class="box next">
+                <div class="h">種にするもの</div>
+                <div class="v">未収録の場面12<small>次の小説の素材箱へ。</small></div>
+              </div>
+            </div>
+
+            <h6>第50回でやること</h6>
+            <ul style="list-style:none;padding:0;margin:6px 0;font-size:12.5px;line-height:1.7;font-weight:600;">
+              <li>→ 連載の <b style="background:var(--yellow);padding:0 3px">最初の1行</b> を引用して結ぶ</li>
+              <li>→ 編集担当・装丁の方への、名指しの感謝を1段落ずつ</li>
+              <li>→ 第7回「秋、駅前の傘」の続きとして書く</li>
+              <li>→ 連載の最後の単語は、<b>「灯る」</b></li>
+            </ul>
+
+            <div class="seal-end">
+              <div class="big">了</div>
+              <div class="small">50 / 50</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- 03 TEMPLATES -->
+  <section class="templates">
+    <div class="section-head">
+      <div class="section-num" style="background: var(--purple); color: var(--paper); transform: rotate(-1.5deg);">03</div>
+      <h2>長期戦のテンプレ 6つ</h2>
+      <p class="lead">長い仕事は <b>儀式</b> で持つ。同じ言葉を毎週投げるだけで、年単位の往復が安定する。</p>
+    </div>
+
+    <div class="tmpl-grid">
+
+      <div class="tmpl t-purple">
+        <span class="tmpl-tag">CHARTER</span>
+        <h3>① 長期憲章</h3>
+        <p class="when">プロジェクトを始めるとき、毎回貼り直さなくていい <b>動かない部分</b> を明文化する。</p>
+        <pre><span class="cm"># --- LONG-TERM CHARTER ---</span>
+NAME: <span class="ph">[プロジェクト名]</span>
+HORIZON: <span class="ph">[3年 / 5年 / 一生]</span>
+
+<span class="cm"># 灯火（なぜやるか）</span>
+1行で書く。何度でも見返す。
+<span class="ph">[なぜ]</span>
+
+<span class="cm"># 動かないもの</span>
+- 主題: <span class="ph">[1行]</span>
+- 主人公 / 主役: <span class="ph">[誰]</span>
+- 文体・トーン: <span class="ph">[1行]</span>
+- 1回あたりの量: <span class="ph">[N字 / N分]</span>
+- 周期: <span class="ph">[月1 / 週1]</span>
+
+<span class="cm"># 動かしていいもの</span>
+- 公開先 / 媒体
+- 編集体制
+- 価格 / 報酬
+
+<span class="cm"># やめる条件</span>
+1. <span class="ph">[条件]</span>
+2. <span class="ph">[条件]</span>
+最低でも2つ、最初から書く。
+
+合意できれば「憲章了解」とだけ。</pre>
+      </div>
+
+      <div class="tmpl t-gold">
+        <span class="tmpl-tag">WEEKLY-FUEL</span>
+        <h3>② 週次の燃料補給</h3>
+        <p class="when">毎週金曜（or 日曜）に投げる定例。<b>進捗 + 次の1手 + 燃料</b> の3点セット。</p>
+        <pre><span class="cm"># --- WEEKLY FUEL ---</span>
+WEEK: <span class="ph">[YYYY-Www]</span>
+PROJECT: <span class="ph">[名前]</span>
+
+<span class="cm"># 今週の入力</span>
+DID:
+- <span class="ph">[やったこと]</span>
+STUCK:
+- <span class="ph">[詰まったこと]</span>
+MOOD: <span class="ph">[1〜10]</span>
+
+<span class="cm"># あなた（伴走者）の出力</span>
+1. 今週の <span class="ph">最小</span> 進捗の言語化（事実だけ）
+2. 次の1週間で書く <span class="ph">1章だけ</span>
+3. 「来週も書けなくていい」前提での最小一歩
+4. 燃料: 今週の自分へ届ける <span class="ph">10字</span> の一言
+
+<span class="cm"># 禁則</span>
+- 進度の遅れを責めない
+- 「がんばろう」「がんばってる」禁句
+- 全章を見せない。次の1章だけ</pre>
+      </div>
+
+      <div class="tmpl t-red">
+        <span class="tmpl-tag">SLUMP-TRIAGE</span>
+        <h3>③ 詰まり検査</h3>
+        <p class="when">続かなくなった時。気合いを答えに使わず、構造的に原因を探る。</p>
+        <pre>続かなくなりました。
+構造的に検査してください。
+
+<span class="cm"># 5つの観点</span>
+1. 重さ（テーマが大きすぎる？）
+2. 距離（自分から離れすぎ？）
+3. 速度（現実離れした速さ？）
+4. 環境（机・時間・心の状態）
+5. <span class="ph">そもそも</span>（理由が薄れてる？）
+
+<span class="cm"># 進め方</span>
+- 各観点について、私への問いを1つ
+- 答えを受けて、原因を1つだけ
+- 明日できる <span class="ph">最小の一手</span>
+- 「やめる選択肢」も机に乗せて
+   - やめて失うもの 3つ
+   - やめて得られるもの 3つ
+
+<span class="cm"># 禁則</span>
+- 励まさない / 「がんばろう」禁句
+- 「気合い」「やる気」を答えに使わない
+- どちらを選んでも私は私、と最後に1行</pre>
+      </div>
+
+      <div class="tmpl t-blue">
+        <span class="tmpl-tag">RETRO</span>
+        <h3>④ 節目の改訂</h3>
+        <p class="when">3か月・半年・1年の節目で、構造そのものを見直す。<b>計画より仕組み</b>を直す。</p>
+        <pre><span class="cm"># --- MILESTONE RETRO ---</span>
+MILESTONE: <span class="ph">[3か月 / 半年 / 1年]</span>
+PROJECT: <span class="ph">[名前]</span>
+
+<span class="cm"># Claudeから私への問い 5つ</span>
+1. 当初の <span class="ph">主題</span> は、まだ私を惹きつけている？
+2. 動かないと決めた要素のうち、<span class="ph">動かしたほうがいい</span> ものは？
+3. 「やめる条件」に <span class="ph">近づいた</span> 兆候はある？
+4. 過去N回で <span class="ph">3回以上</span> 言いがちな表現は？
+5. これからのN回で、<span class="ph">新しく</span> やってみたいことは？
+
+<span class="cm"># 出力</span>
+1. 憲章の更新差分（旧 → 新）
+2. 次の節目までの新ルール 1つだけ
+3. 過去全本数の <span class="ph">統計</span>（量・テーマ分布）
+
+<span class="cm"># 注意</span>
+- 計画より <span class="ph">仕組み</span> を直す
+- 新ルールは1つだけ。盛らない</pre>
+      </div>
+
+      <div class="tmpl t-green">
+        <span class="tmpl-tag">FAREWELL</span>
+        <h3>⑤ 終わらせ方</h3>
+        <p class="when">続けてきたものを終わらせるとき。<b>3つの箱</b>に仕分けてから次へ。</p>
+        <pre>長く続けたプロジェクトを終わらせます。
+<span class="ph">[名前]</span> を、よい形で結びたい。
+
+<span class="cm"># 私から</span>
+- やり切った感: <span class="ph">[1〜10]</span>
+- 終わらせる理由 3つ
+- 未練 3つ
+- 関わった人の数: <span class="ph">[N]</span>
+
+<span class="cm"># 出力</span>
+1. 最終回でやることリスト
+2. <span class="ph">3つの箱</span> に仕分け
+   - 残すもの: 次に持っていく
+   - 手放すもの: 心置きなく忘れる
+   - 種にするもの: 次の素材
+3. 10年前の自分への手紙の下書き（800字）
+4. 次のプロジェクトを <span class="ph">急かさない</span> 一言
+
+<span class="cm"># 禁則</span>
+- 「お疲れさま」連発しない
+- 「卒業」「節目」のような便利語回避
+- 大げさにしない。淡々と。</pre>
+      </div>
+
+      <div class="tmpl t-pink">
+        <span class="tmpl-tag">FUTURE-LETTER</span>
+        <h3>⑥ 未来への引継ぎ</h3>
+        <p class="when">続けるか終わるか別に、<b>1年後の自分</b> への手紙を、今日の自分から書き残す。</p>
+        <pre>1年後の私への手紙を、
+今日の私の代わりに下書きしてください。
+
+<span class="cm"># 渡したいもの</span>
+- 今、続けていること: <span class="ph">[列挙]</span>
+- 今、悩んでいること: <span class="ph">[1〜3]</span>
+- 今、誇りに思っていること: <span class="ph">[1〜3]</span>
+- 1年後の私に <span class="ph">忘れていてほしくない</span> こと: 3つ
+- 1年後の私に <span class="ph">許してほしい</span> こと: 1つ
+
+<span class="cm"># 出力</span>
+- 1ページの手紙（600字以内）
+- 末尾に「<span class="ph">YYYY年MM月の私より</span>」
+- 説教調禁止
+- 「がんばってる？」のような問いかけ禁止
+- 「ここまでよくやった」のような評価禁止
+
+ただ <span class="ph">事実</span> と <span class="ph">願い</span> だけを書いて。
+
+手紙はProjectsのトップにピン留めします。
+1年後に、勝手に思い出させてくれていい。</pre>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 04 STRENGTHS -->
+  <section class="strengths">
+    <div class="section-head">
+      <div class="section-num" style="background: var(--green); color: var(--paper); transform: rotate(1.5deg);">04</div>
+      <h2>長期戦の得意・不得意</h2>
+      <p class="lead">短距離と長距離は別の競技だ。Claudeにも、できることと、人が握るしかないことがある。</p>
+    </div>
+
+    <div class="sg">
+      <div class="sg-col good">
+        <h3><span class="badge">◯</span>続けるのに効くこと</h3>
+        <div class="sub">CLAUDE FOR THE LONG GAME — 任せて10年走れる</div>
+        <ul>
+          <li>過去の自分の代弁<small>全話を読ませて「3回前に何を言っていたか」を一瞬で参照</small></li>
+          <li>連続性の番人<small>伏線・繰り返し表現・トーンのブレを、何回でもチェック</small></li>
+          <li>進捗の見える化<small>章ごとの進度・空白期間・分量推移を、感情なしで集計</small></li>
+          <li>「次の1章だけ」を見せる<small>全貌で潰れそうなとき、ピンポイントで照準を絞ってくれる</small></li>
+          <li>儀式の保持<small>毎週同じ問いを毎週投げる。退屈な反復こそ得意</small></li>
+          <li>節目の再起動<small>3か月・半年・1年の振り返りを、テンプレで定例化</small></li>
+          <li>淡々とした終わらせ役<small>「お疲れさま」じゃない、構造的な終わらせ方の伴走</small></li>
+        </ul>
+      </div>
+
+      <div class="sg-col bad">
+        <h3><span class="badge">△</span>人にしかできないこと</h3>
+        <div class="sub">HUMAN KEEPS — 譲ってはいけない長期戦の核</div>
+        <ul>
+          <li>始める理由を持ち続けること<small>「灯火」は人が灯し、人が消す。Claudeは保管庫</small></li>
+          <li>本物の喪失感<small>大事なものを失った時、テンプレでは絶対に解けない</small></li>
+          <li>飽きの正しい判断<small>「もう書きたくない」は気分か本気か、最後は自分でしかわからない</small></li>
+          <li>誰かとの長い関係<small>編集者・読者・仲間との10年は、Claudeの代行できない領域</small></li>
+          <li>変化していく自分の主役<small>10年後の自分は別人。誰がそれを書くか、Claudeに渡してはいけない</small></li>
+          <li>終わるタイミングの感覚<small>「ここでやめる」は理屈ではなく身体感覚。最終決定は人</small></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 LIFE STAGES -->
+  <section class="stages">
+    <div class="tape"></div>
+    <div class="stages-head">
+      <span class="num">05 / STAGES</span>
+      <h2>長く続くものの、5つの局面。</h2>
+    </div>
+
+    <div class="stages-grid">
+      <div class="stage">
+        <div class="num">1</div>
+        <h4>はじまり</h4>
+        <div class="tag">SPARK · 0-6m</div>
+        <div class="desc">
+          <b>テーマ</b>
+          灯火を灯し、最初の3本を出す。テンプレはいらない。新鮮さで走れる時期。
+        </div>
+      </div>
+      <div class="stage">
+        <div class="num">2</div>
+        <h4>骨格</h4>
+        <div class="tag">FRAME · 6m-1y</div>
+        <div class="desc">
+          <b>テーマ</b>
+          周期と憲章を作る。Claudeに常駐させる仕組みを整える。<b>退屈な土台</b>づくり。
+        </div>
+      </div>
+      <div class="stage">
+        <div class="num">3</div>
+        <h4>谷</h4>
+        <div class="tag">VALLEY · 1y-3y</div>
+        <div class="desc">
+          <b>テーマ</b>
+          飽き・停滞・スランプの3年間。<b>続けるか終わらせるか</b>の分かれ目が来る。
+        </div>
+      </div>
+      <div class="stage">
+        <div class="num">4</div>
+        <h4>育つ</h4>
+        <div class="tag">GROW · 3y-7y</div>
+        <div class="desc">
+          <b>テーマ</b>
+          蓄積が複利で効きはじめる。過去の自分が、いちばんの教材になる時期。
+        </div>
+      </div>
+      <div class="stage">
+        <div class="num">5</div>
+        <h4>結ぶ</h4>
+        <div class="tag">CONCLUDE · 7y-</div>
+        <div class="desc">
+          <b>テーマ</b>
+          続けるか終わらせるか、もう一度。終わらせるなら、ちゃんと <b>儀式</b> をやる。
+        </div>
+      </div>
+    </div>
+
+    <p style="margin-top: 30px; font-size: 14px; color: var(--ink-soft); font-weight: 600; line-height: 1.65;">
+      <b style="font-family:'Kaisei Decol',serif; color: var(--ink);">📐 コツ</b>
+      ・1〜2年は <b>骨格づくり</b>。退屈に感じるが、ここをサボると3年目で必ず破綻する。
+      ・3年目の「谷」を、<b>事前に予期</b> しておく。来ると知っていれば、抜け方が違う。
+      ・7年を超えたら、いつ終わらせてもいい。長く続いたことは、それだけで充分な達成。
+    </p>
+  </section>
+
+  <!-- =========== FULL INDEX (VOL.1 + VOL.2) =========== -->
+  <section class="full-index">
+    <div class="tape"></div>
+    <h2>ALIGNLAB NOTE — 全10章 総目次</h2>
+    <div class="subtitle">VOL.1 + VOL.2 · 完</div>
+
+    <div class="vols">
+      <div class="vol-block">
+        <div class="vol-label">VOL.01</div>
+        <div class="vol-name">Claudeで、つくる。</div>
+        <div class="ch-list">
+          <div class="ch">
+            <div class="n">01</div>
+            <div class="ttl">Claudeでつくる<small>クリエイティブ・ワークフロー大全</small></div>
+            <div class="pg">P.01</div>
+          </div>
+          <div class="ch">
+            <div class="n">02</div>
+            <div class="ttl">Claudeでデザインする<small>実例とプロンプトの教科書</small></div>
+            <div class="pg">P.02</div>
+          </div>
+          <div class="ch">
+            <div class="n">03</div>
+            <div class="ttl">Claudeで書く<small>ライティング実例集</small></div>
+            <div class="pg">P.03</div>
+          </div>
+          <div class="ch">
+            <div class="n">04</div>
+            <div class="ttl">Claudeと対話する<small>会話の作法</small></div>
+            <div class="pg">P.04</div>
+          </div>
+          <div class="ch">
+            <div class="n">05</div>
+            <div class="ttl">Claudeでしくじる<small>落とし穴とアンチパターン</small></div>
+            <div class="pg">P.05</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="vol-block">
+        <div class="vol-label">VOL.02</div>
+        <div class="vol-name">Claudeで、拡がる。</div>
+        <div class="ch-list">
+          <div class="ch">
+            <div class="n">01</div>
+            <div class="ttl">Claudeで動かす<small>動画とモーションの実例集</small></div>
+            <div class="pg">P.01</div>
+          </div>
+          <div class="ch">
+            <div class="n">02</div>
+            <div class="ttl">Claudeで仕組み化する<small>反復と継続の設計</small></div>
+            <div class="pg">P.02</div>
+          </div>
+          <div class="ch">
+            <div class="n">03</div>
+            <div class="ttl">Claudeとはたらく<small>チームと共有の作法</small></div>
+            <div class="pg">P.03</div>
+          </div>
+          <div class="ch">
+            <div class="n">04</div>
+            <div class="ttl">Claudeで100本<small>ユースケース辞典</small></div>
+            <div class="pg">P.04</div>
+          </div>
+          <div class="ch">
+            <div class="n">05</div>
+            <div class="ttl">Claudeで続ける<small>長期戦の伴走 — 本章</small></div>
+            <div class="pg">P.05</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- END SEAL -->
+  <div class="end-stamp">
+    <div class="seal">
+      <div class="big">完</div>
+      <div class="small">ALIGNLAB NOTE · 2026</div>
+    </div>
+    <div class="scribble">
+      ありがとう。<br>
+      また、いつか、続きを。
+    </div>
+  </div>
+
+  <footer>
+    <div>AlignLab / creator-system &nbsp;◆&nbsp; Claude Sustain Cookbook · FINAL</div>
+    <div class="page-num">VOL.2 — P. 05</div>
+  </footer>
+
+</div>
+
+</body>
+</html>
