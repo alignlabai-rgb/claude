@@ -431,6 +431,64 @@
   </div>
 </section>
 
+<!-- 設計意図 / ツール選定 WHY -->
+<section class="section" id="why">
+  <div class="section-inner">
+    <div class="section-label">設計意図</div>
+    <h2 class="section-title">なぜこのツール・手法を選んだのか</h2>
+    <p style="color: var(--text-muted); margin-bottom: 2rem; max-width: 700px;">
+      「LoRA + IP-Adapter + ControlNet」という組み合わせは一見複雑です。
+      それぞれが別の問題を解いていることを記録します。
+      将来のセッションが構成変更を検討するときの判断軸として。
+    </p>
+    <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem; display: flex; gap: 1.25rem; align-items: flex-start;">
+        <div style="background: rgba(108,60,225,0.15); border-radius: 10px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0;">🎨</div>
+        <div>
+          <div style="font-weight: 700; margin-bottom: 0.35rem;">ComfyUI をバックエンドに選んだ理由</div>
+          <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.8;">
+            ノードグラフ構造により、各生成ステップが独立した API 呼び出しになる。
+            Automatic1111 は GUI 操作前提でスクリプト制御が煩雑だが、ComfyUI は JSON ワークフローで完全自動化できる。
+            バッチ生成・シード固定・ControlNet の重みをコードから制御できることが、OpenClaw との統合の前提条件だった。
+          </div>
+        </div>
+      </div>
+
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem; display: flex; gap: 1.25rem; align-items: flex-start;">
+        <div style="background: rgba(0,220,130,0.15); border-radius: 10px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0;">🧬</div>
+        <div>
+          <div style="font-weight: 700; margin-bottom: 0.35rem;">LoRA + IP-Adapter + ControlNet の3重構成にした理由</div>
+          <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.8;">
+            それぞれが異なるキャラクター一貫性の問題を解いている。
+            <strong style="color: var(--text);">LoRA</strong> は「このキャラのスタイル・顔つき」を学習したファインチューン——最も強力だが失敗時の影響も大きい。
+            <strong style="color: var(--text);">IP-Adapter</strong> は参照画像から視覚的特徴をコンディショニングする補完——LoRA が弱い構図変化に対応。
+            <strong style="color: var(--text);">ControlNet Canny</strong> は「線画・輪郭の一貫性」——コマ間でポーズが変わっても輪郭スタイルが崩れない。
+            1つでは補えない穴を3つで埋めている構成。
+          </div>
+        </div>
+      </div>
+
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem; display: flex; gap: 1.25rem; align-items: flex-start;">
+        <div style="background: rgba(0,212,255,0.15); border-radius: 10px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0;">🔧</div>
+        <div>
+          <div style="font-weight: 700; margin-bottom: 0.35rem;">ADetailer を別途使う理由（ComfyUI 内で完結させない理由）</div>
+          <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.8;">
+            顔の修復は生成後処理として独立させることで、メイン生成のシードを変えずに顔品質だけを向上させられる。
+            全体を再生成するとシーンの整合性が崩れる（背景・他キャラの変化）。
+            ADetailer は顔領域を切り抜いて inpaint → 合成するため、顔以外に影響を与えない。
+            この分離設計がコスト効率（全体再生成 vs 顔部分のみ）でも優れている。
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div style="margin-top: 1.5rem; background: rgba(0,212,255,0.06); border: 1px solid rgba(0,212,255,0.2); border-radius: 12px; padding: 1rem; font-size: 0.82rem; color: var(--text-muted);">
+      💡 将来のセッションへ: 生成AIモデルは半年で世代が変わる。ツール名より「キャラ同一性・スタイル一貫性・顔品質の3問題をそれぞれ解く層がある」という構造の方が重要。
+    </div>
+  </div>
+</section>
+
 <!-- LoRA失敗時フォールバック -->
 <section class="section" id="lora-fallback">
   <div class="section-inner">

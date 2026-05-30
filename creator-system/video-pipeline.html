@@ -401,6 +401,74 @@ ffmpeg -i <span class="str">video_scenes.mp4</span> \
   </div>
 </section>
 
+<!-- 設計意図 / ツール選定 WHY -->
+<section class="section" id="why">
+  <div class="section-inner">
+    <div class="section-label">設計意図</div>
+    <h2 class="section-title">なぜこのツール構成なのか</h2>
+    <p style="color: var(--text-muted); margin-bottom: 2rem; max-width: 700px;">
+      ツール比較表は「何を使うか」を示しますが、「なぜそれを選んだか」は別の問いです。
+      将来のセッションがこのページを読んだとき、選定の意図が分かるように記録します。
+    </p>
+    <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem; display: flex; gap: 1.25rem; align-items: flex-start;">
+        <div style="background: rgba(0,212,255,0.15); border-radius: 10px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0;">🎤</div>
+        <div>
+          <div style="font-weight: 700; margin-bottom: 0.35rem;">ElevenLabs を音声合成の主軸にした理由</div>
+          <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.8;">
+            日本語のイントネーション・抑揚の自然さが Azure / Google TTS より一段上で、視聴継続率に影響する冒頭30秒の「語り口」で差が出やすかった。
+            API の安定性と日本語マルチボイス対応がパイプライン自動化の前提条件を満たす実質唯一の選択肢だった。
+            フォールバックとして VOICEVOX をローカルに保持している理由も同じ——クレジット超過時に音声品質が突然落ちるリスクを許容できないため。
+          </div>
+        </div>
+      </div>
+
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem; display: flex; gap: 1.25rem; align-items: flex-start;">
+        <div style="background: rgba(108,60,225,0.15); border-radius: 10px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0;">🎬</div>
+        <div>
+          <div style="font-weight: 700; margin-bottom: 0.35rem;">RunwayML Gen-4 / Google Veo 3 を「どちらか1本」にしなかった理由</div>
+          <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.8;">
+            両方とも「API 経由で自動制御できる最高品質」という条件を満たす。
+            RunwayML はプロンプト一貫性（複数シーンでスタイルが崩れにくい）に強みがあり、
+            Veo 3 は Google エコシステムとのコスト単価で優位性がある。
+            並列で生成して評価エンジンが高スコアを選ぶ設計にすることで、半年単位のモデル更新にも自動で追従できる。
+            1本に絞ると「そのモデルが劣化した瞬間」に全体品質が下がるリスクを背負う。
+          </div>
+        </div>
+      </div>
+
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem; display: flex; gap: 1.25rem; align-items: flex-start;">
+        <div style="background: rgba(0,220,130,0.15); border-radius: 10px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0;">⚙️</div>
+        <div>
+          <div style="font-weight: 700; margin-bottom: 0.35rem;">最終合成を FFmpeg で行う理由</div>
+          <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.8;">
+            映像・音声・字幕の合成はローカルで完結できる唯一の工程であり、ここだけがクラウド API コストのかからない要素。
+            フレームレート・ビットレート・コーデック（H.264 / H.265）の細かい制御が YouTube 最適化に必要で、クラウドレンダリングでは自由度が足りない。
+            FFmpeg はオープンソースで永続性が保証されており、プラットフォーム依存リスクがない。これも選定基準の一つ。
+          </div>
+        </div>
+      </div>
+
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem; display: flex; gap: 1.25rem; align-items: flex-start;">
+        <div style="background: rgba(255,158,0,0.15); border-radius: 10px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0;">🔢</div>
+        <div>
+          <div style="font-weight: 700; margin-bottom: 0.35rem;">7ステップに分割した理由（一括処理でないのはなぜか）</div>
+          <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.8;">
+            各ステップが独立した API 呼び出しになることで、途中失敗時の再開コストが最小化できる。
+            ステップ4（映像生成）が失敗してもステップ1〜3の成果物（スクリプト・ナレーション・サムネ素材）を再利用できる。
+            並列化可能なステップ（映像生成 + 音声合成 + サムネ生成）を3並列で回すためにも、ステップ分割が有効になっている。
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div style="margin-top: 1.5rem; background: rgba(0,212,255,0.06); border: 1px solid rgba(0,212,255,0.2); border-radius: 12px; padding: 1rem; font-size: 0.82rem; color: var(--text-muted);">
+      💡 将来のセッションへ: ツール名が変わってもこの設計思想は変わらない。「API制御可能・最高品質・フォールバック先あり・ローカル合成」という4軸で代替を探すこと。
+    </div>
+  </div>
+</section>
+
 <footer>
   <div class="footer-inner">
     <div class="footer-logo">AI Creator Hub</div>
@@ -413,7 +481,7 @@ ffmpeg -i <span class="str">video_scenes.mp4</span> \
       <a href="openclaw.html">OpenClaw連携</a>
     </nav>
     <p>AI Creator Hub — AIでコンテンツをつくり、稼ぐ</p>
-    <p style="font-size:0.8rem;opacity:0.65;">最終更新: 2026-05-30（Google Veo 3・RunwayML Gen-4・Kling AI v2・Hailuo AI をツール表に追加）</p>
+    <p style="font-size:0.8rem;opacity:0.65;">最終更新: 2026-06-01（設計意図 / ツール選定 WHY セクションを追加）</p>
   </div>
 </footer>
 
