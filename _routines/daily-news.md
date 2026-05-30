@@ -24,10 +24,13 @@ GitHub Pages経由でいつでもブラウザから確認できる状態に保�
 
 ### 🟠 高優先（積極的に収集）
 - **GPT / OpenAI / Codex**：モデル更新・Codex新機能・エージェント関連
+- **Grok / xAI**：モデル更新（Grok 4.x → 5）・Grok builds・Hermes Agent 連携・Grok Imagine（画像/動画）
 - **動画・画像生成ツール**：Kling / Runway / Sora / Pika / HailuoAI など
 - **クリエイティブAI連携**：Adobe MCP / Blender MCP / Ableton MCP / Affinity
 - **中国系LLM**：DeepSeek / Qwen / Kimi / GLM / Baidu Ernie
 - **AIエージェント全般**：新しいフレームワーク・ツール・ベンチマーク
+
+> 📌 **LLM トラッカー6本との連動**: 本ハブは LLM 速報トラッカーを6本（Claude / ChatGPT / Gemini / Grok / Qwen / GLM）運用している。この6社の重要アップデートは特に拾い、日次ニュースに含める。蓄積した日次記事は、月次棚卸しで該当する `research/*-recent-updates.html` に反映する候補とする（トラッカーの深掘りは「日次の積み上げ」で行い、捏造で埋めない）。
 
 ### 🟡 中優先（重要なものだけ）
 - **Gemini / Google AI**：大きなモデル更新や新サービスのみ
@@ -58,8 +61,8 @@ Web検索で以下のクエリを実行し、**過去24〜48時間**の情報を
 ```
 "Claude" OR "Anthropic" news 2026
 "OpenClaw" OR "Hermes Agent" update 2026
-"GPT-5" OR "Codex" OR "OpenAI" news 2026
-"DeepSeek" OR "Qwen" OR "Kimi" news 2026
+"GPT-5" OR "Codex" OR "OpenAI" OR "Grok" OR "xAI" news 2026
+"DeepSeek" OR "Qwen" OR "Kimi" OR "GLM" OR "Zhipu" news 2026
 "Kling AI" OR "Runway" OR "Sora" video generation 2026
 "Adobe Firefly" OR "Adobe MCP" AI 2026
 AI agent framework release 2026

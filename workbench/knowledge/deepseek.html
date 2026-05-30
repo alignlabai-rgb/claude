@@ -323,6 +323,75 @@
                 </ul>
             </article>
         </section>
+
+        <section class="card">
+            <h2>役割: 激安推論 × コーディングの量産保険</h2>
+            <p>速報トラッカー 6 本（Claude / GPT / Gemini / Grok / Qwen / GLM）には入れていませんが、DeepSeek は<strong>役割ベースの深掘り対象</strong>として確保しています。現行 <strong>DeepSeek V4</strong> の核は「圧倒的なコストパフォーマンス」。</p>
+            <ul>
+                <li><strong>激安推論</strong>: 大量バッチの下書き・分類・要約など、量を回す工程の"保険"として効く。</li>
+                <li><strong>コーディングも相当強い</strong>: GLM と並ぶ実装力で、自動化スクリプトやパイプライン補助にも使える。</li>
+            </ul>
+            <p style="border-left:3px solid #888;padding-left:14px;color:#bbb;font-style:italic;">自動化エンジンの主役は伸び盛りの GLM-5.1 に置きつつ、DeepSeek は「最安・OSS の量産保険」枠として深掘り側で押さえる整理。</p>
+        </section>
+
+        <!-- ===== 実践深掘り: 激安推論の経済性と使い分け ===== -->
+        <section class="card" style="border-color:rgba(59,130,246,0.35);">
+            <h2>Deep Dive ①: なぜ「激安」が成立するのか — 推論コストの経済学</h2>
+            <p>DeepSeek の核心は性能首位ではなく<strong>単位コストの安さ</strong>です。「同じ仕事をどれだけ安く回せるか」という軸で、巨人たちを価格で殴る立ち位置。安さは値引きではなく<strong>アーキテクチャ起因</strong>なのがポイントです。</p>
+            <ul>
+                <li><strong>Engram メモリ × 99% キャッシュヒット</strong>: 過去の対話・読み込み済みドキュメントを「Engram（記憶痕跡）」としてキャッシュし、99% 超のヒット率で再利用。同じ前提を毎回再計算しないため、長文脈・反復ワークロードほど実効コストが落ちる。</li>
+                <li><strong>蒸留（Distillation）</strong>: 巨大教師モデルの思考プロセスを小型モデルへ蒸留し、小さいサイズで高い推論を引き出す。これが「PC に乗るサイズで博士級」を支える。</li>
+                <li><strong>MoE による推論コスト削減</strong>: canon の 5/25 ニュースでは、DeepSeek V4 は <strong>1.6兆パラメータ MoE</strong>で<strong>単一トークンの推論コストを 73% 削減したと発表済み</strong>。総パラメータは巨大でも、推論時に動くのは一部だけ＝サイズの割に安い。</li>
+            </ul>
+            <p style="margin-top:10px;"><strong>価格の継続性（canon）</strong>: 5/26 ニュースで、DeepSeek は <strong>V4-Pro API の 75% 割引</strong>（当初 5/31 終了予定）を<strong>恒久価格に移行</strong>すると発表。V4-Pro は <strong>100万トークンの長文脈</strong>を持ち、自ら「低コスト1Mコンテキスト時代の幕開け」と表現しています。安さが一時キャンペーンでなく構造として続く見込み、というのが下流工程に組み込む上で効きます。</p>
+        </section>
+
+        <section class="card">
+            <h2>Deep Dive ②: コーディングも相当強い</h2>
+            <p>「安いだけ」ではありません。コーディング面でも上位常連です。canon（5/25）では DeepSeek V4 は <strong>Kimi K2.6・Qwen 3.6 Max と同水準</strong>のコーディング性能（SWE-bench Pro 系の評価帯）に位置づけられ、中国系オープンモデルが上位を占める構図の一角を担っています。5/29 時点でも <strong>V4 Pro は BenchLM Tier A（スコア 87）を維持</strong>。</p>
+            <ul>
+                <li><strong>FIM（Fill-In-the-Middle）</strong>: コード中間補完に強い。関数名と閉じ括弧だけ書いて中身を提案させる使い方が得意。</li>
+                <li><strong>ハードロジック</strong>: 数式・正規表現・「正解/不正解がはっきりするタスク」に滅法強い。デバッグはエラーログを投げると論理的・簡潔に原因を指摘。</li>
+                <li><strong>自動化スクリプト/パイプライン補助</strong>: GLM と並ぶ実装力で、量産の下流処理を回すグルーコードの生成にも使える。</li>
+            </ul>
+            <p style="margin-top:10px;"><strong>世代の注意（canon 据え置き）</strong>: 5/29 ニュースでは「次世代 V4 の正式リリースが Huawei Ascend チップ不足で不確定」と報じられており、<strong>現行は DeepSeek V4（V4-Pro）</strong>。本ページもそれを現行として扱います。</p>
+        </section>
+
+        <section class="card">
+            <h2>Deep Dive ③: 「量産の保険／下流工程」での使い方</h2>
+            <p>DeepSeek の真価は、自動コンテンツ量産の<strong>下流（大量・反復・低単価で済む工程）</strong>に置いたとき。最高品質の一発勝負ではなく、「数で効く工程」を安く回す保険枠です。</p>
+            <div style="display:flex; gap:24px; flex-wrap:wrap; margin-top:8px;">
+                <div style="flex:1; min-width:280px;">
+                    <h3>向く工程</h3>
+                    <p>下書き・分類・タグ付け・要約・整形・大量バッチの一次処理。長文脈キャッシュが効くので、同じ前提資料を何百件にも当てる処理ほどコストメリットが大きい。</p>
+                </div>
+                <div style="flex:1; min-width:280px;">
+                    <h3>保険の張り方</h3>
+                    <p>主役の自動化エンジン（GLM-5.1 等）が詰まった/高い時の<strong>フォールバック</strong>として確保。質の最終判断は Claude / GPT-5.5 に通し、量の地ならしを DeepSeek に任せる。</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Deep Dive ④: ローカル / API の使い分け</h2>
+            <p>DeepSeek はオープンソース路線（canon: <strong>MIT ライセンス</strong>）を維持しており、「API で叩く」「自前で動かす」の両取りができます。</p>
+            <ul>
+                <li><strong>API（V4-Pro）</strong>: 初期投資ゼロ・即起動・最新世代にすぐ乗れる。<strong>恒久化された低価格 × 1M コンテキスト</strong>のおかげで、量を回しても従量コストが暴れにくい。まずはここから始めるのが楽。</li>
+                <li><strong>ローカル/OSS</strong>: 重みが公開される系列は <code>GGUF</code>/<code>AWQ</code>/<code>GPTQ</code> 等で量子化し、Ollama / vLLM / llama.cpp で自前運用も可能。オフライン・機密・通信遅延を嫌う用途、あるいは API でも割に合わない超大量反復で検討する（普遍的なローカル運用の考え方）。</li>
+                <li><strong>判断軸</strong>: 「最新性・手軽さ・1M 長文脈」が要るなら API、「オフライン/機密・極端な反復量」ならローカル。多くの量産現場では<strong>API の安さで足りる</strong>ことが多いのが DeepSeek の強み。</li>
+            </ul>
+        </section>
+
+        <section class="card">
+            <h2>Deep Dive ⑤: いつ DeepSeek を選ぶか</h2>
+            <ul>
+                <li><strong>コストが最優先</strong>: 「同じ品質ならとにかく安く」。激安推論が直接効く第一候補。</li>
+                <li><strong>大量・反復</strong>: 同じ前提で何百〜何千件を回すバッチ。Engram キャッシュと 1M コンテキストが効く工程。</li>
+                <li><strong>論理が硬いタスク</strong>: 数式・正規表現・デバッグなど「正解がはっきりする」系。</li>
+                <li><strong>逆に選ばない場面</strong>: ブランドの最終品質・最高難度の一発勝負・対外的に責任を負う成果物は、Claude（Opus 4.8 / Sonnet 4.6）や GPT-5.5 等のフラッグシップへ。DeepSeek は「量と安さで効かせる保険」として下流に置くのが最適。</li>
+            </ul>
+            <p style="border-left:3px solid #3b82f6;padding-left:14px;color:#9ab8e0;font-style:italic;">ひとことで: DeepSeek =「最安・OSS の量産保険」。質の頂点は他社フラッグシップ、自動化の主役は GLM-5.1 に置きつつ、DeepSeek は<strong>大量反復の下流をコストで支える</strong>役回り。</p>
+        </section>
     </div>
 </body>
 

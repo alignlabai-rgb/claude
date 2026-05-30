@@ -322,6 +322,92 @@
                 </ul>
             </article>
         </section>
+
+        <section class="card">
+            <h2>役割: 連作・設定資料の一貫性エンジン</h2>
+            <p>速報トラッカーは 6 本（Claude / GPT / Gemini / Grok / Qwen / GLM）に絞っていますが、Kimi はその外側で<strong>役割ベースの深掘り対象</strong>として押さえています。自動コンテンツ量産で Kimi が効くのは、現行 <strong>Kimi K2.6</strong> の<strong>超長コンテキスト × Agent Swarm</strong>。</p>
+            <ul>
+                <li><strong>キャラクター設定（bible）の一貫性</strong>: 長い設定資料を丸ごと文脈に保持したまま、連作エピソードでキャラ崩れを起こさず書き続ける用途に向く。</li>
+                <li><strong>長編・資料横断</strong>: 大量の参照を同時に抱えた構成・要約・整合チェック。</li>
+            </ul>
+            <p style="border-left:3px solid #888;padding-left:14px;color:#bbb;font-style:italic;">トラッカーで毎日追うほどリリース頻度は高くないため、速報 6 本には入れず「一貫性が要る局面の専用エンジン」として深掘り側に置く整理。</p>
+        </section>
+
+        <!-- ===== 深掘り: 超長コンテキストの実務 ===== -->
+        <section class="card" style="border-color:rgba(225,29,72,0.35);">
+            <h2>Deep Dive ①: 超長コンテキストを「一貫性」に使い切る</h2>
+            <p>Kimi K2.6 の核心は <strong>256k トークン級の長コンテキスト</strong>（canon: intelligence-matrix）。ポイントは「長く読める」こと自体ではなく、<strong>大量の設定を文脈に常駐させたまま破綻させない</strong>ことです。連作・設定資料の整合は、まさにこの一点に効きます。</p>
+            <table style="width:100%; border-collapse:collapse; font-size:0.86rem; margin-top:10px;">
+                <thead><tr style="text-align:left; color:#fda4af;">
+                    <th style="padding:6px 8px;">局面</th><th style="padding:6px 8px;">なぜ長コンテキストが効くか</th>
+                </tr></thead>
+                <tbody>
+                    <tr><td style="padding:6px 8px;"><strong>キャラ bible 常駐</strong></td><td style="padding:6px 8px;">人物の口調・関係・過去設定を丸ごと文脈に置いたまま新エピソードを書くので、巻が進んでもキャラ崩れが起きにくい。</td></tr>
+                    <tr><td style="padding:6px 8px;"><strong>連作エピソードの整合</strong></td><td style="padding:6px 8px;">既刊の伏線・時系列・固有名詞を参照しながら次話を書く／矛盾をチェックする。RAG の切り貼りより「全部入り」が崩れにくい。</td></tr>
+                    <tr><td style="padding:6px 8px;"><strong>長文資料の横断</strong></td><td style="padding:6px 8px;">複数の仕様書・台本・設定メモを同時に抱えて要約・突き合わせ。分割すると失う文脈を保ったまま扱える。</td></tr>
+                </tbody>
+                </table>
+            <p style="margin-top:10px;"><strong>使い方の勘所</strong>: 「都度プロンプトに必要部分だけ貼る」のではなく、<strong>正典（bible）を毎回フル投入</strong>して整合の基準を固定する。長コンテキストは「探す手間を消す」のではなく「忘れさせない」ために使う、と割り切ると効果が出ます。</p>
+        </section>
+
+        <!-- ===== 深掘り: Agent Swarm ===== -->
+        <section class="card">
+            <h2>Deep Dive ②: Agent Swarm の使いどころ</h2>
+            <p>Kimi K2.6 は <strong>最大 300 サブエージェントの並列実行</strong>（canon: intelligence-matrix）を持ちます。1 つの巨大な脳で順番に考えるのではなく、専門化したエージェント群が<strong>同時並行</strong>で動く設計です。量産運用では「速さ」より「分担できる仕事を一気に片付ける」点で効きます。</p>
+            <div style="display:flex; gap:24px; flex-wrap:wrap; margin-top:8px;">
+                <div style="flex:1; min-width:280px;">
+                    <h3>向くタスク（並列分解できる）</h3>
+                    <ul>
+                        <li><strong>横断調査</strong>: 複数資料・複数候補を同時に当たり、比較表にまとめる。</li>
+                        <li><strong>一括整合チェック</strong>: 連作の各話を別エージェントが並行で読み、矛盾箇所を洗い出す。</li>
+                        <li><strong>素材の並列処理</strong>: 大量の参照を分担して要約・タグ付け。</li>
+                    </ul>
+                </div>
+                <div style="flex:1; min-width:280px;">
+                    <h3>向かないタスク（逐次・一発勝負）</h3>
+                    <ul>
+                        <li><strong>1 本の高品質な仕上げ</strong>: 分割の旨味がなく、質判断は Claude / GPT 側が向く。</li>
+                        <li><strong>速報性</strong>: 群れの立ち上げコストがあり、即レスの主役ではない。</li>
+                    </ul>
+                </div>
+            </div>
+            <p style="margin-top:10px;"><strong>長コンテキスト × Swarm の合わせ技</strong>: 全話の正典を共有文脈に置いたまま、各エージェントが担当回を並行チェック——という組み方が「一貫性が要る大規模作業」での Kimi らしい使い方です。</p>
+        </section>
+
+        <!-- ===== 深掘り: 数理推論と視覚 ===== -->
+        <section class="card">
+            <h2>Deep Dive ③: 数理推論（k0-math 由来）と視覚（MoonViT）</h2>
+            <div style="display:flex; gap:24px; flex-wrap:wrap;">
+                <div style="flex:1; min-width:280px;">
+                    <h3>数理推論</h3>
+                    <p>k0-math 直系の推論能力を受け継ぎ、AIME 2025 で <strong>96.1%</strong>（canon: 本ページ Core Specs）。複雑なロジックの検算や構造化された推論が要る局面で土台になります。制作用途では「設定の数量的整合（時系列・年齢・距離などの辻褄）」のチェックに転用できます。</p>
+                </div>
+                <div style="flex:1; min-width:280px;">
+                    <h3>視覚 — MoonViT</h3>
+                    <p>独自視覚エンコーダ <strong>MoonViT</strong> を搭載し、テキストと画像を同等に扱う VLM（K2.6 は 1兆パラメータ級 VLM、canon: 5/25 news）。設定画・ラフ・コマ割りなどの<strong>視覚資料も「文脈」に取り込んで整合判断</strong>に回せるのが、テキスト専用モデルとの差です。</p>
+                </div>
+            </div>
+            <p style="border-left:3px solid #888;padding-left:14px;color:#bbb;font-style:italic;margin-top:8px;">SWE-bench Pro 58.6% を入力 $0.60/M で出す「コーディング最高コスパ」枠でもある（canon: 5/25 news, OpenRouter 2位）。ただし本ハブでは Kimi を量産下流の主役ではなく、長文一貫性の専用エンジンとして位置づける。</p>
+        </section>
+
+        <!-- ===== 深掘り: いつ Kimi を選ぶか / 役割分担 ===== -->
+        <section class="card">
+            <h2>Deep Dive ④: いつ Kimi を選び、いつ他を選ぶか</h2>
+            <p>自動コンテンツ量産の中で Kimi は「主役」ではなく、<strong>一貫性が要る局面の専用エンジン</strong>。質や速報の主役ではない、という前提で役割を切ると判断が速くなります。</p>
+            <table style="width:100%; border-collapse:collapse; font-size:0.86rem; margin-top:10px;">
+                <thead><tr style="text-align:left; color:#fda4af;">
+                    <th style="padding:6px 8px;">こういう時は</th><th style="padding:6px 8px;">使うモデル（現行世代）</th><th style="padding:6px 8px;">理由</th>
+                </tr></thead>
+                <tbody>
+                    <tr><td style="padding:6px 8px;"><strong>長文の一貫性が命</strong>（連作・bible・大規模資料横断）</td><td style="padding:6px 8px;"><strong>Kimi K2.6</strong></td><td style="padding:6px 8px;">256k 長コンテキスト＋ Swarm で「忘れさせない・並行で突き合わせる」。</td></tr>
+                    <tr><td style="padding:6px 8px;"><strong>質の最終判断・仕上げ</strong></td><td style="padding:6px 8px;"><strong>Claude Opus 4.8 / Sonnet 4.6, GPT-5.5</strong></td><td style="padding:6px 8px;">1 本を丁寧に仕上げる品質ゲート。Kimi の出力もここに通す。</td></tr>
+                    <tr><td style="padding:6px 8px;"><strong>量産下流</strong>（下書き・分類・整形・タグ付け）</td><td style="padding:6px 8px;"><strong>Qwen 3.6-Plus / GLM-5.1</strong></td><td style="padding:6px 8px;">ローカル/低コストで安く速く回す土台。</td></tr>
+                    <tr><td style="padding:6px 8px;"><strong>速報・即レス</strong></td><td style="padding:6px 8px;">速報 6 本（Claude / GPT / Gemini / Grok / Qwen / GLM）</td><td style="padding:6px 8px;">Kimi は群れの立ち上げがあり即レスの主役ではない。</td></tr>
+                </tbody>
+            </table>
+            <p style="margin-top:10px;"><strong>典型フロー</strong>: ① 量産下流を Qwen/GLM で安く回す → ② <strong>長文の整合だけ Kimi に通す</strong>（bible 常駐＋並行チェック）→ ③ 最終品質を Claude / GPT-5.5 で締める。Kimi は「②の一貫性レイヤー」を一手に引き受ける専用エンジン、という整理です。</p>
+            <p style="border-left:3px solid #888;padding-left:14px;color:#bbb;font-style:italic;">現行世代メモ: Kimi=K2.6 / Claude=Opus 4.8・Sonnet 4.6 / GPT-5.5 / Gemini=3.1 Pro（3.5 Pro は延期） / Qwen 3.6-Plus / GLM-5.1。日付・数値は canon（本ページ・intelligence-matrix・5/25–26 の AI News）に紐づく範囲で記載し、それ以外は定性記述に留めた。</p>
+        </section>
     </div>
 </body>
 

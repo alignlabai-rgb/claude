@@ -258,6 +258,7 @@
             <span class="last-updated">Last Updated: 2026.05.30</span>
             <br>
             <a class="back" href="../index.html">← Workbenchへ戻る</a>
+            <a class="back" href="../research/grok-recent-updates.html" style="margin-left:14px;">📈 最新動向トラッカー →</a>
         </header>
 
         <section class="grid">
@@ -327,6 +328,119 @@
                     </li>
                 </ul>
             </article>
+        </section>
+
+        <!-- ===== 深掘り：エージェント志向 ===== -->
+        <section class="card">
+            <h2>Deep Dive: Hermes Agent 連携</h2>
+            <p>Grokは単体のチャットモデルとしてだけでなく、<strong>provider非依存の常駐エージェント基盤</strong>の推論バックエンドとしても組み込めます。代表例が <a href="hermes-agent.html" style="color:#fff;text-decoration:underline;">Hermes Agent</a>（Nous Research）です。</p>
+            <h3>なぜ組み込みやすいのか</h3>
+            <ul>
+                <li><strong>モデル非依存の運用層</strong>: Hermesの設計思想の核は「どのモデルが最強か」ではなく「<strong>modelを入れ替えても運用が崩れない構造</strong>」。Grokはその差し替え候補の一つになります。</li>
+                <li><strong>OpenAI互換で呼べる</strong>: GrokはOpenAI SDKの <code style="background:rgba(255,255,255,.08);padding:1px 5px;border-radius:4px;color:#a5f3d0;">base_url</code> を切り替えるだけで呼べるため（Intelligence Matrix記載）、エージェント基盤への組み込みコストが低い。</li>
+                <li><strong>リアルタイム性が効く役割</strong>: 常駐エージェントが「今の状況」を踏まえて動く場面では、GrokのX dataリアルタイムアクセスが推論バックエンドとして強みになります。</li>
+            </ul>
+            <div class="quote-box">
+                ポイントは「Grok専用の連携機能」ではなく、<strong>provider-agnosticな運用層の中の一つの選択肢</strong>として扱えること。一般的なツール連携の文脈で理解するのが正確です。
+            </div>
+        </section>
+
+        <section class="grid">
+            <article class="card">
+                <h2>Deep Dive: Grok builds</h2>
+                <p>Grokのリアルタイム性・高速生成・常時推論は、<strong>制作・自動化レーン</strong>と特に相性がよい組み合わせです。<strong>Grok builds</strong>は、自然言語の指示からアプリやワークフローを組み上げる制作志向の方向性を指します。</p>
+                <ul>
+                    <li><strong>「調べながら作る」体験</strong>: リアルタイム情報を取り込みながらアプリを組めるのは、学習データが固定された他モデルにはない体験です。</li>
+                    <li><strong>Grok Computer との接続</strong>: canon記載のデスクトップ自動化「Grok Computer」と組み合わせると、生成したものを実環境で操作・検証するループが描けます。</li>
+                    <li><strong>Grok 4.3 Fast が下支え</strong>: ターミナルでの高速ツール呼び出し・エージェントワークフローの中核として、制作ループを速く回します。</li>
+                </ul>
+                <p style="font-size:14px;opacity:0.75;">※ 提供日・具体仕様は本ハブcanonに確定情報がないため、能力・ポジショニングの記述に留めています。</p>
+            </article>
+
+            <article class="card">
+                <h2>Deep Dive: エージェント志向の今後（Grok 5 展望）</h2>
+                <p>現行が <strong>Grok 4.3</strong> であることを踏まえると、次世代 <strong>Grok 5</strong> が見込まれます。Grokの差別化軸である<strong>「リアルタイム × エージェント志向」</strong>がさらに強化される方向が有望視されます。</p>
+                <ul>
+                    <li><strong>常時推論の深化</strong>: Thinking Modeの常時稼働をベースに、より長い自律実行・自己検証のループへ。</li>
+                    <li><strong>リアルタイム × 自動化</strong>: X dataの取り込みとGrok Computerの操作能力が一体化する方向。</li>
+                    <li><strong>制作レーンの拡張</strong>: Grok buildsのような「調べながら作る」体験のさらなる作り込み。</li>
+                </ul>
+                <div class="quote-box">
+                    ※ リリース日・ベンチ数値などはcanonに未記載のため、ここでは<strong>方向性の期待</strong>として記述しています。
+                </div>
+            </article>
+        </section>
+
+        <section class="card">
+            <h2>Deep Dive: リアルタイム / X 優位</h2>
+            <p>Grokの最大の差別化は、xAIが持つ <strong>X（旧Twitter）のリアルタイムデータ資産</strong>です。Geminiが「Googleの個人データ資産（Gmail / 検索）」を活かすように、Grokは<strong>「SNSのリアルタイム言説」</strong>を武器にします。</p>
+            <div class="spec-grid" style="grid-template-columns:1fr 1fr;">
+                <div class="spec-item">
+                    <span class="spec-label">最新トレンド調査</span>
+                    <span class="spec-value">X上の投稿をRT分析</span>
+                </div>
+                <div class="spec-item">
+                    <span class="spec-label">新技術キャッチアップ</span>
+                    <span class="spec-value">今朝出た情報に即対応</span>
+                </div>
+                <div class="spec-item">
+                    <span class="spec-label">動画生成（canon）</span>
+                    <span class="spec-value">Grok Imagine Video 首位</span>
+                </div>
+                <div class="spec-item">
+                    <span class="spec-label">推奨フロー</span>
+                    <span class="spec-value">リサーチ起点 → 設計 → 実装</span>
+                </div>
+            </div>
+            <p>ハブの推奨コンボ「① リサーチ = Grok → ② 整理・設計 = Gemini → ③ 実装」のように、<strong>未知領域への素早いキャッチアップの入口</strong>として機能します。AI News（2026-05-12）では <strong>Grok Imagine Video が動画生成リーダーボードで724点を獲得し首位</strong>となり、マルチモーダル生成でもフロンティアに食い込んでいることが記録されています。</p>
+            <p style="font-size:14px;opacity:0.75;">知識の正確性・安全性では Claude / GPT に及ばない場面もありますが、<strong>リアルタイム性ではほぼ独走</strong>というのがcanonの見立てです。重要判断は別モデルでのレビューを推奨します。</p>
+        </section>
+
+        <!-- ===== 実践深掘り: 系列の使い分け ===== -->
+        <section class="card" style="border-color:rgba(244,184,96,0.35);">
+            <h2>Deep Dive ①: どの Grok を、どこで使うか</h2>
+            <p>「Grok をマスターする」上で最初に効くのは、<strong>同じ Grok ブランドの中の役割分担</strong>です。チャット用の最上位、開発者向けの高速版、デスクトップ自動化、動画生成は、それぞれ向く用途が違います（系列名・スペックは本ハブ canon 準拠）。</p>
+            <table style="width:100%; border-collapse:collapse; font-size:0.86rem; margin-top:10px;">
+                <thead><tr style="text-align:left; color:#f4b860;">
+                    <th style="padding:6px 8px;">系列（canon）</th><th style="padding:6px 8px;">置き場所</th><th style="padding:6px 8px;">使いどころ</th>
+                </tr></thead>
+                <tbody>
+                    <tr><td style="padding:6px 8px;"><strong>Grok 4.3</strong></td><td style="padding:6px 8px;">クラウド（grok.com / API）</td><td style="padding:6px 8px;">現行フラッグシップ。Thinking Mode・常時推論。質と推論深度が要る本番。</td></tr>
+                    <tr><td style="padding:6px 8px;"><strong>Grok 4.3 Fast</strong></td><td style="padding:6px 8px;">API（開発者向け）</td><td style="padding:6px 8px;">高速版。ターミナルでのツール呼び出し・エージェントループの中核。</td></tr>
+                    <tr><td style="padding:6px 8px;"><strong>Grok Computer</strong></td><td style="padding:6px 8px;">アプリ統合</td><td style="padding:6px 8px;">デスクトップ自動化。生成物を実環境で操作・検証するループ用。</td></tr>
+                    <tr><td style="padding:6px 8px;"><strong>Grok Imagine Video</strong></td><td style="padding:6px 8px;">アプリ</td><td style="padding:6px 8px;">動画生成。canon（2026-05-12）で人間評価リーダーボード首位 724点。</td></tr>
+                </tbody>
+            </table>
+            <p style="margin-top:10px;"><strong>「リアルタイム × エージェント」が共通の軸</strong>: どの系列も、xAI の X data へのアクセスと常時推論という Grok 固有の強みを土台に持ちます。だから「今の状況を踏まえて自律的に動く」用途で一貫して効く、という理屈です。</p>
+        </section>
+
+        <section class="card">
+            <h2>Deep Dive ②: いつ Grok を選ぶか（使い分け判断）</h2>
+            <p>多軸構成の中で「この場面は Grok」と即断するための早見表です。Grok の差別化軸は <strong>①リアルタイム性 ②ペルソナ ③エージェント志向</strong> の3つ。逆に最終品質・安全性が最重要な場面は別モデルに回すのが canon の方針です。</p>
+            <table style="width:100%; border-collapse:collapse; font-size:0.86rem; margin-top:10px;">
+                <thead><tr style="text-align:left; color:#f4b860;">
+                    <th style="padding:6px 8px;">場面</th><th style="padding:6px 8px;">Grok を選ぶ理由</th><th style="padding:6px 8px;">むしろ別モデルが向く時</th>
+                </tr></thead>
+                <tbody>
+                    <tr><td style="padding:6px 8px;"><strong>リアルタイム性</strong>: 今朝出た技術・進行中のトレンド調査</td><td style="padding:6px 8px;">X data で「今」を読む。学習データが固定の他モデルにない入口。</td><td style="padding:6px 8px;">確定済みの定説・厳密な事実検証 → Claude / GPT-5.5。</td></tr>
+                    <tr><td style="padding:6px 8px;"><strong>ペルソナ</strong>: 率直なフィードバック・相棒的な対話</td><td style="padding:6px 8px;">Emotional Awareness で人間味のある反応。長時間開発の伴走。</td><td style="padding:6px 8px;">フォーマルな成果物・トーン管理が要る出力 → Claude。</td></tr>
+                    <tr><td style="padding:6px 8px;"><strong>エージェント</strong>: 自律ループ・ツール呼び出し</td><td style="padding:6px 8px;">Grok 4.3 Fast ＋ Grok Computer で「調べて作って操作」を回す。</td><td style="padding:6px 8px;">安く大量に回す量産下層 → GLM-5.1 / ローカル Qwen。</td></tr>
+                    <tr><td style="padding:6px 8px;"><strong>動画生成</strong></td><td style="padding:6px 8px;">Grok Imagine Video が canon でリーダーボード首位（724点）。</td><td style="padding:6px 8px;">長尺構成・マルチショット → 用途次第で Veo 等も比較。</td></tr>
+                </tbody>
+            </table>
+            <p style="margin-top:10px;"><strong>推奨コンボ</strong>: 「① リサーチ起点 = Grok → ② 整理・設計 = Gemini → ③ 実装・品質判断 = Claude / GPT-5.5」。Grok は<strong>未知領域への素早い入口</strong>として置き、最終判断は別モデルに通すのが安全なパターンです。</p>
+            <p style="font-size:14px;opacity:0.75;">※ 他社現行世代の参照（canon）: Claude = Opus 4.8 / Sonnet 4.6、GPT-5.5、Gemini 最上位 3.1 Pro。</p>
+        </section>
+
+        <section class="card">
+            <h2>Deep Dive ③: API で呼ぶ — provider 非依存の組み込み</h2>
+            <p>Grok を運用に組み込む上での実務ポイントは、<strong>OpenAI 互換エンドポイント</strong>で呼べることです（Intelligence Matrix 記載）。これが Hermes Agent のような provider 非依存の運用層に差し込みやすい理由でもあります。</p>
+            <ul>
+                <li><strong>base_url を差し替えるだけ</strong>: OpenAI SDK の <code style="background:rgba(255,255,255,.08);padding:1px 5px;border-radius:4px;color:#a5f3d0;">base_url="https://api.x.ai/v1"</code> に向けるだけで既存コードから呼べる。エージェント基盤への組み込みコストが低い。</li>
+                <li><strong>参考価格（canon）</strong>: Grok 4.3 は入力 $1.25 / 出力 $2.50（per 1M tokens）。フロンティア級の中では手頃な部類で、リアルタイム性の対価として割に合う場面が多い。</li>
+                <li><strong>運用層の中の一候補として</strong>: 「Grok 専用連携」ではなく、<strong>model を入れ替えても運用が崩れない構造</strong>の中の差し替え候補として扱うのが正確。リアルタイム性が効く役割を Grok に割り当てる、という設計です。</li>
+            </ul>
+            <p style="font-size:14px;opacity:0.75;">※ 価格・エンドポイントは本ハブ canon（Intelligence Matrix）準拠。実際の利用前に xAI 公式の最新値を確認のこと。</p>
         </section>
     </div>
 </body>

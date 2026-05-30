@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Qwen / Alibaba 最新アップデート完全版 | Research</title>
+  <style>
+    :root {
+      --bg: #0b101d;
+      --panel: #12152a;
+      --panel-2: #181d36;
+      --panel-3: #0f1226;
+      --text: #e8eaf9;
+      --muted: #bcc0da;
+      --soft: #8c8fb4;
+      --border: rgba(255,255,255,0.08);
+      --accent: #c4b5fd;
+      --accent-2: #8b5cf6;
+      --accent-3: #a78bfa;
+      --accent-4: #d8b4fe;
+      --shadow: 0 12px 36px rgba(0,0,0,0.32);
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 12% 14%, rgba(139,92,246,0.16), transparent 28%),
+        radial-gradient(circle at 88% 4%, rgba(196,181,253,0.12), transparent 24%),
+        linear-gradient(145deg, #0b101d 0%, #0d1124 52%, #080b18 100%);
+      color: var(--text);
+      font-family: "Segoe UI", "Noto Sans JP", system-ui, sans-serif;
+      line-height: 1.72;
+      padding: 28px 18px 80px;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .shell { max-width: 1100px; margin: 0 auto; display: grid; gap: 18px; }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px 26px;
+    }
+    .hero {
+      background: linear-gradient(135deg, rgba(139,92,246,0.10), rgba(196,181,253,0.08)), var(--panel);
+    }
+    .breadcrumb { color: var(--soft); font-size: 0.82rem; margin-bottom: 8px; }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      background: rgba(139,92,246,0.16);
+      color: var(--accent);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    h1, h2, h3, h4 { margin: 0 0 10px; }
+    h1 { font-size: 2rem; }
+    h2 { font-size: 1.18rem; }
+    h3 { font-size: 1rem; }
+    h4 { font-size: 0.92rem; color: var(--text); }
+    p, li { color: var(--muted); font-size: 0.92rem; }
+    ul { margin: 8px 0 0; padding-left: 18px; }
+    li { margin-bottom: 6px; }
+    strong { color: var(--text); }
+    .last-update { color: var(--soft); font-size: 0.8rem; margin-top: 10px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    @media (max-width: 920px) {
+      .grid-4, .grid-3 { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 640px) {
+      .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; }
+    }
+    .card, .stat, .subpanel {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+    }
+    .subpanel.deep { background: var(--panel-3); }
+    .stat .value { font-size: 1.8rem; color: var(--accent); font-weight: 800; line-height: 1; }
+    .stat .label { color: var(--soft); font-size: 0.75rem; margin-top: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .tag {
+      display: inline-block;
+      padding: 3px 8px;
+      margin-right: 6px;
+      margin-bottom: 6px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+    .tag-model { background: rgba(167,139,250,0.18); color: var(--accent-4); }
+    .tag-product { background: rgba(96,208,255,0.16); color: #7dd3fc; }
+    .tag-code { background: rgba(247,168,122,0.16); color: #fdba74; }
+    .tag-api { background: rgba(244,184,96,0.16); color: #fcd34d; }
+    .tag-new { background: rgba(79,255,176,0.16); color: #4FFFB0; }
+    .tag-risk { background: rgba(255,107,107,0.16); color: #fca5a5; }
+    .summary {
+      border-left: 4px solid var(--accent);
+      padding-left: 14px;
+      margin-top: 8px;
+    }
+    .timeline {
+      position: relative;
+      display: grid;
+      gap: 14px;
+      padding-left: 28px;
+    }
+    .timeline::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 9px;
+      width: 2px;
+      background: rgba(255,255,255,0.08);
+    }
+    .item {
+      position: relative;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 18px;
+    }
+    .item::before {
+      content: "";
+      position: absolute;
+      left: -24px;
+      top: 18px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--panel);
+      border: 2px solid var(--accent);
+    }
+    .item.hot::before { border-color: var(--accent-2); }
+    .date { font-size: 0.76rem; color: var(--soft); font-weight: 700; margin-bottom: 4px; }
+    .note {
+      background: rgba(139,92,246,0.08);
+      border: 1px solid rgba(139,92,246,0.24);
+      border-radius: 12px;
+      padding: 14px 16px;
+    }
+    .sources li { margin-bottom: 8px; }
+    code {
+      font-family: "Fira Code", "Consolas", monospace;
+      background: rgba(255,255,255,0.06);
+      padding: 0.12rem 0.4rem;
+      border-radius: 6px;
+      color: #ddd6fe;
+    }
+    .small { font-size: 0.84rem; color: var(--soft); }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <section class="panel hero">
+      <div class="breadcrumb"><a href="index.html">Research</a> / <a href="../index.html">Hub Top</a></div>
+      <div class="eyebrow">Qwen / Alibaba Update Tracker</div>
+      <h1>Qwen / Alibaba 最新アップデート完全版</h1>
+      <p>
+        ハブ内 canon（<a href="../workbench/knowledge/qwen.html">qwen.html 深掘り</a>・
+        <a href="../workbench/knowledge/intelligence-matrix.html">Intelligence Matrix</a>・
+        <a href="ai-news/index.html">AI News 日次</a>）をもとに、Alibaba の Qwen 系列の動きを実務視点で整理したページです。
+        単なる年表ではなく、<strong>何が変わり、どこに効き、自前運用・量産でどう使えるか</strong>まで踏み込んでまとめています。
+      </p>
+      <div class="summary">
+        <p>
+          Qwen は <strong>本ハブが追う LLM の中で最も更新頻度が高い系列</strong>です。現行フラッグシップは
+          <strong>Qwen 3.6-Plus</strong>（The Scholar）。MoE（Mixture-of-Experts）アーキテクチャで効率を稼ぎつつ、
+          <strong>数理とコーディング（Qwen-Coder）</strong>で商用トップモデルに肉薄します。
+        </p>
+        <p>
+          2026年前半の本質は、<strong>「オープンウェイトで安く・速く回せる作業馬」</strong>としての地位確立です。
+          5月だけでも <strong>Qwen 3.6-35B-A3B</strong>（RTX 4090 一枚で動く MoE）、
+          <strong>Qwen3 Agent + Qwen-Image 2.0</strong>（フルエージェント＋マルチモーダル）が立て続けに出荷され、
+          ローカル LLM 運用と自動コンテンツ量産の両方で実用度が一段上がりました。
+          DeepSeek V4・Kimi K2.6 と並ぶ<strong>中国系オープンモデル競争</strong>の中核です。
+        </p>
+      </div>
+      <p class="last-update">最終更新: 2026-05-30</p>
+    </section>
+
+    <section class="grid-4">
+      <div class="stat"><div class="value">3.6</div><div class="label">Qwen 現行世代</div></div>
+      <div class="stat"><div class="value">1M</div><div class="label">コンテキスト長（canon）</div></div>
+      <div class="stat"><div class="value">RTX 4090</div><div class="label">35B-A3B が動く GPU</div></div>
+      <div class="stat"><div class="value">29+</div><div class="label">対応言語数</div></div>
+    </section>
+
+    <section class="panel">
+      <h2>まず押さえる結論</h2>
+      <div class="grid-3">
+        <div class="card">
+          <span class="tag tag-model">Cadence</span>
+          <h3>最も更新が速い系列 — Plus / Max / 35B-A3B が並走</h3>
+          <p>
+            Qwen は<strong>本ハブが追う中で最も活発に更新されるモデル系</strong>。現行は
+            <strong>Qwen 3.6-Plus</strong>。同じ 3.6 世代で <strong>Max</strong>（ベンチ最上位帯）・
+            <strong>35B-A3B</strong>（ローカル向け）と用途別バリアントが並走し、数週間単位で派生が増える。
+          </p>
+        </div>
+        <div class="card">
+          <span class="tag tag-product">Local / Open Weight</span>
+          <h3>RTX 4090 一枚で回る「自前で安い作業馬」</h3>
+          <p>
+            <strong>Qwen 3.6-35B-A3B</strong> は MoE で 1 トークン処理時に <strong>3B のみ起動</strong>、
+            量子化適用で <strong>RTX 4090 一枚でフル動作</strong>。canon では「コンシューマーハードで動く最強オープンウェイト」と位置づけ。
+            大量リクエストを並列投入してコストを削る量産用途に最適。
+          </p>
+        </div>
+        <div class="card">
+          <span class="tag tag-product">Multimodal / Agent</span>
+          <h3>Qwen3 Agent + Qwen-Image 2.0 でワークフロー化</h3>
+          <p>
+            5/19 に <strong>Qwen3 Agent と Qwen-Image 2.0 を統合したエンドツーエンドのエージェントフレームワーク</strong>を公開。
+            論文 PDF からスライドデックを自動生成するなど、<strong>マルチモーダルな業務ワークフローをオープンウェイト</strong>で実現。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>重要タイムライン</h2>
+      <p class="small">※ 本ハブ canon（AI News 日次・Intelligence Matrix）に出典がある項目のみ掲載。日付が「5月」止まりの canon は月内表記。</p>
+      <div class="timeline">
+
+        <article class="item hot">
+          <div class="date">2026-05（buildfastwithai）</div>
+          <h3>Qwen 3.6-35B-A3B リリース — RTX 4090 一台で動く MoE オープンウェイト</h3>
+          <p>
+            Alibaba が Qwen 3.6 シリーズの <strong>35B パラメータ版</strong>を公開。MoE アーキテクチャにより
+            <strong>1 トークン処理時に 3B のみ起動</strong>させ、量子化適用で <strong>RTX 4090 一枚でフル動作</strong>可能。
+            <strong>コンシューマーハードウェアで稼働する最強オープンウェイトモデル</strong>として注目を集める。
+          </p>
+          <p class="small">Source: buildfastwithai（2026年5月）／ ハブ内 <a href="ai-news/2026-05-07.html">AI News 2026-05-07</a></p>
+        </article>
+
+        <article class="item hot">
+          <div class="date">2026-05-19</div>
+          <h3>Qwen3 Agent + Qwen-Image 2.0 — フルエージェントフレームワーク公開</h3>
+          <p>
+            Alibaba が <strong>Qwen3 Agent と Qwen-Image 2.0 を統合したエンドツーエンドのエージェントフレームワーク</strong>を公開。
+            論文 PDF を入力すると<strong>スライドデックを自動生成</strong>するなど、マルチモーダルな業務ワークフローを
+            <strong>オープンウェイトで実現</strong>し、中国系 LLM スタックの実用性が一段向上。
+          </p>
+          <p class="small">Source: WhatLLM.org / NextFuture ／ ハブ内 <a href="ai-news/2026-05-19.html">AI News 2026-05-19</a></p>
+        </article>
+
+        <article class="item">
+          <div class="date">2026-05-22</div>
+          <h3>Hermes Agent × Qwen 3.6（27B / 35B）でローカル・マルチステップ実行</h3>
+          <p>
+            Nous Research の <strong>Hermes Agent</strong> が NVIDIA RTX PC / DGX Spark でのネイティブ動作を発表。
+            <strong>Qwen 3.6（27B / 35B）との組み合わせ</strong>でローカル動作しながら複数ステップのエージェントタスクをこなす構成が示され、
+            Qwen が<strong>自前運用エージェントのベースモデル</strong>として使われていることが裏づけられた。
+          </p>
+          <p class="small">Source: ハブ内 <a href="ai-news/2026-05-22.html">AI News 2026-05-22</a></p>
+        </article>
+
+        <article class="item">
+          <div class="date">2026-05-08 / 05-21 / 05-25</div>
+          <h3>Qwen 3.6 Max — 中国系オープンモデル競争のベンチ基準</h3>
+          <p>
+            複数の日次記事で <strong>Qwen 3.6 Max</strong> が<strong>コーディングベンチの基準モデル</strong>として参照されている。
+            Kimi K2.6・DeepSeek V4 がいずれも「Qwen 3.6 Max と同水準／僅差」として性能を語られ、
+            Qwen が中国系オープンモデル群の<strong>事実上のものさし</strong>になっていることがわかる（SWE-Bench / OpenRouter ランキング文脈）。
+          </p>
+          <p class="small">Source: ハブ内 <a href="ai-news/2026-05-08.html">2026-05-08</a> / <a href="ai-news/2026-05-21.html">05-21</a> / <a href="ai-news/2026-05-25.html">05-25</a></p>
+        </article>
+
+        <article class="item">
+          <div class="date">現行</div>
+          <h3>Qwen 3.6-Plus（The Scholar）— ハブ SSOT の現行フラッグシップ</h3>
+          <p>
+            Intelligence Matrix・各深掘りページでの現行表記は <strong>Qwen 3.6-Plus</strong>。
+            強みは <strong>Math &amp; Code / Multilingual</strong>、コンテキスト長は <strong>1,000,000</strong>。
+            「アルゴリズム実装」「多言語ドキュメント読解」を効きどころとして整理されている。
+          </p>
+          <p class="small">Source: ハブ内 <a href="../workbench/knowledge/intelligence-matrix.html">Intelligence Matrix</a></p>
+        </article>
+
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Qwen モデル系統で何が変わったか</h2>
+      <p>同じ 3.6 世代の中で、Qwen は「サイズ」「用途」「マルチモーダル」を軸にバリアントを並走させています（canon 準拠）：</p>
+      <div class="grid-2">
+        <div class="subpanel">
+          <span class="tag tag-model">現行フラッグシップ</span>
+          <h3>Qwen 3.6-Plus</h3>
+          <p>The Scholar。MoE アーキテクチャ、1M コンテキスト。Math &amp; Code と Multilingual が二枚看板。汎用の主力。</p>
+        </div>
+        <div class="subpanel">
+          <span class="tag tag-model">ベンチ最上位帯</span>
+          <h3>Qwen 3.6 Max</h3>
+          <p>コーディングベンチで DeepSeek V4・Kimi K2.6 と同水準として参照される基準モデル。中国系オープンモデルのものさし。</p>
+        </div>
+        <div class="subpanel">
+          <span class="tag tag-model">ローカル向け（5月）</span>
+          <h3>Qwen 3.6-35B-A3B</h3>
+          <p>35B 総パラメータ・アクティブ 3B の MoE。量子化で RTX 4090 一枚でフル動作。コンシューマーハードで動く最強オープンウェイト。</p>
+        </div>
+        <div class="subpanel">
+          <span class="tag tag-model">エージェント基盤として</span>
+          <h3>Qwen 3.6（27B / 35B）on Hermes</h3>
+          <p>Hermes Agent と組み、RTX PC / DGX Spark 上でローカルにマルチステップ実行。自前運用エージェントのベースモデル。</p>
+        </div>
+        <div class="subpanel">
+          <span class="tag tag-code">コーディング特化</span>
+          <h3>Qwen-Coder</h3>
+          <p>膨大なコードリポジトリ・技術文書で学習。スニペットでなくファイル構造全体や実行可能な完全スクリプトを生成。Vibe Coding の中核。</p>
+        </div>
+        <div class="subpanel">
+          <span class="tag tag-product">マルチモーダル</span>
+          <h3>Qwen3 Agent + Qwen-Image 2.0</h3>
+          <p>5/19 公開のエンドツーエンドフレームワーク。PDF→スライド自動生成などの業務ワークフローをオープンウェイトで実現。</p>
+        </div>
+      </div>
+      <p class="small" style="margin-top: 14px;">※ 上記は本ハブ canon に出典がある範囲。固有のベンチ数値・正式リリース日は canon に無いものは載せていない。</p>
+    </section>
+
+    <section class="panel">
+      <h2>ローカル LLM 運用での強み — 「自前で安く回せる作業馬」</h2>
+      <p>
+        Qwen 系列の最大の実務価値は、<strong>オープンウェイトをコンシューマー / ワークステーション GPU で回せる</strong>点にあります。
+      </p>
+      <ul>
+        <li><strong>MoE による軽さ</strong>：35B-A3B は総 35B でも 1 トークンあたり <strong>3B のみ起動</strong>。量子化で <strong>RTX 4090 一枚</strong>に収まる。</li>
+        <li><strong>並列・量産前提</strong>：推論時アクティブパラメータが少ないため高速・低コスト。<strong>大量リクエストを並列投入</strong>してコストを削る用途に向く（Intelligence Matrix の運用メモ準拠）。</li>
+        <li><strong>ローカルエージェント</strong>：Hermes Agent と組めば RTX PC / DGX Spark 上で<strong>マルチステップのエージェントタスク</strong>がオフラインで回る。</li>
+        <li><strong>API でも統一呼び出し</strong>：OpenRouter 経由で <code>qwen/qwen3.6-plus</code> として他モデルと同じ SDK 流儀で呼べる（Intelligence Matrix のコード例準拠）。</li>
+      </ul>
+      <p class="small">
+        本ハブの文脈では、Qwen は<strong>自動コンテンツ量産パイプラインの「安い実行ワーカー」</strong>として位置づけられる。
+        フロンティアモデルで設計・判断し、量をこなす反復処理を Qwen のローカル / 低コスト推論に逃がす、という分担が自然。
+      </p>
+    </section>
+
+    <section class="panel">
+      <h2>動画・マルチモーダル展開</h2>
+      <p>
+        Qwen はテキストだけでなく、<strong>画像・マルチモーダルの生成／理解</strong>をオープンウェイトで広げています（canon 範囲）。
+      </p>
+      <ul>
+        <li><strong>Qwen-Image 2.0</strong>：Qwen3 Agent と統合され、<strong>マルチモーダルな業務ワークフロー</strong>（PDF→スライド等）を構成する画像側の核。</li>
+        <li><strong>フレームワーク化</strong>：単体モデルでなく、<strong>入力理解→生成→成果物</strong>までをつなぐエンドツーエンドのエージェントフレームとして提供。</li>
+        <li><strong>オープンウェイトのまま</strong>：商用 API に依存せず、マルチモーダルなパイプラインを<strong>自前環境で組める</strong>のが差別化点。</li>
+      </ul>
+      <p class="small">
+        本ハブの文脈では、こうしたマルチモーダル／量産機能は<strong>自動コンテンツ量産での反復生成タスク</strong>の担い手として有用。
+        ※ 動画生成の固有スペック・ベンチ・正式名称は本ハブ canon に明確な記述が無いため、ここでは定性記述に留める。
+      </p>
+    </section>
+
+    <section class="panel">
+      <h2>更新頻度の速さ — なぜ「最も活発な系列」なのか</h2>
+      <p>
+        本ハブが追う各系列の中で、Qwen は<strong>同一世代内のバリアント派生が最も速い</strong>のが特徴です。
+      </p>
+      <ul>
+        <li><strong>1 世代＝多バリアント</strong>：3.6 世代だけで <strong>Plus / Max / 35B-A3B / 27B</strong> と用途別に枝分かれ。</li>
+        <li><strong>月内に複数の出荷</strong>：canon 上、2026 年 5 月だけで 35B-A3B（ローカル）と Qwen3 Agent + Qwen-Image 2.0（エージェント）が立て続けに登場。</li>
+        <li><strong>競合のものさし化</strong>：Kimi K2.6・DeepSeek V4 が「Qwen 3.6 Max と同水準」で語られるほど、<strong>Qwen がベンチの基準点</strong>として参照され続ける。</li>
+      </ul>
+      <p class="small">
+        実務上の含意：Qwen を採用する場合は<strong>モデル ID とバリアントの追従</strong>が前提になる。
+        OpenRouter のモデル名やローカルの量子化版を、パイプライン側で切り替え可能にしておくと更新に耐えやすい。
+      </p>
+    </section>
+
+    <section class="panel">
+      <h2>Qwen-Coder — コーディング特化の中身</h2>
+      <p>
+        Qwen ファミリーの中で Vibe Coding に最も効くのが <strong>Qwen-Coder</strong> です（qwen.html 深掘り準拠）。
+      </p>
+      <div class="grid-2" style="margin-top: 14px;">
+        <div class="subpanel">
+          <h3>Code-First Thinking</h3>
+          <p>一般会話データだけでなく、膨大なコードリポジトリと技術文書で学習。「開発者の文脈」を理解した上で実装する。</p>
+        </div>
+        <div class="subpanel">
+          <h3>Artifact Generation</h3>
+          <p>スニペットでなく、<strong>ファイル構造全体や実行可能な完全スクリプト</strong>を生成する能力に長ける。</p>
+        </div>
+        <div class="subpanel">
+          <h3>アルゴリズム実装</h3>
+          <p>複雑な計算ロジックやデータ構造最適化が必要な場面で精度が高い。「数学に強いアルゴリズム担当」。</p>
+        </div>
+        <div class="subpanel">
+          <h3>多言語コメント</h3>
+          <p>日本語コメントを含むコード生成でも、違和感のない自然な日本語を使う。多言語ドキュメント読解にも強い。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>立ち位置 — 競合との住み分け</h2>
+      <p>SSOT 現行世代（Claude=Opus 4.8/Sonnet 4.6、GPT-5.5、Gemini 3.1 Pro、Grok 4.3、GLM-5.1、DeepSeek V4、Kimi K2.6）を前提に整理：</p>
+      <ul>
+        <li><strong>vs DeepSeek V4</strong>：どちらも中国発の強力モデル。Qwen は <strong>Alibaba Cloud を背景にした「実用性・堅牢性」重視</strong>、DeepSeek は「推論能力」重視という住み分け（qwen.html 準拠）。ベンチ上はしばしば同水準で語られる。</li>
+        <li><strong>vs Kimi K2.6</strong>：Kimi はフロントエンド UI に寄り、Qwen 3.6 Max は<strong>コーディングベンチの基準点</strong>として参照される側。</li>
+        <li><strong>vs Mistral</strong>：Mistral は汎用、Qwen はより「理数系」に特化した鋭い回答をする傾向（qwen.html 準拠）。</li>
+        <li><strong>vs フロンティア商用（Claude / GPT / Gemini）</strong>：最高難度の推論・安全性評価は商用フロンティアが優位。Qwen は<strong>オープンウェイトで安く量をこなす作業馬</strong>として差別化。</li>
+      </ul>
+    </section>
+
+    <section class="panel">
+      <h2>注意点とリスク</h2>
+      <div class="note">
+        <ul>
+          <li><strong>バリアントの追従コスト</strong>：Plus / Max / 35B-A3B / 27B と同世代で枝が多く、更新が速い。API のモデル ID・ローカル量子化版の管理が複雑になりやすい。</li>
+          <li><strong>言語指定が前提</strong>：多言語が最強だが、Intelligence Matrix の運用メモでは<strong>出力言語を明示</strong>すると精度が上がる／言語未指定の多言語混在入力は避ける、とされる。数式・コードは英語プロンプト推奨。</li>
+          <li><strong>安全性評価には不向き</strong>：高度な倫理判断・安全性評価タスクは避けるべき用途として canon に明記。フロンティア商用に任せる。</li>
+          <li><strong>固有スペックの未確定</strong>：動画生成の正式名称・ベンチ・リリース日など、本ハブ canon に無い数値は確定情報として扱わない。</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>出典（ハブ内 canon 参照）</h2>
+      <ul class="sources">
+        <li><a href="../workbench/knowledge/qwen.html">Qwen (The Scholar) 深掘り</a> — workbench/knowledge/qwen.html（Last Updated: 2026.05.30）</li>
+        <li><a href="../workbench/knowledge/intelligence-matrix.html">Intelligence Matrix</a> — 現行世代・運用メモ・OpenRouter 呼び出し例</li>
+        <li><a href="ai-news/2026-05-07.html">AI News 2026-05-07</a> — Qwen 3.6-35B-A3B（RTX 4090 一台 / MoE）<span class="small">／ ソース: buildfastwithai</span></li>
+        <li><a href="ai-news/2026-05-19.html">AI News 2026-05-19</a> — Qwen3 Agent + Qwen-Image 2.0 フレームワーク<span class="small">／ ソース: WhatLLM.org / NextFuture</span></li>
+        <li><a href="ai-news/2026-05-22.html">AI News 2026-05-22</a> — Hermes Agent × Qwen 3.6（27B / 35B）ローカル動作</li>
+        <li><a href="ai-news/2026-05-08.html">AI News 2026-05-08</a> / <a href="ai-news/2026-05-21.html">05-21</a> / <a href="ai-news/2026-05-25.html">05-25</a> — Qwen 3.6 Max をベンチ基準とする中国系オープンモデル競争</li>
+        <li><a href="ai-news/index.html">AI News 日次インデックス</a></li>
+      </ul>
+    </section>
+
+    <section class="panel">
+      <h2>関連リンク</h2>
+      <ul>
+        <li><a href="../workbench/knowledge/qwen.html">Qwen 深掘り（workbench/knowledge/qwen.html）</a></li>
+        <li><a href="../workbench/knowledge/intelligence-matrix.html">Intelligence Matrix（モデル横断比較）</a></li>
+        <li><a href="index.html">Research トップ</a></li>
+      </ul>
+      <p class="last-update">最終更新: 2026-05-30 ／ 全記述はハブ内 canon（qwen.html・intelligence-matrix.html・AI News 日次）に基づく。canon に無い固有数値・日付は定性記述に留めている。</p>
+    </section>
+
+  </div>
+</body>
+</html>

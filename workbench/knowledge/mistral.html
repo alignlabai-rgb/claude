@@ -324,6 +324,60 @@
                 </ul>
             </article>
         </section>
+
+        <!-- ===== 実践深掘り: 欧州オープンウェイトの使いどころ ===== -->
+        <section class="card" style="border-color:rgba(240,192,93,0.35);">
+            <h2>Deep Dive ①: 欧州発・オープンウェイト × 透明性という立ち位置</h2>
+            <p>Mistral を「マスターする」上で最初に押さえるべきは、性能の絶対値よりも<strong>立ち位置</strong>です。米中の巨大ラボがクローズドな最強モデル競争を走るなか、Mistral は<strong>欧州発・オープンウェイト・効率重視</strong>という別の軸で価値を出しています。現行は <strong>Mistral 3 系</strong>（intelligence-matrix では実用枠として <strong>Mistral Medium 3.5</strong> を掲載、コンテキスト <strong>256k</strong>）。</p>
+            <ul>
+                <li><strong>オープンウェイト</strong>: 重みが公開されるため、自社インフラ・オンプレ・プライベートクラウドで動かせる。データを外部 API に送らずに済むのが最大の差別化点。</li>
+                <li><strong>透明性</strong>: 「巨大な万能ブラックボックス」ではなく、何をどう動かしているか把握しやすい構成。監査・説明責任が求められる現場と相性がよい。</li>
+                <li><strong>欧州というコンテキスト</strong>: 欧州言語への対応と、商用利用のしやすさ（ライセンス面の素直さ）で一歩リード。データ主権・コンプライアンス志向の組織にとって「政治的にも選びやすい」選択肢。</li>
+            </ul>
+            <p style="margin-top:10px;"><strong>注意（canon 据え置き）</strong>: 本ハブの世代確認では <strong>Mistral 3 系が現行</strong>で、新世代（いわゆる「Mistral 4」）の確報はありません。ここでも「Mistral 3 系を現行」として扱います。</p>
+        </section>
+
+        <section class="card">
+            <h2>Deep Dive ②: 効率重視のラインナップ — 用途特化のスリムなモデル群</h2>
+            <p>Mistral の設計思想は「一個の巨人」ではなく「<strong>目的に特化した最強のツールを並べる</strong>」こと。だから選ぶときは「どのサイズ・どの特化か」をまず決めると速いです。canon に載っているモデルだけで整理すると：</p>
+            <table style="width:100%; border-collapse:collapse; font-size:0.86rem; margin-top:10px;">
+                <thead><tr style="text-align:left; color:#f0c05d;">
+                    <th style="padding:6px 8px;">系列（canon）</th><th style="padding:6px 8px;">特化</th><th style="padding:6px 8px;">使いどころ</th>
+                </tr></thead>
+                <tbody>
+                    <tr><td style="padding:6px 8px;"><strong>Mistral 3 Large</strong></td><td style="padding:6px 8px;">汎用フラッグシップ</td><td style="padding:6px 8px;">質が要る本番生成・複雑な指示の中核。</td></tr>
+                    <tr><td style="padding:6px 8px;"><strong>Mistral Medium 3.5</strong></td><td style="padding:6px 8px;">実用バランス（256k）</td><td style="padding:6px 8px;">ローカル/OSS 枠の主力。Le Chat の Work モードでマルチステップ自動化。</td></tr>
+                    <tr><td style="padding:6px 8px;"><strong>Ministral</strong></td><td style="padding:6px 8px;">軽量</td><td style="padding:6px 8px;">エッジ・低リソース・常駐タスク。最小負荷で回す。</td></tr>
+                    <tr><td style="padding:6px 8px;"><strong>Magistral</strong></td><td style="padding:6px 8px;">推論（Reasoning）</td><td style="padding:6px 8px;">数学・論理。パラメータ効率の良い思考系。</td></tr>
+                    <tr><td style="padding:6px 8px;"><strong>Codestral / Devstral</strong></td><td style="padding:6px 8px;">コーディング</td><td style="padding:6px 8px;">80+ 言語・低レイテンシ補完。エディタ組み込み向き。</td></tr>
+                    <tr><td style="padding:6px 8px;"><strong>Voxtral</strong></td><td style="padding:6px 8px;">音声（Speech）</td><td style="padding:6px 8px;">音声認識・処理。リアルタイム音声エージェントの核。</td></tr>
+                    <tr><td style="padding:6px 8px;"><strong>Pixtral</strong></td><td style="padding:6px 8px;">画像（Vision）</td><td style="padding:6px 8px;">画像理解。素材のタグ付け・内容把握など前処理に。</td></tr>
+                </tbody>
+            </table>
+            <p style="margin-top:10px;"><strong>選び方のコツ</strong>: 「汎用に Large、量を回すなら Medium 3.5、エッジは Ministral、思考は Magistral、コードは Codestral/Devstral、音声は Voxtral、画像は Pixtral」。万能一個で全部こなすのではなく、<strong>工程ごとに最小の専用モデルを当てる</strong>のが Mistral 流の効率です。</p>
+        </section>
+
+        <section class="card">
+            <h2>Deep Dive ③: いつ Mistral を選ぶか</h2>
+            <p>「最強だから選ぶ」ではなく、「<strong>この条件のときは Mistral が最適</strong>」という判断軸で持っておくと迷いません。</p>
+            <ul>
+                <li><strong>欧州/コンプライアンス起点</strong>: データ主権・規制対応・説明責任が重い案件。オープンウェイト × 透明性が効く。</li>
+                <li><strong>オンプレ/機密</strong>: 外部 API にデータを出せない秘匿プロジェクト。自社インフラで完結させたいとき。</li>
+                <li><strong>効率・特化</strong>: 「Python 補完だけ」「音声書き起こしだけ」のように<strong>用途が絞れている</strong>とき。少ないリソースで巨人クラスに肉薄する。</li>
+                <li><strong>逆に選ばない場面</strong>: 総合力の最高品質が要る一発勝負は、Claude（Opus 4.8 / Sonnet 4.6）や GPT-5.5 等のフラッグシップに寄せる。Mistral は「特化と自前運用で効かせる」のが本領。</li>
+            </ul>
+        </section>
+
+        <section class="card">
+            <h2>Deep Dive ④: ローカル運用とコストの考え方</h2>
+            <p>オープンウェイトの Mistral は、Qwen 同様「<strong>自前で安く回す</strong>」発想が効きます（普遍的なローカル運用の考え方）。</p>
+            <ul>
+                <li><strong>動かす場所</strong>: <strong>Ollama</strong>（最も手軽・個人/検証）、<strong>LM Studio</strong>（GUI で試す）、<strong>vLLM</strong>（バッチ並列でスループット最大＝量産向き）、<strong>llama.cpp</strong>（低 VRAM / CPU フォールバック）。</li>
+                <li><strong>VRAM と量子化</strong>: FP16 はおおむね「param 数 × 約2GB」、<code>INT4</code> 量子化なら「× 約0.5GB」と VRAM を 1/2〜1/4 に圧縮できる。<code>GGUF</code>（Ollama/LM Studio/llama.cpp）、<code>AWQ</code>/<code>GPTQ</code>（vLLM）が定番フォーマット。Ministral など軽量系ほどローカルに乗せやすい。</li>
+                <li><strong>API（従量） vs ローカル</strong>: API は初期投資ゼロ・即起動で<strong>低頻度・試作</strong>向き。ローカルは GPU 初期投資＋電気代で<strong>事実上使い放題</strong>＝大量・反復・オフライン/機密向き。月間トークン量が一定を超えるとローカルが安くなる、という損益分岐で考える。</li>
+            </ul>
+            <p style="border-left:3px solid #f0c05d;padding-left:14px;color:#cdbf9a;font-style:italic;">注意: ローカルは「無料」ではない。電気代・GPU の減価・運用の手間も“コスト”。まずは「特化工程だけローカル Mistral」から始め、質の最終判断は他社フラッグシップ API に通すハイブリッドが安全。</p>
+        </section>
     </div>
 </body>
 

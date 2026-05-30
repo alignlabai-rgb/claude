@@ -325,6 +325,83 @@
                 </ul>
             </article>
         </section>
+
+        <section class="card">
+            <h2>Role: 自動化/コーディングの「作業馬」</h2>
+            <p>GLM-5.1
+                を本ハブの制作・OpenClaw 志向の中でどう位置づけるか。答えは明快で、<strong>「自動コンテンツ工場を安く回す作業馬（workhorse）」</strong>です。</p>
+            <ul>
+                <li><strong>安く・止めずに回す</strong>:
+                    オープンウェイト＋低コスト（API 参考価格 入力 $1.40 / 出力 $4.40 per 1M）のため、量産パイプラインで大量リクエストを単価で殴れます。最高品質を1回より「十分な品質を大量に」が効く工程の下層を担います。</li>
+                <li><strong>"All Tools" で自走する</strong>:
+                    「調べて→整形して→描画して」を1プロンプトで完結できるため、定型の制作タスク（素材収集・整形・下書き生成）を人間の逐次指示なしに回せます。</li>
+                <li><strong>役割分担の下層</strong>:
+                    「設計・相談・品質判断 = フロンティア（Claude / GPT / Gemini）」「量産・接着 = GLM」という二層構造で組むのが正しい使い方。最高知能を狙う層ではなく、パイプラインを安価に支える <strong>The Connector（連結者）</strong> として設計に組み込みます。</li>
+            </ul>
+            <p style="font-size:13px; opacity:0.75;">▶ 更新追跡: <a style="color:#9ab4f0;" href="../../research/glm-recent-updates.html">GLM / Zhipu AI 最新アップデート完全版</a>（Research トラッカー）</p>
+        </section>
+
+        <!-- ===== 実践深掘り: コーディング/エージェントが主戦場 ===== -->
+        <section class="card" style="border-color:rgba(110,148,230,0.35);">
+            <h2>Deep Dive ①: なぜ「コーディング/エージェント」が主戦場なのか</h2>
+            <p>GLM を「マスターする」上で最初に押さえるべきは、<strong>GLM の土俵がコーディングとエージェント実行だ</strong>という点です。汎用チャットの総合力で他社フラッグシップを上回るのではなく、<strong>「ツールを使って自律的にタスクを完遂する」</strong>能力で評価される系列です。</p>
+            <table style="width:100%; border-collapse:collapse; font-size:0.86rem; margin-top:10px;">
+                <thead><tr style="text-align:left; color:#9ab4f0;">
+                    <th style="padding:6px 8px;">指標（canon）</th><th style="padding:6px 8px;">数値</th><th style="padding:6px 8px;">意味</th>
+                </tr></thead>
+                <tbody>
+                    <tr><td style="padding:6px 8px;"><strong>Code Arena Elo</strong></td><td style="padding:6px 8px;">約 1,530（オープンウェイト3位）</td><td style="padding:6px 8px;">人間がコードの実用性・読みやすさを ELO 方式で判定。上位に食い込む。</td></tr>
+                    <tr><td style="padding:6px 8px;"><strong>規模</strong></td><td style="padding:6px 8px;">754B MoE</td><td style="padding:6px 8px;">兆パラメータ級の MoE。サイズの割に推論コストを抑えやすい構造。</td></tr>
+                    <tr><td style="padding:6px 8px;"><strong>性能水準（canon 2026-05-11）</strong></td><td style="padding:6px 8px;">中国系トップ群と収束</td><td style="padding:6px 8px;">GLM-5.1・Kimi K2.6・DeepSeek V4 等がエージェント型タスクでほぼ同等の上限に。</td></tr>
+                    <tr><td style="padding:6px 8px;"><strong>推論コスト（canon）</strong></td><td style="padding:6px 8px;">Claude Opus 系の 1/3 以下</td><td style="padding:6px 8px;">同水準の性能を大幅に安く回せる、というコスト競争力が要点。</td></tr>
+                </tbody>
+            </table>
+            <p style="margin-top:10px;"><strong>含意</strong>: 「最高知能を1回」ではなく「<strong>十分な知能を安く大量に</strong>」が効く工程 — つまりコード生成・ツール連携・自動化の量産下層 — が GLM の主戦場です。</p>
+        </section>
+
+        <section class="card">
+            <h2>Deep Dive ②: "All Tools" モジュール — 1プロンプトで自走する</h2>
+            <p>GLM-5.1 の中核機能が <strong>"All Tools"</strong> です。Web 検索・コード実行・画像生成といった複数ツールを、<strong>モデル自身が選んで・順番に呼び出して</strong>タスクを完遂します。人間が逐次「次はこれをやって」と指示しなくても回るのが価値です。</p>
+            <div style="display:flex; gap:24px; flex-wrap:wrap; margin-top:8px;">
+                <div style="flex:1; min-width:280px;">
+                    <h3>自律的なツール選択</h3>
+                    <p>「昨日の◯◯を調べてグラフにして」の一言で、<strong>Web 検索 → データ取得 → Python 描画 → 画像生成</strong>のパイプラインを自分で組んで実行する。Function Calling の安定性が土台。</p>
+                </div>
+                <div style="flex:1; min-width:280px;">
+                    <h3>接着剤（Connector）として</h3>
+                    <p>外部 API・ブラウザ・コード実行を「つなぐ」のが得意な The Connector。最新ドキュメントを見ながらのコーディング支援で<strong>ハルシネーションが比較的少ない</strong>傾向。</p>
+                </div>
+            </div>
+            <p style="margin-top:10px;"><strong>使いどころ</strong>: 定型の制作タスク（素材収集・整形・下書き生成・データ加工）を<strong>人間の介在なしに回す自走レーン</strong>。質の最終判断はフロンティア（Claude / GPT-5.5 / Gemini）に通す二層構造が正解です。</p>
+        </section>
+
+        <section class="card">
+            <h2>Deep Dive ③: 自動コンテンツ工場の「作業馬」としての使い方</h2>
+            <p>本ハブの制作・<a href="../../openclaw.html" style="color:#9ab4f0;">OpenClaw</a> 志向の中での GLM の役割は明快で、<strong>「自動コンテンツ工場を安く回す作業馬（workhorse）」</strong>です。最高知能を狙う層ではなく、<strong>パイプラインを安価に支える層</strong>を受け持ちます。</p>
+            <ul>
+                <li><strong>OpenClaw スキルを安く回す</strong>: スキル化された定型工程（収集・整形・下書き）を、低コスト・高スループットの GLM で大量に叩く。「十分な品質を大量に」が効く工程の本命。</li>
+                <li><strong>ツール連携で自走する</strong>: "All Tools" により、スキルの中で複数ツールを自分で呼び分けて完遂。人間の逐次指示を減らし、工場を止めずに回す。</li>
+                <li><strong>Connector 的な接着</strong>: 外部システム・API を動かすオートメーションの接着剤。設計・相談・品質判断を担うフロンティア層と、量産・接着を担う GLM 層の<strong>二層構造</strong>で組む。</li>
+            </ul>
+            <p style="border-left:3px solid #6e94e6;padding-left:14px;color:#bcc0da;font-style:italic;">役割整理: GLM-5.1 =「自動化エンジン本体・量産と接着の作業馬」。質の最終判断は Claude / GPT-5.5、構成・長尺は Gemini、安く回す土台はローカル Qwen が担う多軸構成の中で、GLM は<strong>"自走する接着レーン"</strong>を受け持つ。</p>
+        </section>
+
+        <section class="card">
+            <h2>Deep Dive ④: コスト設計 — API vs ローカルの損益分岐</h2>
+            <p>GLM はオープンウェイトなので「クラウド API で呼ぶ」か「ローカルで回す」かを選べます。判断はコストの形で捉えると速い（qwen の Deep Dive に倣った考え方）。</p>
+            <div style="display:flex; gap:24px; flex-wrap:wrap; margin-top:8px;">
+                <div style="flex:1; min-width:280px;">
+                    <h3>API（従量）</h3>
+                    <p>トークン量 × 単価で<strong>使うほど比例増</strong>。GLM-5.1 の参考価格は入力 $1.40 / 出力 $4.40（per 1M）。初期投資ゼロ・即起動・最新版にすぐ乗れる。<strong>低〜中頻度・試作・即応</strong>向き。</p>
+                </div>
+                <div style="flex:1; min-width:280px;">
+                    <h3>ローカル（オープンウェイト）</h3>
+                    <p>重みが公開されているため自前 GPU でも動かせる。GPU 初期投資＋電気代で<strong>事実上使い放題</strong>。ただし 754B MoE は規模が大きく、量子化・複数 GPU 前提。<strong>大量反復・機密・オフライン</strong>向き。</p>
+                </div>
+            </div>
+            <p style="margin-top:10px;"><strong>損益分岐の考え方</strong>: 「月にどれだけ叩くか」が閾値。大量反復の量産工程はローカル（またはホスト型の安価 API）が効き、一発勝負の最終品質はフロンティア API に通す。GLM 自体が<strong>Opus 系の 1/3 以下のコスト</strong>（canon）なので、まずは安価 API で回し、量が読めてからローカル化を検討するのが現実解です。</p>
+            <p style="border-left:3px solid #6e94e6;padding-left:14px;color:#bcc0da;font-style:italic;">注意: ローカルは「無料」ではない。電気代・GPU 減価・運用保守も“コスト”。754B 級は VRAM 要件が重いため、低頻度なら API のほうが総コストが安いことも多い。完全自前に振り切るより「量が読める工程だけローカル」から始めるのが安全。</p>
+        </section>
     </div>
 </body>
 

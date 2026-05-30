@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GLM / Zhipu AI 最新アップデート完全版 | Research</title>
+  <style>
+    :root {
+      --bg: #07111d;
+      --panel: #0d1829;
+      --panel-2: #101f34;
+      --panel-3: #09131f;
+      --text: #e8eef9;
+      --muted: #b6c3da;
+      --soft: #7f92ac;
+      --border: rgba(255,255,255,0.08);
+      --accent: #6e94e6;
+      --accent-2: #325ab4;
+      --accent-3: #9ab4f0;
+      --accent-4: #c2d4ff;
+      --shadow: 0 12px 36px rgba(0,0,0,0.28);
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 12% 14%, rgba(110,148,230,0.14), transparent 28%),
+        radial-gradient(circle at 88% 4%, rgba(50,90,180,0.12), transparent 24%),
+        linear-gradient(145deg, #07111d 0%, #0a1422 52%, #060d18 100%);
+      color: var(--text);
+      font-family: "Segoe UI", "Noto Sans JP", system-ui, sans-serif;
+      line-height: 1.72;
+      padding: 28px 18px 80px;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .shell { max-width: 1100px; margin: 0 auto; display: grid; gap: 18px; }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px 26px;
+    }
+    .hero {
+      background: linear-gradient(135deg, rgba(110,148,230,0.08), rgba(50,90,180,0.08)), var(--panel);
+    }
+    .breadcrumb { color: var(--soft); font-size: 0.82rem; margin-bottom: 8px; }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      background: rgba(110,148,230,0.12);
+      color: var(--accent);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    h1, h2, h3, h4 { margin: 0 0 10px; }
+    h1 { font-size: 2rem; }
+    h2 { font-size: 1.18rem; }
+    h3 { font-size: 1rem; }
+    h4 { font-size: 0.92rem; color: var(--text); }
+    p, li { color: var(--muted); font-size: 0.92rem; }
+    ul { margin: 8px 0 0; padding-left: 18px; }
+    li { margin-bottom: 6px; }
+    strong { color: var(--text); }
+    .last-update { color: var(--soft); font-size: 0.8rem; margin-top: 10px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    @media (max-width: 920px) {
+      .grid-4, .grid-3 { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 640px) {
+      .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; }
+    }
+    .card, .stat, .subpanel {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+    }
+    .subpanel.deep { background: var(--panel-3); }
+    .stat .value { font-size: 1.8rem; color: var(--accent); font-weight: 800; line-height: 1; }
+    .stat .label { color: var(--soft); font-size: 0.75rem; margin-top: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .tag {
+      display: inline-block;
+      padding: 3px 8px;
+      margin-right: 6px;
+      margin-bottom: 6px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+    .tag-model { background: rgba(110,148,230,0.18); color: var(--accent-3); }
+    .tag-product { background: rgba(96,208,255,0.16); color: #7dd3fc; }
+    .tag-code { background: rgba(247,168,122,0.16); color: #fdba74; }
+    .tag-api { background: rgba(244,184,96,0.16); color: #fcd34d; }
+    .tag-new { background: rgba(79,255,176,0.16); color: #4FFFB0; }
+    .tag-risk { background: rgba(255,107,107,0.16); color: #fca5a5; }
+    .summary {
+      border-left: 4px solid var(--accent);
+      padding-left: 14px;
+      margin-top: 8px;
+    }
+    .timeline {
+      position: relative;
+      display: grid;
+      gap: 14px;
+      padding-left: 28px;
+    }
+    .timeline::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 9px;
+      width: 2px;
+      background: rgba(255,255,255,0.08);
+    }
+    .item {
+      position: relative;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 18px;
+    }
+    .item::before {
+      content: "";
+      position: absolute;
+      left: -24px;
+      top: 18px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--panel);
+      border: 2px solid var(--accent);
+    }
+    .item.hot::before { border-color: var(--accent-2); }
+    .date { font-size: 0.76rem; color: var(--soft); font-weight: 700; margin-bottom: 4px; }
+    .note {
+      background: rgba(110,148,230,0.08);
+      border: 1px solid rgba(110,148,230,0.24);
+      border-radius: 12px;
+      padding: 14px 16px;
+    }
+    .sources li { margin-bottom: 8px; }
+    code {
+      font-family: "Fira Code", "Consolas", monospace;
+      background: rgba(255,255,255,0.06);
+      padding: 0.12rem 0.4rem;
+      border-radius: 6px;
+      color: #c2d4ff;
+    }
+    .small { font-size: 0.84rem; color: var(--soft); }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <section class="panel hero">
+      <div class="breadcrumb"><a href="index.html">Research</a> / <a href="../index.html">Hub Top</a></div>
+      <div class="eyebrow">GLM / Zhipu AI Update Tracker</div>
+      <h1>GLM / Zhipu AI 最新アップデート完全版</h1>
+      <p>
+        Zhipu AI（智譜AI）の <strong>GLM</strong> シリーズを、このハブ内 canon
+        （<a href="../workbench/knowledge/glm.html">GLM 深掘り</a>・<a href="../workbench/knowledge/intelligence-matrix.html">Intelligence Matrix</a>・AI News 日次記事）をもとに、
+        <strong>実務視点で「何に効くか」</strong>まで踏み込んで整理したトラッカーです。
+        Claude / ChatGPT / Gemini のトラッカーと見た目・構成を統一しています。
+      </p>
+      <div class="summary">
+        <p>
+          現行は <strong>GLM-5.1</strong>（兆パラメータ級）。軸は明確で、
+          <strong>① コーディング/エージェントが強い</strong>、<strong>② Code Arena 上位（Elo ~1,530・3位水準）</strong>、
+          <strong>③ オープンウェイト＋低コスト</strong>、そして本ハブにとって最大の意味である
+          <strong>④「自動コンテンツ工場を安く回す作業馬」</strong>という位置づけです。
+        </p>
+        <p>
+          フロンティアの最高知能（Claude / GPT / Gemini）が「設計・相談・品質判断」を担うのに対し、
+          GLM は <strong>「決まった手順を大量に・安く・止めずに回す」</strong>レイヤーを引き受ける。
+          "All Tools" モジュールで Web 検索→データ取得→コード実行→画像生成を一気通貫で自走できるため、
+          OpenClaw 志向の量産パイプラインにそのまま噛み合います。
+        </p>
+      </div>
+      <p class="last-update">最終更新: 2026-05-30</p>
+    </section>
+
+    <section class="grid-4">
+      <div class="stat"><div class="value">GLM-5.1</div><div class="label">現行モデル</div></div>
+      <div class="stat"><div class="value">~1,530</div><div class="label">Code Arena Elo（3位水準）</div></div>
+      <div class="stat"><div class="value">128k</div><div class="label">コンテキスト</div></div>
+      <div class="stat"><div class="value">$1.40/$4.40</div><div class="label">API 入力/出力 per 1M</div></div>
+    </section>
+
+    <section class="panel">
+      <h2>まず押さえる結論</h2>
+      <div class="grid-3">
+        <div class="card">
+          <span class="tag tag-code">Coding / Agent</span>
+          <h3>コーディングとエージェントが主戦場</h3>
+          <p>
+            GLM-5.1 は <strong>"All Tools" モジュール</strong>で、単一プロンプトから
+            Web 検索→データ取得→Python 描画→画像生成のパイプラインを<strong>自律的に組んで実行</strong>する。
+            Function Calling の安定性は GPT 系に匹敵する場面があり、外部システムを動かす
+            <strong>オートメーションの接着剤（Connector）</strong>として機能する。
+          </p>
+        </div>
+        <div class="card">
+          <span class="tag tag-model">Arena</span>
+          <h3>Code Arena 上位（Elo ~1,530）</h3>
+          <p>
+            Intelligence Matrix canon では <strong>Code Arena Elo 1,530（3位水準）</strong>。
+            フロンティアと拮抗するわけではないが、<strong>コーディング系の実用域では明確に上位</strong>に位置する。
+            「最高知能ではないが、コーディングなら十分使える」という線引きが要点。
+          </p>
+        </div>
+        <div class="card">
+          <span class="tag tag-new">Open + Low Cost</span>
+          <h3>オープンウェイト＋低コスト</h3>
+          <p>
+            API は <strong>入力 $1.40 / 出力 $4.40 per 1M（Efficient tier）</strong>。
+            オープンウェイト系として <strong>GLM-Edge / Air</strong> など端末・PC 上で動く軽量版も持ち、
+            MoE 採用の GLM-4.5 Air は高速トークン生成が強み。
+            <strong>クラウド API でもローカルでも安く回せる</strong>二面性がある。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>このハブにとっての GLM ＝「自動コンテンツ工場の作業馬」</h2>
+      <p>
+        本ハブは制作（動画・漫画パイプライン）と OpenClaw を主軸とする。そこで GLM が持つ意味は明確です。
+      </p>
+      <div class="grid-2">
+        <div class="subpanel">
+          <h3>① 安く・止めずに回す</h3>
+          <p>
+            量産パイプラインでは「最高品質を1回」より「十分な品質を大量に」が効く。
+            低コスト＋オープンウェイトの GLM は、<strong>大量リクエストを単価で殴れる作業馬</strong>。
+            フロンティアモデルに毎回投げると財布が持たない工程を肩代わりする。
+          </p>
+        </div>
+        <div class="subpanel">
+          <h3>② ツール連携で自走する</h3>
+          <p>
+            "All Tools" の自律ツール選択により、<strong>「調べて→整形して→描画して」を1プロンプトで完結</strong>。
+            定型の制作タスク（素材収集・整形・下書き生成）を、人間の逐次指示なしに回せるのが
+            OpenClaw 的なオーケストレーションと噛み合う。
+          </p>
+        </div>
+        <div class="subpanel">
+          <h3>③ Connector としての接着</h3>
+          <p>
+            外部 API を叩いて JSON を正確に整形する力が高く、<strong>システム間の接着剤</strong>になる。
+            APIテスト・データ変換・ワークフロー結線など、地味だが詰まりやすい工程を任せやすい。
+          </p>
+        </div>
+        <div class="subpanel">
+          <h3>④ 役割分担の下層</h3>
+          <p>
+            「設計・相談・品質判断 = フロンティア」「量産・接着 = GLM」という二層構造。
+            Matrix の役割では <strong>The Connector（連結者）</strong>。最高知能を狙う層ではなく、
+            <strong>パイプラインを安価に支える下層</strong>として設計に組み込むのが正しい使い方。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>GLM-5.1 の現在地（canon ベース）</h2>
+      <p>このハブ内 canon（GLM 深掘り・Intelligence Matrix）で確定している事実を整理：</p>
+      <div class="grid-2">
+        <div class="subpanel">
+          <span class="tag tag-model">Model</span>
+          <h3>GLM-5.1（現行）</h3>
+          <p>GLM-5 系は 2026年春節に合わせて発表・出荷され、現行は GLM-5.1。兆パラメータ級の規模を持ち、長期的なタスク計画・クリエイティブ執筆でも性能を発揮する。</p>
+        </div>
+        <div class="subpanel">
+          <span class="tag tag-code">All Tools</span>
+          <h3>"All Tools" モジュール</h3>
+          <p>Web 検索・コード実行・画像生成をシームレスに統合。単一プロンプトから複数ツールを自律的に使い分ける Agentic Specialized なモデル。</p>
+        </div>
+        <div class="subpanel">
+          <span class="tag tag-model">Arena</span>
+          <h3>Code Arena Elo ~1,530（3位水準）</h3>
+          <p>コーディング系のアリーナで上位。フロンティア最高知能には一歩譲るが、実用コーディング域では明確に強い。</p>
+        </div>
+        <div class="subpanel">
+          <span class="tag tag-new">Pricing</span>
+          <h3>低コスト（Efficient tier）</h3>
+          <p>API 参考価格は入力 $1.40 / 出力 $4.40 per 1M、コンテキスト 128k。9モデル中でも安価な水準で、量産用途に向く。</p>
+        </div>
+        <div class="subpanel">
+          <span class="tag tag-product">Edge / Air</span>
+          <h3>GLM-Edge / Air（軽量版）</h3>
+          <p>スマホ・PC 上で動く軽量版を持ち、オフライン環境でも高度な日本語・中国語処理が可能。ローカル RAG の基盤に適する。</p>
+        </div>
+        <div class="subpanel">
+          <span class="tag tag-product">Origin</span>
+          <h3>Zhipu AI / 清華大学由来</h3>
+          <p>アカデミックな出自を持ちつつ、極めて実用的な「ツール使用（Function Calling）」能力に焦点を当てて進化してきた。</p>
+        </div>
+      </div>
+      <p class="small" style="margin-top: 14px;">※ 上記は本ハブ内 canon（<a href="../workbench/knowledge/glm.html">glm.html</a> / <a href="../workbench/knowledge/intelligence-matrix.html">intelligence-matrix.html</a>）に基づく定性整理。日付付きの個別リリース履歴は canon に確証がないため、ここでは作成していません。</p>
+    </section>
+
+    <section class="panel">
+      <h2>他モデルとの位置づけ（比較）</h2>
+      <p>
+        本ハブの 9 モデル canon の中で、GLM は<strong>「中国系オープン・低コスト勢」</strong>のひとつ。
+        同じレイヤーの DeepSeek / Kimi / Qwen との役割の違いを押さえると選択が速くなります。
+      </p>
+      <div class="grid-2">
+        <div class="subpanel">
+          <h3>vs フロンティア（Claude / GPT-5.5 / Gemini 3.1 Pro）</h3>
+          <p>
+            設計・相談・品質判断・マルチモーダルの最高峰はフロンティアが担う。
+            GLM はそこを狙わず、<strong>「ツール連携で安く量産する」下層</strong>に徹する。
+            <a href="../workbench/knowledge/intelligence-matrix.html">Matrix</a> でも総合知能では上位 3 強が突出。
+          </p>
+        </div>
+        <div class="subpanel">
+          <h3>vs DeepSeek（The Disruptor）</h3>
+          <p>
+            DeepSeek は<strong>激安推論＋論理デバッグ・FIM 補完</strong>に振った「論理の鬼」。
+            GLM は<strong>ツール連携・自走</strong>に振った「接着剤」。
+            量産の保険として DeepSeek、ワークフロー自走として GLM、という棲み分け。
+          </p>
+        </div>
+        <div class="subpanel">
+          <h3>vs Kimi（The Explorer）</h3>
+          <p>
+            Kimi は<strong>長コンテキスト（256k）＋ Agent Swarm の並列リサーチ</strong>に強い。
+            連作・設定資料の一貫性維持はKimi、定型ツール実行はGLM、と使い分けると効率的。
+          </p>
+        </div>
+        <div class="subpanel">
+          <h3>vs Qwen（The Scholar）</h3>
+          <p>
+            canon では「Qwen が理数系特化なら、GLM はツール連携特化」。
+            Qwen は 9 モデル最安水準で多言語ドキュメント読解に強く、GLM は外部システムを動かす自動化の接着剤。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>使い方のヒント（Vibe Coding / 量産）</h2>
+      <ul>
+        <li><strong>API 連携テスト</strong>：「このAPIを叩いて結果を整形して」という JSON 構造理解・パラメータ挿入のタスクに強い。</li>
+        <li><strong>Web 検索統合</strong>：独自ブラウザツールとの相性が良く、最新ドキュメントを見ながらのコーディングでハルシネーションが比較的少ない傾向。</li>
+        <li><strong>量産の下層に置く</strong>：定型工程（素材収集・整形・下書き生成）を GLM に流し、品質判断だけフロンティアに上げる二層運用。</li>
+        <li><strong>ローカル併用</strong>：プライバシー重視・オフライン要件では GLM-Edge / Air をローカル RAG の基盤に。</li>
+      </ul>
+    </section>
+
+    <section class="panel">
+      <h2>注意点とリスク</h2>
+      <div class="note">
+        <ul>
+          <li><strong>最高知能ではない</strong>：総合知能のフロンティア 3 強（Claude / GPT-5.5 / Gemini 3.1 Pro）には一歩譲る。難度の高い設計・推論はそちらに任せる前提で組む。</li>
+          <li><strong>コンテキストは 128k</strong>：超長文の一括処理が必要な工程は Kimi（256k）や 100万トークン勢に振り分ける方が安全。</li>
+          <li><strong>中国系オープンモデル全般の論点</strong>：データガバナンス・利用規約・コンプライアンスはエンタープライズ導入前に各社で確認が必要（モデル横断の一般的留意点）。</li>
+          <li><strong>世代表記の追従</strong>：GLM 系はバージョン更新が速いため、API のモデル ID と現行世代（GLM-5.1）の対応は都度確認する。</li>
+        </ul>
+      </div>
+      <p class="small" style="margin-top: 10px;">※ 本トラッカーは出典の確実な canon のみで構成し、確証のない日付付きニュース・固有 URL・固有数値は記載していません（定性記述に留めた箇所あり）。</p>
+    </section>
+
+    <section class="panel">
+      <h2>関連リンク・出典（ハブ内 canon）</h2>
+      <ul class="sources">
+        <li><a href="../workbench/knowledge/glm.html">GLM（The Connector）深掘り</a> — モデル特性・"All Tools"・Edge/Air・Vibe Coding 用途の詳細</li>
+        <li><a href="../workbench/knowledge/intelligence-matrix.html">Intelligence Matrix</a> — 9 モデル横断比較・Code Arena Elo 1,530・価格マトリクス（$1.40/$4.40・128k）</li>
+        <li><a href="../workbench/knowledge/deepseek.html">DeepSeek（The Disruptor）</a> / <a href="../workbench/knowledge/kimi.html">Kimi（The Explorer）</a> / <a href="../workbench/knowledge/qwen.html">Qwen（The Scholar）</a> — 同レイヤーの中国系オープン勢</li>
+        <li><a href="index.html">Research トップ</a> — 他ベンダーのアップデートトラッカー・AI News 日次へ</li>
+      </ul>
+      <p class="small">本ページの記述は上記ハブ内 canon を一次情報として構築。外部の日付付き出典 URL は確証がないため省略しています。</p>
+    </section>
+
+  </div>
+</body>
+</html>
