@@ -143,9 +143,9 @@
   <h1>Claude API <em>Deep Dive</em></h1>
   <p class="hero-sub">Advisor Tool・Managed Agents・Files API・Prompt Caching・Adaptive Thinking・Agent SDK。エージェント時代に必要なAPIの全機能を実務視点で整理する。</p>
   <div class="hero-meta">
-    <div class="meta-chip">更新日: <strong>2026年4月16日</strong></div>
+    <div class="meta-chip">更新日: <strong>2026年5月30日</strong></div>
     <div class="meta-chip">対象: <strong>Anthropic API v1</strong></div>
-    <div class="meta-chip">モデル: <strong>Claude Opus 4.6 / Sonnet 4.6 / Haiku 4.5</strong></div>
+    <div class="meta-chip">モデル: <strong>Claude Opus 4.8 / Sonnet 4.6 / Haiku 4.5</strong></div>
     <div class="meta-chip">用途: <strong>MAチームDD自動化 / エージェント開発</strong></div>
   </div>
 </div>
@@ -187,7 +187,7 @@
         </div>
         <div class="card">
           <h3 style="color:var(--green);">🧠 Adaptive Thinking</h3>
-          <p>Opus 4.6が推論予算をターンごとに自動決定。Extended Thinkingの「常時最大ON」問題を解決。</p>
+          <p>Opus 4.8が推論予算をターンごとに自動決定。Extended Thinkingの「常時最大ON」問題を解決。</p>
           <div style="margin-top:8px;"><span class="badge b-new">New</span></div>
         </div>
         <div class="card">
@@ -219,13 +219,13 @@
         <div class="arch-row">
           <div class="arch-box blue">エグゼキューター<br><small>Haiku 4.5 / Sonnet 4.6</small></div>
           <div class="arch-arrow">⟷</div>
-          <div class="arch-box gold">Advisor Tool<br><small>Opus 4.6</small></div>
+          <div class="arch-box gold">Advisor Tool<br><small>Opus 4.8</small></div>
         </div>
         <div class="arch-label" style="margin-top:12px;">エグゼキューターが判断を要請 → Advisorが戦略的助言 → エグゼキューターが実行継続</div>
       </div>
       <ul>
         <li>エグゼキューターは通常の高速モデル（Haiku / Sonnet）がタスクを処理する</li>
-        <li>「判断が難しい」「重要な分岐点」でAdvisor（Opus 4.6）にツール呼び出しで相談</li>
+        <li>「判断が難しい」「重要な分岐点」でAdvisor（Opus 4.8）にツール呼び出しで相談</li>
         <li>Advisorは実行を引き継がず、<strong style="color:var(--text)">助言だけを返す</strong>（コンテキストを渡さない）</li>
         <li>長時間タスク（DD分析など）で特に有効：90%の処理はHaikuコスト、10%の重要判断だけOpusコスト</li>
       </ul>
@@ -239,7 +239,7 @@
             <div>構成</div><div>コスト</div><div>品質</div>
           </div>
           <div class="compare-row">
-            <div>Opus 4.6 単体</div>
+            <div>Opus 4.8 単体</div>
             <div style="color:var(--red);">$12〜18</div>
             <div style="color:var(--green);">最高</div>
           </div>
@@ -291,7 +291,7 @@ client = anthropic.Anthropic()
 # Advisor Tool の定義（エグゼキューターが使うツールとして登録）
 advisor_tool = {
     "name": "ask_advisor",
-    "description": "複雑な判断や戦略的分析が必要な場合にOpus 4.6アドバイザーに相談する",
+    "description": "複雑な判断や戦略的分析が必要な場合にOpus 4.8アドバイザーに相談する",
     "input_schema": {
         "type": "object",
         "properties": {
@@ -303,9 +303,9 @@ advisor_tool = {
 }
 
 def handle_advisor_call(question: str, context: str = "") -> str:
-    """Opus 4.6をAdvisorとして呼び出す"""
+    """Opus 4.8をAdvisorとして呼び出す"""
     advisor_response = client.messages.create(
-        model="claude-opus-4-6",
+        model="claude-opus-4-8",
         max_tokens=1024,
         messages=[{
             "role": "user",
@@ -476,7 +476,7 @@ financial_analysis = client.messages.create(
 
 # 3. リスク分析エージェントも同じfile_idを使用（再アップ不要）
 risk_analysis = client.messages.create(
-    model="claude-opus-4-6",
+    model="claude-opus-4-8",
     max_tokens=4096,
     messages=[{
         "role": "user",
@@ -599,7 +599,7 @@ response = client.messages.create(
   <!-- Adaptive Thinking -->
   <section class="section">
     <div class="section-label">機能 5</div>
-    <div class="section-title">Extended / Adaptive Thinking <span class="badge b-new">Opus 4.6 — Adaptive</span></div>
+    <div class="section-title">Extended / Adaptive Thinking <span class="badge b-new">Opus 4.8 — Adaptive / Effort Control</span></div>
     <div class="section-sub">「考える深さ」を問題の複雑さに応じてモデルが自動調整する。難問だけに深い推論を使いコストを最適化。</div>
 
     <div class="feature-card thinking">
@@ -608,13 +608,13 @@ response = client.messages.create(
       <p>
         Extended Thinkingは推論バジェット（thinking tokens）を手動設定する必要があり、
         「全タスクに最大トークンを使う」か「全タスクに最小トークンを使う」かの二択になりがちだった。
-        <strong style="color:var(--text)">Adaptive Thinking（Opus 4.6）</strong>はモデルが問題の複雑さを評価し、
+        <strong style="color:var(--text)">Adaptive Thinking（Opus 4.6で導入、現行 Opus 4.8 では Effort Control へ進化）</strong>はモデルが問題の複雑さを評価し、
         ターンごとに推論予算を自動決定する。
       </p>
       <ul>
         <li>簡単なタスク: Thinkingトークンをほぼ使わず高速・安価に応答</li>
         <li>複雑なタスク: 深い推論チェーンを自動展開して精度を最大化</li>
-        <li>Opus 4.6ではデフォルトでAdaptive Thinkingが有効（明示設定不要）</li>
+        <li>Opus 4.8ではデフォルトで自動推論（Effort Control / Adaptive）が有効（明示設定不要）</li>
         <li>Sonnet 4.6: Extended Thinking（手動設定）は引き続き利用可能</li>
       </ul>
     </div>
@@ -634,7 +634,7 @@ response = client.messages.create(
           <div class="compare-row">
             <div>対応モデル</div>
             <div>Sonnet 4.6</div>
-            <div style="color:var(--green);">Opus 4.6（デフォルト）</div>
+            <div style="color:var(--green);">Opus 4.8（デフォルト）</div>
           </div>
           <div class="compare-row">
             <div>コスト予測</div>
@@ -665,11 +665,11 @@ response = client.messages.create(
     messages=[{"role": "user", "content": "複雑な財務モデルを構築..."}]
 )
 
-# Adaptive Thinking — Opus 4.6（設定不要）
+# Adaptive Thinking / Effort Control — Opus 4.8（設定不要）
 response = client.messages.create(
-    model="claude-opus-4-6",
+    model="claude-opus-4-8",
     max_tokens=16000,
-    # thinking設定不要 — Opusが自動でAdaptive Thinkingを使用
+    # thinking設定不要 — Opusが自動で推論深度を最適化
     messages=[{
         "role": "user",
         "content": "この買収案件のValuation range を算出し、想定シナジーとPMIリスクを分析してください"
@@ -743,7 +743,7 @@ legal_agent = Agent(
 
 business_agent = Agent(
     name="ビジネスDDエージェント",
-    model="claude-opus-4-6",  # ビジネス判断はOpusを使用
+    model="claude-opus-4-8",  # ビジネス判断はOpusを使用
     system_prompt="M&Aのビジネスデューデリジェンス専門家。市場分析・競合調査・シナジー評価を担当。",
     tools=[market_research_tool, competitor_analysis_tool],
     context=shared_ctx
@@ -751,7 +751,7 @@ business_agent = Agent(
 
 report_agent = Agent(
     name="レポート統合エージェント",
-    model="claude-opus-4-6",
+    model="claude-opus-4-8",
     system_prompt="各エージェントの分析結果を統合し、エグゼクティブサマリーを作成する。",
     context=shared_ctx
 )
@@ -850,8 +850,8 @@ print(result.final_output)</code></pre>
       <div class="flow-step">
         <div class="step-num gold">3</div>
         <div>
-          <h4>Adaptive Thinking（Opus 4.6） <span class="tag t-b">品質向上</span></h4>
-          <p>複雑なバリュエーション・シナジー評価にOpus 4.6を採用。設定不要でAdaptive Thinkingが有効になり分析精度が向上。</p>
+          <h4>Adaptive Thinking（Opus 4.8） <span class="tag t-b">品質向上</span></h4>
+          <p>複雑なバリュエーション・シナジー評価にOpus 4.8を採用。設定不要で自動推論（Effort Control / Adaptive）が有効になり分析精度が向上。</p>
         </div>
       </div>
       <div class="flow-step">
