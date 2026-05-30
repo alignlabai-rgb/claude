@@ -351,6 +351,112 @@ skills/
   </div>
 </section>
 
+<!-- HITL 返答パース実装 -->
+<section class="section" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-label">HITL 実装詳細</div>
+    <h2 class="section-title">Signal返答パースの<br>完全実装パターン</h2>
+    <div class="two-col">
+      <div>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+          YAMLの <code>response_map</code> は「何に対応するか」だけを定義します。
+          実際のSignalメッセージを受け取ってどう解釈するか——エイリアス・曖昧入力・タイムアウト・
+          解釈不能——の完全な処理は別途Pythonで実装します。
+        </p>
+        <div class="code-block">
+<span class="cm"># signal_hitl_handler.py</span>
+
+RESPONSE_MAP = {
+    <span class="str">"y"</span>: <span class="str">"publish"</span>,
+    <span class="str">"n"</span>: <span class="str">"discard_retry"</span>,
+    <span class="str">"e"</span>: <span class="str">"auto_improve"</span>,
+}
+
+ALIASES = {
+    <span class="str">"yes"</span>: <span class="str">"y"</span>, <span class="str">"ok"</span>: <span class="str">"y"</span>, <span class="str">"公開"</span>: <span class="str">"y"</span>,
+    <span class="str">"no"</span>: <span class="str">"n"</span>, <span class="str">"ng"</span>: <span class="str">"n"</span>, <span class="str">"破棄"</span>: <span class="str">"n"</span>,
+    <span class="str">"edit"</span>: <span class="str">"e"</span>, <span class="str">"改善"</span>: <span class="str">"e"</span>, <span class="str">"直して"</span>: <span class="str">"e"</span>,
+}
+
+<span class="kw">def</span> <span class="fn">parse_reply</span>(raw_text):
+    normalized = raw_text.<span class="fn">strip</span>().<span class="fn">lower</span>()
+
+    <span class="cm"># 完全一致</span>
+    <span class="kw">if</span> normalized <span class="kw">in</span> RESPONSE_MAP:
+        <span class="kw">return</span> RESPONSE_MAP[normalized]
+
+    <span class="cm"># エイリアス照合（日本語対応）</span>
+    <span class="kw">if</span> normalized <span class="kw">in</span> ALIASES:
+        <span class="kw">return</span> RESPONSE_MAP[ALIASES[normalized]]
+
+    <span class="cm"># 先頭1文字で判定（長文返答への対応）</span>
+    <span class="kw">if</span> normalized[:<span class="num">1</span>] <span class="kw">in</span> RESPONSE_MAP:
+        <span class="kw">return</span> RESPONSE_MAP[normalized[:<span class="num">1</span>]]
+
+    <span class="kw">return</span> <span class="str">"ambiguous"</span>
+
+<span class="kw">def</span> <span class="fn">handle_hitl_response</span>(content_id, raw_reply, elapsed_secs,
+                           ambiguous_count=<span class="num">0</span>):
+    <span class="kw">if</span> elapsed_secs >= <span class="num">3600</span>:         <span class="cm"># タイムアウト</span>
+        <span class="fn">discard</span>(content_id, reason=<span class="str">"hitl_timeout"</span>)
+        <span class="kw">return</span>
+
+    action = <span class="fn">parse_reply</span>(raw_reply)
+
+    <span class="kw">if</span> action == <span class="str">"publish"</span>:
+        <span class="fn">publish</span>(content_id)
+    <span class="kw">elif</span> action == <span class="str">"discard_retry"</span>:
+        <span class="fn">discard_and_regenerate</span>(content_id)
+    <span class="kw">elif</span> action == <span class="str">"auto_improve"</span>:
+        <span class="fn">queue_improvement</span>(content_id)
+    <span class="kw">elif</span> action == <span class="str">"ambiguous"</span>:
+        <span class="kw">if</span> ambiguous_count >= <span class="num">2</span>:
+            <span class="cm"># 3回目は安全側倒し（破棄）</span>
+            <span class="fn">discard</span>(content_id, reason=<span class="str">"ambiguous_3x"</span>)
+        <span class="kw">else</span>:
+            <span class="fn">signal</span>.<span class="fn">send</span>(
+                <span class="str">f"返答が不明瞭です: '{raw_reply}'\n"</span>
+                <span class="str">"y（公開）/ n（破棄）/ e（改善）で返信してください"</span>
+            )</div>
+      </div>
+      <div>
+        <h3 style="font-size: 1rem; margin-bottom: 0.875rem; color: var(--text-muted);">返答パターン別の挙動</h3>
+        <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.5rem;">
+          <div style="background: rgba(0,220,130,0.1); border: 1px solid rgba(0,220,130,0.3); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; color: #4FFFB0; font-weight: 700; margin-bottom: 0.35rem;">[y] / yes / ok / 公開 → publish</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">スケジューラーに投入し最適投稿時間で配信。評価スコアはログに「HITL承認」として記録。</div>
+          </div>
+          <div style="background: rgba(255,107,107,0.1); border: 1px solid rgba(255,107,107,0.3); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; color: #FF6B6B; font-weight: 700; margin-bottom: 0.35rem;">[n] / no / ng / 破棄 → discard_retry</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">コンテンツを破棄し、同じネタから別バリアントを再生成してキューに再投入（当日内1回まで）。</div>
+          </div>
+          <div style="background: rgba(108,60,225,0.1); border: 1px solid rgba(108,60,225,0.3); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; color: #A78BFA; font-weight: 700; margin-bottom: 0.35rem;">[e] / edit / 改善 / 直して → auto_improve</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">評価フィードバック（issues）をプロンプトに付与してLLMで再生成。改善後スコア70+なら自動公開。</div>
+          </div>
+          <div style="background: rgba(255,158,0,0.1); border: 1px solid rgba(255,158,0,0.3); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; color: #FF9E00; font-weight: 700; margin-bottom: 0.35rem;">タイムアウト（60分未返信）→ discard</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">自動破棄。Signal通知「タイムアウト: content_id を破棄しました」を送信。</div>
+          </div>
+          <div style="background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 700; margin-bottom: 0.35rem;">解釈不能 → 再送依頼（最大2回）</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">2回まで再送依頼。3回目も不明なら n と同じ扱い（安全側倒し）。</div>
+          </div>
+        </div>
+        <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem;">
+          <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.5rem;">Signal Bot コマンド拡張方法</div>
+          <div style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.7;">
+            新コマンドを追加するには <code>ALIASES</code> dict に1行追加し、
+            対応するアクションを <code>handle_hitl_response</code> の分岐に追記するだけ。
+            例: <code>"skip": "e"</code> → 今日はスキップして翌日再評価。
+            コマンド一覧は <code>/help</code> 送信でSignalに返信される。
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- Cost Management -->
 <section class="section" style="background: var(--bg2);">
   <div class="section-inner">
@@ -399,6 +505,102 @@ skills/
     <span class="fn">include_roi</span>: <span class="kw">true</span>  <span class="cm"># 収益 ÷ APIコスト</span></div>
       </div>
     </div>
+  </div>
+</section>
+
+<!-- フォールバック条件詳細 -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label">フォールバック設計</div>
+    <h2 class="section-title">エラー種別ごとの<br>フォールバック発動条件</h2>
+    <p style="color: var(--text-muted); margin-bottom: 2rem; max-width: 700px;">
+      コスト管理YAMLの <code>fallbacks</code> は「どこに切り替えるか」を定義しますが、
+      「いつ切り替えるか」は別途のロジックで制御します。
+      エラー起因のフォールバック（即時）と品質起因のフォールバック（リトライ後）は区別して設計します。
+    </p>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+      <div>
+        <h3 style="font-size: 0.9rem; margin-bottom: 0.875rem; color: #FF6B6B;">エラー起因（即時切替）</h3>
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <div style="background: var(--card); border: 1px solid rgba(255,107,107,0.3); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; font-weight: 700; color: #FF6B6B; margin-bottom: 0.4rem;">RunwayML → Kling AI</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.75;">
+              HTTP 429（rate limit）× 3連続<br>
+              HTTP 503（unavailable）/ タイムアウト60s<br>
+              予想コストが per_job 上限の80%超<br>
+              <span style="color: #4FFFB0;">→ 即時切替（リトライ不要）</span>
+            </div>
+          </div>
+          <div style="background: var(--card); border: 1px solid rgba(255,107,107,0.3); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; font-weight: 700; color: #FF6B6B; margin-bottom: 0.4rem;">ElevenLabs → VOICEVOX</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.75;">
+              月次クレジット残量 &lt; 20%<br>
+              HTTP 402（quota exceeded）<br>
+              <span style="color: #4FFFB0;">→ VOICEVOXはローカル実行のためコストゼロ・待機ゼロ</span>
+            </div>
+          </div>
+          <div style="background: var(--card); border: 1px solid rgba(255,107,107,0.3); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; font-weight: 700; color: #FF6B6B; margin-bottom: 0.4rem;">GPT-4o API → Claude Haiku</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.75;">
+              HTTP 429 × 2連続<br>
+              per_job 上限 80%超（GPT-4oは高単価）<br>
+              <span style="color: #4FFFB0;">→ Haiku で同タスクを再実行</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <h3 style="font-size: 0.9rem; margin-bottom: 0.875rem; color: #FF9E00;">品質起因（リトライ後に切替）</h3>
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <div style="background: var(--card); border: 1px solid rgba(255,158,0,0.3); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; font-weight: 700; color: #FF9E00; margin-bottom: 0.4rem;">Midjourney → DALL-E 3</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.75;">
+              CLIP similarity &lt; 0.65（プロンプトとの不一致）<br>
+              2回リトライ後も改善なし<br>
+              <span style="color: #4FFFB0;">→ DALL-E 3で再生成 → それでも未達ならHITL</span>
+            </div>
+          </div>
+          <div style="background: var(--card); border: 1px solid rgba(255,158,0,0.3); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; font-weight: 700; color: #FF9E00; margin-bottom: 0.4rem;">高精度LLM → Haiku（タスク格下げ）</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.75;">
+              タスク複雑度スコア &lt; 0.4<br>（分類・タグ生成・要約 等の単純タスク）<br>
+              コスト最適化モードがオンの場合<br>
+              <span style="color: #4FFFB0;">→ 品質差が軽微なタスクに限定して格下げ</span>
+            </div>
+          </div>
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.4rem;">フォールバック先もNGの場合</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.75;">
+              代替ツールも閾値未達またはエラーの場合、<br>
+              そのタスクをスキップして HITL キューに積む。<br>
+              <span style="color: var(--accent);">NoFallbackError → 必ず人間に引き渡す</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="code-block">
+<span class="cm"># fallback_engine.py — フォールバック判断ロジック</span>
+
+<span class="kw">class</span> <span class="fn">FallbackEngine</span>:
+    <span class="fn">def</span> <span class="fn">should_fallback_on_error</span>(<span class="fn">self</span>, tool, error):
+        <span class="kw">if</span> error.status_code <span class="kw">in</span> (<span class="num">429</span>, <span class="num">402</span>, <span class="num">503</span>):
+            <span class="kw">return</span> <span class="kw">True</span>  <span class="cm"># 即時フォールバック</span>
+        <span class="kw">if</span> <span class="fn">self</span>.<span class="fn">consecutive_failures</span>(tool) >= <span class="num">3</span>:
+            <span class="kw">return</span> <span class="kw">True</span>
+        <span class="kw">return</span> <span class="kw">False</span>
+
+    <span class="fn">def</span> <span class="fn">should_fallback_on_quality</span>(<span class="fn">self</span>, tool, score):
+        threshold = <span class="fn">self</span>.quality_thresholds.<span class="fn">get</span>(tool, <span class="num">0.65</span>)
+        <span class="kw">if</span> score &lt; threshold <span class="kw">and</span> <span class="fn">self</span>.<span class="fn">retry_count</span>(tool) >= <span class="num">2</span>:
+            <span class="kw">return</span> <span class="kw">True</span>
+        <span class="kw">return</span> <span class="kw">False</span>
+
+    <span class="fn">def</span> <span class="fn">get_fallback</span>(<span class="fn">self</span>, tool):
+        fallbacks = <span class="fn">self</span>.config[<span class="str">"fallbacks"</span>]
+        <span class="kw">if</span> tool <span class="kw">not in</span> fallbacks:
+            <span class="kw">raise</span> <span class="fn">NoFallbackError</span>(<span class="str">f"No fallback for {tool} → route to HITL"</span>)
+        <span class="kw">return</span> fallbacks[tool]</div>
   </div>
 </section>
 
