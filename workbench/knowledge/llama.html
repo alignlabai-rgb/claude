@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Llama (The Open Standard) | Tech Workbench</title>
+    <style>
+        :root {
+            --bg: #0b1220;
+            --panel: #101418;
+            --muted: #94a3b8;
+            --text: #e2e8f0;
+            --accent: #f59e0b;
+            /* Llama Amber/Orange */
+            --accent-grad: linear-gradient(135deg, #f59e0b, #fcd34d);
+            --border: rgba(245, 158, 11, 0.2);
+            --radius: 16px;
+            --font-mono: "SF Mono", "Consolas", monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Segoe UI", "SF Pro Display", system-ui, sans-serif;
+            color: var(--text);
+            background: var(--bg);
+            padding: 32px 20px 64px;
+            line-height: 1.7;
+        }
+
+        .shell {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        header.hero {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 48px 40px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        header.hero::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--accent-grad);
+        }
+
+        header.hero::after {
+            content: "";
+            position: absolute;
+            right: -100px;
+            bottom: -100px;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(245, 158, 11, 0.1), transparent 70%);
+            pointer-events: none;
+        }
+
+        .meta-tag {
+            display: inline-block;
+            background: rgba(245, 158, 11, 0.15);
+            color: #fcd34d;
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .last-updated {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--muted);
+            opacity: 0.7;
+            margin-top: 8px;
+            display: block;
+        }
+
+        .eyebrow {
+            font-size: 0.9em;
+            margin-bottom: 12px;
+            display: block;
+            color: var(--accent);
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        h1 {
+            margin: 0 0 16px;
+            font-size: 48px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            line-height: 1.1;
+            background: linear-gradient(to right, #fff, #fde68a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .lead {
+            margin: 0 0 32px;
+            font-size: 20px;
+            color: var(--muted);
+            max-width: 760px;
+            font-weight: 300;
+        }
+
+        .back {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        .back:hover {
+            opacity: 1;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 32px;
+            transition: transform 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        h2 {
+            margin: 0 0 20px;
+            font-size: 24px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+        }
+
+        h2::before {
+            content: "";
+            width: 4px;
+            height: 24px;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+
+        h3 {
+            margin: 24px 0 12px;
+            font-size: 18px;
+            color: #fff;
+            font-weight: 600;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 8px;
+        }
+
+        p {
+            margin: 0 0 16px;
+            color: var(--muted);
+            font-size: 16px;
+        }
+
+        ul {
+            margin: 0 0 24px;
+            padding-left: 24px;
+            color: var(--muted);
+        }
+
+        li {
+            margin-bottom: 12px;
+        }
+
+        li strong {
+            color: var(--text);
+        }
+
+        .spec-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .spec-item {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .spec-label {
+            display: block;
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--muted);
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .spec-value {
+            display: block;
+            font-size: 16px;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        code {
+            font-family: var(--font-mono);
+            background: rgba(255, 255, 255, 0.06);
+            padding: 1px 6px;
+            border-radius: 5px;
+            font-size: 0.86em;
+            color: #fcd34d;
+        }
+
+        .footer {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 28px 32px;
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        .footer a {
+            color: #fcd34d;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="shell">
+        <header class="hero">
+            <div class="meta-tag">INTELLIGENCE / META</div>
+            <span class="eyebrow">The Open Standard (開かれた標準)</span>
+            <h1>Llama</h1>
+            <p class="lead">オープンウェイト LLM の事実上の標準。Meta の現行「Llama 3.3」は、性能首位を狙うより「誰でも自前で動かせる土台」として君臨し、ツール・派生モデル・量子化版が最も豊富に揃う"困ったらこれ"の安全牌です。</p>
+            <span class="last-updated">Last Updated: 2026.05.30（世代確認: Llama 3.3 が現行・新世代の確報なし）</span>
+            <br>
+            <a class="back" href="../index.html">← Workbenchへ戻る</a>
+            <a class="back" href="slm-guide.html" style="margin-left:14px;">📐 SLM / ローカル運用ガイド →</a>
+        </header>
+
+        <section class="grid">
+            <article class="card">
+                <h2>Core Specs</h2>
+                <div class="spec-grid">
+                    <div class="spec-item">
+                        <span class="spec-label">Latest Model</span>
+                        <span class="spec-value">Llama 3.3</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Philosophy</span>
+                        <span class="spec-value">Open Weights</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Context</span>
+                        <span class="spec-value">128k</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Strength</span>
+                        <span class="spec-value">Ecosystem & Tooling</span>
+                    </div>
+                </div>
+                <p>Llama は Meta が公開するオープンウェイトのファミリーです。最大の価値は単体ベンチの高さではなく、<strong>エコシステムの厚み</strong>——情報・派生モデル・量子化版・推論ツールのどれを取っても一番揃っている、という「枯れた安心感」にあります。ツール使用・関数呼び出しにも対応します。</p>
+            </article>
+
+            <article class="card">
+                <h2>The Open Standard: なぜ"標準"なのか</h2>
+                <p>Llama は「いちばん賢いモデル」ではなく、「いちばん<strong>多くの人が触っているモデル</strong>」です。それがそのまま実用上の強さになります。</p>
+                <ul>
+                    <li><strong>情報量が最大</strong>: 動かし方・トラブル事例・チューニング知見がネット上に最も多く、詰まったときに解決策が見つかりやすい。</li>
+                    <li><strong>ツールが揃う</strong>: Ollama / llama.cpp / vLLM など主要な推論エンジンが軒並み第一級でサポート。"動かない"がほぼ起きない。</li>
+                    <li><strong>派生の土台</strong>: 多くのファインチューン版・特化版が Llama をベースに作られており、その上に乗るだけで選択肢が広がる。</li>
+                </ul>
+            </article>
+        </section>
+
+        <section class="card">
+            <h2>Why "Open Weights"?</h2>
+            <p>Llama は重み（Weights）が公開されているため、クラウド API に依存せず<strong>自社インフラで完結</strong>させられます。これがローカル/オンプレ運用の定番たる理由です。</p>
+            <div style="display: flex; gap: 24px; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 280px;">
+                    <h3>Local & On-Prem</h3>
+                    <p>外部サーバーにデータを出せない機密プロジェクトでも、ローカル GPU やプライベートクラウドで動かせます。トークン課金から解放され、大量・反復タスクのコストを大きく圧縮できます。</p>
+                </div>
+                <div style="flex: 1; min-width: 280px;">
+                    <h3>Fine-tuning</h3>
+                    <p>ベースが公開されているため、社内用語・特定ドメイン・特殊な言語に追加学習させやすい。多くの研究・派生モデルがこの「土台」の上で育っています。</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="grid">
+            <article class="card">
+                <h2>主な用途</h2>
+                <ul>
+                    <li><strong>ローカル / オンプレ運用</strong>: API にデータを出せない・出したくない環境での定番。オフラインでも動く。</li>
+                    <li><strong>ファインチューン基盤</strong>: ドメイン特化モデルを自前で育てるときのベースモデル。</li>
+                    <li><strong>研究・派生モデルの土台</strong>: 新手法の検証や派生モデル構築の出発点として広く使われる。</li>
+                </ul>
+            </article>
+
+            <article class="card">
+                <h2>他との使い分け</h2>
+                <ul>
+                    <li><strong>vs Qwen</strong>: Qwen は<strong>多言語とコーディング・理数</strong>に鋭く、MoE で効率も高い。「日本語コメント込みのコード生成」や算法系は Qwen が一歩リード。Llama は<strong>エコシステムの厚みと汎用バランス</strong>で選ぶ。</li>
+                    <li><strong>vs Gemma</strong>: Gemma は Google 系の<strong>軽量・端末寄り</strong>の構成が得意。極小サイズで端末に乗せるなら Gemma、<strong>情報量・ツール・派生の豊富さ</strong>を取るなら Llama。</li>
+                    <li><strong>vs Mistral</strong>: どちらもオープンウェイトだが、Mistral は欧州発・用途特化のスリムなモデル群が持ち味。汎用の"安全牌"としては Llama が無難。</li>
+                </ul>
+            </article>
+        </section>
+
+        <section class="card">
+            <h2>Deep Dive: ローカル運用の"安全牌"として</h2>
+            <p>Llama を選ぶ最大の理由は「迷ったときに最も外しにくい」点です。性能首位を狙う場面では他モデルに譲ることもありますが、<strong>オープンウェイト × 最大のエコシステム × ツール対応の厚み</strong>という三拍子で、ローカル運用の出発点として最も安定しています。（以下はオープンウェイト運用一般の考え方）</p>
+
+            <h3>どこで動かすか（推論エンジン）</h3>
+            <ul>
+                <li><strong>Ollama</strong>: 最も手軽。個人・検証用に1コマンドで起動。</li>
+                <li><strong>LM Studio</strong>: GUI で試したいとき。</li>
+                <li><strong>vLLM</strong>: バッチ並列でスループット最大。量産向き。</li>
+                <li><strong>llama.cpp</strong>: 低 VRAM / CPU フォールバック。名前の通り Llama 系との相性が深い。</li>
+            </ul>
+
+            <h3>VRAM と量子化</h3>
+            <p>ローカルで動くか／何枚 GPU が要るかは、ほぼ <strong>VRAM と量子化</strong>で決まります。目安として FP16（無圧縮）は「param 数 × 約2GB」、<code>INT4</code> 量子化なら「× 約0.5GB」と VRAM を 1/2〜1/4 に圧縮できます。フォーマットは <code>GGUF</code>（Ollama / LM Studio / llama.cpp 向け）、<code>AWQ</code> / <code>GPTQ</code>（vLLM 向け）が定番。Llama はこれらの量子化版が最も豊富に出回っているため、手元のハードに合わせた版を見つけやすいのが強みです。</p>
+        </section>
+
+        <section class="card">
+            <h2>Deep Dive: API（従量） vs ローカルの損益分岐</h2>
+            <p>「自前で安い」が成立する条件をコストの形で捉えると判断が速くなります（普遍的なローカル運用の考え方）。</p>
+            <div style="display:flex; gap:24px; flex-wrap:wrap; margin-top:8px;">
+                <div style="flex:1; min-width:280px;">
+                    <h3>API（従量）</h3>
+                    <p>トークン量 × 単価で<strong>使うほど比例増</strong>。初期投資ゼロ・即起動・最新モデルにすぐ乗れる。<strong>低頻度・最高品質・試作</strong>向き。</p>
+                </div>
+                <div style="flex:1; min-width:280px;">
+                    <h3>ローカル（OSS Llama）</h3>
+                    <p>GPU 初期投資 ＋ 電気代で<strong>事実上使い放題</strong>。一定の月間トークン量を超えると単価が API を下回る。<strong>大量・反復・オフライン/機密</strong>向き。</p>
+                </div>
+            </div>
+            <p style="margin-top:10px;"><strong>現実解＝ハイブリッド</strong>: 下書き・分類・整形・要約のような大量反復工程はローカル Llama で安く回し、質の最終判断だけ Claude（Opus 4.8 / Sonnet 4.6）や GPT-5.5 等のフラッグシップ API に通す。これがコスト最適のパターンです。</p>
+            <p style="border-left:3px solid #fcd34d;padding-left:14px;color:#d9c79a;font-style:italic;">注意: ローカルは「無料」ではない。電気代・GPU の減価・運用/保守の手間も“コスト”。完全自前に振り切るより、まずは「量産工程だけローカル Llama」から始めるのが安全。</p>
+        </section>
+
+        <footer class="footer">
+            <h3 style="color:#fff;border:none;margin-top:0;">関連リンク</h3>
+            <ul style="margin-bottom:18px;">
+                <li><a href="slm-guide.html">SLM / ローカル運用ガイド</a> — どのサイズ・どの量子化を、どこで動かすか</li>
+                <li><a href="model-generations.html">現行モデル世代（SSOT）</a> — 各社フラッグシップ／オープンモデルの現行世代一覧</li>
+                <li><a href="intelligence-matrix.html">Intelligence Matrix</a> — モデル横断の能力比較</li>
+                <li><a href="qwen.html">Qwen 深掘り</a> / <a href="mistral.html">Mistral 深掘り</a> — 他のオープンウェイト勢</li>
+            </ul>
+            <p style="margin:0 0 6px;"><strong style="color:#fff;">出典:</strong> 本ハブ canon（<code>workbench/knowledge/slm-guide.html</code>・<code>bonsai-8b.html</code>・<code>intelligence-matrix.html</code>）および Meta 公開のオープンウェイト系列に関する一般情報。具体の日付・ベンチ数値は確報のあるものに限定し、それ以外は定性記述としています。</p>
+            <p style="margin:0;"><strong style="color:#fff;">Last Updated:</strong> 2026-05-30</p>
+        </footer>
+    </div>
+</body>
+
+</html>

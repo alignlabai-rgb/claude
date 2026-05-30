@@ -1,0 +1,588 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google AI エコシステム総覧 — 何をしたい時にどれを使うか | Tech Workbench</title>
+    <style>
+        :root {
+            --bg: #0b1220;
+            --panel: #101418;
+            --muted: #94a3b8;
+            --text: #e2e8f0;
+            --accent: #4e8cff;
+            /* Google Blue */
+            --accent-grad: linear-gradient(135deg, #4e8cff, #a5caff);
+            --border: rgba(78, 140, 255, 0.2);
+            --radius: 16px;
+            --font-mono: "SF Mono", "Consolas", monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Segoe UI", "SF Pro Display", system-ui, sans-serif;
+            color: var(--text);
+            background: var(--bg);
+            padding: 32px 20px 64px;
+            line-height: 1.7;
+        }
+
+        .shell {
+            max-width: 1040px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        header.hero {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 48px 40px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        header.hero::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--accent-grad);
+        }
+
+        header.hero::after {
+            content: "";
+            position: absolute;
+            right: -100px;
+            bottom: -100px;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(78, 140, 255, 0.1), transparent 70%);
+            pointer-events: none;
+        }
+
+        .meta-tag {
+            display: inline-block;
+            background: rgba(78, 140, 255, 0.15);
+            color: #8bbeff;
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(78, 140, 255, 0.3);
+        }
+
+        .last-updated {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--muted);
+            opacity: 0.7;
+            margin-top: 8px;
+            display: block;
+        }
+
+        .eyebrow {
+            font-size: 0.9em;
+            margin-bottom: 12px;
+            display: block;
+            color: var(--accent);
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        h1 {
+            margin: 0 0 16px;
+            font-size: 44px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            line-height: 1.1;
+            background: linear-gradient(to right, #fff, #a5caff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .lead {
+            margin: 0 0 32px;
+            font-size: 19px;
+            color: var(--muted);
+            max-width: 800px;
+            font-weight: 300;
+        }
+
+        .back {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        .back:hover {
+            opacity: 1;
+        }
+
+        a {
+            color: #8bbeff;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 32px;
+            transition: transform 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        h2 {
+            margin: 0 0 20px;
+            font-size: 24px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+        }
+
+        h2::before {
+            content: "";
+            width: 4px;
+            height: 24px;
+            background: var(--accent);
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        h3 {
+            margin: 4px 0 12px;
+            font-size: 18px;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        p {
+            margin: 0 0 16px;
+            color: var(--muted);
+            font-size: 15px;
+        }
+
+        ul {
+            margin: 0 0 20px;
+            padding-left: 22px;
+            color: var(--muted);
+            font-size: 15px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        li strong {
+            color: var(--text);
+        }
+
+        .pill {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 5px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+        .pill-canon { background: rgba(78,140,255,0.15); color: #8bbeff; }
+        .pill-qual { background: rgba(148,163,184,0.15); color: #cbd5e1; }
+        .pill-open { background: rgba(79,255,176,0.15); color: #4fffb0; }
+
+        .highlight-box {
+            background: rgba(78, 140, 255, 0.07);
+            border: 1px solid rgba(78, 140, 255, 0.25);
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin-top: 12px;
+        }
+        .highlight-box p { font-size: 0.88rem; margin: 0; color: var(--text); }
+
+        .warn-box {
+            background: rgba(255, 180, 78, 0.07);
+            border: 1px solid rgba(255, 180, 78, 0.3);
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin-top: 12px;
+        }
+        .warn-box p { font-size: 0.88rem; margin: 0; color: #ffd9a0; }
+
+        /* product map */
+        .map-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+        }
+        .map-col {
+            background: rgba(0,0,0,0.25);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 16px;
+        }
+        .map-col h4 {
+            margin: 0 0 10px;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent);
+        }
+        .map-col ul { margin: 0; padding-left: 18px; font-size: 14px; }
+        .map-col li { margin-bottom: 6px; }
+
+        /* decision table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            margin-top: 8px;
+        }
+        th, td {
+            text-align: left;
+            padding: 12px 14px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            vertical-align: top;
+        }
+        th {
+            color: var(--accent);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        td.want { color: var(--text); font-weight: 600; width: 38%; }
+        td strong { color: #8bbeff; }
+
+        .tool-chip {
+            display: inline-block;
+            background: rgba(78,140,255,0.08);
+            border: 1px solid rgba(78,140,255,0.2);
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-size: 0.86rem;
+            margin: 4px 6px 4px 0;
+        }
+
+        footer.page-footer {
+            border-top: 1px solid var(--border);
+            padding-top: 24px;
+            color: var(--muted);
+            font-size: 14px;
+        }
+        footer.page-footer h2 { font-size: 20px; }
+        footer.page-footer a { color: #8bbeff; }
+        .src-list { font-size: 13px; }
+        .src-list li { margin-bottom: 6px; }
+    </style>
+</head>
+
+<body>
+    <div class="shell">
+        <header class="hero">
+            <div class="meta-tag">KNOWLEDGE / GOOGLE ECOSYSTEM</div>
+            <span class="eyebrow">何をしたい時に、どれを使うか</span>
+            <h1>Google AI エコシステム総覧</h1>
+            <p class="lead">Gemini・Gemma・Veo・Flow・Antigravity・NotebookLM・AI Studio・Imagen…。
+                Google の AI 製品は増え続け、全体像が掴みづらくなっています。本ページは製品スペックの羅列ではなく
+                <strong>「目的から逆引きする意思決定ガイド」</strong>として、用途別にどれを選ぶかを整理します。</p>
+            <span class="last-updated">Last Updated: 2026.05.30 — Pro最上位は依然 Gemini 3.1 Pro。I/O 2026 (5/19) 出荷は 3.5 Flash / Omni / Omni Flash・3.2 Flash。3.5 Pro は延期。Gemma 4 公開 (5/20)。</span>
+            <br>
+            <a class="back" href="index.html">← Workbenchへ戻る</a>
+            <a class="back" href="gemini.html" style="margin-left:14px;">Gemini 深掘り →</a>
+        </header>
+
+        <!-- 注記: canon vs 定性 -->
+        <section class="card">
+            <h2>このページの読み方</h2>
+            <p>各製品には情報の確度を示すバッジを付けています。</p>
+            <p>
+                <span class="pill pill-canon">CANON</span> ハブ内の検証済みドキュメント（gemini.html / 各トラッカー）に裏付けがある事実。<br>
+                <span class="pill pill-open">OPEN</span> オープンウェイト／ローカル実行系。<br>
+                <span class="pill pill-qual">定性</span> ハブ内の確証が薄いため、日付・数値・料金は記載せず<strong>「用途・できること」中心の定性記述</strong>に留めた項目。
+            </p>
+        </section>
+
+        <!-- 1. 全体像マップ -->
+        <section class="card">
+            <h2>1. 全体像 — 5つの軸で整理する</h2>
+            <p>Google の AI 製品は、ざっくり次の5軸に分類すると迷いません。「フロンティア推論」「ローカル／オープン」「映像・画像生成」「開発基盤」「リサーチ・知識処理」です。</p>
+            <div class="map-grid">
+                <div class="map-col">
+                    <h4>LLM（推論）</h4>
+                    <ul>
+                        <li><strong>Gemini 3.1 Pro</strong>（最上位）</li>
+                        <li>Gemini 3.5 Flash（高速）</li>
+                        <li>Gemini Omni / Omni Flash</li>
+                        <li>Gemini 3.2 Flash</li>
+                    </ul>
+                </div>
+                <div class="map-col">
+                    <h4>ローカル / オープン</h4>
+                    <ul>
+                        <li><strong>Gemma 4</strong>（2B / 4B / 26B MoE / 31B Dense）</li>
+                    </ul>
+                </div>
+                <div class="map-col">
+                    <h4>映像 / 画像</h4>
+                    <ul>
+                        <li><strong>Veo</strong>（動画生成）</li>
+                        <li><strong>Flow</strong>（制作ツール）</li>
+                        <li>Imagen（画像）</li>
+                        <li>Whisk（画像）</li>
+                    </ul>
+                </div>
+                <div class="map-col">
+                    <h4>開発基盤</h4>
+                    <ul>
+                        <li><strong>Antigravity</strong>（IDE/CLI/SDK/Managed Agents）</li>
+                        <li>Google AI Studio</li>
+                        <li>Vertex AI / Gemini API</li>
+                    </ul>
+                </div>
+                <div class="map-col">
+                    <h4>リサーチ / 知識</h4>
+                    <ul>
+                        <li><strong>NotebookLM</strong>（資料処理）</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="warn-box">
+                <p>⚠️ <strong>世代の正確な現在地（2026-05-30）:</strong> Pro最上位は <strong>Gemini 3.1 Pro</strong>（2026/2/19）。I/O 2026 で出荷されたのは <strong>3.5 Flash / Omni / Omni Flash</strong>（および 3.2 Flash）。<strong>「Gemini 3.5 Pro」は延期され、未提供</strong>です。Gemma は <strong>Gemma 4</strong> が現行。</p>
+            </div>
+        </section>
+
+        <!-- 2. 製品別カード -->
+        <section class="card">
+            <h2>2. 製品別ガイド</h2>
+            <p>核となる製品を、用途と確度バッジ付きで個別に解説します。</p>
+        </section>
+
+        <section class="grid">
+            <!-- Gemini -->
+            <article class="card">
+                <h3>Gemini <span class="pill pill-canon">CANON</span></h3>
+                <p><strong>フロンティアLLM。</strong>テキスト・コード・画像・音声・動画をネイティブに扱う Google の主力モデル群。</p>
+                <ul>
+                    <li><strong>最上位 = Gemini 3.1 Pro</strong>（2026/2/19）。1M トークン、ARC-AGI-2 77.1%、SWE-bench Verified 80.6%。最高品質の推論・設計・コーディングはこれ。</li>
+                    <li><strong>3.5 Flash</strong>：同等性能を高速・低コストで。Gemini アプリと検索 AI Mode のデフォルト。</li>
+                    <li><strong>Omni / Omni Flash</strong>：任意入出力のマルチモーダル（動画生成を統合）。</li>
+                    <li><strong>3.5 Pro は延期</strong>（未提供）。出荷済みと混同しないこと。</li>
+                </ul>
+                <div class="highlight-box">
+                    <p>💡 深掘りは <a href="gemini.html">gemini.html</a>、最新動向は <a href="../research/gemini-recent-updates.html">gemini-recent-updates.html</a>。</p>
+                </div>
+            </article>
+
+            <!-- Gemma 4 -->
+            <article class="card">
+                <h3>Gemma 4 <span class="pill pill-open">OPEN</span></h3>
+                <p><strong>Google のオープンウェイト／ローカル LLM。</strong>手元やオンプレで動かしたい・データを外に出したくない場合の選択肢。</p>
+                <ul>
+                    <li><strong>4 構成</strong>：Effective 2B / 4B（端末向け）、26B MoE（高スループット推論）、31B Dense（高精度タスク）。</li>
+                    <li><strong>Apache 2.0 ライセンス</strong>で商用利用可（2026/5/20 公開）。</li>
+                    <li>クラウド・デスクトップ・モバイルをカバーするデプロイツールチェーンも同時公開。</li>
+                </ul>
+                <div class="highlight-box">
+                    <p>💡 ローカルLLMの選び方全般は <a href="slm-guide.html">slm-guide.html</a> も参照。</p>
+                </div>
+            </article>
+
+            <!-- Veo -->
+            <article class="card">
+                <h3>Veo <span class="pill pill-canon">CANON</span></h3>
+                <p><strong>動画生成モデル。</strong>テキストプロンプトから映像を生成する Google の動画基盤。</p>
+                <ul>
+                    <li><strong>Veo 3 系</strong>はテキストプロンプト一つで<strong>映像・環境音・台詞を同時生成</strong>する点で差別化。</li>
+                    <li>市場では Runway / Kling と並ぶ主要モデルの一角（プロ映像制作向けの定番として定着）。</li>
+                    <li>I/O 2026 では <strong>Gemini Omni</strong> がテキスト・画像・動画プロンプトをシネマティック動画へ変換する経路も加わった。</li>
+                </ul>
+            </article>
+
+            <!-- Flow -->
+            <article class="card">
+                <h3>Flow <span class="pill pill-qual">定性</span></h3>
+                <p><strong>フィルムメイキング／制作ツール。</strong>Veo などの生成モデルを使い、ショットをつないで映像作品を組み立てるための制作環境という位置づけ。</p>
+                <ul>
+                    <li>用途は「単発のクリップ生成」ではなく、<strong>複数ショットの構成・編集を伴う制作ワークフロー</strong>。</li>
+                    <li>ハブ内の確証が薄いため、固有機能名・提供条件は記載せず用途記述に留める。</li>
+                </ul>
+            </article>
+
+            <!-- Antigravity -->
+            <article class="card">
+                <h3>Antigravity <span class="pill pill-canon">CANON</span></h3>
+                <p><strong>エージェント開発基盤。</strong>当初は「Gemini CLI 的なツール」だったが、I/O 2026 で総合基盤へ拡張。</p>
+                <ul>
+                    <li><strong>Antigravity 2.0</strong> は Desktop IDE + CLI + SDK + Managed Agents + Enterprise の5コンポーネント構成。</li>
+                    <li>デフォルトエンジンは Gemini 3.5 Flash。<strong>Gemini CLI は Antigravity CLI へ移行</strong>。</li>
+                    <li>エージェントの自律実行・オーケストレーションを構築したい開発者向け。</li>
+                </ul>
+                <div class="highlight-box">
+                    <p>💡 深掘りは <a href="anti-gravity.html">anti-gravity.html</a>。</p>
+                </div>
+            </article>
+
+            <!-- NotebookLM -->
+            <article class="card">
+                <h3>NotebookLM <span class="pill pill-qual">定性</span></h3>
+                <p><strong>資料・リサーチ AI。</strong>自分が与えた資料（ドキュメント・PDF・ノート等）を情報源として、要約・Q&amp;A・整理を行う「ソース接地型」のツールという位置づけ。汎用チャットと違い、<strong>持ち込んだ資料の範囲で答える</strong>のが特徴。</p>
+                <ul>
+                    <li><strong>大量資料の要約</strong>：長い資料群を読み込ませて要点を抽出する。</li>
+                    <li><strong>資料への Q&amp;A</strong>：「この資料群のどこに何が書いてあるか」を対話で引き出す。</li>
+                    <li><strong>音声化</strong>：取り込んだ資料を会話形式の音声へまとめる用途で知られる。</li>
+                    <li>リサーチ・学習・社内資料の棚卸しなど、<strong>既存資料を捌く</strong>場面に向く。</li>
+                </ul>
+                <div class="warn-box">
+                    <p>⚠️ ハブ内の確証が薄いため、具体的な日付・数値・料金・固有機能名は記載せず、用途・できることの定性記述に徹しています。</p>
+                </div>
+            </article>
+
+            <!-- AI Studio -->
+            <article class="card">
+                <h3>Google AI Studio <span class="pill pill-qual">定性</span></h3>
+                <p><strong>無料で始める開発プレイグラウンド。</strong>Gemini をブラウザ上で手早く試し、API へつなぐための入口という位置づけ。Gemini 系モデル（3.2 Flash など）が静かに最初に現れる場でもある。</p>
+                <ul>
+                    <li><strong>無料で試せる</strong>：登録してすぐ、プロンプトを打ち込んでモデルの挙動を確認できる。</li>
+                    <li><strong>プロンプト試作</strong>：本番コードを書く前に、パラメータや指示文を素早く反復する。</li>
+                    <li><strong>API 取得への導線</strong>：試した内容をそのまま API / Vertex AI 連携へ展開する起点。</li>
+                    <li>「まず触ってみたい」「最小コストで検証したい」段階の第一候補。</li>
+                </ul>
+                <div class="warn-box">
+                    <p>⚠️ ハブ内の確証が薄いため、具体的な無料枠の数値・料金・固有機能名は記載せず、用途・できることの定性記述に徹しています。</p>
+                </div>
+            </article>
+
+            <!-- Imagen / Whisk -->
+            <article class="card">
+                <h3>Imagen / Whisk <span class="pill pill-qual">定性</span></h3>
+                <p><strong>画像生成系。</strong>静止画を作りたい場合の Google 製品。<strong>Imagen</strong> はテキストからの画像生成モデル、<strong>Whisk</strong> は画像を素材に組み合わせて新しい画像を作る系統のツール、という位置づけ。</p>
+                <ul>
+                    <li>用途は「サムネイル・素材・コンセプトビジュアルなどの静止画生成」。</li>
+                    <li>ハブ内の確証が薄いため、バージョン・数値・料金・固有機能名は記載せず用途記述に留める。</li>
+                </ul>
+            </article>
+        </section>
+
+        <!-- 3. 早見表 -->
+        <section class="card">
+            <h2>3. 「こういう時はこれ」早見表</h2>
+            <p>目的から逆引きする決定表です。迷ったらここから。</p>
+            <table>
+                <thead>
+                    <tr><th>やりたいこと</th><th>使う製品</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="want">最高品質の推論・設計・難問コーディング</td>
+                        <td><strong>Gemini 3.1 Pro</strong>（現行最上位。3.5 Pro は延期で未提供）</td>
+                    </tr>
+                    <tr>
+                        <td class="want">速く・安く大量にLLMを回す</td>
+                        <td><strong>Gemini 3.5 Flash</strong>（高速・低コスト）</td>
+                    </tr>
+                    <tr>
+                        <td class="want">ローカル／オンプレで動かす・データを外に出さない</td>
+                        <td><strong>Gemma 4</strong>（端末向け 2B/4B 〜 31B Dense、Apache 2.0）</td>
+                    </tr>
+                    <tr>
+                        <td class="want">動画を生成する</td>
+                        <td><strong>Veo</strong>（映像＋音＋台詞を同時生成）／ Omni 経由のシネマティック動画</td>
+                    </tr>
+                    <tr>
+                        <td class="want">映像作品として構成・制作する</td>
+                        <td><strong>Flow</strong>（複数ショットの制作ワークフロー）</td>
+                    </tr>
+                    <tr>
+                        <td class="want">静止画・ビジュアル素材を作る</td>
+                        <td><strong>Imagen / Whisk</strong></td>
+                    </tr>
+                    <tr>
+                        <td class="want">とりあえず無料で試す・プロンプトを試作する</td>
+                        <td><strong>Google AI Studio</strong>（→ API/Vertex AI へ展開）</td>
+                    </tr>
+                    <tr>
+                        <td class="want">大量の資料を要約・整理・Q&amp;A・音声化する</td>
+                        <td><strong>NotebookLM</strong>（持ち込み資料に接地）</td>
+                    </tr>
+                    <tr>
+                        <td class="want">自律エージェント／開発基盤を組む</td>
+                        <td><strong>Antigravity</strong>（IDE / CLI / SDK / Managed Agents）</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 4. 創作視点 -->
+        <section class="card">
+            <h2>4. 創作（クリエイト）視点 — どう組み合わせるか</h2>
+            <p>自動コンテンツ量産の観点で Google 製品を組み合わせる場合の<strong>一般的な役割分担</strong>を示します（具体的な制作物・IP は本ハブでは扱いません）。</p>
+            <ul>
+                <li><strong>企画・台本・構成</strong>：Gemini 3.1 Pro で全体設計・脚本・プロンプト設計を詰める。大量資料があるなら NotebookLM で素材を整理・要約してから渡す。</li>
+                <li><strong>量産の高速化</strong>：定型処理・大量バッチは Gemini 3.5 Flash に寄せてコストと速度を稼ぐ。機密素材やオフライン処理は Gemma 4 をローカルで。</li>
+                <li><strong>ビジュアル</strong>：静止画は Imagen / Whisk、動画は Veo、作品としての組み立ては Flow。</li>
+                <li><strong>仕組み化</strong>：上記を手作業でなくパイプラインとして回すなら、AI Studio で検証 → API/Vertex AI で実装 → Antigravity でエージェント化、という流れが素直。</li>
+            </ul>
+            <div class="highlight-box">
+                <p>💡 ポイントは「1製品で全部やろうとしない」こと。<strong>推論は Gemini、量産は Flash、ローカルは Gemma、映像は Veo/Flow、土台は AI Studio/Antigravity</strong> と役割で割り当てると、増え続ける製品群でも判断が安定します。</p>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="page-footer">
+            <h2>関連</h2>
+            <ul>
+                <li><a href="gemini.html">gemini.html</a> — Gemini 3.1 Pro 深掘り（現行最上位）</li>
+                <li><a href="../research/gemini-recent-updates.html">gemini-recent-updates.html</a> — Gemini / I/O 2026 最新動向トラッカー</li>
+                <li><a href="anti-gravity.html">anti-gravity.html</a> — Antigravity（エージェント開発基盤）ガイド</li>
+                <li><a href="intelligence-matrix.html">intelligence-matrix.html</a> — モデル横断の能力マトリクス</li>
+            </ul>
+            <h2>出典（canon 参照）</h2>
+            <ul class="src-list">
+                <li><a href="gemini.html">workbench/knowledge/gemini.html</a> — Gemini 3.1 Pro スペック・I/O 2026 整理・3.5 Pro 延期</li>
+                <li><a href="../research/gemini-recent-updates.html">research/gemini-recent-updates.html</a> — 3.5 Flash / Omni / 3.2 Flash 出荷、Gemma 4 構成、Antigravity 2.0、Veo 3 系</li>
+                <li><a href="../research/ai-news/2026-05-19.html">research/ai-news/2026-05-19.html ほか日次</a> — I/O 2026 一斉発表、Veo/動画市場の言及</li>
+                <li><a href="intelligence-matrix.html">workbench/knowledge/intelligence-matrix.html</a> — モデル横断比較</li>
+            </ul>
+            <p class="last-update" style="margin-top:18px;">最終更新: 2026-05-30</p>
+            <p style="font-size:13px;"><a class="back" href="index.html">← Workbench index へ戻る</a></p>
+        </footer>
+    </div>
+</body>
+
+</html>

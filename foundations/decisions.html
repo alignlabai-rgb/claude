@@ -356,6 +356,70 @@
           <li><a href="../creator-system/Claude_Design/index.html">Studio Notes 書架（完結アーカイブ）</a></li>
         </ul>
       </div>
+
+      <div class="adr" id="012-llm-tooling-hubs">
+        <h3>ADR-012: LLM 特集の6本化＋「ツール群」ハブの新設と動線</h3>
+        <div class="meta"><span class="status accepted">ACCEPTED</span> 2026-05-30</div>
+
+        <h4>Context（背景）</h4>
+        <p>LLM Updates Hub は当初 Claude / ChatGPT / Gemini の3トラッカーだった。Grok（Hermes Agent 連携・Grok 5 展望）と Qwen（ローカル運用・高頻度更新）の重要性が増し、コーディング/自動化の作業馬として GLM も追うべきと判断。さらに、Google の製品群（Veo / Flow / NotebookLM / AI Studio / Gemma 等）が増えすぎて全体像が掴めない、動画・画像・音楽の生成ツールが多数ページに散在して比較がない、という課題が顕在化した。</p>
+
+        <h4>Decision（決定）</h4>
+        <ol>
+          <li><strong>LLM 速報トラッカーを6本化</strong>（Claude / ChatGPT / Gemini / Grok / Qwen / GLM）。速報は厳選6社、<strong>深掘り（workbench/knowledge）は全ベンダー網羅</strong>という非対称を意図的な設計として明示</li>
+          <li><strong>深掘り ⇄ 速報の相互リンク</strong>を全6ページに張り、knowledge カタログにベンダー×[深掘り/速報]の対応表を設置</li>
+          <li><strong>「ツール群」入口を新設</strong>: Google AI 全体像（workbench/knowledge/google-ecosystem.html、Gemini深掘りから分岐）、生成AIツール比較（creator-system/genai-tools.html、主軸の制作文脈）、エージェント頭脳選定ガイド（claw-stack/agent-brain-guide.html）</li>
+          <li><strong>slm-guide をローカルLLM運用の正本に格上げ</strong>。daily-news ルーチンを6社連動に拡張し、トラッカーは「日次の積み上げ」で深掘りする（捏造で埋めない）方針を明文化</li>
+          <li>「汎用AIエージェント（Codex/Antigravity/Claude Code/Grok Build＝使用中）」と「ツール群（Google AI / 生成ツール）」を別導線として整理</li>
+        </ol>
+
+        <h4>Consequences（結果）</h4>
+        <ul>
+          <li>+ 「何をしたい時にどれを使うか」の意思決定が各入口で明示され、理念（自動コンテンツ量産）に直結</li>
+          <li>+ Google 製品群と生成ツールの全体像が1枚で掴める</li>
+          <li>+ canon 準拠・捏造禁止を全工程で徹底（NotebookLM/AI Studio 等 canon 薄い項目は定性記述に限定）</li>
+          <li>− 速報トラッカーが6本に増え、月次メンテ対象が倍増（daily-news 連動で蓄積は自動化）</li>
+          <li>− 未対応: Meta Llama 専用ページ（slm-guide に統合済み・単独化は後日判断）</li>
+        </ul>
+
+        <h4>関連</h4>
+        <ul>
+          <li><a href="#007-creator-spotlight">ADR-007</a>: Creator System の主軸宣言（生成ツール比較の置き場の根拠）</li>
+          <li><a href="../research/index.html">LLM Updates Hub（速報6本）</a> / <a href="../workbench/knowledge/index.html">LLM 個別深掘り（カタログ）</a></li>
+          <li><a href="../workbench/knowledge/google-ecosystem.html">Google AI 全体像</a> / <a href="../creator-system/genai-tools.html">生成AIツール比較</a> / <a href="../claw-stack/agent-brain-guide.html">エージェント頭脳選定ガイド</a></li>
+        </ul>
+      </div>
+
+      <div class="adr" id="013-model-generations-ssot">
+        <h3>ADR-013: 現行モデル世代の SSOT 化＋ダッシュボード/戦略層の真実同期</h3>
+        <div class="meta"><span class="status accepted">ACCEPTED</span> 2026-05-30</div>
+
+        <h4>Context（背景）</h4>
+        <p>モデル世代表記（Opus 4.8 / GPT-5.5 / Gemini 3.1 Pro=3.5 Pro 延期 等）がハブ全体に散在し、複数セッションにわたり繰り返し修正が発生していた。同時に、大量更新の結果 <strong>hub-health が「creator-system / claw-stack は45日未更新」という偽 ALERT</strong> を出し、next-actions / roadmap / priorities / capability-map が当セッションの成果（LLM6本化・ツール群）を反映していない「土台層の遅れ」が顕在化した。</p>
+
+        <h4>Decision（決定）</h4>
+        <ol>
+          <li><strong>現行モデル世代 SSOT ページを新設</strong>（<a href="../workbench/knowledge/model-generations.html">model-generations.html</a>）。各ページの世代表記はここに合わせ、更新時はまずここを直す。「やってはいけない表記」（Gemini 3.5 Pro 出荷済み／GPT-5.6 現行 等）も明記</li>
+          <li>Intelligence Matrix・knowledge カタログ・root index から SSOT へ動線を張る</li>
+          <li><strong>hub-health を再計測</strong>し偽 ALERT を解消（creator-system / claw-stack の更新を反映）。残る実課題（claw-stack 旧4ページ・session-log・openclaw-news の古さ）は正直に WARN として残す</li>
+          <li><strong>next-actions / roadmap / priorities / capability-map を当セッション成果に同期</strong>（土台層の遅れを解消）</li>
+          <li><strong>Meta Llama 深掘りページを新設</strong>し、LLM 個別深掘りの主要ベンダーの穴を解消</li>
+        </ol>
+
+        <h4>Consequences（結果）</h4>
+        <ul>
+          <li>+ モデル世代ドリフトの再発防止（直す場所が1つに定まる）</li>
+          <li>+ ダッシュボード/戦略層が「現実」を語るようになり、次セッションの誤誘導を防ぐ</li>
+          <li>+ glossary に新語追記、Llama の穴解消で LLM 個別深掘りが主要ベンダー網羅に</li>
+          <li>− SSOT と各ページの二重管理が発生（運用ルールで「SSOT を先に直す」と明文化して緩和）</li>
+        </ul>
+
+        <h4>関連</h4>
+        <ul>
+          <li><a href="#012-llm-tooling-hubs">ADR-012</a>: LLM 特集6本化＋ツール群ハブ（本 ADR の前段）</li>
+          <li><a href="../workbench/knowledge/model-generations.html">現行モデル世代 SSOT</a> / <a href="../workbench/knowledge/llama.html">Llama 深掘り</a> / <a href="../logs/hub-health.html">Hub Health（再計測）</a></li>
+        </ul>
+      </div>
     </div>
 
     <div class="panel">

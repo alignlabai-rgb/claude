@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>エージェントの頭脳（LLM）選定ガイド | AI Creator Hub</title>
+  <meta name="description" content="Hermes Agent / OpenClaw / PicoClaw などのエージェントの主脳をクラウドAPIにするかローカルLLMにするか。量産運用を前提とした意思決定ガイド。">
+  <link rel="stylesheet" href="../creator-system/style.css">
+  <style>
+    /* このページ専用の小さな補助スタイル（ハブのダークテーマに準拠） */
+    .matrix-cell { font-size: 0.85rem; }
+    .lead-box { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.8rem 2rem; }
+    .lead-box strong.hl { color: var(--accent); }
+    .verdict { border-left: 3px solid var(--accent); padding: 0.4rem 0 0.4rem 1rem; margin: 0.8rem 0; color: var(--text-muted); }
+    .small-note { color: var(--text-muted); font-size: 0.82rem; }
+    .flow-arrow { text-align: center; color: var(--text-muted); font-size: 1.4rem; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">AI Creator Hub</div>
+  <ul class="nav-links">
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="index.html">Claw Guides</a></li>
+    <li><a href="comparison.html">比較表</a></li>
+    <li><a href="agent-brain-guide.html" class="active">頭脳選定</a></li>
+    <li><a href="../workbench/index.html">Tech Workbench</a></li>
+  </ul>
+  <div class="nav-hamburger"><span></span><span></span><span></span></div>
+</nav>
+
+<!-- Hero -->
+<section class="hero" style="min-height: 55vh;">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <div class="hero-badge"><span class="dot-live"></span>意思決定ガイド · 2026-05-30</div>
+    <h1 class="fade-up">
+      エージェントの<br>
+      <span class="gradient-text">頭脳（LLM）の選び方</span>
+    </h1>
+    <p class="hero-desc fade-up-2">
+      Hermes Agent・OpenClaw・PicoClaw などの「主脳」を、クラウド API にするかローカル LLM にするか。<br>
+      <strong>自動でコンテンツを量産する</strong>運用を前提に、どこに何を置くかを判断するためのガイドです。
+    </p>
+    <div class="hero-cta fade-up-3">
+      <a href="#verdict" class="btn btn-primary">結論を見る</a>
+      <a href="comparison.html" class="btn btn-outline">Claw 比較表へ</a>
+    </div>
+  </div>
+</section>
+
+<!-- 1. 結論 -->
+<section class="section" id="verdict">
+  <div class="section-inner">
+    <div class="section-label">結論</div>
+    <h2 class="section-title">主脳はクラウド、量産の下流だけローカル</h2>
+    <p class="section-desc">
+      迷ったら、まずこの原則から逆算してください。
+    </p>
+
+    <div class="lead-box">
+      <p style="font-size:1.05rem; line-height:1.8;">
+        エージェントの<strong class="hl">主脳（オーケストレータ）は基本クラウド API</strong> にします。
+        賢さが一段上で運用の手間がほぼゼロだからです。
+        ローカル LLM は「賢さ」で選ぶものではなく、
+        <strong class="hl">経済性・制御・プライバシー</strong>のために使います。
+      </p>
+      <div class="verdict">
+        量産の<strong>下流工程（下書き・分類・整形・タグ付け）だけをローカルに切り出す</strong>のが定石。
+        ここはトークン量が多く、品質要求が一定で、外に出したくないデータも混ざるため、ローカルの旨味が最も出ます。
+      </div>
+      <p class="small-note">
+        ※ 本ハブの多軸構成（<a href="../workbench/knowledge/kimi.html">kimi.html</a>）とも整合する立て付けです。
+        「質の最終判断は Claude / GPT、長文の整合は Kimi、量産下流は Qwen / GLM」という役割分担をそのまま頭脳選定に写しています。
+      </p>
+    </div>
+
+    <div class="card-grid" style="margin-top:2rem;">
+      <div class="card">
+        <div class="card-icon purple">☁</div>
+        <h3>クラウドを主脳にする理由</h3>
+        <ul class="checklist">
+          <li>賢さが一段上（複雑な判断・長期ワークフロー）</li>
+          <li>運用負荷ゼロ（GPU・量子化・更新の管理が不要）</li>
+          <li>ツール使用・関数呼び出しの信頼性が高い</li>
+          <li>立ち上げが速く、失敗の戻しが容易</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-icon green">▣</div>
+        <h3>ローカルを使う理由</h3>
+        <ul class="checklist">
+          <li>経済性：高頻度・大量トークンを API 課金なしで回す</li>
+          <li>制御：モデル固定・オフライン・レイテンシの安定</li>
+          <li>プライバシー：データを外部送信しない</li>
+          <li>量産下流に限定すれば品質要求を満たしやすい</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-icon cyan">⚖</div>
+        <h3>やってはいけない切り分け</h3>
+        <ul class="checklist">
+          <li>「賢さが欲しいから」ローカルを主脳にする</li>
+          <li>運用体制がないのに全工程をローカル化する</li>
+          <li>品質ゲート（最終判断）までローカルに任せる</li>
+          <li>下流の最適化のために主脳を妥協する</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 2. 判断マトリクス -->
+<section class="section" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-label">判断マトリクス</div>
+    <h2 class="section-title">Cloud vs Local — 4軸で比べる</h2>
+    <p class="section-desc">
+      「賢さ・運用負荷・コスト・向くタスク」の4軸で見ると、置き場所はほぼ自動的に決まります。
+    </p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>軸</th>
+            <th style="color:#a48cf5;">クラウド API（主脳向き）</th>
+            <th style="color:#4FFFB0;">ローカル LLM（下流向き）</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>賢さ</strong></td>
+            <td class="matrix-cell">最上位。複雑な判断・長期計画・曖昧な指示の解釈に強い。</td>
+            <td class="matrix-cell">定型タスクなら十分。複雑な判断は不安定になりやすい。</td>
+          </tr>
+          <tr>
+            <td><strong>運用負荷</strong></td>
+            <td class="matrix-cell">ほぼゼロ。API キーだけ。更新はベンダー任せ。</td>
+            <td class="matrix-cell">GPU 確保・量子化・推論エンジン運用・モデル更新が自前。</td>
+          </tr>
+          <tr>
+            <td><strong>コスト構造</strong></td>
+            <td class="matrix-cell">従量課金。量が増えるほど効く。低頻度なら割安。</td>
+            <td class="matrix-cell">初期投資（GPU）後は電気代中心。高頻度・大量で逆転。</td>
+          </tr>
+          <tr>
+            <td><strong>制御・プライバシー</strong></td>
+            <td class="matrix-cell">外部送信あり。モデルはベンダー都合で更新される。</td>
+            <td class="matrix-cell">完全ローカル。モデル固定・オフライン・閉域に対応。</td>
+          </tr>
+          <tr>
+            <td><strong>向くタスク</strong></td>
+            <td class="matrix-cell">主脳のオーケストレーション・最終品質判断・難所の推論。</td>
+            <td class="matrix-cell">下書き・分類・整形・タグ付け・大量バッチ。</td>
+          </tr>
+          <tr>
+            <td><strong>本ハブの位置づけ</strong></td>
+            <td class="matrix-cell"><span class="tag tag-purple">主脳・品質ゲート</span></td>
+            <td class="matrix-cell"><span class="tag tag-green">量産の土台</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="small-note" style="margin-top:1rem;">
+      コストの分岐点は呼び出し頻度とトークン量で決まります。詳細な試算と推論エンジンの選び方は
+      <a href="../workbench/knowledge/slm-guide.html">SLM ガイド</a> を参照してください。
+    </p>
+  </div>
+</section>
+
+<!-- 3. クラウド候補 -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label">クラウド候補</div>
+    <h2 class="section-title">主脳に置けるクラウド LLM（現行世代）</h2>
+    <p class="section-desc">
+      エージェントの「頭」として何を選ぶか。それぞれの向きを定性的に整理します。
+    </p>
+
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon purple">C</div>
+        <h3>Claude Opus 4.8 / Sonnet 4.6</h3>
+        <p>本ハブの品質ゲートの軸。Opus 4.8 は難所の判断と丁寧な仕上げ、Sonnet 4.6 は速度・コストのバランス担当。<strong>1本を高品質に締める</strong>最終判断に向く。</p>
+        <div style="margin-top:0.6rem;">
+          <span class="tag tag-purple">最終品質判断</span>
+          <span class="tag tag-cyan">難所の推論</span>
+        </div>
+        <a href="../workbench/knowledge/claude-model.html" class="card-link">Claude モデル詳細 →</a>
+      </div>
+
+      <div class="card">
+        <div class="card-icon cyan">G</div>
+        <h3>GPT-5.5</h3>
+        <p>GUI 自動化・デスクトップ操作（OSWorld 系）に強く、長期・複雑なワークフローの遂行が一段上がった世代。<strong>主脳・品質ゲートの両方</strong>に置ける汎用の柱。</p>
+        <div style="margin-top:0.6rem;">
+          <span class="tag tag-cyan">汎用オーケストレータ</span>
+          <span class="tag tag-orange">GUI 自動化</span>
+        </div>
+        <a href="../workbench/knowledge/chatgpt.html" class="card-link">ChatGPT / GPT 詳細 →</a>
+      </div>
+
+      <div class="card">
+        <div class="card-icon green">◆</div>
+        <h3>Gemini（Pro 最上位 = 3.1 Pro）</h3>
+        <p>エージェントタスクの実行能力が大幅に向上した世代。最上位 Pro は <strong>3.1 Pro</strong>（3.5 Pro は延期で未提供）。マルチモーダルを抱える主脳に向く。</p>
+        <div style="margin-top:0.6rem;">
+          <span class="tag tag-green">マルチモーダル主脳</span>
+          <span class="tag tag-cyan">エージェント実行</span>
+        </div>
+        <a href="../workbench/knowledge/gemini.html" class="card-link">Gemini 詳細 →</a>
+      </div>
+
+      <div class="card">
+        <div class="card-icon orange">X</div>
+        <h3>Grok 4.3</h3>
+        <p>リアルタイム情報・X 連携が強み。Grok 4.3 Fast は<strong>エージェント基盤への組み込みコストが低い</strong>のが利点。速報性・即時性が要る主脳・補助脳に。</p>
+        <div style="margin-top:0.6rem;">
+          <span class="tag tag-orange">リアルタイム</span>
+          <span class="tag tag-cyan">低い組み込みコスト</span>
+        </div>
+        <a href="../workbench/knowledge/grok.html" class="card-link">Grok 詳細 →</a>
+      </div>
+    </div>
+    <p class="small-note" style="margin-top:1rem;">
+      現行世代：Claude = Opus 4.8 / Sonnet 4.6、GPT-5.5、Gemini = 3.1 Pro（3.5 Pro は延期）、Grok 4.3。横断比較は
+      <a href="../workbench/knowledge/intelligence-matrix.html">Intelligence Matrix</a> を参照。
+    </p>
+  </div>
+</section>
+
+<!-- 4. ローカル候補 -->
+<section class="section" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-label">ローカル候補</div>
+    <h2 class="section-title">量産下流に置くローカル LLM</h2>
+    <p class="section-desc">
+      Ollama / vLLM で回す前提。「賢さ」ではなく経済性・制御・プライバシーのために選びます。
+    </p>
+
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon green">Q</div>
+        <h3>Qwen 3.6（35B-A3B）</h3>
+        <p>MoE で<strong>アクティブ約3B</strong>だけ動くため、INT4 量子化なら 24GB の <strong>RTX 4090 一枚</strong>に乗る。本ハブの量産主力。vLLM の並列バッチでスループットを稼ぐ。</p>
+        <div style="margin-top:0.6rem;">
+          <span class="tag tag-green">量産主力</span>
+          <span class="tag tag-cyan">RTX 4090 一枚</span>
+        </div>
+        <a href="../workbench/knowledge/qwen.html" class="card-link">Qwen 詳細 →</a>
+      </div>
+
+      <div class="card">
+        <div class="card-icon purple">G</div>
+        <h3>GLM-5.1</h3>
+        <p>エージェント機能に特化した "All Tools" モジュールで、1プロンプトから自律的に複数ツールを使い分ける。<strong>定型の制作タスクを逐次指示なしで回す</strong>下流に向く。</p>
+        <div style="margin-top:0.6rem;">
+          <span class="tag tag-purple">All Tools 自走</span>
+          <span class="tag tag-green">下流自動化</span>
+        </div>
+        <a href="../workbench/knowledge/glm.html" class="card-link">GLM 詳細 →</a>
+      </div>
+
+      <div class="card">
+        <div class="card-icon cyan">◆</div>
+        <h3>Gemma 4</h3>
+        <p>「Effective」パラメータ設計でスマホ・小型機にも乗る省メモリ系。ネイティブのマルチモーダル＋関数呼び出し対応。<strong>省メモリでツールを使う</strong>軽量ノードに。</p>
+        <div style="margin-top:0.6rem;">
+          <span class="tag tag-cyan">省メモリ</span>
+          <span class="tag tag-green">ネイティブ関数呼び出し</span>
+        </div>
+        <a href="../workbench/knowledge/slm-guide.html" class="card-link">SLM ガイド →</a>
+      </div>
+
+      <div class="card">
+        <div class="card-icon orange">D</div>
+        <h3>DeepSeek V4</h3>
+        <p>Engram（記憶痕跡）アーキテクチャによる MoE 系の効率モデル。V4-Pro は API 割引も大きい。ローカル運用も視野に入る<strong>大規模下流の選択肢</strong>。</p>
+        <div style="margin-top:0.6rem;">
+          <span class="tag tag-orange">効率 MoE</span>
+          <span class="tag tag-cyan">下流バッチ</span>
+        </div>
+        <a href="../workbench/knowledge/deepseek.html" class="card-link">DeepSeek 詳細 →</a>
+      </div>
+    </div>
+
+    <p class="small-note" style="margin-top:1rem;">
+      VRAM 目安・量子化フォーマット（GGUF / AWQ / GPTQ）・推論エンジンの使い分け（Ollama＝手軽 / LM Studio＝GUI / vLLM＝量産 / llama.cpp＝低 VRAM）は
+      <a href="../workbench/knowledge/slm-guide.html">SLM ガイド</a> に詳細があります。
+    </p>
+  </div>
+</section>
+
+<!-- 5. エージェント別の実践 -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label">エージェント別の実践</div>
+    <h2 class="section-title">エージェントごとに何を脳にするか</h2>
+    <p class="section-desc">
+      実行環境の前提が違うので、置けるモデルも変わります。
+    </p>
+
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon purple">H</div>
+        <h3>Hermes Agent</h3>
+        <p>
+          ローカル PC だけで閉じる発想より、<strong>VPS / GPU マシン / クラウド上に居続ける前提</strong>で設計された常駐エージェント。
+          canon 上は <strong>GPT-5.5 / GPT-5.5-pro（Codex OAuth 経由）・DeepSeek V4・Qwen 3.6-Plus</strong> に対応。
+        </p>
+        <div class="verdict" style="margin:0.8rem 0;">
+          主脳は GPT-5.5 系などのクラウド。GPU を持つなら下流を Qwen 3.6-Plus / DeepSeek V4 でローカル化し、常駐の強みを活かす。
+        </div>
+        <a href="../workbench/knowledge/hermes-agent.html" class="card-link">Hermes Agent 詳細 →</a>
+      </div>
+
+      <div class="card">
+        <div class="card-icon green">O</div>
+        <h3>OpenClaw</h3>
+        <p>
+          フルスケール本番運用・AI パイプライン統合向け。Orchestrator + Worker のマルチエージェントをフル対応し、クラウド / On-premise で動く。
+        </p>
+        <div class="verdict" style="margin:0.8rem 0;">
+          Orchestrator はクラウド主脳（Claude / GPT-5.5）、Worker 群の下流は Qwen / GLM をローカルに。役割で脳を分けるのが本領。
+        </div>
+        <a href="../creator-system/openclaw.html" class="card-link">OpenClaw 連携設計へ →</a>
+      </div>
+
+      <div class="card">
+        <div class="card-icon cyan">P</div>
+        <h3>PicoClaw</h3>
+        <p>
+          軽量・単一エージェントのローカル寄りスタック。HTTP / CLI のみで、ローカル SLM をバックエンドに据えやすい。PoC・個人開発・エッジノード向け。
+        </p>
+        <div class="verdict" style="margin:0.8rem 0;">
+          ローカル SLM（Gemma 4 / 軽量 Qwen）を素直にバックエンドに。難所だけクラウドへルーティングするハイブリッドが効く。
+        </div>
+        <a href="picoclaw/index.html" class="card-link">PicoClaw ガイドへ →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 6. 典型フロー -->
+<section class="section" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-label">典型フロー</div>
+    <h2 class="section-title">量産パイプラインでの頭脳配置</h2>
+    <p class="section-desc">
+      前回 <a href="../workbench/knowledge/kimi.html">kimi.html</a> に書いた多軸構成と同じ立て付けです。
+    </p>
+
+    <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem;">
+      <div class="pipeline">
+        <div class="pipeline-step">
+          <div class="step-num" style="background: rgba(0,220,130,0.2); color: #4FFFB0;">1</div>
+          <h4>量産の下流＝ローカル</h4>
+          <p>下書き・分類・整形・タグ付けを <strong>Qwen 3.6 / GLM-5.1</strong> で安く速く回す。vLLM 並列で本数を稼ぐ。</p>
+        </div>
+        <div class="pipeline-step">
+          <div class="step-num" style="background: rgba(0,212,255,0.2); color: var(--accent);">2</div>
+          <h4>整合＝Kimi 長文</h4>
+          <p>連作の伏線・設定資料の突き合わせなど、<strong>長文の一貫性だけ Kimi K2.6</strong> に通す。bible 常駐＋並行チェック。</p>
+        </div>
+        <div class="pipeline-step">
+          <div class="step-num" style="background: rgba(108,60,225,0.2); color: #a48cf5;">3</div>
+          <h4>最終品質判断＝クラウド</h4>
+          <p>1本を丁寧に仕上げる品質ゲートを <strong>Claude Opus 4.8 / Sonnet 4.6 ・ GPT-5.5</strong> で締める。</p>
+        </div>
+      </div>
+      <p style="color: var(--text-muted); font-size: 0.88rem; margin-top: 1.5rem; text-align: center;">
+        下流ほどローカル・低コスト、上流（判断）ほどクラウド・高品質。トークン量の多い工程を下に寄せるのがコスト設計の勘所です。
+      </p>
+    </div>
+
+    <p class="small-note" style="margin-top:1.5rem;">
+      Kimi は「②の一貫性レイヤー」を一手に引き受ける専用エンジンで、速報や量産の主役ではない、という整理（canon: kimi.html）に揃えています。
+    </p>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">AI Creator Hub</div>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="index.html">Claw Guides</a>
+      <a href="comparison.html">比較表</a>
+      <a href="../workbench/knowledge/slm-guide.html">SLM ガイド</a>
+      <a href="../workbench/knowledge/hermes-agent.html">Hermes Agent</a>
+      <a href="picoclaw/index.html">PicoClaw</a>
+      <a href="../workbench/knowledge/intelligence-matrix.html">Intelligence Matrix</a>
+    </nav>
+    <div style="margin-top:1rem; color: var(--text-muted); font-size: 0.84rem; line-height:1.9; text-align:center;">
+      <p><strong>LLM トラッカー / 個別深掘り：</strong>
+        <a href="../workbench/knowledge/claude-model.html">Claude</a> ·
+        <a href="../workbench/knowledge/chatgpt.html">GPT</a> ·
+        <a href="../workbench/knowledge/gemini.html">Gemini</a> ·
+        <a href="../workbench/knowledge/grok.html">Grok</a> ·
+        <a href="../workbench/knowledge/qwen.html">Qwen</a> ·
+        <a href="../workbench/knowledge/glm.html">GLM</a> ·
+        <a href="../workbench/knowledge/deepseek.html">DeepSeek</a> ·
+        <a href="../workbench/knowledge/kimi.html">Kimi</a>
+      </p>
+      <p class="small-note">
+        現行世代メモ：Claude = Opus 4.8 / Sonnet 4.6、GPT-5.5、Gemini = 3.1 Pro（3.5 Pro は延期）、Grok 4.3、
+        Qwen 3.6-Plus、GLM-5.1、DeepSeek V4、Kimi K2.6、Gemma 4。
+      </p>
+      <p class="small-note">
+        出典：本ハブ canon（hermes-agent.html / slm-guide.html / intelligence-matrix.html / kimi.html / qwen.html / glm.html / 各 LLM 個別ページ）。
+        canon に紐づく範囲で事実を記載し、それ以外は定性記述に留めています。
+      </p>
+      <p style="margin-top:0.6rem;"><strong>最終更新：2026-05-30</strong></p>
+    </div>
+  </div>
+</footer>
+
+<script src="../creator-system/main.js"></script>
+</body>
+</html>

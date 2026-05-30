@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>現行モデル世代 SSOT — ベンダー別フラッグシップの正本 | LLM 個別深掘り</title>
+  <style>
+    body { font-family: "Segoe UI", "Noto Sans JP", system-ui, sans-serif; margin: 0; background: #0b1220; color: #edf2fb; line-height: 1.7; padding: 28px 18px 64px; }
+    .shell { max-width: 1100px; margin: 0 auto; display: grid; gap: 18px; }
+    .panel { background: #111a2b; border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 22px 24px; }
+    a { color: #75d7c0; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    h1, h2, h3 { margin: 0 0 10px; }
+    h1 { font-size: 1.7rem; }
+    h2 { color: #fcd34d; font-size: 1.15rem; border-bottom: 2px solid rgba(244,184,96,0.25); padding-bottom: 6px; margin-bottom: 14px; }
+    p, li { color: #c5d0e3; }
+    strong { color: #edf2fb; }
+    code {
+      font-family: "Fira Code", "Consolas", monospace;
+      background: rgba(255,255,255,0.06); padding: 1px 6px;
+      border-radius: 5px; font-size: 0.86em; color: #a5f3d0;
+    }
+    .small { font-size: 0.84rem; color: #7f92ac; }
+    .summary { border-left: 4px solid #3dd8c5; padding-left: 14px; margin: 12px 0; }
+    .ssot-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    .ssot-table th { text-align: left; padding: 10px 12px; color: #fcd34d; border-bottom: 2px solid rgba(244,184,96,0.3); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; vertical-align: bottom; }
+    .ssot-table td { padding: 11px 12px; border-bottom: 1px solid rgba(255,255,255,0.06); vertical-align: top; }
+    .ssot-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .vendor { font-weight: 700; color: #edf2fb; white-space: nowrap; }
+    .flagship { color: #a5f3d0; font-weight: 700; }
+    .tier { color: #c5d0e3; font-size: 0.85rem; }
+    .note { color: #9fb0c8; font-size: 0.82rem; }
+    .badge { display: inline-block; padding: 1px 7px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; margin-left: 4px; vertical-align: middle; }
+    .badge-new { background: rgba(79,255,176,0.16); color: #4FFFB0; }
+    .badge-defer { background: rgba(255,107,107,0.16); color: #fca5a5; }
+    .badge-soon { background: rgba(244,184,96,0.16); color: #fcd34d; }
+    .warn { background: rgba(255,107,107,0.06); border: 1px solid rgba(255,107,107,0.25); border-radius: 10px; padding: 12px 16px; margin: 12px 0; }
+    .warn strong { color: #ff7070; }
+    .info { background: rgba(102,224,194,0.06); border: 1px solid rgba(102,224,194,0.2); border-radius: 10px; padding: 12px 16px; margin: 12px 0; }
+    .donts li { margin-bottom: 6px; }
+    .donts .x { color: #ff7070; font-weight: 700; }
+    .step { background: rgba(255,255,255,0.03); border-radius: 12px; padding: 12px 16px 12px 56px; margin: 10px 0; position: relative; border-left: 3px solid #3dd8c5; }
+    .step .num { position: absolute; left: 12px; top: 12px; width: 30px; height: 30px; border-radius: 50%; background: #3dd8c5; color: #07111d; font-weight: 800; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; }
+    .step h3 { color: #edf2fb; font-size: 1rem; margin-bottom: 4px; }
+    .ts { color: #f4b860; font-weight: 700; }
+    @media (max-width: 720px) { .ssot-table { font-size: 0.82rem; } .ssot-table th, .ssot-table td { padding: 8px 7px; } }
+  </style>
+</head>
+<body>
+  <div class="shell">
+
+    <div class="panel">
+      <p class="small"><a href="index.html">← LLM 個別深掘り</a> / <a href="../../index.html">Hub Top</a></p>
+      <h1>現行モデル世代 SSOT — ベンダー別フラッグシップの正本</h1>
+      <div class="summary">
+        <p>このページは<strong>ハブ内の「現行モデル世代」の唯一の正本（Single Source of Truth）</strong>です。各深掘りページ・トラッカー・パイプライン記事の世代表記は、すべてここに合わせます。新世代が出たら<strong>まずこの表を更新</strong>し、その後で各ページに展開してください。表記がページ間でドリフトするのを止めるのがこのページの役割です。</p>
+      </div>
+      <p class="small">最終更新: <span class="ts">2026-05-30</span> ／ canon 準拠（出典は最下部）</p>
+    </div>
+
+    <div class="panel">
+      <h2>このページの使い方</h2>
+      <ul>
+        <li><strong>参照する側</strong>: 各ページで「現行は何世代か」迷ったら、まずここを見る。ここと矛盾する表記はバグ扱いで直す。</li>
+        <li><strong>更新する側</strong>: 新世代リリース・延期・繰り下げを観測したら、<strong>このページを先に直す</strong>。出典 URL を確認し、確証のある日付・数値だけを書く。</li>
+        <li>個別ベンダーの詳細・実装メモは各<a href="index.html">深掘りページ</a>、横断比較は <a href="intelligence-matrix.html">intelligence-matrix</a>、週次の動きは各 <code>*-recent-updates</code> トラッカーを参照。</li>
+      </ul>
+      <div class="info">この表の世代は<strong>本ハブ canon の確定事項</strong>です。噂・予定段階のものは「未リリース／延期」と明示し、現行扱いしません。</div>
+    </div>
+
+    <div class="panel">
+      <h2>現行世代テーブル（2026-05-30 時点）</h2>
+      <table class="ssot-table">
+        <thead>
+          <tr>
+            <th style="width:14%;">ベンダー</th>
+            <th style="width:24%;">現行フラッグシップ</th>
+            <th style="width:26%;">主要ティア</th>
+            <th>備考</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="vendor">Anthropic<br>Claude</td>
+            <td class="flagship">Opus 4.8 <span class="badge badge-new">最新</span></td>
+            <td class="tier">Sonnet 4.6（主力）／ Haiku 4.5（軽量）</td>
+            <td class="note">Opus 4.8 は <span class="ts">2026-05-28</span> 公開。SWE-Bench Pro <strong>69.2%</strong> で記録更新、<strong>Effort Control</strong>（推論コストを task 単位で調整）搭載。<a href="claude-model.html">claude-model</a> ／ <a href="../../research/claude-recent-updates.html">claude-recent-updates</a></td>
+          </tr>
+          <tr>
+            <td class="vendor">OpenAI</td>
+            <td class="flagship">GPT-5.5 ／ GPT-5.5 Instant</td>
+            <td class="tier">GPT-5.5 Pro（上位）</td>
+            <td class="note"><strong>GPT-5.6 は 2026年6月リリース見込み・<span style="color:#fca5a5;">未リリース</span></strong> <span class="badge badge-soon">予定</span>。現行は 5.5 系。<a href="chatgpt.html">chatgpt</a> ／ <a href="../../research/chatgpt-recent-updates.html">chatgpt-recent-updates</a></td>
+          </tr>
+          <tr>
+            <td class="vendor">Google<br>Gemini</td>
+            <td class="flagship">Gemini 3.1 Pro<br><span class="note">（Pro 最上位）</span></td>
+            <td class="tier">I/O 2026 出荷: 3.5 Flash ／ Omni ／ Omni Flash ／ 3.2 Flash<br>Gemma 4（オープンウェイト）</td>
+            <td class="note"><strong>Gemini 3.5 Pro は延期</strong> <span class="badge badge-defer">延期・未出荷</span>。I/O 2026 で公開されたのは Flash 系のみ。Pro 最上位は依然 3.1 Pro。<a href="gemini.html">gemini</a> ／ <a href="google-ecosystem.html">google-ecosystem</a> ／ <a href="../../research/gemini-recent-updates.html">gemini-recent-updates</a></td>
+          </tr>
+          <tr>
+            <td class="vendor">xAI<br>Grok</td>
+            <td class="flagship">Grok 4.3</td>
+            <td class="tier">Grok 4.3 Fast（高速ティア）</td>
+            <td class="note"><a href="grok.html">grok</a> ／ <a href="../../research/grok-recent-updates.html">grok-recent-updates</a></td>
+          </tr>
+          <tr>
+            <td class="vendor">Alibaba<br>Qwen</td>
+            <td class="flagship">Qwen 3.6-Plus</td>
+            <td class="tier">35B-A3B（ローカル／MoE）／ Qwen-Coder</td>
+            <td class="note"><a href="qwen.html">qwen</a> ／ <a href="../../research/qwen-recent-updates.html">qwen-recent-updates</a></td>
+          </tr>
+          <tr>
+            <td class="vendor">Zhipu<br>GLM</td>
+            <td class="flagship">GLM-5.1</td>
+            <td class="tier">—</td>
+            <td class="note"><a href="glm.html">glm</a> ／ <a href="../../research/glm-recent-updates.html">glm-recent-updates</a></td>
+          </tr>
+          <tr>
+            <td class="vendor">DeepSeek</td>
+            <td class="flagship">DeepSeek V4</td>
+            <td class="tier">DeepSeek V4-Pro（上位）</td>
+            <td class="note"><a href="deepseek.html">deepseek</a></td>
+          </tr>
+          <tr>
+            <td class="vendor">Moonshot<br>Kimi</td>
+            <td class="flagship">Kimi K2.6</td>
+            <td class="tier">—</td>
+            <td class="note"><a href="kimi.html">kimi</a></td>
+          </tr>
+          <tr>
+            <td class="vendor">Mistral</td>
+            <td class="flagship">Mistral 3 系</td>
+            <td class="tier">Mistral 3 Large 等</td>
+            <td class="note"><strong>新世代の確報なし</strong>。現行は Mistral 3 系として扱う。<a href="mistral.html">mistral</a></td>
+          </tr>
+          <tr>
+            <td class="vendor">Meta<br>Llama</td>
+            <td class="flagship">Llama 3.3</td>
+            <td class="tier">—</td>
+            <td class="note">横断比較は <a href="intelligence-matrix.html">intelligence-matrix</a> を参照（深掘りページは別途整備予定）。</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="small">★ 世代の正本はこの表。各ページの表記がこれと食い違っていたら、ここを基準に修正する。</p>
+    </div>
+
+    <div class="panel">
+      <h2>やってはいけない表記（ドリフト防止）</h2>
+      <p>以下は<strong>事実誤認</strong>です。各ページでこの書き方を見つけたら直してください。</p>
+      <ul class="donts">
+        <li><span class="x">❌</span> 「<strong>Gemini 3.5 Pro が現行／出荷済み</strong>」 — <strong>延期</strong>であり未出荷。I/O 2026 で出たのは Flash 系のみ。Pro 最上位は 3.1 Pro。「3.5 Pro は延期」と明記すること。</li>
+        <li><span class="x">❌</span> 「<strong>GPT-5.6 が現行</strong>」 — 6月リリース見込みの<strong>未リリース</strong>。現行は GPT-5.5 / 5.5 Instant。</li>
+        <li><span class="x">❌</span> 「<strong>Opus 4.6 / 4.7 が現行フラッグシップ</strong>」 — 旧世代。現行は <strong>Opus 4.8</strong>（5/28〜）。</li>
+        <li><span class="x">❌</span> Gemini 3.5 / 3.2 を「Pro」と混同 — 出荷済みは Flash／Omni 系。Pro ティアは 3.1 Pro のまま。</li>
+        <li><span class="x">❌</span> 確証のない日付・ベンチ数値の記載 — canon にある確定値（例: SWE-Bench Pro 69.2%）以外は書かない。</li>
+      </ul>
+      <div class="warn"><strong>最重要:</strong> 「Gemini 3.5 Pro 出荷済み」は<strong>絶対に書かない</strong>。常に「延期・未出荷」と扱う。</div>
+    </div>
+
+    <div class="panel">
+      <h2>更新手順（新世代が出たとき）</h2>
+      <div class="step"><div class="num">1</div>
+        <h3>このページの表を直す</h3>
+        <p>出典 URL を確認し、確証のある日付・数値だけを反映。延期・予定は badge で明示。最終更新日を更新。</p>
+      </div>
+      <div class="step"><div class="num">2</div>
+        <h3>横断比較を更新</h3>
+        <p><a href="intelligence-matrix.html">intelligence-matrix</a> のモデル名・スコアを揃える。</p>
+      </div>
+      <div class="step"><div class="num">3</div>
+        <h3>該当トラッカーへ展開</h3>
+        <p>該当ベンダーの <code>*-recent-updates</code> にタイムライン項目を追加。</p>
+      </div>
+      <div class="step"><div class="num">4</div>
+        <h3>深掘りページ・パイプライン記事へ波及</h3>
+        <p>個別<a href="index.html">深掘りページ</a>、および世代名をハードコードしている creator-system / pipeline 系の記述を grep して揃える。</p>
+      </div>
+      <div class="step"><div class="num">5</div>
+        <h3>大きな世代交代なら ADR / ログ</h3>
+        <p>方針に関わる変更は <a href="../../foundations/decisions.html">decisions</a> / <a href="../../logs/next-actions.html">next-actions</a> に記録。</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>関連 / 出典</h2>
+      <ul>
+        <li><a href="intelligence-matrix.html">intelligence-matrix.html</a> — モデル横断の能力比較（世代の主参照元）</li>
+        <li><a href="index.html">LLM 個別深掘り index</a> — 各ベンダー深掘りページの入口</li>
+        <li>トラッカー: <a href="../../research/claude-recent-updates.html">claude</a> ／ <a href="../../research/chatgpt-recent-updates.html">chatgpt</a> ／ <a href="../../research/gemini-recent-updates.html">gemini</a> ／ <a href="../../research/grok-recent-updates.html">grok</a> ／ <a href="../../research/qwen-recent-updates.html">qwen</a> ／ <a href="../../research/glm-recent-updates.html">glm</a></li>
+        <li><strong>出典（canon）:</strong> 本ハブ内の <code>intelligence-matrix.html</code>・各 <code>*-recent-updates.html</code>・各深掘りページ。世代・日付・数値はこれら canon に確証のあるもののみ記載。</li>
+      </ul>
+      <p class="small">最終更新: <span class="ts">2026-05-30</span></p>
+    </div>
+
+  </div>
+</body>
+</html>
