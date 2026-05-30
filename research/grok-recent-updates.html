@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grok / xAI 最新アップデート完全版 | Research</title>
+  <style>
+    :root {
+      --bg: #07111d;
+      --panel: #0d1829;
+      --panel-2: #101f34;
+      --panel-3: #09131f;
+      --text: #e8eef9;
+      --muted: #b6c3da;
+      --soft: #7f92ac;
+      --border: rgba(255,255,255,0.08);
+      --accent: #f4b860;
+      --accent-2: #66e0c2;
+      --accent-3: #f7a87a;
+      --accent-4: #d8b4fe;
+      --shadow: 0 12px 36px rgba(0,0,0,0.28);
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 12% 14%, rgba(244,184,96,0.14), transparent 28%),
+        radial-gradient(circle at 88% 4%, rgba(255,255,255,0.08), transparent 24%),
+        linear-gradient(145deg, #07111d 0%, #0a1422 52%, #060d18 100%);
+      color: var(--text);
+      font-family: "Segoe UI", "Noto Sans JP", system-ui, sans-serif;
+      line-height: 1.72;
+      padding: 28px 18px 80px;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .shell { max-width: 1100px; margin: 0 auto; display: grid; gap: 18px; }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px 26px;
+    }
+    .hero {
+      background: linear-gradient(135deg, rgba(244,184,96,0.08), rgba(255,255,255,0.05)), var(--panel);
+    }
+    .breadcrumb { color: var(--soft); font-size: 0.82rem; margin-bottom: 8px; }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      background: rgba(244,184,96,0.12);
+      color: var(--accent);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    h1, h2, h3, h4 { margin: 0 0 10px; }
+    h1 { font-size: 2rem; }
+    h2 { font-size: 1.18rem; }
+    h3 { font-size: 1rem; }
+    h4 { font-size: 0.92rem; color: var(--text); }
+    p, li { color: var(--muted); font-size: 0.92rem; }
+    ul { margin: 8px 0 0; padding-left: 18px; }
+    li { margin-bottom: 6px; }
+    strong { color: var(--text); }
+    .last-update { color: var(--soft); font-size: 0.8rem; margin-top: 10px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    @media (max-width: 920px) {
+      .grid-4, .grid-3 { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 640px) {
+      .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; }
+    }
+    .card, .stat, .subpanel {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+    }
+    .subpanel.deep { background: var(--panel-3); }
+    .stat .value { font-size: 1.8rem; color: var(--accent); font-weight: 800; line-height: 1; }
+    .stat .label { color: var(--soft); font-size: 0.75rem; margin-top: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .tag {
+      display: inline-block;
+      padding: 3px 8px;
+      margin-right: 6px;
+      margin-bottom: 6px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+    .tag-model { background: rgba(167,139,250,0.18); color: var(--accent-4); }
+    .tag-product { background: rgba(96,208,255,0.16); color: #7dd3fc; }
+    .tag-code { background: rgba(247,168,122,0.16); color: #fdba74; }
+    .tag-api { background: rgba(244,184,96,0.16); color: #fcd34d; }
+    .tag-new { background: rgba(79,255,176,0.16); color: #4FFFB0; }
+    .tag-risk { background: rgba(255,107,107,0.16); color: #fca5a5; }
+    .summary {
+      border-left: 4px solid var(--accent);
+      padding-left: 14px;
+      margin-top: 8px;
+    }
+    .timeline {
+      position: relative;
+      display: grid;
+      gap: 14px;
+      padding-left: 28px;
+    }
+    .timeline::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 9px;
+      width: 2px;
+      background: rgba(255,255,255,0.08);
+    }
+    .item {
+      position: relative;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 18px;
+    }
+    .item::before {
+      content: "";
+      position: absolute;
+      left: -24px;
+      top: 18px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--panel);
+      border: 2px solid var(--accent);
+    }
+    .item.hot::before { border-color: #fff; }
+    .date { font-size: 0.76rem; color: var(--soft); font-weight: 700; margin-bottom: 4px; }
+    .note {
+      background: rgba(244,184,96,0.08);
+      border: 1px solid rgba(244,184,96,0.24);
+      border-radius: 12px;
+      padding: 14px 16px;
+    }
+    .sources li { margin-bottom: 8px; }
+    code {
+      font-family: "Fira Code", "Consolas", monospace;
+      background: rgba(255,255,255,0.06);
+      padding: 0.12rem 0.4rem;
+      border-radius: 6px;
+      color: #a5f3d0;
+    }
+    .small { font-size: 0.84rem; color: var(--soft); }
+    .footer-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      font-size: 0.86rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <section class="panel hero">
+      <div class="breadcrumb"><a href="index.html">Research</a> / <a href="../index.html">Hub Top</a></div>
+      <div class="eyebrow">Grok / xAI Update Tracker</div>
+      <h1>Grok / xAI 最新アップデート完全版</h1>
+      <p>
+        本ハブの canon（<a href="../workbench/knowledge/grok.html">Grok 深掘り</a>・
+        <a href="../workbench/knowledge/intelligence-matrix.html">Intelligence Matrix</a>・AI News 日次）をもとに、
+        <strong>現行の Grok 4.3</strong> を中心に xAI の動きを「能力・ポジショニング」視点で整理したページです。
+        単なる年表ではなく、<strong>何が強みで、どこに効き、Claude / ChatGPT / Gemini とどう違うか</strong>まで踏み込んでまとめています。
+      </p>
+      <div class="summary">
+        <p>
+          Grok は「The Maverick（異端児）」として、<strong>X（旧 Twitter）由来のリアルタイムデータ</strong>と
+          <strong>常時稼働の Thinking Mode（深い推論）</strong>、そして <strong>Emotional Awareness（人間味）</strong>を併せ持つ尖った知性です。
+          現行の <strong>Grok 4.3</strong> は 100 万トークンのコンテキスト、出力単価最安クラス（$1.25 / $2.50 per 1M）、約 81 tok/s の高速生成を備え、
+          <strong>「リアルタイム × 高速実装」</strong>のレーンで存在感を出しています。
+        </p>
+        <p>
+          実務的な軸は 5 つ。①<strong>Hermes Agent などエージェント基盤との連携</strong>（provider 非依存の運用層で Grok を呼ぶ）、
+          ②<strong>Grok builds</strong>（自然言語からアプリ・ワークフローを生成する制作レーン）、
+          ③<strong>今後の Grok 5 への展望</strong>、④<strong>リアルタイム / X data</strong>、
+          ⑤<strong>Thinking Mode・Emotional Awareness</strong>。
+          Claude が「品質・安全性の Sage」、Gemini が「設計の Architect」なら、Grok は<strong>「最新性と速度で殴る実装パートナー」</strong>という位置づけです。
+        </p>
+      </div>
+      <p class="last-update">最終更新: 2026-05-30</p>
+    </section>
+
+    <section class="grid-4">
+      <div class="stat"><div class="value">4.3</div><div class="label">現行フラッグシップ</div></div>
+      <div class="stat"><div class="value">1M</div><div class="label">コンテキスト（tokens）</div></div>
+      <div class="stat"><div class="value">81</div><div class="label">tok/s（生成速度）</div></div>
+      <div class="stat"><div class="value">$1.25/$2.50</div><div class="label">入力/出力 per 1M</div></div>
+    </section>
+
+    <section class="panel">
+      <h2>まず押さえる結論</h2>
+      <div class="grid-3">
+        <div class="card">
+          <span class="tag tag-model">Real-time</span>
+          <h3>リアルタイム / X data が最大の武器</h3>
+          <p>
+            X 上の膨大な投稿を<strong>リアルタイムに検索・分析</strong>。「今、世界で何が起きているか」に基づいた
+            リサーチや意思決定が可能で、学習データが古い他モデルが知らない<strong>「今朝出たばかりの情報」</strong>にも即対応できる。
+            ハブ内の選択ガイドでも「最新情報・トレンドリサーチ」の第一候補。
+          </p>
+        </div>
+        <div class="card">
+          <span class="tag tag-product">Agent</span>
+          <h3>Thinking Mode × 常時推論 × デスクトップ自動化</h3>
+          <p>
+            <strong>Thinking Mode</strong>（深い推論モード）を常時稼働で持ち、複雑な数学・科学・コーディングに時間をかけて思考する。
+            <strong>Grok Computer</strong> によるデスクトップ自動化も canon に記録されており、
+            <strong>「リアルタイム情報を取り込みながら手を動かすエージェント」</strong>の方向に寄っている。
+          </p>
+        </div>
+        <div class="card">
+          <span class="tag tag-code">Cost / Speed</span>
+          <h3>出力単価最安クラス + 高速ループ</h3>
+          <p>
+            $1.25 / $2.50（入力 / 出力 per 1M）と<strong>出力単価が最安クラス</strong>、約 81 tok/s の高速生成。
+            ハブの推奨コンボでは「① 設計 = Gemini → ② <strong>実装 = Grok</strong> → ③ レビュー = Claude」と、
+            <strong>高速な量産実装レーン</strong>として組み込まれている。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>重要タイムライン（能力・ポジショニング軸）</h2>
+      <p class="small">
+        ※ 本ハブは公開リポであり、出典は<strong>ハブ内 canon 参照</strong>を基本とします。
+        canon に日付が確定している事項のみ日付を付し、それ以外は「現行世代の能力・ポジショニング」として定性記述に留めています。
+      </p>
+      <div class="timeline">
+
+        <article class="item hot">
+          <div class="date">現行（2026-05 時点）</div>
+          <h3>Grok 4.3 — xAI の現行フラッグシップ <span class="tag tag-model">Model</span></h3>
+          <p>
+            canon（Intelligence Matrix / Grok 深掘り）上の現行モデルは <strong>Grok 4.3</strong>。
+            <strong>1M コンテキスト</strong>・<strong>常時推論モード（Thinking Mode）</strong>・
+            <strong>リアルタイム X data</strong>・<strong>Grok Computer によるデスクトップ自動化</strong>を備える。
+            役割は <strong>The Maverick（異端児）</strong>。API 価格は <strong>$1.25 / $2.50 per 1M</strong>、生成速度は約 <strong>81 tok/s</strong>。
+          </p>
+        </article>
+
+        <article class="item">
+          <div class="date">現行</div>
+          <h3>Grok 4.3 Fast — 開発者向け高速版 <span class="tag tag-code">Dev</span></h3>
+          <p>
+            canon の Grok 深掘りに記載される開発者向け高速版。<strong>ターミナルでの高速なツール呼び出し</strong>や、
+            <strong>エージェントワークフローの中核</strong>として機能する。リアルタイム性を保ったまま実装ループを速く回す用途に向く。
+          </p>
+        </article>
+
+        <article class="item hot">
+          <div class="date">2026-05-12</div>
+          <h3>Grok Imagine Video が動画生成リーダーボードで首位 <span class="tag tag-product">Multimodal</span></h3>
+          <p>
+            ハブの AI News 日次（2026-05-12）より：<strong>xAI の Grok Imagine Video が人間評価ベースの動画生成リーダーボードで 724 点を獲得し首位</strong>。
+            Google Veo 3.1（618 点）・WAN Video 2.6（577 点）が続いた。
+            Grok のマルチモーダル生成が<strong>テキスト系の枠を超えてフロンティアに食い込んでいる</strong>ことを示す事例。
+          </p>
+          <p class="small">出典: ハブ内 canon — <a href="ai-news/2026-05-12.html">AI News 2026-05-12</a></p>
+        </article>
+
+        <article class="item">
+          <div class="date">能力軸（定性）</div>
+          <h3>Hermes Agent など provider 非依存の運用層から呼べる <span class="tag tag-product">Agent連携</span></h3>
+          <p>
+            canon の <a href="../workbench/knowledge/hermes-agent.html">Hermes Agent</a> は<strong>モデル非依存の運用層</strong>として設計され、
+            複数 provider を入れ替え可能な前提を持つ。Grok は <strong>OpenAI 互換 SDK で <code>base_url</code> を切り替えるだけ</strong>で呼べるため
+            （Intelligence Matrix 記載）、こうした<strong>常駐型エージェント基盤の推論バックエンドの 1 つ</strong>として組み込みやすい。
+            ※ 具体的なバージョン対応は各基盤の対応一覧に依存するため、ここでは一般的なツール連携の文脈に留める。
+          </p>
+        </article>
+
+        <article class="item">
+          <div class="date">展望（定性）</div>
+          <h3>Grok builds — 自然言語からの制作レーン <span class="tag tag-product">Builds</span></h3>
+          <p>
+            <strong>Grok builds</strong> は、自然言語の指示からアプリ・ワークフローを組み上げる制作志向の方向性。
+            Grok のリアルタイム性・高速生成・常時推論と相性がよく、<strong>「調べながら作る」</strong>体験に寄与する。
+            ※ 具体的な提供日・仕様は canon に確定情報がないため、能力・ポジショニングの記述に留める。
+          </p>
+        </article>
+
+        <article class="item hot">
+          <div class="date">展望（定性）</div>
+          <h3>今後 Grok 5 が見込まれ有望 <span class="tag tag-model">Next Gen</span></h3>
+          <p>
+            現行が Grok 4.3 であることを踏まえると、<strong>次世代 Grok 5 が見込まれる</strong>。
+            リアルタイム × エージェント志向という Grok の差別化軸がさらに強化される方向が有望視される。
+            ※ リリース日・ベンチ数値などは canon に未記載のため、ここでは<strong>方向性の期待</strong>として記述する。
+          </p>
+        </article>
+
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Grok モデル系統で何が変わったか</h2>
+      <p>現行世代（Grok 4.3）を起点に、xAI は「リアルタイム」「速度」「エージェント実行」「マルチモーダル」を軸に展開している：</p>
+      <div class="grid-2">
+        <div class="subpanel">
+          <span class="tag tag-model">現行</span>
+          <h3>Grok 4.3（The Maverick）</h3>
+          <p>1M コンテキスト・常時推論モード・リアルタイム X data・Grok Computer。$1.25 / $2.50 per 1M、約 81 tok/s。</p>
+        </div>
+        <div class="subpanel">
+          <span class="tag tag-code">現行</span>
+          <h3>Grok 4.3 Fast</h3>
+          <p>開発者向け高速版。ターミナルでの高速ツール呼び出し・エージェントワークフローの中核として機能。</p>
+        </div>
+        <div class="subpanel">
+          <span class="tag tag-product">現行</span>
+          <h3>Grok Imagine Video</h3>
+          <p>動画生成リーダーボード首位（724 点 / 2026-05-12 canon）。マルチモーダル生成のフロンティアに到達。</p>
+        </div>
+        <div class="subpanel">
+          <span class="tag tag-model">展望</span>
+          <h3>Grok 5（見込み）</h3>
+          <p>次世代として有望視。リアルタイム × エージェント志向の強化が期待される。※ 確定情報は canon 未記載。</p>
+        </div>
+      </div>
+      <p class="small" style="margin-top: 14px;">※ Grok は weights 公開の実績を持つ（canon: Grok 深掘りの比較記述）。SNS データという独自の武器と合わせ、オープンな精神とリアルタイム性の両取りが特徴。</p>
+    </section>
+
+    <section class="panel">
+      <h2>Hermes Agent 連携の意味 — 「provider 非依存の運用層」から Grok を呼ぶ</h2>
+      <p>
+        ハブ canon の <a href="../workbench/knowledge/hermes-agent.html">Hermes Agent</a> は、単発のチャットツールではなく
+        <strong>記憶し技能を育てる常駐型エージェント環境</strong>で、最大の設計思想の 1 つが<strong>モデル非依存（provider-agnostic）</strong>です。
+      </p>
+      <ul>
+        <li><strong>運用とモデル選定の分離</strong>：「どのモデルが最強か」ではなく「<strong>model を入れ替えても運用が崩れない構造</strong>」を学ぶ教材。Grok はその差し替え候補の 1 つになりうる。</li>
+        <li><strong>OpenAI 互換で呼べる</strong>：Intelligence Matrix の記述どおり、Grok は OpenAI SDK の <code>base_url</code> を切り替えるだけで呼べるため、エージェント基盤への組み込みコストが低い。</li>
+        <li><strong>リアルタイム性が効く役割</strong>：常駐エージェントが「今の状況」を踏まえて動く場面では、Grok の X data リアルタイムアクセスが推論バックエンドとして強みになる。</li>
+      </ul>
+      <p class="small">
+        ※ 一般的なツール連携の文脈のみを記述しています。具体的な provider 対応一覧・バージョン整合は各基盤側のドキュメントに依存します。
+      </p>
+    </section>
+
+    <section class="panel">
+      <h2>Grok builds とエージェント志向の今後 — 「調べながら作る」レーン</h2>
+      <p>
+        Grok の強みは<strong>「最新性」と「速度」と「常時推論」</strong>の組み合わせです。これらは制作・自動化レーンと特に相性がよい：
+      </p>
+      <div class="grid-3" style="margin-top: 14px;">
+        <div class="subpanel">
+          <h3>① Grok builds（制作）</h3>
+          <p>自然言語からアプリ・ワークフローを組み上げる方向性。リアルタイム情報を取り込みながら作れるのが他にない体験。※ 仕様は能力記述に留める。</p>
+        </div>
+        <div class="subpanel">
+          <h3>② Grok Computer（自動化）</h3>
+          <p>canon 記載のデスクトップ自動化。「このアプリを操作して」といった指示で実環境を操作するエージェント実行に対応。</p>
+        </div>
+        <div class="subpanel">
+          <h3>③ Grok 4.3 Fast（高速ループ）</h3>
+          <p>ターミナルでの高速ツール呼び出し・エージェントワークフローの中核。実装ループを速く回す。</p>
+        </div>
+        <div class="subpanel">
+          <h3>④ リアルタイム × 実装</h3>
+          <p>「今朝発表されたばかりの技術」を X 上のドキュメント・感想から読み込んで即座に実装に反映できる。</p>
+        </div>
+        <div class="subpanel">
+          <h3>⑤ Grok 5 への布石</h3>
+          <p>現行の方向性を踏まえると、次世代ではエージェント志向・リアルタイム性のさらなる強化が見込まれる（定性）。</p>
+        </div>
+        <div class="subpanel">
+          <h3>⑥ Emotional Awareness</h3>
+          <p>「一緒に開発を楽しむ相棒」としての側面。率直なフィードバックやジョークが長時間開発の孤独感を軽減する（canon 記述）。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>リアルタイム / X 優位 — Grok だけが取れる戦略</h2>
+      <p>
+        Grok の最大の差別化は、<strong>xAI が持つ X（旧 Twitter）のリアルタイムデータ資産</strong>です。
+        Gemini が「Google の個人データ資産（Gmail / 検索）」を活かすように、Grok は<strong>「SNS のリアルタイム言説」</strong>を武器にします。
+      </p>
+      <ul>
+        <li><strong>「今」に基づく判断</strong>：X 上の投稿をリアルタイム検索・分析し、最新トレンドや突発的な出来事を踏まえた応答ができる。</li>
+        <li><strong>最新技術のキャッチアップ</strong>：学習データが古い他モデルが知らない新フレームワークも、X 上のドキュメント・感想を読み込んで即対応。</li>
+        <li><strong>リサーチ起点のフロー</strong>：ハブの推奨コンボ C「① <strong>リサーチ = Grok</strong> → ② 整理・設計 = Gemini → ③ …」のように、未知領域への素早いキャッチアップの入口として機能する。</li>
+      </ul>
+      <p class="small">
+        Claude / ChatGPT / Gemini が「正確性・安全性・設計・OS 統合」で競うのに対し、Grok は<strong>「最新性」と「面白さ（個性）」</strong>で勝負する。
+        知識の正確性や安全性では及ばない場面もあるが、<strong>リアルタイム性ではほぼ独走</strong>というのが canon の見立て。
+      </p>
+    </section>
+
+    <section class="panel">
+      <h2>Thinking Mode・Emotional Awareness — 「相反する 2 要素の融合」</h2>
+      <p>
+        Grok 4.3 の本質は、<strong>深い推論（Thinking Mode）</strong>と<strong>人間味（Emotional Awareness）</strong>という、
+        一見相反する 2 つの要素を融合している点にあります（canon: Grok 深掘り）。
+      </p>
+      <ul>
+        <li><strong>Thinking Mode</strong>：複雑な数学・科学・プログラミングに対し、時間をかけて思考ステップを踏む深い推論モード。canon では「常時推論モード」とも表現され、「ステップバイステップで考えて」と促す必要がない。</li>
+        <li><strong>Emotional Awareness</strong>：ユーザーの感情的なニュアンスを理解し、人間味のある反応を返す能力。「無機質なコード出力機」ではなく「一緒に開発を楽しむ相棒」。</li>
+        <li><strong>プロンプトの効かせ方</strong>：canon の運用ガイドでは、Grok には<strong>簡潔で直接的な 1〜2 行の指示</strong>が最もよく効き、過剰な思考誘導や 1 万字超の長文コンテキスト渡しは避けるべきとされる。</li>
+      </ul>
+    </section>
+
+    <section class="panel">
+      <h2>注意点と向き不向き</h2>
+      <div class="note">
+        <ul>
+          <li><strong>情報鮮度の裏返し</strong>：リアルタイム性が強みである一方、知識の正確性・安全性では Claude / GPT に及ばない場面がある（canon の比較記述）。重要判断は別モデルでのレビューを推奨。</li>
+          <li><strong>長文コンテキストは不得手寄り</strong>：1M コンテキストを持つが、canon の運用ガイドでは「1 万字超の長文コンテキスト渡し」は避けるべきとされ、超長文解析は Kimi / Gemini が優位。</li>
+          <li><strong>過剰出力に注意</strong>：常時推論モードのため「ステップバイステップで考えて」と促すと過剰出力になりやすい。指示は簡潔に。</li>
+          <li><strong>展望事項の不確実性</strong>：Grok 5 / Grok builds は本ハブ canon に確定情報がなく、リリース日・仕様・ベンチ数値は未確定。本ページでは方向性の期待として扱う。</li>
+          <li><strong>エージェント連携の権限</strong>：Grok Computer のデスクトップ自動化や常駐エージェントへの組み込みは、実行環境の権限・安全境界の設計（Hermes 流に言えば backend / approvals）を前提に検討する。</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>出典（ハブ内 canon）・関連リンク</h2>
+      <p class="small">
+        本ページは公開リポジトリのトラッカーであり、外部の日付付きニュース・URL を新規に作成していません。
+        記述はすべて以下のハブ内 canon に基づきます（CLAUDE.md / daily-news ルールに従い、不確実な外部 URL は省略）。
+      </p>
+      <ul class="sources">
+        <li>ハブ内 canon: <a href="../workbench/knowledge/grok.html">Grok 深掘り（workbench/knowledge/grok.html）</a> — 現行 Grok 4.3 の能力・個性・運用</li>
+        <li>ハブ内 canon: <a href="../workbench/knowledge/intelligence-matrix.html">Intelligence Matrix</a> — 9 モデル比較・価格・速度・プロンプト運用</li>
+        <li>ハブ内 canon: <a href="../workbench/knowledge/hermes-agent.html">Hermes Agent</a> — provider 非依存の常駐エージェント運用層</li>
+        <li>ハブ内 canon: <a href="ai-news/2026-05-12.html">AI News 2026-05-12</a> — Grok Imagine Video が動画生成首位</li>
+        <li>関連トラッカー: <a href="claude-recent-updates.html">Claude 最新アップデート</a> / <a href="chatgpt-recent-updates.html">ChatGPT 最新アップデート</a> / <a href="gemini-recent-updates.html">Gemini 最新アップデート</a></li>
+      </ul>
+      <div class="footer-links" style="margin-top: 16px;">
+        <a href="../workbench/knowledge/grok.html">Grok 深掘り →</a>
+        <a href="../workbench/knowledge/intelligence-matrix.html">Intelligence Matrix →</a>
+        <a href="index.html">Research トップ →</a>
+        <a href="../index.html">Hub Top →</a>
+      </div>
+      <p class="last-update">最終更新: 2026-05-30</p>
+    </section>
+
+  </div>
+</body>
+</html>

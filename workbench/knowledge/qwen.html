@@ -250,6 +250,7 @@
             <span class="last-updated">Last Updated: 2026.05.30</span>
             <br>
             <a class="back" href="../index.html">← Workbenchへ戻る</a>
+            <a class="back" href="../research/qwen-recent-updates.html" style="margin-left:14px;">📈 最新動向トラッカー →</a>
         </header>
 
         <section class="grid">
@@ -321,6 +322,71 @@
                         Cloudのインフラを背景にした「実用性・堅牢性」重視、DeepSeekは「推論能力」重視という住み分けがあります。</li>
                 </ul>
             </article>
+        </section>
+
+        <section class="card">
+            <h2>Deep Dive: 自前で安く回す量産エンジン</h2>
+            <p>ALIGN_Lab のような「自動でコンテンツを量産する」運用では、Qwen は<strong>速報トラッカーで追う 6 本</strong>の一角として位置づけています。理由は性能首位だからではなく、<strong>オープンウェイト × ローカル運用 × 猛烈な更新頻度</strong>という「工場を安く・速く回す」三拍子にあります。</p>
+
+            <h3>ローカル運用（オープンウェイト）</h3>
+            <p>重みが公開されているため、ローカル GPU や自前サーバーで動かせます。クラウド API のトークン課金に依存せず、量産パイプラインのコストを大きく圧縮できるのが最大の利点です。MoE アーキテクチャで、サイズの割に推論コストを抑えられる点もローカル向き。</p>
+
+            <h3>動画・マルチモーダル</h3>
+            <p>テキストだけでなく画像・動画方向のマルチモーダル展開が進んでおり、制作パイプラインの前処理（素材理解・タグ付け・構成判断の補助）に組み込みやすい系列です。</p>
+
+            <h3>更新頻度の速さ</h3>
+            <p>主要 LLM の中でも特にリリース・派生モデルの回転が速く、「追い続ける価値が高い」のが速報トラッカー入りの決め手。現行は <strong>Qwen 3.6-Plus</strong>、コーディング特化の <strong>Qwen-Coder</strong> が併走します。</p>
+
+            <p style="border-left:3px solid #c4b5fd;padding-left:14px;color:#bcc0da;font-style:italic;">役割整理: Qwen =「ローカル・低コストの量産エンジン」。質の最終判断は Claude / GPT-5.5、構成・長尺は Gemini、自動化エンジン本体は GLM-5.1 が担う多軸構成の中で、Qwen は"安く速く回す土台"を受け持つ。</p>
+        </section>
+
+        <!-- ===== 実践深掘り: ローカル運用とコスト ===== -->
+        <section class="card" style="border-color:rgba(196,181,253,0.35);">
+            <h2>Deep Dive ①: どの Qwen を、どこで動かすか</h2>
+            <p>Qwen を「マスターする」上で最初に効くのは、<strong>系列の使い分け</strong>です。同じ Qwen でも「クラウド API で呼ぶ最上位」と「ローカルで回すオープンウェイト」は役割が違います。</p>
+            <table style="width:100%; border-collapse:collapse; font-size:0.86rem; margin-top:10px;">
+                <thead><tr style="text-align:left; color:#c4b5fd;">
+                    <th style="padding:6px 8px;">系列（canon）</th><th style="padding:6px 8px;">置き場所</th><th style="padding:6px 8px;">使いどころ</th>
+                </tr></thead>
+                <tbody>
+                    <tr><td style="padding:6px 8px;"><strong>Qwen 3.6-Plus</strong></td><td style="padding:6px 8px;">クラウド API</td><td style="padding:6px 8px;">汎用・高品質。質が要る本番生成の API 担当。</td></tr>
+                    <tr><td style="padding:6px 8px;"><strong>Qwen 3.6 Max</strong></td><td style="padding:6px 8px;">クラウド API</td><td style="padding:6px 8px;">最上位ベンチ。中国系オープンモデル競争の性能基準。</td></tr>
+                    <tr><td style="padding:6px 8px;"><strong>Qwen 3.6-35B-A3B</strong></td><td style="padding:6px 8px;"><strong>ローカル</strong>（オープンウェイト）</td><td style="padding:6px 8px;">MoE で<strong>アクティブ約3B</strong>だけ動くため RTX 4090 一枚で回る。量産の主力。</td></tr>
+                    <tr><td style="padding:6px 8px;"><strong>Qwen 3.6 27B</strong></td><td style="padding:6px 8px;">ローカル</td><td style="padding:6px 8px;">さらに軽量寄り。マルチステップのローカル実行に。</td></tr>
+                    <tr><td style="padding:6px 8px;"><strong>Qwen-Coder</strong></td><td style="padding:6px 8px;">API / ローカル</td><td style="padding:6px 8px;">コード特化。スクリプト・パイプライン補助。</td></tr>
+                    <tr><td style="padding:6px 8px;"><strong>Qwen-Image 2.0</strong></td><td style="padding:6px 8px;">API / ローカル</td><td style="padding:6px 8px;">画像生成。Qwen3 Agent と組んで素材生成まで。</td></tr>
+                </tbody>
+            </table>
+            <p style="margin-top:10px;"><strong>「A3B」がローカルの鍵</strong>: 総パラメータは大きくても、MoE は推論時に<strong>一部の専門家（≒3B）だけ</strong>を起動します。だから「35B級の賢さ」を「3B級の負荷」で回せる＝一枚 GPU で量産できる、という理屈です。</p>
+        </section>
+
+        <section class="card">
+            <h2>Deep Dive ②: ハードウェアと量子化（VRAM の考え方）</h2>
+            <p>ローカルで動くか／何枚 GPU が要るかは、ほぼ <strong>VRAM と量子化</strong>で決まります。ざっくりの目安：</p>
+            <ul>
+                <li><strong>VRAM の目安</strong>: FP16（無圧縮）なら「アクティブ param 数 × 約2GB」、<strong>INT4 量子化</strong>なら「× 約0.5GB」。35B-A3B はアクティブ約3B なので、INT4 で実効数 GB に収まり 24GB の RTX 4090 一枚に乗ります。</li>
+                <li><strong>量子化フォーマット</strong>: <code>GGUF</code>（Ollama / LM Studio / llama.cpp 向け）、<code>AWQ</code> / <code>GPTQ</code>（vLLM 向け）。INT4 でも品質劣化は小さく、VRAM を 1/2〜1/4 に圧縮できます。</li>
+                <li><strong>推論エンジンの選択</strong>: <strong>Ollama</strong>＝最も手軽（個人・検証）、<strong>LM Studio</strong>＝GUI で試す、<strong>vLLM</strong>＝バッチ並列でスループット最大（量産向き）、<strong>llama.cpp</strong>＝低 VRAM / CPU フォールバック。</li>
+                <li><strong>量産のコツ</strong>: vLLM で並列バッチを回せば、一枚 GPU でも実効スループットが大きく伸びます。「1リクエストの速さ」より「単位時間あたりの本数」で設計する。</li>
+            </ul>
+        </section>
+
+        <section class="card">
+            <h2>Deep Dive ③: コスト設計 — ローカル vs API の損益分岐</h2>
+            <p>「自前で安い」が成立する条件を、コストの形で捉えると判断が速くなります。</p>
+            <div style="display:flex; gap:24px; flex-wrap:wrap; margin-top:8px;">
+                <div style="flex:1; min-width:280px;">
+                    <h3>API（従量）</h3>
+                    <p>トークン量 × 単価で<strong>使うほど比例増</strong>。初期投資ゼロ・即起動・最新モデルにすぐ乗れる。<strong>低頻度・最高品質・試作</strong>向き。</p>
+                </div>
+                <div style="flex:1; min-width:280px;">
+                    <h3>ローカル（OSS Qwen）</h3>
+                    <p>GPU 初期投資 ＋ 電気代で<strong>事実上使い放題</strong>。一定の月間トークン量を超えると単価が API を下回る。<strong>大量・反復・オフライン/機密</strong>向き。</p>
+                </div>
+            </div>
+            <p style="margin-top:10px;"><strong>損益分岐の考え方</strong>: 「月にどれだけ叩くか」が閾値。下書き・分類・整形・要約のような<strong>大量反復工程</strong>はローカル Qwen が圧倒的に安い。一方、最終品質が要る一発勝負は API（Plus/Max や他社フラッグシップ）。</p>
+            <p><strong>現実解＝ハイブリッド</strong>: 量産の下流（下書き・タグ付け・整形）はローカル Qwen で安く回し、<strong>質の最終判断だけ Claude / GPT-5.5 の API</strong> に通す。これが ALIGN_Lab 的な「自動コンテンツ量産」のコスト最適パターンです。</p>
+            <p style="border-left:3px solid #c4b5fd;padding-left:14px;color:#bcc0da;font-style:italic;">注意: ローカルは「無料」ではない。電気代・GPU の減価・運用/保守の手間も“コスト”。完全自前に振り切るより、まずは「量産工程だけローカル」から始めるのが安全。</p>
         </section>
     </div>
 </body>
