@@ -87,6 +87,7 @@
         <a href="#openai">OpenAI 製品</a>
         <a href="#google">Google / Gemini 製品</a>
         <a href="#protocol">プロトコル・標準</a>
+        <a href="#local">オープンウェイト・ローカルLLM</a>
         <a href="#hub">ハブ運用</a>
         <a href="#business">事業・市場</a>
       </div>
@@ -128,6 +129,12 @@
           <div class="name">Claude Code</div>
           <p>Anthropic 純正の CLI エージェント。実装支援＋レビュー＋長時間運転＋権限制御を含むエージェント基盤。2026年5月時点で v2.1.147（5/22リリース、Ctrl+T ピン留めバックグラウンドセッション搭載）。</p>
           <p class="links">→ <a href="../workbench/knowledge/claude-code.html">Claude Code 詳細</a> / <a href="../workbench/knowledge/claude-code/">操作ガイド</a></p>
+        </div>
+
+        <div class="term">
+          <div class="name">Effort Control <span class="aka">（旧 Adaptive Thinking）</span></div>
+          <p>Claude が「どれくらい深く考えるか（思考量）」をタスク難易度に応じて調整する機能。Opus 4.8 で <strong>Adaptive Thinking の進化形</strong>として明示的な制御性が強化された。深い推論・コーディング精度の強みの源泉。</p>
+          <p class="links">→ <a href="../workbench/knowledge/claude-model.html">Claude モデル詳細</a></p>
         </div>
 
         <div class="term">
@@ -233,6 +240,18 @@
         </div>
 
         <div class="term">
+          <div class="name">Veo / Flow</div>
+          <p><strong>Veo</strong> は Google の動画生成モデル（テキストプロンプトから映像・環境音・台詞を同時生成）。<strong>Flow</strong> はその生成素材をショットとしてつなぎ、映像作品を組み立てるフィルムメイキング／制作環境。制作パイプラインでは「動画は Veo、作品としての組み立ては Flow」と役割分担する。</p>
+          <p class="links">→ <a href="../workbench/knowledge/google-ecosystem.html">Google AI 全体像</a></p>
+        </div>
+
+        <div class="term">
+          <div class="name">NotebookLM / Google AI Studio</div>
+          <p><strong>NotebookLM</strong> は持ち込み資料に接地（grounding）して要約・調査するリサーチ AI。大量素材を整理してから Gemini に渡す前処理に使う。<strong>Google AI Studio</strong> は Gemini を無料で試せる開発環境で、ここで詰めたプロンプトを API / Vertex AI へ展開する土台になる。</p>
+          <p class="links">→ <a href="../workbench/knowledge/google-ecosystem.html">Google AI 全体像</a></p>
+        </div>
+
+        <div class="term">
           <div class="name">Aluminum OS</div>
           <p>2026/05/19 I/O で初公開された新 OS。Android XR スマートグラスとの組み合わせで、Gemini を OS レベルで統合する戦略の核。</p>
         </div>
@@ -259,6 +278,28 @@
         <div class="term">
           <div class="name">ADR <span class="aka">（Architecture Decision Record）</span></div>
           <p>「なぜそう決めたか」を残す決定記録のフォーマット。本ハブでは <a href="decisions.html">decisions.html</a> で軽量 ADR を採用している。</p>
+        </div>
+      </div>
+
+      <div class="term-group" id="local">
+        <h2>オープンウェイト・ローカルLLM</h2>
+
+        <div class="term">
+          <div class="name">MoE / A3B <span class="aka">（Mixture-of-Experts / アクティブパラメータ）</span></div>
+          <p><strong>MoE（Mixture-of-Experts）</strong>は、推論時にモデル全体ではなく一部の「専門家」だけを起動するアーキテクチャ。<strong>A3B</strong> の「A」は <strong>Active（アクティブパラメータ）</strong>の意で、例えば「Qwen 3.6 35B-A3B」は<strong>総パラメータ35B・推論時にアクティブなのは約3B</strong>を表す。「35B級の賢さを3B級の負荷で回せる」ため、一枚 GPU でのローカル運用に向く。</p>
+          <p class="links">→ <a href="../workbench/knowledge/qwen.html">Qwen 深掘り</a> / <a href="../workbench/knowledge/slm-guide.html">SLM ガイド</a></p>
+        </div>
+
+        <div class="term">
+          <div class="name">量子化 / GGUF / AWQ</div>
+          <p>モデルの重みを低ビット（例 <code>INT4</code>）に圧縮し、必要 VRAM を 1/2〜1/4 に減らしてローカル運用を可能にする手法が<strong>量子化</strong>。<code>GGUF</code> は Ollama / LM Studio / llama.cpp 向けの定番フォーマット、<code>AWQ</code>（や <code>GPTQ</code>）は vLLM 向け。INT4 でも品質劣化は小さく、省 VRAM 化の中心技術。</p>
+          <p class="links">→ <a href="../workbench/knowledge/slm-guide.html">SLM ガイド</a> / <a href="../workbench/knowledge/llama.html">Llama 深掘り</a></p>
+        </div>
+
+        <div class="term">
+          <div class="name">エージェント頭脳 <span class="aka">（agent brain）</span></div>
+          <p>エージェント（OpenClaw / Claude Code 等のハーネス）を実際に動かす<strong>中身の LLM をどれにするか</strong>という選定概念。同じハーネスでも頭脳を Claude にするか、ローカルの Llama/Qwen にするかで品質・コスト・プライバシーが変わる。「ハーネス（外枠）」と「頭脳（中身の LLM）」を分けて考えるのが選定の出発点。</p>
+          <p class="links">→ <a href="../workbench/knowledge/slm-guide.html">SLM ガイド（頭脳の選び方）</a></p>
         </div>
       </div>
 
