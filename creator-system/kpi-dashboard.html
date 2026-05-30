@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KPIダッシュボード — AI Creator Hub</title>
+  <meta name="description" content="AI Creator Hub の実装状況・目標KPI・週次月次レビューサイクル・フィードバックループの設計書。長期運用の羅針盤。">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">AI Creator Hub</div>
+  <ul class="nav-links">
+    <li><a href="index.html">ホーム</a></li>
+    <li><a href="topic-generator.html">ネタ生成</a></li>
+    <li><a href="video-pipeline.html">動画制作</a></li>
+    <li><a href="manga-pipeline.html">漫画制作</a></li>
+    <li><a href="evaluation.html">評価システム</a></li>
+    <li><a href="monetization.html">マネタイズ</a></li>
+    <li><a href="openclaw.html">OpenClaw連携</a></li>
+    <li><a href="kpi-dashboard.html" class="active">KPI</a></li>
+    <li><a href="genai-tools.html">生成ツール比較</a></li>
+    <li><a href="../research/openclaw-news/index.html" style="color: #4FFFB0;">🦞 OpenClaw情報</a></li>
+  </ul>
+  <div class="nav-hamburger"><span></span><span></span><span></span></div>
+</nav>
+
+<div class="page-hero">
+  <div class="section-label">実装状況トラッカー</div>
+  <h1>KPIダッシュボード<br><span style="background: linear-gradient(135deg,#00DC82,#00D4FF); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">設計と指針</span></h1>
+  <p>AI Creator Hubの目標数値・フェーズ別マイルストーン・週次月次レビューサイクル・フィードバックループ設計をまとめた長期運用の羅針盤</p>
+</div>
+
+<!-- TOC -->
+<section style="background: var(--bg2); padding: 1.5rem 2rem; border-bottom: 1px solid var(--border);">
+  <div style="max-width: 1100px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; font-size: 0.85rem;">
+    <span style="color: var(--text-muted); font-weight: 700; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; margin-right: 0.5rem;">目次 →</span>
+    <a href="#phase" style="color: var(--accent);">フェーズ進捗</a>
+    <a href="#daily" style="color: var(--accent);">日次KPI</a>
+    <a href="#monthly" style="color: var(--accent);">月次収益KPI</a>
+    <a href="#health" style="color: var(--accent);">システムヘルス</a>
+    <a href="#review" style="color: var(--accent);">レビューサイクル</a>
+    <a href="#triggers" style="color: var(--accent);">改善トリガー</a>
+    <a href="#loop" style="color: var(--accent);">フィードバックループ</a>
+  </div>
+</section>
+
+<!-- Why this page exists -->
+<section class="section" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div style="background: rgba(108,60,225,0.08); border: 1px solid rgba(108,60,225,0.3); border-radius: 16px; padding: 2rem;">
+      <div class="section-label" style="margin-bottom: 0.75rem;">このページの存在理由</div>
+      <p style="color: var(--text-muted); line-height: 1.8; margin-bottom: 1rem;">
+        AI Creator Hubは大量のコンテンツを自動生成するシステムだが、<strong style="color: var(--text);">「何本作れたか」より「何がうまくいっているか・うまくいっていないか」を常に把握することが長期運用の核心</strong>である。
+        数値を見ずに動かし続けると、コスト過多・低品質量産・アルゴリズム悪化のループに入る。
+      </p>
+      <p style="color: var(--text-muted); line-height: 1.8; margin-bottom: 1rem;">
+        このページは <strong style="color: var(--text);">「どの数値を・いつ・何と比較して・何を判断するか」</strong> を定義する設計書である。
+        実際のデータ可視化ツール（Looker Studio / Redash 等）に接続する前段階として、KPIの定義と判断基準を明文化する。
+      </p>
+      <p style="color: var(--text-muted); line-height: 1.8; margin: 0;">
+        <strong style="color: #4FFFB0;">ルール:</strong> 週次レビューで数値を確認し、月次レビューで戦略を見直す。2週間データを見ずに動かし続けることを禁止する。
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Phase Progress -->
+<section class="section" id="phase">
+  <div class="section-inner">
+    <div class="section-label">フェーズ進捗</div>
+    <h2 class="section-title">4フェーズの<br>実装ロードマップ</h2>
+    <p style="color: var(--text-muted); margin-bottom: 2rem;">フェーズは「技術の完成度」ではなく「システムが自律稼働して収益を生む」ことを到達点として定義する。</p>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem;">
+
+      <div style="background: rgba(0,220,130,0.08); border: 2px solid rgba(0,220,130,0.4); border-radius: 16px; padding: 1.75rem;">
+        <div style="font-size: 0.75rem; font-weight: 700; color: #4FFFB0; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.75rem;">Phase 1 — 設計・検証</div>
+        <h3 style="font-size: 1.1rem; margin-bottom: 0.75rem; color: #4FFFB0;">PoC 達成</h3>
+        <ul style="font-size: 0.82rem; color: var(--text-muted); padding-left: 1.2rem; line-height: 2;">
+          <li>各モジュールを単独実行できる</li>
+          <li>ネタ→動画1本を手動で完走</li>
+          <li>評価スコアが返ってくる</li>
+          <li>1プラットフォームへ手動投稿</li>
+        </ul>
+        <div style="margin-top: 1rem; font-size: 0.8rem; color: #4FFFB0; font-weight: 700;">✅ 設計完了 / 実装待ち</div>
+      </div>
+
+      <div style="background: rgba(0,212,255,0.08); border: 2px solid rgba(0,212,255,0.4); border-radius: 16px; padding: 1.75rem;">
+        <div style="font-size: 0.75rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.75rem;">Phase 2 — 部分自動化</div>
+        <h3 style="font-size: 1.1rem; margin-bottom: 0.75rem; color: var(--accent);">初期収益化</h3>
+        <ul style="font-size: 0.82rem; color: var(--text-muted); padding-left: 1.2rem; line-height: 2;">
+          <li>ネタ→評価をパイプライン化</li>
+          <li>週5本以上を安定生成</li>
+          <li>評価通過率 50%+ を達成</li>
+          <li>月収 ¥10,000 到達</li>
+        </ul>
+        <div style="margin-top: 1rem; font-size: 0.8rem; color: var(--accent); font-weight: 700;">🔄 次のフェーズ</div>
+      </div>
+
+      <div style="background: rgba(108,60,225,0.06); border: 1px solid rgba(108,60,225,0.3); border-radius: 16px; padding: 1.75rem;">
+        <div style="font-size: 0.75rem; font-weight: 700; color: #a48cf5; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.75rem;">Phase 3 — 全自動稼働</div>
+        <h3 style="font-size: 1.1rem; margin-bottom: 0.75rem; color: #a48cf5;">安定収益化</h3>
+        <ul style="font-size: 0.82rem; color: var(--text-muted); padding-left: 1.2rem; line-height: 2;">
+          <li>全パイプラインを無人稼働</li>
+          <li>日5本動画 + 日2本漫画</li>
+          <li>評価通過率 65%+ 達成</li>
+          <li>月収 ¥100,000 到達</li>
+        </ul>
+        <div style="margin-top: 1rem; font-size: 0.8rem; color: #a48cf5; font-weight: 700;">○ 将来</div>
+      </div>
+
+      <div style="background: rgba(255,158,0,0.06); border: 1px solid rgba(255,158,0,0.25); border-radius: 16px; padding: 1.75rem;">
+        <div style="font-size: 0.75rem; font-weight: 700; color: #FF9E00; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.75rem;">Phase 4 — スケール</div>
+        <h3 style="font-size: 1.1rem; margin-bottom: 0.75rem; color: #FF9E00;">収益最大化</h3>
+        <ul style="font-size: 0.82rem; color: var(--text-muted); padding-left: 1.2rem; line-height: 2;">
+          <li>複数ジャンル・チャンネル展開</li>
+          <li>自己学習によるKPI自動改善</li>
+          <li>月収 ¥500,000+</li>
+          <li>ROI 200%+ 定常化</li>
+        </ul>
+        <div style="margin-top: 1rem; font-size: 0.8rem; color: #FF9E00; font-weight: 700;">○ 長期目標</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Daily KPIs -->
+<section class="section" style="background: var(--bg2);" id="daily">
+  <div class="section-inner">
+    <div class="section-label">日次KPI目標値</div>
+    <h2 class="section-title">Phase 3 到達時の<br>1日の目標スループット</h2>
+    <p style="color: var(--text-muted); margin-bottom: 2rem;">「何本動かすか」より「何が通過して何が公開されるか」を軸に設計。量より通過率が本質的な指標。</p>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem;">
+
+      <div class="card">
+        <div style="font-size: 0.75rem; color: #FF9E00; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 1rem;">ネタ生成</div>
+        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.5rem;">
+          <span style="font-size: 0.9rem; color: var(--text-muted);">生成本数</span>
+          <span style="font-size: 1.6rem; font-weight: 800; color: #FF9E00;">15本</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.5rem;">
+          <span style="font-size: 0.9rem; color: var(--text-muted);">スコア60未満廃棄</span>
+          <span style="font-size: 1.4rem; font-weight: 700; color: var(--text-muted);">〜5本</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: baseline;">
+          <span style="font-size: 0.9rem; color: var(--text-muted);">キュー投入</span>
+          <span style="font-size: 1.4rem; font-weight: 700; color: #FF9E00;">10本+</span>
+        </div>
+        <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); font-size: 0.78rem; color: var(--text-muted);">コスト: ¥60〜150/日 / API費用はほぼLLMトークンのみ</div>
+      </div>
+
+      <div class="card">
+        <div style="font-size: 0.75rem; color: #6C3CE1; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 1rem;">動画生成</div>
+        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.5rem;">
+          <span style="font-size: 0.9rem; color: var(--text-muted);">生成本数</span>
+          <span style="font-size: 1.6rem; font-weight: 800; color: #a48cf5;">5本</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.5rem;">
+          <span style="font-size: 0.9rem; color: var(--text-muted);">ショート : 長尺</span>
+          <span style="font-size: 1.4rem; font-weight: 700; color: var(--text-muted);">4 : 1</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: baseline;">
+          <span style="font-size: 0.9rem; color: var(--text-muted);">評価通過（目標65%）</span>
+          <span style="font-size: 1.4rem; font-weight: 700; color: #4FFFB0;">3本</span>
+        </div>
+        <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); font-size: 0.78rem; color: var(--text-muted);">コスト: ¥500〜1,500/日（ショート中心で抑制）</div>
+      </div>
+
+      <div class="card">
+        <div style="font-size: 0.75rem; color: var(--accent); font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 1rem;">漫画生成</div>
+        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.5rem;">
+          <span style="font-size: 0.9rem; color: var(--text-muted);">生成本数</span>
+          <span style="font-size: 1.6rem; font-weight: 800; color: var(--accent);">2本</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.5rem;">
+          <span style="font-size: 0.9rem; color: var(--text-muted);">ページ数（8p × 2）</span>
+          <span style="font-size: 1.4rem; font-weight: 700; color: var(--text-muted);">16p</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: baseline;">
+          <span style="font-size: 0.9rem; color: var(--text-muted);">評価通過（目標65%）</span>
+          <span style="font-size: 1.4rem; font-weight: 700; color: #4FFFB0;">1〜2本</span>
+        </div>
+        <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); font-size: 0.78rem; color: var(--text-muted);">コスト: ¥600〜1,200/日（LoRA使用ページ数に比例）</div>
+      </div>
+
+      <div class="card">
+        <div style="font-size: 0.75rem; color: #4FFFB0; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 1rem;">公開 & 収益</div>
+        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.5rem;">
+          <span style="font-size: 0.9rem; color: var(--text-muted);">公開本数/日</span>
+          <span style="font-size: 1.6rem; font-weight: 800; color: #4FFFB0;">4〜5本</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.5rem;">
+          <span style="font-size: 0.9rem; color: var(--text-muted);">月間公開本数</span>
+          <span style="font-size: 1.4rem; font-weight: 700; color: #4FFFB0;">120〜150本</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: baseline;">
+          <span style="font-size: 0.9rem; color: var(--text-muted);">API総コスト/日</span>
+          <span style="font-size: 1.4rem; font-weight: 700; color: var(--text-muted);">¥1,200〜3,000</span>
+        </div>
+        <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); font-size: 0.78rem; color: var(--text-muted);">月間コスト: ¥36,000〜90,000（目標: 収益の30%以下に抑制）</div>
+      </div>
+
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>指標</th><th>Phase 2 目標</th><th>Phase 3 目標</th><th>Phase 4 目標</th><th>判断基準</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>ネタ生成/日</td><td>5本</td><td>15本</td><td>30本+</td><td>7日平均が目標値を下回ったらバッチ設定を見直す</td></tr>
+          <tr><td>動画生成/日</td><td>2本</td><td>5本</td><td>15本+</td><td>APIエラー率3%超ならツール切替を検討</td></tr>
+          <tr><td>漫画生成/日</td><td>0.5本</td><td>2本</td><td>5本+</td><td>処理時間が目標の1.5倍超ならGPUを増強</td></tr>
+          <tr><td>評価通過率</td><td>50%</td><td>65%</td><td>75%</td><td>2週間連続で目標未達ならネタ生成プロンプトを改訂</td></tr>
+          <tr><td>公開/日</td><td>1.5本</td><td>4〜5本</td><td>15本+</td><td>通過率×生成本数が出力の上限</td></tr>
+          <tr><td>API費用/日</td><td>¥500以下</td><td>¥3,000以下</td><td>¥10,000以下</td><td>費用が目標を超えたらRun ratioとツール選択を見直す</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- Monthly Revenue KPIs -->
+<section class="section" id="monthly">
+  <div class="section-inner">
+    <div class="section-label">月次収益KPI</div>
+    <h2 class="section-title">収益目標と<br>プラットフォーム別設計</h2>
+    <div class="two-col">
+      <div>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+          収益は「本数 × 単価」ではなく、<strong style="color: var(--text);">プラットフォームの仕組みに応じた積み上げ型</strong>で予測する。
+          YouTube広告は再生数依存、noteは販売数×価格、Kindleはロイヤリティ率が固定という違いがある。
+          初期はYouTube広告収益に集中し、段階的にnote・Kindleを加える。
+        </p>
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+              <div style="font-size: 0.8rem; font-weight: 700; color: #FF6B6B;">YouTube（広告収益）</div>
+              <span class="tag tag-orange">Phase 3: ¥50,000〜150,000/月</span>
+            </div>
+            <div style="font-size: 0.82rem; color: var(--text-muted);">月120本公開 × 平均3,000再生 × RPM ¥150 = ¥54,000。ショートと通常動画を混在させてリーチ最大化。</div>
+          </div>
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+              <div style="font-size: 0.8rem; font-weight: 700; color: var(--accent);">note（有料記事・漫画）</div>
+              <span class="tag tag-cyan">Phase 3: ¥20,000〜60,000/月</span>
+            </div>
+            <div style="font-size: 0.82rem; color: var(--text-muted);">月60本漫画公開 × 単価¥300〜500 × 購入率3% = ¥5,400〜9,000。まとめ版・完全版を有料化して上乗せ。</div>
+          </div>
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+              <div style="font-size: 0.8rem; font-weight: 700; color: #4FFFB0;">Kindle（電子書籍）</div>
+              <span class="tag tag-green">Phase 3: ¥10,000〜30,000/月</span>
+            </div>
+            <div style="font-size: 0.82rem; color: var(--text-muted);">月2冊出版（10エピソードまとめ）× ¥250〜350ロイヤリティ × 100販売 = ¥25,000〜35,000。積み上がり型の強み。</div>
+          </div>
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+              <div style="font-size: 0.8rem; font-weight: 700; color: #FF9E00;">ファンクラブ / Booth</div>
+              <span class="tag tag-orange">Phase 4 本格化</span>
+            </div>
+            <div style="font-size: 0.82rem; color: var(--text-muted);">ロイヤルユーザーへの先行公開・限定素材販売。Phase 3 でコアファン100人を形成後に展開。</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <h3 style="margin-bottom: 1.25rem; font-size: 1rem; color: var(--text-muted);">収益目標サマリー</h3>
+        <div class="stats-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 1.5rem;">
+          <div class="stat-card">
+            <div class="stat-value" style="font-size: 1.5rem;">¥10k</div>
+            <div class="stat-label">Phase 2 月収目標</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" style="font-size: 1.5rem;">¥100k</div>
+            <div class="stat-label">Phase 3 月収目標</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" style="font-size: 1.5rem;">30%</div>
+            <div class="stat-label">コスト上限（対収益比）</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" style="font-size: 1.5rem;">3倍</div>
+            <div class="stat-label">Phase 3 ROI 目標</div>
+          </div>
+        </div>
+        <div class="code-block">
+<span class="cm"># 月次収支シミュレーション（Phase 3）</span>
+<span class="cm">-------- 収入 --------</span>
+YouTube広告    : ¥   54,000〜150,000
+note有料       : ¥    5,400〜  9,000
+Kindleロイヤリティ: ¥  25,000〜 35,000
+<span class="fn">小計</span>           : ¥   84,400〜194,000
+
+<span class="cm">-------- 支出 --------</span>
+ネタ生成API    : ¥    2,000〜  4,500
+動画生成API    : ¥   45,000〜 80,000
+漫画生成API    : ¥   18,000〜 36,000
+評価API        : ¥    1,500〜  3,000
+サーバー費     : ¥    5,000〜 10,000
+<span class="fn">小計</span>           : ¥   71,500〜133,500
+
+<span class="fn">純利益</span>         : ¥   12,900〜 60,500</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- System Health KPIs -->
+<section class="section" style="background: var(--bg2);" id="health">
+  <div class="section-inner">
+    <div class="section-label">システムヘルス指標</div>
+    <h2 class="section-title">収益の手前にある<br>インフラ健全性の定義</h2>
+    <p style="color: var(--text-muted); margin-bottom: 2rem;">
+      「公開本数が少ない」の原因を素早く特定するために、各モジュールの健全性を個別に追う。収益KPIが悪化したとき、どこのボトルネックか3分以内に切り分けられる状態が目標。
+    </p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>モジュール</th><th>健全性指標</th><th>目標値</th><th>ALERT閾値</th><th>対処法</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>ネタ生成</strong></td>
+            <td>バッチ成功率</td>
+            <td><span class="tag tag-green">99%</span></td>
+            <td>95%未満</td>
+            <td>ソースAPIの死活確認。LLMレート制限を確認。</td>
+          </tr>
+          <tr>
+            <td><strong>ネタ生成</strong></td>
+            <td>スコア60未満廃棄率</td>
+            <td><span class="tag tag-cyan">&lt;35%</span></td>
+            <td>50%超</td>
+            <td>展開プロンプトを見直す。フィードバックデータが古くなっていないか確認。</td>
+          </tr>
+          <tr>
+            <td><strong>動画生成</strong></td>
+            <td>ジョブ成功率</td>
+            <td><span class="tag tag-green">95%</span></td>
+            <td>85%未満</td>
+            <td>エラーログでどのステップが落ちているか確認。主因はRunwayMLのレート超過が多い。</td>
+          </tr>
+          <tr>
+            <td><strong>動画生成</strong></td>
+            <td>平均生成コスト（ショート）</td>
+            <td><span class="tag tag-cyan">¥200以下</span></td>
+            <td>¥320超</td>
+            <td>RunwayML Gen-4の使用量を確認。Kling AI v2へのフォールバック比率を上げる。</td>
+          </tr>
+          <tr>
+            <td><strong>漫画生成</strong></td>
+            <td>ジョブ成功率</td>
+            <td><span class="tag tag-green">90%</span></td>
+            <td>75%未満</td>
+            <td>LoRAモデルのロード失敗が多い。キャラ設定YAMLの整合性を確認。</td>
+          </tr>
+          <tr>
+            <td><strong>評価システム</strong></td>
+            <td>評価通過率</td>
+            <td><span class="tag tag-green">65%</span></td>
+            <td>45%未満</td>
+            <td>どのスコア項目が下を引いているか確認。ネタ展開プロンプトの問題か生成品質の問題かを切り分ける。</td>
+          </tr>
+          <tr>
+            <td><strong>マネタイズ</strong></td>
+            <td>投稿成功率</td>
+            <td><span class="tag tag-green">99%</span></td>
+            <td>95%未満</td>
+            <td>各プラットフォームのAPIトークン有効期限を確認。認証エラーが最多原因。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- Review Cycle -->
+<section class="section" id="review">
+  <div class="section-inner">
+    <div class="section-label">レビューサイクル</div>
+    <h2 class="section-title">週次・月次で<br>何を見て何を判断するか</h2>
+    <div class="two-col">
+      <div>
+        <h3 style="margin-bottom: 1.25rem; font-size: 1.05rem; color: var(--accent);">週次レビュー（毎週月曜 15分）</h3>
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; font-weight: 700; color: var(--accent); margin-bottom: 0.35rem;">1. システムヘルス確認（5分）</div>
+            <ul style="font-size: 0.82rem; color: var(--text-muted); padding-left: 1.2rem; line-height: 1.9; margin: 0;">
+              <li>先週のバッチ成功率・エラー件数を確認</li>
+              <li>ALERT が出ていたモジュールを特定</li>
+              <li>未解決エラーがあれば優先対応リストに追加</li>
+            </ul>
+          </div>
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; font-weight: 700; color: var(--accent); margin-bottom: 0.35rem;">2. 生産KPI確認（5分）</div>
+            <ul style="font-size: 0.82rem; color: var(--text-muted); padding-left: 1.2rem; line-height: 1.9; margin: 0;">
+              <li>生成本数・評価通過率・公開本数を目標値と比較</li>
+              <li>通過率が目標の80%を下回っていたら原因をメモ</li>
+              <li>コスト/本を確認してRun ratio の最適化余地を評価</li>
+            </ul>
+          </div>
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; font-weight: 700; color: var(--accent); margin-bottom: 0.35rem;">3. 翌週アクション決定（5分）</div>
+            <ul style="font-size: 0.82rem; color: var(--text-muted); padding-left: 1.2rem; line-height: 1.9; margin: 0;">
+              <li>調整が必要なプロンプト・設定を1つだけ選ぶ（複数同時変更はNG）</li>
+              <li>変更内容・変更理由・成功判定条件をメモに残す</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div>
+        <h3 style="margin-bottom: 1.25rem; font-size: 1.05rem; color: #FF9E00;">月次レビュー（毎月1日 1時間）</h3>
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; font-weight: 700; color: #FF9E00; margin-bottom: 0.35rem;">1. 収益レポート（15分）</div>
+            <ul style="font-size: 0.82rem; color: var(--text-muted); padding-left: 1.2rem; line-height: 1.9; margin: 0;">
+              <li>プラットフォーム別収益を集計・目標比較</li>
+              <li>コスト合計と対収益比を計算（30%以内か）</li>
+              <li>収益ランキング上位5本を分析（共通パターンを抽出）</li>
+            </ul>
+          </div>
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; font-weight: 700; color: #FF9E00; margin-bottom: 0.35rem;">2. ネタ生成AIのフィードバック更新（20分）</div>
+            <ul style="font-size: 0.82rem; color: var(--text-muted); padding-left: 1.2rem; line-height: 1.9; margin: 0;">
+              <li>高収益ネタパターンをプロンプトの成功例に追加</li>
+              <li>低通過率ジャンルを避けるパターンに追加</li>
+              <li>スコアリング重みを実績に基づいて微調整（±5%以内）</li>
+            </ul>
+          </div>
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; font-weight: 700; color: #FF9E00; margin-bottom: 0.35rem;">3. フェーズ評価・次月方針（25分）</div>
+            <ul style="font-size: 0.82rem; color: var(--text-muted); padding-left: 1.2rem; line-height: 1.9; margin: 0;">
+              <li>フェーズ移行条件を満たしているか評価</li>
+              <li>次月の本数目標・コスト上限を設定</li>
+              <li>導入・廃棄するツールがあれば決定</li>
+              <li>ADRに重大な判断変更を記録</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Improvement Triggers -->
+<section class="section" style="background: var(--bg2);" id="triggers">
+  <div class="section-inner">
+    <div class="section-label">改善トリガー定義</div>
+    <h2 class="section-title">何が起きたら何をするか<br>の自動判断ルール</h2>
+    <p style="color: var(--text-muted); margin-bottom: 2rem;">
+      週次レビューを待たずに即対応が必要な状況を定義する。これを定義しておくことで「異常を見て見ぬふりをしない」運用が成立する。
+    </p>
+    <div style="display: flex; flex-direction: column; gap: 1rem;">
+
+      <div style="background: rgba(255,107,107,0.08); border: 1px solid rgba(255,107,107,0.3); border-radius: 14px; padding: 1.25rem; display: grid; grid-template-columns: 180px 1fr; gap: 1rem; align-items: start;">
+        <div>
+          <div style="font-size: 0.75rem; font-weight: 700; color: #FF6B6B; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.35rem;">CRITICAL</div>
+          <div style="font-size: 0.85rem; font-weight: 700;">バッチ3回連続失敗</div>
+        </div>
+        <div style="font-size: 0.82rem; color: var(--text-muted);">即座にOpenClawのアラートを確認。エラーログを見てモジュール特定。各APIのステータスページで障害情報を確認。6時間以内に復旧できなければ手動で代替ネタをキューに投入。</div>
+      </div>
+
+      <div style="background: rgba(255,107,107,0.08); border: 1px solid rgba(255,107,107,0.3); border-radius: 14px; padding: 1.25rem; display: grid; grid-template-columns: 180px 1fr; gap: 1rem; align-items: start;">
+        <div>
+          <div style="font-size: 0.75rem; font-weight: 700; color: #FF6B6B; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.35rem;">CRITICAL</div>
+          <div style="font-size: 0.85rem; font-weight: 700;">API費用が日次上限の2倍超</div>
+        </div>
+        <div style="font-size: 0.82rem; color: var(--text-muted);">当日のジョブキューを一時停止。どのAPIが突出しているか特定。RunwayML等のクレジット消費が原因なら即座にKling AI v2またはVeo 3へ切替。コスト異常の原因が解消されるまで稼働を止める。</div>
+      </div>
+
+      <div style="background: rgba(255,158,0,0.08); border: 1px solid rgba(255,158,0,0.3); border-radius: 14px; padding: 1.25rem; display: grid; grid-template-columns: 180px 1fr; gap: 1rem; align-items: start;">
+        <div>
+          <div style="font-size: 0.75rem; font-weight: 700; color: #FF9E00; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.35rem;">HIGH</div>
+          <div style="font-size: 0.85rem; font-weight: 700;">評価通過率が2週間連続45%未満</div>
+        </div>
+        <div style="font-size: 0.82rem; color: var(--text-muted);">ネタ展開プロンプトの失敗パターン蓄積が原因である可能性が高い。過去2週間の破棄コンテンツから共通ジャンル・キーワードを抽出してプロンプトに「避けるパターン」として追加。効果が出るまで1週間様子を見る。</div>
+      </div>
+
+      <div style="background: rgba(255,158,0,0.08); border: 1px solid rgba(255,158,0,0.3); border-radius: 14px; padding: 1.25rem; display: grid; grid-template-columns: 180px 1fr; gap: 1rem; align-items: start;">
+        <div>
+          <div style="font-size: 0.75rem; font-weight: 700; color: #FF9E00; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.35rem;">HIGH</div>
+          <div style="font-size: 0.85rem; font-weight: 700;">月収が目標の50%未満</div>
+        </div>
+        <div style="font-size: 0.82rem; color: var(--text-muted);">公開本数の不足か、公開後のエンゲージメント不足かを切り分ける。前者なら通過率・生成本数を見直す。後者なら高再生コンテンツのジャンル・タイトル・公開時間帯を分析してネタ生成の方向性を修正。</div>
+      </div>
+
+      <div style="background: rgba(0,212,255,0.06); border: 1px solid rgba(0,212,255,0.2); border-radius: 14px; padding: 1.25rem; display: grid; grid-template-columns: 180px 1fr; gap: 1rem; align-items: start;">
+        <div>
+          <div style="font-size: 0.75rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.35rem;">MEDIUM</div>
+          <div style="font-size: 0.85rem; font-weight: 700;">新しい動画AIツールがリリース</div>
+        </div>
+        <div style="font-size: 0.82rem; color: var(--text-muted);">genai-tools.html の比較表を更新。5本分のテスト生成を実施してコスト・品質を比較。既存ツールと比較して有意差があれば翌月のツール構成を変更。変更の判断をADRに記録。</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Feedback Loop -->
+<section class="section" id="loop">
+  <div class="section-inner">
+    <div class="section-label">フィードバックループ設計</div>
+    <h2 class="section-title">システムが自己改善する<br>データの循環構造</h2>
+    <p style="color: var(--text-muted); margin-bottom: 2rem;">
+      AI Creator Hubの競争優位は「量産できること」ではなく<strong style="color: var(--text);">「運用を続けるほどネタの精度・評価通過率・収益が改善すること」</strong>にある。
+      このフィードバックループが機能しなければ、量産システムは品質劣化と収益低迷に向かう。
+    </p>
+
+    <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; margin-bottom: 2rem;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; align-items: center; text-align: center;">
+
+        <div>
+          <div style="background: rgba(255,158,0,0.15); border: 1px solid rgba(255,158,0,0.4); border-radius: 12px; padding: 1rem; margin-bottom: 0.75rem;">
+            <div style="font-size: 1.5rem; margin-bottom: 0.35rem;">💡</div>
+            <div style="font-size: 0.85rem; font-weight: 700; color: #FF9E00;">ネタ生成AI</div>
+            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.35rem;">トレンド収集・LLM展開・スコアリング</div>
+          </div>
+          <div style="font-size: 0.75rem; color: var(--text-muted);">↓ 展開済みネタJSON</div>
+        </div>
+
+        <div>
+          <div style="background: rgba(108,60,225,0.1); border: 1px solid rgba(108,60,225,0.35); border-radius: 12px; padding: 1rem; margin-bottom: 0.75rem;">
+            <div style="font-size: 1.5rem; margin-bottom: 0.35rem;">🎬📖</div>
+            <div style="font-size: 0.85rem; font-weight: 700; color: #a48cf5;">生成パイプライン</div>
+            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.35rem;">動画・漫画を生成</div>
+          </div>
+          <div style="font-size: 0.75rem; color: var(--text-muted);">↓ 生成コンテンツ</div>
+        </div>
+
+        <div>
+          <div style="background: rgba(255,107,107,0.08); border: 1px solid rgba(255,107,107,0.3); border-radius: 12px; padding: 1rem; margin-bottom: 0.75rem;">
+            <div style="font-size: 1.5rem; margin-bottom: 0.35rem;">⭐</div>
+            <div style="font-size: 0.85rem; font-weight: 700; color: #FF6B6B;">評価システム</div>
+            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.35rem;">スコアリング・合否判定</div>
+          </div>
+          <div style="font-size: 0.75rem; color: var(--text-muted);">↓ 通過コンテンツ</div>
+        </div>
+
+        <div>
+          <div style="background: rgba(0,220,130,0.08); border: 1px solid rgba(0,220,130,0.3); border-radius: 12px; padding: 1rem; margin-bottom: 0.75rem;">
+            <div style="font-size: 1.5rem; margin-bottom: 0.35rem;">💰</div>
+            <div style="font-size: 0.85rem; font-weight: 700; color: #4FFFB0;">マネタイズ</div>
+            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.35rem;">投稿・収益計測</div>
+          </div>
+          <div style="font-size: 0.75rem; color: var(--text-muted);">↑ 実収益データ（月次）</div>
+        </div>
+
+      </div>
+      <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border);">
+        <div style="font-size: 0.82rem; color: var(--text-muted); text-align: center; line-height: 2;">
+          <strong style="color: var(--accent);">評価 → ネタ生成：</strong>週次フィードバック（成功・失敗パターン）&nbsp;&nbsp;|&nbsp;&nbsp;
+          <strong style="color: #4FFFB0;">収益 → ネタ生成：</strong>月次フィードバック（収益相関分析）&nbsp;&nbsp;|&nbsp;&nbsp;
+          <strong style="color: #FF9E00;">収益 → 評価重み：</strong>月次チューニング（スコアリング精度向上）
+        </div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div>
+        <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--text-muted);">ループが機能している状態の定義</h3>
+        <ul class="checklist">
+          <li>評価スコアが月ごとに平均0.5pt以上改善している</li>
+          <li>過去の失敗パターンが繰り返されていない（=避けるパターンDBが機能）</li>
+          <li>高収益ジャンルの生成比率が月次で増加している</li>
+          <li>評価通過率が右肩上がり（3ヶ月移動平均）</li>
+          <li>コスト/本が改善または維持（ツール最適化が効いている）</li>
+        </ul>
+      </div>
+      <div>
+        <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--text-muted);">ループが壊れているサインの定義</h3>
+        <ul style="color: var(--text-muted); font-size: 0.88rem; line-height: 2; padding-left: 1.2rem;">
+          <li style="color: #FF6B6B;">評価通過率が3ヶ月連続で改善しない</li>
+          <li style="color: #FF6B6B;">月次レビューを2回以上スキップした</li>
+          <li style="color: #FF9E00;">フィードバックAPIの呼び出しがエラー続きで放置</li>
+          <li style="color: #FF9E00;">週次で確認した問題が翌週も同じ状態のまま</li>
+          <li style="color: var(--text-muted);">収益データをネタ生成AIに送っていない</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">AI Creator Hub</div>
+    <nav>
+      <a href="index.html">ホーム</a>
+      <a href="topic-generator.html">ネタ生成</a>
+      <a href="video-pipeline.html">動画制作</a>
+      <a href="manga-pipeline.html">漫画制作</a>
+      <a href="evaluation.html">評価システム</a>
+      <a href="monetization.html">マネタイズ</a>
+      <a href="openclaw.html">OpenClaw連携</a>
+      <a href="kpi-dashboard.html">KPI</a>
+    </nav>
+    <p>AI Creator Hub — AIでコンテンツをつくり、稼ぐ</p>
+    <p style="font-size:0.8rem;opacity:0.65;">最終更新: 2026-05-30（KPIダッシュボード初版作成 — フェーズ別KPI・ヘルス指標・レビューサイクル・改善トリガー・フィードバックループを定義）</p>
+  </div>
+</footer>
+
+<script src="main.js"></script>
+</body>
+</html>

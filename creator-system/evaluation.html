@@ -19,6 +19,7 @@
     <li><a href="evaluation.html" class="active">評価システム</a></li>
     <li><a href="monetization.html">マネタイズ</a></li>
     <li><a href="openclaw.html">OpenClaw連携</a></li>
+    <li><a href="kpi-dashboard.html">KPI</a></li>
     <li><a href="genai-tools.html">生成ツール比較</a></li>
     <li><a href="../research/openclaw-news/index.html" style="color: #4FFFB0;">🦞 OpenClaw情報</a></li>
   </ul>
@@ -368,19 +369,89 @@
   </div>
 </section>
 
+<!-- Design Intent: WHY -->
+<section class="section" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-label">設計の意図（WHY）</div>
+    <h2 class="section-title">なぜこのスコアリングか<br>判断根拠の記録</h2>
+    <p style="color: var(--text-muted); margin-bottom: 2rem;">
+      スコアリング設計は「なんとなく10項目」ではなく、収益構造とリスク構造から逆算して定義している。
+      将来の改訂者（別セッションを含む）が「なぜこの重みか」を理解できるよう、設計意図を明文化する。
+    </p>
+
+    <div style="display: flex; flex-direction: column; gap: 1rem;">
+
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem;">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
+          <span class="tag tag-purple">重み 20%</span>
+          <h3 style="margin: 0; font-size: 1rem;">エンゲージメント予測が最大重みの理由</h3>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.8; margin: 0;">
+          YouTube広告収益・SNSバイラルの両方がエンゲージメント率に直結するため。視聴継続率が高いコンテンツはアルゴリズムに優遇されて再生数が複利的に伸びる。他の全指標の中で「実際の稼ぎ」と最も相関が高い指標として最大重みを割り当てた。視覚品質が低くてもエンゲージメントが取れる動画は存在するが、逆は成立しない。
+        </p>
+      </div>
+
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem;">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
+          <span class="tag tag-cyan">重み 15% ×3</span>
+          <h3 style="margin: 0; font-size: 1rem;">ビジュアル・コンテンツ・SEOが同率15%の理由</h3>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.8; margin: 0;">
+          この3つはそれぞれ独立した問題を解決する。SEOは「見つけてもらえるか（新規流入）」、コンテンツは「見続けてもらえるか（継続視聴）」、ビジュアルは「最初の3秒でクリックしてもらえるか（クリック率）」。どれか1つが欠けても収益の上限が下がるため、等重みで扱うのが合理的。特定の1つに過剰投資することで他が下がる状態を防ぐ。
+        </p>
+      </div>
+
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem;">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
+          <span class="tag tag-orange">重み 10% ×2</span>
+          <h3 style="margin: 0; font-size: 1rem;">安全性・ターゲット適合が10%の理由（安全性が拒否権を持つ理由）</h3>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.8; margin: 0;">
+          安全性は「発生頻度は低いが被害が壊滅的（アカウント停止）」なリスクのため、通常の重み付きスコアではなく拒否権方式を採用した。
+          重みを0%にしているのは「加点要素ではなく必須通過条件」であることを明示するため。
+          ターゲット適合を10%にしているのは、的外れなコンテンツはどれだけ品質が高くても伸びないが、若干ずれたコンテンツでも品質次第でカバーできるという実観察による。
+        </p>
+      </div>
+
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem;">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
+          <span class="tag tag-green">閾値設計</span>
+          <h3 style="margin: 0; font-size: 1rem;">「85点即時公開 / 70〜84改善 / 55〜69人間レビュー / &lt;55破棄」の根拠</h3>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.8; margin: 0;">
+          85点の閾値は「AI評価スコア85点以上のコンテンツが実際の視聴数で平均値を上回る」という想定から設定。
+          70〜84帯は「改善すれば85以上になれる可能性が高い」ゾーンで、AI自動改善のコスト（数十円）に見合うROIがある。
+          55〜69は「判断が難しいグレーゾーン」でAIの評価精度が下がる帯域。人間の目で最終確認するコストを払う価値がある。
+          55未満は改善コストが期待収益を超えるため、再生成の方が効率的。この閾値は実データ蓄積後に月次で見直す想定。
+        </p>
+      </div>
+
+      <div style="background: rgba(108,60,225,0.08); border: 1px solid rgba(108,60,225,0.3); border-radius: 14px; padding: 1.25rem;">
+        <div style="font-size: 0.8rem; font-weight: 700; color: #a48cf5; margin-bottom: 0.5rem;">重み変更のルール</div>
+        <p style="color: var(--text-muted); font-size: 0.85rem; line-height: 1.8; margin: 0;">
+          実データ蓄積後に月次レビューで重みをチューニングする。1回の調整は各指標±5%以内を原則とし、変更の根拠（どのデータが変更を示唆したか）をADR（<a href="../foundations/decisions.html" style="color: var(--accent);">foundations/decisions.html</a>）に記録してから変更する。複数指標を同時変更すると因果が追えなくなるため、1回の月次レビューで変更する指標は1つに限定する。
+        </p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
 <footer>
   <div class="footer-inner">
     <div class="footer-logo">AI Creator Hub</div>
     <nav>
       <a href="index.html">ホーム</a>
+      <a href="topic-generator.html">ネタ生成</a>
       <a href="video-pipeline.html">動画制作</a>
       <a href="manga-pipeline.html">漫画制作</a>
       <a href="evaluation.html">評価システム</a>
       <a href="monetization.html">マネタイズ</a>
       <a href="openclaw.html">OpenClaw連携</a>
+      <a href="kpi-dashboard.html">KPI</a>
     </nav>
     <p>AI Creator Hub — AIでコンテンツをつくり、稼ぐ</p>
-    <p style="font-size:0.8rem;opacity:0.65;">最終更新: 2026-05-30（評価エンジンの判定モデルを現行世代に明記、サンプルIDの日付を更新。Gemini は Pro 最上位の 3.1 Pro 据え置き＝3.5 Pro は延期中）</p>
+    <p style="font-size:0.8rem;opacity:0.65;">最終更新: 2026-05-30（スコアリング設計意図（WHY）セクション追加）</p>
   </div>
 </footer>
 

@@ -13,12 +13,14 @@
   <div class="nav-logo">AI Creator Hub</div>
   <ul class="nav-links">
     <li><a href="index.html">ホーム</a></li>
+    <li><a href="topic-generator.html">ネタ生成</a></li>
     <li><a href="video-pipeline.html">動画制作</a></li>
     <li><a href="manga-pipeline.html">漫画制作</a></li>
     <li><a href="evaluation.html">評価システム</a></li>
     <li><a href="monetization.html">マネタイズ</a></li>
-    <li><a href="spec.html" class="active">仕様書</a></li>
     <li><a href="openclaw.html">OpenClaw連携</a></li>
+    <li><a href="kpi-dashboard.html">KPI</a></li>
+    <li><a href="spec.html" class="active">仕様書</a></li>
   </ul>
   <div class="nav-hamburger"><span></span><span></span><span></span></div>
 </nav>
@@ -64,14 +66,24 @@
 <section class="section" id="modules">
   <div class="section-inner">
     <div class="section-label">モジュール構成</div>
-    <h2 class="section-title">5つのコアモジュール</h2>
+    <h2 class="section-title">6つのコアモジュール</h2>
     <p class="section-desc">各モジュールは独立したOpenClaw Skillとして実装され、メッセージキューで非同期連携します。</p>
 
     <div class="card-grid">
       <div class="card">
+        <div class="card-icon orange">0</div>
+        <h3>topic-generator</h3>
+        <p>トレンド収集・LLM展開・スコアリングを経て構造化されたネタJSONを生成し、パイプラインキューへ投入するシステム最上流モジュール。詳細は <a href="topic-generator.html" style="color: var(--accent);">topic-generator.html</a>。</p>
+        <div style="margin-top: 1rem; font-size: 0.82rem; color: var(--text-muted);">
+          <strong>Input:</strong> trigger（cron or manual）<br>
+          <strong>Output:</strong> queued_topics: TopicJob[]<br>
+          <strong>SLA:</strong> バッチ 〜5分（15本）
+        </div>
+      </div>
+      <div class="card">
         <div class="card-icon purple">1</div>
         <h3>topic-analyzer</h3>
-        <p>ネタ文章を受け取り、ジャンル・ターゲット・難易度を分析してメタデータを付与する。</p>
+        <p>ネタ文章を受け取り、ジャンル・ターゲット・難易度を分析してメタデータを付与する。topic-generatorのステップ2で内部呼び出しされる分析サブモジュール。</p>
         <div style="margin-top: 1rem; font-size: 0.82rem; color: var(--text-muted);">
           <strong>Input:</strong> raw_text: string<br>
           <strong>Output:</strong> topic_data: TopicMeta<br>
