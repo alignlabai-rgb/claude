@@ -1,0 +1,1612 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ComfyUI 完全ガイド | Knowledge Hub</title>
+  <style>
+    :root{--bg:#0b1220;--panel:#0f172a;--muted:#c8d3e3;--text:#e9edf5;--accent:#3dd8c5;--accent2:#a78bfa;--accent3:#f7b733;--border:rgba(255,255,255,0.08);--shadow:0 18px 48px rgba(0,0,0,0.35);--radius:18px}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;font-family:"Segoe UI","SF Pro Display","Noto Sans JP",system-ui,sans-serif;color:var(--text);background:radial-gradient(circle at 18% 18%,rgba(61,216,197,0.12),transparent 32%),radial-gradient(circle at 80% 0%,rgba(167,139,250,0.14),transparent 32%),linear-gradient(145deg,#0b1220 0%,#0c1526 50%,#0a1020 100%);padding:32px 20px 64px;line-height:1.65}
+    .shell{max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+    .panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:24px 28px;box-shadow:var(--shadow)}
+    .panel-accent{border-color:rgba(61,216,197,.3)}
+    .panel-purple{border-color:rgba(167,139,250,.3)}
+    .panel-orange{border-color:rgba(247,183,51,.3)}
+    .panel-red{border-color:rgba(255,107,107,.3)}
+    a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+    h1{margin:8px 0;font-size:2rem}h2{margin:0 0 14px;font-size:1.1rem}h3{margin:0 0 6px;font-size:.95rem}
+    p,li{color:var(--muted);font-size:.92rem}ul{padding-left:18px;margin:4px 0}li{margin-bottom:4px}
+    .eyebrow{display:inline-flex;gap:8px;align-items:center;padding:4px 10px;border-radius:999px;background:rgba(61,216,197,0.14);color:var(--accent);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+    .lead{color:var(--muted);font-size:.97rem;margin:6px 0 0}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+    @media(max-width:700px){.grid2,.grid3{grid-template-columns:1fr}}
+    .card{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;padding:18px}
+    .card-accent{border-color:rgba(61,216,197,.3);background:rgba(61,216,197,.03)}
+    .card-purple{border-color:rgba(167,139,250,.3);background:rgba(167,139,250,.04)}
+    .card-orange{border-color:rgba(247,183,51,.3);background:rgba(247,183,51,.03)}
+    .card-red{border-color:rgba(255,107,107,.3);background:rgba(255,107,107,.03)}
+    .card-green{border-color:rgba(79,255,176,.3);background:rgba(79,255,176,.03)}
+    .tag{display:inline-block;font-size:.72rem;font-weight:700;padding:.15rem .5rem;border-radius:5px;margin:0 3px 6px 0}
+    .tag-teal{background:rgba(61,216,197,.18);color:#3dd8c5}
+    .tag-purple{background:rgba(167,139,250,.18);color:#c4a0ff}
+    .tag-orange{background:rgba(247,183,51,.18);color:#f7b733}
+    .tag-red{background:rgba(255,107,107,.18);color:#ff9090}
+    .tag-green{background:rgba(79,255,176,.18);color:#4fffb0}
+    .tag-gray{background:rgba(255,255,255,.1);color:#aaa}
+    table{width:100%;border-collapse:collapse;font-size:.88rem}
+    th{text-align:left;padding:9px 12px;background:rgba(61,216,197,.08);color:var(--accent);font-size:.8rem;border-bottom:1px solid var(--border)}
+    td{padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--muted);vertical-align:top}
+    td strong{color:var(--text)}
+    .code{background:#070d18;border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:16px 18px;font-family:"Fira Code","Cascadia Code","Consolas",monospace;font-size:.8rem;line-height:1.7;overflow-x:auto;white-space:pre;color:#c8d3e3;margin:10px 0}
+    .c{color:#5a7a9a}.k{color:var(--accent)}.kw{color:#a78bfa}.s{color:#f7b733}.n{color:#c4a0ff}.fn{color:#7dd3fc}.p{color:#e9edf5}
+    .note{background:rgba(61,216,197,.07);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:10px 14px;margin:10px 0;font-size:.88rem;color:var(--muted)}
+    .warn{background:rgba(247,183,51,.07);border-left:3px solid var(--accent3);border-radius:0 8px 8px 0;padding:10px 14px;margin:10px 0;font-size:.88rem;color:var(--muted)}
+    .danger{background:rgba(255,107,107,.07);border-left:3px solid #ff6b6b;border-radius:0 8px 8px 0;padding:10px 14px;margin:10px 0;font-size:.88rem;color:var(--muted)}
+    .flow{display:flex;flex-direction:column;gap:0}
+    .flow-node{background:rgba(61,216,197,.08);border:1px solid rgba(61,216,197,.3);border-radius:8px;padding:8px 14px;display:inline-block;font-size:.82rem;font-weight:700;color:var(--accent)}
+    .flow-node.purple{background:rgba(167,139,250,.08);border-color:rgba(167,139,250,.3);color:#c4a0ff}
+    .flow-node.orange{background:rgba(247,183,51,.08);border-color:rgba(247,183,51,.3);color:#f7b733}
+    .flow-node.green{background:rgba(79,255,176,.08);border-color:rgba(79,255,176,.3);color:#4fffb0}
+    .flow-arrow{text-align:center;color:#5a7a9a;font-size:1.1rem;line-height:1.2;margin:2px 0}
+    .flow-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:4px 0}
+    .flow-sep{color:#5a7a9a;font-size:.8rem}
+    .breadcrumb{font-size:.82rem;color:#5a7a9a;margin-bottom:6px}
+    small{color:#5a7a9a;font-size:.8rem}
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    @media(max-width:640px){.two-col{grid-template-columns:1fr}}
+    .toc{display:flex;flex-wrap:wrap;gap:8px}
+    .toc a{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;padding:5px 12px;font-size:.8rem;color:var(--muted)}
+    .toc a:hover{border-color:var(--accent);color:var(--accent);text-decoration:none}
+    .section-id{font-size:.72rem;color:#5a7a9a;font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+    code{background:rgba(255,255,255,.07);padding:2px 7px;border-radius:5px;font-size:.82rem;color:#a5f3d0;font-family:"Fira Code",monospace}
+    .badge{display:inline-block;padding:2px 8px;border-radius:5px;font-size:.72rem;font-weight:700}
+    .badge-teal{background:rgba(61,216,197,.2);color:#3dd8c5}
+    .badge-purple{background:rgba(167,139,250,.2);color:#c4a0ff}
+    .badge-orange{background:rgba(247,183,51,.2);color:#f7b733}
+    .badge-red{background:rgba(255,107,107,.2);color:#ff9090}
+  </style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ヘッダー -->
+  <div class="panel panel-accent">
+    <div class="breadcrumb"><a href="../../index.html">← Hub Top</a> / <a href="../index.html">Tech Workbench</a> / <a href="index.html">Knowledge Hub</a></div>
+    <div class="eyebrow">Image Generation</div>
+    <h1>ComfyUI 完全ガイド</h1>
+    <p class="lead">ノードベースの画像生成フレームワーク ComfyUI を基礎から実践まで徹底解説。JSON ワークフロー・Python API・LoRA / ControlNet / IP-Adapter・漫画コマ自動生成への応用まで。</p>
+    <p style="margin-top:8px"><small>最終更新: 2026-05-30</small></p>
+    <nav class="toc" style="margin-top:14px">
+      <a href="#s1">1. ComfyUI とは</a>
+      <a href="#s2">2. インストール</a>
+      <a href="#s3">3. 基礎概念</a>
+      <a href="#s4">4. 必須ノード</a>
+      <a href="#s5">5. txt2img / img2img</a>
+      <a href="#s6">6. LoRA</a>
+      <a href="#s7">7. ControlNet</a>
+      <a href="#s8">8. IP-Adapter</a>
+      <a href="#s9">9. Python API</a>
+      <a href="#s10">10. バッチ生成</a>
+      <a href="#s11">11. 漫画コマ生成</a>
+      <a href="#s12">12. VRAM 最適化</a>
+      <a href="#s13">13. エラー対処</a>
+      <a href="#ex-a" style="border-color:rgba(61,216,197,.4);color:var(--accent)">実例A: キャラ一貫性</a>
+      <a href="#ex-b" style="border-color:rgba(167,139,250,.4);color:#c4a0ff">実例B: 感情バリエーション</a>
+      <a href="#ex-c" style="border-color:rgba(247,183,51,.4);color:#f7b733">実例C: 顔修正</a>
+      <a href="#ex-d">実例D: アップスケール</a>
+      <a href="#ex-e" style="border-color:rgba(167,139,250,.4);color:#c4a0ff">実例E: 1話完全スクリプト</a>
+      <a href="#ex-f">実例F: プロンプト作法</a>
+    </nav>
+  </div>
+
+  <!-- 1. ComfyUI とは -->
+  <div class="panel" id="s1">
+    <div class="section-id">Section 01</div>
+    <h2>ComfyUI とは — Automatic1111 との比較</h2>
+    <p>ComfyUI は Stable Diffusion の推論パイプラインを<strong>グラフ（ノード＋エッジ）</strong>として視覚化・操作する OSS フレームワーク。UI 上で組み立てたワークフローは JSON としてエクスポートでき、Python API や REST API から再現性を保ったまま自動実行できる。</p>
+
+    <table style="margin-top:12px">
+      <thead><tr><th>比較軸</th><th>ComfyUI</th><th>Automatic1111 (A1111)</th></tr></thead>
+      <tbody>
+        <tr><td><strong>操作スタイル</strong></td><td>ノード接続（グラフ）</td><td>フォーム入力（タブUI）</td></tr>
+        <tr><td><strong>API 自動化</strong></td><td><span class="badge badge-teal">◎ 最適</span> — JSON ワークフローをそのままPOST</td><td>△ — 独自パラメータ形式で変換が必要</td></tr>
+        <tr><td><strong>柔軟性</strong></td><td>任意パイプライン構築可（分岐・並列可）</td><td>標準フローのみ（拡張は Extensions 依存）</td></tr>
+        <tr><td><strong>学習コスト</strong></td><td>高め（ノード概念の習得が必要）</td><td>低め（直感的フォーム）</td></tr>
+        <tr><td><strong>VRAM 効率</strong></td><td>細粒度制御可能</td><td>自動管理（制御しにくい）</td></tr>
+        <tr><td><strong>再現性</strong></td><td><span class="badge badge-teal">◎</span> JSON = ワークフローの完全な仕様書</td><td>△ seed + 設定メモで管理が必要</td></tr>
+        <tr><td><strong>AI Creator Hub 適性</strong></td><td><span class="badge badge-teal">◎ 採用</span> — バッチ・API 連携が前提の漫画自動生成に最適</td><td>△ 手動操作向き</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note" style="margin-top:14px">
+      <strong>なぜ ComfyUI を選ぶか:</strong> 漫画コマを 1 話 30〜80 枚バッチ生成し、LoRA + ControlNet + IP-Adapter を組み合わせる用途では、JSON ワークフロー = 「生成仕様書」として扱える ComfyUI の再現性が決定的に有利。詳細は <a href="../manga-pipeline.html">manga-pipeline.html</a> を参照。
+    </div>
+  </div>
+
+  <!-- 2. インストール -->
+  <div class="panel" id="s2">
+    <div class="section-id">Section 02</div>
+    <h2>インストールと起動</h2>
+
+    <div class="grid2" style="margin-bottom:14px">
+      <div class="card card-accent">
+        <h3>動作要件</h3>
+        <table>
+          <thead><tr><th>項目</th><th>最小</th><th>推奨</th></tr></thead>
+          <tbody>
+            <tr><td>GPU VRAM</td><td>4 GB</td><td>8 GB+</td></tr>
+            <tr><td>Python</td><td>3.10+</td><td>3.11</td></tr>
+            <tr><td>Disk</td><td>10 GB</td><td>50 GB+（モデル複数）</td></tr>
+            <tr><td>OS</td><td>Win / Mac / Linux</td><td>Linux（サーバー自動化）</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h3>インストール手順</h3>
+        <pre class="code"><span class="c"># 1. リポジトリ取得</span>
+<span class="fn">git</span> clone https://github.com/comfyanonymous/ComfyUI.git
+<span class="fn">cd</span> ComfyUI
+
+<span class="c"># 2. 依存関係インストール（CUDA 環境）</span>
+<span class="fn">pip</span> install torch torchvision torchaudio \
+    --extra-index-url https://download.pytorch.org/whl/cu121
+<span class="fn">pip</span> install -r requirements.txt
+
+<span class="c"># 3. モデルを配置</span>
+<span class="c"># models/checkpoints/ に .safetensors を置く</span>
+
+<span class="c"># 4. 起動</span>
+<span class="fn">python</span> main.py</pre>
+      </div>
+    </div>
+
+    <h3 style="margin-top:16px;margin-bottom:8px">起動オプション</h3>
+    <table>
+      <thead><tr><th>フラグ</th><th>効果</th><th>用途</th></tr></thead>
+      <tbody>
+        <tr><td><code>--lowvram</code></td><td>モデルをオンデマンドでVRAMへ</td><td>VRAM 4〜6 GB 環境</td></tr>
+        <tr><td><code>--novram</code></td><td>全演算をRAMに落とす</td><td>VRAM 不足時の最終手段</td></tr>
+        <tr><td><code>--cpu</code></td><td>CPU のみで推論</td><td>動作確認・GPU なし環境</td></tr>
+        <tr><td><code>--listen 0.0.0.0</code></td><td>外部ホストからアクセス可能に</td><td>VPS・Docker 環境</td></tr>
+        <tr><td><code>--port 8188</code></td><td>ポート指定（デフォルト 8188）</td><td>複数インスタンス並走</td></tr>
+        <tr><td><code>--disable-auto-launch</code></td><td>ブラウザ自動起動を無効化</td><td>サーバー・API 専用運用</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="margin-top:16px;margin-bottom:8px">バックグラウンド起動（サーバー運用）</h3>
+    <pre class="code"><span class="c"># nohup でバックグラウンド実行</span>
+<span class="fn">nohup</span> python main.py --listen 0.0.0.0 --disable-auto-launch &gt; comfyui.log 2&gt;&amp;1 &amp;
+
+<span class="c"># systemd サービス（推奨）</span>
+<span class="c"># /etc/systemd/system/comfyui.service に記述後:</span>
+<span class="fn">systemctl</span> enable --now comfyui</pre>
+
+    <h3 style="margin-top:16px;margin-bottom:8px">モデルフォルダ構造</h3>
+    <pre class="code">ComfyUI/
+├── models/
+│   ├── checkpoints/     <span class="c"># ベースモデル (.safetensors / .ckpt)</span>
+│   ├── loras/           <span class="c"># LoRA ファイル</span>
+│   ├── controlnet/      <span class="c"># ControlNet モデル</span>
+│   ├── clip/            <span class="c"># CLIP テキストエンコーダー</span>
+│   ├── vae/             <span class="c"># VAE モデル</span>
+│   ├── ipadapter/       <span class="c"># IP-Adapter モデル</span>
+│   └── upscale_models/  <span class="c"># アップスケーラー</span>
+├── input/               <span class="c"># img2img 入力画像</span>
+└── output/              <span class="c"># 生成結果</span></pre>
+  </div>
+
+  <!-- 3. 基礎概念 -->
+  <div class="panel" id="s3">
+    <div class="section-id">Section 03</div>
+    <h2>基礎概念 — ノードとデータフロー</h2>
+
+    <p>ComfyUI の全ての処理は<strong>ノード（Node）</strong>の組み合わせで表現される。ノード同士を<strong>エッジ（接続線）</strong>でつなぐことで、データがフローし最終的に画像が生成される。</p>
+
+    <h3 style="margin-top:16px;margin-bottom:10px">データ型</h3>
+    <div class="grid3">
+      <div class="card card-accent"><span class="tag tag-teal">MODEL</span><p>Stable Diffusion の U-Net 重み。CheckpointLoader → LoRALoader → KSampler へ流れる。</p></div>
+      <div class="card card-purple"><span class="tag tag-purple">CLIP</span><p>テキストエンコーダー。プロンプト文字列を Conditioning（ベクトル）に変換する入力。</p></div>
+      <div class="card card-orange"><span class="tag tag-orange">VAE</span><p>Latent ↔ Pixel 変換器。生成後の Latent を画像に戻す（デコード）のに必須。</p></div>
+      <div class="card"><span class="tag tag-teal">LATENT</span><p>潜在空間の中間表現。KSampler が操作するメイン対象。WIDTH×HEIGHT÷8 の解像度。</p></div>
+      <div class="card"><span class="tag tag-green">IMAGE</span><p>ピクセル空間の画像テンソル。VAEDecode 後、または LoadImage で得られる。</p></div>
+      <div class="card"><span class="tag tag-gray">CONDITIONING</span><p>CLIPTextEncode の出力。Positive / Negative の 2 本が KSampler に入る。</p></div>
+    </div>
+
+    <h3 style="margin-top:20px;margin-bottom:10px">基本データフロー</h3>
+    <div style="background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:12px;padding:18px">
+      <div class="flow-row">
+        <div class="flow-node">CheckpointLoader</div>
+        <span class="flow-sep">→ MODEL, CLIP, VAE</span>
+      </div>
+      <div class="flow-arrow">↓ MODEL ↓ CLIP ↓ VAE（それぞれ別経路）</div>
+      <div class="flow-row">
+        <div class="flow-node purple">CLIPTextEncode (positive)</div>
+        <span class="flow-sep">→ CONDITIONING(+)</span>
+        <div class="flow-node purple">CLIPTextEncode (negative)</div>
+        <span class="flow-sep">→ CONDITIONING(−)</span>
+      </div>
+      <div class="flow-arrow">↓ MODEL + COND(+) + COND(−) + LATENT → KSampler</div>
+      <div class="flow-row">
+        <div class="flow-node orange">EmptyLatentImage</div>
+        <span class="flow-sep">→ LATENT</span>
+        <div class="flow-node">KSampler</div>
+        <span class="flow-sep">→ LATENT（ノイズ除去済）</span>
+      </div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-row">
+        <div class="flow-node green">VAEDecode</div>
+        <span class="flow-sep">→ IMAGE</span>
+        <div class="flow-node green">SaveImage</div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:20px;margin-bottom:8px">JSON での接続表現</h3>
+    <p>UI のエッジは JSON では <code>["node_id", output_index]</code> 形式で表現される。</p>
+    <pre class="code"><span class="c">// KSampler が CheckpointLoader の MODEL (0番目出力) を受け取る例</span>
+<span class="s">"model"</span>: [<span class="s">"4"</span>, <span class="n">0</span>],  <span class="c">// ["ノードID", 出力インデックス]</span>
+<span class="s">"positive"</span>: [<span class="s">"6"</span>, <span class="n">0</span>],
+<span class="s">"negative"</span>: [<span class="s">"7"</span>, <span class="n">0</span>],
+<span class="s">"latent_image"</span>: [<span class="s">"5"</span>, <span class="n">0</span>]</pre>
+  </div>
+
+  <!-- 4. 必須ノード -->
+  <div class="panel" id="s4">
+    <div class="section-id">Section 04</div>
+    <h2>必須ノード一覧</h2>
+
+    <table>
+      <thead><tr><th>ノード名</th><th>入力</th><th>出力</th><th>役割</th></tr></thead>
+      <tbody>
+        <tr><td><strong>CheckpointLoaderSimple</strong></td><td>ckpt_name</td><td>MODEL, CLIP, VAE</td><td>ベースモデルの読み込み</td></tr>
+        <tr><td><strong>CLIPTextEncode</strong></td><td>CLIP, text</td><td>CONDITIONING</td><td>プロンプト → Conditioning 変換</td></tr>
+        <tr><td><strong>KSampler</strong></td><td>MODEL, COND+, COND−, LATENT</td><td>LATENT</td><td>ノイズ除去（推論コア）</td></tr>
+        <tr><td><strong>EmptyLatentImage</strong></td><td>width, height, batch_size</td><td>LATENT</td><td>空の Latent（txt2img）</td></tr>
+        <tr><td><strong>VAEDecode</strong></td><td>LATENT, VAE</td><td>IMAGE</td><td>Latent → ピクセル画像</td></tr>
+        <tr><td><strong>VAEEncode</strong></td><td>IMAGE, VAE</td><td>LATENT</td><td>ピクセル → Latent（img2img）</td></tr>
+        <tr><td><strong>LoadImage</strong></td><td>image（ファイル名）</td><td>IMAGE, MASK</td><td>入力画像の読み込み</td></tr>
+        <tr><td><strong>SaveImage</strong></td><td>IMAGE, filename_prefix</td><td>—</td><td>output/ へ PNG 保存</td></tr>
+        <tr><td><strong>LoraLoader</strong></td><td>MODEL, CLIP, lora_name, strength_model, strength_clip</td><td>MODEL, CLIP</td><td>LoRA 適用</td></tr>
+        <tr><td><strong>ControlNetLoader</strong></td><td>control_net_name</td><td>CONTROL_NET</td><td>ControlNet モデル読み込み</td></tr>
+        <tr><td><strong>ControlNetApplyAdvanced</strong></td><td>COND+, COND−, CONTROL_NET, IMAGE, strength, start_percent, end_percent</td><td>COND+, COND−</td><td>ControlNet 適用</td></tr>
+        <tr><td><strong>ImageScale</strong></td><td>IMAGE, width, height, upscale_method</td><td>IMAGE</td><td>画像リサイズ</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="margin-top:20px;margin-bottom:10px">KSampler パラメータ詳解</h3>
+    <div class="grid2">
+      <div>
+        <table>
+          <thead><tr><th>パラメータ</th><th>推奨値</th><th>説明</th></tr></thead>
+          <tbody>
+            <tr><td><strong>seed</strong></td><td>任意の整数</td><td>再現性のキー。同じ seed + 設定 = 同じ画像</td></tr>
+            <tr><td><strong>steps</strong></td><td>20〜30</td><td>ノイズ除去ステップ数。多いほど精緻だが遅い</td></tr>
+            <tr><td><strong>cfg</strong></td><td>7.0〜8.5</td><td>プロンプト追従度。高すぎると崩壊リスク</td></tr>
+            <tr><td><strong>sampler_name</strong></td><td>euler_ancestral</td><td>サンプリングアルゴリズム</td></tr>
+            <tr><td><strong>scheduler</strong></td><td>karras</td><td>ノイズスケジュール。karras が現在標準</td></tr>
+            <tr><td><strong>denoise</strong></td><td>1.0 (txt2img)</td><td>0.0〜1.0。img2img では 0.5〜0.8 が典型</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card-purple card" style="padding:16px">
+        <h3>sampler_name の選択指針</h3>
+        <ul>
+          <li><strong>euler_ancestral</strong> — バランスが良く最も汎用。anime 系に◎</li>
+          <li><strong>dpm_2_ancestral</strong> — ディテール重視。やや遅い</li>
+          <li><strong>ddim</strong> — img2img の denoise 調整に使いやすい</li>
+          <li><strong>lcm</strong> — LCM LoRA 使用時に 4〜8 steps で高速生成可</li>
+          <li><strong>dpmpp_2m karras</strong> — 写実系の品質が安定しやすい</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. txt2img / img2img -->
+  <div class="panel" id="s5">
+    <div class="section-id">Section 05</div>
+    <h2>txt2img / img2img — 基本ワークフロー JSON</h2>
+
+    <h3 style="margin-bottom:8px">txt2img 7ノード構成</h3>
+    <p>ComfyUI の最小ワークフロー。LoRA 差し込みポイントも含む。</p>
+    <pre class="code">{
+  <span class="s">"1"</span>: {
+    <span class="s">"class_type"</span>: <span class="s">"CheckpointLoaderSimple"</span>,
+    <span class="s">"inputs"</span>: { <span class="s">"ckpt_name"</span>: <span class="s">"animagine-xl-4.0.safetensors"</span> }
+  },
+  <span class="s">"2"</span>: {
+    <span class="s">"class_type"</span>: <span class="s">"LoraLoader"</span>,             <span class="c">// LoRA 不要なら削除してノード1を直接参照</span>
+    <span class="s">"inputs"</span>: {
+      <span class="s">"model"</span>: [<span class="s">"1"</span>, <span class="n">0</span>], <span class="s">"clip"</span>: [<span class="s">"1"</span>, <span class="n">1</span>],
+      <span class="s">"lora_name"</span>: <span class="s">"character_yuki_v3.safetensors"</span>,
+      <span class="s">"strength_model"</span>: <span class="n">0.8</span>, <span class="s">"strength_clip"</span>: <span class="n">0.8</span>
+    }
+  },
+  <span class="s">"3"</span>: {
+    <span class="s">"class_type"</span>: <span class="s">"CLIPTextEncode"</span>,
+    <span class="s">"inputs"</span>: {
+      <span class="s">"clip"</span>: [<span class="s">"2"</span>, <span class="n">1</span>],
+      <span class="s">"text"</span>: <span class="s">"1girl, yuki, white hair, school uniform, sitting, window, soft light, masterpiece, best quality"</span>
+    }
+  },
+  <span class="s">"4"</span>: {
+    <span class="s">"class_type"</span>: <span class="s">"CLIPTextEncode"</span>,
+    <span class="s">"inputs"</span>: {
+      <span class="s">"clip"</span>: [<span class="s">"2"</span>, <span class="n">1</span>],
+      <span class="s">"text"</span>: <span class="s">"lowres, bad anatomy, worst quality, blurry, watermark, nsfw"</span>
+    }
+  },
+  <span class="s">"5"</span>: {
+    <span class="s">"class_type"</span>: <span class="s">"EmptyLatentImage"</span>,
+    <span class="s">"inputs"</span>: { <span class="s">"width"</span>: <span class="n">832</span>, <span class="s">"height"</span>: <span class="n">1216</span>, <span class="s">"batch_size"</span>: <span class="n">1</span> }
+  },
+  <span class="s">"6"</span>: {
+    <span class="s">"class_type"</span>: <span class="s">"KSampler"</span>,
+    <span class="s">"inputs"</span>: {
+      <span class="s">"model"</span>: [<span class="s">"2"</span>, <span class="n">0</span>], <span class="s">"positive"</span>: [<span class="s">"3"</span>, <span class="n">0</span>],
+      <span class="s">"negative"</span>: [<span class="s">"4"</span>, <span class="n">0</span>], <span class="s">"latent_image"</span>: [<span class="s">"5"</span>, <span class="n">0</span>],
+      <span class="s">"seed"</span>: <span class="n">42</span>, <span class="s">"steps"</span>: <span class="n">25</span>, <span class="s">"cfg"</span>: <span class="n">7.5</span>,
+      <span class="s">"sampler_name"</span>: <span class="s">"euler_ancestral"</span>, <span class="s">"scheduler"</span>: <span class="s">"karras"</span>,
+      <span class="s">"denoise"</span>: <span class="n">1.0</span>
+    }
+  },
+  <span class="s">"7"</span>: {
+    <span class="s">"class_type"</span>: <span class="s">"VAEDecode"</span>,
+    <span class="s">"inputs"</span>: { <span class="s">"samples"</span>: [<span class="s">"6"</span>, <span class="n">0</span>], <span class="s">"vae"</span>: [<span class="s">"1"</span>, <span class="n">2</span>] }
+  },
+  <span class="s">"8"</span>: {
+    <span class="s">"class_type"</span>: <span class="s">"SaveImage"</span>,
+    <span class="s">"inputs"</span>: { <span class="s">"images"</span>: [<span class="s">"7"</span>, <span class="n">0</span>], <span class="s">"filename_prefix"</span>: <span class="s">"panel_"</span> }
+  }
+}</pre>
+
+    <h3 style="margin-top:20px;margin-bottom:8px">img2img への変更点</h3>
+    <p>txt2img から 2 ノードを置き換えるだけで img2img になる。</p>
+    <div class="grid2">
+      <div class="card">
+        <h3>削除ノード</h3>
+        <p><strong>EmptyLatentImage</strong> — 空の Latent を生成していたノードを削除</p>
+      </div>
+      <div class="card card-accent">
+        <h3>追加ノード</h3>
+        <pre class="code" style="margin:0"><span class="c">// LoadImage で既存画像を読み込む</span>
+<span class="s">"9"</span>: {
+  <span class="s">"class_type"</span>: <span class="s">"LoadImage"</span>,
+  <span class="s">"inputs"</span>: { <span class="s">"image"</span>: <span class="s">"reference.png"</span> }
+},
+<span class="c">// VAEEncode で Latent に変換</span>
+<span class="s">"10"</span>: {
+  <span class="s">"class_type"</span>: <span class="s">"VAEEncode"</span>,
+  <span class="s">"inputs"</span>: {
+    <span class="s">"pixels"</span>: [<span class="s">"9"</span>, <span class="n">0</span>],
+    <span class="s">"vae"</span>: [<span class="s">"1"</span>, <span class="n">2</span>]
+  }
+}
+<span class="c">// KSampler の latent_image を ["10", 0] に変更</span>
+<span class="c">// KSampler の denoise を 0.5〜0.75 に変更</span></pre>
+      </div>
+    </div>
+
+    <div class="note">
+      <strong>解像度の注意:</strong> Stable Diffusion XL は 1024×1024 が基本。縦長コマには 832×1216 が最適（アスペクト比 1:√2 ≒ A4）。SD 1.5 系は 512×768。
+    </div>
+  </div>
+
+  <!-- 6. LoRA -->
+  <div class="panel" id="s6">
+    <div class="section-id">Section 06</div>
+    <h2>LoRA — キャラクター固定と画風制御</h2>
+
+    <p>LoRA（Low-Rank Adaptation）はベースモデルの重みを低ランク行列で微調整する技術。キャラクター固定・画風指定・ポーズ偏重に使う。</p>
+
+    <div class="grid2" style="margin-bottom:16px">
+      <div class="card card-accent">
+        <h3>単一 LoRA</h3>
+        <pre class="code" style="margin:0">{
+  <span class="s">"class_type"</span>: <span class="s">"LoraLoader"</span>,
+  <span class="s">"inputs"</span>: {
+    <span class="s">"model"</span>: [<span class="s">"1"</span>, <span class="n">0</span>],
+    <span class="s">"clip"</span>: [<span class="s">"1"</span>, <span class="n">1</span>],
+    <span class="s">"lora_name"</span>: <span class="s">"char_yuki_v3.safetensors"</span>,
+    <span class="s">"strength_model"</span>: <span class="n">0.8</span>,
+    <span class="s">"strength_clip"</span>: <span class="n">0.8</span>
+  }
+}</pre>
+      </div>
+      <div class="card card-purple">
+        <h3>複数 LoRA のチェーン</h3>
+        <p>LoraLoader を直列接続することで複数 LoRA を積み重ねられる。</p>
+        <pre class="code" style="margin:0"><span class="c">// LoRA 1: キャラクター</span>
+<span class="s">"lora1"</span>: {
+  <span class="s">"class_type"</span>: <span class="s">"LoraLoader"</span>,
+  <span class="s">"inputs"</span>: {
+    <span class="s">"model"</span>: [<span class="s">"checkpoint"</span>, <span class="n">0</span>],
+    <span class="s">"clip"</span>: [<span class="s">"checkpoint"</span>, <span class="n">1</span>],
+    <span class="s">"lora_name"</span>: <span class="s">"char_yuki.safetensors"</span>,
+    <span class="s">"strength_model"</span>: <span class="n">0.8</span>,
+    <span class="s">"strength_clip"</span>: <span class="n">0.8</span>
+  }
+},
+<span class="c">// LoRA 2: 画風（前段の出力を受ける）</span>
+<span class="s">"lora2"</span>: {
+  <span class="s">"class_type"</span>: <span class="s">"LoraLoader"</span>,
+  <span class="s">"inputs"</span>: {
+    <span class="s">"model"</span>: [<span class="s">"lora1"</span>, <span class="n">0</span>],
+    <span class="s">"clip"</span>: [<span class="s">"lora1"</span>, <span class="n">1</span>],
+    <span class="s">"lora_name"</span>: <span class="s">"style_manga_v2.safetensors"</span>,
+    <span class="s">"strength_model"</span>: <span class="n">0.6</span>,
+    <span class="s">"strength_clip"</span>: <span class="n">0.4</span>
+  }
+}</pre>
+      </div>
+    </div>
+
+    <h3 style="margin-bottom:8px">strength の調整指針</h3>
+    <table>
+      <thead><tr><th>strength_model</th><th>strength_clip</th><th>効果</th><th>典型的用途</th></tr></thead>
+      <tbody>
+        <tr><td>1.0</td><td>1.0</td><td>LoRA 全開。プロンプト追従が弱まることも</td><td>キャラクター固定重視</td></tr>
+        <tr><td>0.8</td><td>0.8</td><td>バランス型。最初のデフォルト値に最適</td><td>汎用</td></tr>
+        <tr><td>0.6〜0.7</td><td>0.4〜0.5</td><td>画風LoRAに。モデル寄りは強く、CLIP は控えめ</td><td>スタイル微調整</td></tr>
+        <tr><td>0.0</td><td>0.0</td><td>LoRA 無効化（ノードを残したまま off）</td><td>A/B テスト</td></tr>
+      </tbody>
+    </table>
+
+    <div class="warn" style="margin-top:12px">
+      <strong>LoRA 過負荷の症状:</strong> 顔崩れ・手指異常・極端な色変化。複数 LoRA を使う場合は合計 strength を 1.5〜2.0 以内に収めることを推奨。品質が下がったらまず strength を 0.1 ずつ下げる。
+    </div>
+  </div>
+
+  <!-- 7. ControlNet -->
+  <div class="panel" id="s7">
+    <div class="section-id">Section 07</div>
+    <h2>ControlNet — ポーズ・輪郭・構図の制御</h2>
+
+    <p>ControlNet は参照画像から抽出した「構造情報（骨格・輪郭・深度）」を条件として画像生成をガイドする。LoRA がキャラクターを固定するのに対し、ControlNet は<strong>ポーズと構図</strong>を固定する。</p>
+
+    <table style="margin-bottom:16px">
+      <thead><tr><th>タイプ</th><th>抽出情報</th><th>用途</th><th>推奨モデル</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Canny</strong></td><td>エッジ（輪郭線）</td><td>既存コマの線を保ちつつ塗り変え、漫画コマの輪郭継続</td><td>control_v11p_sd15_canny</td></tr>
+        <tr><td><strong>Openpose</strong></td><td>人体骨格 18点</td><td>ポーズ指定、複数キャラクターの位置固定</td><td>control_v11p_sd15_openpose</td></tr>
+        <tr><td><strong>Depth</strong></td><td>深度マップ</td><td>前景/背景の奥行き関係を維持</td><td>control_v11f1p_sd15_depth</td></tr>
+        <tr><td><strong>Lineart</strong></td><td>ラインアート</td><td>手描き線画の彩色</td><td>control_v11p_sd15_lineart</td></tr>
+        <tr><td><strong>Tile</strong></td><td>タイル分割</td><td>高解像度アップスケール時のディテール維持</td><td>control_v11f1e_sd15_tile</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="margin-bottom:8px">ControlNetApplyAdvanced の JSON</h3>
+    <pre class="code">{
+  <span class="s">"cn_apply"</span>: {
+    <span class="s">"class_type"</span>: <span class="s">"ControlNetApplyAdvanced"</span>,
+    <span class="s">"inputs"</span>: {
+      <span class="s">"positive"</span>: [<span class="s">"clip_pos"</span>, <span class="n">0</span>],    <span class="c">// CLIPTextEncode の出力</span>
+      <span class="s">"negative"</span>: [<span class="s">"clip_neg"</span>, <span class="n">0</span>],
+      <span class="s">"control_net"</span>: [<span class="s">"cn_loader"</span>, <span class="n">0</span>],  <span class="c">// ControlNetLoader の出力</span>
+      <span class="s">"image"</span>: [<span class="s">"preprocessor"</span>, <span class="n">0</span>],    <span class="c">// 前処理済み参照画像</span>
+      <span class="s">"strength"</span>: <span class="n">0.85</span>,
+      <span class="s">"start_percent"</span>: <span class="n">0.0</span>,            <span class="c">// 何 % ステップ目から有効化</span>
+      <span class="s">"end_percent"</span>: <span class="n">0.7</span>              <span class="c">// 何 % ステップ目まで有効化</span>
+    }
+  }
+}</pre>
+
+    <div class="grid2" style="margin-top:14px">
+      <div class="card card-accent">
+        <h3>start_percent / end_percent の意味</h3>
+        <p><code>start_percent: 0.0, end_percent: 0.7</code> の場合、25 steps 中のステップ 0〜17 で ControlNet が有効。後半ステップでは解放することでディテールの自由度を確保できる。</p>
+        <ul>
+          <li><strong>0.0 〜 1.0</strong>: 全ステップで強制（最もタイト）</li>
+          <li><strong>0.0 〜 0.7</strong>: 構造を固めつつ仕上げは自由（推奨）</li>
+          <li><strong>0.2 〜 0.8</strong>: 初期ノイズを自由にしつつ中盤以降で誘導</li>
+        </ul>
+      </div>
+      <div class="card card-purple">
+        <h3>前処理ノード</h3>
+        <p>参照画像は前処理ノードでControlNet入力形式に変換する。</p>
+        <ul>
+          <li><strong>Canny前処理</strong>: CannyEdgePreprocessor（low_threshold: 100, high_threshold: 200）</li>
+          <li><strong>Openpose前処理</strong>: OpenposePreprocessor（detect_hand: true）</li>
+          <li><strong>Depth前処理</strong>: MiDaS / ZoeDepth Preprocessor</li>
+          <li>前処理なしで直接参照画像を渡すことも可能（既に前処理済みの場合）</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. IP-Adapter -->
+  <div class="panel" id="s8">
+    <div class="section-id">Section 08</div>
+    <h2>IP-Adapter — 参照画像からスタイル注入</h2>
+
+    <p>IP-Adapter（Image Prompt Adapter）は参照画像の視覚的特徴（色味・スタイル・雰囲気）を動的に U-Net へ注入する。LoRA が「訓練済み静的特徴」を使うのに対し、IP-Adapter は「推論時の動的注入」。</p>
+
+    <table style="margin-bottom:16px">
+      <thead><tr><th>比較軸</th><th>LoRA</th><th>IP-Adapter</th></tr></thead>
+      <tbody>
+        <tr><td>特徴の格納</td><td>モデルファイルに焼き込み</td><td>推論時に参照画像から抽出</td></tr>
+        <tr><td>新キャラ対応</td><td>新LoRAを訓練（時間がかかる）</td><td>参照画像1枚で即対応</td></tr>
+        <tr><td>安定性</td><td>◎（同一モデルで常に安定）</td><td>△（参照画像品質に依存）</td></tr>
+        <tr><td>組み合わせ</td><td>ControlNet・IP-Adapterと併用可</td><td>LoRA・ControlNetと併用可</td></tr>
+        <tr><td>典型的用途</td><td>主人公キャラクター固定</td><td>サブキャラ・背景スタイル統一</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="margin-bottom:8px">IPAdapterApply ノード JSON</h3>
+    <p>ComfyUI_IPAdapter_plus カスタムノードが必要。</p>
+    <pre class="code">{
+  <span class="s">"ipadapter_loader"</span>: {
+    <span class="s">"class_type"</span>: <span class="s">"IPAdapterModelLoader"</span>,
+    <span class="s">"inputs"</span>: {
+      <span class="s">"ipadapter_file"</span>: <span class="s">"ip-adapter-plus_sdxl_vit-h.safetensors"</span>
+    }
+  },
+  <span class="s">"clip_vision_loader"</span>: {
+    <span class="s">"class_type"</span>: <span class="s">"CLIPVisionLoader"</span>,
+    <span class="s">"inputs"</span>: {
+      <span class="s">"clip_name"</span>: <span class="s">"CLIP-ViT-H-14-laion2B-s32B-b79K.safetensors"</span>
+    }
+  },
+  <span class="s">"ipadapter_apply"</span>: {
+    <span class="s">"class_type"</span>: <span class="s">"IPAdapterAdvanced"</span>,
+    <span class="s">"inputs"</span>: {
+      <span class="s">"model"</span>: [<span class="s">"checkpoint"</span>, <span class="n">0</span>],
+      <span class="s">"ipadapter"</span>: [<span class="s">"ipadapter_loader"</span>, <span class="n">0</span>],
+      <span class="s">"clip_vision"</span>: [<span class="s">"clip_vision_loader"</span>, <span class="n">0</span>],
+      <span class="s">"image"</span>: [<span class="s">"ref_image_loader"</span>, <span class="n">0</span>],
+      <span class="s">"weight"</span>: <span class="n">0.6</span>,                <span class="c">// 0.0〜1.0。高いほど参照画像に近づく</span>
+      <span class="s">"start_at"</span>: <span class="n">0.0</span>,
+      <span class="s">"end_at"</span>: <span class="n">1.0</span>,
+      <span class="s">"weight_type"</span>: <span class="s">"linear"</span>       <span class="c">// linear / ease in / ease out</span>
+    }
+  }
+}</pre>
+
+    <div class="note">
+      <strong>LoRA + IP-Adapter の併用:</strong> 漫画パイプラインでは LoRA でキャラクター骨格を固定しつつ、IP-Adapter で参照コマから色調・照明を引き継ぐ組み合わせが有効。LoRA が失敗した際のフォールバックとして IP-Adapter のみ使用する戦略については <a href="../manga-pipeline.html#lora-fallback">manga-pipeline.html</a> を参照。
+    </div>
+  </div>
+
+  <!-- 9. Python API -->
+  <div class="panel" id="s9">
+    <div class="section-id">Section 09</div>
+    <h2>Python API — 自動化の入口</h2>
+
+    <h3 style="margin-bottom:8px">エンドポイント一覧</h3>
+    <table style="margin-bottom:16px">
+      <thead><tr><th>エンドポイント</th><th>メソッド</th><th>説明</th></tr></thead>
+      <tbody>
+        <tr><td><code>POST /prompt</code></td><td>POST</td><td>ワークフロー JSON をキューに追加。prompt_id を返す</td></tr>
+        <tr><td><code>GET /history/{prompt_id}</code></td><td>GET</td><td>実行結果（出力ファイル名）を取得</td></tr>
+        <tr><td><code>GET /view</code></td><td>GET</td><td>生成済み画像のバイナリ取得（?filename=&subfolder=&type=）</td></tr>
+        <tr><td><code>GET /queue</code></td><td>GET</td><td>現在のキュー状態（実行中・待機中）</td></tr>
+        <tr><td><code>POST /interrupt</code></td><td>POST</td><td>実行中のジョブを中断</td></tr>
+        <tr><td><code>ws://host/ws?clientId=ID</code></td><td>WebSocket</td><td>完了通知・進捗イベントのストリーム受信</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="margin-bottom:8px">完全な Python クライアント実装</h3>
+    <pre class="code"><span class="kw">import</span> json, uuid, urllib.request, urllib.parse, websocket
+<span class="kw">from</span> pathlib <span class="kw">import</span> Path
+
+COMFY_HOST = <span class="s">"127.0.0.1:8188"</span>
+
+<span class="kw">def</span> <span class="fn">queue_prompt</span>(workflow: dict) -&gt; str:
+    <span class="s">"""ワークフローをキューに追加し prompt_id を返す"""</span>
+    client_id = str(uuid.uuid4())
+    payload = json.dumps({<span class="s">"prompt"</span>: workflow, <span class="s">"client_id"</span>: client_id}).encode()
+    req = urllib.request.Request(
+        f<span class="s">"http://{COMFY_HOST}/prompt"</span>,
+        data=payload,
+        headers={<span class="s">"Content-Type"</span>: <span class="s">"application/json"</span>}
+    )
+    result = json.loads(urllib.request.urlopen(req).read())
+    <span class="kw">return</span> result[<span class="s">"prompt_id"</span>], client_id
+
+<span class="kw">def</span> <span class="fn">wait_for_completion</span>(prompt_id: str, client_id: str) -&gt; <span class="kw">None</span>:
+    <span class="s">"""WebSocket で完了を待機"""</span>
+    ws = websocket.WebSocket()
+    ws.connect(f<span class="s">"ws://{COMFY_HOST}/ws?clientId={client_id}"</span>)
+    <span class="kw">while</span> <span class="kw">True</span>:
+        msg = json.loads(ws.recv())
+        <span class="kw">if</span> msg[<span class="s">"type"</span>] == <span class="s">"executing"</span>:
+            data = msg.get(<span class="s">"data"</span>, {})
+            <span class="kw">if</span> data.get(<span class="s">"node"</span>) <span class="kw">is</span> <span class="kw">None</span> <span class="kw">and</span> data.get(<span class="s">"prompt_id"</span>) == prompt_id:
+                <span class="kw">break</span>  <span class="c"># 完了</span>
+    ws.close()
+
+<span class="kw">def</span> <span class="fn">get_images</span>(prompt_id: str) -&gt; list[bytes]:
+    <span class="s">"""生成画像のバイナリリストを返す"""</span>
+    history = json.loads(
+        urllib.request.urlopen(f<span class="s">"http://{COMFY_HOST}/history/{prompt_id}"</span>).read()
+    )
+    images = []
+    outputs = history[prompt_id][<span class="s">"outputs"</span>]
+    <span class="kw">for</span> node_output <span class="kw">in</span> outputs.values():
+        <span class="kw">for</span> img_info <span class="kw">in</span> node_output.get(<span class="s">"images"</span>, []):
+            params = urllib.parse.urlencode({
+                <span class="s">"filename"</span>: img_info[<span class="s">"filename"</span>],
+                <span class="s">"subfolder"</span>: img_info[<span class="s">"subfolder"</span>],
+                <span class="s">"type"</span>: img_info[<span class="s">"type"</span>]
+            })
+            img_data = urllib.request.urlopen(f<span class="s">"http://{COMFY_HOST}/view?{params}"</span>).read()
+            images.append(img_data)
+    <span class="kw">return</span> images
+
+<span class="kw">def</span> <span class="fn">generate_panel</span>(workflow: dict, save_dir: str = <span class="s">"output"</span>) -&gt; list[Path]:
+    <span class="s">"""ワークフローを実行して生成画像を保存。パスリストを返す"""</span>
+    prompt_id, client_id = queue_prompt(workflow)
+    wait_for_completion(prompt_id, client_id)
+    images = get_images(prompt_id)
+
+    saved = []
+    save_path = Path(save_dir)
+    save_path.mkdir(exist_ok=<span class="kw">True</span>)
+    <span class="kw">for</span> i, img_bytes <span class="kw">in</span> enumerate(images):
+        path = save_path / f<span class="s">"{prompt_id}_{i}.png"</span>
+        path.write_bytes(img_bytes)
+        saved.append(path)
+    <span class="kw">return</span> saved
+
+<span class="c"># 使用例</span>
+<span class="kw">if</span> __name__ == <span class="s">"__main__"</span>:
+    <span class="kw">with</span> open(<span class="s">"workflow_txt2img.json"</span>) <span class="kw">as</span> f:
+        workflow = json.load(f)
+
+    <span class="c"># シードとプロンプトを動的に変更</span>
+    workflow[<span class="s">"6"</span>][<span class="s">"inputs"</span>][<span class="s">"seed"</span>] = 12345
+    workflow[<span class="s">"3"</span>][<span class="s">"inputs"</span>][<span class="s">"text"</span>] = <span class="s">"1girl, yuki, running, park, sunset"</span>
+
+    paths = generate_panel(workflow)
+    print(f<span class="s">"生成完了: {paths}"</span>)</pre>
+  </div>
+
+  <!-- 10. バッチ生成 -->
+  <div class="panel" id="s10">
+    <div class="section-id">Section 10</div>
+    <h2>バッチ生成 — 漫画 1 話分を自動生成</h2>
+
+    <p>1 話 30〜80 コマを JSON ワークフローを書き換えながら連続生成する実装例。失敗時の再試行ロジック付き。</p>
+
+    <pre class="code"><span class="kw">import</span> json, copy, random, time
+<span class="kw">from</span> pathlib <span class="kw">import</span> Path
+<span class="c"># generate_panel は Section 9 の実装を使用</span>
+
+<span class="kw">def</span> <span class="fn">build_workflow</span>(base_wf: dict, scene: dict) -&gt; dict:
+    <span class="s">"""シーン情報からワークフローを構築"""</span>
+    wf = copy.deepcopy(base_wf)
+
+    <span class="c"># プロンプト更新</span>
+    wf[<span class="s">"3"</span>][<span class="s">"inputs"</span>][<span class="s">"text"</span>] = scene[<span class="s">"prompt"</span>]
+
+    <span class="c"># シード（再現性確保 or ランダム）</span>
+    wf[<span class="s">"6"</span>][<span class="s">"inputs"</span>][<span class="s">"seed"</span>] = scene.get(<span class="s">"seed"</span>, random.randint(<span class="n">0</span>, <span class="n">999999999</span>))
+
+    <span class="c"># LoRA 切り替え（キャラクターごと）</span>
+    <span class="kw">if</span> <span class="s">"lora"</span> <span class="kw">in</span> scene:
+        wf[<span class="s">"2"</span>][<span class="s">"inputs"</span>][<span class="s">"lora_name"</span>] = scene[<span class="s">"lora"</span>]
+        wf[<span class="s">"2"</span>][<span class="s">"inputs"</span>][<span class="s">"strength_model"</span>] = scene.get(<span class="s">"lora_weight"</span>, <span class="n">0.8</span>)
+
+    <span class="c"># 解像度（コマサイズ別）</span>
+    wf[<span class="s">"5"</span>][<span class="s">"inputs"</span>][<span class="s">"width"</span>] = scene.get(<span class="s">"width"</span>, <span class="n">832</span>)
+    wf[<span class="s">"5"</span>][<span class="s">"inputs"</span>][<span class="s">"height"</span>] = scene.get(<span class="s">"height"</span>, <span class="n">1216</span>)
+
+    <span class="kw">return</span> wf
+
+<span class="kw">def</span> <span class="fn">generate_manga_chapter</span>(
+    chapter: list[dict],
+    base_workflow_path: str,
+    output_dir: str,
+    max_retries: int = <span class="n">3</span>
+) -&gt; dict:
+    <span class="s">"""1話分のコマをバッチ生成。成功/失敗の集計を返す"""</span>
+    <span class="kw">with</span> open(base_workflow_path) <span class="kw">as</span> f:
+        base_wf = json.load(f)
+
+    results = {<span class="s">"success"</span>: [], <span class="s">"failed"</span>: []}
+
+    <span class="kw">for</span> i, scene <span class="kw">in</span> enumerate(chapter):
+        scene_id = scene.get(<span class="s">"id"</span>, f<span class="s">"scene_{i:03d}"</span>)
+        attempt = <span class="n">0</span>
+
+        <span class="kw">while</span> attempt &lt; max_retries:
+            <span class="kw">try</span>:
+                wf = build_workflow(base_wf, scene)
+                paths = generate_panel(wf, save_dir=f<span class="s">"{output_dir}/{scene_id}"</span>)
+
+                results[<span class="s">"success"</span>].append({
+                    <span class="s">"scene_id"</span>: scene_id,
+                    <span class="s">"paths"</span>: [str(p) <span class="kw">for</span> p <span class="kw">in</span> paths]
+                })
+                <span class="kw">break</span>
+
+            <span class="kw">except</span> Exception <span class="kw">as</span> e:
+                attempt += <span class="n">1</span>
+                wait = <span class="n">2</span> ** attempt  <span class="c"># 指数バックオフ</span>
+                print(f<span class="s">"[{scene_id}] attempt {attempt} failed: {e}. retry in {wait}s"</span>)
+                time.sleep(wait)
+
+                <span class="kw">if</span> attempt &gt;= max_retries:
+                    results[<span class="s">"failed"</span>].append({<span class="s">"scene_id"</span>: scene_id, <span class="s">"error"</span>: str(e)})
+
+    print(f<span class="s">"完了: {len(results['success'])} 成功 / {len(results['failed'])} 失敗"</span>)
+    <span class="kw">return</span> results
+
+<span class="c"># 使用例: scenes.json からバッチ実行</span>
+<span class="kw">if</span> __name__ == <span class="s">"__main__"</span>:
+    scenes = [
+        {<span class="s">"id"</span>: <span class="s">"s001"</span>, <span class="s">"prompt"</span>: <span class="s">"1girl, yuki, classroom, morning light"</span>, <span class="s">"lora"</span>: <span class="s">"char_yuki.safetensors"</span>},
+        {<span class="s">"id"</span>: <span class="s">"s002"</span>, <span class="s">"prompt"</span>: <span class="s">"1girl, yuki, running in hallway, surprised"</span>, <span class="s">"lora"</span>: <span class="s">"char_yuki.safetensors"</span>},
+        {<span class="s">"id"</span>: <span class="s">"s003"</span>, <span class="s">"prompt"</span>: <span class="s">"2girls, yuki and ami, rooftop, sunset, talking"</span>, <span class="s">"width"</span>: <span class="n">1216</span>, <span class="s">"height"</span>: <span class="n">832</span>},
+    ]
+    results = generate_manga_chapter(scenes, <span class="s">"workflow_base.json"</span>, <span class="s">"output/chapter01"</span>)</pre>
+  </div>
+
+  <!-- 11. 漫画コマ生成ワークフロー -->
+  <div class="panel panel-purple" id="s11">
+    <div class="section-id">Section 11</div>
+    <h2>漫画コマ生成 — LoRA + ControlNet 統合ワークフロー</h2>
+
+    <p>実際に AI Creator Hub の漫画パイプラインで使用する 13 ノード構成のワークフロー。キャラクター LoRA + Canny ControlNet（輪郭維持）を組み合わせる。</p>
+
+    <pre class="code">{
+  <span class="c">// ① ベースモデル</span>
+  <span class="s">"checkpoint"</span>: {
+    <span class="s">"class_type"</span>: <span class="s">"CheckpointLoaderSimple"</span>,
+    <span class="s">"inputs"</span>: { <span class="s">"ckpt_name"</span>: <span class="s">"animagine-xl-4.0.safetensors"</span> }
+  },
+
+  <span class="c">// ② キャラクター LoRA</span>
+  <span class="s">"lora"</span>: {
+    <span class="s">"class_type"</span>: <span class="s">"LoraLoader"</span>,
+    <span class="s">"inputs"</span>: {
+      <span class="s">"model"</span>: [<span class="s">"checkpoint"</span>, <span class="n">0</span>], <span class="s">"clip"</span>: [<span class="s">"checkpoint"</span>, <span class="n">1</span>],
+      <span class="s">"lora_name"</span>: <span class="s">"char_yuki_v3.safetensors"</span>,
+      <span class="s">"strength_model"</span>: <span class="n">0.8</span>, <span class="s">"strength_clip"</span>: <span class="n">0.8</span>
+    }
+  },
+
+  <span class="c">// ③④ プロンプト（Positive / Negative）</span>
+  <span class="s">"clip_pos"</span>: {
+    <span class="s">"class_type"</span>: <span class="s">"CLIPTextEncode"</span>,
+    <span class="s">"inputs"</span>: { <span class="s">"clip"</span>: [<span class="s">"lora"</span>, <span class="n">1</span>], <span class="s">"text"</span>: <span class="s">"1girl, yuki, classroom, soft light, masterpiece"</span> }
+  },
+  <span class="s">"clip_neg"</span>: {
+    <span class="s">"class_type"</span>: <span class="s">"CLIPTextEncode"</span>,
+    <span class="s">"inputs"</span>: { <span class="s">"clip"</span>: [<span class="s">"lora"</span>, <span class="n">1</span>], <span class="s">"text"</span>: <span class="s">"lowres, bad anatomy, worst quality, blurry, nsfw"</span> }
+  },
+
+  <span class="c">// ⑤ ControlNet モデルロード</span>
+  <span class="s">"cn_loader"</span>: {
+    <span class="s">"class_type"</span>: <span class="s">"ControlNetLoader"</span>,
+    <span class="s">"inputs"</span>: { <span class="s">"control_net_name"</span>: <span class="s">"control_v11p_sd15_canny.pth"</span> }
+  },
+
+  <span class="c">// ⑥ 参照コマ読み込み</span>
+  <span class="s">"ref_image"</span>: {
+    <span class="s">"class_type"</span>: <span class="s">"LoadImage"</span>,
+    <span class="s">"inputs"</span>: { <span class="s">"image"</span>: <span class="s">"reference_panel.png"</span> }
+  },
+
+  <span class="c">// ⑦ Canny 前処理</span>
+  <span class="s">"canny_preprocess"</span>: {
+    <span class="s">"class_type"</span>: <span class="s">"CannyEdgePreprocessor"</span>,
+    <span class="s">"inputs"</span>: {
+      <span class="s">"image"</span>: [<span class="s">"ref_image"</span>, <span class="n">0</span>],
+      <span class="s">"low_threshold"</span>: <span class="n">100</span>, <span class="s">"high_threshold"</span>: <span class="n">200</span>
+    }
+  },
+
+  <span class="c">// ⑧ ControlNet 適用</span>
+  <span class="s">"cn_apply"</span>: {
+    <span class="s">"class_type"</span>: <span class="s">"ControlNetApplyAdvanced"</span>,
+    <span class="s">"inputs"</span>: {
+      <span class="s">"positive"</span>: [<span class="s">"clip_pos"</span>, <span class="n">0</span>], <span class="s">"negative"</span>: [<span class="s">"clip_neg"</span>, <span class="n">0</span>],
+      <span class="s">"control_net"</span>: [<span class="s">"cn_loader"</span>, <span class="n">0</span>], <span class="s">"image"</span>: [<span class="s">"canny_preprocess"</span>, <span class="n">0</span>],
+      <span class="s">"strength"</span>: <span class="n">0.85</span>, <span class="s">"start_percent"</span>: <span class="n">0.0</span>, <span class="s">"end_percent"</span>: <span class="n">0.7</span>
+    }
+  },
+
+  <span class="c">// ⑨ Latent（コマサイズ）</span>
+  <span class="s">"latent"</span>: {
+    <span class="s">"class_type"</span>: <span class="s">"EmptyLatentImage"</span>,
+    <span class="s">"inputs"</span>: { <span class="s">"width"</span>: <span class="n">832</span>, <span class="s">"height"</span>: <span class="n">1216</span>, <span class="s">"batch_size"</span>: <span class="n">1</span> }
+  },
+
+  <span class="c">// ⑩ KSampler（メイン推論）</span>
+  <span class="s">"sampler"</span>: {
+    <span class="s">"class_type"</span>: <span class="s">"KSampler"</span>,
+    <span class="s">"inputs"</span>: {
+      <span class="s">"model"</span>: [<span class="s">"lora"</span>, <span class="n">0</span>],
+      <span class="s">"positive"</span>: [<span class="s">"cn_apply"</span>, <span class="n">0</span>], <span class="s">"negative"</span>: [<span class="s">"cn_apply"</span>, <span class="n">1</span>],
+      <span class="s">"latent_image"</span>: [<span class="s">"latent"</span>, <span class="n">0</span>],
+      <span class="s">"seed"</span>: <span class="n">42</span>, <span class="s">"steps"</span>: <span class="n">25</span>, <span class="s">"cfg"</span>: <span class="n">7.5</span>,
+      <span class="s">"sampler_name"</span>: <span class="s">"euler_ancestral"</span>, <span class="s">"scheduler"</span>: <span class="s">"karras"</span>, <span class="s">"denoise"</span>: <span class="n">1.0</span>
+    }
+  },
+
+  <span class="c">// ⑪ VAEDecode → ⑫ SaveImage</span>
+  <span class="s">"decode"</span>: {
+    <span class="s">"class_type"</span>: <span class="s">"VAEDecode"</span>,
+    <span class="s">"inputs"</span>: { <span class="s">"samples"</span>: [<span class="s">"sampler"</span>, <span class="n">0</span>], <span class="s">"vae"</span>: [<span class="s">"checkpoint"</span>, <span class="n">2</span>] }
+  },
+  <span class="s">"save"</span>: {
+    <span class="s">"class_type"</span>: <span class="s">"SaveImage"</span>,
+    <span class="s">"inputs"</span>: { <span class="s">"images"</span>: [<span class="s">"decode"</span>, <span class="n">0</span>], <span class="s">"filename_prefix"</span>: <span class="s">"manga_panel_"</span> }
+  }
+}</pre>
+
+    <div class="note">
+      このワークフローは Python API から <code>workflow["ref_image"]["inputs"]["image"]</code> と <code>workflow["sampler"]["inputs"]["seed"]</code> を書き換えるだけでコマごとに差し替えられる。バッチ生成時の差し替え方は Section 10 の <code>build_workflow()</code> を参照。
+    </div>
+  </div>
+
+  <!-- 12. VRAM最適化 -->
+  <div class="panel" id="s12">
+    <div class="section-id">Section 12</div>
+    <h2>VRAM 最適化</h2>
+
+    <div class="grid2" style="margin-bottom:16px">
+      <div class="card card-accent">
+        <h3>VRAM 16 GB+（RTX 3080/4080 以上）</h3>
+        <span class="tag tag-green">フル性能</span>
+        <ul>
+          <li>追加オプション不要。SDXL フル精度で動作</li>
+          <li><code>batch_size: 4</code> でスループット向上</li>
+          <li>複数モデルの同時キャッシュ可能</li>
+        </ul>
+      </div>
+      <div class="card card-purple">
+        <h3>VRAM 8〜12 GB（RTX 3060/3070）</h3>
+        <span class="tag tag-teal">推奨構成</span>
+        <ul>
+          <li>起動フラグ不要だが <code>--lowvram</code> で安定性向上</li>
+          <li>SDXL 使用時は <code>batch_size: 1</code> に固定</li>
+          <li>fp16 で半精度推論（品質ほぼ変わらず）</li>
+        </ul>
+      </div>
+      <div class="card card-orange">
+        <h3>VRAM 4〜8 GB（GTX 1080/RTX 2060）</h3>
+        <span class="tag tag-orange">要チューニング</span>
+        <ul>
+          <li><code>--lowvram</code> 必須</li>
+          <li>SDXL は厳しい。SD 1.5 系 (512px) 推奨</li>
+          <li>VAEDecodeTiled ノードでOOMを回避</li>
+          <li><code>steps: 20</code> に抑える</li>
+        </ul>
+      </div>
+      <div class="card card-red">
+        <h3>VRAM ≤ 4 GB / CPU のみ</h3>
+        <span class="tag tag-red">低速モード</span>
+        <ul>
+          <li><code>--novram</code> または <code>--cpu</code></li>
+          <li>1 枚の生成に数分〜十数分</li>
+          <li>動作確認・プロンプト検証用途に限定</li>
+          <li>SD 1.5 系 512×512 のみ現実的</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3 style="margin-bottom:8px">速度改善テクニック</h3>
+    <table>
+      <thead><tr><th>手法</th><th>効果</th><th>デメリット</th></tr></thead>
+      <tbody>
+        <tr><td><strong>steps を 20 に削減</strong></td><td>生成速度 25〜30% 向上</td><td>やや品質低下（特にディテール）</td></tr>
+        <tr><td><strong>LCM LoRA + sampler:lcm</strong></td><td>4〜8 steps で生成可（3〜5×高速）</td><td>画風が変わることがある</td></tr>
+        <tr><td><strong>TurboXL / Lightning LoRA</strong></td><td>4〜8 steps、SDXL 品質維持</td><td>cfg 値調整が必要（1.0〜2.0）</td></tr>
+        <tr><td><strong>batch_size を上げる</strong></td><td>複数枚を並列生成でスループット向上</td><td>VRAM 使用量が比例増加</td></tr>
+        <tr><td><strong>モデルをあらかじめロード</strong></td><td>初回以降のキュー処理が高速化</td><td>VRAM 常時確保</td></tr>
+        <tr><td><strong>SSD への配置</strong></td><td>モデルロード時間が 2〜5× 短縮</td><td>—</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="margin-top:16px;margin-bottom:8px">VAEDecodeTiled — 高解像度 OOM 対策</h3>
+    <pre class="code"><span class="c">// 通常の VAEDecode を VAEDecodeTiled に置き換えるだけ</span>
+<span class="s">"decode"</span>: {
+  <span class="s">"class_type"</span>: <span class="s">"VAEDecodeTiled"</span>,
+  <span class="s">"inputs"</span>: {
+    <span class="s">"samples"</span>: [<span class="s">"sampler"</span>, <span class="n">0</span>],
+    <span class="s">"vae"</span>: [<span class="s">"checkpoint"</span>, <span class="n">2</span>],
+    <span class="s">"tile_size"</span>: <span class="n">512</span>           <span class="c">// タイルサイズ。小さいほど省VRAM</span>
+  }
+}</pre>
+  </div>
+
+  <!-- 13. エラー対処 -->
+  <div class="panel" id="s13">
+    <div class="section-id">Section 13</div>
+    <h2>エラー対処</h2>
+
+    <table>
+      <thead><tr><th>エラー</th><th>原因</th><th>対処</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>CUDA out of memory</strong></td>
+          <td>VRAM 不足</td>
+          <td><code>--lowvram</code> 追加 / batch_size を 1 に / VAEDecodeTiled 使用 / steps 削減</td>
+        </tr>
+        <tr>
+          <td><strong>真っ白な画像が出力される</strong></td>
+          <td>VAE ミスマッチ / cfg 値が高すぎる</td>
+          <td>モデル専用 VAE を明示的にロード / cfg を 6〜7.5 に下げる</td>
+        </tr>
+        <tr>
+          <td><strong>FileNotFoundError: model xxx not found</strong></td>
+          <td>モデルファイルのパスが違う</td>
+          <td>ComfyUI の <code>models/</code> 以下の正しいフォルダへ配置。大文字/小文字・拡張子確認</td>
+        </tr>
+        <tr>
+          <td><strong>RuntimeError: expected scalar type Half but found Float</strong></td>
+          <td>fp16/fp32 型の混在</td>
+          <td>モデルと ControlNet の精度を揃える。<code>--force-fp32</code> または <code>--force-fp16</code> で統一</td>
+        </tr>
+        <tr>
+          <td><strong>生成が極端に遅い（1枚15分以上）</strong></td>
+          <td>CPU 推論になっている</td>
+          <td>GPU ドライバー確認 / <code>torch.cuda.is_available()</code> で True か確認 / PyTorch の CUDA 版を再インストール</td>
+        </tr>
+        <tr>
+          <td><strong>KeyError: 'prompt_id'（API）</strong></td>
+          <td>ワークフロー JSON に構文エラー</td>
+          <td>POST の response body に <code>error</code> フィールドがあるか確認。ノードIDの重複・参照切れを探す</td>
+        </tr>
+        <tr>
+          <td><strong>LoRA 適用後に顔崩れ</strong></td>
+          <td>strength が高すぎる / LoRA とベースモデルの不整合</td>
+          <td>strength_model を 0.6〜0.7 に下げる。LoRA 訓練に使ったベースモデルと合わせる</td>
+        </tr>
+        <tr>
+          <td><strong>ControlNet が効いていない</strong></td>
+          <td>前処理画像の解像度不一致 / strength が低い</td>
+          <td>前処理画像を生成解像度と同じにリサイズ / strength を 0.8〜1.0 に上げる</td>
+        </tr>
+        <tr>
+          <td><strong>WebSocket で完了通知が来ない</strong></td>
+          <td>client_id 不一致 / 接続タイムアウト</td>
+          <td>POST した client_id と ws 接続の client_id が同じか確認。ws に ping/pong ハートビートを追加</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="danger" style="margin-top:14px">
+      <strong>LoRA + ControlNet 同時使用でのよくある落とし穴:</strong> ControlNet の前処理画像と生成解像度が一致していないと、ControlNet が正しく機能しない。必ず ImageScale ノードで前処理画像を <code>EmptyLatentImage</code> と同じ解像度（例: 832×1216）にリサイズしてから ControlNetApplyAdvanced に渡すこと。
+    </div>
+  </div>
+
+  <!-- 実例 A: キャラクター一貫性ワークフロー -->
+  <div class="panel panel-accent" id="ex-a">
+    <div class="section-id">実例 A</div>
+    <h2>キャラクター一貫性ワークフロー — 「雪」を全シーンで統一する</h2>
+    <p>白髪ショートの女子高生キャラ「雪」を、教室・廊下・屋外・夜景で一貫して描き続ける実践例。LoRA + ControlNet (Openpose) + IP-Adapter の 3 層を組み合わせる。</p>
+
+    <h3 style="margin-top:16px;margin-bottom:8px">キャラクター設定 YAML（manga-pipeline と共有）</h3>
+    <pre class="code"><span class="c"># characters/yuki.yaml</span>
+name: <span class="s">"雪 (Yuki)"</span>
+lora: <span class="s">"char_yuki_v3.safetensors"</span>
+lora_strength: <span class="n">0.8</span>
+trigger_words: <span class="s">"yuki, 1girl, white hair, short hair, blue eyes, school uniform"</span>
+negative_base: <span class="s">"lowres, bad anatomy, worst quality, blurry, extra fingers, watermark"</span>
+reference_image: <span class="s">"refs/yuki_canonical.png"</span>  <span class="c"># IP-Adapter フォールバック用</span>
+clip_threshold: <span class="n">0.72</span>           <span class="c"># これ以上の CLIP スコアで合格</span>
+quality_threshold: <span class="n">0.65</span></pre>
+
+    <h3 style="margin-top:16px;margin-bottom:8px">シーン別プロンプト集（実際の制作例）</h3>
+    <table>
+      <thead><tr><th>シーン</th><th>Positive プロンプト</th><th>cfg</th><th>備考</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>教室 / 朝</strong></td>
+          <td><code>yuki, 1girl, white hair, school uniform, sitting at desk, classroom, morning light, soft shadows, chalk board background, masterpiece, best quality</code></td>
+          <td>7.5</td>
+          <td>標準シーン。LoRA のみで安定</td>
+        </tr>
+        <tr>
+          <td><strong>廊下 / 驚き</strong></td>
+          <td><code>yuki, 1girl, white hair, school uniform, standing in hallway, surprised expression, wide eyes, open mouth, lockers background, dynamic angle, manga style</code></td>
+          <td>8.0</td>
+          <td>表情の激しさに合わせ cfg を上げる</td>
+        </tr>
+        <tr>
+          <td><strong>屋上 / 夕暮れ</strong></td>
+          <td><code>yuki, 1girl, white hair, school uniform, rooftop, sunset sky, orange light, hair blowing in wind, peaceful expression, scenic background, cinematic</code></td>
+          <td>7.0</td>
+          <td>背景重視。cfg を下げて自然な光に</td>
+        </tr>
+        <tr>
+          <td><strong>夜 / 泣き顔</strong></td>
+          <td><code>yuki, 1girl, white hair, casual clothes, bedroom, night, tears on cheek, sad expression, moonlight, blue tones, emotional, close-up face</code></td>
+          <td>7.5</td>
+          <td>クローズアップは 768×768 に変更</td>
+        </tr>
+        <tr>
+          <td><strong>アクション / 走る</strong></td>
+          <td><code>yuki, 1girl, white hair, school uniform, running, motion blur, hallway, desperate expression, dynamic pose, speed lines background</code></td>
+          <td>8.5</td>
+          <td>Openpose ControlNet でポーズ固定必須</td>
+        </tr>
+        <tr>
+          <td><strong>2ショット / 会話</strong></td>
+          <td><code>yuki and ami, 2girls, school uniforms, rooftop, talking, facing each other, blue sky, afternoon, friendship, manga style</code></td>
+          <td>7.5</td>
+          <td>複数キャラ → Section 11 の多キャラフロー使用</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 style="margin-top:20px;margin-bottom:8px">一貫性チェック付き生成ループ</h3>
+    <pre class="code"><span class="kw">import</span> yaml, json, copy, random
+<span class="kw">from</span> pathlib <span class="kw">import</span> Path
+<span class="c"># clip_similarity は open_clip などで実装</span>
+<span class="kw">from</span> clip_utils <span class="kw">import</span> compute_clip_similarity
+
+<span class="kw">def</span> <span class="fn">load_character</span>(char_yaml_path: str) -&gt; dict:
+    <span class="kw">with</span> open(char_yaml_path) <span class="kw">as</span> f:
+        <span class="kw">return</span> yaml.safe_load(f)
+
+<span class="kw">def</span> <span class="fn">generate_consistent_panel</span>(
+    scene: dict,
+    character: dict,
+    base_workflow: dict,
+    max_attempts: int = <span class="n">5</span>
+) -&gt; Path | <span class="kw">None</span>:
+    <span class="s">"""CLIP スコアが閾値を超えるまで再生成する"""</span>
+    ref_image = character[<span class="s">"reference_image"</span>]
+    threshold = character[<span class="s">"clip_threshold"</span>]
+
+    <span class="kw">for</span> attempt <span class="kw">in</span> range(max_attempts):
+        wf = copy.deepcopy(base_workflow)
+
+        <span class="c"># キャラクター LoRA を設定</span>
+        wf[<span class="s">"lora"</span>][<span class="s">"inputs"</span>][<span class="s">"lora_name"</span>] = character[<span class="s">"lora"</span>]
+        wf[<span class="s">"lora"</span>][<span class="s">"inputs"</span>][<span class="s">"strength_model"</span>] = character[<span class="s">"lora_strength"</span>]
+
+        <span class="c"># プロンプト合成（trigger words + scene prompt）</span>
+        full_prompt = f<span class="s">"{character['trigger_words']}, {scene['prompt']}"</span>
+        wf[<span class="s">"clip_pos"</span>][<span class="s">"inputs"</span>][<span class="s">"text"</span>] = full_prompt
+        wf[<span class="s">"clip_neg"</span>][<span class="s">"inputs"</span>][<span class="s">"text"</span>] = character[<span class="s">"negative_base"</span>]
+
+        <span class="c"># cfg とシード</span>
+        wf[<span class="s">"sampler"</span>][<span class="s">"inputs"</span>][<span class="s">"cfg"</span>] = scene.get(<span class="s">"cfg"</span>, <span class="n">7.5</span>)
+        wf[<span class="s">"sampler"</span>][<span class="s">"inputs"</span>][<span class="s">"seed"</span>] = (
+            scene.get(<span class="s">"seed"</span>) <span class="kw">if</span> attempt == <span class="n">0</span>
+            <span class="kw">else</span> random.randint(<span class="n">0</span>, <span class="n">999999999</span>)  <span class="c"># リトライは別シード</span>
+        )
+
+        paths = generate_panel(wf, save_dir=f<span class="s">"output/{scene['id']}/attempt_{attempt}"</span>)
+        <span class="kw">if</span> <span class="kw">not</span> paths:
+            <span class="kw">continue</span>
+
+        <span class="c"># CLIP スコアでキャラクター一致度を検証</span>
+        score = compute_clip_similarity(str(paths[<span class="n">0</span>]), ref_image)
+        print(f<span class="s">"  [{scene['id']}] attempt {attempt}: CLIP={score:.3f} (threshold={threshold})"</span>)
+
+        <span class="kw">if</span> score &gt;= threshold:
+            <span class="kw">return</span> paths[<span class="n">0</span>]  <span class="c"># 合格</span>
+
+    <span class="c"># 全試行失敗 → HITL にエスカレーション</span>
+    print(f<span class="s">"  [{scene['id']}] CLIP threshold not met after {max_attempts} attempts → HITL"</span>)
+    <span class="kw">return</span> <span class="kw">None</span>
+
+<span class="c"># 実行例</span>
+char = load_character(<span class="s">"characters/yuki.yaml"</span>)
+scenes = [
+    {<span class="s">"id"</span>: <span class="s">"s001"</span>, <span class="s">"prompt"</span>: <span class="s">"sitting at desk, classroom, morning light"</span>, <span class="s">"cfg"</span>: <span class="n">7.5</span>},
+    {<span class="s">"id"</span>: <span class="s">"s002"</span>, <span class="s">"prompt"</span>: <span class="s">"running in hallway, surprised"</span>, <span class="s">"cfg"</span>: <span class="n">8.0</span>},
+    {<span class="s">"id"</span>: <span class="s">"s003"</span>, <span class="s">"prompt"</span>: <span class="s">"rooftop, sunset, hair blowing in wind"</span>, <span class="s">"cfg"</span>: <span class="n">7.0</span>},
+]
+<span class="kw">with</span> open(<span class="s">"workflow_char_consistent.json"</span>) <span class="kw">as</span> f:
+    base_wf = json.load(f)
+
+<span class="kw">for</span> scene <span class="kw">in</span> scenes:
+    result = generate_consistent_panel(scene, char, base_wf)
+    print(<span class="s">"OK:"</span> <span class="kw">if</span> result <span class="kw">else</span> <span class="s">"HITL:"</span>, scene[<span class="s">"id"</span>])</pre>
+  </div>
+
+  <!-- 実例 B: 感情・表情バリエーション -->
+  <div class="panel" id="ex-b">
+    <div class="section-id">実例 B</div>
+    <h2>感情・表情バリエーション生成 — seed ×表情プロンプトの組み合わせ</h2>
+    <p>同じポーズのキャラクターを「喜・怒・哀・驚・照れ」5表情で生成する実例。seed と表情プロンプトを変えるだけで統一感を保ちながらバリエーションを出す。</p>
+
+    <div class="grid2">
+      <div>
+        <h3 style="margin-bottom:8px">表情プロンプト辞書</h3>
+        <pre class="code"><span class="n">EMOTION_PROMPTS</span> = {
+  <span class="s">"joy"</span>: <span class="s">"happy expression, big smile, eyes closed, cheerful"</span>,
+  <span class="s">"anger"</span>: <span class="s">"angry expression, furrowed brows, gritted teeth, flushed cheeks"</span>,
+  <span class="s">"sadness"</span>: <span class="s">"sad expression, teary eyes, downcast, trembling lips"</span>,
+  <span class="s">"surprise"</span>: <span class="s">"surprised expression, wide eyes, open mouth, shocked"</span>,
+  <span class="s">"shy"</span>: <span class="s">"embarrassed expression, blushing cheeks, looking away, shy smile"</span>,
+  <span class="s">"neutral"</span>: <span class="s">"calm expression, gentle smile, soft gaze"</span>,
+  <span class="s">"serious"</span>: <span class="s">"serious expression, determined eyes, firm mouth, focused"</span>,
+}
+
+<span class="kw">def</span> <span class="fn">generate_emotion_set</span>(
+    character: dict,
+    base_scene: str,
+    base_workflow: dict,
+    base_seed: int = <span class="n">42</span>,
+) -&gt; dict[str, Path]:
+    <span class="s">"""5感情分を一括生成。base_seed + index でバリエーション"""</span>
+    results = {}
+    <span class="kw">for</span> i, (emotion, emotion_prompt) <span class="kw">in</span> enumerate(EMOTION_PROMPTS.items()):
+        wf = copy.deepcopy(base_workflow)
+        full_prompt = (
+            f<span class="s">"{character['trigger_words']}, {base_scene}, {emotion_prompt}"</span>
+        )
+        wf[<span class="s">"clip_pos"</span>][<span class="s">"inputs"</span>][<span class="s">"text"</span>] = full_prompt
+        wf[<span class="s">"sampler"</span>][<span class="s">"inputs"</span>][<span class="s">"seed"</span>] = base_seed + i
+        paths = generate_panel(wf, save_dir=f<span class="s">"output/emotions/{emotion}"</span>)
+        results[emotion] = paths[<span class="n">0</span>] <span class="kw">if</span> paths <span class="kw">else</span> <span class="kw">None</span>
+    <span class="kw">return</span> results</pre>
+      </div>
+      <div>
+        <h3 style="margin-bottom:8px">表情と cfg の関係</h3>
+        <table>
+          <thead><tr><th>表情</th><th>推奨 cfg</th><th>理由</th></tr></thead>
+          <tbody>
+            <tr><td>joy / shy</td><td>7.0〜7.5</td><td>自然な笑顔は低めで柔らかく</td></tr>
+            <tr><td>neutral</td><td>7.5</td><td>標準</td></tr>
+            <tr><td>anger</td><td>8.0〜8.5</td><td>強い表情はプロンプト追従を強める</td></tr>
+            <tr><td>surprise</td><td>8.0</td><td>変化の大きい表情に</td></tr>
+            <tr><td>sadness</td><td>7.0〜7.5</td><td>細かいニュアンスは低めで</td></tr>
+          </tbody>
+        </table>
+
+        <div class="note" style="margin-top:12px">
+          <strong>ヒント:</strong> <code>base_seed + i</code> で各感情に異なる seed を使うことで、LoRA によるキャラクター固定を維持しながら表情ごとに異なる「自然な揺れ」を演出できる。全て同一 seed にするとポーズまで完全一致してしまう。
+        </div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:20px;margin-bottom:8px">コマ内での感情変化シーケンス（実際の漫画ページ例）</h3>
+    <div style="background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:12px;padding:16px">
+      <p style="margin:0 0 10px;font-size:.85rem;color:var(--muted);">告白シーン（5コマ）: 告白される → 驚き → 混乱 → 照れ → 笑顔</p>
+      <pre class="code" style="margin:0">confession_scene = [
+  {<span class="s">"id"</span>: <span class="s">"c001"</span>, <span class="s">"prompt"</span>: <span class="s">"classroom after school, standing, listening, neutral expression, anticipation"</span>, <span class="s">"cfg"</span>: <span class="n">7.5</span>},
+  {<span class="s">"id"</span>: <span class="s">"c002"</span>, <span class="s">"prompt"</span>: <span class="s">"close-up face, shocked expression, wide eyes, open mouth, sunset background"</span>, <span class="s">"cfg"</span>: <span class="n">8.0</span>, <span class="s">"width"</span>: <span class="n">768</span>, <span class="s">"height"</span>: <span class="n">768</span>},
+  {<span class="s">"id"</span>: <span class="s">"c003"</span>, <span class="s">"prompt"</span>: <span class="s">"looking down, troubled expression, hands clasped, conflicted, warm light"</span>, <span class="s">"cfg"</span>: <span class="n">7.5</span>},
+  {<span class="s">"id"</span>: <span class="s">"c004"</span>, <span class="s">"prompt"</span>: <span class="s">"turning head away, blushing cheeks, shy smile, embarrassed, golden hour"</span>, <span class="s">"cfg"</span>: <span class="n">7.0</span>},
+  {<span class="s">"id"</span>: <span class="s">"c005"</span>, <span class="s">"prompt"</span>: <span class="s">"looking at camera, radiant smile, hopeful eyes, soft bokeh background"</span>, <span class="s">"cfg"</span>: <span class="n">7.0</span>, <span class="s">"width"</span>: <span class="n">832</span>, <span class="s">"height"</span>: <span class="n">1216</span>},
+]</pre>
+    </div>
+  </div>
+
+  <!-- 実例 C: 顔修正 (ADetailer) -->
+  <div class="panel panel-orange" id="ex-c">
+    <div class="section-id">実例 C</div>
+    <h2>顔修正フロー — ADetailer 相当の実装</h2>
+    <p>バッチ生成後に顔部分だけを再生成して品質を底上げする。ComfyUI では「顔を検出→クロップ→img2img→貼り戻す」ノードチェーンで ADetailer と同等の処理を実現する。</p>
+
+    <div class="two-col">
+      <div>
+        <h3 style="margin-bottom:8px">処理フロー</h3>
+        <div style="background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:12px;padding:14px">
+          <div class="flow-row"><div class="flow-node">LoadImage（生成済みコマ）</div></div>
+          <div class="flow-arrow">↓</div>
+          <div class="flow-row"><div class="flow-node purple">FaceDetailer / UltralyticsDetectorProvider</div><span class="flow-sep"> 顔の bbox 検出</span></div>
+          <div class="flow-arrow">↓</div>
+          <div class="flow-row"><div class="flow-node orange">Crop + Upscale (64→512 px)</div></div>
+          <div class="flow-arrow">↓</div>
+          <div class="flow-row"><div class="flow-node">KSampler (denoise: 0.4〜0.6)</div><span class="flow-sep"> 顔だけ再生成</span></div>
+          <div class="flow-arrow">↓</div>
+          <div class="flow-row"><div class="flow-node green">Paste Back（元画像に合成）</div></div>
+          <div class="flow-arrow">↓</div>
+          <div class="flow-row"><div class="flow-node green">SaveImage</div></div>
+        </div>
+      </div>
+      <div>
+        <h3 style="margin-bottom:8px">顔修正 JSON（主要部分）</h3>
+        <pre class="code">{
+  <span class="s">"face_bbox"</span>: {
+    <span class="s">"class_type"</span>: <span class="s">"FaceDetailer"</span>,
+    <span class="s">"inputs"</span>: {
+      <span class="s">"image"</span>: [<span class="s">"load_original"</span>, <span class="n">0</span>],
+      <span class="s">"model"</span>: [<span class="s">"lora"</span>, <span class="n">0</span>],
+      <span class="s">"positive"</span>: [<span class="s">"clip_pos"</span>, <span class="n">0</span>],
+      <span class="s">"negative"</span>: [<span class="s">"clip_neg"</span>, <span class="n">0</span>],
+      <span class="s">"vae"</span>: [<span class="s">"checkpoint"</span>, <span class="n">2</span>],
+      <span class="s">"bbox_detector"</span>: [<span class="s">"bbox_model"</span>, <span class="n">0</span>],
+      <span class="s">"guide_size"</span>: <span class="n">512</span>,
+      <span class="s">"denoise"</span>: <span class="n">0.5</span>,    <span class="c">// 強く変えすぎない</span>
+      <span class="s">"steps"</span>: <span class="n">20</span>,
+      <span class="s">"cfg"</span>: <span class="n">8.0</span>,
+      <span class="s">"feather"</span>: <span class="n">20</span>      <span class="c">// 境界をぼかして自然に合成</span>
+    }
+  }
+}</pre>
+        <div class="warn" style="margin-top:10px">
+          <strong>denoise の設定:</strong> 0.4 以下では変化が少なくなる（線を維持したい場合）。0.6 以上では顔が別人になるリスク。0.45〜0.55 が最も安全。
+        </div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:20px;margin-bottom:8px">Python での後処理バッチ適用</h3>
+    <pre class="code"><span class="kw">from</span> pathlib <span class="kw">import</span> Path
+
+<span class="kw">def</span> <span class="fn">apply_face_fix_to_chapter</span>(
+    chapter_dir: str,
+    face_workflow_path: str,
+    quality_threshold: float = <span class="n">0.55</span>
+) -&gt; dict:
+    <span class="s">"""chapter_dir 内の全コマに顔修正を適用"""</span>
+    chapter_path = Path(chapter_dir)
+    panels = list(chapter_path.glob(<span class="s">"**/*.png"</span>))
+    results = {<span class="s">"fixed"</span>: <span class="n">0</span>, <span class="s">"skipped"</span>: <span class="n">0</span>}
+
+    <span class="kw">with</span> open(face_workflow_path) <span class="kw">as</span> f:
+        face_wf = json.load(f)
+
+    <span class="kw">for</span> panel_path <span class="kw">in</span> sorted(panels):
+        <span class="c"># 顔検出スコアが低い場合のみ修正（不要な書き換えを避ける）</span>
+        face_score = evaluate_face_quality(str(panel_path))
+        <span class="kw">if</span> face_score &gt;= quality_threshold:
+            results[<span class="s">"skipped"</span>] += <span class="n">1</span>
+            <span class="kw">continue</span>
+
+        face_wf[<span class="s">"load_original"</span>][<span class="s">"inputs"</span>][<span class="s">"image"</span>] = str(panel_path.name)
+        fixed_paths = generate_panel(face_wf, save_dir=str(panel_path.parent))
+
+        <span class="kw">if</span> fixed_paths:
+            <span class="c"># 元ファイルを上書き保存</span>
+            panel_path.write_bytes(fixed_paths[<span class="n">0</span>].read_bytes())
+            results[<span class="s">"fixed"</span>] += <span class="n">1</span>
+
+    print(f<span class="s">"顔修正: {results['fixed']} 枚修正 / {results['skipped']} 枚スキップ"</span>)
+    <span class="kw">return</span> results</pre>
+  </div>
+
+  <!-- 実例 D: アップスケール -->
+  <div class="panel" id="ex-d">
+    <div class="section-id">実例 D</div>
+    <h2>アップスケール — 832×1216 → 1664×2432（2×）</h2>
+    <p>生成した漫画コマを印刷・高解像度公開用に 2× アップスケールする。ComfyUI では「UpscaleModelLoader → ImageUpscaleWithModel → KSampler」の 2 段階で行う。</p>
+
+    <div class="grid2">
+      <div>
+        <h3 style="margin-bottom:8px">2段階アップスケール JSON</h3>
+        <pre class="code">{
+  <span class="c">// ① アップスケールモデルで 2× 拡大</span>
+  <span class="s">"upscale_loader"</span>: {
+    <span class="s">"class_type"</span>: <span class="s">"UpscaleModelLoader"</span>,
+    <span class="s">"inputs"</span>: { <span class="s">"model_name"</span>: <span class="s">"4xUltraSharp.pth"</span> }
+  },
+  <span class="s">"upscale_img"</span>: {
+    <span class="s">"class_type"</span>: <span class="s">"ImageUpscaleWithModel"</span>,
+    <span class="s">"inputs"</span>: {
+      <span class="s">"upscale_model"</span>: [<span class="s">"upscale_loader"</span>, <span class="n">0</span>],
+      <span class="s">"image"</span>: [<span class="s">"load_original"</span>, <span class="n">0</span>]
+    }
+  },
+
+  <span class="c">// ② img2img で HDR ディテール付与 (denoise 低め)</span>
+  <span class="s">"encode_upscaled"</span>: {
+    <span class="s">"class_type"</span>: <span class="s">"VAEEncode"</span>,
+    <span class="s">"inputs"</span>: {
+      <span class="s">"pixels"</span>: [<span class="s">"upscale_img"</span>, <span class="n">0</span>],
+      <span class="s">"vae"</span>: [<span class="s">"checkpoint"</span>, <span class="n">2</span>]
+    }
+  },
+  <span class="s">"refine_sampler"</span>: {
+    <span class="s">"class_type"</span>: <span class="s">"KSampler"</span>,
+    <span class="s">"inputs"</span>: {
+      <span class="s">"model"</span>: [<span class="s">"lora"</span>, <span class="n">0</span>],
+      <span class="s">"positive"</span>: [<span class="s">"clip_pos"</span>, <span class="n">0</span>],
+      <span class="s">"negative"</span>: [<span class="s">"clip_neg"</span>, <span class="n">0</span>],
+      <span class="s">"latent_image"</span>: [<span class="s">"encode_upscaled"</span>, <span class="n">0</span>],
+      <span class="s">"seed"</span>: <span class="n">42</span>, <span class="s">"steps"</span>: <span class="n">15</span>, <span class="s">"cfg"</span>: <span class="n">6.0</span>,
+      <span class="s">"sampler_name"</span>: <span class="s">"euler_ancestral"</span>,
+      <span class="s">"scheduler"</span>: <span class="s">"karras"</span>,
+      <span class="s">"denoise"</span>: <span class="n">0.25</span>   <span class="c">// 低め: 構造を保ちディテールのみ強化</span>
+    }
+  }
+}</pre>
+      </div>
+      <div>
+        <h3 style="margin-bottom:8px">アップスケールモデル比較</h3>
+        <table>
+          <thead><tr><th>モデル</th><th>特性</th><th>向いているもの</th></tr></thead>
+          <tbody>
+            <tr><td><strong>4xUltraSharp</strong></td><td>シャープ・高コントラスト</td><td>漫画・イラスト</td></tr>
+            <tr><td><strong>4xRealESRGAN</strong></td><td>写実的・自然なディテール</td><td>写真・実写系</td></tr>
+            <tr><td><strong>4xAnime6B</strong></td><td>アニメ特化・線画維持</td><td>アニメ塗り</td></tr>
+            <tr><td><strong>2xHFA2kAVCOmniSR</strong></td><td>軽量・高速</td><td>バッチ処理優先時</td></tr>
+          </tbody>
+        </table>
+
+        <div class="card card-accent" style="margin-top:12px;padding:14px">
+          <h3>ControlNet Tile との組み合わせ</h3>
+          <p style="font-size:.85rem;">アップスケール画像を ControlNet Tile の参照に使うと、元の構図・色調を維持しながら高解像度の細部（毛髪・衣服の皺）を精密に描き足せる。denoise は 0.3〜0.4 で。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 実例 E: 完全な制作スクリプト -->
+  <div class="panel panel-purple" id="ex-e">
+    <div class="section-id">実例 E</div>
+    <h2>完全な 1 話制作スクリプト — スクリプトから完成コマまで</h2>
+    <p>YAML で書いた脚本から、生成 → 顔修正 → アップスケール → ZIP 圧縮まで全自動で行う本番用スクリプト。manga-pipeline との接続ポイントも含む。</p>
+
+    <h3 style="margin-bottom:8px">脚本 YAML 形式</h3>
+    <pre class="code"><span class="c"># script/chapter01.yaml</span>
+chapter: <span class="n">1</span>
+title: <span class="s">"出会い"</span>
+character_default: <span class="s">"characters/yuki.yaml"</span>
+
+panels:
+  - id: p001
+    type: establishing   <span class="c"># establishing / action / close-up / two-shot</span>
+    prompt: <span class="s">"school exterior, spring morning, cherry blossoms, wide shot"</span>
+    character: <span class="kw">null</span>      <span class="c"># 背景のみ</span>
+    width: <span class="n">1216</span>
+    height: <span class="n">832</span>
+    cfg: <span class="n">6.5</span>
+
+  - id: p002
+    type: action
+    prompt: <span class="s">"running through school gate, school bag, late, hurried"</span>
+    character: <span class="s">"characters/yuki.yaml"</span>
+    cfg: <span class="n">8.0</span>
+    lora_weight: <span class="n">0.85</span>
+
+  - id: p003
+    type: close-up
+    prompt: <span class="s">"close-up face, surprised expression, wide eyes, cherry blossom petals"</span>
+    character: <span class="s">"characters/yuki.yaml"</span>
+    width: <span class="n">768</span>
+    height: <span class="n">768</span>
+    cfg: <span class="n">8.0</span>
+    face_fix: <span class="kw">true</span>       <span class="c"># 顔修正フラグ</span>
+
+  - id: p004
+    type: two-shot
+    prompt: <span class="s">"yuki and new transfer student, classroom, introduction scene, both standing"</span>
+    character: <span class="s">"characters/yuki.yaml"</span>
+    extra_character: <span class="s">"characters/ami.yaml"</span>
+    cfg: <span class="n">7.5</span>
+
+  - id: p005
+    type: close-up
+    prompt: <span class="s">"blushing cheeks, shy smile, looking down, first meeting nervous"</span>
+    character: <span class="s">"characters/yuki.yaml"</span>
+    width: <span class="n">768</span>
+    height: <span class="n">768</span>
+    face_fix: <span class="kw">true</span>
+    upscale: <span class="kw">true</span>        <span class="c"># 重要コマはアップスケール</span></pre>
+
+    <h3 style="margin-top:20px;margin-bottom:8px">メイン実行スクリプト</h3>
+    <pre class="code"><span class="kw">import</span> yaml, json, zipfile
+<span class="kw">from</span> pathlib <span class="kw">import</span> Path
+<span class="kw">from</span> datetime <span class="kw">import</span> datetime
+
+<span class="kw">class</span> <span class="n">ChapterPipeline</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, base_workflows_dir: str):
+        self.workflows = {
+            <span class="s">"txt2img"</span>:  self._load_wf(f<span class="s">"{base_workflows_dir}/txt2img.json"</span>),
+            <span class="s">"face_fix"</span>: self._load_wf(f<span class="s">"{base_workflows_dir}/face_fix.json"</span>),
+            <span class="s">"upscale"</span>:  self._load_wf(f<span class="s">"{base_workflows_dir}/upscale.json"</span>),
+        }
+
+    <span class="kw">def</span> <span class="fn">_load_wf</span>(self, path: str) -&gt; dict:
+        <span class="kw">with</span> open(path) <span class="kw">as</span> f: <span class="kw">return</span> json.load(f)
+
+    <span class="kw">def</span> <span class="fn">run</span>(self, script_path: str, output_dir: str) -&gt; Path:
+        <span class="kw">with</span> open(script_path) <span class="kw">as</span> f:
+            script = yaml.safe_load(f)
+
+        chapter_id = f<span class="s">"ch{script['chapter']:02d}"</span>
+        out = Path(output_dir) / chapter_id
+        out.mkdir(parents=True, exist_ok=True)
+        log = []
+
+        <span class="kw">for</span> panel <span class="kw">in</span> script[<span class="s">"panels"</span>]:
+            print(f<span class="s">"▶ [{panel['id']}] {panel['type']}: {panel['prompt'][:50]}..."</span>)
+
+            <span class="c"># 1. メイン生成</span>
+            char = yaml.safe_load(open(panel[<span class="s">"character"</span>])) <span class="kw">if</span> panel.get(<span class="s">"character"</span>) <span class="kw">else</span> <span class="kw">None</span>
+            path = self._generate(panel, char)
+
+            <span class="c"># 2. 顔修正（フラグがある場合）</span>
+            <span class="kw">if</span> panel.get(<span class="s">"face_fix"</span>) <span class="kw">and</span> path:
+                path = self._face_fix(path, char)
+
+            <span class="c"># 3. アップスケール（フラグがある場合）</span>
+            <span class="kw">if</span> panel.get(<span class="s">"upscale"</span>) <span class="kw">and</span> path:
+                path = self._upscale(path, char)
+
+            <span class="c"># 4. 最終コマをコピー</span>
+            <span class="kw">if</span> path:
+                dest = out / f<span class="s">"{panel['id']}.png"</span>
+                dest.write_bytes(path.read_bytes())
+                log.append({<span class="s">"id"</span>: panel[<span class="s">"id"</span>], <span class="s">"status"</span>: <span class="s">"ok"</span>, <span class="s">"path"</span>: str(dest)})
+                print(f<span class="s">"  ✓ 保存: {dest}"</span>)
+            <span class="kw">else</span>:
+                log.append({<span class="s">"id"</span>: panel[<span class="s">"id"</span>], <span class="s">"status"</span>: <span class="s">"failed"</span>})
+                print(f<span class="s">"  ✗ 失敗: {panel['id']} → HITL キュー追加"</span>)
+
+        <span class="c"># 5. 完成コマを ZIP にまとめる</span>
+        zip_path = out.parent / f<span class="s">"{chapter_id}_{datetime.now():%Y%m%d_%H%M}.zip"</span>
+        <span class="kw">with</span> zipfile.ZipFile(zip_path, <span class="s">"w"</span>) <span class="kw">as</span> zf:
+            <span class="kw">for</span> png <span class="kw">in</span> sorted(out.glob(<span class="s">"*.png"</span>)):
+                zf.write(png, png.name)
+
+        success = sum(<span class="n">1</span> <span class="kw">for</span> l <span class="kw">in</span> log <span class="kw">if</span> l[<span class="s">"status"</span>] == <span class="s">"ok"</span>)
+        print(f<span class="s">"\n{'='*50}"</span>)
+        print(f<span class="s">"第{script['chapter']}話「{script['title']}」完了"</span>)
+        print(f<span class="s">"成功: {success}/{len(log)} コマ → {zip_path}"</span>)
+        <span class="kw">return</span> zip_path
+
+    <span class="kw">def</span> <span class="fn">_generate</span>(self, panel: dict, char: dict | <span class="kw">None</span>) -&gt; Path | <span class="kw">None</span>:
+        wf = copy.deepcopy(self.workflows[<span class="s">"txt2img"</span>])
+        base_prompt = panel[<span class="s">"prompt"</span>]
+        <span class="kw">if</span> char:
+            base_prompt = f<span class="s">"{char['trigger_words']}, {base_prompt}"</span>
+            wf[<span class="s">"lora"</span>][<span class="s">"inputs"</span>][<span class="s">"lora_name"</span>] = char[<span class="s">"lora"</span>]
+            wf[<span class="s">"lora"</span>][<span class="s">"inputs"</span>][<span class="s">"strength_model"</span>] = panel.get(<span class="s">"lora_weight"</span>, char[<span class="s">"lora_strength"</span>])
+        wf[<span class="s">"clip_pos"</span>][<span class="s">"inputs"</span>][<span class="s">"text"</span>] = base_prompt
+        wf[<span class="s">"sampler"</span>][<span class="s">"inputs"</span>][<span class="s">"cfg"</span>] = panel.get(<span class="s">"cfg"</span>, <span class="n">7.5</span>)
+        wf[<span class="s">"latent"</span>][<span class="s">"inputs"</span>][<span class="s">"width"</span>] = panel.get(<span class="s">"width"</span>, <span class="n">832</span>)
+        wf[<span class="s">"latent"</span>][<span class="s">"inputs"</span>][<span class="s">"height"</span>] = panel.get(<span class="s">"height"</span>, <span class="n">1216</span>)
+        paths = generate_panel(wf, save_dir=f<span class="s">"tmp/{panel['id']}"</span>)
+        <span class="kw">return</span> paths[<span class="n">0</span>] <span class="kw">if</span> paths <span class="kw">else</span> <span class="kw">None</span>
+
+    <span class="kw">def</span> <span class="fn">_face_fix</span>(self, path: Path, char: dict | <span class="kw">None</span>) -&gt; Path:
+        wf = copy.deepcopy(self.workflows[<span class="s">"face_fix"</span>])
+        wf[<span class="s">"load_original"</span>][<span class="s">"inputs"</span>][<span class="s">"image"</span>] = str(path.name)
+        <span class="kw">if</span> char:
+            wf[<span class="s">"lora"</span>][<span class="s">"inputs"</span>][<span class="s">"lora_name"</span>] = char[<span class="s">"lora"</span>]
+        paths = generate_panel(wf, save_dir=str(path.parent))
+        <span class="kw">return</span> paths[<span class="n">0</span>] <span class="kw">if</span> paths <span class="kw">else</span> path
+
+    <span class="kw">def</span> <span class="fn">_upscale</span>(self, path: Path, char: dict | <span class="kw">None</span>) -&gt; Path:
+        wf = copy.deepcopy(self.workflows[<span class="s">"upscale"</span>])
+        wf[<span class="s">"load_original"</span>][<span class="s">"inputs"</span>][<span class="s">"image"</span>] = str(path.name)
+        <span class="kw">if</span> char:
+            wf[<span class="s">"lora"</span>][<span class="s">"inputs"</span>][<span class="s">"lora_name"</span>] = char[<span class="s">"lora"</span>]
+        paths = generate_panel(wf, save_dir=str(path.parent))
+        <span class="kw">return</span> paths[<span class="n">0</span>] <span class="kw">if</span> paths <span class="kw">else</span> path
+
+<span class="c"># 実行</span>
+<span class="kw">if</span> __name__ == <span class="s">"__main__"</span>:
+    pipeline = ChapterPipeline(base_workflows_dir=<span class="s">"workflows/"</span>)
+    zip_path = pipeline.run(<span class="s">"script/chapter01.yaml"</span>, output_dir=<span class="s">"output/"</span>)
+    print(f<span class="s">"配信用 ZIP: {zip_path}"</span>)</pre>
+
+    <div class="note">
+      この <code>ChapterPipeline</code> クラスは manga-pipeline.html の Python API セクションと接続されている。OpenClaw の HITL キューへの投げ込みは <code>request_human_review()</code> を呼ぶだけで良い。詳細は <a href="../../creator-system/manga-pipeline.html">manga-pipeline.html</a> を参照。
+    </div>
+  </div>
+
+  <!-- 実例 F: プロンプト作法とよくある改善パターン -->
+  <div class="panel" id="ex-f">
+    <div class="section-id">実例 F</div>
+    <h2>プロンプト作法 — 品質を上げる実践パターン集</h2>
+
+    <div class="grid2">
+      <div>
+        <h3 style="margin-bottom:8px">構造化プロンプトテンプレート</h3>
+        <pre class="code"><span class="c"># SDXL 向けの推奨プロンプト構造</span>
+
+<span class="c"># Positive プロンプト</span>
+<span class="s">"""
+[キャラクター識別子],            # trigger words
+[人数・性別],                    # 1girl / 2girls / 1boy
+[容姿特徴],                      # white hair, blue eyes
+[衣装],                          # school uniform / casual
+[表情・ポーズ],                  # smiling, standing, arms raised
+[アクション],                    # running / sitting / looking at viewer
+[場所・背景],                    # classroom / rooftop / park
+[時間・光源],                    # morning light / sunset / moonlight
+[構図指定],                      # close-up / wide shot / from above
+[画質タグ],                      # masterpiece, best quality, highly detailed
+[スタイル],                      # anime style / manga style / illustration
+"""</span>
+
+<span class="c"># Negative プロンプト（共通）</span>
+NEGATIVE_BASE = <span class="s">"""
+lowres, bad anatomy, bad hands, missing fingers,
+extra digit, fewer digits, worst quality, low quality,
+blurry, jpeg artifacts, watermark, signature,
+ugly, deformed, mutated, poorly drawn face,
+nsfw, nude
+"""</span></pre>
+      </div>
+      <div>
+        <h3 style="margin-bottom:8px">よくある問題と改善プロンプト</h3>
+        <table>
+          <thead><tr><th>問題</th><th>追加するプロンプト</th></tr></thead>
+          <tbody>
+            <tr><td>手・指が崩れる</td><td>Positive に <code>perfect hands, detailed fingers</code><br>Negative に <code>extra fingers, missing fingers, bad hands</code></td></tr>
+            <tr><td>顔が平坦</td><td><code>detailed face, beautiful detailed eyes, eyelashes</code></td></tr>
+            <tr><td>背景がぼやける</td><td><code>detailed background, architectural detail, sharp background</code></td></tr>
+            <tr><td>衣服がのっぺり</td><td><code>fabric texture, clothing wrinkles, detailed clothing</code></td></tr>
+            <tr><td>光源が不自然</td><td><code>volumetric lighting, ray tracing, caustics</code>（写実系）<br><code>flat color, soft shading, cel shading</code>（アニメ系）</td></tr>
+            <tr><td>構図が毎回似る</td><td>プロンプトに <code>from above</code> / <code>low angle</code> / <code>side view</code> / <code>three-quarter view</code> を追加</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <h3 style="margin-top:20px;margin-bottom:8px">シーンタイプ別プロンプト雛形集</h3>
+    <div class="grid3">
+      <div class="card card-accent">
+        <h3>アクション / 動きのあるシーン</h3>
+        <pre class="code" style="margin:6px 0 0;font-size:.76rem">dynamic pose, motion blur,
+speed lines, action shot,
+dramatic angle, wind effect,
+flowing hair and clothing</pre>
+      </div>
+      <div class="card card-purple">
+        <h3>会話 / 感情的シーン</h3>
+        <pre class="code" style="margin:6px 0 0;font-size:.76rem">facing each other, eye contact,
+soft bokeh background,
+emotional lighting, warm tones,
+intimate framing</pre>
+      </div>
+      <div class="card card-orange">
+        <h3>回想 / 夢シーン</h3>
+        <pre class="code" style="margin:6px 0 0;font-size:.76rem">dreamy atmosphere, soft focus,
+light particles, pastel tones,
+vignette, ethereal lighting,
+monochrome with color accents</pre>
+      </div>
+      <div class="card">
+        <h3>背景のみ（俯瞰・引き）</h3>
+        <pre class="code" style="margin:6px 0 0;font-size:.76rem">wide establishing shot,
+no characters, architectural detail,
+depth of field, golden hour,
+photo-realistic background</pre>
+      </div>
+      <div class="card">
+        <h3>クローズアップ（顔）</h3>
+        <pre class="code" style="margin:6px 0 0;font-size:.76rem">portrait, close-up face,
+detailed eyes, eyelashes,
+skin texture, hair detail,
+dramatic lighting, 768x768</pre>
+      </div>
+      <div class="card">
+        <h3>コメディ / デフォルメ</h3>
+        <pre class="code" style="margin:6px 0 0;font-size:.76rem">chibi, super deformed, SD,
+exaggerated expression,
+sweat drop, shock lines,
+pastel colors, cute style</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- 関連リンク -->
+  <div class="panel">
+    <h2>関連リンク</h2>
+    <div class="grid3">
+      <div class="card card-accent">
+        <h3>AI Creator Hub</h3>
+        <ul>
+          <li><a href="../../creator-system/manga-pipeline.html">漫画パイプライン</a> — LoRA フォールバック・複数キャラ同フレーム対応</li>
+          <li><a href="../../creator-system/video-pipeline.html">動画パイプライン</a></li>
+          <li><a href="../../creator-system/openclaw.html">OpenClaw</a> — HITL・フォールバックエンジン</li>
+        </ul>
+      </div>
+      <div class="card card-purple">
+        <h3>Knowledge Hub 関連ページ</h3>
+        <ul>
+          <li><a href="ai-creative.html">AI × クリエイティブ</a></li>
+          <li><a href="index.html">Knowledge Hub 一覧</a></li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>外部リファレンス</h3>
+        <ul>
+          <li>ComfyUI GitHub: <a href="https://github.com/comfyanonymous/ComfyUI">comfyanonymous/ComfyUI</a></li>
+          <li>ComfyUI_IPAdapter_plus: カスタムノードリポジトリ</li>
+          <li>ComfyUI Manager: ノード管理ツール</li>
+        </ul>
+      </div>
+    </div>
+    <p style="margin-top:14px"><small>最終更新: 2026-05-30 | 関連: <a href="../../creator-system/manga-pipeline.html">manga-pipeline</a> / <a href="ai-creative.html">ai-creative</a> / <a href="index.html">Knowledge Hub</a></small></p>
+  </div>
+
+</div>
+</body>
+</html>
