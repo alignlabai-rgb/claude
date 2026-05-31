@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Claw スタック比較表 | AI Creator Hub</title>
-  <meta name="description" content="OpenClaw・PicoClaw・NanoClaw の機能・用途・リソース要件を比較">
+  <meta name="description" content="OpenClaw・PicoClaw・NanoClaw・Hermes Agent の機能・用途・リソース要件を比較">
   <link rel="stylesheet" href="../creator-system/style.css">
 </head>
 <body>
@@ -15,6 +15,7 @@
     <li><a href="../index.html">Home</a></li>
     <li><a href="index.html">Claw Guides</a></li>
     <li><a href="comparison.html" class="active">比較表</a></li>
+    <li><a href="agent-brain-guide.html">頭脳選定</a></li>
     <li><a href="../research/openclaw-news/index.html">OpenClaw News</a></li>
     <li><a href="../workbench/index.html">Tech Workbench</a></li>
   </ul>
@@ -24,14 +25,14 @@
 <section class="hero" style="min-height: 55vh;">
   <div class="hero-bg"></div>
   <div class="hero-content">
-    <div class="hero-badge"><span class="dot-live"></span>比較リファレンス</div>
+    <div class="hero-badge"><span class="dot-live"></span>比較リファレンス · 2026-06-01 更新</div>
     <h1 class="fade-up">
       Claw スタック<br>
       <span class="gradient-text">比較表</span>
     </h1>
     <p class="hero-desc fade-up-2">
-      OpenClaw・PicoClaw・NanoClaw の機能・リソース要件・用途を一覧で比較します。<br>
-      導入前の選定判断にお使いください。
+      OpenClaw・PicoClaw・NanoClaw・Hermes Agent の機能・リソース要件・用途を一覧で比較します。<br>
+      OpenClaw は 2026-05-24 に再解禁。導入前の選定判断にお使いください。
     </p>
     <div class="hero-cta fade-up-3">
       <a href="#comparison" class="btn btn-primary">比較表を見る</a>
@@ -44,7 +45,7 @@
 <section class="section" id="comparison">
   <div class="section-inner">
     <div class="section-label">機能比較</div>
-    <h2 class="section-title">3スタック 一覧比較</h2>
+    <h2 class="section-title">4スタック 一覧比較</h2>
     <p class="section-desc">
       それぞれの特性を把握して、用途に合ったスタックを選んでください。
     </p>
@@ -54,9 +55,10 @@
         <thead>
           <tr>
             <th>項目</th>
-            <th style="color: #a48cf5;">OpenClaw</th>
+            <th style="color: #a48cf5;">OpenClaw <span class="tag tag-green" style="font-size:0.65rem; vertical-align:middle;">✅ 再解禁</span></th>
             <th style="color: #60d0ff;">PicoClaw</th>
             <th style="color: #4FFFB0;">NanoClaw</th>
+            <th style="color: #FF9E00;">Hermes Agent</th>
           </tr>
         </thead>
         <tbody>
@@ -65,76 +67,99 @@
             <td>フルスケール本番運用・AIパイプライン統合</td>
             <td>軽量ローカル実行・個人開発・PoC</td>
             <td>コンテナ運用・チーム規模・複数チャネル</td>
+            <td>VPS/クラウド常駐・長期自律ジョブ</td>
           </tr>
           <tr>
             <td><strong>実行環境</strong></td>
             <td>クラウド / On-premise</td>
             <td>ローカル / 低スペックマシン</td>
             <td>Docker / Kubernetes</td>
+            <td>VPS / クラウド（常駐前提）</td>
           </tr>
           <tr>
             <td><strong>最低リソース</strong></td>
             <td>4 vCPU / 8 GB RAM</td>
             <td>1 vCPU / 512 MB RAM</td>
             <td>2 vCPU / 2 GB RAM</td>
+            <td>1 vCPU / 1 GB RAM</td>
           </tr>
           <tr>
             <td><strong>スケールアウト</strong></td>
             <td>水平・垂直どちらも対応</td>
             <td>単一プロセスのみ</td>
             <td>コンテナ単位で水平スケール</td>
+            <td>単一常駐プロセス（スケールは OpenClaw へ）</td>
           </tr>
           <tr>
             <td><strong>マルチエージェント</strong></td>
             <td>Orchestrator + Worker フル対応</td>
             <td>シングルエージェントのみ</td>
             <td>Agent Swarm 対応</td>
+            <td>単一常駐（サブタスクを API 委譲）</td>
           </tr>
           <tr>
             <td><strong>チャネル連携</strong></td>
             <td>Slack / Discord / Signal / Telegram / HTTP</td>
             <td>HTTP / CLI のみ</td>
             <td>HTTP / WebSocket / Webhook</td>
+            <td>Signal / HTTP / Webhook</td>
+          </tr>
+          <tr>
+            <td><strong>LLM 主脳</strong></td>
+            <td>Claude / GPT-5.5 / Gemini（クラウド API）</td>
+            <td>SLM ローカル / クラウド API どちらも可</td>
+            <td>ローカル SLM + クラウド API ハイブリッド</td>
+            <td>GPT-5.5 / DeepSeek V4 / Qwen 3.6-Plus</td>
           </tr>
           <tr>
             <td><strong>スキル管理</strong></td>
             <td>マーケットプレイス + カスタム</td>
             <td>ローカルファイルのみ</td>
             <td>Git管理 + ローカル</td>
+            <td>Skill / スクリプトファイル</td>
           </tr>
           <tr>
             <td><strong>認証・権限</strong></td>
             <td>OAuth2 / APIキー / RBAC</td>
             <td>APIキーのみ</td>
             <td>APIキー / 基本RBAC</td>
+            <td>APIキー / Codex OAuth</td>
           </tr>
           <tr>
             <td><strong>監視・ログ</strong></td>
             <td>Prometheus / Grafana 統合</td>
-            <td>stdoutログのみ</td>
+            <td>stdout ログのみ</td>
             <td>構造化ログ / 軽量メトリクス</td>
+            <td>構造化ログ（外部連携は手動）</td>
           </tr>
           <tr>
             <td><strong>セットアップ難易度</strong></td>
             <td><span class="tag tag-purple">やや複雑</span></td>
             <td><span class="tag tag-green">簡単</span></td>
             <td><span class="tag tag-cyan">中程度</span></td>
+            <td><span class="tag tag-cyan">中程度（VPS 設定要）</span></td>
           </tr>
           <tr>
             <td><strong>ライセンス</strong></td>
             <td>Commercial / OSS (MIT)</td>
             <td>OSS (MIT)</td>
             <td>OSS (Apache 2.0)</td>
+            <td>OSS</td>
           </tr>
           <tr>
             <td><strong>AI Creator Hub 適性</strong></td>
             <td><span class="tag tag-green">本番推奨</span></td>
-            <td><span class="tag tag-orange">PoC向け</span></td>
+            <td><span class="tag tag-orange">PoC 向け</span></td>
             <td><span class="tag tag-cyan">中間規模向け</span></td>
+            <td><span class="tag tag-orange">常駐自律ジョブ向け</span></td>
           </tr>
         </tbody>
       </table>
     </div>
+    <p style="color: var(--text-muted); font-size: 0.82rem; margin-top: 0.75rem;">
+      ※ OpenClaw は 2026-05-24 に再解禁済。詳細は <a href="../research/openclaw-news/index.html">OpenClaw News</a> を参照。
+      LLM 主脳の選び方は <a href="agent-brain-guide.html">エージェント頭脳選定ガイド</a> を参照。
+    </p>
   </div>
 </section>
 
@@ -161,10 +186,10 @@
         <div class="card-icon green">N</div>
         <h3>NanoClaw を選ぶとき</h3>
         <ul class="checklist">
-          <li>Docker環境で動かしたい</li>
+          <li>Docker 環境で動かしたい</li>
           <li>小〜中規模チームで利用</li>
           <li>複数チャネル連携が必要</li>
-          <li>フルスケールは不要だがAgent Swarmを試したい</li>
+          <li>フルスケールは不要だが Agent Swarm を試したい</li>
         </ul>
         <a href="nanoclaw/index.html" class="card-link">NanoClaw ガイドへ →</a>
       </div>
@@ -175,10 +200,22 @@
         <ul class="checklist">
           <li>AI Creator Hub を本番稼動させたい</li>
           <li>複数パイプラインを並列運用したい</li>
-          <li>マーケットプレイスのSkillを活用したい</li>
+          <li>マーケットプレイスの Skill を活用したい</li>
           <li>詳細な監視・アラートが必要</li>
         </ul>
         <a href="../creator-system/openclaw.html" class="card-link">OpenClaw 連携設計へ →</a>
+      </div>
+
+      <div class="card">
+        <div class="card-icon orange">H</div>
+        <h3>Hermes Agent を選ぶとき</h3>
+        <ul class="checklist">
+          <li>VPS/クラウドで 24 時間常駐させたい</li>
+          <li>PC に依存せず長期ジョブを自律実行したい</li>
+          <li>GPT-5.5 / DeepSeek V4 / Qwen 3.6 を主脳にしたい</li>
+          <li>OpenClaw ほどの複雑な設定はまだ不要</li>
+        </ul>
+        <a href="../workbench/knowledge/hermes-agent.html" class="card-link">Hermes Agent 詳細へ →</a>
       </div>
     </div>
   </div>
@@ -188,28 +225,103 @@
 <section class="section">
   <div class="section-inner">
     <div class="section-label">移行パス</div>
-    <h2 class="section-title">ステップアップの流れ</h2>
-    <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem;">
-      <div class="pipeline">
-        <div class="pipeline-step">
-          <div class="step-num" style="background: rgba(0,212,255,0.2); color: var(--accent);">1</div>
-          <h4>PicoClaw</h4>
-          <p>ローカルでコンセプト検証。Skill構造を学ぶ。</p>
+    <h2 class="section-title">スタックの選び方と移行経路</h2>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem;">
+        <div style="font-size: 0.78rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 1.25rem;">スタンダードパス（ローカル→本番）</div>
+        <div class="pipeline">
+          <div class="pipeline-step">
+            <div class="step-num" style="background: rgba(0,212,255,0.2); color: var(--accent);">1</div>
+            <h4>PicoClaw</h4>
+            <p>ローカルでコンセプト検証。Skill 構造を学ぶ。</p>
+          </div>
+          <div class="pipeline-step">
+            <div class="step-num" style="background: rgba(0,220,130,0.2); color: #4FFFB0;">2</div>
+            <h4>NanoClaw</h4>
+            <p>Docker 化・チーム共有・複数チャネル追加。</p>
+          </div>
+          <div class="pipeline-step">
+            <div class="step-num" style="background: rgba(108,60,225,0.2); color: #a48cf5;">3</div>
+            <h4>OpenClaw</h4>
+            <p>本番スケール・監視・マーケットプレイス活用。</p>
+          </div>
         </div>
-        <div class="pipeline-step">
-          <div class="step-num" style="background: rgba(0,220,130,0.2); color: #4FFFB0;">2</div>
-          <h4>NanoClaw</h4>
-          <p>Docker化・チーム共有・複数チャネル追加。</p>
+        <p style="color: var(--text-muted); font-size: 0.82rem; margin-top: 1rem;">
+          Skill 定義は PicoClaw → NanoClaw → OpenClaw でそのまま移行可能。インターフェースは共通仕様。
+        </p>
+      </div>
+
+      <div style="background: var(--card); border: 1px solid rgba(255,158,0,0.3); border-radius: 16px; padding: 2rem;">
+        <div style="font-size: 0.78rem; font-weight: 700; color: #FF9E00; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 1.25rem;">クラウド常駐パス（PC 非依存）</div>
+        <div class="pipeline">
+          <div class="pipeline-step">
+            <div class="step-num" style="background: rgba(0,212,255,0.2); color: var(--accent);">1</div>
+            <h4>PicoClaw</h4>
+            <p>ローカルで Skill と設計を検証。</p>
+          </div>
+          <div class="pipeline-step">
+            <div class="step-num" style="background: rgba(255,158,0,0.2); color: #FF9E00;">2</div>
+            <h4>Hermes Agent</h4>
+            <p>VPS に移して PC 非依存で常駐稼働。</p>
+          </div>
+          <div class="pipeline-step">
+            <div class="step-num" style="background: rgba(108,60,225,0.2); color: #a48cf5;">3</div>
+            <h4>OpenClaw</h4>
+            <p>並列・監視・マーケットが必要になったら移行。</p>
+          </div>
         </div>
-        <div class="pipeline-step">
-          <div class="step-num" style="background: rgba(108,60,225,0.2); color: #a48cf5;">3</div>
-          <h4>OpenClaw</h4>
-          <p>本番スケール・監視・マーケットプレイス活用。</p>
+        <p style="color: var(--text-muted); font-size: 0.82rem; margin-top: 1rem;">
+          Hermes Agent は NanoClaw より軽量でシンプル。VPS 常駐の最速ルート。
+        </p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Why This Stack Architecture -->
+<section class="section" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-label">設計意図</div>
+    <h2 class="section-title">なぜ4スタックに分かれているのか</h2>
+    <p style="color: var(--text-muted); margin-bottom: 2rem; max-width: 700px;">
+      「全部 OpenClaw で統一すればよい」という疑問は自然です。
+      4スタックに分けた理由を記録しておきます。
+    </p>
+    <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.25rem; display: flex; gap: 1.25rem; align-items: flex-start;">
+        <div style="background: rgba(0,212,255,0.15); border-radius: 8px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0;">⚡</div>
+        <div>
+          <div style="font-weight: 700; margin-bottom: 0.25rem; font-size: 0.9rem;">習得コストと参入障壁の分離</div>
+          <div style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.75;">
+            OpenClaw は高機能だが、設定・デプロイ・監視の学習コストが高い。
+            PicoClaw は「まず動かす」ための最小構成で、参入障壁を下げるために分離している。
+            失敗コストが低い段階で構造を学べることが、長期的に OpenClaw を使いこなせる前提になる。
+          </div>
         </div>
       </div>
-      <p style="color: var(--text-muted); font-size: 0.88rem; margin-top: 1.5rem; text-align: center;">
-        Skill定義はPicoClaw → NanoClaw → OpenClaw でそのまま移行可能です。インターフェースは共通仕様。
-      </p>
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.25rem; display: flex; gap: 1.25rem; align-items: flex-start;">
+        <div style="background: rgba(255,158,0,0.15); border-radius: 8px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0;">🏠</div>
+        <div>
+          <div style="font-weight: 700; margin-bottom: 0.25rem; font-size: 0.9rem;">Hermes Agent が「第4の選択肢」として存在する理由</div>
+          <div style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.75;">
+            NanoClaw（Docker・チーム向け）とは別に、「個人がVPSに常駐させる」用途には
+            Docker の複雑さが不要で、スクリプト常駐の軽さが刺さる。
+            AI Creator Hub の「外出中に自律実行」というコアユースケースに最もシンプルに対応できるのが Hermes Agent。
+          </div>
+        </div>
+      </div>
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.25rem; display: flex; gap: 1.25rem; align-items: flex-start;">
+        <div style="background: rgba(0,220,130,0.15); border-radius: 8px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0;">🔄</div>
+        <div>
+          <div style="font-weight: 700; margin-bottom: 0.25rem; font-size: 0.9rem;">将来のセッションへの注記</div>
+          <div style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.75;">
+            スタック統合の提案は過去に議論したが、段階的な習得経路と「軽さ」の価値を残すために分離を維持している。
+            統合を提案するなら、まず <a href="../foundations/decisions.html">decisions.html</a> の ADR を確認すること。
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -223,9 +335,11 @@
       <a href="picoclaw/index.html">PicoClaw</a>
       <a href="nanoclaw/index.html">NanoClaw</a>
       <a href="../creator-system/openclaw.html">OpenClaw</a>
+      <a href="../workbench/knowledge/hermes-agent.html">Hermes Agent</a>
       <a href="../research/openclaw-news/index.html">OpenClaw News</a>
     </nav>
     <p>Claw スタック比較表</p>
+    <p style="font-size:0.8rem;opacity:0.65;">最終更新: 2026-06-01（Hermes Agent を4列目に追加。OpenClaw 再解禁（5/24）反映。移行パスを2経路に更新。設計意図セクション追加）</p>
   </div>
 </footer>
 

@@ -1,0 +1,829 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Google AI Studio 完全ガイド — Gemini API 開発プレイグラウンド | Tech Workbench</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --panel: #101418;
+      --muted: #94a3b8;
+      --text: #e2e8f0;
+      --accent: #00b4d8;
+      --accent-soft: rgba(0,180,216,0.12);
+      --accent-border: rgba(0,180,216,0.28);
+      --accent-grad: linear-gradient(135deg,#00b4d8,#90e0ef);
+      --green: #34d399;
+      --green-soft: rgba(52,211,153,0.1);
+      --yellow: #fbbf24;
+      --yellow-soft: rgba(251,191,36,0.1);
+      --red: #f87171;
+      --red-soft: rgba(248,113,113,0.1);
+      --border: rgba(255,255,255,0.08);
+      --radius: 16px;
+      --font-mono: "SF Mono","Consolas",monospace;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;font-family:"Segoe UI","SF Pro Display",system-ui,sans-serif;color:var(--text);background:var(--bg);padding:32px 20px 64px;line-height:1.7}
+    .shell{max-width:1020px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+    a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+
+    header.hero{background:var(--panel);border:1px solid var(--accent-border);border-radius:var(--radius);padding:44px 40px;position:relative;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+    header.hero::before{content:"";position:absolute;top:0;left:0;width:100%;height:4px;background:var(--accent-grad)}
+    header.hero::after{content:"";position:absolute;right:-80px;bottom:-80px;width:360px;height:360px;background:radial-gradient(circle,rgba(0,180,216,.07),transparent 70%);pointer-events:none}
+    .meta-tag{display:inline-block;background:var(--accent-soft);color:var(--accent);padding:4px 12px;border-radius:99px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;border:1px solid var(--accent-border)}
+    h1{margin:0 0 14px;font-size:44px;font-weight:800;letter-spacing:-1px;line-height:1.1;background:linear-gradient(to right,#fff,#90e0ef);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .lead{margin:0 0 28px;color:var(--muted);font-size:1.05rem;max-width:780px;line-height:1.8}
+    .nav-pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+    .nav-pills a{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--muted);font-size:.83rem;transition:all .15s}
+    .nav-pills a:hover{border-color:var(--accent-border);color:var(--accent);text-decoration:none}
+    .breadcrumb{font-size:.8rem;color:#4a6a7a;margin-bottom:14px}
+
+    .panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:28px 32px}
+    .panel-accent{border-color:var(--accent-border);background:linear-gradient(135deg,rgba(0,180,216,.04),var(--panel))}
+    .panel-green{border-color:rgba(52,211,153,.25);background:rgba(52,211,153,.03)}
+    h2{margin:0 0 18px;font-size:1.25rem;font-weight:700;color:#fff}
+    h3{margin:14px 0 8px;font-size:1rem;font-weight:700;color:var(--accent)}
+    h4{margin:12px 0 6px;font-size:.9rem;font-weight:700;color:#cbd5e1}
+    p{margin:0 0 12px;color:var(--muted);font-size:.93rem}
+    ul,ol{padding-left:22px;margin:8px 0}
+    li{margin-bottom:5px;color:var(--muted);font-size:.9rem}
+    strong{color:#e2e8f0}
+    code{font-family:var(--font-mono);background:rgba(255,255,255,.07);padding:2px 7px;border-radius:5px;font-size:.82em;color:#90e0ef}
+
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+    .grid4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px}
+    @media(max-width:700px){.grid2,.grid3,.grid4{grid-template-columns:1fr}}
+
+    .card{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;padding:18px 20px}
+    .card-accent{border-color:var(--accent-border);background:var(--accent-soft)}
+    .card-green{border-color:rgba(52,211,153,.25);background:var(--green-soft)}
+    .card-yellow{border-color:rgba(251,191,36,.25);background:var(--yellow-soft)}
+    .card-red{border-color:rgba(248,113,113,.2);background:var(--red-soft)}
+    .card h4{margin:0 0 6px;color:#e2e8f0}
+
+    .badge{display:inline-block;font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:5px;margin-right:4px;vertical-align:middle}
+    .badge-free{background:rgba(52,211,153,.2);color:#34d399}
+    .badge-paid{background:var(--accent-soft);color:var(--accent)}
+    .badge-new{background:rgba(248,113,113,.15);color:#f87171}
+
+    table{width:100%;border-collapse:collapse;font-size:.87rem;margin:12px 0}
+    th{text-align:left;padding:9px 12px;background:rgba(0,180,216,.07);color:var(--accent);font-size:.78rem;border-bottom:1px solid rgba(255,255,255,.07);font-weight:700}
+    td{padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--muted);vertical-align:top}
+    td strong{color:#e2e8f0}
+    td.yes{color:#34d399;font-weight:700;text-align:center}
+    td.no{color:#6b7280;text-align:center}
+    td.center{text-align:center}
+
+    .codeblock{background:#070d18;border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:16px 18px;font-family:var(--font-mono);font-size:.8rem;line-height:1.7;overflow-x:auto;white-space:pre;color:#c8d3e3;margin:12px 0}
+    .codeblock .cm{color:#4a6a7a}
+    .codeblock .kw{color:#93c5fd}
+    .codeblock .st{color:#86efac}
+    .codeblock .fn{color:#90e0ef}
+    .codeblock .nm{color:#f9a8d4}
+    .codeblock .num{color:#fde68a}
+
+    .note{background:rgba(0,180,216,.06);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:.88rem;color:var(--muted)}
+    .tip{background:rgba(52,211,153,.06);border-left:3px solid var(--green);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:.88rem;color:var(--muted)}
+    .warn{background:rgba(248,113,113,.06);border-left:3px solid var(--red);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:.88rem;color:var(--muted)}
+
+    .flow{display:flex;flex-direction:column;gap:0}
+    .flow-step{display:flex;gap:16px;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.04);align-items:flex-start}
+    .flow-step:last-child{border-bottom:none}
+    .flow-num{background:var(--accent-soft);border:1px solid var(--accent-border);color:var(--accent);border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.82rem;flex-shrink:0;margin-top:2px}
+    .flow-body h4{margin:0 0 4px;color:#e2e8f0;font-size:.92rem}
+    .flow-body p{margin:0;font-size:.87rem}
+
+    .price-table{display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:0;border:1px solid var(--border);border-radius:10px;overflow:hidden;font-size:.84rem}
+    .pt-head{background:rgba(0,180,216,.08);color:var(--accent);font-weight:700;padding:9px 12px;border-bottom:1px solid var(--border)}
+    .pt-cell{padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--muted)}
+    .pt-cell.model{color:#e2e8f0;font-weight:600}
+    .pt-cell.free-row{background:rgba(52,211,153,.03)}
+
+    small{color:#4a6a7a;font-size:.78rem}
+  </style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ── HERO ── -->
+  <header class="hero">
+    <div class="breadcrumb"><a href="../../index.html">← Hub Top</a> / <a href="../index.html">Tech Workbench</a> / <a href="index.html">Knowledge</a></div>
+    <div class="meta-tag">Google AI · Developer Platform</div>
+    <h1>Google AI Studio</h1>
+    <p class="lead">
+      Gemini API のウェブブラウザ版開発プレイグラウンド。<strong>無料でゼロから始められ</strong>、全 Gemini モデルをテストし、
+      プロンプトが固まったら <strong>1クリックで Python/JS コードをエクスポート</strong>できる。
+      プロトタイプから本番 API 実装まで最短距離をつなぐ Google 公式ツール。
+    </p>
+    <div class="nav-pills">
+      <a href="#ui">UI 構成</a>
+      <a href="#models">対応モデル</a>
+      <a href="#pricing">料金・レート</a>
+      <a href="#features">機能詳細</a>
+      <a href="#quickstart">クイックスタート</a>
+      <a href="#code">コード例</a>
+      <a href="#advanced">上級機能</a>
+      <a href="#vs-vertex">vs Vertex AI</a>
+      <a href="#tips">実践ヒント</a>
+    </div>
+    <span class="last-updated" style="margin-top:16px">最終更新: 2026-05-31 | aistudio.google.com</span>
+  </header>
+
+  <!-- ── WHAT IS ── -->
+  <section class="panel panel-accent">
+    <h2>Google AI Studio とは</h2>
+    <div class="grid2">
+      <div>
+        <p>Google AI Studio は、Gemini モデルを無料でブラウザ上から試せる開発者向けプレイグラウンド。プロンプト設計・モデル選択・パラメータ調整のすべてを GUI で行い、結果が満足いけばコードに変換してアプリに組み込める。</p>
+        <p>OpenAI Playground に相当するが、<strong>無料枠が大きく</strong>、<strong>マルチモーダル入力（画像・音声・動画・PDF）</strong>がネイティブ対応している点が異なる。</p>
+        <div class="tip"><strong>開発フロー上の位置付け:</strong> 「アイデアを試す場所」。ここで固めたプロンプト・システム指示をそのまま本番コードに転用する。Vertex AI は本番 API のホスティング先。</div>
+      </div>
+      <div>
+        <h4>特徴的な強み</h4>
+        <ul>
+          <li>✅ <strong>無料</strong>で全 Gemini モデルにアクセス</li>
+          <li>✅ <strong>1M トークン</strong>コンテキストをブラウザで試験可</li>
+          <li>✅ マルチモーダル: テキスト・画像・音声・動画・PDF</li>
+          <li>✅ Google 検索グラウンディング（リアルタイム検索）</li>
+          <li>✅ 関数呼び出し（Function Calling）のテスト</li>
+          <li>✅ コード出力（Python/JS/Go/REST）ワンクリック</li>
+          <li>✅ Fine-tuning（チューニング）も無料枠で可能</li>
+          <li>✅ API キー管理と即時利用</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── UI OVERVIEW ── -->
+  <section class="panel" id="ui">
+    <h2>UI 構成と各モード</h2>
+    <p>AI Studio のインターフェースは用途別に複数のモードに分かれている。左サイドバーで切り替える。</p>
+    <div class="grid2">
+      <div>
+        <div class="flow">
+          <div class="flow-step">
+            <div class="flow-num">💬</div>
+            <div class="flow-body">
+              <h4>Chat（チャット）</h4>
+              <p>会話型インターフェース。システム指示を設定し、マルチターンの対話をテストする。最もよく使うモード。温度・Top-P・Max tokens をリアルタイムで調整。</p>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-num">✍</div>
+            <div class="flow-body">
+              <h4>Generate text（単発生成）</h4>
+              <p>1 回の入力 → 1 回の出力のシンプルな補完モード。コンテンツ生成・要約・翻訳のプロトタイプに使う。FEW-shot 例を直接記述できる。</p>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-num">{}</div>
+            <div class="flow-body">
+              <h4>Structured output（JSON モード）</h4>
+              <p>出力を特定の JSON スキーマに強制するモード。フォーム入力の処理・データ抽出・API レスポンス設計のテストに。<code>response_schema</code> を GUI で定義できる。</p>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-num">🖼</div>
+            <div class="flow-body">
+              <h4>Image generation（画像生成）</h4>
+              <p>Imagen 3 / Imagen 4（2026-05 最新）を利用した画像生成。テキスト→画像。アスペクト比・スタイルを選択可能。</p>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-num">🎵</div>
+            <div class="flow-body">
+              <h4>Generate speech（音声合成）</h4>
+              <p>テキストを自然な音声に変換（TTS）。30+ 言語、複数の音声スタイルから選択。Audio Overview の音声クオリティをイメージ。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <h3>パラメータパネル</h3>
+        <table>
+          <thead><tr><th>パラメータ</th><th>説明</th><th>推奨値</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Temperature</strong></td><td>出力の多様性・創造性。高いほどランダム</td><td>事実系: 0.1〜0.3 / 創作: 0.7〜1.0</td></tr>
+            <tr><td><strong>Top-P</strong></td><td>累積確率でトークンをサンプリング</td><td>通常 0.95 のまま</td></tr>
+            <tr><td><strong>Top-K</strong></td><td>上位 K 個のトークンから選択</td><td>通常 40 のまま</td></tr>
+            <tr><td><strong>Max output tokens</strong></td><td>生成する最大トークン数</td><td>目的に合わせて設定（上限 64K）</td></tr>
+            <tr><td><strong>Stop sequence</strong></td><td>生成を止めるキーワード</td><td>構造化出力の区切りに使用</td></tr>
+            <tr><td><strong>Safety settings</strong></td><td>有害コンテンツフィルター強度</td><td>デフォルトは MEDIUM</td></tr>
+          </tbody>
+        </table>
+
+        <h3 style="margin-top:16px">システム指示（System Instructions）</h3>
+        <p>モデルの振る舞い・役割・制約を定義するプロンプト。毎回ユーザーメッセージに含める必要がなく、<strong>ターンを超えて持続</strong>する。AI Studio で最も重要な設定項目。</p>
+        <div class="note">システム指示は API での <code>system_instruction</code> パラメータに対応。AI Studio で作成したシステム指示をコードにエクスポートすればそのまま使える。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── MODELS ── -->
+  <section class="panel" id="models">
+    <h2>利用可能なモデル一覧（2026-05）</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>モデル</th>
+          <th>コンテキスト</th>
+          <th>マルチモーダル</th>
+          <th>用途</th>
+          <th>無料枠</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Gemini 3.1 Pro</strong></td>
+          <td>1M tokens</td>
+          <td class="yes">✓</td>
+          <td>最高品質の推論・複雑タスク</td>
+          <td>2 RPM / 50 req/day</td>
+        </tr>
+        <tr>
+          <td><strong>Gemini 3.5 Flash</strong></td>
+          <td>1M tokens</td>
+          <td class="yes">✓</td>
+          <td>高速・コスト効率・汎用</td>
+          <td>15 RPM / 1500 req/day</td>
+        </tr>
+        <tr>
+          <td><strong>Gemini 3.5 Omni</strong></td>
+          <td>1M tokens</td>
+          <td class="yes">✓ 音声入出力</td>
+          <td>音声・リアルタイム会話</td>
+          <td>制限あり（要確認）</td>
+        </tr>
+        <tr>
+          <td><strong>Gemini 2.5 Flash</strong></td>
+          <td>1M tokens</td>
+          <td class="yes">✓</td>
+          <td>バランス型・量産向け</td>
+          <td>15 RPM / 1500 req/day</td>
+        </tr>
+        <tr>
+          <td><strong>Gemini 2.5 Flash-Lite</strong></td>
+          <td>1M tokens</td>
+          <td class="yes">✓</td>
+          <td>超高速・低コスト・大量処理</td>
+          <td>30 RPM / 1500 req/day</td>
+        </tr>
+        <tr>
+          <td><strong>Imagen 4</strong></td>
+          <td>—</td>
+          <td class="yes">画像生成</td>
+          <td>テキスト→高品質画像</td>
+          <td>制限あり</td>
+        </tr>
+        <tr>
+          <td><strong>Gemma 3 / 4</strong></td>
+          <td>128K</td>
+          <td class="yes">✓</td>
+          <td>オープンモデル、ローカル実行可</td>
+          <td>無料（ローカル版は別）</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="note"><strong>モデル選択の基本:</strong> プロトタイプは Flash で試して品質確認 → 本番も Flash で量産。品質が足りなければ Pro に切り替え。Pro は Flash の約 10〜20× の費用がかかる。</div>
+  </section>
+
+  <!-- ── PRICING ── -->
+  <section class="panel" id="pricing">
+    <h2>料金体系とレート制限</h2>
+
+    <h3>無料枠（クレカ不要）</h3>
+    <table>
+      <thead><tr><th>モデル</th><th>RPM（リクエスト/分）</th><th>TPM（トークン/分）</th><th>RPD（リクエスト/日）</th><th>備考</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Gemini 3.1 Pro</strong></td><td class="center">2</td><td class="center">32,000</td><td class="center">50</td><td>プロトタイプのみ</td></tr>
+        <tr><td><strong>Gemini 3.5 Flash</strong></td><td class="center">15</td><td class="center">1,000,000</td><td class="center">1,500</td><td>開発・テストに十分</td></tr>
+        <tr><td><strong>Gemini 2.5 Flash</strong></td><td class="center">15</td><td class="center">1,000,000</td><td class="center">1,500</td><td>量産テストに使える</td></tr>
+        <tr><td><strong>Gemini 2.5 Flash-Lite</strong></td><td class="center">30</td><td class="center">1,000,000</td><td class="center">1,500</td><td>最も寛大な無料枠</td></tr>
+      </tbody>
+    </table>
+    <div class="warn"><strong>無料枠のデータポリシー:</strong> 無料枠では入力データが Google のモデル改善に利用される可能性がある。機密情報・個人情報を含むリクエストは有料プランを使用すること。</div>
+
+    <h3 style="margin-top:20px">有料価格（2026-05 目安）</h3>
+    <p>有料に切り替えると、データがモデル学習に使われず、レート制限も大幅に緩和される。Google Cloud の課金が適用される。</p>
+    <table>
+      <thead>
+        <tr>
+          <th>モデル</th>
+          <th>入力（≤200K ctx）</th>
+          <th>入力（>200K ctx）</th>
+          <th>出力</th>
+          <th>キャッシュ（入力）</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Gemini 3.1 Pro</strong></td>
+          <td>$2.50 / 1M tok</td>
+          <td>$5.00 / 1M tok</td>
+          <td>$10.00 / 1M tok</td>
+          <td>$0.625 / 1M tok</td>
+        </tr>
+        <tr>
+          <td><strong>Gemini 3.5 Flash</strong></td>
+          <td>$0.10 / 1M tok</td>
+          <td>$0.20 / 1M tok</td>
+          <td>$0.40 / 1M tok</td>
+          <td>$0.025 / 1M tok</td>
+        </tr>
+        <tr>
+          <td><strong>Gemini 2.5 Flash</strong></td>
+          <td>$0.15 / 1M tok</td>
+          <td>$0.30 / 1M tok</td>
+          <td>$0.60 / 1M tok</td>
+          <td>$0.0375 / 1M tok</td>
+        </tr>
+        <tr>
+          <td><strong>Gemini 2.5 Flash-Lite</strong></td>
+          <td>$0.03 / 1M tok</td>
+          <td>$0.06 / 1M tok</td>
+          <td>$0.10 / 1M tok</td>
+          <td>$0.008 / 1M tok</td>
+        </tr>
+        <tr>
+          <td><strong>Imagen 4（画像生成）</strong></td>
+          <td colspan="4" style="color:#e2e8f0;font-weight:600">$0.04〜0.08 / 画像（解像度・枚数による）</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="tip"><strong>コスト計算の目安:</strong> 1M トークン ≒ 約 75万 文字（日本語では漢字1字=3-4トークンが目安）。Flash で 1000 回の Q&A（各 1000 トークン）≒ 約 $0.60 。Flash-Lite なら約 $0.13。</div>
+
+    <h3 style="margin-top:20px">Context Caching でコスト削減</h3>
+    <div class="grid2">
+      <div>
+        <p>同じ長いドキュメントを繰り返し参照するワークフローでは、<strong>Context Caching</strong>（コンテキストキャッシュ）を使うと大幅にコストを削減できる。</p>
+        <ul>
+          <li>最低 32,768 トークン以上のコンテキストが対象</li>
+          <li>キャッシュ保存コスト: 通常の 1/4</li>
+          <li>キャッシュ保存期間: 最大 1 時間（延長可）</li>
+          <li>ストレージ料金: $1.00 / 1M tok / hour</li>
+        </ul>
+      </div>
+      <div class="codeblock"><span class="cm"># Context Caching の使い方（Python SDK）</span>
+<span class="kw">import</span> google.generativeai <span class="kw">as</span> genai
+
+<span class="cm"># 長いドキュメントをキャッシュ</span>
+cache = genai.caching.CachedContent.create(
+    model=<span class="st">'models/gemini-2.5-flash'</span>,
+    system_instruction=long_document,
+    ttl=datetime.timedelta(hours=<span class="num">1</span>),
+)
+
+<span class="cm"># キャッシュを使ってリクエスト</span>
+model = genai.GenerativeModel.from_cached_content(cache)
+response = model.generate_content(<span class="st">"この文書の要点は？"</span>)</div>
+    </div>
+  </section>
+
+  <!-- ── FEATURES ── -->
+  <section class="panel" id="features">
+    <h2>主要機能詳細</h2>
+    <div class="grid2">
+      <div>
+        <h3>🌐 Google 検索グラウンディング</h3>
+        <p>Gemini にリアルタイムの Google 検索結果を参照させる機能。「今日の天気は？」「最新の為替レートは？」など時系列に敏感な質問に対して正確な回答が可能になる。</p>
+        <ul>
+          <li>有効化: システム指示パネルの「Tools」→「Google Search」をオン</li>
+          <li>回答に検索引用が付く</li>
+          <li>追加コスト: $35/1000 リクエスト（有料プラン）</li>
+          <li>NotebookLM との違い: 特定ドキュメントでなく広範な Web から検索</li>
+        </ul>
+
+        <h3 style="margin-top:18px">🔧 Function Calling（関数呼び出し）</h3>
+        <p>モデルに「外部ツールを呼び出す能力」を与える機能。AI Studio で JSON Schema として関数を定義し、モデルが適切なタイミングで呼び出す。</p>
+        <div class="codeblock"><span class="cm"># 関数定義の例</span>
+get_weather = {
+  <span class="st">"name"</span>: <span class="st">"get_current_weather"</span>,
+  <span class="st">"description"</span>: <span class="st">"Get the current weather"</span>,
+  <span class="st">"parameters"</span>: {
+    <span class="st">"type"</span>: <span class="st">"object"</span>,
+    <span class="st">"properties"</span>: {
+      <span class="st">"location"</span>: {
+        <span class="st">"type"</span>: <span class="st">"string"</span>,
+        <span class="st">"description"</span>: <span class="st">"City name"</span>
+      }
+    },
+    <span class="st">"required"</span>: [<span class="st">"location"</span>]
+  }
+}</div>
+      </div>
+      <div>
+        <h3>📤 コードエクスポート</h3>
+        <p>AI Studio で動作確認したプロンプト・設定をワンクリックでコードに変換する。プロトタイプから本番実装への最短ルート。</p>
+        <div class="grid2" style="gap:8px;margin:8px 0">
+          <div class="card" style="padding:10px 12px"><strong style="font-size:.82rem">Python</strong><p style="margin:2px 0;font-size:.78rem;color:#6b7280">google-generativeai SDK</p></div>
+          <div class="card" style="padding:10px 12px"><strong style="font-size:.82rem">JavaScript</strong><p style="margin:2px 0;font-size:.78rem;color:#6b7280">@google/generative-ai</p></div>
+          <div class="card" style="padding:10px 12px"><strong style="font-size:.82rem">Go</strong><p style="margin:2px 0;font-size:.78rem;color:#6b7280">google.golang.org/genai</p></div>
+          <div class="card" style="padding:10px 12px"><strong style="font-size:.82rem">REST / curl</strong><p style="margin:2px 0;font-size:.78rem;color:#6b7280">直接 HTTP 呼び出し</p></div>
+        </div>
+
+        <h3 style="margin-top:18px">📁 Files API（ファイルアップロード）</h3>
+        <p>大きなファイルを API に直接アップロードして参照させる機能。</p>
+        <ul>
+          <li>対応形式: PDF・画像（JPG/PNG/WebP）・音声（MP3/WAV）・動画（MP4）</li>
+          <li>最大ファイルサイズ: 2GB / ファイル</li>
+          <li>保存期間: アップロードから 48 時間で自動削除</li>
+          <li>無料枠: 20GB の一時ストレージ</li>
+        </ul>
+
+        <h3 style="margin-top:18px">🔬 Evaluate（評価）</h3>
+        <p>複数のプロンプトバリアントを体系的に評価する機能。A/B テスト・品質評価の自動化が可能。</p>
+        <ul>
+          <li>テストデータセット（CSV / JSONL）をアップロード</li>
+          <li>複数モデル・プロンプトの比較表を自動生成</li>
+          <li>スコアリング基準を定義して自動採点</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── QUICKSTART ── -->
+  <section class="panel" id="quickstart">
+    <h2>クイックスタート（5 分で最初の API 呼び出し）</h2>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-num">1</div>
+        <div class="flow-body">
+          <h4>aistudio.google.com にアクセス</h4>
+          <p>Google アカウントでログインするだけ。クレジットカード不要。</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">2</div>
+        <div class="flow-body">
+          <h4>「Create new prompt」→ Chat を選択</h4>
+          <p>左上の「+ New prompt」から「Chat」を選ぶ。</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">3</div>
+        <div class="flow-body">
+          <h4>モデルと System Instructions を設定</h4>
+          <p>右パネルでモデル（Gemini 3.5 Flash 推奨）を選択。「System instructions」欄にロール・制約を記述。</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">4</div>
+        <div class="flow-body">
+          <h4>プロンプトを試してパラメータを調整</h4>
+          <p>チャット欄で対話しながら Temperature・Max tokens を調整。期待通りの出力になるまで反復。</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">5</div>
+        <div class="flow-body">
+          <h4>「Get code」でコードをエクスポート</h4>
+          <p>右上の「Get code」ボタンで Python/JS コードを取得。API キーを「Get API key」ページで発行して置き換えれば即動く。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CODE EXAMPLES ── -->
+  <section class="panel" id="code">
+    <h2>コード例集</h2>
+
+    <h3>基本: テキスト生成（Python）</h3>
+    <div class="codeblock"><span class="cm"># pip install google-generativeai</span>
+<span class="kw">import</span> google.generativeai <span class="kw">as</span> genai
+
+genai.configure(api_key=<span class="st">"YOUR_API_KEY"</span>)
+
+model = genai.GenerativeModel(
+    model_name=<span class="st">"gemini-2.5-flash"</span>,
+    system_instruction=<span class="st">"あなたは日本語で回答するリサーチアシスタントです。"</span>
+)
+
+response = model.generate_content(<span class="st">"AI エージェントの主要なアーキテクチャパターンを教えて"</span>)
+print(response.text)</div>
+
+    <h3>マルチモーダル: 画像 + テキスト</h3>
+    <div class="codeblock"><span class="kw">import</span> google.generativeai <span class="kw">as</span> genai
+<span class="kw">import</span> PIL.Image
+
+genai.configure(api_key=<span class="st">"YOUR_API_KEY"</span>)
+model = genai.GenerativeModel(<span class="st">"gemini-2.5-flash"</span>)
+
+<span class="cm"># 画像ファイルを直接渡す</span>
+image = PIL.Image.open(<span class="st">"character_design.png"</span>)
+response = model.generate_content([
+    image,
+    <span class="st">"このキャラクターデザインの特徴を分析して、改善点を提案して"</span>
+])
+print(response.text)
+
+<span class="cm"># URL の画像も直接参照可能</span>
+response2 = model.generate_content([
+    {<span class="st">"url"</span>: <span class="st">"https://example.com/image.jpg"</span>, <span class="st">"mime_type"</span>: <span class="st">"image/jpeg"</span>},
+    <span class="st">"この画像を説明して"</span>
+])</div>
+
+    <h3>ストリーミング生成（長文を逐次表示）</h3>
+    <div class="codeblock">model = genai.GenerativeModel(<span class="st">"gemini-2.5-flash"</span>)
+
+<span class="cm"># stream=True でトークンごとに受け取る</span>
+<span class="kw">for</span> chunk <span class="kw">in</span> model.generate_content(<span class="st">"長い記事を書いて"</span>, stream=<span class="nm">True</span>):
+    print(chunk.text, end=<span class="st">""</span>, flush=<span class="nm">True</span>)</div>
+
+    <h3>JSON モード（構造化出力）</h3>
+    <div class="codeblock"><span class="kw">import</span> json
+<span class="kw">import</span> google.generativeai <span class="kw">as</span> genai
+<span class="kw">from</span> google.generativeai.types <span class="kw">import</span> GenerationConfig
+
+genai.configure(api_key=<span class="st">"YOUR_API_KEY"</span>)
+model = genai.GenerativeModel(<span class="st">"gemini-2.5-flash"</span>)
+
+response = model.generate_content(
+    <span class="st">"以下の記事から登場人物の情報を抽出してください:\n\n太郎は35歳のエンジニア..."</span>,
+    generation_config=GenerationConfig(
+        response_mime_type=<span class="st">"application/json"</span>,
+        response_schema={
+            <span class="st">"type"</span>: <span class="st">"object"</span>,
+            <span class="st">"properties"</span>: {
+                <span class="st">"name"</span>: {<span class="st">"type"</span>: <span class="st">"string"</span>},
+                <span class="st">"age"</span>: {<span class="st">"type"</span>: <span class="st">"integer"</span>},
+                <span class="st">"occupation"</span>: {<span class="st">"type"</span>: <span class="st">"string"</span>}
+            }
+        }
+    )
+)
+person = json.loads(response.text)
+print(person)  <span class="cm"># {"name": "太郎", "age": 35, "occupation": "エンジニア"}</span></div>
+
+    <h3>チャット（マルチターン会話）</h3>
+    <div class="codeblock">model = genai.GenerativeModel(
+    <span class="st">"gemini-2.5-flash"</span>,
+    system_instruction=<span class="st">"あなたは漫画の脚本アドバイザーです。"</span>
+)
+
+chat = model.start_chat(history=[])
+
+<span class="cm"># 会話の継続（history が自動管理される）</span>
+r1 = chat.send_message(<span class="st">"主人公が過去の失敗から立ち直るシーンのアイデアは？"</span>)
+print(r1.text)
+
+r2 = chat.send_message(<span class="st">"それを3ページの漫画にするとしたら各ページのコマ構成は？"</span>)
+print(r2.text)
+
+<span class="cm"># 会話履歴を確認</span>
+<span class="kw">for</span> msg <span class="kw">in</span> chat.history:
+    print(f<span class="st">"{msg.role}: {msg.parts[0].text[:50]}..."</span>)</div>
+
+    <h3>Google 検索グラウンディング（Python）</h3>
+    <div class="codeblock"><span class="kw">from</span> google.generativeai <span class="kw">import</span> protos
+
+model = genai.GenerativeModel(<span class="st">"gemini-2.5-flash"</span>)
+
+<span class="cm"># Google 検索ツールを有効化</span>
+response = model.generate_content(
+    <span class="st">"2026年5月の最新の AI ニュースを教えて"</span>,
+    tools=[protos.Tool(google_search=protos.GoogleSearch())]
+)
+
+print(response.text)
+<span class="cm"># grounding_metadata にソース URL が含まれる</span>
+<span class="kw">for</span> src <span class="kw">in</span> response.candidates[<span class="num">0</span>].grounding_metadata.grounding_chunks:
+    print(src.web.uri)</div>
+  </section>
+
+  <!-- ── ADVANCED ── -->
+  <section class="panel" id="advanced">
+    <h2>上級機能</h2>
+    <div class="grid2">
+      <div>
+        <h3>Fine-tuning（チューニング）</h3>
+        <p>少数のサンプルデータから自分専用のモデルをファインチューニングできる。AI Studio の GUI から操作可能。</p>
+        <ul>
+          <li>対象モデル: Gemini 2.5 Flash-Lite（主）</li>
+          <li>必要データ: 最低 10〜20 件の例（推奨 100〜500 件）</li>
+          <li>形式: JSONL（{"text_input": "...", "output": "..."}）</li>
+          <li>トレーニング時間: 数分〜1 時間</li>
+          <li>コスト: トレーニングデータ量に応じた課金</li>
+        </ul>
+        <div class="note">ファインチューニングが有効なケース: 特定のトーン・スタイル・フォーマットへの適応。数百例で既存モデルの挙動を大きく変えられる。</div>
+
+        <h3 style="margin-top:18px">Long Context 活用（1M トークン）</h3>
+        <p>1M トークン（≒ 約 75 万文字）のコンテキストは、他の LLM の 4〜8 倍。</p>
+        <ul>
+          <li>本 1 冊丸ごと: ~100K トークン × 10 冊分</li>
+          <li>コードベース全体: 中規模プロジェクトなら丸ごと入る</li>
+          <li>長編動画（1.5時間 MP4）: 直接解析可能</li>
+          <li>データベース的な Q&amp;A: テーブル全体を渡して問い合わせ</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Live API（リアルタイム音声・映像）</h3>
+        <p>Gemini の音声入出力をリアルタイムでストリーミングする API。低遅延の音声会話アプリ構築に使用。</p>
+        <ul>
+          <li>WebSocket ベースの双方向ストリーミング</li>
+          <li>音声入力 → テキスト変換なし → 直接 Gemini が処理</li>
+          <li>テキスト・音声の混合出力</li>
+          <li>カメラ映像のリアルタイム解析にも対応</li>
+        </ul>
+        <div class="codeblock"><span class="cm"># Live API（WebSocket）の概念コード</span>
+<span class="kw">import</span> asyncio
+<span class="kw">from</span> google import genai
+
+client = genai.Client(api_key=<span class="st">"YOUR_API_KEY"</span>)
+
+<span class="kw">async def</span> <span class="fn">live_session</span>():
+    <span class="kw">async with</span> client.aio.live.connect(
+        model=<span class="st">"gemini-live-2.5-flash-preview"</span>
+    ) <span class="kw">as</span> session:
+        <span class="cm"># 音声データを送信</span>
+        <span class="kw">await</span> session.send(audio_data, end_of_turn=<span class="nm">True</span>)
+        <span class="cm"># 音声応答を受信</span>
+        <span class="kw">async for</span> response <span class="kw">in</span> session.receive():
+            <span class="kw">if</span> response.data:
+                play_audio(response.data)</div>
+
+        <h3 style="margin-top:18px">Imagen 4 による画像生成</h3>
+        <div class="codeblock"><span class="kw">from</span> google import genai
+
+client = genai.Client(api_key=<span class="st">"YOUR_API_KEY"</span>)
+
+response = client.models.generate_images(
+    model=<span class="st">'imagen-4-preview'</span>,
+    prompt=<span class="st">'A manga-style illustration of a futuristic city at dusk'</span>,
+    config={<span class="st">'number_of_images'</span>: <span class="num">4</span>}
+)
+
+<span class="kw">for</span> img <span class="kw">in</span> response.generated_images:
+    img.image.save(<span class="st">'output.png'</span>)</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── VS VERTEX ── -->
+  <section class="panel" id="vs-vertex">
+    <h2>AI Studio vs Vertex AI — いつどちらを使うか</h2>
+    <table>
+      <thead>
+        <tr><th>観点</th><th>Google AI Studio</th><th>Vertex AI</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>用途</strong></td><td>プロトタイプ・開発・テスト</td><td>本番デプロイ・エンタープライズ</td></tr>
+        <tr><td><strong>料金</strong></td><td>無料枠あり</td><td>全リクエスト課金（無料枠なし）</td></tr>
+        <tr><td><strong>セットアップ</strong></td><td>Google アカウントだけで即利用</td><td>Google Cloud プロジェクト必要</td></tr>
+        <tr><td><strong>データプライバシー</strong></td><td>無料: 学習利用あり / 有料: なし</td><td>常に学習利用なし</td></tr>
+        <tr><td><strong>SLA</strong></td><td>なし</td><td>99.9%〜（エンタープライズ）</td></tr>
+        <tr><td><strong>モデル Fine-tuning</strong></td><td>GUI で簡単</td><td>大規模・本番向けの高度な設定</td></tr>
+        <tr><td><strong>Batch 処理</strong></td><td>限定的</td><td>大規模バッチ対応</td></tr>
+        <tr><td><strong>VPC / セキュリティ</strong></td><td>なし</td><td>VPC Service Controls、CMEK 対応</td></tr>
+        <tr><td><strong>RAG（検索拡張生成）</strong></td><td>部分的</td><td>Vertex AI Search との統合</td></tr>
+        <tr><td><strong>Agent Builder</strong></td><td>なし</td><td>Vertex AI Agent Builder あり</td></tr>
+        <tr><td><strong>移行</strong></td><td colspan="2">AI Studio の API キーは Google Cloud プロジェクトに移行可能。コードの変更は最小限。</td></tr>
+      </tbody>
+    </table>
+    <div class="tip"><strong>判断基準:</strong> 個人利用・スタートアップ・プロトタイプ → AI Studio。エンタープライズ・本番 SLA 必要・VPC 統合 → Vertex AI。多くのケースで AI Studio から始めて Vertex AI へ移行するのが最短ルート。</div>
+  </section>
+
+  <!-- ── TIPS ── -->
+  <section class="panel panel-green" id="tips">
+    <h2>実践的なヒント集</h2>
+    <div class="grid2">
+      <div>
+        <h4>📌 プロンプト設計の鉄則</h4>
+        <ul>
+          <li><strong>システム指示でペルソナ設定:</strong> 「あなたは〇〇のエキスパートです」で品質が安定</li>
+          <li><strong>出力形式を明示:</strong> 「JSON で」「箇条書きで」「500字以内で」</li>
+          <li><strong>Few-shot 例を入れる:</strong> 入力→出力の例を 2〜3 個入れると精度が上がる</li>
+          <li><strong>CoT を促す:</strong> 「ステップバイステップで考えてください」で推論精度向上</li>
+        </ul>
+
+        <h4 style="margin-top:14px">📌 コスト最適化</h4>
+        <ul>
+          <li>開発中は Flash-Lite で試してから Flash / Pro に切り替え</li>
+          <li>同じ長文ドキュメントを繰り返し参照 → Context Caching</li>
+          <li>大量バッチ処理は夜間 or 並列化でレート制限を回避</li>
+          <li>Max tokens を適切に設定してコスト管理</li>
+        </ul>
+      </div>
+      <div>
+        <h4>📌 デバッグ・品質向上</h4>
+        <ul>
+          <li><strong>Temperature を下げる:</strong> 事実確認や構造化出力は 0.1〜0.3 推奨</li>
+          <li><strong>モデルを切り替えて比較:</strong> 同じプロンプトを Flash / Pro で試して差を確認</li>
+          <li><strong>Evaluate 機能:</strong> 複数プロンプトを体系的に比較評価</li>
+          <li><strong>System instructions のバージョン管理:</strong> プロンプトもコードと同様に Git で管理</li>
+        </ul>
+
+        <h4 style="margin-top:14px">📌 AI Studio → 本番への橋渡し</h4>
+        <ul>
+          <li>「Get code」→ コピペで即動くベースコードを取得</li>
+          <li>API キーは環境変数で管理（<code>GOOGLE_API_KEY</code>）</li>
+          <li>本番では <code>google-cloud-aiplatform</code> SDK に移行検討</li>
+          <li>レート制限対策: exponential backoff を実装</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── REAL WORLD EXAMPLES ── -->
+  <section class="panel panel-accent" id="examples">
+    <h2>🌟 最新の驚くべき実例 13 選（2025〜2026）</h2>
+    <p>AI Studio / Gemini API を使った実際の開発事例・企業導入事例。Google公式発表・Cloud ブログ・I/O 2026 発表内容から。</p>
+
+    <h3 style="margin-top:20px;color:var(--accent)">🆕 I/O 2026 — AI Studio の革命的新機能（2026年5月19日）</h3>
+    <div class="grid2">
+      <div class="card card-accent">
+        <h4>① ブラウザから Android アプリをそのままビルド・出版</h4>
+        <p>I/O 2026 で発表。Build タブで「Android app を作って」とプロンプトするだけで、<strong>Kotlin + Jetpack Compose の本番品質コードを生成</strong>。ブラウザ内の Android エミュレータで即テストし、ADB (USB) で実機にインストール。Google Play Developer アカウントがあればそのまま<strong>内部テスト版として Play ストアに公開</strong>も可。SDK も IDE も不要。</p>
+        <p class="sub" style="color:var(--accent);font-size:.78rem;margin-top:6px">出典: TechCrunch 2026-05-19 / Android Developers Blog / 9to5Google</p>
+      </div>
+      <div class="card card-accent">
+        <h4>② App Gallery — ブラウザで即「リミックス」できるショーケース</h4>
+        <p>AI Studio に App Gallery が追加され、Gemini API を使って作られたアプリのビジュアルライブラリとして機能。プレビューを見て気に入ったら<strong>「リミックス」ボタン 1 つでソースをフォークして自分用にカスタマイズ</strong>できる。モバイルアプリ版（iOS/Android）も提供され、外出中もコードを反復できる。</p>
+        <p class="sub" style="color:var(--accent);font-size:.78rem;margin-top:6px">出典: Google AI Studio I/O 2026 公式発表 / pulse2.com</p>
+      </div>
+      <div class="card card-accent">
+        <h4>③ Google Workspace 統合 — Sheets/Drive を直接読んでアプリを作る</h4>
+        <p>AI Studio で作るアプリから Google Workspace へ直接アクセスできるようになった。「この Sheets のデータをダッシュボード化して」「Drive のドキュメントを検索して答えるチャットボットを作って」という指示だけで<strong>実際の業務データに接続したアプリが数分で完成</strong>。ノーコードでエンタープライズ内製ツールを作れる。</p>
+        <p class="sub" style="color:var(--accent);font-size:.78rem;margin-top:6px">出典: Google I/O 2026 developer keynote / developers.googleblog.com</p>
+      </div>
+      <div class="card card-accent">
+        <h4>④ Managed Agents API — 1 API コールで自律エージェントが起動</h4>
+        <p>Gemini API の新機能。<code>agents.create()</code> 一発で、<strong>推論・ツール使用・コード実行（隔離 Linux 環境）を持つエージェント</strong>がスピンアップされる。AI Studio でプロトタイプし、Antigravity にエクスポートして本番スケールへ展開するフローが確立。OpenAI Agents SDK の対抗となる Google の回答。</p>
+        <p class="sub" style="color:var(--accent);font-size:.78rem;margin-top:6px">出典: Google I/O 2026 developer keynote / blog.google 2026-05-19</p>
+      </div>
+    </div>
+
+    <h3 style="margin-top:24px;color:var(--accent)">🏢 Gemini API 企業導入の具体的成果（Google Cloud 公式事例）</h3>
+    <p style="font-size:.85rem;color:var(--muted)">以下は Google Cloud の公式事例ページから。AI Studio でプロトタイプ → Vertex AI で本番というパスを辿ったケースが多数。</p>
+    <div class="grid2">
+      <div class="card">
+        <h4>⑤ Wendy's FreshAI — ドライブスルー注文の 99% 自動化</h4>
+        <p>Wendy's が Google Cloud と共同開発した AI 音声注文アシスタント。ドライブスルーで注文受付・確認・送信を自動処理し、<strong>99% の成功率</strong>を達成。2025年末までに <strong>500〜600 店舗</strong>に展開予定。人間スタッフは接客品質向上に集中できるようになった。</p>
+        <p class="sub" style="color:#4a6a7a;font-size:.78rem;margin-top:6px">出典: Google Cloud "101 real-world gen AI use cases"</p>
+      </div>
+      <div class="card">
+        <h4>⑥ Toyota — 年間 10,000 人時以上の削減</h4>
+        <p>Toyota が Google Cloud AI インフラを活用して工場労働者でも ML モデルを開発・展開できる環境を整備。コードの <strong>35% 以上が AI 生成</strong>（Valeo 社も同様）。<strong>年間 10,000 人時以上</strong>の工数削減を達成し、現場エンジニアが機械学習の専門知識なしに AI 活用できる仕組みを構築。</p>
+        <p class="sub" style="color:#4a6a7a;font-size:.78rem;margin-top:6px">出典: Google Cloud 公式事例 2025</p>
+      </div>
+      <div class="card">
+        <h4>⑦ Commerzbank「Bene」— 200 万件チャット・70% 解決率</h4>
+        <p>ドイツのコメルツバンクが Google Customer Engagement Suite で構築したチャットボット「Bene」。<strong>200 万件以上のチャット</strong>に対応し、<strong>70% の問い合わせを成功裏に自動解決</strong>。担当者への転送が必要なケースを大幅に削減し、24/7 の顧客対応を実現。</p>
+        <p class="sub" style="color:#4a6a7a;font-size:.78rem;margin-top:6px">出典: Google Cloud 公式事例 2025</p>
+      </div>
+      <div class="card">
+        <h4>⑧ Deutsche Bank「DB Lumina」— 調査報告書を数日→数分に</h4>
+        <p>Deutsche Bank が金融アナリスト向けに Gemini で AI 調査ツール「DB Lumina」を構築。従来<strong>数時間〜数日</strong>かかっていた報告書作成が<strong>数分</strong>に短縮。複数のデータソースを横断的に分析して構造化レポートを自動生成する。</p>
+        <p class="sub" style="color:#4a6a7a;font-size:.78rem;margin-top:6px">出典: Google Cloud 公式事例 2025</p>
+      </div>
+      <div class="card">
+        <h4>⑨ Hiscox（保険）— 複雑リスク見積もりを 3 日 → 数分</h4>
+        <p>保険会社 Hiscox が BigQuery + Vertex AI で業界初の AI 強化リード引受モデルを構築。複雑なリスクの見積もりにかかる時間を<strong>3 日間から数分</strong>に短縮。Underwriter の生産性向上と共に、顧客への回答スピードが劇的に改善。</p>
+        <p class="sub" style="color:#4a6a7a;font-size:.78rem;margin-top:6px">出典: Google Cloud 公式事例 2025</p>
+      </div>
+      <div class="card">
+        <h4>⑩ Banco Covalto — 信用承認の応答時間を 90% 以上削減</h4>
+        <p>メキシコのネオバンク Banco Covalto が生成 AI で業務を変革。融資審査の信用承認応答時間を<strong>90% 以上削減</strong>。従来は数日かかっていた審査が数時間〜即日に短縮され、中小企業向け融資の競争力が大幅向上。</p>
+        <p class="sub" style="color:#4a6a7a;font-size:.78rem;margin-top:6px">出典: Google Cloud 公式事例 2025</p>
+      </div>
+      <div class="card">
+        <h4>⑪ AdVon Commerce — 93,673 製品を 1 ヶ月でカタログ化・売上 67% 増</h4>
+        <p>EC 向けコンテンツ最適化企業 AdVon が Gemini + Veo で大手小売業の製品詳細ページを強化。<strong>93,673 製品のカタログを 1 ヶ月以内に処理</strong>（従来は最大 1 年）。スポーツ用品クライアントでは検索順位 <strong>30% 向上</strong>、1 日の売上が <strong>67% 増加</strong>して <strong>1,700 万ドルの収益増</strong>を実現。</p>
+        <p class="sub" style="color:#4a6a7a;font-size:.78rem;margin-top:6px">出典: Google Cloud 公式事例 2025</p>
+      </div>
+      <div class="card">
+        <h4>⑫ Inspira（法律 AI）— ワークフロー時間を 80% 削減</h4>
+        <p>法律テック企業 Inspira が Gemini + Vertex AI + BigQuery で法律文書の検索・分析・起案を自動化。<strong>ワークフロー時間を 80% 削減</strong>。弁護士が数週間ではなく<strong>数分〜数時間で回答</strong>を得られるように。Harvey（法律 AI）も Gemini 2.5 Pro で<strong>数百ページの法的資料の推論</strong>を自動化。</p>
+        <p class="sub" style="color:#4a6a7a;font-size:.78rem;margin-top:6px">出典: Google Cloud 公式事例 2025</p>
+      </div>
+      <div class="card card-green">
+        <h4>⑬ Deloitte「Care Finder」— 5〜8 分の通話を 1 分以内に</h4>
+        <p>Deloitte が構築した医療プロバイダー検索エージェント「Care Finder」。従来は電話オペレーターが平均 <strong>5〜8 分</strong>かけていた「ネットワーク内の医療機関を探す」タスクを <strong>1 分以内</strong>に短縮。患者は自然言語で「近くの皮膚科でウォークインできる場所」などを尋ねるだけで最適な医療機関を提示される。</p>
+        <p class="sub" style="color:#34d399;font-size:.78rem;margin-top:6px">出典: Google Cloud 公式事例 2025</p>
+      </div>
+    </div>
+
+    <div class="tip" style="margin-top:16px">
+      <strong>AI Studio → 本番への典型パス:</strong> AI Studio で無料プロトタイプ（無料枠 1500 req/日）→ プロンプト確定後「Get Code」でコードエクスポート → Vertex AI に移行して本番 SLA と VPC 保護を追加。上記の企業事例の多くがこのフローを辿っている。
+    </div>
+  </section>
+
+  <!-- ── REFERENCES ── -->
+  <section class="panel">
+    <h2>参照リンク</h2>
+    <ul>
+      <li><a href="https://aistudio.google.com" target="_blank" rel="noopener">aistudio.google.com</a> — AI Studio 本体</li>
+      <li><a href="https://ai.google.dev/gemini-api/docs" target="_blank" rel="noopener">ai.google.dev/gemini-api/docs</a> — Gemini API 公式ドキュメント</li>
+      <li><a href="gemini.html">Gemini 深掘り</a> — モデルスペック・ベンチマーク</li>
+      <li><a href="notebooklm.html">NotebookLM 完全ガイド</a> — ドキュメント接地型 AI</li>
+      <li><a href="google-ecosystem.html">Google AI エコシステム総覧</a> — 全製品の使い分け</li>
+      <li><a href="../../research/gemini-recent-updates.html">Gemini 最新アップデート</a> — リリース追跡</li>
+    </ul>
+    <p style="margin-top:12px"><small>最終更新: 2026-05-31 | 料金・レート制限は公式ドキュメントで最新情報を確認すること。</small></p>
+  </section>
+
+</div>
+</body>
+</html>

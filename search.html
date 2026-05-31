@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>サイト検索 | Hub</title>
+  <style>
+    :root{--bg:#0b1220;--panel:#0f172a;--muted:#c8d3e3;--text:#e9edf5;--accent:#3dd8c5;--border:rgba(255,255,255,0.08);--radius:18px}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:"Segoe UI","Noto Sans JP",system-ui,sans-serif;color:var(--text);background:radial-gradient(circle at 20% 20%,rgba(61,216,197,0.12),transparent 30%),linear-gradient(145deg,#0b1220,#0c1526 50%,#0a1020);min-height:100vh;padding:32px 20px 64px;line-height:1.6}
+    .shell{max-width:880px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+    .panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:24px 28px}
+    a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+    h1{margin:6px 0;font-size:1.7rem}
+    .breadcrumb{font-size:.8rem;color:#5a7a9a;margin-bottom:8px}
+
+    /* 検索ボックス */
+    .search-wrap{position:relative;margin-top:16px}
+    #searchInput{width:100%;padding:14px 50px 14px 18px;background:rgba(255,255,255,.05);border:1px solid rgba(61,216,197,.3);border-radius:12px;color:var(--text);font-size:1rem;font-family:inherit;outline:none;transition:border-color .2s}
+    #searchInput:focus{border-color:var(--accent);background:rgba(61,216,197,.04)}
+    #searchInput::placeholder{color:#5a7a9a}
+    .search-icon{position:absolute;right:16px;top:50%;transform:translateY(-50%);color:#5a7a9a;font-size:1.1rem;pointer-events:none}
+    #resultCount{font-size:.8rem;color:#5a7a9a;margin-top:8px;min-height:1.2em}
+
+    /* フィルター */
+    .filters{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+    .filter-btn{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:999px;padding:4px 14px;font-size:.75rem;color:#7a9aac;cursor:pointer;transition:all .15s;font-family:inherit}
+    .filter-btn.active{background:rgba(61,216,197,.15);border-color:rgba(61,216,197,.4);color:var(--accent)}
+    .filter-btn:hover{border-color:rgba(61,216,197,.3);color:var(--muted)}
+
+    /* 結果 */
+    #results{display:flex;flex-direction:column;gap:10px}
+    .result-item{background:rgba(255,255,255,.025);border:1px solid var(--border);border-radius:14px;padding:16px 20px;transition:border-color .15s;cursor:pointer}
+    .result-item:hover{border-color:rgba(61,216,197,.35);background:rgba(61,216,197,.03)}
+    .result-item a{display:block;text-decoration:none;color:inherit}
+    .result-title{font-size:.97rem;font-weight:700;color:var(--text);margin-bottom:4px}
+    .result-title mark{background:rgba(61,216,197,.25);color:var(--accent);border-radius:3px;padding:0 2px}
+    .result-desc{font-size:.84rem;color:var(--muted);margin-bottom:6px;line-height:1.5}
+    .result-meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .result-cat{font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:5px;text-transform:uppercase;letter-spacing:.04em}
+    .result-url{font-size:.72rem;color:#5a7a9a;font-family:"Fira Code",monospace}
+    .cat-creator-system{background:rgba(61,216,197,.15);color:#3dd8c5}
+    .cat-claw-stack{background:rgba(167,139,250,.15);color:#c4a0ff}
+    .cat-workbench{background:rgba(247,183,51,.15);color:#f7b733}
+    .cat-research{background:rgba(79,255,176,.15);color:#4fffb0}
+    .cat-foundations{background:rgba(255,107,107,.15);color:#ff9090}
+    .cat-strategy{background:rgba(255,160,60,.15);color:#ffa03c}
+    .cat-logs{background:rgba(150,150,180,.15);color:#a0a0c0}
+    .cat-demos{background:rgba(150,150,180,.12);color:#888}
+    .cat-root{background:rgba(61,216,197,.08);color:#3dd8c5}
+    .cat-_routines{background:rgba(167,139,250,.12);color:#c4a0ff}
+
+    /* 空・エラー状態 */
+    .empty{text-align:center;padding:40px 20px;color:#5a7a9a;font-size:.9rem}
+    .empty .icon{font-size:2.5rem;margin-bottom:12px}
+
+    /* ショートカットヒント */
+    .hint{font-size:.75rem;color:#5a7a9a;margin-top:4px}
+    kbd{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:4px;padding:1px 6px;font-size:.72rem;font-family:inherit}
+
+    /* スタッツ */
+    .stats{display:flex;flex-wrap:wrap;gap:12px;margin-top:14px}
+    .stat{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:10px 16px;text-align:center;flex:1;min-width:90px}
+    .stat .v{font-size:1.3rem;font-weight:800;color:var(--accent)}
+    .stat .l{font-size:.7rem;color:#5a7a9a;text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
+  </style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ヘッダー -->
+  <div class="panel">
+    <div class="breadcrumb"><a href="index.html">← Hub Top</a></div>
+    <h1>🔍 サイト内検索</h1>
+    <p style="color:var(--muted);font-size:.92rem;margin:6px 0 0">200 ページをリアルタイム検索。タイトル・説明・見出しをキーワードで絞り込む。</p>
+
+    <div class="search-wrap">
+      <input id="searchInput" type="text" placeholder="キーワードを入力... (例: LoRA, HITL, ComfyUI, monetization)" autofocus autocomplete="off">
+      <span class="search-icon">⌕</span>
+    </div>
+    <div id="resultCount"></div>
+    <p class="hint"><kbd>/</kbd> でフォーカス &nbsp;·&nbsp; <kbd>↑↓</kbd> で移動 &nbsp;·&nbsp; <kbd>Enter</kbd> で開く &nbsp;·&nbsp; <kbd>Esc</kbd> でクリア</p>
+
+    <div class="filters" id="filters">
+      <button class="filter-btn active" data-cat="all">すべて</button>
+      <button class="filter-btn" data-cat="creator-system">Creator System</button>
+      <button class="filter-btn" data-cat="claw-stack">Claw Stack</button>
+      <button class="filter-btn" data-cat="workbench">Workbench</button>
+      <button class="filter-btn" data-cat="research">Research</button>
+      <button class="filter-btn" data-cat="foundations">Foundations</button>
+      <button class="filter-btn" data-cat="strategy">Strategy</button>
+      <button class="filter-btn" data-cat="logs">Logs</button>
+      <button class="filter-btn" data-cat="_routines">Routines</button>
+    </div>
+  </div>
+
+  <!-- 統計 -->
+  <div class="panel" id="statsPanel">
+    <div class="stats">
+      <div class="stat"><div class="v" id="stat-total">200</div><div class="l">総ページ数</div></div>
+      <div class="stat"><div class="v">10</div><div class="l">カテゴリ</div></div>
+      <div class="stat"><div class="v" id="stat-fresh">—</div><div class="l">最近更新</div></div>
+    </div>
+  </div>
+
+  <!-- 結果 -->
+  <div id="results"></div>
+
+</div>
+
+<!-- Fuse.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
+<script>
+// ===== インデックス読み込み =====
+let PAGES = [];
+let fuse = null;
+let activeCategory = 'all';
+let selectedIndex = -1;
+let currentResults = [];
+
+async function loadIndex() {
+  try {
+    const res = await fetch('search-index.json');
+    PAGES = await res.json();
+  } catch(e) {
+    // フォールバック: インラインデータを使う
+    console.warn('search-index.json fetch failed, using inline fallback');
+    PAGES = INLINE_PAGES;
+  }
+  initFuse();
+  updateStats();
+  // 初期表示: 全ページをカテゴリ別に表示
+  renderInitial();
+}
+
+function initFuse() {
+  fuse = new Fuse(PAGES, {
+    keys: [
+      { name: 'title',    weight: 3.0 },
+      { name: 'desc',     weight: 1.5 },
+      { name: 'keywords', weight: 1.0 },
+      { name: 'url',      weight: 0.5 }
+    ],
+    threshold: 0.4,
+    includeScore: true,
+    includeMatches: true,
+    minMatchCharLength: 2,
+    ignoreLocation: true
+  });
+}
+
+function updateStats() {
+  document.getElementById('stat-total').textContent = PAGES.length;
+}
+
+// ===== 検索 =====
+const input = document.getElementById('searchInput');
+const countEl = document.getElementById('resultCount');
+const resultsEl = document.getElementById('results');
+
+input.addEventListener('input', () => {
+  const q = input.value.trim();
+  if (!q) {
+    renderInitial();
+    countEl.textContent = '';
+    selectedIndex = -1;
+    return;
+  }
+  doSearch(q);
+});
+
+function doSearch(q) {
+  const raw = fuse.search(q);
+  let results = raw.map(r => r.item);
+  if (activeCategory !== 'all') {
+    results = results.filter(p => p.category === activeCategory);
+  }
+  currentResults = results;
+  selectedIndex = -1;
+  renderResults(results, q);
+  countEl.textContent = results.length > 0
+    ? `${results.length} 件ヒット`
+    : '一致するページが見つかりませんでした';
+}
+
+// ===== レンダリング =====
+function highlight(text, query) {
+  if (!query || !text) return escHtml(text || '');
+  const words = query.split(/\s+/).filter(w => w.length > 1);
+  let result = escHtml(text);
+  words.forEach(w => {
+    const re = new RegExp('(' + escRe(escHtml(w)) + ')', 'gi');
+    result = result.replace(re, '<mark>$1</mark>');
+  });
+  return result;
+}
+
+function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
+
+function catLabel(cat) {
+  const map = {
+    'creator-system':'Creator System','claw-stack':'Claw Stack',
+    'workbench':'Workbench','research':'Research','foundations':'Foundations',
+    'strategy':'Strategy','logs':'Logs','demos':'Demos',
+    'root':'Root','_routines':'Routines'
+  };
+  return map[cat] || cat;
+}
+
+function renderItem(page, query) {
+  const cat = page.category;
+  const url = page.url;
+  const titleHl = highlight(page.title, query);
+  const descHl = highlight(page.desc, query);
+  return `<div class="result-item" data-url="${escHtml(url)}">
+    <a href="${escHtml(url)}">
+      <div class="result-title">${titleHl}</div>
+      ${page.desc ? `<div class="result-desc">${descHl}</div>` : ''}
+      <div class="result-meta">
+        <span class="result-cat cat-${escHtml(cat)}">${catLabel(cat)}</span>
+        <span class="result-url">${escHtml(url)}</span>
+      </div>
+    </a>
+  </div>`;
+}
+
+function renderResults(pages, query) {
+  if (!pages.length) {
+    resultsEl.innerHTML = `<div class="panel empty"><div class="icon">🔍</div><p>「${escHtml(query)}」に一致するページが見つかりませんでした。<br>別のキーワードや短い単語でお試しください。</p></div>`;
+    return;
+  }
+  resultsEl.innerHTML = pages.slice(0, 50).map(p => renderItem(p, query)).join('');
+  attachClickHandlers();
+}
+
+function renderInitial() {
+  // カテゴリ別にグループ化して表示
+  const cats = activeCategory === 'all'
+    ? [...new Set(PAGES.map(p => p.category))]
+    : [activeCategory];
+
+  const catOrder = ['creator-system','claw-stack','workbench','research','foundations','strategy','logs','_routines','demos','root'];
+  const sortedCats = cats.sort((a,b) => {
+    const ai = catOrder.indexOf(a), bi = catOrder.indexOf(b);
+    return (ai<0?99:ai) - (bi<0?99:bi);
+  });
+
+  let html = '';
+  sortedCats.forEach(cat => {
+    const pages = PAGES.filter(p => p.category === cat);
+    if (!pages.length) return;
+    html += `<div class="panel" style="padding:16px 20px">
+      <div style="font-size:.72rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">${catLabel(cat)} — ${pages.length} ページ</div>
+      <div style="display:flex;flex-direction:column;gap:6px">`;
+    pages.slice(0, 20).forEach(p => {
+      html += `<a href="${escHtml(p.url)}" style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04);color:var(--muted);font-size:.86rem;text-decoration:none;transition:color .1s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">
+        <span>${escHtml(p.title)}</span>
+        <span style="font-size:.72rem;color:#5a7a9a;font-family:monospace;white-space:nowrap;flex-shrink:0">${escHtml(p.url.split('/').pop())}</span>
+      </a>`;
+    });
+    if (pages.length > 20) {
+      html += `<span style="font-size:.75rem;color:#5a7a9a;padding-top:6px">… 他 ${pages.length-20} ページ（検索で絞り込む）</span>`;
+    }
+    html += `</div></div>`;
+  });
+  resultsEl.innerHTML = html;
+}
+
+function attachClickHandlers() {
+  resultsEl.querySelectorAll('.result-item').forEach((el, i) => {
+    el.addEventListener('mouseenter', () => {
+      document.querySelectorAll('.result-item').forEach(e => e.style.outline = '');
+      el.style.outline = '1px solid rgba(61,216,197,.5)';
+      selectedIndex = i;
+    });
+  });
+}
+
+// ===== キーボードナビ =====
+document.addEventListener('keydown', e => {
+  if (e.key === '/' && document.activeElement !== input) {
+    e.preventDefault(); input.focus(); return;
+  }
+  if (e.key === 'Escape') {
+    input.value = ''; renderInitial(); countEl.textContent = ''; selectedIndex = -1; return;
+  }
+  const items = resultsEl.querySelectorAll('.result-item');
+  if (!items.length) return;
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    selectedIndex = Math.min(selectedIndex+1, items.length-1);
+    items.forEach((el,i) => el.style.outline = i===selectedIndex ? '1px solid rgba(61,216,197,.5)' : '');
+    items[selectedIndex]?.scrollIntoView({block:'nearest'});
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    selectedIndex = Math.max(selectedIndex-1, 0);
+    items.forEach((el,i) => el.style.outline = i===selectedIndex ? '1px solid rgba(61,216,197,.5)' : '');
+    items[selectedIndex]?.scrollIntoView({block:'nearest'});
+  } else if (e.key === 'Enter' && selectedIndex >= 0) {
+    const link = items[selectedIndex]?.querySelector('a');
+    if (link) window.location.href = link.getAttribute('href');
+  }
+});
+
+// ===== フィルター =====
+document.getElementById('filters').addEventListener('click', e => {
+  const btn = e.target.closest('.filter-btn');
+  if (!btn) return;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activeCategory = btn.dataset.cat;
+  const q = input.value.trim();
+  if (q) doSearch(q); else renderInitial();
+});
+
+// インラインフォールバック（fetch が使えない環境用）
+const INLINE_PAGES = [];
+
+// 起動
+loadIndex();
+</script>
+</body>
+</html>

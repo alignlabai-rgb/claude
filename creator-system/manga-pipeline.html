@@ -13,11 +13,15 @@
   <div class="nav-logo">AI Creator Hub</div>
   <ul class="nav-links">
     <li><a href="index.html">ホーム</a></li>
+    <li><a href="topic-generator.html">ネタ生成</a></li>
     <li><a href="video-pipeline.html">動画制作</a></li>
     <li><a href="manga-pipeline.html" class="active">漫画制作</a></li>
     <li><a href="evaluation.html">評価システム</a></li>
     <li><a href="monetization.html">マネタイズ</a></li>
     <li><a href="openclaw.html">OpenClaw連携</a></li>
+    <li><a href="kpi-dashboard.html">KPI</a></li>
+    <li><a href="genai-tools.html">生成ツール比較</a></li>
+    <li><a href="overview.html" style="color:#3dd8c5;">全体フロー</a></li>
     <li><a href="../research/openclaw-news/index.html" style="color: #4FFFB0;">🦞 OpenClaw情報</a></li>
   </ul>
   <div class="nav-hamburger"><span></span><span></span><span></span></div>
@@ -228,7 +232,7 @@
         <div style="display: flex; flex-direction: column; gap: 0.5rem;">
           <div style="background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 0.875rem; display: flex; gap: 0.875rem; align-items: flex-start;">
             <div class="step-num" style="margin: 0; min-width: 36px; height: 36px; font-size: 0.85rem;">1</div>
-            <div><strong>参照画像収集</strong><br><span style="font-size: 0.82rem; color: var(--text-muted);">キャラクター設定画20〜50枚（正面・斜め・表情バリエーション）をMidjourneyで生成</span></div>
+            <div><strong>参照画像収集</strong><br><span style="font-size: 0.82rem; color: var(--text-muted);">キャラクター設定画20〜50枚（正面・斜め・表情バリエーション）を Midjourney または Imagen 4 Ultra で生成。Imagen 4 は Vertex AI API 統合が容易で $0.06/枚（Ultra）・8言語プロンプト対応。</span></div>
           </div>
           <div style="background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 0.875rem; display: flex; gap: 0.875rem; align-items: flex-start;">
             <div class="step-num" style="margin: 0; min-width: 36px; height: 36px; font-size: 0.85rem;">2</div>
@@ -428,6 +432,264 @@
   </div>
 </section>
 
+<!-- 設計意図 / ツール選定 WHY -->
+<section class="section" id="why">
+  <div class="section-inner">
+    <div class="section-label">設計意図</div>
+    <h2 class="section-title">なぜこのツール・手法を選んだのか</h2>
+    <p style="color: var(--text-muted); margin-bottom: 2rem; max-width: 700px;">
+      「LoRA + IP-Adapter + ControlNet」という組み合わせは一見複雑です。
+      それぞれが別の問題を解いていることを記録します。
+      将来のセッションが構成変更を検討するときの判断軸として。
+    </p>
+    <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem; display: flex; gap: 1.25rem; align-items: flex-start;">
+        <div style="background: rgba(108,60,225,0.15); border-radius: 10px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0;">🎨</div>
+        <div>
+          <div style="font-weight: 700; margin-bottom: 0.35rem;">ComfyUI をバックエンドに選んだ理由</div>
+          <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.8;">
+            ノードグラフ構造により、各生成ステップが独立した API 呼び出しになる。
+            Automatic1111 は GUI 操作前提でスクリプト制御が煩雑だが、ComfyUI は JSON ワークフローで完全自動化できる。
+            バッチ生成・シード固定・ControlNet の重みをコードから制御できることが、OpenClaw との統合の前提条件だった。
+          </div>
+        </div>
+      </div>
+
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem; display: flex; gap: 1.25rem; align-items: flex-start;">
+        <div style="background: rgba(0,220,130,0.15); border-radius: 10px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0;">🧬</div>
+        <div>
+          <div style="font-weight: 700; margin-bottom: 0.35rem;">LoRA + IP-Adapter + ControlNet の3重構成にした理由</div>
+          <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.8;">
+            それぞれが異なるキャラクター一貫性の問題を解いている。
+            <strong style="color: var(--text);">LoRA</strong> は「このキャラのスタイル・顔つき」を学習したファインチューン——最も強力だが失敗時の影響も大きい。
+            <strong style="color: var(--text);">IP-Adapter</strong> は参照画像から視覚的特徴をコンディショニングする補完——LoRA が弱い構図変化に対応。
+            <strong style="color: var(--text);">ControlNet Canny</strong> は「線画・輪郭の一貫性」——コマ間でポーズが変わっても輪郭スタイルが崩れない。
+            1つでは補えない穴を3つで埋めている構成。
+          </div>
+        </div>
+      </div>
+
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem; display: flex; gap: 1.25rem; align-items: flex-start;">
+        <div style="background: rgba(0,212,255,0.15); border-radius: 10px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0;">🔧</div>
+        <div>
+          <div style="font-weight: 700; margin-bottom: 0.35rem;">ADetailer を別途使う理由（ComfyUI 内で完結させない理由）</div>
+          <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.8;">
+            顔の修復は生成後処理として独立させることで、メイン生成のシードを変えずに顔品質だけを向上させられる。
+            全体を再生成するとシーンの整合性が崩れる（背景・他キャラの変化）。
+            ADetailer は顔領域を切り抜いて inpaint → 合成するため、顔以外に影響を与えない。
+            この分離設計がコスト効率（全体再生成 vs 顔部分のみ）でも優れている。
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div style="margin-top: 1.5rem; background: rgba(0,212,255,0.06); border: 1px solid rgba(0,212,255,0.2); border-radius: 12px; padding: 1rem; font-size: 0.82rem; color: var(--text-muted);">
+      💡 将来のセッションへ: 生成AIモデルは半年で世代が変わる。ツール名より「キャラ同一性・スタイル一貫性・顔品質の3問題をそれぞれ解く層がある」という構造の方が重要。
+    </div>
+  </div>
+</section>
+
+<!-- LoRA失敗時フォールバック -->
+<section class="section" id="lora-fallback">
+  <div class="section-inner">
+    <div class="section-label">障害対応設計</div>
+    <h2 class="section-title">LoRA失敗時の<br>フォールバック設計</h2>
+    <p style="color: var(--text-muted); margin-bottom: 2rem; max-width: 700px;">
+      LoRAは最も強力なキャラクター一貫性手法ですが、チェックポイント破損・スタイル崩壊・
+      モデル不整合といった障害も起きやすい。段階的フォールバックで自動回復し、
+      それでも回復できない場合のみHITLに引き渡す設計が重要です。
+    </p>
+    <div class="two-col">
+      <div>
+        <h3 style="font-size: 0.95rem; margin-bottom: 1rem; color: var(--text-muted);">障害パターンと対応</h3>
+        <div style="display: flex; flex-direction: column; gap: 0.875rem;">
+          <div style="background: rgba(255,107,107,0.1); border: 1px solid rgba(255,107,107,0.3); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; color: #FF6B6B; font-weight: 700; margin-bottom: 0.35rem;">LoRAチェックポイント破損</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.7;">
+              症状: ComfyUI APIが500エラーまたはNaN生成<br>
+              対応: ベースモデル（SD 1.5 / SDXL）+ IP-Adapterのみで代替生成。
+              品質スコアが0.65以上なら暫定公開、未満なら再生成。
+            </div>
+          </div>
+          <div style="background: rgba(255,158,0,0.1); border: 1px solid rgba(255,158,0,0.3); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; color: #FF9E00; font-weight: 700; margin-bottom: 0.35rem;">スタイル崩壊（キャラ外見ズレ）</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.7;">
+              症状: CLIP類似度スコアがキャラ基準画像と0.70未満<br>
+              対応: ① CFG強度を7.0→8.5に上げて再生成（seed変更）<br>
+              ② それでも0.70未満 → LoRA weightを0.9→0.7に落として再生成<br>
+              ③ 2回失敗でHITL通知（プレビュー画像添付）
+            </div>
+          </div>
+          <div style="background: rgba(108,60,225,0.1); border: 1px solid rgba(108,60,225,0.3); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; color: #A78BFA; font-weight: 700; margin-bottom: 0.35rem;">品質閾値未達（汎用的低品質）</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.7;">
+              症状: ADetailerスコアが0.65未満（顔崩れ等）<br>
+              対応: steps 25→35、denoise 0.6→0.4で顔修復再試行（1回限り）。
+              修復後も0.65未満ならIPAdapterのみにフォールバック。
+            </div>
+          </div>
+          <div style="background: rgba(0,220,130,0.1); border: 1px solid rgba(0,220,130,0.3); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; color: #4FFFB0; font-weight: 700; margin-bottom: 0.35rem;">フォールバック成功判定</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.7;">
+              代替手法で生成した画像が品質スコア0.65以上かつCLIP類似度0.70以上なら
+              「フォールバック成功」として通常フローに合流。ログに障害種別を記録。
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="code-block">
+<span class="cm"># lora_fallback_handler.py</span>
+
+QUALITY_THRESHOLD = <span class="num">0.65</span>
+CLIP_THRESHOLD = <span class="num">0.70</span>
+
+<span class="kw">def</span> <span class="fn">generate_with_fallback</span>(character, scene):
+    <span class="cm"># ① LoRA通常生成</span>
+    result = <span class="fn">generate_panel</span>(character, scene, use_lora=<span class="kw">True</span>)
+
+    <span class="kw">if</span> <span class="fn">check_quality</span>(result) >= QUALITY_THRESHOLD:
+        <span class="kw">if</span> <span class="fn">check_clip_sim</span>(result, character[<span class="str">"ref"</span>]) >= CLIP_THRESHOLD:
+            <span class="kw">return</span> result  <span class="cm"># 通常成功</span>
+
+    <span class="cm"># ② CFG/weight 調整で再生成</span>
+    result2 = <span class="fn">generate_panel</span>(
+        character, scene, use_lora=<span class="kw">True</span>,
+        cfg=<span class="num">8.5</span>, lora_weight=<span class="num">0.7</span>,
+        seed=<span class="fn">random</span>.<span class="fn">randint</span>(<span class="num">0</span>, <span class="num">999999</span>)
+    )
+    <span class="kw">if</span> <span class="fn">check_quality</span>(result2) >= QUALITY_THRESHOLD:
+        <span class="kw">if</span> <span class="fn">check_clip_sim</span>(result2, character[<span class="str">"ref"</span>]) >= CLIP_THRESHOLD:
+            <span class="kw">return</span> result2  <span class="cm"># 調整成功</span>
+
+    <span class="cm"># ③ IP-Adapterのみにフォールバック</span>
+    result3 = <span class="fn">generate_panel</span>(
+        character, scene, use_lora=<span class="kw">False</span>,
+        ip_adapter_scale=<span class="num">0.85</span>
+    )
+    <span class="kw">if</span> <span class="fn">check_quality</span>(result3) >= QUALITY_THRESHOLD:
+        <span class="kw">return</span> result3  <span class="cm"># フォールバック成功</span>
+
+    <span class="cm"># ④ すべて失敗 → HITL</span>
+    <span class="fn">request_human_review</span>(
+        content_id=scene[<span class="str">"id"</span>],
+        preview=result3,
+        reason=<span class="str">"lora_fallback_failed"</span>
+    )
+    <span class="kw">return</span> <span class="kw">None</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 複数キャラクター同フレーム -->
+<section class="section" id="multi-character" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-label">複数キャラクター対応</div>
+    <h2 class="section-title">複数キャラクターを<br>同フレームに配置する</h2>
+    <p style="color: var(--text-muted); margin-bottom: 2rem; max-width: 700px;">
+      1キャラクター1フレームなら品質管理は単純ですが、会話シーンや群像シーンでは
+      複数キャラクターを同一フレームに配置する必要があります。
+      ControlNet Openposeによる位置制御と、クロスコンタミネーション（顔混じり）の自動検出が鍵になります。
+    </p>
+    <div class="two-col">
+      <div>
+        <h3 style="font-size: 0.95rem; margin-bottom: 1rem; color: var(--text-muted);">配置制御の設計</h3>
+        <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.5rem;">
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; font-weight: 700; color: var(--accent); margin-bottom: 0.35rem;">ControlNet Openpose — キャラ別ポーズ指定</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.7;">
+              キャラAの骨格マップとキャラBの骨格マップを別レイヤーで合成したポーズ画像を入力。
+              各キャラの位置・向き・手の動きをスクリプトで生成することで、シーンに応じた自動ポーズ配置が可能。
+            </div>
+          </div>
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; font-weight: 700; color: #FF9E00; margin-bottom: 0.35rem;">クロスコンタミネーション検出</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.7;">
+              主な障害: キャラAの顔がキャラBのボディに混入する「顔混じり」。
+              検出方法: 生成画像をキャラAの顔領域・キャラBの顔領域に分割し、
+              それぞれのCLIP埋め込みが基準画像と正しく対応しているか確認。
+              両キャラのCLIPスコアが0.70以上なら合格。
+            </div>
+          </div>
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; font-weight: 700; color: #A78BFA; margin-bottom: 0.35rem;">3キャラ以上のシーン</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.7;">
+              3キャラ以上は自動品質検証の精度が下がるため、スコアに関わらず自動でHITLに引き渡す。
+              Signal通知にコマ画像プレビューを添付して人間が確認後に公開/再生成を判断。
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="code-block">
+<span class="cm"># multi_character_compositor.py</span>
+
+<span class="kw">def</span> <span class="fn">build_multi_char_pose</span>(characters, scene_layout):
+    <span class="str">"""
+    characters: [{id, position, pose_preset, facing}]
+    scene_layout: "dialogue_left_right" | "crowd" | "confrontation"
+    """</span>
+    pose_map = <span class="fn">np.zeros</span>((<span class="num">512</span>, <span class="num">512</span>, <span class="num">3</span>), dtype=<span class="fn">np.uint8</span>)
+
+    <span class="kw">for</span> char <span class="kw">in</span> characters:
+        skeleton = <span class="fn">get_pose_preset</span>(
+            char[<span class="str">"pose_preset"</span>],
+            char[<span class="str">"facing"</span>]
+        )
+        offset_x, offset_y = char[<span class="str">"position"</span>]
+        pose_map = <span class="fn">overlay_skeleton</span>(
+            pose_map, skeleton, offset_x, offset_y
+        )
+    <span class="kw">return</span> pose_map
+
+<span class="kw">def</span> <span class="fn">check_cross_contamination</span>(image, characters):
+    <span class="kw">for</span> i, char <span class="kw">in</span> <span class="fn">enumerate</span>(characters):
+        region = <span class="fn">crop_face_region</span>(image, char[<span class="str">"position"</span>])
+        sim = <span class="fn">clip_similarity</span>(region, char[<span class="str">"ref_image"</span>])
+        <span class="kw">if</span> sim &lt; <span class="num">0.70</span>:
+            <span class="kw">return</span> <span class="kw">False</span>, {
+                <span class="str">"char"</span>: char[<span class="str">"id"</span>],
+                <span class="str">"score"</span>: sim,
+                <span class="str">"issue"</span>: <span class="str">"contamination"</span>
+            }
+    <span class="kw">return</span> <span class="kw">True</span>, {}
+
+<span class="kw">def</span> <span class="fn">generate_multi_char_panel</span>(characters, scene):
+    <span class="kw">if</span> <span class="fn">len</span>(characters) >= <span class="num">3</span>:
+        <span class="cm"># 3キャラ以上は直接HITL</span>
+        <span class="kw">return</span> <span class="fn">request_human_review</span>(
+            reason=<span class="str">"3+ characters"</span>
+        )
+
+    pose_map = <span class="fn">build_multi_char_pose</span>(characters, scene[<span class="str">"layout"</span>])
+    result = <span class="fn">generate_panel</span>(
+        characters, scene,
+        controlnet_openpose=pose_map,
+        controlnet_weight=<span class="num">0.85</span>
+    )
+    ok, err = <span class="fn">check_cross_contamination</span>(result, characters)
+    <span class="kw">if</span> <span class="kw">not</span> ok:
+        <span class="cm"># 再生成（1回）してもNGならHITL</span>
+        result2 = <span class="fn">generate_panel</span>(
+            characters, scene,
+            controlnet_openpose=pose_map,
+            controlnet_weight=<span class="num">0.95</span>,   <span class="cm"># weight強化</span>
+            seed=<span class="fn">random</span>.<span class="fn">randint</span>(<span class="num">0</span>, <span class="num">999999</span>)
+        )
+        ok2, _ = <span class="fn">check_cross_contamination</span>(result2, characters)
+        <span class="kw">if</span> <span class="kw">not</span> ok2:
+            <span class="kw">return</span> <span class="fn">request_human_review</span>(
+                preview=result2, reason=<span class="fn">str</span>(err)
+            )
+        <span class="kw">return</span> result2
+    <span class="kw">return</span> result</div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <footer>
   <div class="footer-inner">
     <div class="footer-logo">AI Creator Hub</div>
@@ -440,7 +702,7 @@
       <a href="openclaw.html">OpenClaw連携</a>
     </nav>
     <p>AI Creator Hub — AIでコンテンツをつくり、稼ぐ</p>
-    <p style="font-size:0.8rem;opacity:0.65;">最終更新: 2026-05-30（モデル世代を点検。Gemini は Pro 最上位の 3.1 Pro 据え置き＝3.5 Pro は延期中）</p>
+    <p style="font-size:0.8rem;opacity:0.65;">最終更新: 2026-05-31（LoRA参照画像生成に Imagen 4 Ultra を追加）</p>
   </div>
 </footer>
 

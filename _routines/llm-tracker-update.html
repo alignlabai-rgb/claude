@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LLM トラッカー更新ルーティン | _routines</title>
+  <style>
+    body { font-family: "Segoe UI","Noto Sans JP",system-ui,sans-serif; margin:0; background:#0b1220; color:#edf2fb; line-height:1.7; padding:28px 18px 64px; }
+    .shell { max-width:960px; margin:0 auto; display:flex; flex-direction:column; gap:16px; }
+    .panel { background:#111a2b; border:1px solid rgba(255,255,255,0.08); border-radius:18px; padding:22px 26px; }
+    .panel-accent { border-color:rgba(61,216,197,.3); }
+    .panel-yellow { border-color:rgba(252,211,77,.3); }
+    a { color:#75d7c0; text-decoration:none; }
+    a:hover { text-decoration:underline; }
+    h1 { margin:6px 0; font-size:1.7rem; }
+    h2 { margin:0 0 12px; font-size:1.05rem; color:#fcd34d; border-bottom:2px solid rgba(252,211,77,.2); padding-bottom:6px; }
+    h3 { margin:12px 0 6px; font-size:.95rem; color:#75d7c0; }
+    p,li { color:#c5d0e3; font-size:.9rem; }
+    ul { padding-left:20px; margin:6px 0; }
+    li { margin-bottom:4px; }
+    code { font-family:"Fira Code","Consolas",monospace; background:rgba(255,255,255,.06); padding:1px 7px; border-radius:5px; font-size:.83em; color:#a5f3d0; }
+    .pre { background:#070d18; border:1px solid rgba(255,255,255,.07); border-radius:10px; padding:14px 16px; font-family:"Fira Code","Consolas",monospace; font-size:.8rem; line-height:1.65; overflow-x:auto; white-space:pre; color:#c8d3e3; margin:10px 0; }
+    .badge { display:inline-block; font-size:.72rem; font-weight:700; padding:2px 8px; border-radius:5px; margin-right:6px; }
+    .badge-teal { background:rgba(61,216,197,.18); color:#3dd8c5; }
+    .badge-yellow { background:rgba(252,211,77,.18); color:#fcd34d; }
+    .badge-red { background:rgba(255,90,90,.18); color:#ff8080; }
+    .step { display:flex; gap:14px; padding:12px 0; border-bottom:1px solid rgba(255,255,255,.04); }
+    .step:last-child { border-bottom:none; }
+    .step-num { background:rgba(61,216,197,.12); border:1px solid rgba(61,216,197,.3); color:#3dd8c5; border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:.82rem; flex-shrink:0; }
+    .step-body h3 { margin:0 0 4px; font-size:.9rem; color:#edf2fb; }
+    .step-body p { margin:0; font-size:.86rem; }
+    .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    @media(max-width:640px) { .grid2 { grid-template-columns:1fr; } }
+    .card { background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.07); border-radius:12px; padding:14px 16px; }
+    .note { background:rgba(61,216,197,.06); border-left:3px solid #3dd8c5; border-radius:0 8px 8px 0; padding:10px 14px; margin:10px 0; font-size:.87rem; color:#c5d0e3; }
+    table { width:100%; border-collapse:collapse; font-size:.86rem; }
+    th { text-align:left; padding:8px 11px; background:rgba(61,216,197,.07); color:#3dd8c5; font-size:.78rem; border-bottom:1px solid rgba(255,255,255,.07); }
+    td { padding:8px 11px; border-bottom:1px solid rgba(255,255,255,.04); color:#c5d0e3; vertical-align:top; }
+    td strong { color:#edf2fb; }
+    small { color:#4a6a7a; font-size:.78rem; }
+    .breadcrumb { font-size:.8rem; color:#4a6a7a; margin-bottom:8px; }
+  </style>
+</head>
+<body>
+<div class="shell">
+
+  <div class="panel panel-accent">
+    <div class="breadcrumb"><a href="../index.html">← Hub Top</a> / _routines</div>
+    <span class="badge badge-teal">月次ルーティン</span>
+    <h1>LLM トラッカー更新</h1>
+    <p style="color:#c5d0e3;margin:8px 0 0;font-size:.95rem;">毎月初に実施。6 ベンダーの最新モデル情報・API 変更・料金改定を各トラッカーページに反映する。所要時間: 約 30〜45 分（Claude セッション）。</p>
+    <p style="margin-top:8px"><small>最終更新: 2026-05-30 | 実施頻度: 月1回（月初5日以内）</small></p>
+  </div>
+
+  <!-- 対象ページ -->
+  <div class="panel">
+    <h2>更新対象トラッカーページ</h2>
+    <table>
+      <thead><tr><th>ベンダー</th><th>ファイル</th><th>主な更新情報源</th><th>前回更新</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Anthropic (Claude)</strong></td><td><code>research/claude-recent-updates.html</code></td><td>Anthropic ブログ / API changelog</td><td>2026-05-29</td></tr>
+        <tr><td><strong>OpenAI (ChatGPT)</strong></td><td><code>research/chatgpt-recent-updates.html</code></td><td>OpenAI ブログ / platform changelog</td><td>2026-05-29</td></tr>
+        <tr><td><strong>Google (Gemini)</strong></td><td><code>research/gemini-recent-updates.html</code></td><td>Google AI Blog / DeepMind blog</td><td>2026-05-29</td></tr>
+        <tr><td><strong>xAI (Grok)</strong></td><td><code>research/grok-recent-updates.html</code></td><td>x.ai / X社発表</td><td>2026-05-30</td></tr>
+        <tr><td><strong>Qwen (Alibaba)</strong></td><td><code>research/qwen-recent-updates.html</code></td><td>Qwen Blog / HuggingFace</td><td>2026-05-30</td></tr>
+        <tr><td><strong>GLM (Zhipu AI)</strong></td><td><code>research/glm-recent-updates.html</code></td><td>zhipuai.cn / GitHub</td><td>2026-05-30</td></tr>
+      </tbody>
+    </table>
+    <div class="note" style="margin-top:12px">
+      <strong>優先度:</strong> Claude → ChatGPT → Gemini の順（ALIGN_Lab の実装依存度順）。時間が足りない場合は上位 3 ベンダーを優先。
+    </div>
+  </div>
+
+  <!-- 実施手順 -->
+  <div class="panel panel-yellow">
+    <h2>実施手順（Claude セッションで実行）</h2>
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h3>前月比較 — 何が変わったか把握</h3>
+        <p>各トラッカーページの「最近の更新」セクションを読み、前月末時点での最新モデル名・バージョンを控える。git log で当該ファイルの最終コミット日も確認する。</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h3>新情報の収集（Web 検索）</h3>
+        <p>Claude に WebSearch で各ベンダーの直近 30 日のリリース情報を調査させる。確認項目: ① 新モデルリリース ② API 仕様変更（入出力トークン上限・モダリティ） ③ 料金改定 ④ 廃止予告</p>
+        <div class="pre"># Claude への指示テンプレート
+「[ベンダー名] の [前月日付] 以降の以下情報を調査してください:
+1. 新モデルリリース（モデルID・機能概要・対象プラン）
+2. API 仕様変更（context window・vision対応・tool use）
+3. 料金改定（input/output $/1M tokens）
+4. 廃止・非推奨モデルの予告
+情報源: 公式ブログ・公式ドキュメント・GitHub リリースノートを優先」</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h3>トラッカーページの更新</h3>
+        <p>収集した情報を対象ファイルの「最近の更新」セクション冒頭に追記する。既存エントリは削除せず下に残す（最新が上）。フォーマット例:</p>
+        <div class="pre">&lt;!-- 新エントリ（先頭に追加）--&gt;
+&lt;div class="update-entry"&gt;
+  &lt;span class="date"&gt;2026-06-01&lt;/span&gt;
+  &lt;span class="badge badge-teal"&gt;NEW&lt;/span&gt;
+  &lt;strong&gt;モデル名 X.Y リリース&lt;/strong&gt;
+  &lt;p&gt;概要説明。前バージョンとの差分を 2〜3 文で。&lt;/p&gt;
+&lt;/div&gt;</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h3>claw-stack/comparison.html の確認</h3>
+        <p>新モデルが claw-stack/comparison.html の「LLM エンジン」欄に反映されているか確認。OpenClaw が使う LLM に変更があれば更新する。</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <h3>workbench/knowledge/ 個別ページの確認</h3>
+        <p>重大な仕様変更（モデル廃止・APIレート大幅変更）があれば、<code>workbench/knowledge/[vendor].html</code> にも反映する。小規模更新はトラッカーのみで OK。</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">6</div>
+      <div class="step-body">
+        <h3>コミット & プッシュ</h3>
+        <div class="pre">git add research/*-recent-updates.html
+git commit -m "Monthly LLM tracker update — 2026-XX-XX
+
+Updated: claude, chatgpt, gemini, grok, qwen, glm trackers
+Key changes: [変更点の概要]"
+git push</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 確認チェックリスト -->
+  <div class="panel">
+    <h2>完了チェックリスト</h2>
+    <div class="grid2">
+      <div class="card">
+        <h3>コンテンツ</h3>
+        <ul>
+          <li>□ 6 ベンダー全トラッカー確認（または上位 3 優先）</li>
+          <li>□ 新モデルリリース情報を反映</li>
+          <li>□ API 仕様変更を反映（あれば）</li>
+          <li>□ 料金変更を反映（あれば）</li>
+          <li>□ 廃止予告を反映（あれば）</li>
+          <li>□ 各ページの「最終更新」日付を更新</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>整合性</h3>
+        <ul>
+          <li>□ comparison.html の LLM 欄と整合しているか</li>
+          <li>□ creator-system 各ページで参照しているモデル名が正しいか</li>
+          <li>□ openclaw.html の判定エンジン記述と一致しているか</li>
+          <li>□ コミットメッセージに変更概要を記載したか</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 参照リンク -->
+  <div class="panel">
+    <h2>参照リンク</h2>
+    <ul>
+      <li><a href="../research/claude-recent-updates.html">Claude トラッカー</a> / <a href="../research/chatgpt-recent-updates.html">ChatGPT</a> / <a href="../research/gemini-recent-updates.html">Gemini</a></li>
+      <li><a href="../research/grok-recent-updates.html">Grok</a> / <a href="../research/qwen-recent-updates.html">Qwen</a> / <a href="../research/glm-recent-updates.html">GLM</a></li>
+      <li><a href="../claw-stack/comparison.html">Claw Stack 比較表</a></li>
+      <li><a href="hub-health-check.html">Hub ヘルスチェックルーティン</a></li>
+      <li><a href="../logs/hub-health.html">hub-health.html（現在の鮮度状態）</a></li>
+    </ul>
+    <p style="margin-top:10px"><small>関連ルーティン: <a href="hub-health-check.html">hub-health-check</a> / <a href="session-start.html">session-start</a></small></p>
+  </div>
+
+</div>
+</body>
+</html>

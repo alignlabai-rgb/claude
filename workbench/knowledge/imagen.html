@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Google Imagen 4 — AI 画像生成（Whisk 終了・Flow へ統合）| Tech Workbench</title>
+<style>
+:root {
+    --accent: #e8437a;
+    --accent2: #f59e0b;
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #21262d;
+    --border: rgba(255,255,255,0.08);
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --radius: 12px;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; line-height:1.65; font-size:16px; }
+a { color:var(--accent); text-decoration:none; }
+a:hover { text-decoration:underline; }
+.page-wrap { max-width:960px; margin:0 auto; padding:32px 20px 80px; }
+nav { background:var(--surface); border-bottom:1px solid var(--border); padding:12px 20px; font-size:0.85rem; }
+nav a { color:var(--muted); margin-right:6px; }
+nav a:hover { color:var(--text); }
+nav span { color:var(--muted); margin-right:6px; }
+.hero { background:linear-gradient(135deg, #e8437a, #f59e0b); border-radius:var(--radius); padding:48px 40px; margin-bottom:40px; }
+.hero h1 { font-size:2.2rem; font-weight:800; color:#fff; margin-bottom:8px; }
+.hero .sub { color:rgba(255,255,255,0.88); font-size:1.05rem; margin-bottom:24px; max-width:640px; }
+.chips { display:flex; flex-wrap:wrap; gap:8px; }
+.chip { background:rgba(255,255,255,0.18); color:#fff; padding:4px 14px; border-radius:20px; font-size:0.8rem; font-weight:600; }
+.section { margin-bottom:48px; }
+.section > h2 { font-size:1.4rem; font-weight:700; margin-bottom:16px; padding-bottom:8px; border-bottom:2px solid var(--accent); color:var(--accent); }
+.section > h2.amber { border-color:var(--accent2); color:var(--accent2); }
+p { margin-bottom:12px; }
+ul, ol { padding-left:1.5em; margin-bottom:12px; }
+li { margin-bottom:5px; }
+.grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:20px; margin-bottom:20px; }
+.card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:24px; }
+.card h3 { font-size:1.05rem; font-weight:700; margin-bottom:10px; color:var(--accent); }
+.card h3.amber { color:var(--accent2); }
+.card h3.green { color:#4fffb0; }
+.card .price { font-size:1.5rem; font-weight:800; color:var(--accent); margin:8px 0 12px; }
+.card .price.amber { color:var(--accent2); }
+.card .price.green { color:#4fffb0; }
+.table-wrap { overflow-x:auto; margin:16px 0; }
+table { width:100%; border-collapse:collapse; font-size:0.9rem; }
+th { background:var(--surface2); color:var(--accent); padding:10px 14px; text-align:left; border:1px solid var(--border); }
+th.amber { color:var(--accent2); }
+td { padding:9px 14px; border:1px solid var(--border); vertical-align:top; }
+tr:nth-child(even) td { background:rgba(255,255,255,0.02); }
+pre { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:20px; overflow-x:auto; margin:16px 0; }
+code { font-family:'JetBrains Mono','Fira Code',monospace; font-size:0.85rem; color:#79c0ff; }
+.cm { color:#8b949e; }
+.highlight-box { background:rgba(232,67,122,0.08); border-left:3px solid var(--accent); border-radius:0 8px 8px 0; padding:16px 20px; margin:16px 0; }
+.highlight-box.amber { background:rgba(245,158,11,0.08); border-color:var(--accent2); }
+.highlight-box.green { background:rgba(79,255,176,0.08); border-color:#4fffb0; }
+.badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:0.75rem; font-weight:700; margin-bottom:8px; }
+.badge-pink { background:rgba(232,67,122,0.15); color:var(--accent); }
+.badge-amber { background:rgba(245,158,11,0.15); color:var(--accent2); }
+.badge-green { background:rgba(79,255,176,0.15); color:#4fffb0; }
+.example-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; margin:16px 0; }
+.example-card { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:18px; }
+.example-card .tag { font-size:0.72rem; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:6px; }
+.example-card h4 { font-size:0.95rem; font-weight:700; margin-bottom:6px; }
+.example-card p { font-size:0.88rem; color:var(--muted); margin:0; line-height:1.55; }
+.ok { color:#4fffb0; font-weight:700; }
+.no { color:#f85149; }
+.partial { color:var(--accent2); }
+.sub-h { font-size:1.05rem; font-weight:700; margin:20px 0 10px; color:var(--text); }
+footer { text-align:center; padding:32px 20px; color:var(--muted); font-size:0.85rem; border-top:1px solid var(--border); margin-top:60px; }
+footer a { color:var(--muted); }
+</style>
+</head>
+<body>
+<nav>
+  <a href="../../index.html">Hub</a> <span>›</span>
+  <a href="./index.html">LLM 個別深掘り</a> <span>›</span>
+  <a href="./google-ecosystem.html">Google AI エコシステム</a> <span>›</span>
+  Imagen 4（Whisk → Flow 統合済み）
+</nav>
+
+<main class="page-wrap">
+
+<div class="hero">
+  <h1>Google Imagen 4 / Whisk</h1>
+  <p class="sub">Google DeepMind の最先端 AI 画像生成モデル群。フォトリアリズム・テキスト描写・高速バッチ生成まで対応。Whisk で画像同士を合成・リミックス。</p>
+  <div class="chips">
+    <span class="chip">Imagen 4 Ultra</span>
+    <span class="chip">2K 解像度</span>
+    <span class="chip">$0.02〜$0.06 / 枚</span>
+    <span class="chip">SynthID 透かし</span>
+    <span class="chip">8言語プロンプト</span>
+    <span class="chip">Whisk リミックス</span>
+    <span class="chip">GA 2026-02</span>
+  </div>
+</div>
+
+<!-- 1. モデルファミリー -->
+<section class="section">
+  <h2>1. Imagen 4 モデルファミリー</h2>
+  <p>Imagen 4 は 2026年2月に一般提供（GA）開始。<strong>Fast・Standard・Ultra</strong> の3バリアントで用途に応じて使い分ける。全モデルで最大 <strong>2K 解像度</strong>、SynthID 透かし自動付与。</p>
+
+  <div class="grid">
+    <div class="card">
+      <span class="badge badge-amber">速度重視</span>
+      <h3 class="amber">Imagen 4 Fast</h3>
+      <div class="price amber">$0.02<span style="font-size:1rem;font-weight:400;">/枚</span></div>
+      <ul>
+        <li>生成時間 <strong>約2.7秒</strong>（Imagen 3 比 10倍高速）</li>
+        <li>Latent Diffusion Transformer 採用</li>
+        <li>ドラフト・モックアップ・大量バッチ向け</li>
+        <li>API ID: <code>imagen-4.0-fast-generate-001</code></li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="badge badge-pink">汎用</span>
+      <h3>Imagen 4 Standard</h3>
+      <div class="price">$0.04<span style="font-size:1rem;font-weight:400;">/枚</span></div>
+      <ul>
+        <li>品質とコストのバランス型</li>
+        <li>フォトリアリズム・テキスト描写 大幅向上</li>
+        <li>Google Workspace（Docs・Slides）統合</li>
+        <li>ImageFX / Gemini アプリで利用可</li>
+        <li>API ID: <code>imagen-4.0-generate-001</code></li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="badge badge-green">最高品質</span>
+      <h3 class="green">Imagen 4 Ultra</h3>
+      <div class="price green">$0.06<span style="font-size:1rem;font-weight:400;">/枚</span></div>
+      <ul>
+        <li>最高精度・プロンプト遵守度 最大</li>
+        <li>細部の質感・光源表現が最精密</li>
+        <li>Vertex AI Enterprise 経由でアクセス</li>
+        <li>Flow の Ingredients 機能の基盤モデル</li>
+        <li>API ID: <code>imagen-4.0-ultra-generate-001</code></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>項目</th>
+          <th>Imagen 4 Fast</th>
+          <th>Imagen 4 Standard</th>
+          <th>Imagen 4 Ultra</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>API 価格</td><td>$0.02 / 枚</td><td>$0.04 / 枚</td><td>$0.06 / 枚</td></tr>
+        <tr><td>生成速度</td><td>~2.7 秒（最速）</td><td>標準</td><td>低速（品質優先）</td></tr>
+        <tr><td>最大解像度</td><td>2K</td><td>2K</td><td>2K</td></tr>
+        <tr><td>プロンプト遵守度</td><td>標準</td><td>高</td><td>最高</td></tr>
+        <tr><td>主な用途</td><td>量産・草案確認</td><td>汎用・マーケティング</td><td>最終稿・広告・アート</td></tr>
+        <tr><td>Vertex AI 提供</td><td>○</td><td>○</td><td>○（Enterprise）</td></tr>
+        <tr><td>AI Studio 無料枠</td><td>○</td><td>○</td><td>△（制限あり）</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 2. 主要機能 -->
+<section class="section">
+  <h2>2. Imagen 4 の主要機能</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>フォトリアリズム</h3>
+      <p>人物・風景・物体の質感と光源表現が Imagen 3 比で大幅向上。プロ写真品質の出力が可能になり、商業撮影の代替として活用が広がっている。</p>
+    </div>
+    <div class="card">
+      <h3>テキスト描写</h3>
+      <p>画像内に鮮明で読みやすいテキストを描写。ポスター・バナー・ブランドロゴを含む制作物に最適。Imagen 3 の最大の弱点を克服した改善点。</p>
+    </div>
+    <div class="card">
+      <h3>SynthID 透かし</h3>
+      <p>全出力に知覚不可能な電子透かしを自動付与。AI 生成コンテンツの追跡・認証に対応。ダウンロード・加工後も透かしが保持される。</p>
+    </div>
+    <div class="card">
+      <h3>多言語プロンプト</h3>
+      <p>英語・日本語・中国語（簡/繁）・ヒンディー語・韓国語・ポルトガル語・スペイン語の8言語に対応。日本語でそのまま指示可能。</p>
+    </div>
+    <div class="card">
+      <h3>Flow Ingredients 連携</h3>
+      <p>Imagen 4 Ultra で生成したキャラクター画像を Flow の Ingredients 機能に登録。Veo 3.1 で複数ショットを生成する際に一貫した外見を維持できる。</p>
+    </div>
+    <div class="card">
+      <h3>Google Workspace 統合</h3>
+      <p>Google Docs・Slides・Vids に直接統合。アプリを切り替えずに文書内で画像を生成・挿入。法人ユーザーは Workspace プランに含まれる形で利用可能。</p>
+    </div>
+  </div>
+</section>
+
+<!-- 3. Whisk EOL -->
+<section class="section">
+  <h2 class="amber">3. Whisk — 2026年4月30日 サービス終了 → Flow に統合</h2>
+
+  <div class="highlight-box amber" style="border-color:#f97316; background:rgba(249,115,22,0.1);">
+    <p>🚨 <strong>Whisk は 2026年4月30日をもってシャットダウンされました。</strong> 全機能は <a href="flow.html">Google Flow</a> に統合済みです。既存のWhisk ライブラリは移行期間（〜4/30）を過ぎると自動削除されました。新規の Whisk 利用はできません。</p>
+  </div>
+
+  <p><strong>統合の経緯:</strong> 2026年2月25日に Google が Flow・Whisk・ImageFX の統合を発表。Flow が唯一の統合クリエイティブスタジオとして、Whisk の画像リミックス機能・ImageFX（Nano Banana）の画像生成機能を取り込みました。</p>
+
+  <div class="grid">
+    <div class="card">
+      <h3 class="amber">Whisk が持っていた機能</h3>
+      <ul>
+        <li>「被写体」「シーン」「スタイル」3枚の参照画像を入力して新画像を生成</li>
+        <li>テキストプロンプト不要の直感的リミックス</li>
+        <li>コンセプトアート・スタイル転送に活用</li>
+        <li>labs.google.com/whisk でアクセス可能だった</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 class="amber">Flow で代替する方法</h3>
+      <ul>
+        <li>Flow の「Ingredients（素材）」機能で参照画像をアップロード</li>
+        <li>Subject / Style 参照として画像を指定してから生成</li>
+        <li>ただし Whisk の3パネル UI（被写体/シーン/スタイル同時指定）は廃止</li>
+        <li>詳細は <a href="flow.html">flow.html</a> を参照</li>
+      </ul>
+    </div>
+  </div>
+
+  <p style="font-size:0.88rem; color:var(--muted);">⚠️ 旧 Whisk の「Subject / Scene / Style 同時指定」という専用ワークフローは Flow には移植されていません。Flow での参照画像指定は可能ですが、Whisk 固有の3パネル体験は失われました。</p>
+</section>
+
+<!-- 4. アクセス方法と料金 -->
+<section class="section">
+  <h2>4. アクセス方法と料金</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>アクセス経路</th><th>対象</th><th>料金</th><th>備考</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Google AI Studio</strong></td>
+          <td>開発者・個人</td>
+          <td>無料枠あり</td>
+          <td>1日あたり生成数制限、クレジットカード不要</td>
+        </tr>
+        <tr>
+          <td><strong>Gemini API</strong></td>
+          <td>開発者</td>
+          <td>$0.02〜$0.06 / 枚</td>
+          <td>google-generativeai ライブラリ経由</td>
+        </tr>
+        <tr>
+          <td><strong>Vertex AI</strong></td>
+          <td>企業・エンタープライズ</td>
+          <td>$0.02〜$0.06 / 枚（SLA 付き）</td>
+          <td>VPC・アクセス制御・コンプライアンス対応</td>
+        </tr>
+        <tr>
+          <td><strong>ImageFX</strong></td>
+          <td>一般ユーザー</td>
+          <td>無料（Google アカウント）</td>
+          <td>商用利用制限あり、labs.google/imagefx</td>
+        </tr>
+        <tr>
+          <td><strong>Gemini アプリ</strong></td>
+          <td>一般ユーザー</td>
+          <td>無料〜Google One AI Premium</td>
+          <td>チャット内で直接生成</td>
+        </tr>
+        <tr>
+          <td><strong>Google Workspace</strong></td>
+          <td>法人ユーザー</td>
+          <td>Workspace プランに含む</td>
+          <td>Docs / Slides / Vids 内からのみ</td>
+        </tr>
+        <tr>
+          <td><strong>Whisk</strong></td>
+          <td>一般ユーザー</td>
+          <td>無料（Google アカウント）</td>
+          <td>labs.google.com/whisk</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 5. 実践ワークフロー & コード -->
+<section class="section">
+  <h2>5. 実践ワークフロー &amp; Python コード例</h2>
+
+  <p class="sub-h">① YouTube サムネイル量産パイプライン</p>
+  <p>Gemini Pro でサムネイルコピーを10案生成 → Imagen 4 Fast でビジュアル案を並列生成（1枚0.02ドル × 10 = 0.2ドル）→ 最良案を Imagen 4 Standard でブラッシュアップ → ImageFX で最終調整。所要コスト1ドル以下、所要時間15分以内。</p>
+
+  <p class="sub-h">② キャラクター素材 → Flow 動画化パイプライン</p>
+  <p>Gemini でキャラクター設定からプロンプト生成 → Imagen 4 Ultra でキャラクターシート生成（$0.06）→ Flow の Ingredients に登録 → Veo 3.1 Fast で複数ショットを生成（20 credits/本）→ Scenebuilder でタイムライン編集。詳細は <a href="flow.html">flow.html</a>。</p>
+
+  <p class="sub-h">③ Vertex AI Python SDK — バッチ画像生成</p>
+<pre><code><span class="cm"># pip install google-cloud-aiplatform</span>
+import vertexai
+from vertexai.vision_models import ImageGenerationModel
+
+vertexai.init(project="YOUR_PROJECT_ID", location="us-central1")
+
+<span class="cm"># Fast (量産): imagen-4.0-fast-generate-001</span>
+<span class="cm"># Standard:    imagen-4.0-generate-001</span>
+<span class="cm"># Ultra:        imagen-4.0-ultra-generate-001</span>
+model = ImageGenerationModel.from_pretrained("imagen-4.0-fast-generate-001")
+
+response = model.generate_images(
+    prompt="A sleek product photo of wireless earbuds on a marble surface, "
+           "studio lighting, white background, 8K quality",
+    number_of_images=4,
+    aspect_ratio="1:1",       <span class="cm"># "1:1" / "16:9" / "9:16" / "4:3" / "3:4"</span>
+    safety_filter_level="block_some",
+    person_generation="allow_adult",
+)
+
+for i, img in enumerate(response.images):
+    img.save(f"output_{i}.png")
+    print(f"Saved output_{i}.png")</code></pre>
+
+  <p class="sub-h">④ Gemini API (google-generativeai) 経由</p>
+<pre><code><span class="cm"># pip install google-generativeai</span>
+import google.generativeai as genai
+from google.generativeai import types
+
+genai.configure(api_key="YOUR_API_KEY")
+
+response = genai.generate_images(
+    model="imagen-4.0-generate-001",
+    prompt="Minimalist Japanese cafe interior, warm afternoon light, "
+           "film photography style, 35mm, bokeh",
+    config=types.GenerateImagesConfig(
+        number_of_images=2,
+        aspect_ratio="16:9",
+        output_mime_type="image/jpeg",
+    ),
+)
+
+for i, img in enumerate(response.generated_images):
+    with open(f"cafe_{i}.jpg", "wb") as f:
+        f.write(img.image.image_bytes)
+    print(f"Saved cafe_{i}.jpg")</code></pre>
+</section>
+
+<!-- 6. 実例 -->
+<section class="section">
+  <h2>6. 最新の驚くべき実例 12選</h2>
+  <div class="example-grid">
+    <div class="example-card">
+      <div class="tag">広告・マーケティング</div>
+      <h4>WPP — 数千バリエーションを数時間で</h4>
+      <p>世界最大の広告グループが Imagen 4 + Veo 3 で1つのコンセプトから数千種類のパーソナライズクリエイティブを数時間以内に生成。従来の週単位制作を解体した。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">旅行・ホテル</div>
+      <h4>Agoda — 旅行先ビジュアル自動生成</h4>
+      <p>宿泊予約大手が Vertex AI 上の Imagen + Veo を使い旅行先の一意なビジュアルを生成。写真素材調達コストの削減と更新速度向上を実現。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">ファッション</div>
+      <h4>Authentic Brands Group — ブランド素材量産</h4>
+      <p>Champion・Reebok 等を保有する ABG が Imagen でブランドビジュアル素材を量産。EC 商品画像のバリエーション制作コストを大幅削減。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">EC / 商品撮影</div>
+      <h4>AdVon Commerce — 93,673 点を1か月で</h4>
+      <p>EC 商品ビジュアル生成パイプラインで月産93,000点超を達成。従来のスタジオ撮影では不可能な速度と規模を Imagen で実現。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">ゲーム・エンタメ</div>
+      <h4>コンセプトアート高速化（ゲームスタジオ）</h4>
+      <p>キャラクター設定書を入力し Imagen 4 Ultra で数十案を数分で生成。アーティストはイテレーションに集中でき、開発スピードが従来比3倍以上向上との報告あり。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">教育</div>
+      <h4>EdTech スタートアップ — 教科書ビジュアル量産</h4>
+      <p>理科・社会の教科書向け説明イラストを Imagen 4 Fast で量産。イラストレーター外注と比較して制作費90%削減、更新サイクルを週次から日次に短縮。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">ローカルビジネス</div>
+      <h4>フィットネスジム — SNS 素材量産</h4>
+      <p>「この写真の背景を縦型 SNS サイズに拡張して」という自然言語指示だけで毎日 SNS 投稿素材を生成。外部デザイナー費用ゼロで運用。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">出版・メディア</div>
+      <h4>デジタルメディア — アイキャッチ自動生成</h4>
+      <p>記事タイトルと要約を Imagen 4 に渡してアイキャッチ画像を自動生成。フリー素材との差別化とブランド統一を両立。SynthID で AI 生成を明示。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">医療・ヘルスケア</div>
+      <h4>医療コンテンツ会社 — 患者説明資料</h4>
+      <p>解剖図・術式説明イラストを Imagen 4 で生成し、インフォームドコンセント資料を患者ごとにカスタマイズ。制作期間を2週間から数時間に圧縮。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">不動産</div>
+      <h4>バーチャルステージング</h4>
+      <p>空室写真を Imagen 4 でバーチャルステージング（家具・インテリア配置）。リアルステージング比95%コスト削減、成約率17%向上の事例報告あり。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">クリエイター個人</div>
+      <h4>Whisk で漫画スタイル変換</h4>
+      <p>実写参照写真（被写体）＋漫画コマ（スタイル）＋背景画像を Whisk に投入し、固有スタイルを維持した新シーン画像を瞬時に量産。同人誌・SNS 投稿に活用。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">市場規模</div>
+      <h4>130億枚・MAU 6.5億（2025年末）</h4>
+      <p>Google は2025年末時点で Imagen モデル群を通じて累計130億枚の画像を生成。MAU は前年比289%増の6.5億。AI 画像生成市場のデファクトスタンダードへ。</p>
+    </div>
+  </div>
+</section>
+
+<!-- 7. 比較表 -->
+<section class="section">
+  <h2>7. 競合比較: Imagen 4 vs 主要 AI 画像生成ツール</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>項目</th>
+          <th>Imagen 4</th>
+          <th>Midjourney v7</th>
+          <th>DALL-E 3</th>
+          <th>Stable Diffusion 3.5</th>
+          <th>Adobe Firefly</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>フォトリアリズム</td>
+          <td class="ok">◎ 最高水準</td>
+          <td class="ok">◎</td>
+          <td class="partial">○</td>
+          <td class="partial">○</td>
+          <td class="partial">○</td>
+        </tr>
+        <tr>
+          <td>テキスト描写</td>
+          <td class="ok">◎ 大幅改善</td>
+          <td class="partial">○</td>
+          <td class="partial">○</td>
+          <td class="no">✗ 苦手</td>
+          <td class="partial">○</td>
+        </tr>
+        <tr>
+          <td>日本語プロンプト</td>
+          <td class="ok">◎ 対応</td>
+          <td class="partial">△（英語推奨）</td>
+          <td class="ok">◎</td>
+          <td class="partial">△</td>
+          <td class="partial">△</td>
+        </tr>
+        <tr>
+          <td>API 提供</td>
+          <td class="ok">◎ Gemini / Vertex</td>
+          <td class="no">✗ なし</td>
+          <td class="ok">◎ OpenAI API</td>
+          <td class="ok">◎ オープン</td>
+          <td class="ok">◎ Firefly API</td>
+        </tr>
+        <tr>
+          <td>商用利用</td>
+          <td class="ok">◎</td>
+          <td class="partial">○（有料プランのみ）</td>
+          <td class="ok">◎</td>
+          <td class="ok">◎</td>
+          <td class="ok">◎（著作権リスク低）</td>
+        </tr>
+        <tr>
+          <td>API 価格</td>
+          <td>$0.02〜$0.06 / 枚</td>
+          <td>API 非提供</td>
+          <td>$0.04〜$0.12 / 枚</td>
+          <td>自前ホスト（ほぼ無料）</td>
+          <td>従量課金</td>
+        </tr>
+        <tr>
+          <td>Google サービス統合</td>
+          <td class="ok">◎ 完全統合</td>
+          <td class="no">✗</td>
+          <td class="no">✗</td>
+          <td class="no">✗</td>
+          <td class="partial">△（Workspace 提携）</td>
+        </tr>
+        <tr>
+          <td>AI 生成透かし</td>
+          <td class="ok">◎ SynthID 自動</td>
+          <td class="no">✗</td>
+          <td class="partial">△</td>
+          <td class="no">✗</td>
+          <td class="ok">◎ Content Credentials</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 8. プロンプトガイド -->
+<section class="section">
+  <h2>8. プロンプトガイド</h2>
+  <p>Imagen 4 は英語プロンプトで最高精度を発揮するが、日本語でも高品質な出力が可能。以下の5要素フレームワークを意識する。</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>要素</th><th>説明</th><th>英語例</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>① 被写体</strong></td><td>何が/誰が写っているか</td><td>A Japanese woman in her 30s sitting in a cafe</td></tr>
+        <tr><td><strong>② スタイル</strong></td><td>画風・媒体・時代感</td><td>cinematic still, film grain, 35mm photography</td></tr>
+        <tr><td><strong>③ 照明</strong></td><td>光源・時間帯・雰囲気</td><td>natural window light, golden hour, soft shadows</td></tr>
+        <tr><td><strong>④ 構図</strong></td><td>画角・視点・フォーカス</td><td>bust shot, rule of thirds, shallow depth of field</td></tr>
+        <tr><td><strong>⑤ 品質修飾</strong></td><td>解像度・制作クレジット</td><td>8K, ultra-detailed, award-winning photography</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>❌ 避けるべき</th><th>✅ 推奨</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>「きれいな画像を作って」</td><td>「商品写真, 白背景, スタジオ照明, 8K, product photography, minimalist」</td></tr>
+        <tr><td>「人を描いて」</td><td>「30代アジア系男性, ビジネスカジュアル, オフィス, 自然光, portrait, Sony A7IV」</td></tr>
+        <tr><td>テキスト無指定</td><td>画像内テキストはダブルクォートで囲む: <code>"SALE 50% OFF"</code></td></tr>
+        <tr><td>長い文章形式</td><td>コンマ区切りのキーワード形式が安定して効果的</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="highlight-box">
+    <p>💡 <strong>日本語プロンプトのコツ</strong>: 感情・雰囲気・シチュエーションは日本語で直接指示しても機能する。ただしスタイル指定（「映画的」→ cinematic / 「水彩画風」→ watercolor style）は英語のほうが精度が高い傾向。</p>
+  </div>
+</section>
+
+<!-- 9. エコシステム連携 -->
+<section class="section">
+  <h2>9. Google エコシステムとの連携</h2>
+  <div class="highlight-box">
+    <p>🎬 <strong>Imagen 4 → Flow パイプライン</strong>: Imagen 4 Ultra でキャラクター/素材画像を生成 → Flow の Ingredients 機能に登録 → Veo 3.1 で一貫したキャラクターが登場する動画を生成。静止画から映像まで一気通貫の Google 制作スタック。詳細は <a href="flow.html">flow.html</a> と <a href="veo.html">veo.html</a>。</p>
+  </div>
+  <div class="highlight-box amber">
+    <p>🛠 <strong>AI Studio → Vertex AI 移行フロー</strong>: Google AI Studio で無料プロトタイプ → コードエクスポート → Vertex AI で本番スケール。Imagen 4 はこのフローをそのまま使える。詳細は <a href="ai-studio.html">ai-studio.html</a>。</p>
+  </div>
+  <div class="highlight-box amber" style="border-color:#f97316; background:rgba(249,115,22,0.08);">
+    <p>🚨 <strong>Whisk は 2026/04/30 終了・Flow に統合</strong>: 旧 Whisk の参照画像リミックス機能は Flow の Ingredients 機能で代替可能。詳細は <a href="flow.html">flow.html</a> を参照。</p>
+  </div>
+</section>
+
+<!-- 10. 更新履歴 -->
+<section class="section">
+  <h2>10. 更新履歴と関連リンク</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>日付</th><th>内容</th></tr></thead>
+      <tbody>
+        <tr><td>2025-05-20</td><td>Google I/O 2025: Imagen 3 → Imagen 4 移行発表、Veo 3 との連携強化</td></tr>
+        <tr><td>2026-02</td><td>Imagen 4 Standard / Ultra GA 開始</td></tr>
+        <tr><td>2026-03</td><td>Imagen 4 Fast 発表・GA（$0.02/枚、~2.7秒）</td></tr>
+        <tr><td>2026-05-19</td><td>Google I/O 2026: Workspace 統合強化、Flow Ingredients 連携拡充</td></tr>
+        <tr><td>2026-05-31</td><td>本ページ作成</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <ul>
+    <li><a href="flow.html">flow.html</a> — Google Flow フィルムメイキングツール</li>
+    <li><a href="veo.html">veo.html</a> — Google Veo 動画生成モデル</li>
+    <li><a href="ai-studio.html">ai-studio.html</a> — Google AI Studio（API プレイグラウンド）</li>
+    <li><a href="google-ecosystem.html">google-ecosystem.html</a> — Google AI エコシステム総覧</li>
+    <li><a href="notebooklm.html">notebooklm.html</a> — NotebookLM</li>
+    <li><a href="gemini.html">gemini.html</a> — Gemini モデル深掘り</li>
+  </ul>
+</section>
+
+</main>
+
+<footer>
+  <p>最終更新: 2026-05-31 | <a href="../../index.html">Hub トップ</a> | <a href="./index.html">LLM 深掘り一覧</a> | <a href="./google-ecosystem.html">Google AI エコシステム</a></p>
+</footer>
+</body>
+</html>

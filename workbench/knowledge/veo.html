@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Google Veo — 動画生成モデル | Tech Workbench</title>
+<style>
+:root {
+    --accent: #f97316;
+    --accent2: #facc15;
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #21262d;
+    --border: rgba(255,255,255,0.08);
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --radius: 12px;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; line-height:1.65; font-size:16px; }
+a { color:var(--accent); text-decoration:none; }
+a:hover { text-decoration:underline; }
+.page-wrap { max-width:960px; margin:0 auto; padding:32px 20px 80px; }
+nav { background:var(--surface); border-bottom:1px solid var(--border); padding:12px 20px; font-size:0.85rem; }
+nav a { color:var(--muted); margin-right:6px; }
+nav a:hover { color:var(--text); }
+nav span { color:var(--muted); margin-right:6px; }
+.hero { background:linear-gradient(135deg, #f97316, #dc2626); border-radius:var(--radius); padding:48px 40px; margin-bottom:40px; }
+.hero h1 { font-size:2.2rem; font-weight:800; color:#fff; margin-bottom:8px; }
+.hero .sub { color:rgba(255,255,255,0.88); font-size:1.05rem; margin-bottom:24px; max-width:640px; }
+.chips { display:flex; flex-wrap:wrap; gap:8px; }
+.chip { background:rgba(255,255,255,0.18); color:#fff; padding:4px 14px; border-radius:20px; font-size:0.8rem; font-weight:600; }
+.section { margin-bottom:48px; }
+.section > h2 { font-size:1.4rem; font-weight:700; margin-bottom:16px; padding-bottom:8px; border-bottom:2px solid var(--accent); color:var(--accent); }
+.section > h2.yellow { border-color:var(--accent2); color:var(--accent2); }
+p { margin-bottom:12px; }
+ul, ol { padding-left:1.5em; margin-bottom:12px; }
+li { margin-bottom:5px; }
+.grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:20px; margin-bottom:20px; }
+.card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:24px; }
+.card h3 { font-size:1.05rem; font-weight:700; margin-bottom:10px; color:var(--accent); }
+.card h3.yellow { color:var(--accent2); }
+.card h3.green { color:#4fffb0; }
+.card .price { font-size:1.4rem; font-weight:800; color:var(--accent); margin:8px 0 12px; }
+.card .price.yellow { color:var(--accent2); }
+.card .price.green { color:#4fffb0; }
+.table-wrap { overflow-x:auto; margin:16px 0; }
+table { width:100%; border-collapse:collapse; font-size:0.9rem; }
+th { background:var(--surface2); color:var(--accent); padding:10px 14px; text-align:left; border:1px solid var(--border); }
+td { padding:9px 14px; border:1px solid var(--border); vertical-align:top; }
+tr:nth-child(even) td { background:rgba(255,255,255,0.02); }
+pre { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:20px; overflow-x:auto; margin:16px 0; }
+code { font-family:'JetBrains Mono','Fira Code',monospace; font-size:0.85rem; color:#79c0ff; }
+.cm { color:#8b949e; }
+.highlight-box { background:rgba(249,115,22,0.08); border-left:3px solid var(--accent); border-radius:0 8px 8px 0; padding:16px 20px; margin:16px 0; }
+.highlight-box.yellow { background:rgba(250,204,21,0.08); border-color:var(--accent2); }
+.highlight-box.green { background:rgba(79,255,176,0.08); border-color:#4fffb0; }
+.badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:0.75rem; font-weight:700; margin-bottom:8px; }
+.badge-orange { background:rgba(249,115,22,0.15); color:var(--accent); }
+.badge-yellow { background:rgba(250,204,21,0.15); color:var(--accent2); }
+.badge-green { background:rgba(79,255,176,0.15); color:#4fffb0; }
+.example-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; margin:16px 0; }
+.example-card { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:18px; }
+.example-card .tag { font-size:0.72rem; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:6px; }
+.example-card h4 { font-size:0.95rem; font-weight:700; margin-bottom:6px; }
+.example-card p { font-size:0.88rem; color:var(--muted); margin:0; line-height:1.55; }
+.ok { color:#4fffb0; font-weight:700; }
+.no { color:#f85149; }
+.partial { color:var(--accent2); }
+.sub-h { font-size:1.05rem; font-weight:700; margin:20px 0 10px; color:var(--text); }
+.timeline { position:relative; padding-left:24px; border-left:2px solid var(--border); }
+.tl-item { margin-bottom:24px; position:relative; }
+.tl-dot { width:10px; height:10px; border-radius:50%; background:var(--accent); position:absolute; left:-29px; top:5px; }
+.tl-date { font-size:0.8rem; font-weight:700; color:var(--accent); margin-bottom:4px; }
+footer { text-align:center; padding:32px 20px; color:var(--muted); font-size:0.85rem; border-top:1px solid var(--border); margin-top:60px; }
+footer a { color:var(--muted); }
+</style>
+</head>
+<body>
+<nav>
+  <a href="../../index.html">Hub</a> <span>›</span>
+  <a href="./index.html">LLM 個別深掘り</a> <span>›</span>
+  <a href="./google-ecosystem.html">Google AI エコシステム</a> <span>›</span>
+  Veo
+</nav>
+
+<main class="page-wrap">
+
+<div class="hero">
+  <h1>Google Veo — 動画生成モデル</h1>
+  <p class="sub">音声・映像を同時生成する Google DeepMind の動画 AI。Veo 3.1 は 4K / 最長60秒 / 口パク精度 ±120ms。API と Flow UI の両方からアクセス可能。</p>
+  <div class="chips">
+    <span class="chip">Veo 3.1</span>
+    <span class="chip">4K 対応</span>
+    <span class="chip">最長 60 秒</span>
+    <span class="chip">音声同時生成</span>
+    <span class="chip">口パク ±120ms</span>
+    <span class="chip">Vertex AI API</span>
+    <span class="chip">Lite = 0 クレジット</span>
+  </div>
+</div>
+
+<!-- 1. モデル進化史 -->
+<section class="section">
+  <h2>1. Veo モデル進化史</h2>
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-date">2024年前半 — Veo 1</div>
+      <p><strong>初代 Veo</strong>。テキストから動画を生成する基礎モデル。解像度・長さは限定的。音声は別途合成が必要だった。Google I/O 2024 でデモ公開。</p>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-date">2024年後半 — Veo 2</div>
+      <p><strong>Veo 2</strong>。物理法則の再現精度・カメラワーク制御・人物動作の自然さを改善。ImageFX の動画機能として一般公開。Runway Gen-3 と並ぶ水準へ。</p>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-date">2025-05-20 — Veo 3</div>
+      <p><strong>Veo 3</strong>（Google I/O 2025 発表）。業界初の<strong>映像・音声同時生成</strong>を実現。環境音・台詞・BGM をテキスト1行から自動生成。Flow アプリと同時リリース。</p>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-date">2025-11-17 — Veo 3.1</div>
+      <p><strong>Veo 3.1</strong>（現行最新）。4K 解像度・最長60秒・口パク精度 ±120ms・Lite / Fast / Quality の3バリアント構成。Gemini API と Vertex AI で提供開始。</p>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>バージョン</th><th>リリース</th><th>主な改善点</th><th>音声</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Veo 1</td><td>2024 前半</td><td>テキスト → 動画の基礎能力</td><td>なし</td></tr>
+        <tr><td>Veo 2</td><td>2024 後半</td><td>物理再現・カメラ制御・人物動作</td><td>なし</td></tr>
+        <tr><td>Veo 3</td><td>2025-05</td><td>音声同時生成（業界初）、Flow 統合</td><td>◎ 同時生成</td></tr>
+        <tr><td>Veo 3.1</td><td>2025-11</td><td>4K / 60s / ±120ms 口パク / 3バリアント</td><td>◎ 強化版</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 2. Veo 3.1 スペック -->
+<section class="section">
+  <h2>2. Veo 3.1 詳細スペック — 3バリアント</h2>
+  <div class="grid">
+    <div class="card">
+      <span class="badge badge-green">無料</span>
+      <h3 class="green">Veo 3.1 Lite</h3>
+      <div class="price green">0 クレジット<span style="font-size:0.9rem;font-weight:400;"></span></div>
+      <ul>
+        <li>API: $0.03〜$0.05 / 秒（720p 音声なし）</li>
+        <li>解像度: 720p</li>
+        <li>音声生成: 基本対応</li>
+        <li>主な用途: プロトタイプ・大量ドラフト</li>
+        <li>Flow 内: 10 credits / 本</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="badge badge-orange">バランス</span>
+      <h3>Veo 3.1 Fast</h3>
+      <div class="price">20 クレジット<span style="font-size:0.9rem;font-weight:400;"> / 本</span></div>
+      <ul>
+        <li>API: ~$0.10〜$0.15 / 秒</li>
+        <li>解像度: 720p〜1080p</li>
+        <li>音声生成: 環境音・台詞・SFX</li>
+        <li>口パク精度: ±120ms</li>
+        <li>主な用途: SNS 動画・広告クリップ</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="badge badge-yellow">最高品質</span>
+      <h3 class="yellow">Veo 3.1 Quality</h3>
+      <div class="price yellow">100 クレジット<span style="font-size:0.9rem;font-weight:400;"> / 本</span></div>
+      <ul>
+        <li>API: ~$0.20〜$0.40 / 秒</li>
+        <li>解像度: 1080p〜4K（プレビュー）</li>
+        <li>音声生成: 最高精度、多チャンネル</li>
+        <li>口パク精度: ±120ms（最精密）</li>
+        <li>主な用途: 映画・CM・ミュージックビデオ</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>スペック項目</th>
+          <th>Veo 3.1 Lite</th>
+          <th>Veo 3.1 Fast</th>
+          <th>Veo 3.1 Quality</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Flow クレジット</td><td>0〜10</td><td>20</td><td>100</td></tr>
+        <tr><td>Vertex AI API 単価</td><td>$0.03〜$0.05/秒</td><td>$0.10〜$0.15/秒</td><td>$0.20〜$0.40/秒</td></tr>
+        <tr><td>最大解像度</td><td>720p</td><td>1080p</td><td>4K（プレビュー）</td></tr>
+        <tr><td>クリップ長（1本）</td><td>4 / 6 / 8 秒</td><td>4 / 6 / 8 秒</td><td>4 / 6 / 8 秒</td></tr>
+        <tr><td>アスペクト比</td><td>16:9 / 9:16</td><td>16:9 / 9:16</td><td>16:9 / 9:16 / 1:1</td></tr>
+        <tr><td>フレームレート</td><td>24 FPS</td><td>24 FPS</td><td>24 FPS</td></tr>
+        <tr><td>出力フォーマット</td><td>MP4</td><td>MP4</td><td>MP4</td></tr>
+        <tr><td>音声同時生成</td><td>基本</td><td>○</td><td>◎</td></tr>
+        <tr><td>口パク精度</td><td>—</td><td>±120ms</td><td>±120ms</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="highlight-box">
+    <p>💡 <strong>Extend（シーン延長）</strong>: 各クリップは 4/6/8 秒。Extend 機能でクリップを連結することで、最長60秒の映像を構成できる。Flow の Scenebuilder がタイムライン管理を担当。</p>
+  </div>
+</section>
+
+<!-- 3. 主要機能 -->
+<section class="section">
+  <h2>3. 主要機能</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>Text-to-Video</h3>
+      <p>テキストプロンプト一行から映像クリップを生成。カメラワーク・照明・雰囲気を細かく指定可能。環境音・台詞も同時生成される。</p>
+    </div>
+    <div class="card">
+      <h3>Image-to-Video (Frames)</h3>
+      <p>静止画をスタートフレームとして動画を生成。Imagen 4 Ultra で生成したキャラクター/素材を動かすことができる（Ingredients 連携）。</p>
+    </div>
+    <div class="card">
+      <h3>Scene Extension</h3>
+      <p>生成済みクリップの末尾から自然につながる追加クリップを生成。同じシーンを延長したり、次のシーンへの橋渡しクリップを作れる。</p>
+    </div>
+    <div class="card">
+      <h3>カメラモーション制御</h3>
+      <p>パン・ティルト・ズーム・ドリー・クレーン・360度回転など、映像制作の基本カメラワークを自然言語で指定。映画的な演出が可能。</p>
+    </div>
+    <div class="card">
+      <h3>音声生成（3種）</h3>
+      <ul>
+        <li><strong>台詞</strong>: <code>"セリフ" [感情]</code> 構文で口パク同期</li>
+        <li><strong>SFX</strong>: 環境音・効果音の自動生成</li>
+        <li><strong>アンビエント</strong>: BGM・雰囲気音</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Ingredients（キャラ一貫性）</h3>
+      <p>Imagen 4 で生成したキャラクター画像を Flow に登録。複数のショットで同じキャラクターが登場する映像を一貫した外見で生成できる。</p>
+    </div>
+  </div>
+</section>
+
+<!-- 4. API アクセス方法 -->
+<section class="section">
+  <h2>4. API アクセス方法 — 3つの経路</h2>
+
+  <div class="grid">
+    <div class="card">
+      <h3>① Vertex AI Python SDK</h3>
+      <p>本番・エンタープライズ向けの主要 API 経路。SLA・VPC・アクセス制御付き。Google Cloud プロジェクトが必要。Paid Preview で利用可能。</p>
+      <p>モデル ID: <code>veo-3.1-fast-generate-001</code><br>または <code>veo-3.1-generate-001</code>（Quality）</p>
+    </div>
+    <div class="card">
+      <h3>② Gemini API</h3>
+      <p>開発・プロトタイプ向け。<code>google-generativeai</code> ライブラリで手軽にアクセス。AI Studio でのプロトタイプから本番移行の第一歩として最適。</p>
+    </div>
+    <div class="card">
+      <h3>③ Flow UI</h3>
+      <p>ノーコードで映像を制作したい場合は Flow アプリ（flow.google.com）を使う。クレジット制で Scenebuilder によるタイムライン編集が可能。詳細は <a href="flow.html">flow.html</a>。</p>
+    </div>
+  </div>
+</section>
+
+<!-- 5. コード例 -->
+<section class="section">
+  <h2>5. Vertex AI Python SDK コード例</h2>
+
+  <p class="sub-h">① 基本の Text-to-Video 生成</p>
+<pre><code><span class="cm"># pip install google-cloud-aiplatform</span>
+import vertexai
+from vertexai.preview.vision_models import VideoGenerationModel
+
+vertexai.init(project="YOUR_PROJECT_ID", location="us-central1")
+
+<span class="cm"># Fast: veo-3.1-fast-generate-001</span>
+<span class="cm"># Quality: veo-3.1-generate-001</span>
+model = VideoGenerationModel.from_pretrained("veo-3.1-fast-generate-001")
+
+operation = model.generate_video(
+    prompt=(
+        "A samurai in full armor walks through a bamboo forest at dawn. "
+        "Morning mist, birds chirping, footsteps on gravel. "
+        "Camera slowly pushes forward at knee height."
+    ),
+    aspect_ratio="16:9",       <span class="cm"># "16:9" / "9:16"</span>
+    duration_seconds=8,        <span class="cm"># 4, 6, or 8</span>
+    generate_audio=True,
+)
+
+result = operation.result(timeout=300)
+video = result.generated_videos[0]
+video.save("samurai.mp4")
+print("Saved samurai.mp4")</code></pre>
+
+  <p class="sub-h">② 台詞付き動画（口パク同期）</p>
+<pre><code>operation = model.generate_video(
+    prompt=(
+        "A news anchor at a desk in a modern studio. "
+        '"Breaking news: AI has changed the world." [professional, calm] '
+        "Subtle background music. 4K studio lighting."
+    ),
+    aspect_ratio="16:9",
+    duration_seconds=6,
+    generate_audio=True,
+)
+
+result = operation.result(timeout=300)
+result.generated_videos[0].save("news_anchor.mp4")</code></pre>
+
+  <p class="sub-h">③ Image-to-Video（参照フレームから生成）</p>
+<pre><code>from vertexai.preview.vision_models import Image as VertexImage
+
+reference_image = VertexImage.load_from_file("character.png")
+
+operation = model.generate_video(
+    prompt="The character turns to face the camera and smiles warmly.",
+    image=reference_image,     <span class="cm"># スタートフレームとして使用</span>
+    aspect_ratio="9:16",
+    duration_seconds=4,
+    generate_audio=True,
+)
+
+result = operation.result(timeout=300)
+result.generated_videos[0].save("character_reaction.mp4")</code></pre>
+</section>
+
+<!-- 6. 料金表 -->
+<section class="section">
+  <h2>6. 料金表</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>プラン</th><th>月額</th><th>クレジット / Flow 利用</th><th>対象</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>AI Free</strong></td>
+          <td>無料</td>
+          <td>50 credits / 日</td>
+          <td>個人・試用</td>
+        </tr>
+        <tr>
+          <td><strong>AI Pro</strong></td>
+          <td>$19.99</td>
+          <td>1,000 credits / 月<br>（Lite 100本 / Fast 50本 / Quality 10本）</td>
+          <td>クリエイター・個人</td>
+        </tr>
+        <tr>
+          <td><strong>AI Ultra</strong></td>
+          <td>$249.99</td>
+          <td>25,000 credits / 月<br>（Lite 2,500本 / Fast 1,250本 / Quality 250本）</td>
+          <td>プロ・スタジオ</td>
+        </tr>
+        <tr>
+          <td><strong>Vertex AI API — Fast</strong></td>
+          <td>従量課金</td>
+          <td>~$0.10〜$0.15 / 秒</td>
+          <td>開発者・企業</td>
+        </tr>
+        <tr>
+          <td><strong>Vertex AI API — Quality</strong></td>
+          <td>従量課金</td>
+          <td>~$0.20〜$0.40 / 秒</td>
+          <td>エンタープライズ</td>
+        </tr>
+        <tr>
+          <td><strong>Vertex AI API — Lite</strong></td>
+          <td>従量課金</td>
+          <td>$0.03〜$0.05 / 秒（720p 音声なし）</td>
+          <td>量産・ドラフト</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="highlight-box">
+    <p>💰 <strong>コスト試算例</strong>: AI Pro で8秒 Fast クリップを月50本生成 → 50 × 20 = 1,000 credits でちょうど使い切り。Vertex AI API なら 8秒 × $0.12/秒 × 50本 = $48（約7,200円）。</p>
+  </div>
+</section>
+
+<!-- 7. 実例 -->
+<section class="section">
+  <h2>7. 最新の驚くべき実例 12選</h2>
+  <div class="example-grid">
+    <div class="example-card">
+      <div class="tag">音楽 MV</div>
+      <h4>Talwiinder — 中世騎士の MV を Veo で制作</h4>
+      <p>インド人シンガーが中世ヨーロッパを舞台にした楽曲の MV 全編を Veo 3.1 で生成。スタジオ撮影ゼロ、制作費を90%以上削減。公開後 SNS でバイラル。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">広告</div>
+      <h4>Dept × Pit Viper — フルAI 広告キャンペーン</h4>
+      <p>クリエイティブエージェンシー Dept がサングラスブランド Pit Viper の広告を Veo 3 で全制作。従来の撮影と比較して制作期間を大幅短縮、エンゲージメントも目標を超過。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">コスト削減</div>
+      <h4>Wild Hare Group — 制作費を1/10以下に</h4>
+      <p>アニメーション制作会社が Veo 3 を導入。従来の代理店発注比で「10%以下のコスト」で同等品質の動画を制作できることを確認し、全ワークフローを移行。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">映像制作</div>
+      <h4>Fianna Studios "Echo Station" — 65% コスト削減</h4>
+      <p>SF ショートフィルム "Echo Station" を Flow + Veo 3.1 で制作。制作コスト65%削減、制作期間が数週間から数日に短縮。第三者映画祭で上映。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">多言語広告</div>
+      <h4>eToro — 多言語対応 CM を即日生成</h4>
+      <p>フィンテック企業 eToro が Veo 3 の台詞同期機能を使い、同一コンテンツの英語・スペイン語・フランス語・ドイツ語版 CM を1日以内に生成。翻訳スタジオ費用をゼロ化。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">EC 商品動画</div>
+      <h4>AdVon Commerce — 月産93,673 本</h4>
+      <p>EC 向け商品動画生成パイプラインで月産9万3千本超を達成。Veo 3.1 Lite を活用しコスト効率を最大化。商品1点あたりの動画制作単価が劇的に低下。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">教育</div>
+      <h4>教師が「光合成」を動画で説明</h4>
+      <p>「光合成が起きている様子」とプロンプトするだけで、葉緑体・太陽光・水分子が視覚化された説明動画が生成。理科教師が授業用コンテンツを毎授業ゼロコストで制作。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">企業研修</div>
+      <h4>Google Cloud 顧客 — 研修動画量産</h4>
+      <p>Google Cloud 顧客が従業員向け研修動画を Veo 3 で量産。外部制作会社に依頼していたコンテンツを内製化し、更新コストを95%削減した事例が複数報告されている。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">プリプロダクション</div>
+      <h4>映画スタジオ — 絵コンテをビデオに</h4>
+      <p>ハリウッドのインディースタジオが脚本段階のシーンを Veo 3.1 でアニマティクス（動く絵コンテ）として生成。投資家への説明資料に活用し資金調達を加速。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">SNS コンテンツ</div>
+      <h4>Groove Jones — リアルタイム AR + Veo 連携</h4>
+      <p>クリエイティブスタジオ Groove Jones が Veo 3 を実験的に活用。短時間でファンタジー・感情表現・アクションなど多様なシーンを生成し、クライアント案件のコンセプト提示に活用。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">市場実績</div>
+      <h4>5か月で2億7500万本生成</h4>
+      <p>Flow / Veo エコシステムで2025年末〜2026年5月の5か月間に2億7500万本以上の動画が140か国以上で生成。AI 動画生成の市場浸透速度が証明された。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">ブランディング</div>
+      <h4>WPP — 数千バリエーションのパーソナライズ動画</h4>
+      <p>世界最大の広告グループ WPP が Veo 3 + Imagen 4 で1仮説から数千種類のパーソナライズ動画クリエイティブを数時間以内に生成。ターゲティング精度と制作速度を両立。</p>
+    </div>
+  </div>
+</section>
+
+<!-- 8. 比較表 -->
+<section class="section">
+  <h2>8. 競合比較: Veo 3.1 vs 主要 AI 動画生成ツール</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>項目</th>
+          <th>Veo 3.1</th>
+          <th>Sora (OpenAI)</th>
+          <th>Runway Gen-3</th>
+          <th>Kling 2.0</th>
+          <th>Pika 2.0</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>最大解像度</td>
+          <td class="ok">4K（プレビュー）</td>
+          <td class="partial">1080p</td>
+          <td class="partial">1080p</td>
+          <td class="partial">1080p</td>
+          <td class="partial">1080p</td>
+        </tr>
+        <tr>
+          <td>最大クリップ長</td>
+          <td class="ok">60 秒（延長連結）</td>
+          <td class="ok">60 秒</td>
+          <td class="partial">18 秒</td>
+          <td class="partial">30 秒</td>
+          <td class="partial">10 秒</td>
+        </tr>
+        <tr>
+          <td>音声同時生成</td>
+          <td class="ok">◎ 台詞+SFX+BGM</td>
+          <td class="no">✗ 別途</td>
+          <td class="no">✗ 別途</td>
+          <td class="partial">△ 実験的</td>
+          <td class="no">✗ 別途</td>
+        </tr>
+        <tr>
+          <td>口パク精度</td>
+          <td class="ok">±120ms</td>
+          <td class="partial">△</td>
+          <td class="partial">△</td>
+          <td class="partial">△</td>
+          <td class="no">✗</td>
+        </tr>
+        <tr>
+          <td>Vertex AI API</td>
+          <td class="ok">◎ 提供中</td>
+          <td class="partial">△（OpenAI API）</td>
+          <td class="ok">◎</td>
+          <td class="partial">△（kling.kuaishou.com）</td>
+          <td class="partial">△</td>
+        </tr>
+        <tr>
+          <td>無料プラン</td>
+          <td class="ok">◎ 50 credits/日</td>
+          <td class="partial">△ 制限付き</td>
+          <td class="partial">△ 500 credits/月</td>
+          <td class="partial">△ 制限付き</td>
+          <td class="partial">△ 制限付き</td>
+        </tr>
+        <tr>
+          <td>日本語対応</td>
+          <td class="ok">◎</td>
+          <td class="partial">○</td>
+          <td class="partial">△</td>
+          <td class="partial">○</td>
+          <td class="partial">△</td>
+        </tr>
+        <tr>
+          <td>Google サービス統合</td>
+          <td class="ok">◎ Flow / Workspace</td>
+          <td class="no">✗</td>
+          <td class="no">✗</td>
+          <td class="no">✗</td>
+          <td class="no">✗</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 9. プロンプトガイド -->
+<section class="section">
+  <h2>9. 動画プロンプトガイド</h2>
+  <p>Veo 3.1 は<strong>「被写体 → アクション → 環境 → カメラ → 音響」</strong>の5要素フレームワークで安定した高品質出力が得られる。</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>要素</th><th>説明</th><th>例</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>① 被写体</strong></td><td>誰が・何が主役か</td><td>A chef in a white coat, mid-30s</td></tr>
+        <tr><td><strong>② アクション</strong></td><td>何をしているか</td><td>carefully plates a gourmet dish</td></tr>
+        <tr><td><strong>③ 環境</strong></td><td>場所・時間・天候</td><td>in a Michelin-starred kitchen, evening, warm kitchen lights</td></tr>
+        <tr><td><strong>④ カメラ</strong></td><td>カメラワーク・アングル</td><td>slow dolly-in from medium shot to close-up</td></tr>
+        <tr><td><strong>⑤ 音響</strong></td><td>BGM・SFX・台詞</td><td>sizzling sounds, ambient kitchen noise, soft jazz</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>カメラワーク指示語</th><th>効果</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>slow dolly-in</code></td><td>前進ドリー（緊張感・寄り）</td></tr>
+        <tr><td><code>pull back reveal</code></td><td>引きながら全景を明かす</td></tr>
+        <tr><td><code>drone aerial shot</code></td><td>俯瞰ドローン映像</td></tr>
+        <tr><td><code>handheld shaky</code></td><td>手持ち・リアル感</td></tr>
+        <tr><td><code>tracking shot</code></td><td>被写体を横から追う</td></tr>
+        <tr><td><code>360 orbit</code></td><td>被写体を中心に周回</td></tr>
+        <tr><td><code>extreme close-up</code></td><td>超アップ（質感強調）</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="highlight-box">
+    <p>🎙 <strong>台詞構文</strong>: <code>"発話内容" [感情・話し方]</code> 形式で指定。例: <code>"Welcome to the future of filmmaking." [excited, whispering]</code></p>
+  </div>
+</section>
+
+<!-- 10. Flow との関係 -->
+<section class="section">
+  <h2>10. Flow との関係 — エンジン vs コックピット</h2>
+  <div class="highlight-box">
+    <p>🎬 <strong>Veo がエンジン、Flow がコックピット</strong>。Veo 3.1 はモデル本体（API でも直接呼び出し可能）。Flow アプリはその Veo をノーコードで使える GUI 制作環境。どちらを使うかは用途次第。</p>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>シナリオ</th><th>推奨経路</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>まず試したい・個人制作</td><td>Flow UI（flow.google.com）</td></tr>
+        <tr><td>プロトタイプ → コードに落としたい</td><td>Google AI Studio → Gemini API</td></tr>
+        <tr><td>本番・大量生成・SLA が必要</td><td>Vertex AI Python SDK</td></tr>
+        <tr><td>映像全体のタイムライン編集</td><td>Flow Scenebuilder</td></tr>
+        <tr><td>キャラクター一貫性が必要</td><td>Imagen 4 Ultra → Flow Ingredients → Veo</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>詳細は <a href="flow.html">flow.html</a>（Flow アプリ全体）と <a href="imagen.html">imagen.html</a>（Ingredients の起点となる画像生成）を参照。</p>
+</section>
+
+<!-- 11. 更新履歴 -->
+<section class="section">
+  <h2>11. 更新履歴と関連リンク</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>日付</th><th>内容</th></tr></thead>
+      <tbody>
+        <tr><td>2024 前半</td><td>Veo 1 公開（Google I/O 2024）</td></tr>
+        <tr><td>2024 後半</td><td>Veo 2 一般提供、ImageFX 動画機能</td></tr>
+        <tr><td>2025-05-20</td><td>Veo 3 発表（Google I/O 2025）、音声同時生成・Flow 同時リリース</td></tr>
+        <tr><td>2025-11-17</td><td>Veo 3.1 リリース — 4K / 60秒 / ±120ms / 3バリアント</td></tr>
+        <tr><td>2026-05-19</td><td>Google I/O 2026: Gemini Omni 動画生成統合、Flow Agent 発表</td></tr>
+        <tr><td>2026-05-31</td><td>本ページ作成</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <ul>
+    <li><a href="flow.html">flow.html</a> — Google Flow フィルムメイキングツール（Veo の GUI）</li>
+    <li><a href="imagen.html">imagen.html</a> — Google Imagen 4 / Whisk（静止画生成）</li>
+    <li><a href="ai-studio.html">ai-studio.html</a> — Google AI Studio（API プレイグラウンド）</li>
+    <li><a href="google-ecosystem.html">google-ecosystem.html</a> — Google AI エコシステム総覧</li>
+  </ul>
+</section>
+
+</main>
+
+<footer>
+  <p>最終更新: 2026-05-31 | <a href="../../index.html">Hub トップ</a> | <a href="./index.html">LLM 深掘り一覧</a> | <a href="./google-ecosystem.html">Google AI エコシステム</a></p>
+</footer>
+</body>
+</html>

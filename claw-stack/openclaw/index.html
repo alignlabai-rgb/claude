@@ -3,31 +3,243 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OpenClaw Stack Guide</title>
+  <title>OpenClaw スタックガイド | Claw Stack</title>
   <style>
-    body { font-family: "Segoe UI", "Noto Sans JP", system-ui, sans-serif; margin: 0; background: #0b1220; color: #edf2fb; line-height: 1.7; padding: 28px 18px 48px; }
-    .shell { max-width: 980px; margin: 0 auto; display: grid; gap: 18px; }
-    .panel { background: #111a2b; border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 22px; }
-    a { color: #75d7c0; }
-    h1, h2 { margin: 0 0 10px; }
-    p, li { color: #c5d0e3; }
+    :root{--bg:#0b1220;--panel:#0f172a;--muted:#c8d3e3;--text:#e9edf5;--accent:#3dd8c5;--accent2:#a78bfa;--accent3:#f7b733;--border:rgba(255,255,255,0.08);--shadow:0 18px 48px rgba(0,0,0,0.35);--radius:18px}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;font-family:"Segoe UI","SF Pro Display","Noto Sans JP",system-ui,sans-serif;color:var(--text);background:radial-gradient(circle at 18% 18%,rgba(61,216,197,0.12),transparent 32%),linear-gradient(145deg,#0b1220 0%,#0c1526 50%,#0a1020 100%);padding:32px 20px 64px;line-height:1.65}
+    .shell{max-width:1060px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+    .panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:24px 28px;box-shadow:var(--shadow)}
+    .panel-accent{border-color:rgba(61,216,197,.35)}
+    .panel-purple{border-color:rgba(167,139,250,.35)}
+    .panel-orange{border-color:rgba(247,183,51,.35)}
+    a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+    h1{margin:8px 0;font-size:1.9rem}h2{margin:0 0 14px;font-size:1.1rem}h3{margin:0 0 6px;font-size:.95rem}
+    p,li{color:var(--muted);font-size:.92rem}ul{padding-left:18px;margin:4px 0}li{margin-bottom:4px}
+    .eyebrow{display:inline-flex;gap:8px;align-items:center;padding:4px 10px;border-radius:999px;background:rgba(61,216,197,0.14);color:var(--accent);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+    .lead{color:var(--muted);font-size:.97rem;margin:6px 0 0}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+    @media(max-width:700px){.grid2,.grid3{grid-template-columns:1fr}}
+    .card{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;padding:18px}
+    .card-accent{border-color:rgba(61,216,197,.3);background:rgba(61,216,197,.03)}
+    .card-purple{border-color:rgba(167,139,250,.3);background:rgba(167,139,250,.04)}
+    .card-orange{border-color:rgba(247,183,51,.3);background:rgba(247,183,51,.03)}
+    .card-green{border-color:rgba(79,255,176,.3);background:rgba(79,255,176,.03)}
+    .tag{display:inline-block;font-size:.72rem;font-weight:700;padding:.15rem .5rem;border-radius:5px;margin:0 3px 6px 0}
+    .tag-teal{background:rgba(61,216,197,.18);color:#3dd8c5}
+    .tag-purple{background:rgba(167,139,250,.18);color:#c4a0ff}
+    .tag-orange{background:rgba(247,183,51,.18);color:#f7b733}
+    .tag-green{background:rgba(79,255,176,.18);color:#4fffb0}
+    .tag-red{background:rgba(255,107,107,.18);color:#ff9090}
+    table{width:100%;border-collapse:collapse;font-size:.88rem}
+    th{text-align:left;padding:9px 12px;background:rgba(61,216,197,.08);color:var(--accent);font-size:.8rem;border-bottom:1px solid var(--border)}
+    td{padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--muted);vertical-align:top}
+    td strong{color:var(--text)}
+    .code{background:#070d18;border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:14px 16px;font-family:"Fira Code","Consolas",monospace;font-size:.8rem;line-height:1.7;overflow-x:auto;white-space:pre;color:#c8d3e3;margin:10px 0}
+    .c{color:#5a7a9a}.k{color:var(--accent)}.s{color:#f7b733}.n{color:#c4a0ff}.fn{color:#7dd3fc}
+    .note{background:rgba(61,216,197,.07);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:10px 14px;margin:10px 0;font-size:.88rem;color:var(--muted)}
+    .warn{background:rgba(247,183,51,.07);border-left:3px solid var(--accent3);border-radius:0 8px 8px 0;padding:10px 14px;margin:10px 0;font-size:.88rem;color:var(--muted)}
+    .step{display:flex;gap:12px;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+    .step:last-child{border-bottom:none}
+    .step-num{background:rgba(61,216,197,.12);border:1px solid rgba(61,216,197,.3);color:var(--accent);border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.8rem;flex-shrink:0}
+    .step-body h3{font-size:.9rem;margin:0 0 3px;color:var(--text)}
+    .step-body p{margin:0;font-size:.87rem}
+    .breadcrumb{font-size:.82rem;color:#5a7a9a;margin-bottom:8px}
+    small{color:#5a7a9a;font-size:.8rem}
+    .new-badge{background:rgba(79,255,176,.15);color:#4fffb0;font-size:.7rem;font-weight:700;padding:2px 7px;border-radius:5px;margin-left:8px}
   </style>
 </head>
 <body>
-  <div class="shell">
-    <div class="panel">
-      <p><a href="../index.html">← Claw Stack</a> / <a href="../../index.html">Hub Top</a></p>
-      <h1>OpenClaw</h1>
-      <p>OpenClaw関連の入口を、設計ページと調査ページに分けて整理したハブです。</p>
-    </div>
-    <div class="panel">
-      <h2>Primary Paths</h2>
-      <ul>
-        <li><a href="../../creator-system/openclaw.html">Creator System: OpenClaw 連携設計</a></li>
-        <li><a href="../../research/openclaw-news/index.html">Research: OpenClaw News</a></li>
-        <li><a href="../../workbench/knowledge/openclaw/index.html">Workbench: OpenClaw Knowledge</a></li>
-      </ul>
+<div class="shell">
+
+  <!-- ヘッダー -->
+  <div class="panel panel-accent">
+    <div class="breadcrumb"><a href="../../index.html">← Hub Top</a> / <a href="../index.html">Claw Stack</a></div>
+    <div class="eyebrow">Claw Stack</div>
+    <h1>OpenClaw <span class="new-badge">5/24 再解禁</span></h1>
+    <p class="lead">4 スタック中で最もフル機能な自律エージェント。Signal 連携 HITL・LoRA フォールバック・API 自動化を備えた Creator System のオーケストレーション層。</p>
+    <p style="margin-top:8px"><small>最終更新: 2026-05-30 | <a href="../../creator-system/openclaw.html">Creator System: OpenClaw 連携設計 →</a></small></p>
+  </div>
+
+  <!-- OpenClaw とは -->
+  <div class="panel">
+    <h2>OpenClaw とは</h2>
+    <div class="grid2">
+      <div>
+        <p>OpenClaw は Claude API をフルに利用するクラウド常駐エージェント。NanoClaw が「スマホから起動するワンショット処理」であるのに対し、OpenClaw は<strong>複数ツール・長いワークフロー・HITL（人間介入）を組み合わせた複合タスク</strong>を自律実行する。</p>
+        <p>2026 年 5 月 24 日に再解禁。creator-system の漫画/動画パイプラインと直接統合されている。</p>
+      </div>
+      <div class="card card-accent">
+        <h3>4 スタックでの位置づけ</h3>
+        <table>
+          <tbody>
+            <tr><td>PicoClaw</td><td>最軽量・スマホのみ</td></tr>
+            <tr><td>NanoClaw</td><td>軽量・ワンショット</td></tr>
+            <tr><td><strong>OpenClaw</strong></td><td><strong>フル機能・長期ワークフロー</strong></td></tr>
+            <tr><td>Hermes Agent</td><td>VPS 常駐・24h 自律</td></tr>
+          </tbody>
+        </table>
+        <p style="margin-top:8px;font-size:.83rem"><a href="../comparison.html">comparison.html で詳細比較 →</a></p>
+      </div>
     </div>
   </div>
+
+  <!-- いつ使うか -->
+  <div class="panel">
+    <h2>いつ OpenClaw を使うか</h2>
+    <div class="grid3">
+      <div class="card card-accent">
+        <span class="tag tag-teal">◎ 最適</span>
+        <h3>漫画 / 動画バッチ生成</h3>
+        <p>ComfyUI + LoRA + ControlNet のパイプラインを 1 話分（30〜80 コマ）自動実行。HITL が必要なコマのみ Signal で確認を取る。</p>
+      </div>
+      <div class="card card-purple">
+        <span class="tag tag-purple">◎ 最適</span>
+        <h3>マルチステップ配信タスク</h3>
+        <p>note 投稿 → YouTube アップロード → KDP 登録 を順序通り実行。各ステップで API 認証エラーがあれば自動リトライ + Signal 通知。</p>
+      </div>
+      <div class="card card-orange">
+        <span class="tag tag-orange">適合</span>
+        <h3>HITL が必要な判断タスク</h3>
+        <p>品質評価で CLIP スコアが閾値を下回ったコマや、LoRA フォールバックが全段失敗したケースをユーザーへ Signal で転送。</p>
+      </div>
+      <div class="card">
+        <span class="tag tag-red">非推奨</span>
+        <h3>ワンショット質問</h3>
+        <p>「○○を調べて」のような単発クエリは PicoClaw / NanoClaw で十分。OpenClaw はオーバースペック。</p>
+      </div>
+      <div class="card">
+        <span class="tag tag-red">非推奨</span>
+        <h3>24h 常駐タスク</h3>
+        <p>電源断リスクのある長期監視タスクは Hermes Agent（VPS 常駐）の領域。OpenClaw はセッション起動型。</p>
+      </div>
+      <div class="card card-green">
+        <span class="tag tag-green">適合</span>
+        <h3>週次定期処理</h3>
+        <p>LLM トラッカー更新・hub-health チェック・API 認証メンテナンスを OpenClaw に依頼してバッチ実行させる。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 設定・接続 -->
+  <div class="panel panel-purple">
+    <h2>セットアップ概要</h2>
+    <div class="grid2">
+      <div>
+        <h3 style="margin-bottom:8px">必要なもの</h3>
+        <table>
+          <thead><tr><th>コンポーネント</th><th>用途</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Claude API キー</strong></td><td>OpenClaw の LLM バックエンド（Sonnet 4.6 推奨）</td></tr>
+            <tr><td><strong>Signal Bot</strong></td><td>HITL 通知・承認チャネル</td></tr>
+            <tr><td><strong>ComfyUI サーバー</strong></td><td>漫画/画像生成バックエンド</td></tr>
+            <tr><td><strong>note/YouTube API</strong></td><td>配信チャネル接続</td></tr>
+          </tbody>
+        </table>
+
+        <h3 style="margin-top:14px;margin-bottom:8px">YAML 設定例</h3>
+        <div class="code"><span class="c"># openclaw_config.yaml</span>
+llm:
+  provider: <span class="s">"anthropic"</span>
+  model: <span class="s">"claude-sonnet-4-6"</span>
+  max_tokens: <span class="n">8192</span>
+
+hitl:
+  channel: <span class="s">"signal"</span>
+  timeout_minutes: <span class="n">30</span>
+  fallback: <span class="s">"auto_approve"</span>  <span class="c"># タイムアウト後の動作</span>
+
+comfyui:
+  host: <span class="s">"127.0.0.1"</span>
+  port: <span class="n">8188</span>
+  workflow_dir: <span class="s">"workflows/"</span>
+
+quality:
+  clip_threshold: <span class="n">0.72</span>
+  face_quality_threshold: <span class="n">0.55</span>
+  max_retries: <span class="n">3</span></div>
+      </div>
+      <div>
+        <h3 style="margin-bottom:8px">Signal Bot の設定手順</h3>
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body"><h3>Signal CLI のインストール</h3><p><code>signal-cli</code> をサーバーにインストールし、専用電話番号でアカウント登録する。</p></div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body"><h3>OpenClaw との接続</h3><p>config に Signal 番号と受信先番号を設定。HITL リクエストが発生すると OpenClaw が Signal メッセージを送信する。</p></div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body"><h3>返答パースの確認</h3><p><code>y</code>/<code>n</code>/<code>e</code>（edit）と日本語エイリアスが使える。詳細は <a href="../../creator-system/openclaw.html">creator-system/openclaw.html</a> の Signal 返答パース実装を参照。</p></div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-body"><h3>タイムアウト設定</h3><p>デフォルト 30 分。タイムアウト後の動作（自動承認 / 自動拒否 / スキップ）を config で指定する。</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- フォールバック構造 -->
+  <div class="panel">
+    <h2>フォールバック構造</h2>
+    <div class="grid2">
+      <div class="card card-orange">
+        <h3>エラートリガー型（即時）</h3>
+        <ul>
+          <li>HTTP 429 / 402 / 503 → 即フォールバック</li>
+          <li>連続失敗 3 回 → 次ツールへ</li>
+        </ul>
+        <div class="code" style="font-size:.76rem">if error.status_code in (429, 402, 503):
+    <span class="k">return</span> fallback_immediately()</div>
+      </div>
+      <div class="card card-purple">
+        <h3>品質トリガー型（遅延）</h3>
+        <ul>
+          <li>CLIP スコア &lt; 閾値 かつ 2 回リトライ後 → HITL</li>
+          <li>LoRA 4 段階失敗 → Signal 転送</li>
+        </ul>
+        <div class="code" style="font-size:.76rem">if clip_score &lt; threshold and retry_count &gt;= 2:
+    request_human_review()</div>
+      </div>
+    </div>
+    <p style="margin-top:12px;font-size:.85rem">完全な実装コードは <a href="../../creator-system/openclaw.html">creator-system/openclaw.html</a> のフォールバック発動条件セクションを参照。</p>
+  </div>
+
+  <!-- 関連リンク -->
+  <div class="panel">
+    <h2>関連ページ</h2>
+    <div class="grid3">
+      <div class="card">
+        <h3>Creator System</h3>
+        <ul>
+          <li><a href="../../creator-system/openclaw.html">OpenClaw 連携設計</a>（HITL実装・フォールバック）</li>
+          <li><a href="../../creator-system/manga-pipeline.html">漫画パイプライン</a></li>
+          <li><a href="../../creator-system/video-pipeline.html">動画パイプライン</a></li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Claw Stack</h3>
+        <ul>
+          <li><a href="../comparison.html">4スタック比較表</a></li>
+          <li><a href="../agent-brain-guide.html">エージェント選定ガイド</a></li>
+          <li><a href="../picoclaw/">PicoClaw</a> / <a href="../nanoclaw/">NanoClaw</a></li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Knowledge Hub</h3>
+        <ul>
+          <li><a href="../../workbench/knowledge/hermes-agent.html">Hermes Agent</a></li>
+          <li><a href="../../workbench/knowledge/comfyui.html">ComfyUI ガイド</a></li>
+          <li><a href="../../workbench/knowledge/openclaw/index.html">OpenClaw Knowledge</a></li>
+        </ul>
+      </div>
+    </div>
+    <p style="margin-top:14px"><small>最終更新: 2026-05-30（OpenClaw 5/24 再解禁後の内容に刷新）</small></p>
+  </div>
+
+</div>
 </body>
 </html>

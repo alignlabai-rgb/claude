@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>_routines — 定期運用ガイド | Hub</title>
+  <style>
+    body { font-family: "Segoe UI","Noto Sans JP",system-ui,sans-serif; margin:0; background:#0b1220; color:#edf2fb; line-height:1.7; padding:28px 18px 64px; }
+    .shell { max-width:960px; margin:0 auto; display:flex; flex-direction:column; gap:16px; }
+    .panel { background:#111a2b; border:1px solid rgba(255,255,255,0.08); border-radius:18px; padding:22px 26px; }
+    .panel-accent { border-color:rgba(61,216,197,.35); }
+    a { color:#75d7c0; text-decoration:none; } a:hover { text-decoration:underline; }
+    h1 { margin:6px 0; font-size:1.8rem; }
+    h2 { margin:0 0 12px; font-size:1.05rem; color:#fcd34d; border-bottom:2px solid rgba(252,211,77,.2); padding-bottom:6px; }
+    h3 { margin:0 0 5px; font-size:.95rem; }
+    p,li { color:#c5d0e3; font-size:.9rem; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:14px; }
+    .card { background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.07); border-radius:14px; padding:18px 20px; display:flex; flex-direction:column; gap:8px; text-decoration:none; transition:border-color .15s; }
+    .card:hover { border-color:rgba(61,216,197,.4); }
+    .card h3 { color:#edf2fb; margin:0; font-size:.97rem; }
+    .card p { color:#c5d0e3; font-size:.85rem; margin:0; }
+    .card.monthly { border-color:rgba(61,216,197,.25); }
+    .card.weekly { border-color:rgba(255,160,60,.25); }
+    .card.every { border-color:rgba(167,139,250,.25); }
+    .badge { display:inline-block; font-size:.7rem; font-weight:700; padding:2px 8px; border-radius:5px; }
+    .badge-teal { background:rgba(61,216,197,.18); color:#3dd8c5; }
+    .badge-orange { background:rgba(255,160,60,.18); color:#ffa03c; }
+    .badge-purple { background:rgba(167,139,250,.18); color:#c4a0ff; }
+    .badge-gray { background:rgba(150,150,180,.12); color:#9090b0; }
+    table { width:100%; border-collapse:collapse; font-size:.87rem; }
+    th { text-align:left; padding:8px 12px; background:rgba(61,216,197,.07); color:#3dd8c5; font-size:.78rem; border-bottom:1px solid rgba(255,255,255,.07); }
+    td { padding:8px 12px; border-bottom:1px solid rgba(255,255,255,.04); color:#c5d0e3; }
+    td strong { color:#edf2fb; }
+    .note { background:rgba(61,216,197,.06); border-left:3px solid #3dd8c5; border-radius:0 8px 8px 0; padding:10px 14px; margin:10px 0; font-size:.86rem; }
+    small { color:#4a6a7a; font-size:.78rem; }
+    .breadcrumb { font-size:.8rem; color:#4a6a7a; margin-bottom:8px; }
+  </style>
+</head>
+<body>
+<div class="shell">
+
+  <div class="panel panel-accent">
+    <div class="breadcrumb"><a href="../index.html">← Hub Top</a></div>
+    <h1>_routines — 定期運用ガイド</h1>
+    <p style="color:#c5d0e3;margin:8px 0 0;font-size:.95rem;">「外出中でも Claude に非同期で更新を依頼できる基盤」を実現するための定期作業テンプレート集。各ページの指示を Claude セッションに渡すだけで実行できる形式で書かれている。</p>
+    <p style="margin-top:8px"><small>最終更新: 2026-05-31</small></p>
+  </div>
+
+  <!-- ルーティン一覧 -->
+  <div class="panel">
+    <h2>ルーティン一覧</h2>
+    <div class="grid">
+
+      <a href="session-start.html" class="card every">
+        <span class="badge badge-purple">毎回</span>
+        <h3>セッション開始チェック</h3>
+        <p>毎回 7 分間の高速ブート。git 状態 → hub-health ALERT確認 → next-actions 把握 → タスク確認の 3 フェーズ。</p>
+      </a>
+
+      <a href="hub-health-check.html" class="card weekly">
+        <span class="badge badge-orange">週次</span>
+        <h3>Hub ヘルスチェック</h3>
+        <p>全カテゴリのファイル鮮度を計算し ALERT/WARN を特定。hub-health.html と next-actions.html を更新する。所要 15〜20 分。</p>
+      </a>
+
+      <a href="llm-tracker-update.html" class="card monthly">
+        <span class="badge badge-teal">月次</span>
+        <h3>LLM トラッカー更新</h3>
+        <p>6 ベンダー（Claude/ChatGPT/Gemini/Grok/Qwen/GLM）のトラッカーページを最新情報に更新。月初 5 日以内に実施。</p>
+      </a>
+
+      <a href="news-template.html" class="card">
+        <span class="badge badge-gray">日次（任意）</span>
+        <h3>AI News テンプレート</h3>
+        <p>daily AI news ページの HTML テンプレート。<code>research/ai-news/</code> に新規ファイルを作る際に使用する。</p>
+      </a>
+
+      <a href="link-checker.html" class="card" style="border-color:rgba(79,255,176,.25);">
+        <span class="badge" style="background:rgba(79,255,176,.18);color:#4fffb0;">四半期</span>
+        <h3>リンクチェッカー</h3>
+        <p>全 HTML ページの内部リンク切れを自動検出。<code>tools/link-checker.py</code> を実行してレポートを生成・確認する。所要 1〜2 分。</p>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- 実施スケジュール早見表 -->
+  <div class="panel">
+    <h2>実施スケジュール早見表</h2>
+    <table>
+      <thead><tr><th>タイミング</th><th>ルーティン</th><th>所要時間</th><th>Claude への依頼文</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>セッション冒頭</strong>（毎回）</td>
+          <td><a href="session-start.html">session-start</a></td>
+          <td>7 分</td>
+          <td>「session-start.html の手順を実行して状況を教えて」</td>
+        </tr>
+        <tr>
+          <td><strong>週末</strong>（週1回）</td>
+          <td><a href="hub-health-check.html">hub-health-check</a></td>
+          <td>15〜20 分</td>
+          <td>「hub-health-check.html の手順でヘルスチェックして hub-health.html と next-actions を更新して」</td>
+        </tr>
+        <tr>
+          <td><strong>月初</strong>（月1回）</td>
+          <td><a href="llm-tracker-update.html">llm-tracker-update</a></td>
+          <td>30〜45 分</td>
+          <td>「llm-tracker-update.html の手順で 6 ベンダーのトラッカーを最新に更新して」</td>
+        </tr>
+        <tr>
+          <td><strong>毎日（任意）</strong></td>
+          <td><a href="news-template.html">news-template</a></td>
+          <td>5〜10 分</td>
+          <td>「今日の AI ニュースを research/ai-news/ に追加して」</td>
+        </tr>
+        <tr>
+          <td><strong>四半期 / 構造変更後</strong></td>
+          <td><a href="link-checker.html">link-checker</a></td>
+          <td>1〜2 分</td>
+          <td>「link-checker.py を実行して切れているリンクを修正してください」</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="note" style="margin-top:12px">
+      <strong>依頼の仕方:</strong> 各ルーティンページを Claude に読ませるだけで手順が分かる設計になっている。スマホから「〇〇の手順を実行して」と送るだけで外出中でも非同期実行可能。
+    </div>
+  </div>
+
+  <!-- 追加予定 -->
+  <div class="panel">
+    <h2>今後追加予定のルーティン</h2>
+    <ul>
+      <li><strong>quarterly-review</strong> — 四半期レビュー（2026-q2-review.html のテンプレート化）</li>
+      <li><strong>strategy-update</strong> — 戦略・ロードマップ更新手順</li>
+      <li><strong>api-auth-maintenance</strong> — note/YouTube/KDP の API 認証メンテナンス（<a href="../creator-system/monetization.html">monetization.html</a> に詳細あり）</li>
+    </ul>
+  </div>
+
+  <!-- 参照 -->
+  <div class="panel">
+    <h2>参照リンク</h2>
+    <ul>
+      <li><a href="../logs/hub-health.html">hub-health.html</a> — 現在の鮮度状態</li>
+      <li><a href="../logs/next-actions.html">next-actions.html</a> — 直近 TODO</li>
+      <li><a href="../foundations/onboarding-checklist.html">onboarding-checklist.html</a> — 初回セッション用</li>
+      <li><a href="../foundations/multi-instance-protocol.html">multi-instance-protocol.html</a> — 並走プロトコル</li>
+    </ul>
+    <p style="margin-top:10px"><small>最終更新: 2026-05-31</small></p>
+  </div>
+
+</div>
+</body>
+</html>

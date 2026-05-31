@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gemini Spark — 24/7 パーソナル AI エージェント | Tech Workbench</title>
+<style>
+:root {
+    --accent: #f59e0b;
+    --accent2: #fcd34d;
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #21262d;
+    --border: rgba(255,255,255,0.08);
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --radius: 12px;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; line-height:1.65; font-size:16px; }
+a { color:var(--accent); text-decoration:none; }
+a:hover { text-decoration:underline; }
+.page-wrap { max-width:960px; margin:0 auto; padding:32px 20px 80px; }
+nav { background:var(--surface); border-bottom:1px solid var(--border); padding:12px 20px; font-size:0.85rem; }
+nav a { color:var(--muted); margin-right:6px; }
+nav a:hover { color:var(--text); }
+nav span { color:var(--muted); margin-right:6px; }
+.hero { background:linear-gradient(135deg, #92400e, #b45309); border-radius:var(--radius); padding:48px 40px; margin-bottom:40px; }
+.hero h1 { font-size:2.2rem; font-weight:800; color:#fff; margin-bottom:8px; }
+.hero .sub { color:rgba(255,255,255,0.88); font-size:1.05rem; margin-bottom:24px; max-width:640px; }
+.chips { display:flex; flex-wrap:wrap; gap:8px; }
+.chip { background:rgba(255,255,255,0.18); color:#fff; padding:4px 14px; border-radius:20px; font-size:0.8rem; font-weight:600; }
+.section { margin-bottom:48px; }
+.section > h2 { font-size:1.4rem; font-weight:700; margin-bottom:16px; padding-bottom:8px; border-bottom:2px solid var(--accent); color:var(--accent); }
+.section > h2.dim { border-color:var(--accent2); color:var(--accent2); }
+p { margin-bottom:12px; }
+ul, ol { padding-left:1.5em; margin-bottom:12px; }
+li { margin-bottom:5px; }
+.grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:20px; margin-bottom:20px; }
+.card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:24px; }
+.card h3 { font-size:1.05rem; font-weight:700; margin-bottom:10px; color:var(--accent); }
+.card h3.dim { color:var(--accent2); }
+.card h3.green { color:#4fffb0; }
+.table-wrap { overflow-x:auto; margin:16px 0; }
+table { width:100%; border-collapse:collapse; font-size:0.9rem; }
+th { background:var(--surface2); color:var(--accent); padding:10px 14px; text-align:left; border:1px solid var(--border); }
+td { padding:9px 14px; border:1px solid var(--border); vertical-align:top; }
+tr:nth-child(even) td { background:rgba(255,255,255,0.02); }
+pre { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:20px; overflow-x:auto; margin:16px 0; }
+code { font-family:'JetBrains Mono','Fira Code',monospace; font-size:0.85rem; color:#79c0ff; }
+.cm { color:#8b949e; }
+.highlight-box { background:rgba(245,158,11,0.08); border-left:3px solid var(--accent); border-radius:0 8px 8px 0; padding:16px 20px; margin:16px 0; }
+.highlight-box.green { background:rgba(79,255,176,0.08); border-color:#4fffb0; }
+.highlight-box.red { background:rgba(248,81,73,0.08); border-color:#f85149; }
+.badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:0.75rem; font-weight:700; margin-bottom:8px; }
+.badge-amber { background:rgba(245,158,11,0.15); color:var(--accent); }
+.badge-green { background:rgba(79,255,176,0.15); color:#4fffb0; }
+.badge-red { background:rgba(248,81,73,0.15); color:#f85149; }
+.example-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; margin:16px 0; }
+.example-card { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:18px; }
+.example-card .tag { font-size:0.72rem; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:6px; }
+.example-card h4 { font-size:0.95rem; font-weight:700; margin-bottom:6px; }
+.example-card p { font-size:0.88rem; color:var(--muted); margin:0; line-height:1.55; }
+.ok { color:#4fffb0; font-weight:700; }
+.no { color:#f85149; }
+.partial { color:#facc15; }
+.vs-jules { background:rgba(34,197,94,0.06); }
+.flow-diagram { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:28px; margin:20px 0; }
+.flow-row { display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:12px; }
+.flow-node { background:rgba(245,158,11,0.1); border:2px solid var(--accent); border-radius:10px; padding:10px 16px; text-align:center; min-width:110px; }
+.flow-node .node-label { font-size:0.7rem; font-weight:700; text-transform:uppercase; color:var(--accent); margin-bottom:3px; }
+.flow-node .node-title { font-size:0.88rem; font-weight:700; }
+.flow-arrow { color:var(--muted); font-size:1.4rem; }
+.step-list { counter-reset:steps; list-style:none; padding:0; }
+.step-list li { counter-increment:steps; display:flex; gap:16px; margin-bottom:20px; align-items:flex-start; }
+.step-list li::before { content:counter(steps); min-width:32px; height:32px; background:var(--accent); color:#000; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:0.9rem; flex-shrink:0; }
+footer { text-align:center; padding:32px 20px; color:var(--muted); font-size:0.85rem; border-top:1px solid var(--border); margin-top:60px; }
+footer a { color:var(--muted); }
+</style>
+</head>
+<body>
+<nav>
+  <a href="../../index.html">Hub</a> <span>›</span>
+  <a href="./index.html">LLM 個別深掘り</a> <span>›</span>
+  <a href="./google-ecosystem.html">Google AI エコシステム</a> <span>›</span>
+  Gemini Spark
+</nav>
+
+<main class="page-wrap">
+
+<div class="hero">
+  <h1>Gemini Spark — 24/7 パーソナル AI エージェント</h1>
+  <p class="sub">Google I/O 2026 で発表された常時稼働型の自律 AI エージェント。ノートを閉じても・スマホをロックしても、クラウド上で長期タスクを実行し続ける。Gmail・Docs・Chrome・30以上のサードパーティツールと連携し、高リスクな操作は明示的な承認を求める。</p>
+  <div class="chips">
+    <span class="chip">I/O 2026 発表</span>
+    <span class="chip">24/7 クラウド稼働</span>
+    <span class="chip">Gmail ネイティブ統合</span>
+    <span class="chip">Chrome 連携</span>
+    <span class="chip">MCP 30+ ツール</span>
+    <span class="chip">Antigravity 基盤</span>
+    <span class="chip">AI Ultra 先行ベータ</span>
+  </div>
+</div>
+
+<!-- 1. Gemini Spark とは -->
+<section class="section">
+  <h2>1. Gemini Spark とは</h2>
+  <p><strong>Gemini Spark</strong> は Google が 2026年5月19日の Google I/O 2026 で発表した <strong>常時稼働型パーソナル AI エージェント</strong>です。Gemini アプリの「次の進化」として位置づけられ、従来のチャット型 AI とは根本的に異なる設計思想を持ちます。</p>
+  <p>最大の特徴は <strong>「閉じても動き続ける」</strong> こと。ノートパソコンを閉じても・スマホをロックしても、Spark はクラウド上で長期タスクを実行し続け、完了したら通知します。Gemini モデルと <strong>Antigravity のエージェントハーネス</strong>を組み合わせた構成で、最小限の監視で長期的なタスクを自律実行できます。</p>
+
+  <div class="highlight-box red">
+    <p>⚠️ <strong>提供状況（2026年5月末）:</strong> Google AI Ultra サブスクライバー向けに米国でベータ先行展開中。日本・他地域への展開時期は未発表。Ultra プランは $99.99/月〜（I/O 2026 で $200 プランと2階層に分割）。</p>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>項目</th><th>内容</th></tr></thead>
+      <tbody>
+        <tr><td>発表</td><td>2026年5月19日 Google I/O 2026</td></tr>
+        <tr><td>対象プラン</td><td>Google AI Ultra（$99.99/月〜・米国先行）</td></tr>
+        <tr><td>基盤モデル</td><td>Gemini 3.1 Pro + Antigravity エージェントハーネス</td></tr>
+        <tr><td>実行環境</td><td>Google Cloud 上でのクラウド常時稼働</td></tr>
+        <tr><td>主要連携</td><td>Gmail・Google Docs・Chrome・MCP 経由 30+ ツール</td></tr>
+        <tr><td>高リスク操作</td><td>メール送信等は明示的承認が必要</td></tr>
+        <tr><td>公式</td><td>gemini.google/overview/agent/spark</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 2. 従来チャット型との違い -->
+<section class="section">
+  <h2>2. 従来の Gemini との根本的な違い</h2>
+
+  <div class="flow-diagram">
+    <p style="font-weight:700; margin-bottom:16px; color:var(--accent);">Gemini（チャット型）vs Gemini Spark（エージェント型）</p>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+      <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:10px; padding:16px;">
+        <p style="font-weight:700; color:var(--muted); margin-bottom:10px;">従来 Gemini</p>
+        <ul style="font-size:0.9rem; color:var(--muted);">
+          <li>会話ターンごとに指示・確認</li>
+          <li>ブラウザを閉じると停止</li>
+          <li>1回1タスクの同期処理</li>
+          <li>ユーザーが常に進行を管理</li>
+          <li>ツール連携は手動設定</li>
+        </ul>
+      </div>
+      <div style="background:rgba(245,158,11,0.06); border:1px solid rgba(245,158,11,0.3); border-radius:10px; padding:16px;">
+        <p style="font-weight:700; color:var(--accent); margin-bottom:10px;">Gemini Spark</p>
+        <ul style="font-size:0.9rem;">
+          <li>目標を渡したら自律実行</li>
+          <li>端末を閉じてもクラウドで継続</li>
+          <li>長期・複数ステップの非同期処理</li>
+          <li>定期タスクのスケジュール実行</li>
+          <li>Gmail・Chrome・30+ ツールを自動操作</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="highlight-box">
+    <p>💡 <strong>一言で言うと:</strong> Gemini が「一緒に作業する AI」なら、Gemini Spark は「代わりに作業してくれる AI」。依頼して忘れていい、という設計。</p>
+  </div>
+</section>
+
+<!-- 3. 主要機能 -->
+<section class="section">
+  <h2>3. 主要機能</h2>
+
+  <div class="grid">
+    <div class="card">
+      <span class="badge badge-amber">核心</span>
+      <h3>24/7 クラウド常時稼働</h3>
+      <ul>
+        <li>端末をオフにしても Google Cloud 上でタスク継続</li>
+        <li>長時間・複数日にわたる長期タスクに対応</li>
+        <li>完了・エラー・重要判断が必要な時に通知</li>
+        <li>並列タスク実行（複数の依頼を同時処理）</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="badge badge-amber">連携</span>
+      <h3>Gmail ネイティブ統合</h3>
+      <ul>
+        <li><strong>Spark 専用 Gmail アドレス</strong>が割り当てられ、メールで直接タスクを依頼可能</li>
+        <li>受信ボックスを監視してトリガー設定（「この条件のメールが来たら〜を実行」）</li>
+        <li>メール送信は明示的承認が必要（誤送信防止）</li>
+        <li>スレッド分析・優先度付け・返信案生成を自律実行</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="badge badge-amber">操作</span>
+      <h3>Chrome ウェブ操作</h3>
+      <ul>
+        <li>Chrome を通じてウェブを自律的にブラウジング</li>
+        <li>フォーム入力・データ収集・情報照合を自動化</li>
+        <li>複数サイトにまたがるリサーチを自律実行</li>
+        <li>スクリーンショット・コンテンツ抽出も可能</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="badge badge-amber">拡張</span>
+      <h3>MCP 30+ ツール連携</h3>
+      <ul>
+        <li>Google ツール優先、順次 30+ の外部ツールへ拡張</li>
+        <li><strong>Adobe</strong>（デザインファイル操作）</li>
+        <li><strong>Dropbox</strong>（クラウドストレージ連携）</li>
+        <li><strong>Uber</strong>（配車・実世界アクション）</li>
+        <li>Linear / Slack / Notion 等も順次追加予定</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="badge badge-green">安全</span>
+      <h3>承認フロー・安全設計</h3>
+      <ul>
+        <li>高リスクアクション（メール送信・購入等）は事前承認が必要</li>
+        <li>重要な判断ポイントでプロアクティブに通知</li>
+        <li>実行ログ・アクション履歴の透明な記録</li>
+        <li>タスクのキャンセル・一時停止がいつでも可能</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="badge badge-amber">自動化</span>
+      <h3>定期・繰り返しタスク</h3>
+      <ul>
+        <li>スケジュール設定で定期実行（毎朝ニュース収集・週次レポート等）</li>
+        <li>カスタムスキルの学習（「このやり方で」と教えると以後自動適用）</li>
+        <li>トリガーベースの実行（条件が満たされたら自律起動）</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="badge badge-green">I/O 2026 新機能</span>
+      <h3 class="green">Daily Brief — 毎朝の AI ダイジェスト</h3>
+      <ul>
+        <li><strong>前夜のうちにクラウドで実行</strong>: Gmail・Google カレンダー・Google Tasks を夜間に分析し、翌朝の開封時に個人化ダイジェストを表示</li>
+        <li><strong>当日のスケジュール + 重要メール + 次のアクション提案</strong>を1画面にまとめて朝に配信</li>
+        <li><strong>全 Google AI サブスクライバー向け</strong>（Free プラン含む 18歳以上・米国先行）: Spark とは異なりプレミアムプランが不要</li>
+        <li>Spark との違い: Daily Brief は固定の朝次情報整理。Spark は任意の長期タスクを自律実行するカスタムエージェント</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="highlight-box">
+    <p>📌 <strong>Spark と Daily Brief の使い分け:</strong> Daily Brief は「毎朝届く自動サマリー」として設定不要で利用できる入門的エージェント機能。Spark は「任意の複雑なタスクを指示して委任する」上位機能（AI Ultra 限定）。まず Daily Brief で体験し、より深い自動化に進む場合は Spark へ移行するのが自然な導線。</p>
+  </div>
+</section>
+
+<!-- 4. 使い方ガイド -->
+<section class="section">
+  <h2>4. 使い方 — Gemini Spark でタスクを委任する</h2>
+
+  <ol class="step-list">
+    <li>
+      <div>
+        <strong>Gemini アプリ → 「Spark」タブを開く</strong><br>
+        Ultra プランでログイン後、Gemini アプリの Spark セクションにアクセス。初回は Spark 専用 Gmail アドレスの設定と、連携するツール（Chrome / Google ツール / MCP ツール）の認証を行う。
+      </div>
+    </li>
+    <li>
+      <div>
+        <strong>タスクを自然言語で依頼</strong><br>
+        例: <code>「今週の競合他社（A社・B社・C社）の新着プレスリリースをまとめて、重要度付きで Docs にまとめておいて。毎週月曜 9時に更新して。」</code>
+      </div>
+    </li>
+    <li>
+      <div>
+        <strong>Spark が計画を提示 → 承認</strong><br>
+        Spark が実行計画（どのツールを使うか・どのステップで承認が必要か）を提示。承認すると自律実行開始。端末を閉じても OK。
+      </div>
+    </li>
+    <li>
+      <div>
+        <strong>承認が必要な時だけ通知が届く</strong><br>
+        Spark は自律的に作業を進め、高リスクな操作（外部メール送信・フォーム送信等）の前に通知を送って承認を求める。
+      </div>
+    </li>
+    <li>
+      <div>
+        <strong>完了通知 → 結果を確認</strong><br>
+        タスク完了時に通知。Spark の実行ログで何を実施したかを確認できる。定期タスクはそのまま継続実行。
+      </div>
+    </li>
+  </ol>
+
+  <p><strong>Gmail 経由でタスクを依頼する場合:</strong></p>
+  <pre><code><span class="cm"># Spark 専用アドレスにメールを送るだけでタスクを依頼できる</span>
+宛先: spark@gemini.google.com
+件名: 競合レポートの自動更新設定
+
+本文:
+A社・B社の新着ブログ記事を毎週月曜8時に収集して
+Google Docs（競合レポート）に追記してください。
+重要度は「高・中・低」で分類してください。</code></pre>
+</section>
+
+<!-- 5. Jules vs Spark -->
+<section class="section">
+  <h2 class="dim">5. Gemini Spark vs Jules — 使い分け</h2>
+  <p>両方とも「AI に仕事を任せる」自律エージェントですが、対象領域が明確に異なります。</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>観点</th><th>Gemini Spark</th><th>Jules</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>対象ドメイン</strong></td><td>ビジネスタスク全般（リサーチ・メール・Docs 等）</td><td>コーディング・GitHub リポジトリ</td></tr>
+        <tr><td><strong>主な入力</strong></td><td>自然言語指示・メール・スケジュール</td><td>GitHub Issue・コード変更依頼</td></tr>
+        <tr><td><strong>主な出力</strong></td><td>Docs・メール・データ・スケジュール実行結果</td><td>GitHub Pull Request</td></tr>
+        <tr><td><strong>ウェブ操作</strong></td><td><span class="ok">◎</span> Chrome でウェブブラウジング可</td><td><span class="no">×</span> コードリポジトリのみ</td></tr>
+        <tr><td><strong>コーディング</strong></td><td><span class="partial">△</span> 基本的なコード生成・Docs 編集</td><td><span class="ok">◎</span> 本格的なコード実装・テスト・PR</td></tr>
+        <tr><td><strong>定期実行</strong></td><td><span class="ok">◎</span> スケジュール・トリガーベース</td><td><span class="ok">◎</span> Scheduled Tasks</td></tr>
+        <tr><td><strong>サードパーティ連携</strong></td><td><span class="ok">◎</span> 30+ MCP ツール（Adobe・Dropbox・Uber）</td><td><span class="partial">△</span> GitHub・Linear 等 開発系のみ</td></tr>
+        <tr><td><strong>料金</strong></td><td>AI Ultra $99.99/月〜（込み）</td><td>Free〜AI Ultra まで段階的</td></tr>
+        <tr><td><strong>最適な用途</strong></td><td>マーケター・PM・経営者・非エンジニア</td><td>開発者・エンジニア・DevOps</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="highlight-box">
+    <p>💡 <strong>組み合わせで最強:</strong> Ultra プランでは Spark と Jules の両方が使える。「競合分析 → Docs まとめ」は Spark に、「その Docs の内容を元にコードを書いて PR を出して」は Jules に、と役割分担すると理想的。</p>
+  </div>
+</section>
+
+<!-- 6. ユースケース -->
+<section class="section">
+  <h2>6. ユースケース 10 選</h2>
+
+  <div class="example-grid">
+    <div class="example-card">
+      <div class="tag">リサーチ</div>
+      <h4>週次競合モニタリング</h4>
+      <p>競合5社のブログ・プレスリリース・SNSを毎週月曜にクロールし、重要度付きサマリーを Docs に自動更新。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">メール</div>
+      <h4>問い合わせの自動トリアージ</h4>
+      <p>特定条件のメールを検知したら分類・優先付け・返信案を作成。承認後に送信。カスタマーサポートを半自動化。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">採用</div>
+      <h4>求人応募書類のスクリーニング</h4>
+      <p>添付 PDF の履歴書を分析し、要件マッチ度を評価してランキング化。採用担当者のレビュー時間を削減。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">マーケ</div>
+      <h4>SNS トレンドの定点観測</h4>
+      <p>指定キーワードの SNS メンション・ニュース記事を毎日収集してシート集計。ブランド監視・トレンド把握。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">営業</div>
+      <h4>見込み客リサーチの自動化</h4>
+      <p>リード企業名リストを渡すと Web + LinkedIn をクロールして概要・課題・アプローチ案を Docs にまとめる。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">財務</div>
+      <h4>経費レポートの自動集計</h4>
+      <p>領収書メールを監視・分析し、カテゴリ別に Sheets に自動記帳。月末レポートを自動生成して承認依頼。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">コンテンツ</div>
+      <h4>コンテンツカレンダーの自動管理</h4>
+      <p>Sheets のコンテンツカレンダーを監視し、公開日前日にリマインダーを関係者に送付。スケジュール管理を自律化。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">学習</div>
+      <h4>業界ニュースの自動まとめ</h4>
+      <p>毎朝 7時に指定業界のニュースを収集・要約して朝のブリーフィング Docs を作成。通勤前に読めるよう自動整理。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">PM</div>
+      <h4>プロジェクト進捗の週次レポート</h4>
+      <p>Docs・Sheets のプロジェクト資料を分析し、達成状況・遅延リスク・次週アクションを整理した週次レポートを自動生成。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">イベント</div>
+      <h4>会議後フォローアップの自動化</h4>
+      <p>Meet 会議が終わると Spark がサマリーを読み取り、参加者への御礼メール案と ToDoリストを Draft として用意。承認で一括送信。</p>
+    </div>
+  </div>
+</section>
+
+<!-- 7. 制限・注意点 -->
+<section class="section">
+  <h2>7. 制限・注意点（2026年5月末時点）</h2>
+
+  <div class="grid">
+    <div class="card">
+      <h3>現在の制限</h3>
+      <ul>
+        <li><strong>AI Ultra 限定</strong>: $99.99/月〜 の最上位プランのみ（日本価格は未発表）</li>
+        <li><strong>米国先行ベータ</strong>: 日本・他地域の提供時期未発表</li>
+        <li><strong>承認フローの摩擦</strong>: 安全のための承認要求が多いと感じるユーザーもいる</li>
+        <li><strong>Workspace エンタープライズ</strong>: 個人 Google アカウント向けに先行展開中</li>
+        <li><strong>エラー時の自律修復</strong>: 予期しない状況での判断精度は発展途上</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 class="dim">セキュリティ考慮事項</h3>
+      <ul>
+        <li>Gmail アクセス権限を付与するため、機密メール取り扱いに注意</li>
+        <li>Chrome 操作はサンドボックス内だが、ログイン済みサービスへのアクセスを意識</li>
+        <li>MCP ツール連携はツールごとに権限スコープを個別確認</li>
+        <li>実行ログで Spark のアクション履歴を定期的に確認することを推奨</li>
+        <li>高機密環境では社内ポリシー確認後に利用</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p>関連: <a href="google-ecosystem.html">Google AI エコシステム総覧</a> &nbsp;|&nbsp; <a href="jules.html">Jules（コーディング自律エージェント）</a> &nbsp;|&nbsp; <a href="anti-gravity.html">Antigravity 2.0</a> &nbsp;|&nbsp; <a href="gemini-advanced.html">Gemini Advanced</a></p>
+  <p style="margin-top:8px;">最終更新: 2026-05-31（Daily Brief カード追加・I/O 2026 新機能を反映） &nbsp;|&nbsp; <a href="../../index.html">Hub トップ</a> &nbsp;|&nbsp; <a href="index.html">← Knowledge Hub</a></p>
+</footer>
+</body>
+</html>

@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ネタ生成AIシステム — AI Creator Hub</title>
+  <meta name="description" content="Googleトレンド・RSS・SNSからネタを収集し、LLMで展開・スコアリングして動画・漫画パイプラインへ自動投入するコンテンツ燃料供給エンジン">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">AI Creator Hub</div>
+  <ul class="nav-links">
+    <li><a href="index.html">ホーム</a></li>
+    <li><a href="topic-generator.html" class="active">ネタ生成</a></li>
+    <li><a href="video-pipeline.html">動画制作</a></li>
+    <li><a href="manga-pipeline.html">漫画制作</a></li>
+    <li><a href="evaluation.html">評価システム</a></li>
+    <li><a href="monetization.html">マネタイズ</a></li>
+    <li><a href="openclaw.html">OpenClaw連携</a></li>
+    <li><a href="kpi-dashboard.html">KPI</a></li>
+    <li><a href="genai-tools.html">生成ツール比較</a></li>
+    <li><a href="overview.html" style="color:#3dd8c5;">全体フロー</a></li>
+    <li><a href="../research/openclaw-news/index.html" style="color: #4FFFB0;">🦞 OpenClaw情報</a></li>
+  </ul>
+  <div class="nav-hamburger"><span></span><span></span><span></span></div>
+</nav>
+
+<div class="page-hero">
+  <div class="section-label">ネタ生成AIシステム</div>
+  <h1>トレンドを読み取り<br><span style="background: linear-gradient(135deg,#FF9E00,#FF6B6B); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">ネタを自動生産</span></h1>
+  <p>Google トレンド・RSS・SNS からリアルタイムに旬のネタを収集し、LLM で展開・スコアリングして動画・漫画パイプラインへ毎朝自動投入する「コンテンツ燃料供給エンジン」</p>
+</div>
+
+<!-- TOC -->
+<section style="background: var(--bg2); padding: 1.5rem 2rem; border-bottom: 1px solid var(--border);">
+  <div style="max-width: 1100px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; font-size: 0.85rem;">
+    <span style="color: var(--text-muted); font-weight: 700; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; margin-right: 0.5rem;">目次 →</span>
+    <a href="#role" style="color: var(--accent);">役割</a>
+    <a href="#sources" style="color: var(--accent);">ネタソース</a>
+    <a href="#flow" style="color: var(--accent);">生成フロー</a>
+    <a href="#scoring" style="color: var(--accent);">スコアリング</a>
+    <a href="#schedule" style="color: var(--accent);">スケジュール</a>
+    <a href="#api" style="color: var(--accent);">API設計</a>
+    <a href="#cost" style="color: var(--accent);">コスト</a>
+  </div>
+</section>
+
+<!-- Role Description -->
+<section class="section" id="role">
+  <div class="section-inner">
+    <div class="two-col">
+      <div>
+        <div class="section-label">システム内での役割</div>
+        <h2 class="section-title">パイプライン全体の<br>「燃料補給エンジン」</h2>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+          ネタ生成AIはコンテンツファクトリーの最上流に位置するモジュールです。
+          人間がゼロから考えることなく、毎朝10〜20本の旬のネタを自動生成し、
+          動画・漫画パイプラインのジョブキューへ投入します。
+          ネタの質がパイプライン全体のアウトプット品質を左右するため、
+          評価システムのフィードバックを受けて継続的に自律最適化されます。
+        </p>
+        <ul class="checklist">
+          <li><strong>入力元:</strong> Googleトレンド / RSS / SNS API / 手動投入</li>
+          <li><strong>出力先:</strong> 動画パイプライン & 漫画パイプラインのジョブキュー</li>
+          <li><strong>フィードバック元:</strong> 評価システム・マネタイズ（成功パターン学習）</li>
+          <li><strong>生成本数:</strong> 毎朝6時に10〜20本バッチ生成（追加でオンデマンド対応）</li>
+          <li><strong>メインLLM:</strong> Claude Sonnet 4.6（ネタ展開・スコアリング）</li>
+        </ul>
+      </div>
+      <div>
+        <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem;">
+          <h3 style="margin-bottom: 1.25rem; font-size: 1rem; color: var(--text-muted);">モジュール入出力定義</h3>
+          <div class="code-block">
+<span class="cm"># OpenClaw スキル定義 (SKILL.md 抜粋)</span>
+<span class="fn">name</span>: <span class="str">topic-generator</span>
+<span class="fn">version</span>: <span class="str">"2.0.0"</span>
+<span class="fn">trigger</span>: <span class="str">cron(0 6 * * *)</span>   <span class="cm"># 毎朝6時</span>
+<span class="fn">input</span>:
+  <span class="fn">source_mix</span>: <span class="fn">list</span>      <span class="cm"># 使用ソースの割合</span>
+  <span class="fn">genre_filter</span>: <span class="fn">list</span>   <span class="cm"># 絞り込むジャンル</span>
+  <span class="fn">target_count</span>: <span class="fn">int</span>    <span class="cm"># 生成本数（デフォルト15）</span>
+  <span class="fn">pipeline_targets</span>: <span class="fn">list</span> <span class="cm"># video|manga|both</span>
+<span class="fn">output</span>:
+  <span class="fn">topics</span>: <span class="fn">list</span>           <span class="cm"># 生成ネタリスト</span>
+  <span class="fn">queued_jobs</span>: <span class="fn">int</span>      <span class="cm"># キュー投入数</span>
+  <span class="fn">skipped</span>: <span class="fn">int</span>          <span class="cm"># フィルタ除外数</span>
+  <span class="fn">feedback_applied</span>: <span class="fn">bool</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Sources -->
+<section class="section" style="background: var(--bg2);" id="sources">
+  <div class="section-inner">
+    <div class="section-label">ネタソース</div>
+    <h2 class="section-title">4つのチャネルから<br>リアルタイムに収集</h2>
+    <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));">
+
+      <div class="card">
+        <div class="card-icon purple">📈</div>
+        <h3>Google トレンド</h3>
+        <p>直近24〜48時間の急上昇ワードをAPIで取得。「AIニュース」「テック解説」ジャンルに特化したフィルタを適用し、検索ボリューム急増のキーワードを優先。</p>
+        <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <span class="tag tag-purple">Trends API</span>
+          <span class="tag tag-cyan">1時間ごと更新</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-icon cyan">📡</div>
+        <h3>RSS / ニュースフィード</h3>
+        <p>TechCrunch・Wired・Ars Technica・NHK NEWS WEB など約30フィードを購読。LLMがタイトルと本文の要点を抽出し、動画ネタとしての転用可能性を判定。</p>
+        <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <span class="tag tag-cyan">30+ フィード</span>
+          <span class="tag tag-green">2時間ごと</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-icon orange">🐦</div>
+        <h3>SNS トレンド</h3>
+        <p>X（旧Twitter）のトレンドワードと、RedditのAI・Tech関連サブレディットでの上位スレッドを収集。バズりやすいトーン・切り口を分析してネタに反映。</p>
+        <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <span class="tag tag-orange">X API v2</span>
+          <span class="tag tag-orange">Reddit API</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-icon green">✍️</div>
+        <h3>手動 / シード投入</h3>
+        <p>人間が気になるトピックを自由入力するフォーム。OpenClawのダッシュボードからいつでも追加でき、朝の自動バッチとは別に即時パイプライン投入も可能。</p>
+        <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <span class="tag tag-green">即時反映</span>
+          <span class="tag tag-purple">最優先キュー</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Pipeline Steps -->
+<section class="section" id="flow">
+  <div class="section-inner">
+    <div class="section-label">生成フロー</div>
+    <h2 class="section-title">5ステップで<br>ネタをキューへ</h2>
+
+    <div style="display: flex; flex-direction: column; gap: 1.5rem; margin-top: 2rem;">
+
+      <div class="card" style="display: grid; grid-template-columns: 60px 1fr; gap: 1.5rem; align-items: start;">
+        <div class="step-num" style="margin: 0;">1</div>
+        <div>
+          <h3>ソース収集 & 重複排除</h3>
+          <p>全4ソースから素材を取得し、過去7日間の生成済みネタDBと照合して重複を除外。同一トピックでも異なる切り口なら別ネタとして保持する軽いセマンティック類似度チェックを実施（embedding距離0.85以上は重複とみなす）。</p>
+          <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <span class="tag tag-purple">入力: 生素材 30〜100件</span>
+            <span class="tag tag-cyan">text-embedding-ada-002</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="display: grid; grid-template-columns: 60px 1fr; gap: 1.5rem; align-items: start;">
+        <div class="step-num" style="margin: 0;">2</div>
+        <div>
+          <h3>ジャンル分類 & 適合フィルタ</h3>
+          <p>LLMがジャンル（テック解説 / AI動向 / ハウツー / ニュース速報 / エンタメ）に分類し、チャンネルポリシーに合致するか確認。過去の評価スコアが低かったジャンルは重みを自動的に下げて除外しやすくする。</p>
+          <div class="code-block" style="margin-top: 0.75rem;">
+<span class="cm">// ジャンル分類プロンプト（抜粋）</span>
+<span class="fn">classify</span>(<span class="str">"AppleがAIチップを新発表"</span>)
+<span class="cm">// → { genre: "tech_news", sub: "hardware",</span>
+<span class="cm">//     visual_fit: 0.82, audience: "general_tech",</span>
+<span class="cm">//     urgency: "high" }</span></div>
+        </div>
+      </div>
+
+      <div class="card" style="display: grid; grid-template-columns: 60px 1fr; gap: 1.5rem; align-items: start;">
+        <div class="step-num" style="margin: 0;">3</div>
+        <div>
+          <h3>LLMによるネタ展開</h3>
+          <p>残った候補をClaude Sonnet 4.6が1本ずつ展開。タイトル案・スクリプトの冒頭フック・想定尺・推奨フォーマット（ショート / 長尺 / 漫画）を生成。同一ネタから動画と漫画向けに別展開することで効率よく2本分のジョブを生成する。</p>
+          <div class="code-block" style="margin-top: 0.75rem;">
+<span class="cm"># ネタ展開プロンプト構造</span>
+<span class="fn">system</span>: <span class="str">"""あなたはバイラル動画のプロデューサーです。
+与えられた素材から視聴者を掴むネタを設計してください。
+評価基準: フック力・SEO適合・ビジュアル演出の豊かさ"""</span>
+
+<span class="fn">user</span>: <span class="str">"""
+素材: {raw_topic}
+成功パターン: {feedback_from_evaluator}
+除外パターン: {failed_patterns}
+出力フォーマット: JSON（SKILL.mdのtopicスキーマ準拠）
+"""</span></div>
+        </div>
+      </div>
+
+      <div class="card" style="display: grid; grid-template-columns: 60px 1fr; gap: 1.5rem; align-items: start;">
+        <div class="step-num" style="margin: 0;">4</div>
+        <div>
+          <h3>スコアリング & ランキング</h3>
+          <p>5指標（下セクション参照）でネタを数値評価し、優先順にランキング。目標本数（デフォルト15）を超えた候補は翌日分のバッファに積むか破棄する。スコア60未満は生成しても意味が薄いため自動破棄。</p>
+          <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <span class="tag tag-cyan">スコア60未満: 自動破棄</span>
+            <span class="tag tag-green">上位15本: キュー投入</span>
+            <span class="tag tag-orange">16〜20位: 翌日バッファ</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="display: grid; grid-template-columns: 60px 1fr; gap: 1.5rem; align-items: start;">
+        <div class="step-num" style="margin: 0;">5</div>
+        <div>
+          <h3>パイプラインキューへ投入</h3>
+          <p>最終ネタをOpenClawのジョブキューへ投入。フォーマット指定（shorts・long・manga）に応じて動画パイプラインまたは漫画パイプラインの該当スキルをトリガーする。緊急性の高いネタ（urgency: high）はキュー先頭に割り込む。</p>
+          <div class="code-block" style="margin-top: 0.75rem;">
+<span class="cm"># ジョブ投入 (OpenClaw YAML)</span>
+<span class="fn">enqueue</span>:
+  <span class="fn">skill</span>: <span class="str">video-pipeline</span>
+  <span class="fn">priority</span>: <span class="str">"${topic.urgency}"</span>
+  <span class="fn">payload</span>:
+    <span class="fn">topic_text</span>: <span class="str">"${topic.expanded_text}"</span>
+    <span class="fn">genre</span>: <span class="str">"${topic.format}"</span>
+    <span class="fn">style_preset</span>: <span class="str">"${topic.recommended_style}"</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Scoring -->
+<section class="section" style="background: var(--bg2);" id="scoring">
+  <div class="section-inner">
+    <div class="section-label">スコアリング指標</div>
+    <h2 class="section-title">5指標でネタの<br>「生産価値」を数値化</h2>
+    <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+          <div class="card-icon purple" style="margin: 0;">🔥</div>
+          <span class="tag tag-purple">重み: 30%</span>
+        </div>
+        <h3>ホット度</h3>
+        <p>検索ボリュームの増加率とSNSでの言及数から「今まさに旬か」を判定。ピーク前（急上昇中）のネタを高く評価し、すでに落ち着いたネタは低評価にする。</p>
+      </div>
+
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+          <div class="card-icon cyan" style="margin: 0;">🎬</div>
+          <span class="tag tag-cyan">重み: 25%</span>
+        </div>
+        <h3>ビジュアル転用適合度</h3>
+        <p>動画や漫画のビジュアルに転用しやすいか。抽象的な概念より具体的なモノ・人物・場面があるネタを優遇。AI生成画像で表現しにくいトピックは低スコア。</p>
+      </div>
+
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+          <div class="card-icon orange" style="margin: 0;">🎯</div>
+          <span class="tag tag-orange">重み: 25%</span>
+        </div>
+        <h3>ターゲット層適合度</h3>
+        <p>チャンネルの想定視聴者（20〜35歳テック好き）との一致度。過去の高評価コンテンツが扱ったトピック群との意味的距離で評価。ズレたネタは品質が高くても刺さらない。</p>
+      </div>
+
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+          <div class="card-icon green" style="margin: 0;">📊</div>
+          <span class="tag tag-green">重み: 15%</span>
+        </div>
+        <h3>SEO ポテンシャル</h3>
+        <p>キーワードの月間検索ボリューム（Google Keyword Planner）と競合動画数の比から「勝てそうか」を予測。ブルーオーシャンのロングテールキーワードを優遇。</p>
+      </div>
+
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+          <div class="card-icon purple" style="margin: 0;">🔄</div>
+          <span class="tag tag-purple">重み: 5%</span>
+        </div>
+        <h3>シリーズ展開可能性</h3>
+        <p>1本で完結するネタより、続編や関連コンテンツへの展開が見込めるネタを優遇。チャンネル全体のシリーズ構造を強化することで視聴回帰率を上げる。</p>
+      </div>
+
+    </div>
+    <p style="text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: 1.5rem;">
+      スコアは評価システムのフィードバック（PUBLISH / DISCARD）を週次で学習し、重みを自動チューニング。初期重みは上記の固定値。
+    </p>
+  </div>
+</section>
+
+<!-- Schedule -->
+<section class="section" id="schedule">
+  <div class="section-inner">
+    <div class="section-label">運用スケジュール</div>
+    <h2 class="section-title">1日の自動生成フローと<br>バッファ管理</h2>
+    <div class="two-col">
+      <div>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+          メインバッチは毎朝6時に実行し、その日のパイプラインが消費するネタを補充します。
+          消化スピードに応じてバッファが常に5本以上残るよう追加バッチが自動実行されます。
+        </p>
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; color: var(--accent); font-weight: 700; margin-bottom: 0.35rem;">06:00 — メインバッチ</div>
+            <div style="font-size: 0.82rem; color: var(--text-muted);">全4ソースを収集してネタ15本を生成・スコアリング後にキュー投入。前日の評価フィードバックを反映して展開プロンプトを更新。</div>
+          </div>
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; color: #FF9E00; font-weight: 700; margin-bottom: 0.35rem;">12:00 — 補充チェック</div>
+            <div style="font-size: 0.82rem; color: var(--text-muted);">キューバッファが5本以下なら補充バッチ（5本）を自動実行。午前中の急上昇トレンドもここで反映。</div>
+          </div>
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; color: #4FFFB0; font-weight: 700; margin-bottom: 0.35rem;">18:00 — 翌日先取りバッファ</div>
+            <div style="font-size: 0.82rem; color: var(--text-muted);">翌朝のネタを5本先生成してバッファに積む。突発的なトラブルでバッチが失敗しても翌日のパイプラインが止まらない保険。</div>
+          </div>
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; color: #6C3CE1; font-weight: 700; margin-bottom: 0.35rem;">随時 — 手動緊急投入</div>
+            <div style="font-size: 0.82rem; color: var(--text-muted);">人間が重要トピックを発見したら OpenClaw ダッシュボードから即時投入。urgency: urgent でキュー先頭に割り込む。</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--text-muted);">生成ネタの構造（SKILL スキーマ）</h3>
+        <div class="code-block">
+<span class="cm">// ネタJSON (topic スキーマ)</span>
+{
+  <span class="str">"topic_id"</span>: <span class="str">"tp_20260530_042"</span>,
+  <span class="str">"raw_source"</span>: <span class="str">"google_trends"</span>,
+  <span class="str">"raw_keyword"</span>: <span class="str">"Claude 4 Opus発表"</span>,
+  <span class="str">"expanded_text"</span>: <span class="str">"Anthropicが Claude 4 Opusを
+    発表。前世代比で推論性能が2倍に。
+    開発者・ビジネス用途への影響と、
+    GPT-6との比較を徹底解説する。"</span>,
+  <span class="str">"title_candidates"</span>: [
+    <span class="str">"Claude 4が凄すぎてGPTが終わる理由"</span>,
+    <span class="str">"最新AI頭脳テスト全部やってみた"</span>
+  ],
+  <span class="str">"format"</span>: <span class="str">"shorts"</span>,
+  <span class="str">"genre"</span>: <span class="str">"tech_news"</span>,
+  <span class="str">"urgency"</span>: <span class="str">"high"</span>,
+  <span class="str">"score"</span>: <span class="num">88.4</span>,
+  <span class="str">"style_preset"</span>: <span class="str">"news_modern"</span>,
+  <span class="str">"created_at"</span>: <span class="str">"2026-05-30T06:00:12Z"</span>
+}</div>
+
+        <h3 style="margin-top: 1.5rem; margin-bottom: 0.75rem; font-size: 1rem; color: var(--text-muted);">キュー管理の設計目標</h3>
+        <div class="stats-grid" style="grid-template-columns: 1fr 1fr;">
+          <div class="stat-card">
+            <div class="stat-value">15</div>
+            <div class="stat-label">1日の生成本数（目標）</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">5+</div>
+            <div class="stat-label">常時バッファ維持本数</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">60</div>
+            <div class="stat-label">ネタ最低スコア閾値</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">7日</div>
+            <div class="stat-label">重複チェック期間</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- API Design -->
+<section class="section" style="background: var(--bg2);" id="api">
+  <div class="section-inner">
+    <div class="section-label">API 設計</div>
+    <h2 class="section-title">ネタ生成・管理の<br>エンドポイント</h2>
+    <div class="two-col">
+      <div>
+        <div class="code-block">
+<span class="cm">// バッチ実行（OpenClaw が内部で呼び出し）</span>
+<span class="kw">POST</span> /api/v1/topic-generator/batch
+{
+  <span class="str">"target_count"</span>: <span class="num">15</span>,
+  <span class="str">"pipeline_targets"</span>: [<span class="str">"video"</span>, <span class="str">"manga"</span>],
+  <span class="str">"genre_filter"</span>: [<span class="str">"tech_news"</span>, <span class="str">"ai"</span>, <span class="str">"howto"</span>]
+}
+
+<span class="cm">// 手動ネタ即時投入</span>
+<span class="kw">POST</span> /api/v1/topic-generator/manual
+{
+  <span class="str">"raw_text"</span>: <span class="str">"Claude 5の噂がリーク"</span>,
+  <span class="str">"format"</span>: <span class="str">"shorts"</span>,
+  <span class="str">"urgency"</span>: <span class="str">"urgent"</span>
+}
+
+<span class="cm">// ネタキュー確認</span>
+<span class="kw">GET</span> /api/v1/topic-generator/queue
+<span class="cm">// → { pending: 12, processing: 3, buffer: 5 }</span>
+
+<span class="cm">// フィードバック受信（評価システムから自動呼び出し）</span>
+<span class="kw">POST</span> /api/v1/topic-generator/feedback
+{
+  <span class="str">"topic_id"</span>: <span class="str">"tp_20260530_042"</span>,
+  <span class="str">"eval_decision"</span>: <span class="str">"DISCARD"</span>,
+  <span class="str">"failed_metrics"</span>: [<span class="str">"visual"</span>, <span class="str">"engagement"</span>],
+  <span class="str">"avoid_pattern"</span>: <span class="kw">true</span>
+}</div>
+      </div>
+      <div>
+        <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--text-muted);">フィードバックループ設計</h3>
+        <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1.25rem;">
+          評価システムとマネタイズシステムが返す結果を週次で学習し、展開プロンプトとスコアリング重みを自動更新します。これにより「どんなネタが実際に稼ぐか」を継続的に学習します。
+        </p>
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <div style="background: rgba(0,220,130,0.08); border: 1px solid rgba(0,220,130,0.3); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; font-weight: 700; color: #4FFFB0; margin-bottom: 0.35rem;">PUBLISH → 成功パターン学習</div>
+            <div style="font-size: 0.82rem; color: var(--text-muted);">評価85以上で公開されたネタの構造・キーワード・トーンを「成功パターン」としてプロンプトに注入。同系統のネタを次回から優遇。</div>
+          </div>
+          <div style="background: rgba(255,107,107,0.08); border: 1px solid rgba(255,107,107,0.3); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; font-weight: 700; color: #FF6B6B; margin-bottom: 0.35rem;">DISCARD → 失敗パターン回避</div>
+            <div style="font-size: 0.82rem; color: var(--text-muted);">スコア55未満で破棄されたネタのジャンル・キーワード・構成を「避けるパターン」としてフィルタに追加。繰り返さない。</div>
+          </div>
+          <div style="background: rgba(108,60,225,0.08); border: 1px solid rgba(108,60,225,0.3); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; font-weight: 700; color: #6C3CE1; margin-bottom: 0.35rem;">収益データ → 長期学習</div>
+            <div style="font-size: 0.82rem; color: var(--text-muted);">マネタイズシステムから1ヶ月後の実収益をフィードバック。広告収入・販売数と高相関のネタパターンをスコアリングに反映。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Cost -->
+<section class="section" id="cost">
+  <div class="section-inner">
+    <div class="section-label">コスト内訳</div>
+    <h2 class="section-title">ネタ1本あたりの<br>生成コスト（極めて低い）</h2>
+    <div class="two-col">
+      <div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ステップ</th>
+                <th>ツール</th>
+                <th>1本あたり</th>
+                <th>15本/日</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>ソース収集</td>
+                <td>Google Trends / RSS</td>
+                <td>¥0</td>
+                <td>¥0</td>
+              </tr>
+              <tr>
+                <td>SNS収集</td>
+                <td>X API / Reddit API</td>
+                <td>¥0〜1</td>
+                <td>¥3〜8</td>
+              </tr>
+              <tr>
+                <td>重複チェック（embedding）</td>
+                <td>text-embedding-ada-002</td>
+                <td>¥0.1〜0.3</td>
+                <td>¥3〜7</td>
+              </tr>
+              <tr>
+                <td>分類 & フィルタ</td>
+                <td>Claude Haiku 4.5</td>
+                <td>¥0.5〜1</td>
+                <td>¥8〜15</td>
+              </tr>
+              <tr>
+                <td>ネタ展開 & スコアリング</td>
+                <td>Claude Sonnet 4.6</td>
+                <td>¥3〜8</td>
+                <td>¥45〜120</td>
+              </tr>
+              <tr style="font-weight: 700;">
+                <td colspan="2">合計</td>
+                <td>¥4〜10</td>
+                <td>¥60〜150</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.82rem; margin-top: 0.75rem;">
+          ※ 動画1本の生成コスト（¥110〜312）と比べてネタ生成は桁違いに安い。15本/日でも月額¥2,000〜4,500で全パイプラインに燃料を供給できる。
+        </p>
+      </div>
+      <div>
+        <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--text-muted);">コスト最適化の設計ポイント</h3>
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; color: var(--accent); font-weight: 700; margin-bottom: 0.35rem;">軽量モデルを前段フィルタに使う</div>
+            <div style="font-size: 0.82rem; color: var(--text-muted);">分類・重複チェックは Claude Haiku 4.5 を使い、高品質な展開生成のみ Sonnet 4.6 を使う2段構成でコストを抑制。</div>
+          </div>
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; color: #FF9E00; font-weight: 700; margin-bottom: 0.35rem;">プロンプトキャッシュを積極活用</div>
+            <div style="font-size: 0.82rem; color: var(--text-muted);">システムプロンプト（チャンネルポリシー・成功パターン集）はClaudeのプロンプトキャッシュ機能を使い、毎回の入力コストを最大90%削減。</div>
+          </div>
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; color: #4FFFB0; font-weight: 700; margin-bottom: 0.35rem;">バッチ API でオフピーク実行</div>
+            <div style="font-size: 0.82rem; color: var(--text-muted);">Claude Batch API を使い夜間オフピークに処理することでリアルタイムAPIより約50%低コストで展開生成が可能。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">AI Creator Hub</div>
+    <nav>
+      <a href="index.html">ホーム</a>
+      <a href="topic-generator.html">ネタ生成</a>
+      <a href="video-pipeline.html">動画制作</a>
+      <a href="manga-pipeline.html">漫画制作</a>
+      <a href="evaluation.html">評価システム</a>
+      <a href="monetization.html">マネタイズ</a>
+      <a href="openclaw.html">OpenClaw連携</a>
+    </nav>
+    <p>AI Creator Hub — AIでコンテンツをつくり、稼ぐ</p>
+    <p style="font-size:0.8rem;opacity:0.65;">最終更新: 2026-05-30（ネタ生成AIシステム ページ初版作成）</p>
+  </div>
+</footer>
+
+<script src="main.js"></script>
+</body>
+</html>
