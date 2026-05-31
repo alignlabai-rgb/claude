@@ -437,6 +437,127 @@
   </div>
 </section>
 
+<!-- CLIP Implementation -->
+<section class="section" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-label">CLIP スコア実装</div>
+    <h2 class="section-title">キャラクター一致度の<br>定量評価</h2>
+    <p style="color:var(--text-muted);max-width:700px;">漫画パイプラインでは Vision 採点（Gemini 3.1 Pro）に加え、CLIP スコアで「キャラクターが正しく描かれているか」を定量チェックする。CLIP は参照画像と生成画像の視覚的類似度を 0.0〜1.0 で返す。</p>
+    <div class="two-col" style="margin-top:2rem">
+      <div>
+        <h3 style="margin-bottom:1rem;font-size:1rem">閾値定義</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div style="background:rgba(79,255,176,.06);border:1px solid rgba(79,255,176,.25);border-radius:12px;padding:16px;text-align:center">
+            <div style="font-size:1.6rem;font-weight:900;color:#4fffb0">0.72+</div>
+            <div style="font-size:.8rem;color:var(--text-muted);margin-top:4px">CLIP 合格<br>キャラクター一致</div>
+          </div>
+          <div style="background:rgba(255,160,60,.06);border:1px solid rgba(255,160,60,.25);border-radius:12px;padding:16px;text-align:center">
+            <div style="font-size:1.6rem;font-weight:900;color:#ffa03c">0.60〜0.71</div>
+            <div style="font-size:.8rem;color:var(--text-muted);margin-top:4px">要リトライ<br>2 回まで再生成</div>
+          </div>
+          <div style="background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.25);border-radius:12px;padding:16px;text-align:center">
+            <div style="font-size:1.6rem;font-weight:900;color:#c4a0ff">&lt;0.60 × 2</div>
+            <div style="font-size:.8rem;color:var(--text-muted);margin-top:4px">HITL 転送<br>人間レビュー</div>
+          </div>
+          <div style="background:rgba(255,107,107,.06);border:1px solid rgba(255,107,107,.25);border-radius:12px;padding:16px;text-align:center">
+            <div style="font-size:1.6rem;font-weight:900;color:#ff9090">LoRA 崩壊</div>
+            <div style="font-size:.8rem;color:var(--text-muted);margin-top:4px">IP-Adapter<br>フォールバック</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <h3 style="margin-bottom:.75rem;font-size:1rem">CLIP スコア計算実装</h3>
+        <div class="code-block">
+<span class="kw">import</span> open_clip
+<span class="kw">import</span> torch
+<span class="kw">from</span> PIL <span class="kw">import</span> Image
+
+_model, _, _preprocess = open_clip.create_model_and_transforms(
+    <span class="str">"ViT-H-14"</span>, pretrained=<span class="str">"laion2b_s32b_b79k"</span>
+)
+_model.eval()
+
+<span class="kw">def</span> <span class="fn">compute_clip_similarity</span>(img_path: str, ref_path: str) -> float:
+    <span class="str">"""2枚の画像の CLIP コサイン類似度を返す"""</span>
+    img = _preprocess(Image.open(img_path)).unsqueeze(<span class="fn">0</span>)
+    ref = _preprocess(Image.open(ref_path)).unsqueeze(<span class="fn">0</span>)
+    <span class="kw">with</span> torch.no_grad():
+        feat_img = _model.encode_image(img)
+        feat_ref = _model.encode_image(ref)
+        feat_img /= feat_img.norm(dim=-<span class="fn">1</span>, keepdim=<span class="kw">True</span>)
+        feat_ref /= feat_ref.norm(dim=-<span class="fn">1</span>, keepdim=<span class="kw">True</span>)
+        score = (feat_img * feat_ref).sum().item()
+    <span class="kw">return</span> float(score)
+
+<span class="cm"># 使用例</span>
+score = compute_clip_similarity(
+    <span class="str">"output/panel_001.png"</span>,
+    <span class="str">"refs/yuki_canonical.png"</span>
+)
+<span class="kw">if</span> score >= <span class="fn">0.72</span>:
+    forward_to_monetization()
+<span class="kw">elif</span> score >= <span class="fn">0.60</span>:
+    retry_generation()
+<span class="kw">else</span>:
+    request_human_review()</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HITL 判定ロジック -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label">HITL 判定ロジック</div>
+    <h2 class="section-title">いつ人間に投げるか</h2>
+    <p style="color:var(--text-muted);max-width:700px;margin-bottom:2rem;">HITL（Human-in-the-Loop）は「AI が判断を誤るリスクが高い状況」でのみ発動する。過剰な HITL は運用コストを上げ、自律化の意味を薄める。発動条件を明示的に定義して管理する。</p>
+
+    <style>
+      .hitl-table{width:100%;border-collapse:collapse;font-size:.88rem}
+      .hitl-table th{text-align:left;padding:10px 14px;background:rgba(255,107,107,.08);color:#ff9090;font-size:.78rem;border-bottom:1px solid var(--border)}
+      .hitl-table td{padding:10px 14px;border-bottom:1px solid var(--border);color:var(--text-muted);vertical-align:top}
+      .hitl-table td strong{color:var(--text)}
+      .hitl-table tr:last-child td{border-bottom:none}
+    </style>
+    <table class="hitl-table">
+      <thead><tr><th>トリガー</th><th>発動条件</th><th>Signal メッセージ内容</th><th>タイムアウト後</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>CLIP スコア不足</strong></td>
+          <td>2 回リトライ後もスコア &lt; 0.60</td>
+          <td>「コマ ID: s003 キャラクター一致度が低い（score=0.58）。承認（y）/ 再生成（n）/ 別LoRA（e）？」</td>
+          <td>auto_approve（30 分）</td>
+        </tr>
+        <tr>
+          <td><strong>LoRA 崩壊</strong></td>
+          <td>4 段階フォールバック全失敗</td>
+          <td>「[シーン名] の LoRA 生成が全段失敗。IP-Adapter 結果を添付。承認（y）/ スキップ（n）？」</td>
+          <td>skip（60 分）</td>
+        </tr>
+        <tr>
+          <td><strong>評価スコア境界</strong></td>
+          <td>55〜69 の「人間レビュー」ゾーン</td>
+          <td>「コンテンツ評価スコア: 62/100。公開（y）/ 改善して再評価（e）/ 破棄（n）？」</td>
+          <td>discard（120 分）</td>
+        </tr>
+        <tr>
+          <td><strong>コンプライアンス疑い</strong></td>
+          <td>AI 生成開示チェックで拒否権発動</td>
+          <td>「コンプライアンス違反の疑い: [理由]。必ず手動確認してください。」</td>
+          <td>block（無期限）</td>
+        </tr>
+        <tr>
+          <td><strong>API エラー連続</strong></td>
+          <td>同一ステップで 3 回以上失敗</td>
+          <td>「[ステップ名] が 3 回連続失敗（最終エラー: HTTP 429）。手動対応が必要です。」</td>
+          <td>pause（無期限）</td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="color:var(--text-muted);font-size:.85rem;margin-top:1.5rem">Signal 返答のパース実装（y/n/e + 日本語エイリアス + タイムアウト処理）は <a href="openclaw.html" style="color:var(--accent)">openclaw.html</a> の「Signal 返答パース実装」セクションを参照。</p>
+  </div>
+</section>
+
 <footer>
   <div class="footer-inner">
     <div class="footer-logo">AI Creator Hub</div>
@@ -451,7 +572,7 @@
       <a href="kpi-dashboard.html">KPI</a>
     </nav>
     <p>AI Creator Hub — AIでコンテンツをつくり、稼ぐ</p>
-    <p style="font-size:0.8rem;opacity:0.65;">最終更新: 2026-05-30（スコアリング設計意図（WHY）セクション追加）</p>
+    <p style="font-size:0.8rem;opacity:0.65;">最終更新: 2026-05-31（CLIP スコア実装・HITL 判定ロジック・品質フィルタ実装セクションを追加）</p>
   </div>
 </footer>
 

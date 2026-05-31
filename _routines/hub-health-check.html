@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hub ヘルスチェック ルーティン | _routines</title>
+  <style>
+    body { font-family: "Segoe UI","Noto Sans JP",system-ui,sans-serif; margin:0; background:#0b1220; color:#edf2fb; line-height:1.7; padding:28px 18px 64px; }
+    .shell { max-width:960px; margin:0 auto; display:flex; flex-direction:column; gap:16px; }
+    .panel { background:#111a2b; border:1px solid rgba(255,255,255,0.08); border-radius:18px; padding:22px 26px; }
+    .panel-accent { border-color:rgba(61,216,197,.3); }
+    .panel-orange { border-color:rgba(255,160,60,.3); }
+    a { color:#75d7c0; text-decoration:none; } a:hover { text-decoration:underline; }
+    h1 { margin:6px 0; font-size:1.7rem; }
+    h2 { margin:0 0 12px; font-size:1.05rem; color:#fcd34d; border-bottom:2px solid rgba(252,211,77,.2); padding-bottom:6px; }
+    h3 { margin:10px 0 5px; font-size:.93rem; color:#75d7c0; }
+    p,li { color:#c5d0e3; font-size:.9rem; }
+    ul { padding-left:20px; margin:6px 0; }
+    li { margin-bottom:4px; }
+    code { font-family:"Fira Code","Consolas",monospace; background:rgba(255,255,255,.06); padding:1px 7px; border-radius:5px; font-size:.83em; color:#a5f3d0; }
+    .pre { background:#070d18; border:1px solid rgba(255,255,255,.07); border-radius:10px; padding:14px 16px; font-family:"Fira Code","Consolas",monospace; font-size:.79rem; line-height:1.65; overflow-x:auto; white-space:pre; color:#c8d3e3; margin:10px 0; }
+    .badge { display:inline-block; font-size:.72rem; font-weight:700; padding:2px 8px; border-radius:5px; margin-right:6px; }
+    .badge-teal { background:rgba(61,216,197,.18); color:#3dd8c5; }
+    .badge-orange { background:rgba(255,160,60,.18); color:#ffa03c; }
+    .badge-red { background:rgba(255,90,90,.18); color:#ff8080; }
+    .badge-gray { background:rgba(150,150,180,.12); color:#9090b0; }
+    .step { display:flex; gap:14px; padding:12px 0; border-bottom:1px solid rgba(255,255,255,.04); }
+    .step:last-child { border-bottom:none; }
+    .step-num { background:rgba(255,160,60,.12); border:1px solid rgba(255,160,60,.3); color:#ffa03c; border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:.82rem; flex-shrink:0; }
+    .step-body h3 { margin:0 0 4px; font-size:.9rem; color:#edf2fb; }
+    .step-body p { margin:0 0 6px; font-size:.86rem; }
+    .grid3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+    @media(max-width:700px) { .grid3 { grid-template-columns:1fr; } }
+    .card { background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.07); border-radius:12px; padding:14px 16px; }
+    .card.alert { border-color:rgba(255,90,90,.3); background:rgba(255,90,90,.03); }
+    .card.warn { border-color:rgba(255,160,60,.3); background:rgba(255,160,60,.03); }
+    .card.ok { border-color:rgba(61,216,197,.3); background:rgba(61,216,197,.03); }
+    table { width:100%; border-collapse:collapse; font-size:.85rem; }
+    th { text-align:left; padding:8px 11px; background:rgba(61,216,197,.07); color:#3dd8c5; font-size:.78rem; border-bottom:1px solid rgba(255,255,255,.07); }
+    td { padding:8px 11px; border-bottom:1px solid rgba(255,255,255,.04); color:#c5d0e3; }
+    td strong { color:#edf2fb; }
+    .note { background:rgba(61,216,197,.06); border-left:3px solid #3dd8c5; border-radius:0 8px 8px 0; padding:10px 14px; margin:10px 0; font-size:.86rem; color:#c5d0e3; }
+    small { color:#4a6a7a; font-size:.78rem; }
+    .breadcrumb { font-size:.8rem; color:#4a6a7a; margin-bottom:8px; }
+  </style>
+</head>
+<body>
+<div class="shell">
+
+  <div class="panel panel-orange">
+    <div class="breadcrumb"><a href="../index.html">← Hub Top</a> / _routines</div>
+    <span class="badge badge-orange">週次ルーティン</span>
+    <h1>Hub ヘルスチェック</h1>
+    <p style="color:#c5d0e3;margin:8px 0 0;font-size:.95rem;">毎週実施。全カテゴリの鮮度を確認し、ALERT/WARN ページを特定して次のアクションを作る。所要時間: 約 15〜20 分。</p>
+    <p style="margin-top:8px"><small>最終更新: 2026-05-30 | 実施頻度: 週1回（週末目安）</small></p>
+  </div>
+
+  <!-- しきい値定義 -->
+  <div class="panel">
+    <h2>鮮度しきい値（カテゴリ別）</h2>
+    <div class="grid3">
+      <div class="card alert">
+        <h3 style="color:#ff8080;margin:0 0 6px">🔴 ALERT（45日超）</h3>
+        <ul>
+          <li>全カテゴリ共通の警戒ライン</li>
+          <li>発見次第 next-actions に追記</li>
+          <li>creator-system は 30 日でも要確認</li>
+        </ul>
+      </div>
+      <div class="card warn">
+        <h3 style="color:#ffa03c;margin:0 0 6px">🟡 WARN（30日超）</h3>
+        <ul>
+          <li>workbench・research は 30 日で WARN</li>
+          <li>優先度に応じて次スプリントで対応</li>
+        </ul>
+      </div>
+      <div class="card ok">
+        <h3 style="color:#3dd8c5;margin:0 0 6px">🟢 OK（30日以内）</h3>
+        <ul>
+          <li>対応不要。記録のみ</li>
+          <li>foundations / logs は 14 日を目安に</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 実施手順 -->
+  <div class="panel panel-orange">
+    <h2>実施手順</h2>
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h3>git 状態の確認</h3>
+        <div class="pre">git fetch origin
+git status
+git log --oneline -10          # 直近コミット確認
+git branch -r                  # 並走セッションのブランチ確認</div>
+        <p>未プッシュのコミットや他セッションのブランチがあれば先にマージ方針を判断する。</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h3>カテゴリ別ファイル鮮度の計算</h3>
+        <p>Claude に以下を実行させる（Bash ツール）:</p>
+        <div class="pre">for dir in creator-system claw-stack workbench research foundations strategy logs; do
+  count=$(find ./$dir -name "*.html" | wc -l)
+  # 最終更新日時の平均を計算
+  avg_days=$(find ./$dir -name "*.html" -exec stat -c %Y {} \; | \
+    awk -v now=$(date +%s) '{sum += (now-$1)/86400} END {print int(sum/NR)}')
+  echo "$dir: $count pages, avg ${avg_days}d old"
+done</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h3>ALERT ページの特定</h3>
+        <p>45 日以上更新されていないページを列挙する:</p>
+        <div class="pre">find . -name "*.html" -mtime +45 | sort | \
+  grep -v ".git" | grep -v "node_modules"</div>
+        <p>リストを確認し、各ページが「意図的に放置（アーカイブ）」か「要更新」かを判断する。</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h3>hub-health.html の更新</h3>
+        <p>計算した数値（総ページ数・平均鮮度・カテゴリ別ステータス）を <code>logs/hub-health.html</code> に反映する。ALERT/WARN の欄は必ず最新状態に保つ。</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <h3>next-actions.html へのフィードバック</h3>
+        <p>ALERT ページを <code>logs/next-actions.html</code> の「緊急」セクションに追記する。既に記載済みのものは優先度を確認して更新する。</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">6</div>
+      <div class="step-body">
+        <h3>コミット</h3>
+        <div class="pre">git add logs/hub-health.html logs/next-actions.html
+git commit -m "Weekly hub health check — $(date +%Y-%m-%d)
+
+Categories: [OK/WARN/ALERT の概要]
+Alerts: [ALERT ページ名があれば]"
+git push</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 判断フロー -->
+  <div class="panel">
+    <h2>ALERT ページの対応判断フロー</h2>
+    <table>
+      <thead><tr><th>状況</th><th>対応</th></tr></thead>
+      <tbody>
+        <tr><td><strong>内容が現在も正確</strong>（技術情報が変わっていない）</td><td>「最終確認: YYYY-MM-DD」を追記して日付を更新。実質 no-op コミット。</td></tr>
+        <tr><td><strong>情報が古い</strong>（API 仕様・モデル名が変わった）</td><td>次の Claude セッションで更新タスクとして実施。next-actions に追記。</td></tr>
+        <tr><td><strong>アーカイブ済み</strong>（demos/ の過去資料など）</td><td>ページ先頭に <code>ARCHIVE</code> バッジを追加して age 計算対象から除外。</td></tr>
+        <tr><td><strong>削除対象</strong>（リンク切れ・重複内容）</td><td>ADR に記録してから削除。ADR-005 のパターン（表示ラベルのみ変更）も検討。</td></tr>
+      </tbody>
+    </table>
+    <div class="note">
+      <strong>原則:</strong> 削除より退避を優先。情報の鮮度より「次のインスタンスが理解できる状態」を目標とする（operating-principles.html #6）。
+    </div>
+  </div>
+
+  <!-- リンク -->
+  <div class="panel">
+    <h2>参照リンク</h2>
+    <ul>
+      <li><a href="../logs/hub-health.html">hub-health.html（現在の状態）</a></li>
+      <li><a href="../logs/next-actions.html">next-actions.html</a></li>
+      <li><a href="../foundations/operating-principles.html">operating-principles.html</a></li>
+      <li><a href="../foundations/anti-patterns.html">anti-patterns.html</a></li>
+      <li><a href="llm-tracker-update.html">LLM トラッカー更新ルーティン</a></li>
+      <li><a href="session-start.html">セッション開始ルーティン</a></li>
+    </ul>
+    <p style="margin-top:10px"><small>最終更新: 2026-05-30</small></p>
+  </div>
+
+</div>
+</body>
+</html>

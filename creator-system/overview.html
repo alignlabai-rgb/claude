@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Creator System 全体フロー | AI Creator Hub</title>
+  <meta name="description" content="ネタ生成から収益化まで — AI Creator Hub の全体像と各モジュールの連携を一枚で把握する">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">AI Creator Hub</div>
+  <ul class="nav-links">
+    <li><a href="index.html">ホーム</a></li>
+    <li><a href="topic-generator.html">ネタ生成</a></li>
+    <li><a href="video-pipeline.html">動画制作</a></li>
+    <li><a href="manga-pipeline.html">漫画制作</a></li>
+    <li><a href="evaluation.html">評価システム</a></li>
+    <li><a href="monetization.html">マネタイズ</a></li>
+    <li><a href="openclaw.html">OpenClaw連携</a></li>
+    <li><a href="kpi-dashboard.html">KPI</a></li>
+    <li><a href="genai-tools.html">生成ツール比較</a></li>
+    <li><a href="overview.html" class="active">全体フロー</a></li>
+    <li><a href="../research/openclaw-news/index.html" style="color: #4FFFB0;">🦞 OpenClaw情報</a></li>
+  </ul>
+  <div class="nav-hamburger"><span></span><span></span><span></span></div>
+</nav>
+
+<div class="page-hero">
+  <div class="section-label">Creator System 全体フロー</div>
+  <h1>ネタ生成から収益化まで<br><span style="background:linear-gradient(135deg,#3dd8c5,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">全自動パイプラインの地図</span></h1>
+  <p>「テキストを投入すると作品ができて収益が入る」仕組みの全体像。どのモジュールがどう連携するかを一枚で把握する。</p>
+</div>
+
+<!-- 全体フロー図 -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label">パイプライン全体像</div>
+    <h2 class="section-title">5 ステップの自動フロー</h2>
+
+    <style>
+      .flow-diagram{display:flex;flex-direction:column;gap:0;max-width:860px;margin:2rem auto}
+      .flow-block{display:grid;grid-template-columns:200px 1fr;gap:24px;padding:24px 0;border-bottom:1px solid var(--border)}
+      .flow-block:last-child{border-bottom:none}
+      .flow-step-label{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+      .flow-num{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.2rem;flex-shrink:0}
+      .flow-num.teal{background:rgba(61,216,197,.15);border:2px solid rgba(61,216,197,.5);color:#3dd8c5}
+      .flow-num.purple{background:rgba(167,139,250,.15);border:2px solid rgba(167,139,250,.5);color:#c4a0ff}
+      .flow-num.orange{background:rgba(247,183,51,.15);border:2px solid rgba(247,183,51,.5);color:#f7b733}
+      .flow-num.green{background:rgba(79,255,176,.15);border:2px solid rgba(79,255,176,.5);color:#4fffb0}
+      .flow-num.red{background:rgba(255,107,107,.15);border:2px solid rgba(255,107,107,.5);color:#ff9090}
+      .flow-step-name{font-size:.8rem;font-weight:700;color:var(--text-muted);text-align:center;text-transform:uppercase;letter-spacing:.05em}
+      .flow-content h3{margin:0 0 8px;font-size:1.05rem}
+      .flow-content p{font-size:.88rem;color:var(--text-muted);margin:0 0 10px}
+      .flow-tools{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+      .flow-tool{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:3px 10px;font-size:.75rem;color:var(--text-muted)}
+      .flow-arrow{text-align:center;font-size:1.5rem;color:rgba(255,255,255,.2);line-height:1;padding:4px 0}
+      .hitl-note{background:rgba(255,107,107,.06);border:1px solid rgba(255,107,107,.2);border-radius:8px;padding:8px 12px;font-size:.8rem;color:#ff9090;margin-top:8px}
+      .hitl-note strong{color:#ff9090}
+      @media(max-width:600px){.flow-block{grid-template-columns:1fr;}.flow-step-label{flex-direction:row;justify-content:flex-start}}
+    </style>
+
+    <div class="flow-diagram">
+
+      <!-- Step 1: ネタ生成 -->
+      <div class="flow-block">
+        <div class="flow-step-label">
+          <div class="flow-num teal">1</div>
+          <div class="flow-step-name">ネタ生成</div>
+        </div>
+        <div class="flow-content">
+          <h3>トピック・企画の自動生成</h3>
+          <p>ジャンル・ターゲット・トレンドを入力すると、動画タイトル案・漫画ストーリー案・投稿スケジュールを AI が生成する。ボツ率が高いため大量生成 → 評価スコアでフィルタリングする運用が基本。</p>
+          <div class="flow-tools">
+            <span class="flow-tool">topic-generator.html</span>
+            <span class="flow-tool">Claude Sonnet 4.6</span>
+            <span class="flow-tool">GPT-5.5（補完）</span>
+          </div>
+        </div>
+      </div>
+      <div class="flow-arrow">↓ コンテンツ種別で分岐 ↓</div>
+
+      <!-- Step 2: 生成 -->
+      <div class="flow-block">
+        <div class="flow-step-label">
+          <div class="flow-num purple">2</div>
+          <div class="flow-step-name">生成</div>
+        </div>
+        <div class="flow-content">
+          <h3>動画 / 漫画コマの自動生成</h3>
+          <p>動画は ElevenLabs (TTS) → RunwayML / Veo 3 (映像) → FFmpeg (合成) の 7 ステップ。漫画は ComfyUI (LoRA + ControlNet + IP-Adapter) でコマを生成し ADetailer で顔を修正する。どちらも Python API 経由で OpenClaw が自動実行。</p>
+          <div class="flow-tools">
+            <span class="flow-tool">video-pipeline.html</span>
+            <span class="flow-tool">manga-pipeline.html</span>
+            <span class="flow-tool">ComfyUI</span>
+            <span class="flow-tool">ElevenLabs</span>
+            <span class="flow-tool">RunwayML / Veo 3</span>
+          </div>
+          <div class="hitl-note">
+            <strong>HITL ポイント ①:</strong> LoRA フォールバック全段失敗時 → Signal で確認要求
+          </div>
+        </div>
+      </div>
+      <div class="flow-arrow">↓</div>
+
+      <!-- Step 3: 評価 -->
+      <div class="flow-block">
+        <div class="flow-step-label">
+          <div class="flow-num orange">3</div>
+          <div class="flow-step-name">評価</div>
+        </div>
+        <div class="flow-content">
+          <h3>品質スコアリング &amp; 選別</h3>
+          <p>Vision モデル（Gemini 3.1 Pro）と CLIP スコアで画質・キャラクター一致度・構図を採点。スコア 85+ は即公開キュー、70〜84 は改善指示付き再処理、69 以下は破棄 or HITL。フィードバックはネタ生成 AI へ環流して自律改善。</p>
+          <div class="flow-tools">
+            <span class="flow-tool">evaluation.html</span>
+            <span class="flow-tool">Gemini 3.1 Pro</span>
+            <span class="flow-tool">CLIP スコア</span>
+            <span class="flow-tool">GPT-5.5（テキスト評価）</span>
+          </div>
+          <div class="hitl-note">
+            <strong>HITL ポイント ②:</strong> スコア境界ケース (70〜79) や判断不能コンテンツ → Signal で確認
+          </div>
+        </div>
+      </div>
+      <div class="flow-arrow">↓ 合格コンテンツのみ通過 ↓</div>
+
+      <!-- Step 4: 配信 -->
+      <div class="flow-block">
+        <div class="flow-step-label">
+          <div class="flow-num green">4</div>
+          <div class="flow-step-name">配信</div>
+        </div>
+        <div class="flow-content">
+          <h3>自動投稿 &amp; プラットフォーム配信</h3>
+          <p>YouTube（動画）/ note（漫画・記事）/ KDP（書籍）へ API 経由で自動投稿。note は定期マガジンに自動登録し継続課金収益を確保する。投稿スケジュールは topic-generator と連携して最適化される。</p>
+          <div class="flow-tools">
+            <span class="flow-tool">monetization.html</span>
+            <span class="flow-tool">YouTube Data API</span>
+            <span class="flow-tool">note API</span>
+            <span class="flow-tool">KDP（Selenium）</span>
+          </div>
+        </div>
+      </div>
+      <div class="flow-arrow">↓</div>
+
+      <!-- Step 5: 収益化 -->
+      <div class="flow-block">
+        <div class="flow-step-label">
+          <div class="flow-num red">5</div>
+          <div class="flow-step-name">収益化</div>
+        </div>
+        <div class="flow-content">
+          <h3>収益トラッキング &amp; 最適化</h3>
+          <p>各プラットフォームの収益データを KPI ダッシュボードに集約。高パフォーマンスのコンテンツパターンをネタ生成 AI へフィードバックし、収益性の高い題材を優先的に生成するよう調整する。</p>
+          <div class="flow-tools">
+            <span class="flow-tool">kpi-dashboard.html</span>
+            <span class="flow-tool">monetization.html</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- OpenClaw の役割 -->
+<section class="section" style="background:var(--section-alt)">
+  <div class="section-inner">
+    <div class="section-label">オーケストレーション層</div>
+    <h2 class="section-title">OpenClaw が全体を繋ぐ</h2>
+    <div class="two-col">
+      <div>
+        <p style="color:var(--text-muted)">OpenClaw は上記 5 ステップの「繋ぎ役」。各ステップは独立した Python モジュールとして実装されており、OpenClaw が JSON ワークフローとして順次起動する。</p>
+        <ul style="color:var(--text-muted)">
+          <li>ステップ間のデータ受け渡し（ファイルパス / メタデータ）を管理</li>
+          <li>API エラー時の自動リトライ（指数バックオフ）</li>
+          <li>品質評価スコアに応じた分岐制御</li>
+          <li>HITL 発動時の Signal 通知と返答待機</li>
+          <li>全ステップの実行ログを構造化 JSON で保存</li>
+        </ul>
+        <p style="color:var(--text-muted);margin-top:1rem">詳細な実装は <a href="openclaw.html" style="color:var(--accent)">openclaw.html</a> の HITL・フォールバック設計を参照。</p>
+      </div>
+      <div>
+        <div class="code-block">
+<span class="cm"># OpenClaw ワークフロー定義（概念）</span>
+<span class="fn">pipeline</span>:
+  - <span class="fn">step</span>: topic_generation
+    <span class="fn">module</span>: <span class="str">topic_generator</span>
+    <span class="fn">output</span>: <span class="str">topics.json</span>
+
+  - <span class="fn">step</span>: manga_generation
+    <span class="fn">module</span>: <span class="str">comfyui_batch</span>
+    <span class="fn">input</span>: <span class="str">topics.json</span>
+    <span class="fn">hitl</span>: lora_fallback_threshold
+
+  - <span class="fn">step</span>: evaluation
+    <span class="fn">module</span>: <span class="str">content_evaluator</span>
+    <span class="fn">hitl</span>: score_boundary
+
+  - <span class="fn">step</span>: distribution
+    <span class="fn">module</span>: <span class="str">platform_publisher</span>
+    <span class="fn">targets</span>: [note, youtube, kdp]
+
+  - <span class="fn">step</span>: kpi_update
+    <span class="fn">module</span>: <span class="str">kpi_collector</span>
+    <span class="fn">feedback_to</span>: topic_generation
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- モジュール早見表 -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label">モジュール早見表</div>
+    <h2 class="section-title">何を知りたいか → どのページを読むか</h2>
+    <style>
+      .module-table{width:100%;border-collapse:collapse;font-size:.9rem}
+      .module-table th{text-align:left;padding:10px 14px;background:rgba(61,216,197,.07);color:#3dd8c5;font-size:.8rem;border-bottom:1px solid var(--border)}
+      .module-table td{padding:10px 14px;border-bottom:1px solid var(--border);color:var(--text-muted);vertical-align:top}
+      .module-table td strong{color:var(--text)}
+      .module-table tr:last-child td{border-bottom:none}
+    </style>
+    <table class="module-table">
+      <thead><tr><th>知りたいこと</th><th>参照ページ</th><th>キーポイント</th></tr></thead>
+      <tbody>
+        <tr><td><strong>ネタを自動生成したい</strong></td><td><a href="topic-generator.html">topic-generator.html</a></td><td>プロンプト構造・ジャンル設定・出力フォーマット</td></tr>
+        <tr><td><strong>動画パイプラインの仕組み</strong></td><td><a href="video-pipeline.html">video-pipeline.html</a></td><td>7 ステップフロー・ElevenLabs/RunwayML/FFmpeg・フォールバック</td></tr>
+        <tr><td><strong>漫画コマを自動生成したい</strong></td><td><a href="manga-pipeline.html">manga-pipeline.html</a></td><td>LoRA+ControlNet+IP-Adapter・フォールバック・複数キャラ</td></tr>
+        <tr><td><strong>ComfyUI の使い方（基礎から）</strong></td><td><a href="../workbench/knowledge/comfyui.html">comfyui.html</a></td><td>ノード概念・JSON API・Python クライアント・実例 6 本</td></tr>
+        <tr><td><strong>品質評価の仕組み・閾値</strong></td><td><a href="evaluation.html">evaluation.html</a></td><td>CLIP スコア・Vision 採点・HITL 判定ロジック</td></tr>
+        <tr><td><strong>note/YouTube への自動投稿</strong></td><td><a href="monetization.html">monetization.html</a></td><td>定期マガジン・API 認証メンテナンス</td></tr>
+        <tr><td><strong>HITL・フォールバックの設計</strong></td><td><a href="openclaw.html">openclaw.html</a></td><td>Signal 返答パース・フォールバック発動条件・FallbackEngine</td></tr>
+        <tr><td><strong>KPI・収益の確認方法</strong></td><td><a href="kpi-dashboard.html">kpi-dashboard.html</a></td><td>プラットフォーム別収益・改善サイクル</td></tr>
+        <tr><td><strong>OpenClaw のセットアップ</strong></td><td><a href="../claw-stack/openclaw/">claw-stack/openclaw/</a></td><td>設定 YAML・Signal Bot 接続手順</td></tr>
+        <tr><td><strong>生成 AI ツール比較</strong></td><td><a href="genai-tools.html">genai-tools.html</a></td><td>画像/動画/テキスト各カテゴリのツール選定</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 最終更新 -->
+<footer style="max-width:1200px;margin:3rem auto 0;padding:0 1.5rem;font-size:.82rem;color:var(--text-muted)">
+  最終更新: 2026-05-30 |
+  <a href="index.html">Creator System TOP</a> /
+  <a href="../index.html">Hub Top</a> /
+  <a href="../foundations/decisions.html">ADR</a>
+</footer>
+
+<script src="main.js"></script>
+</body>
+</html>

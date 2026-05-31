@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2026-05-30 セッションログ | Logs</title>
+  <style>
+    body { font-family: "Segoe UI", "Noto Sans JP", system-ui, sans-serif; margin: 0; background: #0b1220; color: #edf2fb; line-height: 1.7; padding: 28px 18px 56px; }
+    .shell { max-width: 1080px; margin: 0 auto; display: grid; gap: 18px; }
+    .panel { background: #111a2b; border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 22px 24px; }
+    a { color: #75d7c0; }
+    h1, h2, h3 { margin: 0 0 10px; }
+    h2 { color: #fcd34d; font-size: 1.15rem; border-bottom: 2px solid rgba(244,184,96,0.25); padding-bottom: 6px; margin-bottom: 14px; }
+    h3 { color: #75d7c0; font-size: 1rem; margin: 14px 0 6px; }
+    p, li { color: #c5d0e3; }
+    code { font-family: "Fira Code", "Consolas", monospace; background: rgba(255,255,255,0.06); padding: 1px 6px; border-radius: 5px; font-size: 0.86em; color: #a5f3d0; }
+    .meta-row { display: flex; flex-wrap: wrap; gap: 14px; font-size: 0.85rem; color: #7f92ac; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .meta-row span strong { color: #c5d0e3; }
+    .phase { background: rgba(255,255,255,0.03); border-left: 3px solid #3dd8c5; padding: 14px 18px; border-radius: 10px; margin: 14px 0; }
+    .phase h3 { color: #3dd8c5; }
+    .phase .out { color: #7f92ac; font-size: 0.86rem; }
+    .phase ul { margin: 6px 0 0; padding-left: 20px; }
+    .phase li { font-size: 0.9rem; }
+    .phase.purple { border-color: #a78bfa; }
+    .phase.purple h3 { color: #c4a0ff; }
+    .phase.orange { border-color: #f7b733; }
+    .phase.orange h3 { color: #f7b733; }
+    .summary-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; margin: 10px 0; }
+    .tile { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 12px; text-align: center; }
+    .tile .v { color: #3dd8c5; font-size: 1.4rem; font-weight: 800; }
+    .tile .l { color: #7f92ac; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; margin-top: 4px; }
+    .commit { background: rgba(0,0,0,0.4); border-left: 3px solid #fcd34d; padding: 10px 14px; border-radius: 8px; font-family: "Fira Code", monospace; font-size: 0.84rem; color: #c5d0e3; margin: 8px 0; }
+    .commit .hash { color: #fcd34d; font-weight: 700; margin-right: 8px; }
+    .decision { background: rgba(167,139,250,0.05); border: 1px solid rgba(167,139,250,0.2); border-radius: 10px; padding: 12px 16px; margin: 8px 0; }
+    .decision h4 { color: #c4a0ff; margin: 0 0 4px; font-size: .9rem; }
+    .decision p { margin: 0; font-size: .86rem; }
+    table { width: 100%; border-collapse: collapse; font-size: .87rem; }
+    th { text-align: left; padding: 8px 11px; background: rgba(61,216,197,.07); color: #3dd8c5; font-size: .78rem; border-bottom: 1px solid rgba(255,255,255,.07); }
+    td { padding: 8px 11px; border-bottom: 1px solid rgba(255,255,255,.04); color: #c5d0e3; vertical-align: top; }
+    td strong { color: #edf2fb; }
+    small { color: #7f92ac; font-size: .8rem; }
+  </style>
+</head>
+<body>
+  <div class="shell">
+
+    <div class="panel">
+      <p><a href="../index.html">← Logs</a> / <a href="index.html">セッションログ一覧</a> / <a href="../../index.html">Hub Top</a></p>
+      <h1>2026-05-30 セッションログ</h1>
+      <p>Creator System 主軸の深化 + claw-stack 再整備 + ComfyUI 完全ガイド新設。3 回のセッション（コンテキスト圧縮をまたいで継続）で実施。ブランチ: <code>claude/creators-pipeline-enhancement-t5IUQ</code></p>
+      <div class="meta-row">
+        <span>日付: <strong>2026-05-30（〜05-31）</strong></span>
+        <span>ブランチ: <strong>claude/creators-pipeline-enhancement-t5IUQ</strong></span>
+        <span>関連ADR: <strong>ADR-010（ALIGN_Lab 分離）の運用継続</strong></span>
+        <span>セッション形式: <strong>Claude 単独（コンテキスト圧縮 2 回）</strong></span>
+      </div>
+    </div>
+
+    <!-- サマリー数値 -->
+    <div class="panel">
+      <h2>サマリー数値</h2>
+      <div class="summary-tiles">
+        <div class="tile"><div class="v">7</div><div class="l">新規ページ</div></div>
+        <div class="tile"><div class="v">9</div><div class="l">既存改修</div></div>
+        <div class="tile"><div class="v">~4,200</div><div class="l">追加行数（推定）</div></div>
+        <div class="tile"><div class="v">3</div><div class="l">コンテキスト</div></div>
+        <div class="tile"><div class="v">3</div><div class="l">コミット</div></div>
+        <div class="tile"><div class="v">6</div><div class="l">実例セクション</div></div>
+      </div>
+    </div>
+
+    <!-- セッション目的 -->
+    <div class="panel">
+      <h2>セッションの目的と経緯</h2>
+      <p><strong>発端:</strong> 前回セッションからの継続作業。次の 3 つの要求に応えた。</p>
+      <ol>
+        <li>保留だった monetization / openclaw / manga-pipeline の追記を完了させる</li>
+        <li>「他に必要なコンテンツは？」— ゼロベース診断で 5 箇所の空白を特定し実装</li>
+        <li>「ComfyUI を徹底的に充実させて」— 新規ガイドページを作成</li>
+      </ol>
+    </div>
+
+    <!-- Phase 1: 既存ページの強化 -->
+    <div class="panel">
+      <h2>Phase 1 — Creator System 既存ページの強化</h2>
+
+      <div class="phase">
+        <h3>monetization.html</h3>
+        <div class="out">追加セクション 2 本</div>
+        <ul>
+          <li>note 定期マガジン設定ガイド（YAML 設定 + Python 登録コード + 収益早見表）</li>
+          <li>API 認証メンテナンス（note 30 日トークン / YouTube OAuth2 / KDP Selenium + auth_health_check.py）</li>
+        </ul>
+      </div>
+
+      <div class="phase">
+        <h3>manga-pipeline.html</h3>
+        <div class="out">追加セクション 3 本</div>
+        <ul>
+          <li>LoRA 失敗時 4 段階フォールバック（CFG 調整 → weight 削減 → IP-Adapter のみ → HITL）</li>
+          <li>複数キャラクター同フレーム対応（Openpose compositor + CLIP cross-contamination 検出）</li>
+          <li>設計意図 WHY セクション（ComfyUI / LoRA+IP-Adapter+ControlNet / ADetailer 選定理由）</li>
+        </ul>
+      </div>
+
+      <div class="phase">
+        <h3>creator-system/openclaw.html</h3>
+        <div class="out">追加セクション 2 本</div>
+        <ul>
+          <li>Signal 返答パース実装（RESPONSE_MAP + ALIASES + parse_reply() + handle_hitl_response()）</li>
+          <li>フォールバック発動条件（HTTP 429/402/503 即時 / CLIP 品質スコアによる遅延型 + FallbackEngine クラス）</li>
+        </ul>
+      </div>
+
+      <div class="phase">
+        <h3>video-pipeline.html</h3>
+        <div class="out">追加セクション 1 本</div>
+        <ul>
+          <li>設計意図 WHY セクション（ElevenLabs / RunwayML+Veo3 / FFmpeg / 7 ステップ分割の選定理由）</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Phase 2: claw-stack -->
+    <div class="panel">
+      <h2>Phase 2 — claw-stack/comparison.html 全面再構成</h2>
+
+      <div class="phase purple">
+        <h3>Hermes Agent を 4 列目に追加</h3>
+        <div class="out">3 列 → 4 列に拡張。完全書き直し。</div>
+        <ul>
+          <li>Hermes Agent の定義: VPS/クラウド常駐エージェント（1vCPU/1GB RAM）</li>
+          <li>対応 LLM: GPT-5.5 / DeepSeek V4 / Qwen 3.6-Plus</li>
+          <li>認証: API キー / Codex OAuth</li>
+          <li>移行パスを 2 経路に整理: Standard（PicoClaw→NanoClaw→OpenClaw）/ Cloud-resident（PicoClaw→Hermes→OpenClaw）</li>
+          <li>設計意図セクション追加（4 スタックに分かれている理由・学習コスト分離・Hermes の VPS ニッチ）</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Phase 3: ComfyUI -->
+    <div class="panel">
+      <h2>Phase 3 — ComfyUI 完全ガイド新設</h2>
+
+      <div class="phase orange">
+        <h3>workbench/knowledge/comfyui.html（新規 1,700 行超）</h3>
+        <div class="out">13 コアセクション + 実例 6 本</div>
+        <ul>
+          <li><strong>基礎（S1-S4）:</strong> ComfyUI vs A1111 比較 / インストール / ノード概念 / 必須ノード一覧 + KSampler 詳解</li>
+          <li><strong>ワークフロー（S5-S8）:</strong> txt2img/img2img JSON / LoRA チェーン / ControlNet（Canny/Openpose/Depth）/ IP-Adapter</li>
+          <li><strong>API・自動化（S9-S11）:</strong> Python API 完全実装 / バッチ生成 / 漫画コマ生成 13 ノード JSON</li>
+          <li><strong>運用（S12-S13）:</strong> VRAM 最適化（4 tier）/ エラー対処 9 種</li>
+          <li><strong>実例 A:</strong> キャラクター一貫性 + CLIP スコアバリデーションループ</li>
+          <li><strong>実例 B:</strong> 感情バリエーション生成（喜・怒・哀・驚・照れ）</li>
+          <li><strong>実例 C:</strong> 顔修正（ADetailer 相当）+ バッチ後処理</li>
+          <li><strong>実例 D:</strong> 2× アップスケール（4xUltraSharp + img2img refine）</li>
+          <li><strong>実例 E:</strong> 1 話完全制作スクリプト（YAML 脚本→生成→顔修正→アップスケール→ZIP）</li>
+          <li><strong>実例 F:</strong> プロンプト作法（構造化テンプレート / 問題別改善表 / シーンタイプ雛形 6 種）</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Phase 4: 俯瞰更新 -->
+    <div class="panel">
+      <h2>Phase 4 — ゼロベース俯瞰で追加更新（5/31）</h2>
+      <div class="phase">
+        <h3>新規作成ページ（本セッション末）</h3>
+        <ul>
+          <li><code>_routines/llm-tracker-update.html</code> — 月次 LLM トラッカー更新手順</li>
+          <li><code>_routines/hub-health-check.html</code> — 週次ヘルスチェック手順</li>
+          <li><code>_routines/session-start.html</code> — 毎回の 7 分間セッション開始ルーティン</li>
+          <li><code>logs/sessions/2026-05-30.html</code> — このセッションログ（本ファイル）</li>
+          <li><code>claw-stack/openclaw/index.html</code> — OpenClaw スタック詳細（再解禁後対応）</li>
+          <li><code>creator-system/overview.html</code> — Creator System 全体フロー図</li>
+          <li><code>creator-system/evaluation.html</code> — 評価システムに CLIP 実装詳細を追加</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- キー決断 -->
+    <div class="panel">
+      <h2>キー決断（次のセッションへの引き継ぎ）</h2>
+
+      <div class="decision">
+        <h4>決断 1: Hermes Agent を比較表の正式 4 列目とした</h4>
+        <p>「VPS 常駐エージェント」というポジションは PicoClaw〜OpenClaw の延長線上にはなく独立したユースケース（外出中の自律実行）を持つ。4 スタックで学習コストを段階的に分離する方針を採用。</p>
+      </div>
+
+      <div class="decision">
+        <h4>決断 2: ComfyUI ガイドを workbench/knowledge/ に置いた</h4>
+        <p>creator-system/ は「使い方の実装」、workbench/knowledge/ は「ツール自体の理解」という分離を維持。manga-pipeline.html から comfyui.html へのリンクで接続。</p>
+      </div>
+
+      <div class="decision">
+        <h4>決断 3: _routines/ を実質的に機能させることを優先した</h4>
+        <p>「仕組み化・続ける」の理念に反して _routines/ が 1 ファイルしかなかった状態を解消。ルーティン 3 本追加により「外出中に Claude へ非同期依頼できる基盤」の核心部分を補完。</p>
+      </div>
+    </div>
+
+    <!-- コミット履歴 -->
+    <div class="panel">
+      <h2>コミット履歴</h2>
+      <div class="commit"><span class="hash">[1]</span> Add monetization magazine/auth sections + manga-pipeline LoRA fallback + openclaw HITL signal parsing</div>
+      <div class="commit"><span class="hash">[2]</span> Add WHY design intent sections to video-pipeline + manga-pipeline; rewrite comparison.html with Hermes Agent as 4th column</div>
+      <div class="commit"><span class="hash">[3]</span> Add comprehensive ComfyUI guide with rich practical examples (13 sections + 6 examples)</div>
+      <div class="commit"><span class="hash">[4]</span> Add _routines (3 pages), session log, openclaw/index rewrite, overview.html, evaluation.html enhancement</div>
+    </div>
+
+    <!-- フッター -->
+    <div class="panel">
+      <p style="color:#7f92ac;font-size:.85rem;margin:0">次回セッション: 今回積み残しの <code>workbench/knowledge/openclaw/</code> 更新（8 ページ、4/04 から放置）。または次の優先タスクを next-actions.html で確認。</p>
+      <p style="color:#4a6a7a;font-size:.78rem;margin:8px 0 0">関連: <a href="../hub-health.html">hub-health</a> / <a href="../next-actions.html">next-actions</a> / <a href="../../foundations/decisions.html">decisions（ADR）</a></p>
+    </div>
+
+  </div>
+</body>
+</html>

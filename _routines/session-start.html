@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>セッション開始ルーティン | _routines</title>
+  <style>
+    body { font-family: "Segoe UI","Noto Sans JP",system-ui,sans-serif; margin:0; background:#0b1220; color:#edf2fb; line-height:1.7; padding:28px 18px 64px; }
+    .shell { max-width:960px; margin:0 auto; display:flex; flex-direction:column; gap:16px; }
+    .panel { background:#111a2b; border:1px solid rgba(255,255,255,0.08); border-radius:18px; padding:22px 26px; }
+    .panel-purple { border-color:rgba(167,139,250,.35); }
+    a { color:#75d7c0; text-decoration:none; } a:hover { text-decoration:underline; }
+    h1 { margin:6px 0; font-size:1.7rem; }
+    h2 { margin:0 0 12px; font-size:1.05rem; color:#fcd34d; border-bottom:2px solid rgba(252,211,77,.2); padding-bottom:6px; }
+    h3 { margin:10px 0 5px; font-size:.93rem; color:#c4a0ff; }
+    p,li { color:#c5d0e3; font-size:.9rem; }
+    ul { padding-left:20px; margin:6px 0; }
+    li { margin-bottom:4px; }
+    code { font-family:"Fira Code","Consolas",monospace; background:rgba(255,255,255,.06); padding:1px 7px; border-radius:5px; font-size:.83em; color:#a5f3d0; }
+    .pre { background:#070d18; border:1px solid rgba(255,255,255,.07); border-radius:10px; padding:14px 16px; font-family:"Fira Code","Consolas",monospace; font-size:.79rem; line-height:1.65; overflow-x:auto; white-space:pre; color:#c8d3e3; margin:10px 0; }
+    .badge { display:inline-block; font-size:.72rem; font-weight:700; padding:2px 8px; border-radius:5px; margin-right:6px; }
+    .badge-purple { background:rgba(167,139,250,.18); color:#c4a0ff; }
+    .badge-teal { background:rgba(61,216,197,.18); color:#3dd8c5; }
+    .phase { border-left:3px solid #a78bfa; background:rgba(167,139,250,.04); border-radius:0 12px 12px 0; padding:16px 20px; margin:10px 0; }
+    .phase h3 { color:#c4a0ff; margin:0 0 8px; font-size:.95rem; }
+    .phase .time { font-size:.75rem; color:#7f92ac; font-weight:700; text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; }
+    .phase ul { margin:6px 0 0; }
+    .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    @media(max-width:640px) { .grid2 { grid-template-columns:1fr; } }
+    .card { background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.07); border-radius:12px; padding:14px 16px; }
+    .card-teal { border-color:rgba(61,216,197,.3); background:rgba(61,216,197,.03); }
+    .card-red { border-color:rgba(255,90,90,.3); background:rgba(255,90,90,.03); }
+    .note { background:rgba(61,216,197,.06); border-left:3px solid #3dd8c5; border-radius:0 8px 8px 0; padding:10px 14px; margin:10px 0; font-size:.86rem; }
+    table { width:100%; border-collapse:collapse; font-size:.85rem; }
+    th { text-align:left; padding:8px 11px; background:rgba(167,139,250,.08); color:#c4a0ff; font-size:.78rem; border-bottom:1px solid rgba(255,255,255,.07); }
+    td { padding:8px 11px; border-bottom:1px solid rgba(255,255,255,.04); color:#c5d0e3; vertical-align:top; }
+    td strong { color:#edf2fb; }
+    small { color:#4a6a7a; font-size:.78rem; }
+    .breadcrumb { font-size:.8rem; color:#4a6a7a; margin-bottom:8px; }
+  </style>
+</head>
+<body>
+<div class="shell">
+
+  <div class="panel panel-purple">
+    <div class="breadcrumb"><a href="../index.html">← Hub Top</a> / _routines</div>
+    <span class="badge badge-purple">毎回ルーティン</span>
+    <h1>セッション開始チェック</h1>
+    <p style="color:#c5d0e3;margin:8px 0 0;font-size:.95rem;">Claude / Codex セッション開始時の 7 分間ルーティン。最初に必ず通る。<a href="../foundations/onboarding-checklist.html">onboarding-checklist.html</a> が「初回専用」の長い手順なのに対し、これは<strong>毎回使う高速版</strong>。</p>
+    <p style="margin-top:8px"><small>最終更新: 2026-05-30 | 実施頻度: 毎セッション冒頭</small></p>
+  </div>
+
+  <!-- Phase A: git -->
+  <div class="panel">
+    <h2>Phase A — git 状態確認（2 分）</h2>
+    <div class="phase">
+      <div class="time">⏱ 2 min</div>
+      <h3>実行コマンド</h3>
+      <div class="pre">git fetch origin
+git status              # 未コミット変更・ブランチ確認
+git branch -r           # 並走セッションのブランチ検出
+git log --oneline -5    # 直近の変更を把握</div>
+      <ul>
+        <li>未プッシュコミットがあれば先にプッシュするか方針を決める</li>
+        <li><code>claude/*</code> / <code>codex/*</code> ブランチが複数ある場合は multi-instance-protocol を参照</li>
+        <li>このセッションの作業ブランチを決定する</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Phase B: ヘルス -->
+  <div class="panel">
+    <h2>Phase B — ハブ健全性の確認（3 分）</h2>
+    <div class="phase">
+      <div class="time">⏱ 3 min</div>
+      <h3>読むファイル（この順で）</h3>
+      <ol>
+        <li><strong><a href="../logs/hub-health.html">logs/hub-health.html</a></strong> — ALERT / WARN セクションだけ確認（全体は読まなくていい）</li>
+        <li><strong><a href="../logs/next-actions.html">logs/next-actions.html</a></strong> — 「緊急」と「今週」セクションのタスクを把握</li>
+      </ol>
+      <ul>
+        <li>ALERT が出ていたらユーザーに報告してから作業開始</li>
+        <li>next-actions の「緊急」タスクはユーザー指示がなくても優先的に提案する</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Phase C: タスク確認 -->
+  <div class="panel">
+    <h2>Phase C — 今日のタスク確認（2 分）</h2>
+    <div class="phase">
+      <div class="time">⏱ 2 min</div>
+      <h3>ユーザーへの確認</h3>
+      <p>Phase B で把握した状況を踏まえ、今日の作業優先度をユーザーに提示・確認する。提示形式の例:</p>
+      <div class="pre"># セッション開始時の報告テンプレート
+
+git 状態: [ブランチ名] / [未コミット有無]
+ヘルス: [ALERT数] ALERT / [WARN数] WARN
+
+緊急タスク (next-actions より):
+  - [タスク名]
+  - [タスク名]
+
+今日どこから着手しますか？</div>
+    </div>
+  </div>
+
+  <!-- 状況別の分岐 -->
+  <div class="panel">
+    <h2>状況別の分岐判断</h2>
+    <table>
+      <thead><tr><th>状況</th><th>対応</th></tr></thead>
+      <tbody>
+        <tr><td><strong>ALERT が 1 件以上</strong></td><td>ユーザーに報告。明示的な優先指示がなければ ALERT 解消を先に提案する</td></tr>
+        <tr><td><strong>未コミット変更がある</strong></td><td>内容を確認。前セッションのゴミか現在作業中かを判断してからスタート</td></tr>
+        <tr><td><strong>並走ブランチがある</strong></td><td><a href="../foundations/multi-instance-protocol.html">multi-instance-protocol.html</a> を参照。競合を事前に確認する</td></tr>
+        <tr><td><strong>ユーザーが具体的タスクを指示</strong></td><td>Phase A/B の結果と矛盾がなければそのまま着手。矛盾（ALERT 放置など）があれば報告してから</td></tr>
+        <tr><td><strong>コンテキスト圧縮後の再開</strong></td><td>git log + 前回セッションログ（<a href="../logs/sessions/">sessions/</a>）で作業状況を復元する</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- onboarding-checklist との違い -->
+  <div class="panel">
+    <h2>onboarding-checklist との違い</h2>
+    <div class="grid2">
+      <div class="card card-teal">
+        <h3 style="color:#3dd8c5;margin:0 0 8px">このページ（session-start）</h3>
+        <ul>
+          <li>毎回使う <strong>7 分間の高速版</strong></li>
+          <li>git + health + task の 3 フェーズのみ</li>
+          <li>既にハブ構造を知っているセッション向け</li>
+        </ul>
+      </div>
+      <div class="card card-red">
+        <h3 style="color:#ff9090;margin:0 0 8px">onboarding-checklist.html</h3>
+        <ul>
+          <li>初回または長期ブランク後の詳細手順</li>
+          <li>10+ 分の丁寧なオンボーディング</li>
+          <li>CLAUDE.md / 重要ファイルの通読含む</li>
+        </ul>
+      </div>
+    </div>
+    <div class="note" style="margin-top:12px">
+      <strong>選択基準:</strong> 前回セッションから 2 週間以内 → このページ。2 週間超 / 初回 / モデル変更後 → <a href="../foundations/onboarding-checklist.html">onboarding-checklist.html</a>。
+    </div>
+  </div>
+
+  <!-- リンク -->
+  <div class="panel">
+    <h2>参照リンク</h2>
+    <ul>
+      <li><a href="../foundations/onboarding-checklist.html">onboarding-checklist.html</a>（初回用詳細版）</li>
+      <li><a href="../foundations/multi-instance-protocol.html">multi-instance-protocol.html</a>（並走ルール）</li>
+      <li><a href="../logs/hub-health.html">hub-health.html</a></li>
+      <li><a href="../logs/next-actions.html">next-actions.html</a></li>
+      <li><a href="hub-health-check.html">Hub ヘルスチェックルーティン</a></li>
+      <li><a href="llm-tracker-update.html">LLM トラッカー更新ルーティン</a></li>
+    </ul>
+    <p style="margin-top:10px"><small>最終更新: 2026-05-30</small></p>
+  </div>
+
+</div>
+</body>
+</html>
