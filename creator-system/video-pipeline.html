@@ -123,10 +123,10 @@
           <p>スクリプトの各シーンに対応する画像・映像をAIで生成。スタイルの一貫性を保ちながら、シーンごとに最適な構図・色調を自動選択。</p>
           <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
             <span class="tag tag-cyan">Midjourney API</span>
-            <span class="tag tag-cyan">DALL-E 4</span>
+            <span class="tag tag-cyan">Imagen 4 Ultra</span>
             <span class="tag tag-cyan">RunwayML Gen-4</span>
             <span class="tag tag-orange">Kling AI v2</span>
-            <span class="tag tag-green">Google Veo 3</span>
+            <span class="tag tag-green">Google Veo 3.1</span>
           </div>
         </div>
       </div>
@@ -185,6 +185,7 @@ ffmpeg -i <span class="str">video_scenes.mp4</span> \
           <p>動画の内容から最も視聴クリックされやすいサムネイルを複数パターン生成。A/Bテスト用に3〜5パターンを自動作成し評価システムへ送付。</p>
           <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
             <span class="tag tag-purple">Canva API</span>
+            <span class="tag tag-cyan">Imagen 4 Ultra</span>
             <span class="tag tag-cyan">DALL-E 3</span>
             <span class="tag tag-green">出力: 評価システムへ</span>
           </div>
@@ -214,10 +215,18 @@ ffmpeg -i <span class="str">video_scenes.mp4</span> \
         </thead>
         <tbody>
           <tr>
-            <td><strong>Google Veo 3</strong></td>
-            <td>テキスト/画像→動画</td>
+            <td><strong>Google Veo 3.1</strong></td>
+            <td>テキスト/画像→動画・音声同時生成</td>
             <td><span class="tag tag-green">最高</span></td>
             <td><span class="tag tag-orange">高め</span></td>
+            <td><span class="tag tag-green">あり</span></td>
+            <td>⭐⭐⭐⭐⭐</td>
+          </tr>
+          <tr>
+            <td><strong>Google Imagen 4</strong></td>
+            <td>テキスト→画像（サムネ・ビジュアル素材）</td>
+            <td><span class="tag tag-green">最高</span></td>
+            <td><span class="tag tag-green">低め</span></td>
             <td><span class="tag tag-green">あり</span></td>
             <td>⭐⭐⭐⭐⭐</td>
           </tr>
@@ -342,8 +351,8 @@ ffmpeg -i <span class="str">video_scenes.mp4</span> \
             </thead>
             <tbody>
               <tr><td>スクリプト生成</td><td>GPT-5.5 / Claude Sonnet 4.6</td><td>¥0（サブスク利用）〜¥25</td><td>¥0〜60</td></tr>
-              <tr><td>ビジュアル生成</td><td>Midjourney / DALL-E 3</td><td>¥30〜80</td><td>¥120〜350</td></tr>
-              <tr><td>動画クリップ</td><td>RunwayML Gen-3</td><td>¥50〜150</td><td>¥300〜800</td></tr>
+              <tr><td>ビジュアル生成</td><td>Imagen 4 Ultra / Midjourney</td><td>¥10〜60</td><td>¥80〜300</td></tr>
+              <tr><td>動画クリップ</td><td>RunwayML Gen-4 / Veo 3.1</td><td>¥50〜150</td><td>¥300〜800</td></tr>
               <tr><td>音声合成</td><td>ElevenLabs</td><td>¥15〜40</td><td>¥60〜150</td></tr>
               <tr><td>BGM生成</td><td>Suno AI</td><td>¥5〜15</td><td>¥5〜15</td></tr>
               <tr><td>FFmpeg合成</td><td>自前サーバー</td><td>¥0〜2</td><td>¥0〜5</td></tr>
@@ -351,7 +360,7 @@ ffmpeg -i <span class="str">video_scenes.mp4</span> \
             </tbody>
           </table>
         </div>
-        <p style="color: var(--text-muted); font-size: 0.82rem; margin-top: 0.75rem;">※ RunwayML超過時はKling AIへ自動フォールバック（コスト約40%削減、品質は微減）</p>
+        <p style="color: var(--text-muted); font-size: 0.82rem; margin-top: 0.75rem;">※ RunwayML超過時はVeo 3.1 Fast or Kling AIへ自動フォールバック。Imagen 4 Fast（$0.02/枚）はMidjourney比でコスト大幅削減かつGoogle API統合が容易。</p>
       </div>
       <div>
         <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--text-muted);">インフラ要件</h3>
@@ -470,6 +479,59 @@ ffmpeg -i <span class="str">video_scenes.mp4</span> \
   </div>
 </section>
 
+<!-- Google Flow / Antigravity 2.0 連携 -->
+<section class="section" id="google-flow" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-label">Google エコシステム連携（2026年版）</div>
+    <h2 class="section-title">Flow / Antigravity 2.0 との<br>統合オプション</h2>
+    <p style="color: var(--text-muted); margin-bottom: 2rem; max-width: 700px;">
+      I/O 2026（2026-05-19）で Google が発表した2製品は、このパイプライン設計に直接影響する。
+      既存の OpenClaw YAML 構成を置き換えるか補完するかは用途次第。
+    </p>
+    <div class="two-col">
+      <div>
+        <div style="background: var(--card); border: 1px solid rgba(108,60,225,0.4); border-radius: 14px; padding: 1.5rem; margin-bottom: 1rem;">
+          <div style="font-weight: 700; margin-bottom: 0.5rem;">Google Flow — フィルムメイキングUI</div>
+          <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.8;">
+            Veo 3.1 + Imagen 4 + Gemini を統合した映像制作 GUI。
+            <strong style="color: var(--text);">Scenebuilder</strong> でショットをタイムライン編集し、Flow Agent が自然言語指示で多段タスクを自動実行。
+            適用シナリオ: 人間がディレクションを担い、数ショットを組み合わせた完成品が必要な場合。
+            完全自動バッチ生成（このパイプラインの主用途）には API 経由の Veo 3.1 直接呼び出しが引き続き適合。
+          </div>
+        </div>
+        <div style="background: var(--card); border: 1px solid rgba(0,212,255,0.3); border-radius: 14px; padding: 1.5rem;">
+          <div style="font-weight: 700; margin-bottom: 0.5rem;">Antigravity 2.0 — エージェント基盤</div>
+          <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.8;">
+            Desktop IDE + CLI + SDK + Managed Agents API の5コンポーネント基盤。
+            <strong style="color: var(--text);">Managed Agents API</strong> は「API 1回呼び出し = 推論 + ツール + Linux サンドボックス」を実現し、
+            OpenClaw YAML より記述量を大幅削減できる可能性がある。
+            現時点ではコスト・レート制限・ログ可視性を OpenClaw と並列評価する段階。
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="code-block">
+<span class="cm"># Antigravity Managed Agents API（将来検討）</span>
+<span class="kw">import</span> google.genai <span class="kw">as</span> genai
+
+agent = genai.<span class="fn">ManagedAgent</span>(
+    model=<span class="str">"gemini-3.5-flash"</span>,
+    tools=[<span class="str">"web_search"</span>, <span class="str">"image_gen"</span>, <span class="str">"video_gen"</span>],
+    sandbox=<span class="kw">True</span>
+)
+result = agent.<span class="fn">run</span>(
+    <span class="str">f"ネタ「{topic}」から60秒ショート動画を制作。
+    Veo 3.1 Fast でクリップ生成、
+    Imagen 4 でサムネ3案を同時出力すること"</span>
+)</div>
+        <p style="color: var(--text-muted); font-size: 0.82rem; margin-top: 0.75rem;">
+          詳細: <a href="../workbench/knowledge/anti-gravity.html">anti-gravity.html</a> / <a href="../workbench/knowledge/veo.html">veo.html</a> / <a href="../workbench/knowledge/flow.html">flow.html</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <footer>
   <div class="footer-inner">
     <div class="footer-logo">AI Creator Hub</div>
@@ -482,7 +544,7 @@ ffmpeg -i <span class="str">video_scenes.mp4</span> \
       <a href="openclaw.html">OpenClaw連携</a>
     </nav>
     <p>AI Creator Hub — AIでコンテンツをつくり、稼ぐ</p>
-    <p style="font-size:0.8rem;opacity:0.65;">最終更新: 2026-06-01（設計意図 / ツール選定 WHY セクションを追加）</p>
+    <p style="font-size:0.8rem;opacity:0.65;">最終更新: 2026-05-31（Veo 3.1・Imagen 4 反映、Google Flow / Antigravity 2.0 統合オプション追加）</p>
   </div>
 </footer>
 
