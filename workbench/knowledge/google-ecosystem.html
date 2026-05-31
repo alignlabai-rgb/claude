@@ -361,10 +361,11 @@
                 <div class="map-col">
                     <h4>映像 / 画像</h4>
                     <ul>
-                        <li><strong>Veo</strong>（動画生成）</li>
+                        <li><strong>Gemini Omni</strong>（統合 any-to-any）</li>
+                        <li><strong>Veo 3.1</strong>（長尺動画生成）</li>
                         <li><strong>Flow</strong>（制作ツール）</li>
-                        <li>Imagen（画像）</li>
-                        <li>Whisk（画像）</li>
+                        <li>Imagen 4（画像）</li>
+                        <li>Lyria 3（音楽）</li>
                     </ul>
                 </div>
                 <div class="map-col">
@@ -406,6 +407,21 @@
                 </ul>
                 <div class="highlight-box">
                     <p>💡 深掘りは <a href="gemini.html">gemini.html</a>、最新動向は <a href="../../research/gemini-recent-updates.html">gemini-recent-updates.html</a>。</p>
+                </div>
+            </article>
+
+            <!-- Gemini Omni -->
+            <article class="card">
+                <h3>Gemini Omni <span class="pill" style="background:rgba(129,140,248,0.15);color:#818cf8;font-size:0.72rem;padding:3px 8px;border-radius:20px;font-weight:700;margin-left:8px;">I/O 2026</span></h3>
+                <p><strong>統合マルチモーダルモデル。</strong>Veo（動画）・Imagen（画像）・Lyria（音楽）・Nano Banana（音声）を1モデルに統合した「任意入力 → 任意出力」アーキテクチャ。テキスト・画像・音声・動画・音楽のあらゆる組み合わせを入出力できる Google AI スタックの根本的な再設計。</p>
+                <ul>
+                    <li><strong>Gemini Omni Flash</strong>（第一弾）: テキスト1行から動画10秒 + ネイティブ音声を同時生成。SynthID 透かし全出力。</li>
+                    <li><strong>会話編集</strong>: 「カメラアングルを変えて」「照明を夕方にして」と自然言語で修正指示。再生成ではなく部分修正。</li>
+                    <li><strong>YouTube Shorts / Create で無料利用</strong>。AI Plus/Pro/Ultra は Gemini アプリと Flow から（2026/05/19〜）</li>
+                    <li>旧来の Veo / Imagen / Lyria の個別呼び出しが不要になる長期的な方向性。長尺・高品質は引き続き Veo 3.1 で。</li>
+                </ul>
+                <div class="highlight-box">
+                    <p>📖 詳細は <a href="gemini-omni.html">gemini-omni.html</a> — アーキテクチャ図・Omni Flash スペック・会話編集の仕組み・9ユースケース・従来モデルとの比較・ロードマップを掲載。</p>
                 </div>
             </article>
 
@@ -658,8 +674,12 @@
                         <td><strong>Gemma 4</strong>（端末向け 2B/4B 〜 31B Dense、Apache 2.0）</td>
                     </tr>
                     <tr>
-                        <td class="want">動画を生成する</td>
-                        <td><strong>Veo</strong>（映像＋音＋台詞を同時生成）／ Omni 経由のシネマティック動画</td>
+                        <td class="want">テキスト1行から動画＋音声＋BGMを同時に生成したい・会話で修正したい</td>
+                        <td><strong>Gemini Omni Flash</strong>（統合マルチモーダル。10秒以内・ネイティブ音声・会話編集。YouTube Shorts 無料）</td>
+                    </tr>
+                    <tr>
+                        <td class="want">動画を生成する（長尺・高品質・4K）</td>
+                        <td><strong>Veo 3.1</strong>（最長60秒・4K・映像＋音＋台詞を同時生成。Omni Flash が不足の場合）</td>
                     </tr>
                     <tr>
                         <td class="want">映像作品として構成・制作する</td>
@@ -724,11 +744,11 @@
             <ul>
                 <li><strong>企画・台本・構成</strong>：Gemini 3.1 Pro で全体設計・脚本・プロンプト設計を詰める。大量資料があるなら NotebookLM で素材を整理・要約してから渡す。</li>
                 <li><strong>量産の高速化</strong>：定型処理・大量バッチは Gemini 3.5 Flash に寄せてコストと速度を稼ぐ。機密素材やオフライン処理は Gemma 4 をローカルで。</li>
-                <li><strong>ビジュアル</strong>：静止画は Imagen / Whisk、動画は Veo、作品としての組み立ては Flow。</li>
+                <li><strong>ビジュアル</strong>：動画＋音声を素早く1生成なら <strong>Gemini Omni Flash</strong>（会話で修正可）。長尺・高品質は Veo 3.1。静止画は Imagen 4。BGM は Lyria。作品として組み立てるなら Flow。</li>
                 <li><strong>仕組み化</strong>：上記を手作業でなくパイプラインとして回すなら、AI Studio で検証 → API/Vertex AI で実装 → Antigravity でエージェント化、という流れが素直。</li>
             </ul>
             <div class="highlight-box">
-                <p>💡 ポイントは「1製品で全部やろうとしない」こと。<strong>推論は Gemini、量産は Flash、ローカルは Gemma、映像は Veo/Flow、静止画は Imagen、音楽は Lyria、土台は AI Studio→Vertex AI、コード自動化は Jules、長期タスク委任は Gemini Spark、リアルタイム会話は Gemini Live、ビジネス効率化は Workspace AI、自動化は Antigravity、チームへの展開は Gemini Advanced、ノーコード AI アプリは Opal</strong> と役割で割り当てると、増え続ける製品群でも判断が安定します。</p>
+                <p>💡 ポイントは「1製品で全部やろうとしない」こと。<strong>推論は Gemini 3.1 Pro、高速量産は 3.5 Flash、ローカルは Gemma 4、動画＋音声の手軽な統合生成は Gemini Omni Flash、長尺高品質動画は Veo 3.1、映像制作フローは Flow、静止画は Imagen 4、音楽は Lyria 3、土台は AI Studio→Vertex AI、コード自動化は Jules、長期タスク委任は Gemini Spark、リアルタイム会話は Gemini Live、ビジネス効率化は Workspace AI、エージェント開発は Antigravity、チームへの展開は Gemini Advanced、ノーコード AI アプリは Opal</strong> と役割で割り当てると、増え続ける製品群でも判断が安定します。</p>
             </div>
         </section>
 
@@ -736,7 +756,8 @@
         <footer class="page-footer">
             <h2>関連</h2>
             <ul>
-                <li><a href="gemini.html">gemini.html</a> — Gemini 3.1 Pro 深掘り（現行最上位）</li>
+                <li><a href="gemini.html">gemini.html</a> — Gemini モデル群深掘り（3.1 Pro / 3.5 Flash / Omni 比較）</li>
+                <li><a href="gemini-omni.html">gemini-omni.html</a> — Gemini Omni 統合マルチモーダルモデル（Veo+Imagen+Lyria 統合・会話編集・Omni Flash スペック）</li>
                 <li><a href="../../research/gemini-recent-updates.html">gemini-recent-updates.html</a> — Gemini / I/O 2026 最新動向トラッカー</li>
                 <li><a href="anti-gravity.html">anti-gravity.html</a> — Antigravity 2.0（Desktop IDE / CLI / SDK / Managed Agents）ガイド</li>
                 <li><a href="vertex-ai.html">vertex-ai.html</a> — Vertex AI エンタープライズガイド（Model Garden / RAG Engine / Batch API）</li>
@@ -756,7 +777,7 @@
                 <li><a href="../../research/ai-news/2026-05-19.html">research/ai-news/2026-05-19.html ほか日次</a> — I/O 2026 一斉発表、Veo/動画市場の言及</li>
                 <li><a href="intelligence-matrix.html">workbench/knowledge/intelligence-matrix.html</a> — モデル横断比較</li>
             </ul>
-            <p class="last-update" style="margin-top:18px;">最終更新: 2026-05-31</p>
+            <p class="last-update" style="margin-top:18px;">最終更新: 2026-05-31（Gemini Omni カード追加・決定表更新・マップ刷新）</p>
             <p style="font-size:13px;"><a class="back" href="index.html">← Workbench index へ戻る</a></p>
         </footer>
     </div>
