@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>リンクチェッカー ルーティン | _routines</title>
+  <style>
+    body{font-family:"Segoe UI","Noto Sans JP",system-ui,sans-serif;margin:0;background:#0b1220;color:#edf2fb;line-height:1.7;padding:28px 18px 64px}
+    .shell{max-width:960px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+    .panel{background:#111a2b;border:1px solid rgba(255,255,255,0.08);border-radius:18px;padding:22px 26px}
+    .panel-green{border-color:rgba(79,255,176,.3)}
+    a{color:#75d7c0;text-decoration:none}a:hover{text-decoration:underline}
+    h1{margin:6px 0;font-size:1.7rem}
+    h2{margin:0 0 12px;font-size:1.05rem;color:#fcd34d;border-bottom:2px solid rgba(252,211,77,.2);padding-bottom:6px}
+    h3{margin:10px 0 5px;font-size:.93rem;color:#75d7c0}
+    p,li{color:#c5d0e3;font-size:.9rem}
+    ul{padding-left:20px;margin:6px 0}li{margin-bottom:4px}
+    code{font-family:"Fira Code","Consolas",monospace;background:rgba(255,255,255,.06);padding:1px 7px;border-radius:5px;font-size:.83em;color:#a5f3d0}
+    .pre{background:#070d18;border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:14px 16px;font-family:"Fira Code","Consolas",monospace;font-size:.79rem;line-height:1.65;overflow-x:auto;white-space:pre;color:#c8d3e3;margin:10px 0}
+    .badge{display:inline-block;font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:5px;margin-right:6px}
+    .badge-green{background:rgba(79,255,176,.18);color:#4fffb0}
+    .step{display:flex;gap:14px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+    .step:last-child{border-bottom:none}
+    .step-num{background:rgba(79,255,176,.1);border:1px solid rgba(79,255,176,.3);color:#4fffb0;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.82rem;flex-shrink:0}
+    .step-body h3{margin:0 0 4px;font-size:.9rem;color:#edf2fb}
+    .step-body p{margin:0 0 6px;font-size:.86rem}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    @media(max-width:640px){.grid2{grid-template-columns:1fr}}
+    .card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:14px 16px}
+    .card-green{border-color:rgba(79,255,176,.25);background:rgba(79,255,176,.03)}
+    .card-red{border-color:rgba(255,107,107,.25);background:rgba(255,107,107,.03)}
+    table{width:100%;border-collapse:collapse;font-size:.86rem}
+    th{text-align:left;padding:8px 11px;background:rgba(79,255,176,.07);color:#4fffb0;font-size:.78rem;border-bottom:1px solid rgba(255,255,255,.07)}
+    td{padding:8px 11px;border-bottom:1px solid rgba(255,255,255,.04);color:#c5d0e3;vertical-align:top}
+    td strong{color:#edf2fb}
+    .note{background:rgba(79,255,176,.06);border-left:3px solid #4fffb0;border-radius:0 8px 8px 0;padding:10px 14px;margin:10px 0;font-size:.86rem}
+    small{color:#4a6a7a;font-size:.78rem}
+    .breadcrumb{font-size:.8rem;color:#4a6a7a;margin-bottom:8px}
+  </style>
+</head>
+<body>
+<div class="shell">
+
+  <div class="panel panel-green">
+    <div class="breadcrumb"><a href="../index.html">← Hub Top</a> / <a href="index.html">_routines</a></div>
+    <span class="badge badge-green">四半期ルーティン</span>
+    <h1>リンクチェッカー</h1>
+    <p style="color:#c5d0e3;margin:8px 0 0;font-size:.95rem;">全 HTML ページの内部リンク切れを自動検出する。スクリプト: <code>tools/link-checker.py</code>。所要時間: 約 1〜2 分。</p>
+    <p style="margin-top:8px"><small>最終更新: 2026-05-31 | 実施頻度: 四半期に 1 回 / 大きな構造変更後</small></p>
+  </div>
+
+  <!-- 基本実行 -->
+  <div class="panel">
+    <h2>基本的な実行方法</h2>
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h3>Hub ルートへ移動</h3>
+        <div class="pre">cd /path/to/claude    <span style="color:#5a7a9a"># git リポジトリのルート</span></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h3>標準チェック（ターミナル出力）</h3>
+        <div class="pre">python3 tools/link-checker.py</div>
+        <p>全 HTML ファイルをスキャンし、切れているリンクをターミナルに表示する。</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h3>HTML レポートを生成（推奨）</h3>
+        <div class="pre">python3 tools/link-checker.py --html</div>
+        <p><code>logs/link-check-YYYY-MM-DD.html</code> に見やすいレポートを出力する。ブラウザで開いて確認できる。</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h3>切れリンクを修正してコミット</h3>
+        <div class="pre"><span style="color:#5a7a9a"># 切れリンクを修正後:</span>
+git add -A
+git commit -m "Fix broken links — $(date +%Y-%m-%d)"
+git push</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- オプション -->
+  <div class="panel">
+    <h2>オプション一覧</h2>
+    <table>
+      <thead><tr><th>オプション</th><th>効果</th><th>推奨場面</th></tr></thead>
+      <tbody>
+        <tr><td><code>--html</code></td><td><code>logs/link-check-DATE.html</code> を生成</td><td>定期チェック・記録保存</td></tr>
+        <tr><td><code>--json</code></td><td>JSON 形式で結果を stdout に出力</td><td>CI / 自動化パイプライン</td></tr>
+        <tr><td><code>--external</code></td><td>外部 URL（http/https）もチェック</td><td>年次の全リンク確認</td></tr>
+        <tr><td><code>[root]</code></td><td>チェック対象ルートを指定（デフォルト: <code>.</code>）</td><td>特定カテゴリのみ確認</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="margin-top:16px">実行例</h3>
+    <div class="pre"><span style="color:#5a7a9a"># creator-system のみチェック</span>
+python3 tools/link-checker.py creator-system
+
+<span style="color:#5a7a9a"># 外部URLも含めた完全チェック + HTMLレポート</span>
+python3 tools/link-checker.py --html --external
+
+<span style="color:#5a7a9a"># JSON 出力（CI 用）</span>
+python3 tools/link-checker.py --json 2>/dev/null | jq '.broken | length'</div>
+  </div>
+
+  <!-- Claude への依頼文 -->
+  <div class="panel">
+    <h2>Claude への依頼テンプレート</h2>
+    <div class="pre"><span style="color:#5a7a9a"># スマホから送る場合の指示文</span>
+「link-checker.py を実行して切れているリンクを修正してください。
+手順:
+1. python3 tools/link-checker.py --html を実行
+2. 切れリンクを確認して修正
+3. 変更をコミット・プッシュ」</div>
+    <div class="note">
+      <strong>ポイント:</strong> Claude に実行させる場合は <code>--html</code> オプションを指定するとレポートが logs/ に保存されて次回参照しやすい。
+    </div>
+  </div>
+
+  <!-- 出力の読み方 -->
+  <div class="panel">
+    <h2>出力の読み方と対処方針</h2>
+    <div class="grid2">
+      <div class="card card-red">
+        <h3 style="color:#ff9090;margin:0 0 6px">🔴 切れているリンク</h3>
+        <p>ファイルが存在しないリンク。対処法:</p>
+        <ul>
+          <li>ページが移動した → リンクを新しいパスに更新</li>
+          <li>ページを削除した → リンクを削除 or 最も近いページへ差し替え</li>
+          <li>誤字 → リンクを修正</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="color:#ffa03c;margin:0 0 6px">🟡 警告</h3>
+        <p>ルート外に解決されるリンク（CDN 等）。基本的に無視してよい。ローカルの相対パスが誤っている場合のみ修正が必要。</p>
+      </div>
+    </div>
+    <div class="note" style="margin-top:14px">
+      <strong>削除より退避を優先:</strong> ページを削除する前に ADR に記録し、内部リンクをアーカイブページへ更新する。詳細は <a href="../foundations/operating-principles.html">operating-principles.html</a> 参照。
+    </div>
+  </div>
+
+  <!-- スクリプトの仕組み -->
+  <div class="panel">
+    <h2>スクリプトの仕組み</h2>
+    <ul>
+      <li><strong>対象:</strong> リポジトリ内の全 <code>.html</code> ファイル（<code>.git/</code>・<code>node_modules/</code> を除く）</li>
+      <li><strong>チェック対象リンク:</strong> <code>href=</code>・<code>src=</code>・<code>action=</code> 属性（<code>javascript:</code>・<code>mailto:</code>・<code>data:</code> は除外）</li>
+      <li><strong>外部 URL:</strong> デフォルトはスキップ（<code>--external</code> で有効化）</li>
+      <li><strong>アンカー:</strong> 同一ページ内リンク（<code>#section</code>）はスキップ</li>
+      <li><strong>ディレクトリリンク:</strong> <code>href="foo/"</code> は <code>foo/index.html</code> の存在確認にフォールバック</li>
+      <li><strong>出力:</strong> ターミナル（常時）+ HTML レポート（<code>--html</code> 時）+ JSON（<code>--json</code> 時）</li>
+    </ul>
+  </div>
+
+  <!-- 参照リンク -->
+  <div class="panel">
+    <h2>参照リンク</h2>
+    <ul>
+      <li><a href="../tools/link-checker.py">tools/link-checker.py</a>（スクリプト本体）</li>
+      <li><a href="../logs/">logs/</a>（チェック結果の保存先）</li>
+      <li><a href="../foundations/anti-patterns.html">anti-patterns.html</a>（リンク切れのアンチパターン）</li>
+      <li><a href="hub-health-check.html">hub-health-check.html</a>（週次ヘルスチェック）</li>
+    </ul>
+    <p style="margin-top:10px"><small>最終更新: 2026-05-31</small></p>
+  </div>
+
+</div>
+</body>
+</html>
