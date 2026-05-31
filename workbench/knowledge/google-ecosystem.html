@@ -412,26 +412,31 @@
             <!-- Gemma 4 -->
             <article class="card">
                 <h3>Gemma 4 <span class="pill pill-open">OPEN</span></h3>
-                <p><strong>Google のオープンウェイト／ローカル LLM。</strong>手元やオンプレで動かしたい・データを外に出したくない場合の選択肢。</p>
+                <p><strong>Google のオープンウェイト／ローカル LLM。</strong>Apache 2.0・商用無料。プライバシー重視・オフライン・Fine-tuning が必要なケースで Gemini API の代替になる。</p>
                 <ul>
-                    <li><strong>4 構成</strong>：Effective 2B / 4B（端末向け）、26B MoE（高スループット推論）、31B Dense（高精度タスク）。</li>
-                    <li><strong>Apache 2.0 ライセンス</strong>で商用利用可（2026/5/20 公開）。</li>
-                    <li>クラウド・デスクトップ・モバイルをカバーするデプロイツールチェーンも同時公開。</li>
+                    <li><strong>4モデル</strong>: E2B（2.3B、スマホ/Raspberry Pi）/ E4B（4.5B、ラップトップ）/ 26B MoE（3.8B 活性、Arena AI 6位）/ 31B Dense（最高精度、Arena AI 3位 スコア1452）</li>
+                    <li><strong>256K コンテキスト</strong>・140以上の言語・マルチモーダル（テキスト＋画像、小モデルは音声も）</li>
+                    <li>MMLU Pro 85.2% / AIME 2026 89.2% / LiveCodeBench 80.0%（Llama 4 の77.1%を上回る）</li>
+                    <li>Ollama で <code>ollama run gemma4:27b</code> 一行で即実行。QLoRA なら 16GB VRAM で1時間 Fine-tuning 可能。</li>
                 </ul>
                 <div class="highlight-box">
-                    <p>💡 ローカルLLMの選び方全般は <a href="slm-guide.html">slm-guide.html</a> も参照。</p>
+                    <p>📖 詳細は <a href="gemma.html">gemma.html</a> — 4モデル比較・Ollama セットアップ・Fine-tuning ガイド・実例12選・Llama 4/Phi-4 との比較を掲載。ローカル LLM 全般は <a href="slm-guide.html">slm-guide.html</a> も参照。</p>
                 </div>
             </article>
 
             <!-- Veo -->
             <article class="card">
                 <h3>Veo <span class="pill pill-canon">CANON</span></h3>
-                <p><strong>動画生成モデル。</strong>テキストプロンプトから映像を生成する Google の動画基盤。</p>
+                <p><strong>動画生成モデル。</strong>業界初の映像・音声同時生成を実現した Google の動画 AI 基盤。Flow UI の裏側エンジンであり、Vertex AI API からも直接利用できる。</p>
                 <ul>
-                    <li><strong>Veo 3 系</strong>はテキストプロンプト一つで<strong>映像・環境音・台詞を同時生成</strong>する点で差別化。</li>
-                    <li>市場では Runway / Kling と並ぶ主要モデルの一角（プロ映像制作向けの定番として定着）。</li>
-                    <li>I/O 2026 では <strong>Gemini Omni</strong> がテキスト・画像・動画プロンプトをシネマティック動画へ変換する経路も加わった。</li>
+                    <li><strong>最新版 Veo 3.1</strong>（2025-11-17）: 4K / 最長60秒 / 口パク精度 ±120ms</li>
+                    <li><strong>3バリアント</strong>: Lite（0クレジット）/ Fast（20 credits, ~$0.10〜0.15/秒）/ Quality（100 credits, ~$0.20〜0.40/秒）</li>
+                    <li>Runway Gen-3・Kling・Sora を超える音声同時生成が最大の差別化。</li>
+                    <li>Vertex AI API で <code>veo-3.1-fast-generate-001</code> を Python から直接呼び出し可能。</li>
                 </ul>
+                <div class="highlight-box">
+                    <p>📖 詳細は <a href="veo.html">veo.html</a> — モデル進化史・スペック表・API コード例・実例12選・Sora/Runway/Kling 比較を掲載。</p>
+                </div>
             </article>
 
             <!-- Flow -->
@@ -497,12 +502,17 @@
 
             <!-- Imagen / Whisk -->
             <article class="card">
-                <h3>Imagen / Whisk <span class="pill pill-qual">定性</span></h3>
-                <p><strong>画像生成系。</strong>静止画を作りたい場合の Google 製品。<strong>Imagen</strong> はテキストからの画像生成モデル、<strong>Whisk</strong> は画像を素材に組み合わせて新しい画像を作る系統のツール、という位置づけ。</p>
+                <h3>Imagen 4 / Whisk</h3>
+                <p><strong>AI 画像生成モデル＆リミックスツール。</strong>Imagen 4 はテキストから最大2K解像度の画像を生成。Whisk は「被写体・シーン・スタイル」の3枚の参照画像を合成して新画像を作るリミックスツール。</p>
                 <ul>
-                    <li>用途は「サムネイル・素材・コンセプトビジュアルなどの静止画生成」。</li>
-                    <li>ハブ内の確証が薄いため、バージョン・数値・料金・固有機能名は記載せず用途記述に留める。</li>
+                    <li><strong>3バリアント</strong>: Fast（$0.02/枚・約2.7秒）/ Standard（$0.04/枚）/ Ultra（$0.06/枚・最高精度）</li>
+                    <li><strong>SynthID 透かし</strong>全出力に自動付与・8言語プロンプト対応（日本語含む）</li>
+                    <li>Flow の Ingredients 機能の基盤: Imagen 4 Ultra で生成したキャラを Veo 動画で一貫して使える</li>
+                    <li>Gemini API / Vertex AI / Google AI Studio 無料枠 / ImageFX / Workspace に統合済み</li>
                 </ul>
+                <div class="highlight-box">
+                    <p>📖 詳細は <a href="imagen.html">imagen.html</a> — 3バリアント比較・Whisk の使い方・実例12選・Midjourney/DALL-E/Firefly との比較・プロンプトガイドを掲載。</p>
+                </div>
             </article>
         </section>
 
