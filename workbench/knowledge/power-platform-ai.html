@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Power Platform AI — ノーコード業務自動化基盤 | Tech Workbench</title>
+<style>
+:root {
+    --accent: #8b5cf6;
+    --accent2: #0078d4;
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #21262d;
+    --border: rgba(255,255,255,0.08);
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --radius: 12px;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; line-height:1.65; font-size:16px; }
+a { color:var(--accent); text-decoration:none; }
+a:hover { text-decoration:underline; }
+.page-wrap { max-width:960px; margin:0 auto; padding:32px 20px 80px; }
+nav { background:var(--surface); border-bottom:1px solid var(--border); padding:12px 20px; font-size:0.85rem; }
+nav a { color:var(--muted); margin-right:6px; }
+nav a:hover { color:var(--text); }
+nav span { color:var(--muted); margin-right:6px; }
+
+/* Hero */
+.hero { background:linear-gradient(135deg, #3b0764, #6d28d9, #8b5cf6); border-radius:var(--radius); padding:48px 40px; margin-bottom:40px; }
+.hero h1 { font-size:2.2rem; font-weight:800; color:#fff; margin-bottom:8px; }
+.hero .sub { color:rgba(255,255,255,0.88); font-size:1.05rem; margin-bottom:24px; max-width:660px; }
+.chips { display:flex; flex-wrap:wrap; gap:8px; }
+.chip { background:rgba(255,255,255,0.18); color:#fff; padding:4px 14px; border-radius:20px; font-size:0.8rem; font-weight:600; }
+
+/* Sections */
+.section { margin-bottom:52px; }
+.section > h2 { font-size:1.4rem; font-weight:700; margin-bottom:16px; padding-bottom:8px; border-bottom:2px solid var(--accent); color:var(--accent); }
+.section > h2.blue { border-color:var(--accent2); color:var(--accent2); }
+p { margin-bottom:12px; }
+ul, ol { padding-left:1.5em; margin-bottom:12px; }
+li { margin-bottom:5px; }
+
+/* Grid & Cards */
+.grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:20px; margin-bottom:20px; }
+.card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:24px; }
+.card h3 { font-size:1.05rem; font-weight:700; margin-bottom:10px; color:var(--accent); }
+.card h3.blue { color:var(--accent2); }
+
+/* Table */
+.table-wrap { overflow-x:auto; margin:16px 0; }
+table { width:100%; border-collapse:collapse; font-size:0.9rem; }
+th { background:var(--surface2); color:var(--accent); padding:10px 14px; text-align:left; border:1px solid var(--border); }
+th.blue { color:var(--accent2); }
+td { padding:9px 14px; border:1px solid var(--border); vertical-align:top; }
+tr:nth-child(even) td { background:rgba(255,255,255,0.02); }
+
+/* Code */
+pre { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:20px; overflow-x:auto; margin:16px 0; }
+code { font-family:'JetBrains Mono','Fira Code',monospace; font-size:0.85rem; color:#79c0ff; }
+.cm { color:#8b949e; }
+.kw { color:#ff7b72; }
+.str { color:#a5d6ff; }
+
+/* Highlight box */
+.highlight-box { background:rgba(139,92,246,0.08); border-left:3px solid var(--accent); border-radius:0 8px 8px 0; padding:16px 20px; margin:16px 0; }
+.highlight-box.blue { background:rgba(0,120,212,0.08); border-color:var(--accent2); }
+.highlight-box.green { background:rgba(79,255,176,0.08); border-color:#4fffb0; }
+
+/* Badges */
+.badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:0.75rem; font-weight:700; margin-bottom:8px; }
+.badge-purple { background:rgba(139,92,246,0.15); color:var(--accent); }
+.badge-blue { background:rgba(0,120,212,0.15); color:#60a5fa; }
+.badge-green { background:rgba(79,255,176,0.15); color:#4fffb0; }
+.badge-orange { background:rgba(251,146,60,0.15); color:#fb923c; }
+
+/* Examples */
+.example-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; margin:16px 0; }
+.example-card { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:18px; }
+.example-card .tag { font-size:0.72rem; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:6px; }
+.example-card h4 { font-size:0.95rem; font-weight:700; margin-bottom:6px; }
+.example-card p { font-size:0.88rem; color:var(--muted); margin:0; line-height:1.55; }
+
+/* Status */
+.ok { color:#4fffb0; font-weight:700; }
+.no { color:#f85149; }
+.partial { color:#fb923c; }
+
+/* Product cards (5 products) */
+.product-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:14px; margin:20px 0; }
+.product-card { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:18px 14px; text-align:center; }
+.product-card .icon { font-size:2rem; margin-bottom:8px; }
+.product-card h4 { font-size:0.9rem; font-weight:700; color:var(--accent); margin-bottom:4px; }
+.product-card p { font-size:0.78rem; color:var(--muted); margin:0; line-height:1.45; }
+
+/* Sub heading */
+.sub-h { font-size:1.1rem; font-weight:700; margin:24px 0 10px; color:var(--text); border-left:3px solid var(--accent); padding-left:12px; }
+.sub-h.blue { border-color:var(--accent2); }
+
+/* Flow diagram */
+.flow-box { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin:16px 0; }
+.flow-step { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:10px 16px; font-size:0.88rem; font-weight:600; }
+.flow-arrow { color:var(--muted); font-size:1.2rem; }
+
+/* Pricing table */
+.price-tag { font-size:1.3rem; font-weight:800; color:var(--accent); }
+.price-sub { font-size:0.8rem; color:var(--muted); }
+
+footer { text-align:center; padding:32px 20px; color:var(--muted); font-size:0.85rem; border-top:1px solid var(--border); margin-top:60px; }
+footer a { color:var(--muted); }
+footer a:hover { color:var(--text); }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="../../index.html">Hub</a> <span>›</span>
+  <a href="./index.html">LLM 個別深掘り</a> <span>›</span>
+  <a href="./microsoft-ecosystem.html">Microsoft AI エコシステム</a> <span>›</span>
+  Power Platform AI
+</nav>
+
+<main class="page-wrap">
+
+<!-- HERO -->
+<div class="hero">
+  <h1>Microsoft Power Platform AI</h1>
+  <p class="sub">ノーコード〜プロコードの業務自動化基盤。5製品 + AI Builder + Copilot が融合し、請求書処理・RPA・アプリ生成・BI レポートまでを自然言語で構築できる Microsoft の中核プラットフォーム。</p>
+  <div class="chips">
+    <span class="chip">Power Automate</span>
+    <span class="chip">AI Builder</span>
+    <span class="chip">Power Apps</span>
+    <span class="chip">Power BI</span>
+    <span class="chip">Power Pages</span>
+    <span class="chip">Dataverse</span>
+    <span class="chip">ノーコード自動化</span>
+    <span class="chip">Copilot Studio 連携</span>
+    <span class="chip">2026 Release Wave 1</span>
+  </div>
+</div>
+
+<!-- 1. Power Platform とは -->
+<section class="section">
+  <h2>1. Power Platform とは — 5製品の統合エコシステム</h2>
+  <p>Microsoft Power Platform は <strong>Power Automate・Power Apps・Power BI・Power Pages・Copilot Studio</strong> の5製品と、共通データ基盤 <strong>Dataverse</strong> を組み合わせたローコード/ノーコードの業務自動化プラットフォームです。2026年現在、すべての製品に Copilot（生成AI）が統合され、自然言語だけで自動化・アプリ・レポートが構築できる「エージェント・ファースト」な基盤へ進化しています。</p>
+
+  <div class="product-grid">
+    <div class="product-card">
+      <div class="icon">⚡</div>
+      <h4>Power Automate</h4>
+      <p>クラウドフロー・RPA・プロセスマイニング・AI フロー生成</p>
+    </div>
+    <div class="product-card">
+      <div class="icon">📱</div>
+      <h4>Power Apps</h4>
+      <p>自然言語でアプリ生成・Canvas / Model-Driven / Code Apps</p>
+    </div>
+    <div class="product-card">
+      <div class="icon">📊</div>
+      <h4>Power BI</h4>
+      <p>Copilot で DAX 生成・ナラティブ要約・自然言語 Q&A</p>
+    </div>
+    <div class="product-card">
+      <div class="icon">🌐</div>
+      <h4>Power Pages</h4>
+      <p>外部向けウェブポータル・AI チャット・多言語対応</p>
+    </div>
+    <div class="product-card">
+      <div class="icon">🤖</div>
+      <h4>Copilot Studio</h4>
+      <p>会話型エージェント構築・Power Automate との連携基盤</p>
+    </div>
+    <div class="product-card">
+      <div class="icon">🗄️</div>
+      <h4>Dataverse</h4>
+      <p>全製品の共通データ基盤・AI モデルのトレーニング・Knowledge Source</p>
+    </div>
+  </div>
+
+  <div class="highlight-box">
+    <p><strong>Microsoft 365 / Azure / Copilot との接続性</strong>: Power Platform は Teams・SharePoint・Outlook・Dynamics 365 とネイティブ統合し、Azure AI Foundry・Azure OpenAI・Fabric とも接続可能。1,000+ のコネクタ（Salesforce・SAP・ServiceNow・Gmail 等）を標準搭載し、企業の既存システムへの橋渡し役として機能します。</p>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>製品</th><th>主な用途</th><th>主なユーザー</th><th>AI 機能</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Power Automate</strong></td><td>クラウドフロー / RPA / プロセスマイニング</td><td>業務担当者・IT 管理者</td><td>Copilot フロー生成・AI Builder 統合</td></tr>
+        <tr><td><strong>Power Apps</strong></td><td>業務アプリ構築（モバイル対応）</td><td>市民開発者・IT 部門</td><td>自然言語でアプリ生成・Copilot コントロール</td></tr>
+        <tr><td><strong>Power BI</strong></td><td>BI レポート・ダッシュボード</td><td>データアナリスト・経営層</td><td>DAX 生成・ナラティブ要約・Q&A</td></tr>
+        <tr><td><strong>Power Pages</strong></td><td>外部向けウェブポータル</td><td>マーケ・カスタマー部門</td><td>AI チャット組み込み・フォーム自動生成</td></tr>
+        <tr><td><strong>Copilot Studio</strong></td><td>AI エージェント / チャットボット</td><td>IT・業務改善担当</td><td>会話型 AI・Power Automate フロー呼び出し</td></tr>
+        <tr><td><strong>Dataverse</strong></td><td>共通データ管理・ガバナンス</td><td>IT 管理者・開発者</td><td>Knowledge Source・Business Skills・行レベルセキュリティ</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 2. Power Automate + AI Builder -->
+<section class="section">
+  <h2>2. Power Automate + AI Builder — 最重要製品の全機能解説</h2>
+  <p>Power Automate は Power Platform の <strong>自動化エンジン</strong> です。クラウドフロー・デスクトップフロー（RPA）・プロセスマイニングの3軸で構成され、2026年の Release Wave 1 では <strong>AI エージェントによるフロー自律生成・自己修復（Self-Healing）</strong> 機能が追加されました。</p>
+
+  <div class="sub-h">フローの種類</div>
+  <div class="grid">
+    <div class="card">
+      <span class="badge badge-purple">クラウドフロー</span>
+      <h3>クラウドサービス連携</h3>
+      <ul>
+        <li>API ベースのクラウド間自動化</li>
+        <li>トリガー: メール受信・フォーム送信・ファイル変更・スケジュール等</li>
+        <li>1,000+ コネクタ（Salesforce・SAP・ServiceNow・Slack・Gmail）</li>
+        <li>Copilot Studio Agent から呼び出すフローとして利用</li>
+        <li>条件分岐・ループ・並列実行・エラーハンドリング対応</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="badge badge-blue">デスクトップフロー（RPA）</span>
+      <h3>レガシーシステム自動化</h3>
+      <ul>
+        <li>Power Automate Desktop で PC 操作を録画・実行</li>
+        <li>SAP GUI・レガシー基幹システム・Excel 操作を自動化</li>
+        <li>有人（Attended）/ 無人（Unattended）両対応</li>
+        <li>2026年: AI エージェントがフロー異常を検知し自己修復</li>
+        <li>Process $150/bot/month でボット実行</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="badge badge-green">プロセスマイニング</span>
+      <h3>業務プロセス可視化</h3>
+      <ul>
+        <li>システムログからプロセスを自動抽出・可視化</li>
+        <li>Object-Centric Process Mining（OCPM）が 2026 年 GA</li>
+        <li>一つのイベントが複数オブジェクト（受注・請求書・配送）に属する構造を分析</li>
+        <li>ボトルネック・非効率工程を自動検出</li>
+        <li>改善案を AI が提案</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sub-h">Copilot でフロー自然言語生成</div>
+  <p>フロー設計画面の Copilot チャット欄に業務要件を自然言語で入力するだけで、完全なクラウドフローが自動生成されます。<strong>「When X happens, do Y」</strong> 形式で書くと精度が高まります。</p>
+
+  <div class="highlight-box">
+    <strong>自然言語プロンプト例:</strong>
+    <ul style="margin-top:8px;">
+      <li>「メールで PDF 添付の請求書が届いたら、AI Builder で金額・取引先を抽出して SharePoint に保存し、上長に Teams 承認通知を送って」</li>
+      <li>「毎週月曜 9:00 に Salesforce から先週の商談データを取得し Power BI データセットを更新して」</li>
+      <li>「フォームが送信されたら Dataverse に登録し、5万円以上なら部長に、10万円以上なら役員に承認フローを回して」</li>
+    </ul>
+  </div>
+
+  <p>Copilot はプロンプトから意図を解釈し、必要なコネクタへの接続を自動セットアップし、アクションのパラメータも自動入力します。フロー生成後も「このアクションを差し替えて」「Teams ではなくメールで通知して」と追加チャットで修正できます。</p>
+
+  <pre><code><span class="cm">// Power Automate フロー（JSON 定義の概念例）</span>
+{
+  <span class="str">"trigger"</span>: {
+    <span class="str">"type"</span>: <span class="str">"When a new email arrives"</span>,
+    <span class="str">"filter"</span>: <span class="str">"hasAttachment eq true AND subject contains '請求書'"</span>
+  },
+  <span class="str">"actions"</span>: [
+    {
+      <span class="str">"name"</span>: <span class="str">"AI Builder - 請求書を処理する"</span>,
+      <span class="str">"model"</span>: <span class="str">"prebuilt-invoice-processing"</span>,
+      <span class="str">"input"</span>: <span class="str">"@triggerOutputs()?['body/attachments'][0]"</span>
+    },
+    {
+      <span class="str">"name"</span>: <span class="str">"Dataverse - 行を追加する"</span>,
+      <span class="str">"table"</span>: <span class="str">"cr_invoices"</span>,
+      <span class="str">"fields"</span>: {
+        <span class="str">"vendor"</span>: <span class="str">"@outputs('AI_Builder')?['vendorName']"</span>,
+        <span class="str">"amount"</span>: <span class="str">"@outputs('AI_Builder')?['totalAmount']"</span>,
+        <span class="str">"invoiceDate"</span>: <span class="str">"@outputs('AI_Builder')?['invoiceDate']"</span>
+      }
+    },
+    {
+      <span class="str">"name"</span>: <span class="str">"Teams - 承認を開始する"</span>,
+      <span class="str">"assignTo"</span>: <span class="str">"manager@contoso.com"</span>,
+      <span class="str">"title"</span>: <span class="str">"請求書承認: @{outputs('AI_Builder')?['vendorName']}"</span>
+    }
+  ]
+}</code></pre>
+
+  <div class="sub-h">AI Builder — ドキュメント AI・予測・GPT</div>
+  <p>AI Builder は Power Platform に組み込まれた AI モデルライブラリです。トレーニング不要の事前構築モデルから、カスタムモデルのトレーニング、GPT-4o の呼び出しまで対応します。</p>
+
+  <div class="grid">
+    <div class="card">
+      <span class="badge badge-purple">Document AI</span>
+      <h3>ドキュメント自動抽出</h3>
+      <ul>
+        <li><strong>事前構築モデル</strong>（学習不要）: インボイス / 領収書 / 名刺 / 身分証 / 健康保険証</li>
+        <li><strong>カスタムモデル</strong>: 独自フォーム・発注書を5〜20枚サンプルで学習</li>
+        <li>GPT-4o ベースの Document Processing Agent（2026年）: サンプル不要で任意フォームを抽出</li>
+        <li>抽出精度 95%+ (Microsoft 公表の事前構築モデル)</li>
+        <li>PDF・画像・Word・メール本文に対応</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="badge badge-blue">Prediction（予測）</span>
+      <h3>分類・数値予測</h3>
+      <ul>
+        <li>バイナリ分類: チャーン予測・審査承認 / 否認</li>
+        <li>数値予測: 売上予測・需要予測・在庫最適化</li>
+        <li>Dataverse または Excel のデータでカスタムトレーニング</li>
+        <li>AutoML ベースでモデル設定不要</li>
+        <li>Power Automate フローに組み込んで自動判断ロジックへ</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="badge badge-green">GPT Prompts</span>
+      <h3>生成 AI・テキスト処理</h3>
+      <ul>
+        <li>GPT-4o / GPT-4 / GPT-3.5 をノーコードで呼び出し</li>
+        <li>用途: 要約・翻訳・感情分析・文章生成・分類・JSON 構造化出力</li>
+        <li>プロンプトに動的パラメータを注入（フローの前段データを活用）</li>
+        <li>JSON スキーマ指定で下流アクションへ安定した構造データを渡す</li>
+        <li>Copilot Studio Agent への Document Processing 拡張に対応</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="badge badge-orange">Object Detection</span>
+      <h3>物体検出・画像分類</h3>
+      <ul>
+        <li>製造ライン異常検知・棚の在庫確認・設備点検</li>
+        <li>カスタム画像データでトレーニング</li>
+        <li>Power Apps カメラコントロールとリアルタイム統合</li>
+        <li>モバイルアプリから写真を撮ると即座に判定</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sub-h">コネクタ 1,000+</div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>カテゴリ</th><th>主なコネクタ例</th><th>種別</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Microsoft 製品</td><td>Teams・SharePoint・Outlook・Dynamics 365・Azure・OneDrive・Planner</td><td class="ok">標準（無料）</td></tr>
+        <tr><td>CRM / ERP</td><td>Salesforce・SAP・Oracle・HubSpot・Zoho CRM</td><td class="partial">Premium</td></tr>
+        <tr><td>IT / DevOps</td><td>ServiceNow・Jira・GitHub・Zendesk・PagerDuty</td><td class="partial">Premium</td></tr>
+        <tr><td>コミュニケーション</td><td>Slack・Gmail・Twilio SMS・DocuSign・Zoom</td><td class="partial">一部 Premium</td></tr>
+        <tr><td>DB / Storage</td><td>SQL Server・PostgreSQL・Snowflake・Google Sheets</td><td class="partial">一部 Premium</td></tr>
+        <tr><td>カスタム</td><td>Custom Connector（OpenAPI / REST API 定義から作成）</td><td class="partial">カスタム</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="highlight-box blue">
+    <p><strong>2026 Release Wave 1 — 主要アップデート</strong><br>
+    ① AI エージェントによる RPA デスクトップフローの <strong>自己修復（Self-Healing）</strong>: UI 変更でフローが壊れてもエージェントが自動修正<br>
+    ② Copilot Studio の Action として Power Automate フローを直接呼び出し可能に<br>
+    ③ Object-Centric Process Mining（OCPM）正式 GA: 複数オブジェクト横断の業務分析<br>
+    ④ AI Builder: Copilot Studio Agent への Document Processing 拡張 GA</p>
+  </div>
+</section>
+
+<!-- 3. Power Apps + Copilot -->
+<section class="section">
+  <h2>3. Power Apps + Copilot — 自然言語でアプリ生成</h2>
+  <p>Power Apps Copilot は <strong>「アプリを作って」と話しかけるだけで UI + データモデルが自動生成</strong>される機能です。2026年は vibe.powerapps.com プレビューが開始し、プロンプトから計画・データ・アプリを一括生成する次世代エクスペリエンスへ進化しました。</p>
+
+  <div class="highlight-box">
+    <strong>自然言語アプリ生成のプロンプト例:</strong>
+    <ul style="margin-top:8px;">
+      <li>「在庫管理アプリを作って。品目・数量・保管場所・最終更新日を管理したい」</li>
+      <li>「現場の設備点検フォームアプリ。写真を撮って AI が異常を判定し、異常があれば自動で修繕依頼を送る」</li>
+      <li>「採用面接スケジューラー。候補者・面接官・日程・結果を管理し承認フロー付き」</li>
+    </ul>
+    <p style="margin-top:8px;margin-bottom:0;">→ Copilot が Dataverse テーブル・関係性・カラム型・ビジネスルール・サンプルデータを自動設計し、画面・ナビゲーション・ギャラリー・編集フォームを生成します。</p>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <span class="badge badge-purple">Canvas Apps</span>
+      <h3>自由レイアウトのモバイルアプリ</h3>
+      <ul>
+        <li>ドラッグ＆ドロップ + Power Fx（Excel 風関数）</li>
+        <li>Copilot が画面構成・データ接続を自動生成</li>
+        <li>2026年: リアルタイム Dataverse オフラインアクセス（Canvas）</li>
+        <li>AI 異常検知・カメラ + Object Detection 統合</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="badge badge-blue">Model-Driven Apps</span>
+      <h3>Dataverse ベースの業務アプリ</h3>
+      <ul>
+        <li>Dataverse のデータモデルから UI を自動生成</li>
+        <li>2026年: モダンテーマと刷新された UI が GA</li>
+        <li>Copilot コントロールをアプリ内に埋め込み</li>
+        <li>Dynamics 365 と同じ基盤で CRM / ERP 拡張に最適</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="badge badge-green">Code Apps（2026年 GA）</span>
+      <h3>プロコード × Power Platform ガバナンス</h3>
+      <ul>
+        <li>React / Vue 等で書いたコードアプリが Power Platform 管理対象に</li>
+        <li>VS Code / GitHub Copilot / Claude Code と連携</li>
+        <li>Canvas Authoring MCP Server 経由で AI コーディングエージェントが Power Apps を直接操作</li>
+        <li>InfoPath → Canvas Apps の自動移行ツール（PowerCAT Skill）</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sub-h">Copilot コントロール — アプリ内 AI チャット埋め込み</div>
+  <p>アプリ画面の中に <strong>Copilot チャット UI</strong> を数クリックで埋め込めます。アプリのデータに基づいて質問に答えたり、フォームに値を自動入力したり、別画面へ誘導したりが可能です。Microsoft 365 Copilot と同じ AI エンジンを活用します。</p>
+
+  <div class="flow-box">
+    <div class="flow-step">ユーザーが質問入力</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-step">Copilot コントロール</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-step">Dataverse / API 参照</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-step">自然言語で回答</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-step">フォーム自動入力</div>
+  </div>
+
+  <div class="highlight-box blue">
+    <p><strong>Business Skills in Dataverse（2026年 Public Preview）</strong>: 業務プロセス・ポリシー・ドメイン知識を自然言語の「スキル」として Dataverse に保存。エージェントやアプリに接続した MCP Server が自動的にスキルを発見し、回答や操作の精度を向上させます。</p>
+  </div>
+</section>
+
+<!-- 4. Power BI + Copilot -->
+<section class="section">
+  <h2>4. Power BI + Copilot — データを語らせる AI アナリスト</h2>
+  <p>Power BI Copilot は <strong>レポート作成・DAX 数式生成・自然言語によるデータ質問・ナラティブ要約</strong>の4領域で AI を提供します。2026年時点で企業展開済みのチームでは「DAX 作成だけで週2〜3時間の削減」が報告されています。</p>
+
+  <div class="grid">
+    <div class="card">
+      <span class="badge badge-purple">DAX 生成</span>
+      <h3>数式を自然言語で作成</h3>
+      <ul>
+        <li>「先月比成長率を計算して」→ 構文的に正しい DAX を即生成</li>
+        <li>フィルターコンテキストを自動で考慮</li>
+        <li>時系列インテリジェンス関数（SAMEPERIODLASTYEAR 等）を適切に適用</li>
+        <li>生成した数式の論理説明も自動付与</li>
+        <li>非エンジニアが複雑なメジャーを定義可能に</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="badge badge-blue">Narrative Summaries</span>
+      <h3>データを文章で自動解説</h3>
+      <ul>
+        <li>レポートページ全体・特定ページ・個別ビジュアルを要約</li>
+        <li>トレンド・外れ値・異常・主要ドライバーを平文で説明</li>
+        <li>フィルター・スライサー操作に連動して動的に更新</li>
+        <li>経営向けスライドのナラティブを自動作成</li>
+        <li>月次 / 週次レポートの所見コメントを Copilot が執筆</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="badge badge-green">Q&A / Copilot チャット</span>
+      <h3>グラフに自然言語で質問</h3>
+      <ul>
+        <li>「東京の先月の売上は？」→ 数値をピンポイント回答</li>
+        <li>曖昧な質問に対して AI が意図を確認・補完</li>
+        <li>回答のソースビジュアルを参照として提示</li>
+        <li>フィールド名を正確に知らなくても業務文脈で解釈</li>
+        <li>BI の非技術者への民主化を実現</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="badge badge-orange">異常検知・スマートナラティブ</span>
+      <h3>異常を自動フラグ</h3>
+      <ul>
+        <li>時系列データの外れ値を自動検出・アラート</li>
+        <li>スマートナラティブ: ビジュアルにテキスト解説を自動追加</li>
+        <li>Key Influencers ビジュアル: 指標に影響する要因を AI が特定</li>
+        <li>Decomposition Tree: 指標をドリルダウン分析</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="highlight-box">
+    <p><strong>Microsoft Fabric との統合（2026年）</strong>: Power BI Premium は Microsoft Fabric の一部として位置づけられ、OneLake（統合データレイク）上のデータを直接 Power BI レポートで参照できます。Copilot は Fabric のセマンティックモデルを理解した上で DAX・レポート・要約を生成します。</p>
+  </div>
+
+  <pre><code><span class="cm">-- Copilot が生成した DAX 例（「前年同月比成長率」）</span>
+YoY Growth Rate =
+<span class="kw">VAR</span> CurrentPeriodSales = [Total Sales]
+<span class="kw">VAR</span> PriorYearSales =
+    CALCULATE(
+        [Total Sales],
+        SAMEPERIODLASTYEAR('Date'[Date])
+    )
+<span class="kw">RETURN</span>
+    <span class="kw">IF</span>(
+        PriorYearSales = 0 || ISBLANK(PriorYearSales),
+        BLANK(),
+        DIVIDE(CurrentPeriodSales - PriorYearSales, PriorYearSales)
+    )</code></pre>
+</section>
+
+<!-- 5. Power Pages + Copilot -->
+<section class="section">
+  <h2>5. Power Pages + Copilot — 外部向けウェブポータルを AI で構築</h2>
+  <p>Power Pages は <strong>組織外の人々向けのウェブサイト・フォーム・ポータルをノーコードで構築</strong>するサービスです。顧客向けサポートポータル・パートナー向け発注サイト・市民向け行政窓口などに利用されます。</p>
+
+  <div class="grid">
+    <div class="card">
+      <span class="badge badge-purple">Copilot サイト生成</span>
+      <h3>自然言語でサイト構築</h3>
+      <ul>
+        <li>「カスタマーサポートポータルを作って」→ ページ構成・フォーム・スタイルを自動生成</li>
+        <li>Copilot がテキスト・画像・フォームフィールドを提案</li>
+        <li>Dataverse テーブルとフォームを自動連結</li>
+        <li>多言語対応（自動翻訳 AI 統合）</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="badge badge-blue">AI チャット埋め込み</span>
+      <h3>Copilot Studio と連携</h3>
+      <ul>
+        <li>サイト訪問者が AI チャットボットと直接対話</li>
+        <li>Copilot Studio で構築したエージェントをワンクリックで公開</li>
+        <li>サイトコンテンツを Knowledge Source として AI が回答</li>
+        <li>ロールベースアクセス制御（RBAC）対応の会話 UI</li>
+        <li>2026年: カスタムチャット UI コンポーネントが Public Preview</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="badge badge-green">フォーム・ポータル AI</span>
+      <h3>スマートフォーム生成</h3>
+      <ul>
+        <li>フォームフィールドを AI が自動提案・バリデーション設定</li>
+        <li>申請データを Dataverse / Power Automate フローへ自動連携</li>
+        <li>ファイルアップロード + AI Builder でドキュメント自動抽出</li>
+        <li>GitHub Copilot CLI / Claude Code との MCP Server 連携（プレビュー）</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="highlight-box">
+    <p><strong>典型的なユースケース</strong>: 自治体の補助金申請ポータル・製造業の顧客クレーム受付フォーム・金融機関のローン申込サイト・病院の予約・問診フォーム。すべてノーコードで構築し、Dataverse にデータを蓄積、Power Automate で業務フローへ連携します。</p>
+  </div>
+</section>
+
+<!-- 6. Dataverse -->
+<section class="section">
+  <h2>6. Dataverse — Power Platform 全体のインテリジェントデータ基盤</h2>
+  <p>Dataverse は単なるデータベースではなく、<strong>Power Platform 全製品の共通基盤</strong>として機能する Enterprise-grade のデータプラットフォームです。2026年5月には「<strong>Dataverse is Your Agent Data Platform</strong>」と Microsoft が位置づけを再定義しました。</p>
+
+  <div class="grid">
+    <div class="card">
+      <span class="badge badge-purple">データ管理</span>
+      <h3>統合データストア</h3>
+      <ul>
+        <li>Power Apps・Power Automate・Power BI・Copilot Studio が共通で利用</li>
+        <li>テーブル・リレーション・ビュー・フォームをノーコードで設計</li>
+        <li>Dynamics 365 と同一のデータ基盤（互換性 100%）</li>
+        <li>環境スコープでのデータ分離</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="badge badge-blue">AI Knowledge Source</span>
+      <h3>Copilot Studio の知識源</h3>
+      <ul>
+        <li>Dataverse テーブルを Copilot Studio の Knowledge Source として追加（最大15テーブル）</li>
+        <li>同義語・用語集をテーブル・カラム単位で定義し AI 精度向上</li>
+        <li>Unstructured Data（ドキュメント・メモ）も Knowledge として追加可能</li>
+        <li>エージェントが Dataverse MCP Server 経由でリアルタイムデータを取得</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="badge badge-green">ガバナンス・セキュリティ</span>
+      <h3>エンタープライズ統制</h3>
+      <ul>
+        <li>Azure Entra ID（Azure AD）認証統合</li>
+        <li>行レベルセキュリティ（RLS）・列レベルフィールドセキュリティ</li>
+        <li>Microsoft Purview による監査・コンプライアンス</li>
+        <li>DLP（Data Loss Prevention）ポリシーを環境単位で適用</li>
+        <li>エージェントがデータにアクセスする際も同一のセキュリティコンテキストを継承</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="badge badge-orange">Business Skills（2026 Preview）</span>
+      <h3>業務知識の構造化</h3>
+      <ul>
+        <li>プロセス・ポリシー・ドメイン知識を自然言語の「スキル」として保存</li>
+        <li>既存マニュアルをアップロードしてスキルとして変換</li>
+        <li>Dataverse MCP Server に接続したエージェントがスキルを自動発見</li>
+        <li>Power Apps・Copilot Studio・M365 Copilot で共通利用</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 7. 料金体系 -->
+<section class="section">
+  <h2>7. 料金体系（2026年5月現在）</h2>
+  <p>2026年1月に Power Apps Per App プラン（$5/user/app）は新規販売終了。現在の主な選択肢は <strong>Premium（ユーザーごと）</strong> と <strong>Pay-As-You-Go</strong> の2択です。</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>製品</th><th>プラン</th><th>価格</th><th>主な内容</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td rowspan="3"><strong>Power Automate</strong></td>
+          <td>Premium（ユーザー）</td>
+          <td><span class="price-tag">$15</span><span class="price-sub">/user/月</span></td>
+          <td>クラウドフロー無制限・Premium コネクタ・Dataverse 250MB・AI Builder 5,000 credits/月</td>
+        </tr>
+        <tr>
+          <td>Process（RPA ボット）</td>
+          <td><span class="price-tag">$150</span><span class="price-sub">/bot/月</span></td>
+          <td>無人 RPA ボット実行・デスクトップフロー</td>
+        </tr>
+        <tr>
+          <td>Hosted Process</td>
+          <td><span class="price-tag">$215</span><span class="price-sub">/bot/月</span></td>
+          <td>クラウドホスト型 RPA（インフラ管理不要）</td>
+        </tr>
+        <tr>
+          <td rowspan="2"><strong>Power Apps</strong></td>
+          <td>Premium（ユーザー）</td>
+          <td><span class="price-tag">$20</span><span class="price-sub">/user/月</span></td>
+          <td>アプリ作成・利用無制限・Dataverse・Premium コネクタ・AI Builder 500 credits/月。2,000名以上は $12/user/月</td>
+        </tr>
+        <tr>
+          <td>Pay-As-You-Go</td>
+          <td>従量課金</td>
+          <td>Aure サブスクリプションに連結した従量課金</td>
+        </tr>
+        <tr>
+          <td rowspan="2"><strong>Power BI</strong></td>
+          <td>Pro</td>
+          <td><span class="price-tag">$14</span><span class="price-sub">/user/月</span></td>
+          <td>レポート共有・コラボレーション・クラウド上のデータセット</td>
+        </tr>
+        <tr>
+          <td>Premium Per User（PPU）</td>
+          <td><span class="price-tag">$24</span><span class="price-sub">/user/月</span></td>
+          <td>Copilot 機能フル利用・ページネーションレポート・AI 機能拡張・高頻度更新</td>
+        </tr>
+        <tr>
+          <td><strong>Power BI / Fabric</strong></td>
+          <td>Fabric Capacity（F64〜）</td>
+          <td><span class="price-tag">〜$5,258</span><span class="price-sub">/月〜</span></td>
+          <td>500名以上の組織に推奨。Fabric 全機能 + 閲覧者数無制限</td>
+        </tr>
+        <tr>
+          <td><strong>AI Builder</strong></td>
+          <td>スタンドアロン</td>
+          <td><span class="price-tag">$500</span><span class="price-sub">/月</span></td>
+          <td>1,000,000 credits/月（Power Automate / Power Apps とは別枠で購入可）</td>
+        </tr>
+        <tr>
+          <td><strong>Power Pages</strong></td>
+          <td>Authenticated Users</td>
+          <td><span class="price-tag">$200</span><span class="price-sub">/月〜</span></td>
+          <td>認証済みユーザー向けサイト（50,000ログイン/月）</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="highlight-box">
+    <p><strong>M365 E3/E5 バンドルに注意</strong>: Microsoft 365 Business / E3 / E5 には Power Automate の <em>標準コネクタのみ</em> が含まれます。Salesforce・SAP 等の Premium コネクタや AI Builder を使う場合は Power Automate Premium ライセンスが別途必要です。Power Apps も同様で、M365 に含まれる範囲は限定的です。</p>
+  </div>
+</section>
+
+<!-- 8. 実例 12選 -->
+<section class="section">
+  <h2>8. 業種別・部署別 実例 12選</h2>
+  <div class="example-grid">
+    <div class="example-card">
+      <div class="tag">製造業 / 現場</div>
+      <h4>設備点検フォームの完全自動化</h4>
+      <p>現場作業員が Power Apps モバイルアプリで点検写真を撮影。AI Builder の Object Detection が異常を即判定し、異常検知時は Power Automate が自動で修繕依頼を作成・担当者へ Teams 通知。<strong>報告書作成時間が 45分 → 5分</strong>、異常の見落とし率がゼロに。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">法務 / 契約</div>
+      <h4>契約書自動抽出・リスクレビュー</h4>
+      <p>取引先から届く PDF 契約書を AI Builder GPT-4o Prompt で主要条項・期日・金額を自動抽出し Dataverse に登録。異常条項は弁護士へ自動エスカレーション。<strong>初回レビュー時間が 2時間 → 20分</strong>、月間50件以上の契約処理を2名で対応可能に。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">HR / 採用</div>
+      <h4>採用フロー一気通貫自動化</h4>
+      <p>Power Pages で外部向け応募フォームを構築。応募データが自動で Dataverse に登録され、Power Automate が書類選考・面接調整・合否通知・入社手続きまで自動ルーティング。<strong>採用事務工数が 60% 削減</strong>、担当者は応募者対応に集中できるように。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">財務 / 経理</div>
+      <h4>インボイス処理・承認フロー</h4>
+      <p>メール添付の PDF 請求書を AI Builder 事前構築モデルが取引先名・金額・振込先を 95%+ 精度で自動抽出。金額に応じた階層承認フロー（5万円以上は課長、10万円以上は部長）を Power Automate が自動実行。<strong>請求書処理時間が 1件 15分 → 2分</strong>。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">営業 / CRM</div>
+      <h4>Salesforce × Teams CRM 自動更新</h4>
+      <p>営業担当が Teams の商談チャンネルでメモを書くと、Power Automate が AI Builder で要点を抽出し Salesforce の商談レコードを自動更新。次のアクションも AI が提案し、ToDoリストに自動追加。<strong>CRM 入力工数が週 3時間 → 0.5時間</strong>。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">カスタマーサポート</div>
+      <h4>問い合わせ自動分類・エスカレーション</h4>
+      <p>メール・フォームで届く顧客問い合わせを AI Builder GPT Prompt が製品種別・緊急度・感情スコアで自動分類。緊急 / 怒り案件は即エスカレーション、通常案件は担当者キューへ自動振り分け。<strong>初回応答時間が平均 4時間 → 30分</strong>。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">医療 / クリニック</div>
+      <h4>患者フォーム処理のデジタル化</h4>
+      <p>Power Pages で問診フォームを構築し、患者が来院前にスマートフォンから回答。AI Builder が手書き文字を認識し電子化、Power Automate が電子カルテシステムへ自動転記。<strong>受付業務が 60% 削減</strong>、院内での待ち時間が半減。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">小売 / EC</div>
+      <h4>在庫管理アプリとアラート自動化</h4>
+      <p>Power Apps で店舗スタッフ向け在庫管理アプリを構築（1週間で完成）。在庫数が設定閾値を下回ると Power Automate が発注メールを自動送信し、Power BI ダッシュボードで全店舗の在庫状況をリアルタイム可視化。<strong>欠品率が 40% 改善</strong>。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">建設 / 施工管理</div>
+      <h4>現場点検レポートの自動生成</h4>
+      <p>現場監督が Power Apps で写真・コメントを入力すると、AI Builder が写真内容を解析・分類し、Power Automate が Word 形式の点検レポートを自動生成して承認者にメール送信。<strong>レポート作成が 2時間 → 15分</strong>、現場に戻れる時間が増加。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">教育 / 大学</div>
+      <h4>学生データ管理と出席アラート</h4>
+      <p>Power Apps で教員向け出席管理アプリを構築。Power BI が出席率・成績を可視化し、出席率 70% 未満の学生を Power Automate が自動検出して担任へアラート。<strong>中退リスク学生への早期介入率が 3倍</strong>に向上。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">マーケティング</div>
+      <h4>キャンペーン効果レポートの自動化</h4>
+      <p>Google Ads・Meta Ads・Salesforce のデータを Power BI に統合し、Copilot がキャンペーンごとの ROI・CPAをDAX で計算。毎週月曜に Narrative Summary を自動生成し、経営陣へメールで配信。<strong>月次レポート作成が 8時間 → 1時間</strong>。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">IT / インフラ</div>
+      <h4>インシデント管理・自動対応フロー</h4>
+      <p>Azure Monitor アラートが発火すると Power Automate が ServiceNow にインシデントチケットを自動作成し、Teams インシデントチャンネルを開設。AI Builder が過去事例を検索し暫定対応案を提示。<strong>MTTA（平均認知時間）が 30分 → 3分</strong>に短縮。</p>
+    </div>
+  </div>
+</section>
+
+<!-- 9. Copilot Studio との連携 -->
+<section class="section">
+  <h2>9. Copilot Studio との連携 — 使い分けと統合パターン</h2>
+  <p>Power Automate と Copilot Studio は <strong>競合ではなく補完関係</strong>です。正しい使い分けが Power Platform 活用の鍵です。</p>
+
+  <div class="highlight-box blue">
+    <p><strong>原則</strong>: フローファースト、エージェントセカンド。まず Power Automate でバックエンドの自動化を構築し、次に Copilot Studio エージェントからそのフローを呼び出すのが最もスマートなアーキテクチャです。</p>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>観点</th><th>Power Automate</th><th>Copilot Studio</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>本質</strong></td>
+          <td>決定論的なワークフロー自動化（トリガー→アクション）</td>
+          <td>会話型 AI エージェント（質問→計画→行動）</td>
+        </tr>
+        <tr>
+          <td><strong>実行モデル</strong></td>
+          <td>トリガー / スケジュールで起動し確実に完了</td>
+          <td>ユーザーの入力に応じて自律的に計画・実行</td>
+        </tr>
+        <tr>
+          <td><strong>最適なユースケース</strong></td>
+          <td>承認フロー・データ同期・定時バッチ・RPA・通知</td>
+          <td>社内ヘルプデスク・顧客対応・ガイド付き業務手続き・知識検索</td>
+        </tr>
+        <tr>
+          <td><strong>UI</strong></td>
+          <td>なし（バックグラウンド実行）</td>
+          <td>チャット UI（Teams・Power Pages・M365 Copilot 等に埋め込み）</td>
+        </tr>
+        <tr>
+          <td><strong>データアクセス</strong></td>
+          <td>コネクタ経由でシステムを操作</td>
+          <td>Dataverse・Knowledge Source・Power Automate フロー呼び出し</td>
+        </tr>
+        <tr>
+          <td><strong>連携パターン</strong></td>
+          <td colspan="2" style="text-align:center;">Copilot Studio エージェント → Power Automate フロー呼び出し（Agent Action）</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h3>Power Automate を選ぶケース</h3>
+      <ul>
+        <li>メール受信・フォーム送信・スケジュールで自動起動したい</li>
+        <li>SAP・Salesforce 等の複数システムをデータ連携したい</li>
+        <li>承認フロー・通知・RPA を安定して動かしたい</li>
+        <li>ログ・監査証跡が必要なプロセス</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Copilot Studio を選ぶケース</h3>
+      <ul>
+        <li>ユーザーが質問・依頼を自由に入力するインターフェースが必要</li>
+        <li>FAQ 対応・社内ナレッジ検索・ガイド付き入力</li>
+        <li>複数ステップを会話形式でユーザーと確認しながら進めたい</li>
+        <li>Teams・Power Pages・M365 Copilot に会話 AI を埋め込みたい</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="flow-box">
+    <div class="flow-step" style="background:rgba(139,92,246,0.15);">ユーザーが Teams で質問</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-step" style="background:rgba(139,92,246,0.15);">Copilot Studio エージェント</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-step">意図を解釈・Dataverse 参照</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-step" style="background:rgba(0,120,212,0.15);">Power Automate フローを呼び出し</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-step">Salesforce / SAP を更新</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-step" style="background:rgba(139,92,246,0.15);">「完了しました」と返答</div>
+  </div>
+</section>
+
+<!-- 10. vs 競合比較 -->
+<section class="section">
+  <h2>10. vs 競合比較 — Power Platform AI の立ち位置</h2>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>比較軸</th>
+          <th>Power Platform AI<br><span style="font-weight:400;font-size:0.8rem;">（Microsoft）</span></th>
+          <th>Google Workspace<br><span style="font-weight:400;font-size:0.8rem;">（Gemini + AppSheet）</span></th>
+          <th>Zapier<br><span style="font-weight:400;font-size:0.8rem;">（+ Zapier AI）</span></th>
+          <th>ServiceNow<br><span style="font-weight:400;font-size:0.8rem;">（Now Platform AI）</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>対象規模</strong></td>
+          <td class="ok">SMB〜大企業（幅広い）</td>
+          <td class="partial">SMB〜中堅（Google 依存）</td>
+          <td class="partial">個人〜中堅（シンプル自動化）</td>
+          <td class="partial">大企業・IT 部門特化</td>
+        </tr>
+        <tr>
+          <td><strong>ノーコード自動化</strong></td>
+          <td class="ok">◎ Copilot でフロー自然言語生成</td>
+          <td class="partial">○ AppSheet + Gemini</td>
+          <td class="ok">◎ Zap 作成が最もシンプル</td>
+          <td class="partial">△ IT 知識が必要</td>
+        </tr>
+        <tr>
+          <td><strong>AI / LLM 統合</strong></td>
+          <td class="ok">◎ AI Builder（GPT-4o）+ Copilot 全製品統合</td>
+          <td class="ok">◎ Gemini 統合（Workspace 全体）</td>
+          <td class="partial">○ Zapier AI（ChatGPT 連携）</td>
+          <td class="partial">○ Now Assist（AI エージェント）</td>
+        </tr>
+        <tr>
+          <td><strong>ドキュメント AI</strong></td>
+          <td class="ok">◎ AI Builder 事前構築モデル + GPT-4o</td>
+          <td class="partial">△ Document AI（GCP 別サービス）</td>
+          <td class="no">✗ ネイティブ未対応</td>
+          <td class="partial">○ IDP（Intelligent Document Processing）</td>
+        </tr>
+        <tr>
+          <td><strong>RPA（デスクトップ自動化）</strong></td>
+          <td class="ok">◎ Power Automate Desktop（無料）</td>
+          <td class="no">✗ なし</td>
+          <td class="no">✗ なし</td>
+          <td class="partial">△ RPA Hub（追加費用）</td>
+        </tr>
+        <tr>
+          <td><strong>BI / レポーティング</strong></td>
+          <td class="ok">◎ Power BI + Fabric（世界最大シェア）</td>
+          <td class="ok">◎ Looker Studio + BigQuery</td>
+          <td class="no">✗ 専用 BI なし</td>
+          <td class="partial">△ Performance Analytics</td>
+        </tr>
+        <tr>
+          <td><strong>外部ポータル構築</strong></td>
+          <td class="ok">◎ Power Pages（ノーコード）</td>
+          <td class="partial">○ AppSheet（限定的）</td>
+          <td class="no">✗ なし</td>
+          <td class="ok">◎ Service Portal</td>
+        </tr>
+        <tr>
+          <td><strong>コネクタ数</strong></td>
+          <td class="ok">1,000+</td>
+          <td class="partial">700+ (AppSheet)</td>
+          <td class="ok">7,000+（最多）</td>
+          <td class="partial">400+ (Integration Hub)</td>
+        </tr>
+        <tr>
+          <td><strong>Microsoft 365 統合</strong></td>
+          <td class="ok">◎ ネイティブ統合（Teams・SharePoint 等）</td>
+          <td class="no">✗ Google Workspace のみ</td>
+          <td class="partial">○ コネクタで対応</td>
+          <td class="partial">○ コネクタで対応</td>
+        </tr>
+        <tr>
+          <td><strong>SAP / レガシー ERP 連携</strong></td>
+          <td class="ok">◎ SAP コネクタ + RPA</td>
+          <td class="partial">△ Google Cloud の SAP 製品経由</td>
+          <td class="partial">△ SAP コネクタあり（限定）</td>
+          <td class="ok">◎ SAP ネイティブ統合</td>
+        </tr>
+        <tr>
+          <td><strong>最低月額（最安プラン）</strong></td>
+          <td>$14/user（Power BI Pro）</td>
+          <td>$10/user（Google Workspace Business）</td>
+          <td>$19.99/月（Zapier Starter）</td>
+          <td>要問合せ（大企業向け）</td>
+        </tr>
+        <tr>
+          <td><strong>向いている組織</strong></td>
+          <td class="ok">Microsoft 365 を使っている全規模の組織</td>
+          <td class="partial">Google Workspace メインの組織</td>
+          <td class="partial">シンプルなクラウド間連携が目的</td>
+          <td class="partial">IT サービス管理・ITSM に特化した大企業</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="highlight-box">
+    <p><strong>選定の原則</strong>: Microsoft 365（Teams・SharePoint・Dynamics 365）をすでに使っている組織には Power Platform が圧倒的優位。Google Workspace がメインなら AppSheet / Looker Studio で完結する。Zapier は「手軽にクラウドサービスを繋げたいだけ」という用途に強く、RPA・BI・ドキュメント AI は守備範囲外。ServiceNow は IT 部門の ITSM 特化で、業務全般の自動化基盤としては守備範囲が狭い。</p>
+  </div>
+</section>
+
+<!-- 11. アーキテクチャ全体図 -->
+<section class="section">
+  <h2>11. Power Platform AI — アーキテクチャ全体像</h2>
+  <p>各コンポーネントがどのように連携するかを示す概念図です。</p>
+
+  <pre><code>
+┌─────────────────────────────────────────────────────────────┐
+│                   Microsoft 365 / Teams                     │
+│   M365 Copilot ← Copilot Studio エージェント                │
+└──────────────────────┬──────────────────────────────────────┘
+                       │
+┌──────────────────────▼──────────────────────────────────────┐
+│                  Power Platform                             │
+│                                                             │
+│  [Power Apps]  [Power Automate]  [Power BI]  [Power Pages] │
+│       │               │               │            │        │
+│       └───────────────┴───────────────┴────────────┘        │
+│                       │                                     │
+│            ┌──────────▼──────────┐                          │
+│            │      Dataverse      │  ← Knowledge Source      │
+│            │  (データ基盤・ガバナンス)│  ← Business Skills     │
+│            │  Azure Entra ID    │  ← RLS / DLP             │
+│            └──────────┬──────────┘                          │
+│                       │                                     │
+│            ┌──────────▼──────────┐                          │
+│            │    AI Builder       │                          │
+│            │  GPT-4o Prompts    │                          │
+│            │  Document AI       │                          │
+│            │  Prediction        │                          │
+│            │  Object Detection  │                          │
+│            └─────────────────────┘                          │
+└──────────────────────┬──────────────────────────────────────┘
+                       │
+┌──────────────────────▼──────────────────────────────────────┐
+│   Azure / 外部コネクタ (1,000+)                              │
+│   Salesforce / SAP / ServiceNow / Slack / Gmail / Jira...  │
+└─────────────────────────────────────────────────────────────┘</code></pre>
+
+  <div class="highlight-box blue">
+    <p><strong>2026年のキーメッセージ</strong>: Power Platform は「自動化ツール」から「<strong>エージェント基盤</strong>」へ進化しています。Dataverse が AI エージェントのデータ・ガバナンス・知識の統合ハブとなり、Copilot Studio + Power Automate + AI Builder が協調して、人間が指示を出すだけで業務が自律的に回る世界を実現しつつあります。</p>
+  </div>
+</section>
+
+<!-- 12. はじめ方 -->
+<section class="section">
+  <h2>12. はじめ方 — 最短ルート</h2>
+  <div class="grid">
+    <div class="card">
+      <span class="badge badge-purple">Step 1</span>
+      <h3>無料トライアルで試す</h3>
+      <ul>
+        <li>Microsoft 365 アカウントがあれば Power Automate・Power Apps の基本機能は即利用可能</li>
+        <li><a href="https://make.powerautomate.com" target="_blank">make.powerautomate.com</a> でフロー作成開始</li>
+        <li><a href="https://make.powerapps.com" target="_blank">make.powerapps.com</a> でアプリ作成開始</li>
+        <li>AI Builder 30日間トライアルあり</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="badge badge-blue">Step 2</span>
+      <h3>Copilot でフロー生成</h3>
+      <ul>
+        <li>Power Automate を開いて「作成」→「Copilot で作成」を選択</li>
+        <li>「メールで請求書が届いたら承認フローを走らせて」と入力</li>
+        <li>生成されたフローを確認・微調整して保存</li>
+        <li>まず小さな業務で成功体験を作る</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="badge badge-green">Step 3</span>
+      <h3>AI Builder を組み込む</h3>
+      <ul>
+        <li>フローに「AI Builder — 請求書を処理する」アクションを追加</li>
+        <li>事前構築モデルはトレーニング不要で即利用</li>
+        <li>カスタムモデルは 5〜20枚のサンプルで学習開始</li>
+        <li>GPT Prompt で要約・分類・翻訳を追加</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="badge badge-orange">Step 4</span>
+      <h3>Power Apps でアプリ化</h3>
+      <ul>
+        <li>Copilot に「在庫管理アプリを作って」と入力</li>
+        <li>生成された Dataverse テーブルとアプリを確認</li>
+        <li>モバイルで動作確認 → 組織内に共有</li>
+        <li>Power BI でデータを可視化して経営ダッシュボードへ</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="highlight-box green">
+    <p><strong>学習リソース</strong>: Microsoft Learn（<a href="https://learn.microsoft.com/ja-jp/power-platform/" target="_blank">learn.microsoft.com/power-platform</a>）の Power Platform ラーニングパスが無料で充実しています。また Power Platform Community（<a href="https://community.powerplatform.com" target="_blank">community.powerplatform.com</a>）では実際のユースケース・テンプレート・Q&A が活発に共有されています。</p>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p>関連: <a href="microsoft-ecosystem.html">Microsoft AI エコシステム総覧</a> | <a href="copilot-studio.html">Copilot Studio</a> | <a href="m365-copilot.html">M365 Copilot</a> | <a href="azure-ai-foundry.html">Azure AI Foundry</a></p>
+  <p style="margin-top:8px;">最終更新: 2026-05-31 | <a href="../../index.html">Hub トップ</a> | <a href="index.html">← Knowledge Hub</a></p>
+</footer>
+
+</body>
+</html>
