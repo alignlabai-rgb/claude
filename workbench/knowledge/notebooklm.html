@@ -1,0 +1,691 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NotebookLM 完全ガイド — AI研究アシスタントの使いこなし | Tech Workbench</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --panel: #101418;
+      --muted: #94a3b8;
+      --text: #e2e8f0;
+      --accent: #f6b800;
+      --accent-soft: rgba(246,184,0,0.15);
+      --accent-border: rgba(246,184,0,0.3);
+      --accent-grad: linear-gradient(135deg, #f6b800, #ffdd55);
+      --green: #34d399;
+      --green-soft: rgba(52,211,153,0.12);
+      --red: #f87171;
+      --red-soft: rgba(248,113,113,0.1);
+      --blue: #60a5fa;
+      --blue-soft: rgba(96,165,250,0.1);
+      --border: rgba(255,255,255,0.08);
+      --radius: 16px;
+      --font-mono: "SF Mono","Consolas",monospace;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;font-family:"Segoe UI","SF Pro Display",system-ui,sans-serif;color:var(--text);background:var(--bg);padding:32px 20px 64px;line-height:1.7}
+    .shell{max-width:1020px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+    a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+
+    /* ── hero ── */
+    header.hero{background:var(--panel);border:1px solid var(--accent-border);border-radius:var(--radius);padding:44px 40px;position:relative;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+    header.hero::before{content:"";position:absolute;top:0;left:0;width:100%;height:4px;background:var(--accent-grad)}
+    header.hero::after{content:"";position:absolute;right:-80px;bottom:-80px;width:360px;height:360px;background:radial-gradient(circle,rgba(246,184,0,.08),transparent 70%);pointer-events:none}
+    .meta-tag{display:inline-block;background:var(--accent-soft);color:var(--accent);padding:4px 12px;border-radius:99px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;border:1px solid var(--accent-border)}
+    h1{margin:0 0 14px;font-size:44px;font-weight:800;letter-spacing:-1px;line-height:1.1;background:linear-gradient(to right,#fff,#fde68a);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .lead{margin:0 0 28px;color:var(--muted);font-size:1.05rem;max-width:780px;line-height:1.8}
+    .nav-pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+    .nav-pills a{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--muted);font-size:.83rem;transition:all .15s}
+    .nav-pills a:hover{border-color:var(--accent-border);color:var(--accent);text-decoration:none}
+    .breadcrumb{font-size:.8rem;color:#4a6a7a;margin-bottom:14px}
+
+    /* ── panels ── */
+    .panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:28px 32px}
+    .panel-accent{border-color:var(--accent-border);background:linear-gradient(135deg,rgba(246,184,0,.04),var(--panel))}
+    .panel-green{border-color:rgba(52,211,153,.25);background:rgba(52,211,153,.03)}
+    h2{margin:0 0 18px;font-size:1.25rem;font-weight:700;color:#fff}
+    h3{margin:14px 0 8px;font-size:1rem;font-weight:700;color:var(--accent)}
+    h4{margin:12px 0 6px;font-size:.9rem;font-weight:700;color:#cbd5e1}
+    p{margin:0 0 12px;color:var(--muted);font-size:.93rem}
+    ul,ol{padding-left:22px;margin:8px 0}
+    li{margin-bottom:5px;color:var(--muted);font-size:.9rem}
+    strong{color:#e2e8f0}
+    code{font-family:var(--font-mono);background:rgba(255,255,255,.07);padding:2px 7px;border-radius:5px;font-size:.82em;color:#fde68a}
+
+    /* ── grids ── */
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+    @media(max-width:640px){.grid2,.grid3{grid-template-columns:1fr}}
+
+    /* ── cards ── */
+    .card{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;padding:18px 20px}
+    .card-accent{border-color:var(--accent-border);background:var(--accent-soft)}
+    .card-green{border-color:rgba(52,211,153,.25);background:var(--green-soft)}
+    .card-red{border-color:rgba(248,113,113,.2);background:var(--red-soft)}
+    .card-blue{border-color:rgba(96,165,250,.25);background:var(--blue-soft)}
+    .card h4{margin:0 0 6px;color:#e2e8f0}
+
+    /* ── badges ── */
+    .badge{display:inline-block;font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:5px;margin-right:4px;vertical-align:middle}
+    .badge-free{background:rgba(52,211,153,.2);color:#34d399}
+    .badge-plus{background:var(--accent-soft);color:var(--accent)}
+    .badge-biz{background:rgba(96,165,250,.15);color:#60a5fa}
+    .badge-ent{background:rgba(167,139,250,.15);color:#a78bfa}
+    .badge-new{background:rgba(248,113,113,.15);color:#f87171}
+    .new-chip{display:inline-block;background:rgba(248,113,113,.2);color:#fca5a5;font-size:.67rem;font-weight:700;padding:1px 6px;border-radius:4px;margin-left:5px;vertical-align:middle}
+
+    /* ── tables ── */
+    table{width:100%;border-collapse:collapse;font-size:.87rem;margin:12px 0}
+    th{text-align:left;padding:9px 12px;background:rgba(246,184,0,.07);color:var(--accent);font-size:.78rem;border-bottom:1px solid rgba(255,255,255,.07);font-weight:700}
+    td{padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--muted);vertical-align:top}
+    td strong{color:#e2e8f0}
+    td.yes{color:#34d399;font-weight:700;text-align:center}
+    td.no{color:#9ca3af;text-align:center}
+    td.partial{color:var(--accent);text-align:center}
+
+    /* ── code blocks ── */
+    .codeblock{background:#070d18;border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:16px 18px;font-family:var(--font-mono);font-size:.8rem;line-height:1.7;overflow-x:auto;white-space:pre;color:#c8d3e3;margin:12px 0}
+    .codeblock .cm{color:#4a6a7a}
+    .codeblock .kw{color:#93c5fd}
+    .codeblock .st{color:#86efac}
+    .codeblock .fn{color:#fde68a}
+    .codeblock .nm{color:#f9a8d4}
+
+    /* ── note / tip ── */
+    .note{background:rgba(246,184,0,.06);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:.88rem;color:var(--muted)}
+    .tip{background:rgba(52,211,153,.06);border-left:3px solid var(--green);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:.88rem;color:var(--muted)}
+    .warn{background:rgba(248,113,113,.06);border-left:3px solid var(--red);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:.88rem;color:var(--muted)}
+
+    /* ── tier ── */
+    .tier-row{display:flex;gap:12px;margin:4px 0 16px}
+    .tier{flex:1;border-radius:10px;padding:14px 16px;border:1px solid var(--border)}
+    .tier-free{border-color:rgba(52,211,153,.3);background:rgba(52,211,153,.04)}
+    .tier-plus{border-color:var(--accent-border);background:var(--accent-soft)}
+    .tier-biz{border-color:rgba(96,165,250,.3);background:var(--blue-soft)}
+    .tier .tier-name{font-size:.75rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+    .tier .tier-price{font-size:1.4rem;font-weight:800;color:#fff;margin-bottom:4px}
+    .tier .tier-price small{font-size:.7rem;font-weight:400;color:var(--muted)}
+    .tier ul{padding-left:16px;margin:8px 0}
+    .tier li{font-size:.82rem;margin-bottom:4px}
+    @media(max-width:580px){.tier-row{flex-direction:column}}
+
+    /* ── flow step ── */
+    .flow{display:flex;flex-direction:column;gap:0}
+    .flow-step{display:flex;gap:16px;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.04);align-items:flex-start}
+    .flow-step:last-child{border-bottom:none}
+    .flow-num{background:var(--accent-soft);border:1px solid var(--accent-border);color:var(--accent);border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.82rem;flex-shrink:0;margin-top:2px}
+    .flow-body h4{margin:0 0 4px;color:#e2e8f0;font-size:.92rem}
+    .flow-body p{margin:0;font-size:.87rem}
+    .flow-body .sub{color:#4a8a6a;font-size:.8rem;margin-top:4px}
+
+    small{color:#4a6a7a;font-size:.78rem}
+    .section-label{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin-bottom:8px;display:block}
+  </style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ── HERO ── -->
+  <header class="hero">
+    <div class="breadcrumb"><a href="../../index.html">← Hub Top</a> / <a href="../index.html">Tech Workbench</a> / <a href="index.html">Knowledge</a></div>
+    <div class="meta-tag">Google AI · Research Tool</div>
+    <h1>NotebookLM</h1>
+    <p class="lead">
+      Google DeepMind が提供する AI リサーチアシスタント。PDF・YouTube・Google ドキュメントなど<strong>あなたが持ち込んだソース</strong>に接地して回答する。
+      ハルシネーションが少なく、全回答に出典引用が付く。<strong>Audio Overview</strong>（AI ポッドキャスト）で資料を聴きながら移動できる。
+    </p>
+    <div class="nav-pills">
+      <a href="#sources">ソース種類</a>
+      <a href="#features">機能一覧</a>
+      <a href="#tiers">料金プラン</a>
+      <a href="#audio">Audio Overview</a>
+      <a href="#workflow">実践ワークフロー</a>
+      <a href="#api">API連携</a>
+      <a href="#limits">限界と注意</a>
+      <a href="#vs">他ツールとの比較</a>
+    </div>
+    <span class="last-updated" style="margin-top:16px">最終更新: 2026-05-31 | notebooklm.google.com</span>
+  </header>
+
+  <!-- ── WHAT IS ── -->
+  <section class="panel panel-accent">
+    <h2>NotebookLM とは</h2>
+    <div class="grid2">
+      <div>
+        <p>NotebookLM は Google が提供するドキュメント接地型 AI アシスタント。Gemini モデルをベースに、<strong>あなたが追加したソースのみ</strong>を参照して回答する。ネット検索はしないため、情報が混入しない代わりに、提供した資料の範囲で非常に高精度な分析ができる。</p>
+        <p>特徴的な機能は <strong>Audio Overview</strong>（2 人の AI ホストによるポッドキャスト自動生成）。論文や技術書を音声で要約してくれるため、移動中・作業中のインプットが変わる。</p>
+        <div class="tip"><strong>核心価値:</strong> 「自分だけの専門家 AI」を作れる。業界レポート、競合資料、学術論文を束ねて、その分野専用のアシスタントが生まれる。</div>
+      </div>
+      <div>
+        <h4>基本スペック（2026-05 時点）</h4>
+        <table>
+          <tr><td>ベースモデル</td><td><strong>Gemini 2.5 Pro / Flash</strong></td></tr>
+          <tr><td>最大ソース数（無料）</td><td><strong>50 ソース</strong>/ノートブック</td></tr>
+          <tr><td>ソース容量上限</td><td><strong>500K ワード</strong>（約 2MB PDF）/ソース</td></tr>
+          <tr><td>最大ノートブック数（無料）</td><td><strong>100</strong></td></tr>
+          <tr><td>総コンテキスト上限</td><td><strong>25M トークン</strong>/ノートブック</td></tr>
+          <tr><td>言語サポート</td><td><strong>108 言語</strong>（日本語対応）</td></tr>
+          <tr><td>Audio Overview 言語</td><td><strong>日本語含む複数言語</strong></td></tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SOURCE TYPES ── -->
+  <section class="panel" id="sources">
+    <h2>対応ソース一覧</h2>
+    <p>NotebookLM に追加できるコンテンツの種類と制限。<strong>多様なソースを組み合わせる</strong>ほど回答の質が上がる。</p>
+    <div class="grid3">
+      <div class="card">
+        <h4>📄 PDF / ドキュメント</h4>
+        <ul>
+          <li>PDF（スキャン PDF も OCR 対応）</li>
+          <li>Google ドキュメント</li>
+          <li>Google スライド</li>
+          <li>Microsoft Word (.docx)</li>
+          <li>上限: 200MB / ファイル</li>
+          <li>テキスト量: ~500K ワード / ソース</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>🌐 Web / 動画</h4>
+        <ul>
+          <li>URL（Web ページ全文）</li>
+          <li>YouTube 動画（自動字幕から抽出）</li>
+          <li>Google サイト</li>
+          <li>注: JavaScript レンダリングページは不可</li>
+          <li>注: 字幕なし YouTube は不可</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>🎵 音声 / テキスト</h4>
+        <ul>
+          <li>音声ファイル（MP3, WAV, AIFF 等）<span class="new-chip">新機能</span></li>
+          <li>プレーンテキスト（.txt）</li>
+          <li>Markdown</li>
+          <li>コピー&ペースト（テキスト直接入力）</li>
+          <li>Google Drive ファイル全般</li>
+        </ul>
+      </div>
+    </div>
+    <div class="note" style="margin-top:12px"><strong>実用的な上限:</strong> 1 ノートブックに論文 20〜30 本分 + YouTube 講義 10 本程度が目安。それを超えるとレスポンスが遅くなる傾向がある。</div>
+  </section>
+
+  <!-- ── FEATURES ── -->
+  <section class="panel" id="features">
+    <h2>機能一覧</h2>
+    <div class="grid2">
+      <div>
+        <h3>コア機能（全プラン）</h3>
+        <div class="flow">
+          <div class="flow-step">
+            <div class="flow-num">Q</div>
+            <div class="flow-body">
+              <h4>Q&amp;A（出典付き）</h4>
+              <p>ソース内容に基づいた回答を生成。回答の各文に<strong>インライン引用</strong>（クリックで原文箇所にジャンプ）が付く。ソース外の情報を使った場合は明示される。</p>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-num">🎙</div>
+            <div class="flow-body">
+              <h4>Audio Overview（AI ポッドキャスト）</h4>
+              <p>2 人の AI ホストがノートブックの内容を掛け合い形式で議論する音声を自動生成（10〜20 分）。移動中・作業中のインプットに最適。</p>
+              <p class="sub">→ <a href="#audio">Audio Overview の詳細</a>参照</p>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-num">📋</div>
+            <div class="flow-body">
+              <h4>ブリーフィングドキュメント</h4>
+              <p>ソース全体の構造化サマリー。主要テーマ・論点・結論を自動抽出。論文レビューの起点に。</p>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-num">📚</div>
+            <div class="flow-body">
+              <h4>スタディガイド</h4>
+              <p>試験対策・学習向けのQ&amp;A集を自動生成。重要概念の定義・例題・穴埋め問題なども作成可。</p>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-num">📅</div>
+            <div class="flow-body">
+              <h4>タイムライン</h4>
+              <p>ソース内の時系列イベントを自動抽出して年表を生成。歴史資料・プロジェクト記録の整理に有効。</p>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-num">❓</div>
+            <div class="flow-body">
+              <h4>FAQ 生成</h4>
+              <p>ソースから想定される質問と回答のセットを自動生成。資料の理解度チェックに使える。</p>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-num">🗺</div>
+            <div class="flow-body">
+              <h4>マインドマップ <span class="new-chip">新機能</span></h4>
+              <p>ソースの概念構造をビジュアルのマインドマップで表示。全体像の把握に役立つ。ノードをクリックして深掘りできる。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <h3>共有・コラボ機能</h3>
+        <ul>
+          <li><strong>ノートブックの共有</strong>: 閲覧専用リンクを発行してチームと共有</li>
+          <li><strong>コラボ編集</strong>: 複数人でソース追加・Q&amp;A可能（Plus以上）</li>
+          <li><strong>Google スライド出力</strong>: ノートブックの内容を自動でスライド化</li>
+          <li><strong>ノート保存</strong>: 回答をノートとしてピン留め・再利用</li>
+        </ul>
+
+        <h3 style="margin-top:20px">生成コンテンツ形式</h3>
+        <table>
+          <thead><tr><th>機能</th><th>出力形式</th></tr></thead>
+          <tbody>
+            <tr><td>Audio Overview</td><td>MP3 音声ダウンロード</td></tr>
+            <tr><td>各種ドキュメント</td><td>Markdown / Google ドキュメント</td></tr>
+            <tr><td>スライド</td><td>Google スライド (.pptx エクスポート可）</td></tr>
+            <tr><td>マインドマップ</td><td>ブラウザ内（エクスポート機能は限定的）</td></tr>
+            <tr><td>Q&amp;A 回答</td><td>テキスト（出典リンク付き）</td></tr>
+          </tbody>
+        </table>
+
+        <h3 style="margin-top:20px">ノートブック管理</h3>
+        <ul>
+          <li>複数ノートブックの並行運用（例: 「競合調査」「学術論文」「プロジェクト資料」）</li>
+          <li>ソースのラベル・並べ替え</li>
+          <li>ノートブックのアーカイブ</li>
+          <li>Google Drive との同期（Drive ファイルを直接追加）</li>
+        </ul>
+
+        <div class="tip"><strong>使い分けのコツ:</strong> テーマが違う資料群は別ノートブックに分ける。1 ノートブック = 1 テーマが回答精度を上げる鍵。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── TIERS ── -->
+  <section class="panel" id="tiers">
+    <h2>料金プラン</h2>
+    <div class="tier-row">
+      <div class="tier tier-free">
+        <div class="tier-name" style="color:#34d399">Free</div>
+        <div class="tier-price">¥0<small>/月</small></div>
+        <ul>
+          <li>ノートブック: <strong>100</strong> 個</li>
+          <li>ソース数: <strong>50</strong>/ノートブック</li>
+          <li>Audio Overview: <strong>3回/日</strong>（目安）</li>
+          <li>Interactive Audio: ✗</li>
+          <li>カスタム Audio ホスト: ✗</li>
+          <li>共有: 閲覧専用リンクのみ</li>
+          <li>処理優先度: 標準</li>
+          <li>モデルトレーニングへのデータ利用: 可能性あり</li>
+        </ul>
+      </div>
+      <div class="tier tier-plus">
+        <div class="tier-name" style="color:var(--accent)">NotebookLM Plus <span class="badge badge-plus">推奨</span></div>
+        <div class="tier-price">¥2,900<small>/月（Google One AI Premium）</small></div>
+        <ul>
+          <li>ノートブック: <strong>500</strong> 個</li>
+          <li>ソース数: <strong>300</strong>/ノートブック</li>
+          <li>Audio Overview: <strong>20回+/日</strong></li>
+          <li>Interactive Audio: <strong>✓</strong>（会話型ポッドキャスト）</li>
+          <li>カスタム Audio ホスト: <strong>✓</strong>（インストラクションで指定）</li>
+          <li>共有: コラボ編集可</li>
+          <li>処理優先度: 優先</li>
+          <li>Google One AI Premium 特典すべて含む（Gemini Advanced, 2TB Drive 等）</li>
+        </ul>
+      </div>
+      <div class="tier tier-biz">
+        <div class="tier-name" style="color:#60a5fa">Business / Enterprise</div>
+        <div class="tier-price">要問合せ<small>（Google Workspace 経由）</small></div>
+        <ul>
+          <li>管理者コンソール</li>
+          <li>データ保護保証（学習データ利用なし）</li>
+          <li>SSO / SAML 対応</li>
+          <li>使用状況の分析ダッシュボード</li>
+          <li>ノートブック・ソース数: 大幅拡張</li>
+          <li>チーム間ノートブック共有</li>
+          <li>DLP（データ損失防止）統合</li>
+        </ul>
+      </div>
+    </div>
+    <div class="note"><strong>Google One AI Premium の価値:</strong> NotebookLM Plus だけでなく、Gemini Advanced（Gemini 3.1 Pro アクセス）・Gemini in Gmail/Docs/Sheets・2TB Google Drive が含まれる。月¥2,900 は Gemini Advanced 単体と同額なので、NotebookLM Plus は実質無料で付いてくる。</div>
+  </section>
+
+  <!-- ── AUDIO OVERVIEW ── -->
+  <section class="panel" id="audio">
+    <h2>🎙 Audio Overview 完全解説</h2>
+    <p>NotebookLM 最大の差別化機能。<strong>2人の AI ホストが掛け合い形式でノートブック内容を議論する音声コンテンツ</strong>を自動生成する。論文・レポートの内容を「聴いて理解」できる。</p>
+    <div class="grid2">
+      <div>
+        <h3>生成の流れ</h3>
+        <div class="flow">
+          <div class="flow-step">
+            <div class="flow-num">1</div>
+            <div class="flow-body">
+              <h4>ソースを追加してノートブック作成</h4>
+              <p>PDF・URL・YouTube など任意のソースを追加する。</p>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-num">2</div>
+            <div class="flow-body">
+              <h4>「Audio Overview を生成」をクリック</h4>
+              <p>サイドパネルの Audio Overview ボタンから生成。カスタマイズ指示を入力できる（例:「入門者向けに説明して」「具体例を多く入れて」）。</p>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-num">3</div>
+            <div class="flow-body">
+              <h4>2〜5 分で音声生成完了</h4>
+              <p>10〜25 分のポッドキャストが生成される。MP3 としてダウンロード可能。</p>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-num">4</div>
+            <div class="flow-body">
+              <h4>Interactive Mode（Plus）で質問</h4>
+              <p>再生中に「もっと詳しく」「具体例は？」など質問を挿入できる。ホストがリアルタイムで回答する（Plus プランのみ）。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <h3>カスタマイズオプション</h3>
+        <table>
+          <thead><tr><th>指示の種類</th><th>例</th></tr></thead>
+          <tbody>
+            <tr><td>対象読者</td><td>「高校生向けに」「エンジニア向けに」「経営者に説明する形式で」</td></tr>
+            <tr><td>フォーカス</td><td>「第3章の内容を中心に」「数値データと結論に絞って」</td></tr>
+            <tr><td>トーン</td><td>「学術的に」「カジュアルに」「テンポよく」</td></tr>
+            <tr><td>長さ</td><td>「5分程度で簡潔に」「詳細な解説で」</td></tr>
+            <tr><td>言語</td><td>「日本語で」「English で」</td></tr>
+          </tbody>
+        </table>
+        <h3 style="margin-top:16px">日本語 Audio Overview</h3>
+        <p>日本語ソースからの日本語 Audio Overview は生成可能。音質・自然さは英語に比べてやや劣るが、日常使いに十分なレベル。「日本語で」と明示的に指定すると確実。</p>
+        <div class="tip"><strong>活用シーン:</strong> 移動中・作業中のインプット。睡眠前の復習。英語論文を日本語ポッドキャストに変換して聴く。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── WORKFLOW ── -->
+  <section class="panel" id="workflow">
+    <h2>実践ワークフロー</h2>
+
+    <h3>ワークフロー A: 競合分析ノートブック</h3>
+    <div class="codeblock"><span class="cm"># 1. ソースを集める</span>
+競合A の会社ページ URL × 3
+競合B の決算発表 PDF × 2
+業界レポート PDF × 1
+関連 YouTube 解説動画 × 2
+
+<span class="cm"># 2. NotebookLM に追加 → Q&A で掘り下げ</span>
+Q: 「競合 A と B の収益モデルの違いを教えて」
+Q: 「業界全体のトレンドとして共通して言及されているキーワードは？」
+Q: 「我々の差別化ポイントになりうる領域はどこか？」
+
+<span class="cm"># 3. ブリーフィングドキュメントを生成 → Gemini Pro に渡して戦略メモ作成</span>
+→ "このブリーフィングを元に戦略案を3パターン作って" と Gemini Pro に投げる</div>
+
+    <h3>ワークフロー B: 論文サーベイ（学術・技術）</h3>
+    <div class="codeblock"><span class="cm"># arXiv などから関連論文 PDF を 10〜20 本ダウンロード</span>
+<span class="cm"># NotebookLM に一括追加</span>
+
+Q: 「各論文が提案する手法の共通点と相違点は？」
+Q: 「最も再現性が高いと思われる手法はどれで、その根拠は？」
+Q: 「この分野で未解決のまま残っている課題は何か？」
+
+<span class="cm"># スタディガイドを生成 → 理解度テスト</span>
+<span class="cm"># Audio Overview を生成 → 通勤中に聴いてインプット</span></div>
+
+    <h3>ワークフロー C: クリエイター向け資料整理</h3>
+    <div class="codeblock"><span class="cm"># 漫画・動画制作のリサーチに使う場合</span>
+
+<span class="cm"># Step 1: 参考資料を集める</span>
+作品の設定資料 PDF
+キャラクター設定書
+参考にする業界動画の YouTube URL
+コミックマーケットのトレンドレポート
+
+<span class="cm"># Step 2: Q&A でアイデア出し</span>
+Q: 「この設定資料の世界観から、読者が興味を持ちやすいサブプロットの候補を5つ挙げて」
+Q: 「参考動画で視聴者の反応が良かった演出パターンを分析して」
+Q: 「キャラクターAとBの関係性に潜む未展開の葛藤は何か？」
+
+<span class="cm"># Step 3: Audio Overview で設定の口頭確認</span>
+→ 移動中に聴いて自分の設定を再確認・矛盾発見</div>
+
+    <h3>ワークフロー D: NotebookLM → AI Studio → 本番パイプライン</h3>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-num">1</div>
+        <div class="flow-body">
+          <h4>NotebookLM でリサーチ・要約</h4>
+          <p>大量の生資料を整理してブリーフィングドキュメントを生成。</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">2</div>
+        <div class="flow-body">
+          <h4>ブリーフィングを AI Studio に貼り付けてプロトタイプ</h4>
+          <p>整理された情報を Gemini Pro のシステムプロンプトに組み込んでプロトタイピング。</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">3</div>
+        <div class="flow-body">
+          <h4>AI Studio でコード出力 → アプリに組み込む</h4>
+          <p>プロトタイプが固まったら AI Studio から Python/JS コードをエクスポートして自動化。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── API ── -->
+  <section class="panel" id="api">
+    <h2>API 連携・開発者向け情報</h2>
+    <div class="grid2">
+      <div>
+        <h3>NotebookLM に直接 API はない</h3>
+        <p>現時点で NotebookLM の機能を直接呼び出す公開 API は提供されていない（2026-05 時点）。ただし Gemini API（Google AI Studio 経由）を使って同等の仕組みを自作できる。</p>
+
+        <h4>Gemini API で NotebookLM 相当を実装</h4>
+        <div class="codeblock"><span class="kw">import</span> google.generativeai <span class="kw">as</span> genai
+
+genai.configure(api_key=<span class="st">"YOUR_API_KEY"</span>)
+
+<span class="cm"># システムプロンプトに資料を埋め込む</span>
+documents = [open(<span class="st">"paper1.txt"</span>).read(), open(<span class="st">"paper2.txt"</span>).read()]
+context = <span class="st">"\n\n---\n\n"</span>.join(documents)
+
+model = genai.GenerativeModel(
+    model_name=<span class="st">"gemini-2.5-pro"</span>,
+    system_instruction=<span class="st">f"""
+あなたは提供された資料のみに基づいて回答する研究アシスタントです。
+資料外の情報は使わないでください。回答には必ず引用箇所を示してください。
+
+=== 資料 ===
+{context}
+"""</span>
+)
+
+chat = model.start_chat()
+response = chat.send_message(<span class="st">"この資料のキーポイントを教えて"</span>)
+print(response.text)</div>
+      </div>
+      <div>
+        <h3>Files API でファイルを直接渡す</h3>
+        <div class="codeblock"><span class="kw">import</span> google.generativeai <span class="kw">as</span> genai
+<span class="kw">import</span> pathlib
+
+genai.configure(api_key=<span class="st">"YOUR_API_KEY"</span>)
+
+<span class="cm"># PDF を直接アップロード（Files API）</span>
+pdf_file = genai.upload_file(
+    path=<span class="st">"research_paper.pdf"</span>,
+    mime_type=<span class="st">"application/pdf"</span>
+)
+
+model = genai.GenerativeModel(<span class="st">"gemini-2.5-pro"</span>)
+response = model.generate_content([
+    pdf_file,
+    <span class="st">"この論文の結論と実験方法を要約して"</span>
+])
+print(response.text)
+
+<span class="cm"># ファイルは 48 時間後に自動削除</span>
+<span class="cm"># キャッシュ機能でコスト削減可（--enable-caching）</span></div>
+
+        <h3 style="margin-top:16px">Document AI との組み合わせ（上級）</h3>
+        <ul>
+          <li>Google Cloud Document AI で高精度 OCR → テキスト抽出</li>
+          <li>抽出テキストを Gemini API の context に注入</li>
+          <li>複数 PDF の大規模バッチ処理が可能</li>
+        </ul>
+
+        <div class="note"><strong>Context Caching（コスト最適化）:</strong> Gemini API の Context Caching を使うと、同じドキュメントを繰り返し参照するワークフローで大幅なコスト削減が可能。1M トークンのドキュメントを毎回送らなくてよい。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── LIMITS ── -->
+  <section class="panel" id="limits">
+    <h2>限界と注意点</h2>
+    <div class="grid2">
+      <div>
+        <div class="card card-red">
+          <h4>⚠ ハードリミット</h4>
+          <ul>
+            <li>ネット検索なし — ソース外の最新情報は参照不可</li>
+            <li>ソースを超えた推論は行わない（ソース接地が強み でもある）</li>
+            <li>コード実行不可（Code Interpreter 機能なし）</li>
+            <li>画像生成不可</li>
+            <li>外部 API 呼び出し不可</li>
+            <li>ダイナミックなデータ（リアルタイム株価など）不可</li>
+          </ul>
+        </div>
+      </div>
+      <div>
+        <div class="card card-red">
+          <h4>⚠ 実務上の注意</h4>
+          <ul>
+            <li><strong>機密情報の取り扱い:</strong> 無料プランはデータが学習に使われる可能性あり → 企業機密は Business/Enterprise プランを使用</li>
+            <li><strong>PDF の品質:</strong> スキャン PDF は OCR 精度に依存。手書きは不可</li>
+            <li><strong>YouTube 字幕:</strong> 自動生成字幕は誤認識が多い。手動字幕付き動画を優先</li>
+            <li><strong>Audio Overview の精度:</strong> 技術的な固有名詞の発音が誤ることがある</li>
+            <li><strong>長すぎる URL:</strong> 動的ページ（JavaScript が必要なページ）は取得できない</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="warn" style="margin-top:8px"><strong>セキュリティ上の重要な注意:</strong> 未公開の事業戦略、顧客データ、個人情報を含む文書は、無料・Plus プランでは追加しないこと。Enterprise プランではデータ保護保証があるが、その他のプランではデータ利用ポリシーを必ず確認すること。</div>
+  </section>
+
+  <!-- ── COMPARISON ── -->
+  <section class="panel" id="vs">
+    <h2>他ツールとの比較</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>ツール</th>
+          <th>強み</th>
+          <th>弱み</th>
+          <th>NotebookLM との使い分け</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>NotebookLM</strong></td>
+          <td>ソース接地の強さ、Audio Overview、引用付き回答</td>
+          <td>API なし、外部検索なし</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td><strong>Gemini Advanced</strong></td>
+          <td>Web 検索統合、Deep Research、汎用タスク</td>
+          <td>ソース管理が煩雑</td>
+          <td>Web 情報も含む場合は Gemini Advanced。手持ち資料のみなら NotebookLM</td>
+        </tr>
+        <tr>
+          <td><strong>ChatGPT + ファイル</strong></td>
+          <td>Code Interpreter、幅広いプラグイン</td>
+          <td>引用付き回答が弱い、ソース管理なし</td>
+          <td>コード実行や可視化が必要なら ChatGPT。文書分析なら NotebookLM</td>
+        </tr>
+        <tr>
+          <td><strong>Claude + プロジェクト</strong></td>
+          <td>長文理解の精度が高い、推論力</td>
+          <td>Audio Overview なし、ソース管理 UI が弱め</td>
+          <td>複雑な推論・長文ドキュメントの分析は Claude。音声化・大量ソースは NotebookLM</td>
+        </tr>
+        <tr>
+          <td><strong>Perplexity</strong></td>
+          <td>リアルタイム Web 検索、引用付き</td>
+          <td>手持ちドキュメントの管理が不得意</td>
+          <td>最新 Web 情報が必要なら Perplexity。手持ち資料から深掘りなら NotebookLM</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ── TIPS ── -->
+  <section class="panel panel-green">
+    <h2>実践的なプロのヒント</h2>
+    <div class="grid2">
+      <div>
+        <h4>📌 ソース追加のベストプラクティス</h4>
+        <ul>
+          <li><strong>テーマを絞る:</strong> 1 ノートブック = 1 テーマで精度向上</li>
+          <li><strong>PDF より URL:</strong> URL 追加の方がリッチなメタ情報が取れることがある</li>
+          <li><strong>YouTube + PDF の組み合わせ:</strong> 解説動画 + 論文は相性が良い</li>
+          <li><strong>目次付き PDF を優先:</strong> 目次があると NotebookLM の構造理解が向上</li>
+        </ul>
+
+        <h4 style="margin-top:14px">📌 Q&A を上手く使う</h4>
+        <ul>
+          <li>「ソースに記載がない場合は明示してください」と前置きする</li>
+          <li>「表形式で整理して」「箇条書きで」と出力形式を指定</li>
+          <li>「〇〇に詳しくない人向けに説明して」で難易度調整</li>
+          <li>良い回答はノートにピン留めして再利用</li>
+        </ul>
+      </div>
+      <div>
+        <h4>📌 Audio Overview を最大活用</h4>
+        <ul>
+          <li>生成前に「カスタマイズ」で対象読者・フォーカスを指定</li>
+          <li>生成後は MP3 でダウンロードしてポッドキャストアプリで聴く</li>
+          <li>英語ソースからの英語 Audio Overview が最高品質</li>
+          <li>Interactive Mode（Plus）で再生中に疑問点を追加質問</li>
+        </ul>
+
+        <h4 style="margin-top:14px">📌 出力物の活用</h4>
+        <ul>
+          <li>ブリーフィングドキュメント → Gemini Pro に渡して深掘り分析</li>
+          <li>スタディガイド → Anki や NotionDB に転記して記憶定着</li>
+          <li>タイムライン → 可視化ツール（Mermaid 等）に変換</li>
+          <li>スライド出力 → Google スライドで即プレゼンテーション化</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── REFERENCES ── -->
+  <section class="panel">
+    <h2>参照リンク</h2>
+    <ul>
+      <li><a href="https://notebooklm.google.com" target="_blank" rel="noopener">notebooklm.google.com</a> — NotebookLM 本体</li>
+      <li><a href="google-ecosystem.html">Google AI エコシステム総覧</a> — Gemini/Veo/Flow との全体像</li>
+      <li><a href="gemini.html">Gemini 深掘り</a> — モデルスペック・ベンチマーク</li>
+      <li><a href="ai-studio.html">Google AI Studio 完全ガイド</a> — API 開発プレイグラウンド</li>
+      <li><a href="../../research/gemini-recent-updates.html">Gemini 最新アップデート</a> — リリース追跡</li>
+    </ul>
+    <p style="margin-top:12px"><small>最終更新: 2026-05-31 | 情報は公式ドキュメントおよびリリース情報に基づく。プラン詳細は最新の公式ページで確認を。</small></p>
+  </section>
+
+</div>
+</body>
+</html>
