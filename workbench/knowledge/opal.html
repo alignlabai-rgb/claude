@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Google Opal — ノーコード AI アプリビルダー | Tech Workbench</title>
+<style>
+:root {
+    --accent: #06b6d4;
+    --accent2: #8b5cf6;
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #21262d;
+    --border: rgba(255,255,255,0.08);
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --radius: 12px;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; line-height:1.65; font-size:16px; }
+a { color:var(--accent); text-decoration:none; }
+a:hover { text-decoration:underline; }
+.page-wrap { max-width:960px; margin:0 auto; padding:32px 20px 80px; }
+nav { background:var(--surface); border-bottom:1px solid var(--border); padding:12px 20px; font-size:0.85rem; }
+nav a { color:var(--muted); margin-right:6px; }
+nav a:hover { color:var(--text); }
+nav span { color:var(--muted); margin-right:6px; }
+.hero { background:linear-gradient(135deg, #0891b2, #6d28d9); border-radius:var(--radius); padding:48px 40px; margin-bottom:40px; }
+.hero h1 { font-size:2.2rem; font-weight:800; color:#fff; margin-bottom:8px; }
+.hero .sub { color:rgba(255,255,255,0.88); font-size:1.05rem; margin-bottom:24px; max-width:640px; }
+.chips { display:flex; flex-wrap:wrap; gap:8px; }
+.chip { background:rgba(255,255,255,0.18); color:#fff; padding:4px 14px; border-radius:20px; font-size:0.8rem; font-weight:600; }
+.section { margin-bottom:48px; }
+.section > h2 { font-size:1.4rem; font-weight:700; margin-bottom:16px; padding-bottom:8px; border-bottom:2px solid var(--accent); color:var(--accent); }
+.section > h2.purple { border-color:var(--accent2); color:var(--accent2); }
+p { margin-bottom:12px; }
+ul, ol { padding-left:1.5em; margin-bottom:12px; }
+li { margin-bottom:5px; }
+.grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:20px; margin-bottom:20px; }
+.card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:24px; }
+.card h3 { font-size:1.05rem; font-weight:700; margin-bottom:10px; color:var(--accent); }
+.card h3.purple { color:var(--accent2); }
+.card h3.green { color:#4fffb0; }
+.card .price { font-size:1.4rem; font-weight:800; color:var(--accent); margin:8px 0 12px; }
+.table-wrap { overflow-x:auto; margin:16px 0; }
+table { width:100%; border-collapse:collapse; font-size:0.9rem; }
+th { background:var(--surface2); color:var(--accent); padding:10px 14px; text-align:left; border:1px solid var(--border); }
+td { padding:9px 14px; border:1px solid var(--border); vertical-align:top; }
+tr:nth-child(even) td { background:rgba(255,255,255,0.02); }
+pre { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:20px; overflow-x:auto; margin:16px 0; }
+code { font-family:'JetBrains Mono','Fira Code',monospace; font-size:0.85rem; color:#79c0ff; }
+.cm { color:#8b949e; }
+.highlight-box { background:rgba(6,182,212,0.08); border-left:3px solid var(--accent); border-radius:0 8px 8px 0; padding:16px 20px; margin:16px 0; }
+.highlight-box.purple { background:rgba(139,92,246,0.08); border-color:var(--accent2); }
+.highlight-box.green { background:rgba(79,255,176,0.08); border-color:#4fffb0; }
+.badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:0.75rem; font-weight:700; margin-bottom:8px; }
+.badge-cyan { background:rgba(6,182,212,0.15); color:var(--accent); }
+.badge-purple { background:rgba(139,92,246,0.15); color:var(--accent2); }
+.badge-green { background:rgba(79,255,176,0.15); color:#4fffb0; }
+.example-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; margin:16px 0; }
+.example-card { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:18px; }
+.example-card .tag { font-size:0.72rem; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:6px; }
+.example-card h4 { font-size:0.95rem; font-weight:700; margin-bottom:6px; }
+.example-card p { font-size:0.88rem; color:var(--muted); margin:0; line-height:1.55; }
+.ok { color:#4fffb0; font-weight:700; }
+.no { color:#f85149; }
+.partial { color:#facc15; }
+.flow-diagram { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:28px; margin:20px 0; }
+.flow-row { display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:16px; }
+.flow-node { background:rgba(6,182,212,0.12); border:2px solid var(--accent); border-radius:10px; padding:12px 18px; text-align:center; min-width:120px; }
+.flow-node.purple { background:rgba(139,92,246,0.12); border-color:var(--accent2); }
+.flow-node.green { background:rgba(79,255,176,0.08); border-color:#4fffb0; }
+.flow-node .node-label { font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--accent); margin-bottom:4px; }
+.flow-node.purple .node-label { color:var(--accent2); }
+.flow-node.green .node-label { color:#4fffb0; }
+.flow-node .node-title { font-size:0.92rem; font-weight:700; }
+.flow-arrow { color:var(--muted); font-size:1.4rem; }
+.step-list { counter-reset:steps; list-style:none; padding:0; }
+.step-list li { counter-increment:steps; display:flex; gap:16px; margin-bottom:20px; align-items:flex-start; }
+.step-list li::before { content:counter(steps); min-width:32px; height:32px; background:var(--accent); color:#000; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:0.9rem; flex-shrink:0; }
+footer { text-align:center; padding:32px 20px; color:var(--muted); font-size:0.85rem; border-top:1px solid var(--border); margin-top:60px; }
+footer a { color:var(--muted); }
+</style>
+</head>
+<body>
+<nav>
+  <a href="../../index.html">Hub</a> <span>›</span>
+  <a href="./index.html">LLM 個別深掘り</a> <span>›</span>
+  <a href="./google-ecosystem.html">Google AI エコシステム</a> <span>›</span>
+  Opal
+</nav>
+
+<main class="page-wrap">
+
+<div class="hero">
+  <h1>Google Opal — ノーコード AI アプリビルダー</h1>
+  <p class="sub">Google Labs 発のビジュアル AI アプリ構築ツール。コードなしで Gemini・Imagen・Veo を組み合わせた共有可能な AI ミニアプリを数分で作れる。2026年2月に Agent Step が追加され、より高度な自律ワークフローが可能に。</p>
+  <div class="chips">
+    <span class="chip">ノーコード</span>
+    <span class="chip">Gemini 3 Flash</span>
+    <span class="chip">Imagen 4 統合</span>
+    <span class="chip">Agent Step</span>
+    <span class="chip">Workspace 連携</span>
+    <span class="chip">無料ベータ</span>
+    <span class="chip">opal.google.com</span>
+  </div>
+</div>
+
+<!-- 1. Opal とは -->
+<section class="section">
+  <h2>1. Google Opal とは</h2>
+  <p><strong>Google Opal</strong>（旧称: Project Opal）は Google Labs が 2025年7月 に公開したノーコード AI アプリビルダーです。プログラミング不要で Gemini・Imagen・Veo をビジュアルなノードエディタでつなぎ合わせ、共有・公開できる小規模 AI アプリ（「オパール」）を作成できます。</p>
+  <p>発想は「Gems（カスタム AI チャットボット）の次のステップ」。Gems がチャット体験のカスタマイズなら、Opal はフォーム・出力・外部連携を持つ <strong>アプリとして配布できる AI ツール</strong> を作るものです。</p>
+
+  <div class="highlight-box">
+    <p><strong>位置づけ:</strong> Opal は Google のノーコード AI レイヤーを担います。開発者には AI Studio / Vertex AI があり、Opal はコードを書かないユーザー・ビジネスアナリスト・クリエイターが同等のワークフローを自力で構築できる場所として機能します。</p>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>項目</th><th>内容</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>公開日</td><td>2025年7月（Google Labs ベータ）</td></tr>
+        <tr><td>Agent Step 追加</td><td>2026年2月（Gemini 3 Flash 搭載）</td></tr>
+        <tr><td>アクセス</td><td>opal.google.com（デスクトップ推奨）/ Gemini アプリ内「実験的 Gems ビルダー」</td></tr>
+        <tr><td>料金</td><td>無料ベータ（2026年5月時点）</td></tr>
+        <tr><td>対象ユーザー</td><td>非エンジニア・クリエイター・ビジネスアナリスト・教育者</td></tr>
+        <tr><td>出力先</td><td>共有可能な URL / Google Docs / Google Sheets / Google Slides</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 2. 基本ブロック -->
+<section class="section">
+  <h2>2. 基本ブロック — 3層アーキテクチャ</h2>
+  <p>Opal のアプリは <strong>入力 → 処理 → 出力</strong> の3層で構成されます。各レイヤーのブロックをノードエディタ上でつなぐだけでワークフローが完成します。</p>
+
+  <div class="flow-diagram">
+    <div class="flow-row">
+      <div class="flow-node">
+        <div class="node-label">入力</div>
+        <div class="node-title">User Input</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node purple">
+        <div class="node-label">処理</div>
+        <div class="node-title">Generate</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node green">
+        <div class="node-label">出力</div>
+        <div class="node-title">Output</div>
+      </div>
+    </div>
+    <p style="font-size:0.85rem; color:var(--muted); margin-top:8px;">複数の Generate ブロックを並列・直列に連結して複雑なパイプラインを組むことも可能</p>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <span class="badge badge-cyan">入力層</span>
+      <h3>User Input ブロック</h3>
+      <ul>
+        <li><strong>テキスト入力</strong>: フリーテキスト・セレクトボックス・トグル</li>
+        <li><strong>ファイルアップロード</strong>: PDF / 画像 / CSV を受け取れる</li>
+        <li><strong>フォームフィールド</strong>: ラベル・プレースホルダー・バリデーションを設定可</li>
+        <li>複数フィールドを組み合わせて構造化入力を作れる</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="badge badge-purple">処理層</span>
+      <h3 class="purple">Generate ブロック</h3>
+      <ul>
+        <li><strong>Gemini 3 Flash</strong>: テキスト生成・要約・分類・翻訳</li>
+        <li><strong>Imagen 4</strong>: 画像生成（テキスト → 画像・画像編集）</li>
+        <li><strong>Veo 3</strong>: 動画生成（テキスト → 短尺動画クリップ）</li>
+        <li><strong>Agent Step</strong>: 目標ベースの自律処理（2026年2月〜）</li>
+        <li>ブロックの出力を次のブロックの入力として受け渡し可能</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="badge badge-green">出力層</span>
+      <h3 class="green">Output ブロック</h3>
+      <ul>
+        <li><strong>インライン表示</strong>: テキスト・画像・動画をアプリ内でレンダリング</li>
+        <li><strong>Google Docs</strong> へ書き出し（フォーマット保持）</li>
+        <li><strong>Google Sheets</strong> へ書き出し（表形式データ）</li>
+        <li><strong>Google Slides</strong> へ書き出し（プレゼン生成）</li>
+        <li>共有 URL でアプリそのものを配布</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 3. Agent Step -->
+<section class="section">
+  <h2>3. Agent Step（2026年2月〜）— Gemini 3 Flash 搭載</h2>
+  <p>2026年2月のアップデートで追加された <strong>Agent Step</strong> は、Opal に自律的なマルチステップ処理能力をもたらします。従来の静的なノード連結と異なり、<strong>ゴールベース</strong>でダイナミックにルーティングを決定します。</p>
+
+  <div class="highlight-box purple">
+    <p><strong>Agent Step の特徴:</strong> Gemini 3 Flash を推論エンジンとして使用。ユーザーが「目標」を定義すると、Agent が必要なブロックの順序・繰り返し・条件分岐を自律的に決定して実行します。セッション間のメモリ保持もサポート。</p>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h3>従来の静的フロー</h3>
+      <ul>
+        <li>ノードを手動でつなぐ</li>
+        <li>処理順序は固定</li>
+        <li>条件分岐はチェーンで擬似的に実現</li>
+        <li>毎回同じパスを実行</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 class="purple">Agent Step（新）</h3>
+      <ul>
+        <li>目標を記述するだけで実行計画を自動生成</li>
+        <li>動的ルーティング（入力内容に応じてパスが変化）</li>
+        <li>ループ処理・再試行を自律的に判断</li>
+        <li>セッションをまたいだ記憶（Memory）保持</li>
+        <li>Gemini 3 Flash による推論エンジン</li>
+      </ul>
+    </div>
+  </div>
+
+  <p><strong>Agent Step の典型的なユースケース:</strong></p>
+  <ul>
+    <li>コンテンツ品質チェック → 不合格なら自動で再生成するループ</li>
+    <li>ユーザーの入力タイプを判断してルーティング（テキストなら要約、画像なら分析）</li>
+    <li>過去のセッション履歴を参照して継続的なコーチングや提案を実施</li>
+    <li>複数ソースから情報収集し、条件を満たすまで反復検索</li>
+  </ul>
+</section>
+
+<!-- 4. Google Workspace 連携 -->
+<section class="section">
+  <h2>4. Google Workspace 連携</h2>
+  <p>Opal の Output ブロックは Google Workspace と直接統合されており、AI の出力をそのままドキュメント・スプレッドシート・スライドに書き出せます。</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>連携先</th><th>できること</th><th>典型的な使い方</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Google Docs</strong></td>
+          <td>構造化テキスト・見出し・リスト・画像の書き出し</td>
+          <td>ブログ記事・レポート・メール文章の自動生成</td>
+        </tr>
+        <tr>
+          <td><strong>Google Sheets</strong></td>
+          <td>行列データ・CSV 形式のデータを自動入力</td>
+          <td>競合分析・SEO キーワードリスト・FAQ 一覧の生成</td>
+        </tr>
+        <tr>
+          <td><strong>Google Slides</strong></td>
+          <td>スライド構成・テキスト・画像を自動挿入</td>
+          <td>製品紹介デッキ・会議サマリー・教材の自動生成</td>
+        </tr>
+        <tr>
+          <td><strong>共有 URL</strong></td>
+          <td>アプリそのものを URL で公開・埋め込み</td>
+          <td>社内ツール・クライアント向けデモ・ウェブサービスとして配布</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="highlight-box">
+    <p>🔗 Google アカウントで認証すれば、生成したコンテンツが直接マイドライブに保存されます。Gmail や Google Meet との直接連携は現時点（2026年5月）では Gemini Advanced / Workspace AI の領域で、Opal 単体には含まれません。</p>
+  </div>
+</section>
+
+<!-- 5. テンプレートギャラリー -->
+<section class="section">
+  <h2>5. テンプレートギャラリー</h2>
+  <p>Opal にはすぐ使えるテンプレートが多数用意されています。カスタマイズの起点として活用できます。</p>
+
+  <div class="example-grid">
+    <div class="example-card">
+      <div class="tag">コンテンツ生成</div>
+      <h4>ブログ記事ライター</h4>
+      <p>キーワードとターゲット読者を入力するだけで SEO 最適化された記事を生成。Docs 出力対応。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">マーケティング</div>
+      <h4>動画マーケティングコピー</h4>
+      <p>商品名・ターゲット層・トーンを指定してSNS各プラットフォーム向けキャプション一式を生成。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">カスタマーサポート</div>
+      <h4>サポートトリアージ</h4>
+      <p>問い合わせ内容を分類して優先度付け・担当部門振り分け・返答テンプレートを自動生成。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">コンテンツ変換</div>
+      <h4>コンテンツリパッケージ</h4>
+      <p>長文記事 / 動画スクリプト / ポッドキャスト文字起こしを SNS 投稿・要約・Twitter スレッドに変換。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">ミーティング</div>
+      <h4>ミーティングノート整理</h4>
+      <p>議事録テキストを貼り付けると決定事項・アクションアイテム・次回アジェンダを自動抽出。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">SEO</div>
+      <h4>SEO キーワードリスト</h4>
+      <p>テーマと競合 URL を入力すると関連キーワード・検索意図・難易度を Sheets に書き出す。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">画像生成</div>
+      <h4>AI 画像コンテンツジェネレーター</h4>
+      <p>ブランドトーン・テーマを設定すると Imagen 4 でビジュアル素材を一括生成。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">採用</div>
+      <h4>求人票ライター</h4>
+      <p>職種・スキル要件・企業カルチャーを入力して採用ページ用の求人票を即生成。</p>
+    </div>
+  </div>
+</section>
+
+<!-- 6. アクセスと料金 -->
+<section class="section">
+  <h2>6. アクセス方法と料金</h2>
+
+  <div class="grid">
+    <div class="card">
+      <span class="badge badge-green">無料</span>
+      <h3 class="green">opal.google.com</h3>
+      <div class="price green" style="font-size:1.1rem;">無料ベータ</div>
+      <ul>
+        <li>Google アカウントでログインするだけ</li>
+        <li>フルエディタ（ノードベース）</li>
+        <li>Agent Step 対応</li>
+        <li>Workspace 書き出し対応</li>
+        <li>作成アプリ数・公開数: 制限なし（ベータ中）</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="badge badge-cyan">実験版</span>
+      <h3>Gemini アプリ内</h3>
+      <div class="price" style="font-size:1.1rem;">Gemini 内</div>
+      <ul>
+        <li>「実験的 Gems ビルダー」として統合</li>
+        <li>簡易版 UI（フル機能は opal.google.com）</li>
+        <li>Gemini Free / Advanced 両プランで利用可</li>
+        <li>モバイルからのアクセスに適している</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="badge badge-purple">今後</span>
+      <h3 class="purple">有料プラン（予定）</h3>
+      <div class="price purple" style="font-size:1.1rem;">未発表</div>
+      <ul>
+        <li>ベータ終了後は利用量ベースの課金が予想される</li>
+        <li>Gemini Advanced / Workspace への統合の可能性</li>
+        <li>エンタープライズ向け Vertex AI 連携プランも検討中</li>
+        <li>現時点（2026年5月）では無料で全機能が使える</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="highlight-box">
+    <p>⏰ <strong>今が使い時:</strong> 無料ベータ中は機能制限なし。有料化のタイミングは未発表ですが、早期に試して使い方を把握しておくと有利です。Google アカウント（Gmail 等）があればすぐ始められます。</p>
+  </div>
+</section>
+
+<!-- 7. ビルド手順 -->
+<section class="section">
+  <h2>7. Opal アプリを作る — ステップバイステップ</h2>
+  <p>例として「ブログ記事ジェネレーター + アイキャッチ画像生成」アプリを作る流れを示します。</p>
+
+  <ol class="step-list">
+    <li>
+      <div>
+        <strong>opal.google.com にアクセス → 「新しい Opal を作成」</strong><br>
+        Google アカウントでログイン後、「＋ 新規作成」ボタンをクリック。空のキャンバスが開きます。テンプレートから始めることも可能。
+      </div>
+    </li>
+    <li>
+      <div>
+        <strong>User Input ブロックを追加</strong><br>
+        左パネルから「User Input」をキャンバスにドラッグ。フィールドを設定:<br>
+        <code>記事テーマ</code>（テキスト）/ <code>ターゲット読者</code>（テキスト）/ <code>文字数</code>（セレクトボックス: 500 / 1000 / 2000字）
+      </div>
+    </li>
+    <li>
+      <div>
+        <strong>Generate（Gemini）ブロックを追加 → 接続</strong><br>
+        「Generate → Gemini」ブロックを追加し、User Input の出力矢印をつなぐ。プロンプトテンプレートを記述:<br>
+        <pre><code>{{記事テーマ}} について {{ターゲット読者}} 向けに
+SEO 最適化された {{文字数}} の記事を書いてください。
+見出し構成・本文・まとめを含めてください。</code></pre>
+      </div>
+    </li>
+    <li>
+      <div>
+        <strong>Generate（Imagen）ブロックを追加 → 並列接続</strong><br>
+        User Input ブロックから Imagen 4 ブロックにも接続し、アイキャッチ画像を同時生成:<br>
+        <pre><code>{{記事テーマ}} を視覚的に表現したプロフェッショナルな
+ブログアイキャッチ画像。16:9 横長フォーマット。</code></pre>
+      </div>
+    </li>
+    <li>
+      <div>
+        <strong>Output（Google Docs）ブロックを追加 → 接続</strong><br>
+        両方の Generate ブロックの出力を Output → Docs ブロックに接続。ドキュメント名テンプレートを設定: <code>{{記事テーマ}}_記事草稿_{{日時}}</code>
+      </div>
+    </li>
+    <li>
+      <div>
+        <strong>プレビュー → 動作確認 → 公開</strong><br>
+        右上「プレビュー」でテスト実行。問題なければ「公開」をクリックして URL を取得。
+        社内 Slack や Notion にリンクを貼れば、誰でもコードなしでアプリが使えます。
+      </div>
+    </li>
+  </ol>
+</section>
+
+<!-- 8. 比較表 -->
+<section class="section">
+  <h2 class="purple">8. Opal vs 競合ツール比較</h2>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>観点</th>
+          <th>Google Opal</th>
+          <th>Google AI Studio</th>
+          <th>Gemini Advanced（Gems）</th>
+          <th>Antigravity</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>対象ユーザー</strong></td>
+          <td>非エンジニア・クリエイター</td>
+          <td>開発者・研究者</td>
+          <td>エンドユーザー（会話利用）</td>
+          <td>開発者・エンジニア</td>
+        </tr>
+        <tr>
+          <td><strong>コーディング</strong></td>
+          <td><span class="ok">不要</span> ノードエディタ</td>
+          <td><span class="partial">軽度〜必要</span> API/SDK</td>
+          <td><span class="ok">不要</span> 設定のみ</td>
+          <td><span class="no">必要</span> Python/JS</td>
+        </tr>
+        <tr>
+          <td><strong>アプリとして配布</strong></td>
+          <td><span class="ok">◎</span> URL で共有・公開</td>
+          <td><span class="partial">△</span> API 経由で実装が必要</td>
+          <td><span class="partial">△</span> Gems はチャット体験のみ</td>
+          <td><span class="ok">◎</span> フル制御でデプロイ</td>
+        </tr>
+        <tr>
+          <td><strong>マルチモーダル</strong></td>
+          <td>Gemini / Imagen / Veo</td>
+          <td>Gemini / Imagen / Veo（全モデル）</td>
+          <td>Gemini（Imagen一部）</td>
+          <td>Gemini / Imagen / Veo（API経由）</td>
+        </tr>
+        <tr>
+          <td><strong>Workspace 連携</strong></td>
+          <td><span class="ok">◎</span> Docs/Sheets/Slides</td>
+          <td><span class="no">×</span> なし</td>
+          <td><span class="ok">◎</span> Workspace AI 統合</td>
+          <td><span class="partial">△</span> API/SDK で自前実装</td>
+        </tr>
+        <tr>
+          <td><strong>自律エージェント</strong></td>
+          <td>Agent Step（簡易）</td>
+          <td>Agent Builder（高度）</td>
+          <td>Gems（限定的）</td>
+          <td>Managed Agents（本格）</td>
+        </tr>
+        <tr>
+          <td><strong>料金</strong></td>
+          <td>無料ベータ（2026/05時点）</td>
+          <td>無料枠あり、従量課金</td>
+          <td>AI Pro $19.99/月〜</td>
+          <td>AI Ultra $249.99/月（Antigravity付）</td>
+        </tr>
+        <tr>
+          <td><strong>向いている用途</strong></td>
+          <td>プロトタイプ・社内ツール・共有AI</td>
+          <td>API 検証・実験・開発</td>
+          <td>個人生産性・チャット利用</td>
+          <td>本番エージェント・複雑システム</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="highlight-box purple">
+    <p>💡 <strong>使い分けの指針:</strong> 「コードを書かずに AI アプリを人に使ってもらいたい」→ Opal。「Gemini と会話したい・Deep Research したい」→ Gemini Advanced。「API で自分のシステムに組み込む」→ AI Studio / Vertex AI。「エージェントを本格的に構築する」→ Antigravity。</p>
+  </div>
+</section>
+
+<!-- 9. ユースケース 12選 -->
+<section class="section">
+  <h2>9. ユースケース 12 選</h2>
+
+  <div class="example-grid">
+    <div class="example-card">
+      <div class="tag">コンテンツ</div>
+      <h4>SNS 投稿一括生成</h4>
+      <p>1つのブログ記事 URL を入力すると X・Instagram・LinkedIn 向けに最適化した投稿文を自動生成。Sheets 書き出し対応。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">EC</div>
+      <h4>商品説明文ライター</h4>
+      <p>商品名・特徴・ターゲット価格帯を入力し、Amazon・楽天・自社 EC 向けの異なるトーンの説明文を一括生成。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">教育</div>
+      <h4>クイズ生成アプリ</h4>
+      <p>教材テキストをアップロードするだけで選択問題・穴埋め・正誤問題を自動生成。Docs 形式で配布可能。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">営業</div>
+      <h4>営業メール自動生成</h4>
+      <p>企業名・担当者名・課題を入力すると個別最適化した営業メール案を3パターン生成。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">HR</div>
+      <h4>面接フィードバックレポート</h4>
+      <p>面接メモを貼ると評価サマリー・強み・懸念点・採用判断のドラフトを自動生成。Docs 書き出し。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">ビジュアル</div>
+      <h4>ブランド素材ジェネレーター</h4>
+      <p>ブランドカラー・キーワードを入力し Imagen 4 で SNS バナー・アイコン・ヘッダー画像を一括生成。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">サポート</div>
+      <h4>FAQ ビルダー</h4>
+      <p>過去の問い合わせログ CSV をアップロードすると Q&amp;A 一覧を自動生成し Docs に出力。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">データ入力</div>
+      <h4>データクリーニングツール</h4>
+      <p>スプレッドシートの汚れたデータを貼り付けると Gemini が整形・正規化して Sheets に書き出す。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">翻訳</div>
+      <h4>多言語コンテンツ変換</h4>
+      <p>原文を入力して対象言語を選択するだけで品質の高い翻訳＋ローカライズを Docs に一括出力。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">制作</div>
+      <h4>脚本ドラフター</h4>
+      <p>あらすじ・登場人物・場面数を入力すると映像向け台本の初稿を Docs フォーマットで生成。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">分析</div>
+      <h4>競合分析レポーター</h4>
+      <p>競合他社名と自社の強みを入力すると比較分析を Agent Step で多角的に行い Slides に出力。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">研修</div>
+      <h4>新人研修資料ジェネレーター</h4>
+      <p>業務マニュアル PDF をアップロードすると研修スライド・確認テスト・チェックリストを自動生成。</p>
+    </div>
+  </div>
+</section>
+
+<!-- 10. 制限と展望 -->
+<section class="section">
+  <h2>10. 現時点の制限と今後の展望</h2>
+
+  <div class="grid">
+    <div class="card">
+      <h3>現時点の制限（2026年5月）</h3>
+      <ul>
+        <li><strong>真の条件分岐なし</strong>: if/else 分岐はチェーン接続で擬似的に実現（Agent Step で一部緩和）</li>
+        <li><strong>本番エンタープライズ向けではない</strong>: SLA・VPC 隔離・監査ログが必要な場合は Vertex AI へ</li>
+        <li><strong>カスタムドメイン非対応</strong>: 公開 URL は google-opal.app サブドメイン固定</li>
+        <li><strong>API 接続</strong>: 外部 REST API / Webhook の直接呼び出しは未対応</li>
+        <li><strong>利用量上限</strong>: ベータ中は非公式な利用量制限が存在する場合あり</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 class="purple">今後の期待機能</h3>
+      <ul>
+        <li><strong>外部 API ブロック</strong>: REST/GraphQL 連携ブロックの追加</li>
+        <li><strong>真の条件分岐</strong>: if/else ノードの正式サポート</li>
+        <li><strong>Vertex AI バックエンド</strong>: エンタープライズ向けに Vertex AI で動作するモード</li>
+        <li><strong>カスタムドメイン</strong>: 独自ドメインでの公開</li>
+        <li><strong>Analytics</strong>: アプリ利用統計・エラーログのダッシュボード</li>
+        <li><strong>Gemini Advanced 統合深化</strong>: Jules や Deep Research との連携</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="highlight-box">
+    <p>🗺 <strong>Opal の立ち位置:</strong> Opal は Google の「AI を誰でも使えるようにする」戦略の重要な層です。今後 Vertex AI の Agent Builder（開発者向け）と段階的に機能が収束していくことが予想されます。ノーコードとプロコードの中間を埋めるツールとして注目です。</p>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p>関連: <a href="google-ecosystem.html">Google AI エコシステム総覧</a> &nbsp;|&nbsp; <a href="anti-gravity.html">Antigravity</a> &nbsp;|&nbsp; <a href="ai-studio.html">AI Studio</a> &nbsp;|&nbsp; <a href="gemini-advanced.html">Gemini Advanced</a> &nbsp;|&nbsp; <a href="vertex-ai.html">Vertex AI</a></p>
+  <p style="margin-top:8px;">最終更新: 2026-05-31 &nbsp;|&nbsp; <a href="../../index.html">Hub トップ</a> &nbsp;|&nbsp; <a href="index.html">← Knowledge Hub</a></p>
+</footer>
+</body>
+</html>
