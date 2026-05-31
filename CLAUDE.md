@@ -5,7 +5,7 @@
 実験的に運用する前提はありますが、それは「壊してよい」という意味ではありません。
 正しい前提は `安全に更新し、必要なら戻せるようにする` です。
 
-**最終更新:** 2026-05-26
+**最終更新:** 2026-05-31
 
 ---
 
@@ -35,23 +35,31 @@
 
 ---
 
-## トップ index.html の構造（2026-05-25 から）
+## トップ index.html の構造（2026-05-31 から）
 
-トップは以下の3カテゴリ構造で運用しています:
+トップは以下の **4カテゴリ構造** で運用しています（ADR-012 参照）:
 
-### 制作・技術コア（主軸）
+### 🎬 生成AI・クリエイター（主軸）
 
 - **Creator System**（spotlight: 力点領域）— 動画・漫画パイプライン、評価、マネタイズ
 - **Claw Stack** — Claude / PicoClaw / NanoClaw / OpenClaw
-- **Tech Workbench** — 開発実務（git・docker・mac・VSCode・Vibe Coding 等）
-- **LLM 個別深掘り** — ベンダー別の特性・実装メモ（workbench/knowledge 配下）
+- **Google AI エコシステム** — Gemini / Veo / Flow / Imagen / Gemma（制作パイプライン直結）
 
-### ナレッジ・資料
+### 💼 エンタープライズAI・生産性
+
+- **Microsoft AI エコシステム**（spotlight）— M365 Copilot / Power Platform / Copilot Studio / Azure AI Foundry / Phi-4
+- **Briefings & 配布資料** — AI ツール活用のデモ・配布資料アーカイブ（demos/）
+
+> ⚠️ Google AI は「生成AI・クリエイター」、Microsoft AI は「エンタープライズAI・生産性」に分離。
+> 両エコシステムは `workbench/knowledge/` に物理ファイルが置かれているが、表示カテゴリは異なる。
+
+### 📚 LLMナレッジ & テック
 
 - **Industry Trends** — ベンダー横断の長文分析（research/trend-*）
-- **Briefings & 配布資料** — 過去のデモ・配布資料アーカイブ（demos/）
+- **LLM 個別深掘り** — ベンダー別の特性・実装メモ（Google / Microsoft 以外の横断知識）
+- **Tech Workbench** — 開発実務（git・docker・mac・VSCode・Vibe Coding 等）
 
-### ハブ運用
+### 🛠 ハブ運用
 
 - **Foundations** — 前提・理念・運用プロトコル・参照ドキュメント
 - **Strategy** — 事業接続・能力マップ・優先順位・ロードマップ
@@ -88,7 +96,7 @@
 | `logs/` | 変更ログ・実験メモ・TODO・ダッシュボード・四半期レビュー |
 | `_routines/` | 日次運用テンプレート（AI News 等の生成用） |
 
-新カテゴリ追加は ADR-002（3カテゴリ構造）の方針に沿って慎重に判断する。
+新カテゴリ追加は ADR-012（4カテゴリ構造）の方針に沿って慎重に判断する。
 
 ---
 
