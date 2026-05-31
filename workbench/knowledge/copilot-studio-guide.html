@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Copilot Studio 実践大全 | Tech Workbench</title>
+  <style>
+    :root {
+      --bg: #07111d;
+      --panel: #0d1829;
+      --panel2: #101f34;
+      --panel3: #0a1520;
+      --text: #e8eef9;
+      --muted: #b6c3da;
+      --soft: #7f92ac;
+      --border: rgba(255,255,255,0.08);
+      --accent: #0ea5e9;
+      --accent2: #38bdf8;
+      --accent3: #7dd3fc;
+      --green: #4ade80;
+      --yellow: #fbbf24;
+      --red: #f87171;
+      --purple: #a78bfa;
+      --shadow: 0 12px 36px rgba(0,0,0,0.3);
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Segoe UI", "Noto Sans JP", system-ui, sans-serif;
+      background:
+        radial-gradient(circle at 10% 10%, rgba(14,165,233,0.12), transparent 28%),
+        radial-gradient(circle at 90% 5%, rgba(56,189,248,0.08), transparent 26%),
+        linear-gradient(145deg, #07111d 0%, #0a1422 50%, #060d18 100%);
+      color: var(--text);
+      line-height: 1.72;
+      padding: 28px 18px 80px;
+    }
+    a { color: var(--accent2); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .shell { max-width: 1100px; margin: 0 auto; display: grid; gap: 20px; }
+
+    /* hero */
+    .hero {
+      background: linear-gradient(135deg, rgba(12,74,110,0.6), rgba(3,105,161,0.4), rgba(14,165,233,0.2)), var(--panel);
+      border: 1px solid rgba(14,165,233,0.25);
+      border-radius: var(--radius);
+      padding: 36px 38px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: "";
+      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, #0ea5e9, #38bdf8, #7dd3fc);
+    }
+    .breadcrumb { font-size: 0.8rem; color: var(--soft); margin-bottom: 10px; }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 4px 12px; border-radius: 999px;
+      background: rgba(14,165,233,0.14); color: var(--accent2);
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .hero h1 { font-size: 2rem; font-weight: 800; margin-bottom: 10px; }
+    .hero p { color: var(--muted); font-size: 0.95rem; max-width: 720px; margin-bottom: 14px; }
+    .hero-links { display: flex; gap: 10px; flex-wrap: wrap; }
+    .hero-links a {
+      padding: 6px 14px; border-radius: 8px; font-size: 0.82rem; font-weight: 600;
+      background: rgba(14,165,233,0.14); color: var(--accent2);
+      border: 1px solid rgba(14,165,233,0.25);
+    }
+    .last-update { font-size: 0.78rem; color: var(--soft); margin-top: 12px; }
+
+    /* panels */
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 26px 28px;
+    }
+    .panel-accent {
+      background: var(--panel);
+      border: 1px solid rgba(14,165,233,0.2);
+      border-radius: var(--radius);
+      padding: 26px 28px;
+    }
+    .section-eyebrow {
+      font-size: 0.7rem; font-weight: 700; color: var(--accent);
+      text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px;
+    }
+    h2 { font-size: 1.3rem; font-weight: 800; margin-bottom: 8px; }
+    h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 6px; }
+    h4 { font-size: 0.92rem; font-weight: 700; color: var(--accent2); margin-bottom: 4px; }
+    p { color: var(--muted); font-size: 0.92rem; margin-bottom: 10px; }
+    ul, ol { color: var(--muted); font-size: 0.92rem; padding-left: 18px; margin-bottom: 10px; }
+    li { margin-bottom: 5px; }
+    strong { color: var(--text); }
+    code {
+      font-family: "Fira Code", "Consolas", monospace;
+      background: rgba(255,255,255,0.07);
+      padding: 0.1rem 0.4rem; border-radius: 5px;
+      font-size: 0.85rem; color: #a5f3d0;
+    }
+    .small { font-size: 0.82rem; color: var(--soft); }
+
+    /* stats */
+    .stat-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
+    @media(max-width:700px){ .stat-grid { grid-template-columns: repeat(2,1fr); } }
+    .stat {
+      background: rgba(14,165,233,0.07);
+      border: 1px solid rgba(14,165,233,0.2);
+      border-radius: 12px; padding: 16px; text-align: center;
+    }
+    .stat .val { font-size: 1.7rem; font-weight: 800; color: var(--accent2); line-height: 1; }
+    .stat .lbl { font-size: 0.72rem; color: var(--soft); margin-top: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+
+    /* grids */
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+    @media(max-width:860px){ .grid2,.grid3 { grid-template-columns: 1fr; } }
+
+    /* cards */
+    .card {
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      border-radius: 14px; padding: 18px 20px;
+    }
+    .card-accent {
+      background: var(--panel2);
+      border-radius: 14px; padding: 18px 20px;
+    }
+
+    /* mode cards */
+    .mode-card { border-radius: 14px; padding: 20px; }
+    .mode-card.classic { background: rgba(251,191,36,0.06); border: 1px solid rgba(251,191,36,0.2); }
+    .mode-card.generative { background: rgba(14,165,233,0.06); border: 1px solid rgba(14,165,233,0.2); }
+    .mode-card.autonomous { background: rgba(167,139,250,0.06); border: 1px solid rgba(167,139,250,0.2); }
+    .mode-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+    .mode-card.classic .mode-label { color: var(--yellow); }
+    .mode-card.generative .mode-label { color: var(--accent2); }
+    .mode-card.autonomous .mode-label { color: var(--purple); }
+
+    /* tags */
+    .tag {
+      display: inline-block; padding: 3px 9px; border-radius: 6px;
+      font-size: 0.72rem; font-weight: 700; margin-right: 5px; margin-bottom: 5px;
+    }
+    .tag-blue { background: rgba(14,165,233,0.15); color: var(--accent2); }
+    .tag-green { background: rgba(74,222,128,0.15); color: var(--green); }
+    .tag-yellow { background: rgba(251,191,36,0.15); color: var(--yellow); }
+    .tag-red { background: rgba(248,113,113,0.15); color: var(--red); }
+    .tag-purple { background: rgba(167,139,250,0.15); color: var(--purple); }
+
+    /* table */
+    .tbl-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+    th {
+      text-align: left; padding: 10px 14px;
+      color: var(--soft); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;
+      border-bottom: 2px solid rgba(14,165,233,0.2); font-weight: 700;
+    }
+    td { padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--muted); }
+    td:first-child { color: var(--text); font-weight: 600; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+
+    /* highlight box */
+    .hl {
+      border-radius: 12px; padding: 16px 18px; margin: 14px 0;
+    }
+    .hl-blue { background: rgba(14,165,233,0.08); border: 1px solid rgba(14,165,233,0.2); }
+    .hl-green { background: rgba(74,222,128,0.06); border: 1px solid rgba(74,222,128,0.18); }
+    .hl-yellow { background: rgba(251,191,36,0.07); border: 1px solid rgba(251,191,36,0.2); }
+    .hl-red { background: rgba(248,113,113,0.06); border: 1px solid rgba(248,113,113,0.2); }
+    .hl-purple { background: rgba(167,139,250,0.07); border: 1px solid rgba(167,139,250,0.2); }
+    .hl-title { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+    .hl-blue .hl-title { color: var(--accent2); }
+    .hl-green .hl-title { color: var(--green); }
+    .hl-yellow .hl-title { color: var(--yellow); }
+    .hl-red .hl-title { color: var(--red); }
+    .hl-purple .hl-title { color: var(--purple); }
+
+    /* pattern cards */
+    .pattern {
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      border-radius: 14px; padding: 20px;
+    }
+    .pattern-num {
+      font-size: 0.68rem; font-weight: 700; color: var(--accent);
+      text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px;
+    }
+    .pattern h3 { font-size: 1rem; margin-bottom: 8px; }
+    .pattern-meta { display: flex; gap: 6px; flex-wrap: wrap; margin: 10px 0; }
+
+    /* flow diagram */
+    .flow {
+      display: flex; align-items: center; gap: 8px;
+      flex-wrap: wrap; padding: 14px 16px;
+      background: rgba(255,255,255,0.03); border-radius: 10px;
+      font-size: 0.82rem;
+    }
+    .flow-step {
+      padding: 5px 10px; border-radius: 6px;
+      background: rgba(14,165,233,0.12); border: 1px solid rgba(14,165,233,0.25);
+      color: var(--text); font-weight: 600;
+    }
+    .flow-arrow { color: var(--soft); font-size: 1rem; }
+
+    /* credit table row colors */
+    .cr-1 td:last-child { color: var(--green); font-weight: 700; }
+    .cr-2 td:last-child { color: var(--yellow); font-weight: 700; }
+    .cr-5 td:last-child { color: #fb923c; font-weight: 700; }
+    .cr-10 td:last-child { color: var(--red); font-weight: 700; }
+    .cr-25 td:last-child { color: #e879f9; font-weight: 700; }
+
+    /* checklist */
+    .checklist { list-style: none; padding-left: 0; }
+    .checklist li { padding: 6px 0; padding-left: 22px; position: relative; }
+    .checklist li::before { content: "✓"; position: absolute; left: 0; color: var(--green); font-weight: 700; }
+    .checklist.warn li::before { content: "⚠"; color: var(--yellow); }
+    .checklist.cross li::before { content: "✗"; color: var(--red); }
+
+    /* build 2026 */
+    .build-card {
+      background: rgba(167,139,250,0.06);
+      border: 1px solid rgba(167,139,250,0.2);
+      border-radius: 12px; padding: 16px 18px;
+    }
+    .build-badge {
+      display: inline-block; padding: 2px 8px; border-radius: 5px;
+      background: rgba(167,139,250,0.18); color: var(--purple);
+      font-size: 0.68rem; font-weight: 700; text-transform: uppercase; margin-bottom: 6px;
+    }
+
+    /* footer */
+    .footer-links { display: flex; gap: 16px; flex-wrap: wrap; font-size: 0.86rem; padding-top: 10px; }
+    .footer-links a { color: var(--accent2); }
+  </style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="breadcrumb">
+      <a href="../../index.html">Hub Top</a> /
+      <a href="index.html">Tech Workbench</a> /
+      <a href="microsoft-ecosystem.html">Microsoft AI</a> /
+      <a href="copilot-studio.html">Copilot Studio</a>
+    </div>
+    <div class="eyebrow">Copilot Studio 実践大全</div>
+    <h1>Copilot Studio を<br><span style="color:var(--accent2);">本当に使いこなす</span>ための設計・運用ガイド</h1>
+    <p>
+      3 つのモードの選び方から、Knowledge Source の限界値、Power Automate 連携の設計技法、Analytics による改善サイクル、Enterprise 展開のコスト管理まで。
+      デモを動かすだけでなく<strong>実務で価値を出し続けるエージェント</strong>を作るための実践リファレンス。Build 2026（2026年5月）の最新機能を反映。
+    </p>
+    <div class="hero-links">
+      <a href="#modes">① 3モードの設計思想</a>
+      <a href="#patterns">② 設計パターン集</a>
+      <a href="#knowledge">③ Knowledge Source</a>
+      <a href="#automate">④ Power Automate 連携</a>
+      <a href="#analytics">⑤ 品質改善サイクル</a>
+      <a href="#enterprise">⑥ Enterprise 展開</a>
+    </div>
+    <p class="last-update">最終更新: 2026-05-31 ｜ <a href="copilot-studio.html">← Copilot Studio 概要・比較へ</a></p>
+  </section>
+
+  <!-- STATS -->
+  <div class="stat-grid">
+    <div class="stat"><div class="val">3</div><div class="lbl">エージェントモード</div></div>
+    <div class="stat"><div class="val">1,000</div><div class="lbl">最大ファイル数/Agent</div></div>
+    <div class="stat"><div class="val">25</div><div class="lbl">クレジット/自律トリガー</div></div>
+    <div class="stat"><div class="val">500</div><div class="lbl">最大 Knowledge オブジェクト</div></div>
+  </div>
+
+  <!-- ① 3モードの設計思想 -->
+  <section class="panel-accent" id="modes">
+    <div class="section-eyebrow">Section 01</div>
+    <h2>3つのモード — 設計思想と使い分け</h2>
+    <p>Copilot Studio のエージェントは「どう動くか」によって3つのモードに分かれる。<strong>最初にモードを正しく選ぶことが設計の核心</strong>。後から変えると作り直しになる。</p>
+
+    <div class="grid3" style="margin-top:18px;">
+      <div class="mode-card classic">
+        <div class="mode-label">Classic Topics モード</div>
+        <h3>📋 完全制御・決定論型</h3>
+        <p>トリガー句→分岐→アクションを<strong>すべて手動で設計</strong>したフロー。LLM が意図を勝手に解釈しない。</p>
+        <ul>
+          <li>コンプライアンス上、回答を厳密に管理したい</li>
+          <li>回答のたびに同じ結果を保証したい</li>
+          <li>法務・規約・申請フォームなど構造が固定</li>
+        </ul>
+        <div class="hl-yellow" style="border-radius:8px;padding:10px 12px;margin-top:10px;">
+          <span style="font-size:0.72rem;color:#fbbf24;font-weight:700;">消費: 1 クレジット/応答</span>
+        </div>
+      </div>
+
+      <div class="mode-card generative">
+        <div class="mode-label">Generative AI モード</div>
+        <h3>🧠 LLM 自律選択・知識応答型</h3>
+        <p>LLM（GPT-4o / Claude）が <strong>Topics・Knowledge・Actions から適切なものを自律選択</strong>して応答。トピック数が多い or ドキュメント回答が中心の場合に強い。</p>
+        <ul>
+          <li>大量の社内ドキュメントから Q&amp;A</li>
+          <li>意図が多様で Topic を書き切れない</li>
+          <li>「近い質問」への柔軟な対応が必要</li>
+        </ul>
+        <div class="hl-blue" style="border-radius:8px;padding:10px 12px;margin-top:10px;">
+          <span style="font-size:0.72rem;color:#38bdf8;font-weight:700;">消費: 2 クレジット/応答</span>
+        </div>
+      </div>
+
+      <div class="mode-card autonomous">
+        <div class="mode-label">Autonomous Agents モード</div>
+        <h3>⚡ イベント駆動・自律実行型</h3>
+        <p>ユーザーとの会話なしに<strong>外部イベントをトリガーに自律実行</strong>。監視・自動通知・定期処理に特化。Build 2026 で大幅強化。</p>
+        <ul>
+          <li>Dataverse レコード変更 → 自動処理</li>
+          <li>毎朝9時 → レポート生成 → Teams 投稿</li>
+          <li>メール受信 → 分類 → 担当者へ振り分け</li>
+        </ul>
+        <div class="hl-purple" style="border-radius:8px;padding:10px 12px;margin-top:10px;">
+          <span style="font-size:0.72rem;color:#a78bfa;font-weight:700;">消費: 25 クレジット/トリガー（M365ライセンス保持者も同額）</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hl hl-blue" style="margin-top:20px;">
+      <div class="hl-title">⚠ Autonomous の 25 クレジットは例外なし</div>
+      <p style="margin:0;font-size:0.88rem;">M365 Copilot ライセンス保持者でも、Autonomous トリガーは毎回 25 クレジットを消費する。Classic / Generative 応答は M365 ライセンス環境内なら 0 クレジット。コスト計算時に必ず別枠で管理すること。</p>
+    </div>
+
+    <div style="margin-top:22px;">
+      <h3>モード選択の意思決定フロー</h3>
+      <div style="display:grid;gap:10px;margin-top:12px;">
+        <div class="flow">
+          <span class="flow-step">「回答を完全コントロールしたい」</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step" style="background:rgba(251,191,36,0.15);border-color:rgba(251,191,36,0.3);">Classic Topics</span>
+        </div>
+        <div class="flow">
+          <span class="flow-step">「ドキュメントから自動回答・意図が多様」</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step" style="background:rgba(14,165,233,0.15);border-color:rgba(14,165,233,0.3);">Generative AI モード</span>
+        </div>
+        <div class="flow">
+          <span class="flow-step">「会話不要・イベント起動で自動処理」</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step" style="background:rgba(167,139,250,0.15);border-color:rgba(167,139,250,0.3);">Autonomous モード</span>
+        </div>
+        <div class="flow">
+          <span class="flow-step">「構造的フロー + 賢い回答の両立」</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step" style="background:rgba(74,222,128,0.1);border-color:rgba(74,222,128,0.2);">Classic Topics + Generative Answers 混在</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:22px;">
+      <h3>Copilot Studio を「使わない」判断基準</h3>
+      <div class="grid3" style="margin-top:10px;">
+        <div class="card"><h4>Power Automate 単体で十分</h4><p>人との会話なし・ファイル変換・外部 API 連携のみ → Copilot Studio 不要</p></div>
+        <div class="card"><h4>Power Apps で UI が必要</h4><p>チャット形式でなくフォーム・ダッシュボードが適切な場合</p></div>
+        <div class="card"><h4>Azure AI Foundry / LangChain</h4><p>独自モデル・複雑なRAG・プログラマブルな処理が必要なケース</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ② 設計パターン集 -->
+  <section class="panel" id="patterns">
+    <div class="section-eyebrow">Section 02</div>
+    <h2>エージェント設計パターン集 — 業務類型別</h2>
+    <p>実務で頻繁に登場する6パターン。「どのモードで」「何に接続して」「どう動くか」を設計図レベルで整理。</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px;">
+
+      <div class="pattern">
+        <div class="pattern-num">Pattern 01</div>
+        <h3>社内FAQ・ポリシー照会エージェント</h3>
+        <p>「有給の申請方法は？」「経費精算の上限は？」など、社内規定ドキュメントへの Q&amp;A。最も立ち上げが早いパターン。</p>
+        <div class="pattern-meta">
+          <span class="tag tag-blue">Generative AI モード</span>
+          <span class="tag tag-green">SharePoint Knowledge</span>
+        </div>
+        <div class="flow" style="margin:10px 0;">
+          <span class="flow-step">質問受信</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">SharePoint 検索</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">引用付き回答</span>
+        </div>
+        <ul style="margin-top:8px;">
+          <li><strong>ポイント:</strong> Custom Instructions で「社内規定の範囲外の質問は答えない」と明示</li>
+          <li><strong>引用表示を ON</strong> にして情報ソースを透明化（信頼性が上がる）</li>
+          <li><strong>Content moderation を High</strong> に設定するとハルシネーション抑制</li>
+        </ul>
+      </div>
+
+      <div class="pattern">
+        <div class="pattern-num">Pattern 02</div>
+        <h3>申請・承認ワークフローエージェント</h3>
+        <p>会話で申請内容を収集 → 承認者に自動通知 → 結果を申請者に返す。典型的な「Classic Topics + Power Automate」の組み合わせ。</p>
+        <div class="pattern-meta">
+          <span class="tag tag-yellow">Classic Topics</span>
+          <span class="tag tag-blue">Power Automate 連携</span>
+          <span class="tag tag-green">Teams Approvals</span>
+        </div>
+        <div class="flow" style="margin:10px 0;">
+          <span class="flow-step">申請種別確認</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">変数収集</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">Flow 起動</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">承認通知</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">結果返却</span>
+        </div>
+        <ul style="margin-top:8px;">
+          <li><strong>変数設計が核心:</strong> Text（申請種別・理由）、Number（金額）、Boolean（緊急フラグ）</li>
+          <li>Adaptive Card で承認者に見やすいUI を提供</li>
+          <li>承認タイムアウト（24h）の処理を Flow 側に実装</li>
+        </ul>
+      </div>
+
+      <div class="pattern">
+        <div class="pattern-num">Pattern 03</div>
+        <h3>データ照会エージェント</h3>
+        <p>「顧客 A 社の最新ステータスは？」「案件 #1234 の担当者は？」など、Dataverse や SharePoint リストへの構造化データ照会。</p>
+        <div class="pattern-meta">
+          <span class="tag tag-yellow">Classic Topics</span>
+          <span class="tag tag-blue">Power Automate（Dataverse）</span>
+        </div>
+        <div class="flow" style="margin:10px 0;">
+          <span class="flow-step">検索キー取得</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">Flow でDB照会</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">Table変数で受取</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">整形して返答</span>
+        </div>
+        <ul style="margin-top:8px;">
+          <li>Flow の出力を<strong>Table 変数</strong>で受け取り、ループして表示</li>
+          <li>検索結果ゼロの場合の Fallback Topic を必ず設計</li>
+          <li>個人情報照会の場合は Entra ID 認証を必須に</li>
+        </ul>
+      </div>
+
+      <div class="pattern">
+        <div class="pattern-num">Pattern 04</div>
+        <h3>定期レポート自動生成エージェント（自律型）</h3>
+        <p>スケジュールトリガーで毎朝自動起動 → データ収集 → レポート生成 → Teams チャンネルに投稿。人との会話ゼロ。</p>
+        <div class="pattern-meta">
+          <span class="tag tag-purple">Autonomous モード</span>
+          <span class="tag tag-blue">スケジュールトリガー</span>
+          <span class="tag tag-green">Teams 投稿</span>
+        </div>
+        <div class="flow" style="margin:10px 0;">
+          <span class="flow-step">毎朝 8:00 起動</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">Dataverse 集計</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">Excel 生成</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">Teams 投稿</span>
+        </div>
+        <ul style="margin-top:8px;">
+          <li><strong>注意: 毎回 25 クレジット</strong>消費。週5日稼働なら月 ~500 クレジット = $5</li>
+          <li>Action の失敗時に Teams アラート（管理者向け）を送るエラー処理を追加</li>
+          <li>「何も変化がない日は投稿しない」条件分岐で無駄な通知を防ぐ</li>
+        </ul>
+      </div>
+
+      <div class="pattern">
+        <div class="pattern-num">Pattern 05</div>
+        <h3>アラート・エスカレーション監視エージェント（自律型）</h3>
+        <p>Dataverse のレコード変更や Forms の回答をトリガーに、条件を評価して担当者にアラートを飛ばす。IT ヘルプデスクや SLA 管理に有効。</p>
+        <div class="pattern-meta">
+          <span class="tag tag-purple">Autonomous モード</span>
+          <span class="tag tag-blue">イベントトリガー</span>
+          <span class="tag tag-yellow">Outlook / Teams 通知</span>
+        </div>
+        <div class="flow" style="margin:10px 0;">
+          <span class="flow-step">レコード変更検知</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">優先度評価</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">条件分岐</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">担当者に通知</span>
+        </div>
+        <ul style="margin-top:8px;">
+          <li>Dataverse トリガーは<strong>列単位で変更を監視</strong>できる（ステータス列のみ、など）</li>
+          <li>トリガー条件を絞り込んで不要な起動を防ぐ（クレジット節約）</li>
+          <li>Planner タスク作成を Action に追加すると追跡しやすい</li>
+        </ul>
+      </div>
+
+      <div class="pattern">
+        <div class="pattern-num">Pattern 06</div>
+        <h3>マルチエージェント連携（A2A オーケストレーター）</h3>
+        <p>フロントの「受付エージェント」がユーザーの意図を判断し、専門エージェント（HR / IT / Finance）に委譲。Build 2026 の A2A GA で本格運用可。</p>
+        <div class="pattern-meta">
+          <span class="tag tag-purple">A2A Protocol（Build 2026 GA）</span>
+          <span class="tag tag-blue">Generative Orchestration</span>
+        </div>
+        <div class="flow" style="margin:10px 0;">
+          <span class="flow-step">受付 Agent</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">意図分類</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">HR Agent / IT Agent / Finance Agent</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">結果統合</span>
+        </div>
+        <ul style="margin-top:8px;">
+          <li>A2A はエージェント同士が<strong>共有コンテキスト</strong>を持ちながらタスクを委譲</li>
+          <li>各専門エージェントは独立して管理・更新できる（疎結合）</li>
+          <li>Work IQ REST API で既存の業務システムとの統合も可能（Build 2026）</li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ③ Knowledge Source -->
+  <section class="panel-accent" id="knowledge">
+    <div class="section-eyebrow">Section 03</div>
+    <h2>Knowledge Source 完全ガイド</h2>
+    <p>「Generative Answersが答えない」「古い情報を返す」「関係ない内容を返す」— 実務でのハマりポイントの9割はここに集中する。</p>
+
+    <div class="tbl-wrap" style="margin-top:16px;">
+      <table>
+        <thead>
+          <tr>
+            <th>ソース</th>
+            <th>最大ファイル数・制限</th>
+            <th>更新方法</th>
+            <th>向いているケース</th>
+            <th>注意点</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>SharePoint / OneDrive</td>
+            <td>1,000 ファイル/Agent、512 MB/ファイル（M365ライセンスなしは 7 MB）</td>
+            <td>自動同期（リアルタイム）</td>
+            <td>社内規定・マニュアル・ポリシー文書</td>
+            <td>フォルダは50個まで、10階層まで。一度に選択できるのは15件</td>
+          </tr>
+          <tr>
+            <td>Webサイト（URL）</td>
+            <td>500 オブジェクト合計内</td>
+            <td>Bing クロール（手動不可）</td>
+            <td>公開FAQ・製品ページ・法令サイト</td>
+            <td>2階層深まで保証。イントラネット・VPN内は不可。再クロールタイミング不明</td>
+          </tr>
+          <tr>
+            <td>ファイルアップロード（PDF/Word/Excel）</td>
+            <td>512 MB/ファイル（同上）</td>
+            <td>手動（再アップロード）</td>
+            <td>更新頻度が低い参照ドキュメント</td>
+            <td>更新したら手動で再アップロードが必要。SharePoint 連携推奨</td>
+          </tr>
+          <tr>
+            <td>Dataverse</td>
+            <td>2 ソース/Agent、15 テーブル/ソース</td>
+            <td>リアルタイム</td>
+            <td>CRM データ・案件情報・マスタデータ</td>
+            <td>構造化データ向け。自然言語で照会するより Power Automate 経由が精度高い</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="margin-top:22px;">
+      <h3>Generative Answers のチューニング</h3>
+      <div class="grid2" style="margin-top:12px;">
+        <div>
+          <h4>Content Moderation（コンテンツフィルタ）</h4>
+          <div style="display:grid;gap:8px;margin-top:8px;">
+            <div style="background:rgba(74,222,128,0.07);border:1px solid rgba(74,222,128,0.2);border-radius:8px;padding:10px 12px;">
+              <span style="color:var(--green);font-weight:700;font-size:0.82rem;">Low</span>
+              <p style="margin:4px 0 0;font-size:0.85rem;">より多くの回答を生成。ハルシネーション・不適切回答リスク高。テスト環境向け。</p>
+            </div>
+            <div style="background:rgba(14,165,233,0.07);border:1px solid rgba(14,165,233,0.2);border-radius:8px;padding:10px 12px;">
+              <span style="color:var(--accent2);font-weight:700;font-size:0.82rem;">Moderate（デフォルト）</span>
+              <p style="margin:4px 0 0;font-size:0.85rem;">バランス型。大半の業務用途はここ。</p>
+            </div>
+            <div style="background:rgba(251,191,36,0.07);border:1px solid rgba(251,191,36,0.2);border-radius:8px;padding:10px 12px;">
+              <span style="color:var(--yellow);font-weight:700;font-size:0.82rem;">High</span>
+              <p style="margin:4px 0 0;font-size:0.85rem;">回答しない頻度が上がる。医療・法務・金融などコンプライアンス重視の場合に。</p>
+            </div>
+          </div>
+        </div>
+        <div>
+          <h4>Custom Instructions（必ず設定すべき）</h4>
+          <p>エージェントのペルソナ・回答範囲・禁止事項を自然言語で指定。設定しないと関係ない質問にも答えてしまう。</p>
+          <div class="hl hl-blue">
+            <div class="hl-title">Custom Instructions 例文</div>
+            <p style="font-size:0.85rem;margin:0;font-style:italic;">
+              「あなたは社内の人事ポリシーに関する質問に回答するアシスタントです。提供された人事規定ドキュメントの範囲内でのみ回答してください。範囲外の質問には『その件は人事部に直接お問い合わせください』と回答してください。」
+            </p>
+          </div>
+          <p style="margin-top:10px;">Topic レベルでも設定可能（Topic ごとに moderation を Override できる）。</p>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:22px;">
+      <h3>よくある問題と対処法</h3>
+      <div style="display:grid;gap:10px;margin-top:10px;">
+        <div class="hl hl-red">
+          <div class="hl-title">❌「Generative Answers が答えない」</div>
+          <ul style="margin:0;padding-left:16px;">
+            <li>Generative Answers が無効になっている → Agent の Settings で確認</li>
+            <li>Content Moderation が High すぎる → Moderate に下げてテスト</li>
+            <li>ナレッジに対象コンテンツが含まれていない → ソースのインデックス状態を確認</li>
+            <li>Custom Instructions で回答範囲を絞りすぎている</li>
+          </ul>
+        </div>
+        <div class="hl hl-yellow">
+          <div class="hl-title">⚠「関係ない・古い内容を返す」</div>
+          <ul style="margin:0;padding-left:16px;">
+            <li>Webサイトクロールが古い → Web Knowledge を削除して再追加（手動再クロールは不可）</li>
+            <li>ファイルアップロード源が古い → 最新版を再アップロード</li>
+            <li>SharePoint ファイルを直接編集後、同期に時間がかかる場合あり → しばらく待つ</li>
+          </ul>
+        </div>
+        <div class="hl hl-yellow">
+          <div class="hl-title">⚠「Tenant Graph を使いたいがコストが高い」</div>
+          <ul style="margin:0;padding-left:16px;">
+            <li>Tenant Graph（組織全体の M365 コンテンツ参照）は<strong>10 クレジット/応答</strong>と高コスト</li>
+            <li>必要なドキュメントを SharePoint の特定フォルダに集約し、そこだけを Knowledge Source にする方が安く精度も高い</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ④ Power Automate 連携 -->
+  <section class="panel" id="automate">
+    <div class="section-eyebrow">Section 04</div>
+    <h2>Power Automate 連携の設計技法</h2>
+    <p>Copilot Studio 単体でできることは限られる。実務価値の大半は <strong>Power Automate との連携設計</strong>で決まる。</p>
+
+    <div class="grid2" style="margin-top:16px;">
+      <div>
+        <h3>基本アーキテクチャ</h3>
+        <div class="flow" style="flex-direction:column;align-items:flex-start;gap:6px;margin-top:10px;">
+          <div style="display:flex;align-items:center;gap:8px;width:100%;">
+            <span class="flow-step" style="flex:1;text-align:center;">Copilot Studio Topic</span>
+          </div>
+          <div style="padding-left:20px;color:var(--soft);font-size:0.85rem;">↓ Call an action（変数を渡す）</div>
+          <div style="display:flex;align-items:center;gap:8px;width:100%;">
+            <span class="flow-step" style="flex:1;text-align:center;background:rgba(74,222,128,0.1);border-color:rgba(74,222,128,0.25);">Power Automate Cloud Flow</span>
+          </div>
+          <div style="padding-left:20px;color:var(--soft);font-size:0.85rem;">↓ アクション実行（SharePoint / Teams / Outlook / Dataverse など）</div>
+          <div style="display:flex;align-items:center;gap:8px;width:100%;">
+            <span class="flow-step" style="flex:1;text-align:center;background:rgba(167,139,250,0.1);border-color:rgba(167,139,250,0.25);">結果を Topic に返す</span>
+          </div>
+          <div style="padding-left:20px;color:var(--soft);font-size:0.85rem;">↓ Topic が結果をユーザーに応答</div>
+        </div>
+      </div>
+
+      <div>
+        <h3>変数の型と使い方</h3>
+        <div style="display:grid;gap:8px;margin-top:10px;">
+          <div class="card">
+            <code>Text</code> &nbsp; 文字列全般（名前・件名・理由・ID）
+          </div>
+          <div class="card">
+            <code>Number</code> &nbsp; 数値（金額・日数・件数）
+          </div>
+          <div class="card">
+            <code>Boolean</code> &nbsp; Yes/No の確認（緊急フラグ・同意確認）
+          </div>
+          <div class="card">
+            <code>Table</code> &nbsp; 複数件のデータ取得（リスト・検索結果）
+          </div>
+          <div class="card">
+            <code>Record</code> &nbsp; 1件の構造化データ（オブジェクト型）
+          </div>
+          <div class="card">
+            <code>File</code> &nbsp; ファイル渡し（2025.7.2 〜 対応）
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:22px;">
+      <h3>典型コネクタパターン</h3>
+      <div class="tbl-wrap" style="margin-top:10px;">
+        <table>
+          <thead>
+            <tr>
+              <th>コネクタ</th>
+              <th>主なアクション</th>
+              <th>ユースケース</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>SharePoint</td><td>アイテム作成・更新・取得、ファイル作成</td><td>申請記録、ドキュメント生成</td></tr>
+            <tr><td>Microsoft Teams</td><td>メッセージ投稿、Adaptive Card 送信、チャンネル通知</td><td>承認通知、進捗報告、アラート</td></tr>
+            <tr><td>Outlook</td><td>メール送信、予定作成、カレンダー空き確認</td><td>確認メール、会議スケジュール</td></tr>
+            <tr><td>Dataverse</td><td>行の作成・更新・取得・検索</td><td>CRM 更新、案件ステータス照会</td></tr>
+            <tr><td>Approvals</td><td>承認リクエスト送信・結果待機</td><td>稟議・経費承認ワークフロー</td></tr>
+            <tr><td>Excel（Business）</td><td>行の追加・取得、テーブル更新</td><td>台帳管理、集計データ更新</td></tr>
+            <tr><td>Planner</td><td>タスク作成・割り当て・更新</td><td>タスク自動起票、進捗追跡</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div style="margin-top:22px;">
+      <h3>エラーハンドリングの設計</h3>
+      <div class="grid2" style="margin-top:10px;">
+        <div class="hl hl-blue">
+          <div class="hl-title">Flow 側のエラー処理</div>
+          <ul style="margin:0;padding-left:16px;">
+            <li>各アクションの「Configure run after」で失敗パスを設定</li>
+            <li>失敗時は Output 変数に <code>error</code> フラグを立てて Topic に返す</li>
+            <li>スキーマ不一致エラーは Action ノードの「Refresh」で解消</li>
+          </ul>
+        </div>
+        <div class="hl hl-blue">
+          <div class="hl-title">Topic 側のエラー処理</div>
+          <ul style="margin:0;padding-left:16px;">
+            <li>Flow から返ってきた <code>error</code> 変数を Condition で分岐</li>
+            <li>失敗時は「もう一度試す」または「担当者に連絡する」フローに誘導</li>
+            <li>「System.Error」Topics（既定）をカスタマイズして適切なメッセージを設定</li>
+          </ul>
+        </div>
+      </div>
+      <div class="hl hl-yellow" style="margin-top:10px;">
+        <div class="hl-title">よくあるデバッグポイント</div>
+        <ul style="margin:0;padding-left:16px;">
+          <li>Flow が失敗しているのに Topic が無反応 → Flow の実行履歴を Power Automate で直接確認</li>
+          <li>Input が渡されていない → Topic の Action ノードで変数のマッピングを再確認</li>
+          <li>Output が空で返ってくる → Flow の「Respond to Copilot Studio or Power Virtual Agents」ステップの Output 設定を確認</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ⑤ 品質改善サイクル -->
+  <section class="panel-accent" id="analytics">
+    <div class="section-eyebrow">Section 05</div>
+    <h2>品質改善サイクル — Analytics の読み方と改善アプローチ</h2>
+    <p>エージェントを作って終わりにしない。<strong>Analytics を週次で読み、数値をもとに改善を回す</strong>ことで実務価値が積み上がる。</p>
+
+    <div class="stat-grid" style="margin:16px 0;">
+      <div class="stat">
+        <div class="val" style="font-size:1.2rem;">Session Count</div>
+        <div class="lbl">起動セッション数（engaged / unengaged）</div>
+      </div>
+      <div class="stat">
+        <div class="val" style="color:var(--green);font-size:1.2rem;">Resolution Rate</div>
+        <div class="lbl">会話完結率（目標 70%+）</div>
+      </div>
+      <div class="stat">
+        <div class="val" style="color:var(--red);font-size:1.2rem;">Escalation Rate</div>
+        <div class="lbl">人間エスカレーション率（低いほど良い）</div>
+      </div>
+      <div class="stat">
+        <div class="val" style="color:var(--yellow);font-size:1.2rem;">CSAT</div>
+        <div class="lbl">満足度スコア（5点満点）</div>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div>
+        <h3>Resolution Rate の読み方</h3>
+        <p>2種類ある：</p>
+        <ul>
+          <li><strong>Confirmed Resolution</strong>: End of Conversation Topic でユーザーが「解決した」と回答したケース</li>
+          <li><strong>Implied Resolution</strong>: 確認なしにセッション終了したが、ロジックが解決と判定したケース</li>
+        </ul>
+        <div class="hl hl-green" style="margin-top:10px;">
+          <div class="hl-title">解決率が低い場合の対処</div>
+          <ul style="margin:0;padding-left:16px;">
+            <li>会話ログ（Session Details）で「どの Topic で詰まっているか」を特定</li>
+            <li>Fallback Topic に集中している → トリガー句の追加・Generative Answers 強化</li>
+            <li>ユーザーが途中で離脱 → Topic フローが長すぎる → シンプル化</li>
+          </ul>
+        </div>
+      </div>
+      <div>
+        <h3>改善サイクルの回し方</h3>
+        <div style="display:grid;gap:8px;margin-top:8px;">
+          <div class="card" style="display:flex;gap:12px;align-items:flex-start;">
+            <span style="color:var(--accent2);font-weight:800;font-size:1.1rem;flex-shrink:0;">週次</span>
+            <div>会話ログの確認 → 未解決・エスカレーション多発 Topic の特定</div>
+          </div>
+          <div class="card" style="display:flex;gap:12px;align-items:flex-start;">
+            <span style="color:var(--green);font-weight:800;font-size:1.1rem;flex-shrink:0;">改善</span>
+            <div>トリガー句追加・Knowledge 更新・フロー簡略化 → テストキャンバスで検証</div>
+          </div>
+          <div class="card" style="display:flex;gap:12px;align-items:flex-start;">
+            <span style="color:var(--yellow);font-weight:800;font-size:1.1rem;flex-shrink:0;">公開</span>
+            <div>Test → Dev 環境で確認 → Solution で Prod 展開（ALM）</div>
+          </div>
+          <div class="card" style="display:flex;gap:12px;align-items:flex-start;">
+            <span style="color:var(--purple);font-weight:800;font-size:1.1rem;flex-shrink:0;">月次</span>
+            <div>Resolution Rate / CSAT のトレンドを見て中期的な課題を把握</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hl hl-blue" style="margin-top:18px;">
+      <div class="hl-title">Power BI カスタムレポート（発展）</div>
+      <p style="margin:0;font-size:0.88rem;">Copilot Studio Analytics コネクタを使うと、Power BI にデータを引き込んでカスタムダッシュボードが作れる。複数エージェントの横断比較や、部門別の解決率分析が可能になる。</p>
+    </div>
+  </section>
+
+  <!-- ⑥ Enterprise 展開 -->
+  <section class="panel" id="enterprise">
+    <div class="section-eyebrow">Section 06</div>
+    <h2>Enterprise 展開と運用コスト管理</h2>
+
+    <div class="grid2" style="margin-top:16px;">
+      <div>
+        <h3>Teams 公開 — 3つの展開パス</h3>
+        <div style="display:grid;gap:10px;margin-top:10px;">
+          <div class="card">
+            <h4>① Maker → 管理者承認 → 全社公開</h4>
+            <p>Copilot Studio から「Show to everyone in my org」を選択。<strong>Copilot Control System（旧Teams管理センター）での管理者承認が必要</strong>。承認後に全社員のアプリ一覧に表示。</p>
+          </div>
+          <div class="card">
+            <h4>② 管理者が Teams Admin Center にZIPを直接アップロード</h4>
+            <p>承認ステップなし。IT部門が管理・展開する正式ルート。</p>
+          </div>
+          <div class="card">
+            <h4>③ サイドロード（テスト・個人利用）</h4>
+            <p>組織のカスタムアプリアップロードポリシーが有効な場合のみ可能。本番展開不可。</p>
+          </div>
+        </div>
+        <div class="hl hl-blue" style="margin-top:10px;">
+          <div class="hl-title">自動インストール（ピン留め）</div>
+          <p style="margin:0;font-size:0.88rem;">Teams Admin Center の「Setup Policies」でエージェントを追加すると、対象ユーザーグループに<strong>自動インストール＋ピン留め</strong>が可能。全社展開時に有効。</p>
+        </div>
+      </div>
+
+      <div>
+        <h3>セキュリティ設定チェックリスト</h3>
+        <ul class="checklist" style="margin-top:10px;">
+          <li><strong>DLP ポリシー</strong>で「Chat without Entra ID authentication」コネクタを<strong>Blocked</strong>グループに追加（匿名公開防止）</li>
+          <li><strong>Entra ID 認証</strong>を設定（Entra Agent ID が自動発行され監査追跡可能に）</li>
+          <li><strong>Microsoft Purview</strong> で Copilot Studio の監査ログが記録されているか確認</li>
+          <li>会話トランスクリプトは <strong>DSPM for AI</strong>（Purview とは別）で管理</li>
+          <li>各エージェントに<strong>最小権限の接続</strong>のみ割り当て（不要なコネクタは削除）</li>
+        </ul>
+        <div class="hl hl-red" style="margin-top:10px;">
+          <div class="hl-title">⚠ DLP 設定は全テナントで必須（2025年初頭から強制）</div>
+          <p style="margin:0;font-size:0.88rem;">未設定のままだと匿名ユーザーがエージェントにアクセスできる状態になる可能性がある。IT部門と連携して確認すること。</p>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:24px;">
+      <h3>クレジット消費と料金の全体像</h3>
+      <div class="tbl-wrap" style="margin-top:12px;">
+        <table>
+          <thead>
+            <tr>
+              <th>インタラクション種別</th>
+              <th>消費クレジット</th>
+              <th>M365 Copilot ライセンスあり</th>
+              <th>実務上の注意点</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="cr-1">
+              <td>Classic Topics（スクリプト応答）</td>
+              <td>1 クレジット</td>
+              <td>✅ 0 クレジット（M365環境内）</td>
+              <td>最もコスト安。制御重視の場合はここを使う</td>
+            </tr>
+            <tr class="cr-2">
+              <td>Generative 応答（LLM回答）</td>
+              <td>2 クレジット</td>
+              <td>✅ 0 クレジット（M365環境内）</td>
+              <td>FAQ型はここ。量が多いと積み上がる</td>
+            </tr>
+            <tr class="cr-5">
+              <td>Action（Flow呼び出し等）</td>
+              <td>5 クレジット/ステップ</td>
+              <td>✅ 0 クレジット（M365環境内）</td>
+              <td>1回の会話で複数Action使うと急増</td>
+            </tr>
+            <tr class="cr-10">
+              <td>Tenant Graph グラウンディング</td>
+              <td>10 クレジット</td>
+              <td>✅ 0 クレジット（M365環境内）</td>
+              <td>SharePoint 直接参照の方がコスト安&amp;精度高い</td>
+            </tr>
+            <tr class="cr-25">
+              <td>Autonomous トリガー</td>
+              <td>25 クレジット</td>
+              <td>❌ 常に 25 クレジット（例外なし）</td>
+              <td>頻度の高い自律エージェントは月次でコスト試算を</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="grid2" style="margin-top:14px;">
+        <div class="card">
+          <h4>パック購入</h4>
+          <p><strong>25,000 クレジット = $200/月</strong>。従量課金は $0.01/クレジット。</p>
+          <p>大量利用の場合は CCCU（年間コミット）で最大 20% 割引。</p>
+        </div>
+        <div class="card">
+          <h4>コスト試算の例</h4>
+          <p>毎日 200 セッション × 平均 5 Generative 応答 = 2,000 クレジット/日 ≈ 60,000/月 → 約 $600/月</p>
+          <p>M365 ライセンス組織内なら Classic + Generative は無料。Autonomous のみ課金対象。</p>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:22px;">
+      <h3>環境管理（ALM）— 本番展開のベストプラクティス</h3>
+      <div class="grid3">
+        <div class="card">
+          <h4>Dev 環境</h4>
+          <p>開発・テスト用。本番データに接続しない。壊れても影響なし。</p>
+          <span class="tag tag-yellow">開発者のみ</span>
+        </div>
+        <div class="card">
+          <h4>Test / UAT 環境</h4>
+          <p>本番相当のデータで受け入れテスト。ビジネスユーザーが確認。</p>
+          <span class="tag tag-blue">限定ユーザー</span>
+        </div>
+        <div class="card">
+          <h4>Prod 環境</h4>
+          <p>本番。Solution（Managed）でのみ変更を受け付ける。直接編集禁止。</p>
+          <span class="tag tag-green">全社員</span>
+        </div>
+      </div>
+      <div class="hl hl-blue" style="margin-top:10px;">
+        <div class="hl-title">Solution でのデプロイ管理</div>
+        <p style="margin:0;font-size:0.88rem;">エージェント・Flow・環境変数・接続参照をまとめて Solution に入れる。Dev → Test → Prod への昇格は Solution の Export/Import で管理。環境変数で接続先URLを環境ごとに切り替えられる。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Build 2026 -->
+  <section class="panel-accent">
+    <div class="section-eyebrow">Build 2026 — 2026年5月</div>
+    <h2>Build 2026 の主要アップデート</h2>
+    <p>2026年5月の Microsoft Build で発表・GA になった Copilot Studio の新機能。</p>
+    <div class="grid2" style="margin-top:16px;">
+      <div class="build-card">
+        <div class="build-badge">GA — Build 2026</div>
+        <h3>🖥 Computer-Using Agents</h3>
+        <p>Web/デスクトップ UI を人間のように操作（クリック・入力・画面読み取り）。UI 変更に自動適応。RPA より柔軟。セキュアな認証情報管理。モデル選択の柔軟性も向上。</p>
+      </div>
+      <div class="build-card">
+        <div class="build-badge">NEW — Build 2026</div>
+        <h3>🔗 Workflows 統合キャンバス</h3>
+        <p>エンドツーエンドのエージェント自動化を1つのキャンバスで構築。エージェントノードを直接ワークフローに埋め込み可能。ノードレベルのインラインテストで即デバッグ。</p>
+      </div>
+      <div class="build-card">
+        <div class="build-badge">GA — 2026年5月</div>
+        <h3>🤝 A2A（エージェント間通信）</h3>
+        <p>エージェント同士がタスクを委譲・共有コンテキストを維持しながら連携。Work IQ REST API + CLI で既存システムへの統合も標準化。</p>
+      </div>
+      <div class="build-card">
+        <div class="build-badge">GA — 北米先行</div>
+        <h3>🎙 Real-Time Voice Agents</h3>
+        <p>電話対応エージェント（Dynamics 365 Contact Center 経由）。発信者 ID 認識・タスク実行・コンテキスト保持したままの有人エスカレーション。S2S 統合対応。</p>
+      </div>
+    </div>
+    <div class="hl hl-purple" style="margin-top:14px;">
+      <div class="hl-title">モデル追加（Build 2026）</div>
+      <p style="margin:0;font-size:0.88rem;">ChatGPT-5 が全グローバルで GA。<strong>Claude Sonnet 4.5 / 4.6 / Opus</strong> も全グローバルで本番エージェントに利用可能。Copilot Studio 内でモデルを切り替えての動作確認が推奨。</p>
+    </div>
+  </section>
+
+  <!-- フッター -->
+  <div class="panel" style="padding:20px 24px;">
+    <div class="footer-links">
+      <a href="copilot-studio.html">← Copilot Studio 概要・比較</a>
+      <a href="microsoft-ecosystem.html">Microsoft AI 全体像</a>
+      <a href="m365-copilot.html">M365 Copilot</a>
+      <a href="power-platform-ai.html">Power Platform AI</a>
+      <a href="azure-ai-foundry.html">Azure AI Foundry</a>
+      <a href="index.html">Knowledge Index</a>
+    </div>
+    <p class="small" style="margin-top:10px;">最終更新: 2026-05-31 ｜ Sources: Microsoft Learn / Microsoft Copilot Blog / Build 2026 発表資料</p>
+  </div>
+
+</div>
+</body>
+</html>
