@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gemini Advanced（Gemini アプリ）— AI Pro/Ultra 完全ガイド | Tech Workbench</title>
+<style>
+:root {
+    --accent: #8b5cf6;
+    --accent2: #3b82f6;
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #21262d;
+    --border: rgba(255,255,255,0.08);
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --radius: 12px;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; line-height:1.65; font-size:16px; }
+a { color:var(--accent); text-decoration:none; }
+a:hover { text-decoration:underline; }
+.page-wrap { max-width:960px; margin:0 auto; padding:32px 20px 80px; }
+nav { background:var(--surface); border-bottom:1px solid var(--border); padding:12px 20px; font-size:0.85rem; }
+nav a { color:var(--muted); margin-right:6px; }
+nav a:hover { color:var(--text); }
+nav span { color:var(--muted); margin-right:6px; }
+.hero { background:linear-gradient(135deg, #7c3aed, #2563eb); border-radius:var(--radius); padding:48px 40px; margin-bottom:40px; }
+.hero h1 { font-size:2.2rem; font-weight:800; color:#fff; margin-bottom:8px; }
+.hero .sub { color:rgba(255,255,255,0.88); font-size:1.05rem; margin-bottom:24px; max-width:640px; }
+.chips { display:flex; flex-wrap:wrap; gap:8px; }
+.chip { background:rgba(255,255,255,0.18); color:#fff; padding:4px 14px; border-radius:20px; font-size:0.8rem; font-weight:600; }
+.section { margin-bottom:48px; }
+.section > h2 { font-size:1.4rem; font-weight:700; margin-bottom:16px; padding-bottom:8px; border-bottom:2px solid var(--accent); color:var(--accent); }
+.section > h2.blue { border-color:var(--accent2); color:var(--accent2); }
+p { margin-bottom:12px; }
+ul, ol { padding-left:1.5em; margin-bottom:12px; }
+li { margin-bottom:5px; }
+.plan-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:16px; margin-bottom:20px; }
+.plan-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:20px; }
+.plan-card.featured { border-color:var(--accent); }
+.plan-card h3 { font-size:1rem; font-weight:700; margin-bottom:6px; }
+.plan-card .plan-price { font-size:1.5rem; font-weight:800; margin:6px 0 12px; }
+.plan-card.featured .plan-price { color:var(--accent); }
+.plan-card ul { font-size:0.88rem; }
+.grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:20px; margin-bottom:20px; }
+.card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:24px; }
+.card h3 { font-size:1.05rem; font-weight:700; margin-bottom:10px; color:var(--accent); }
+.card h3.blue { color:var(--accent2); }
+.table-wrap { overflow-x:auto; margin:16px 0; }
+table { width:100%; border-collapse:collapse; font-size:0.9rem; }
+th { background:var(--surface2); color:var(--accent); padding:10px 14px; text-align:left; border:1px solid var(--border); }
+td { padding:9px 14px; border:1px solid var(--border); vertical-align:top; }
+tr:nth-child(even) td { background:rgba(255,255,255,0.02); }
+.highlight-box { background:rgba(139,92,246,0.08); border-left:3px solid var(--accent); border-radius:0 8px 8px 0; padding:16px 20px; margin:16px 0; }
+.highlight-box.blue { background:rgba(59,130,246,0.08); border-color:var(--accent2); }
+.highlight-box.green { background:rgba(79,255,176,0.08); border-color:#4fffb0; }
+.badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:0.75rem; font-weight:700; margin-bottom:8px; }
+.badge-purple { background:rgba(139,92,246,0.15); color:var(--accent); }
+.badge-blue { background:rgba(59,130,246,0.15); color:var(--accent2); }
+.badge-green { background:rgba(79,255,176,0.15); color:#4fffb0; }
+.example-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; margin:16px 0; }
+.example-card { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:18px; }
+.example-card .tag { font-size:0.72rem; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:6px; }
+.example-card h4 { font-size:0.95rem; font-weight:700; margin-bottom:6px; }
+.example-card p { font-size:0.88rem; color:var(--muted); margin:0; line-height:1.55; }
+.ok { color:#4fffb0; font-weight:700; }
+.no { color:#f85149; }
+.partial { color:#facc15; }
+.sub-h { font-size:1.05rem; font-weight:700; margin:20px 0 10px; color:var(--text); }
+.tip-box { background:var(--surface2); border-radius:8px; padding:16px 20px; margin:12px 0; font-size:0.9rem; }
+.tip-box strong { color:var(--accent); }
+footer { text-align:center; padding:32px 20px; color:var(--muted); font-size:0.85rem; border-top:1px solid var(--border); margin-top:60px; }
+footer a { color:var(--muted); }
+</style>
+</head>
+<body>
+<nav>
+  <a href="../../index.html">Hub</a> <span>›</span>
+  <a href="./index.html">LLM 個別深掘り</a> <span>›</span>
+  <a href="./google-ecosystem.html">Google AI エコシステム</a> <span>›</span>
+  Gemini Advanced
+</nav>
+
+<main class="page-wrap">
+
+<div class="hero">
+  <h1>Gemini Advanced — Gemini アプリ完全ガイド</h1>
+  <p class="sub">gemini.google.com の一般ユーザー向け製品。API の gemini.html とは別物。Deep Research・Gems・Canvas・Live Voice・1M コンテキストで「AI 秘書」として機能する。</p>
+  <div class="chips">
+    <span class="chip">Deep Research</span>
+    <span class="chip">Gems（カスタム AI）</span>
+    <span class="chip">Canvas</span>
+    <span class="chip">Live Voice</span>
+    <span class="chip">1M コンテキスト</span>
+    <span class="chip">Google Workspace 統合</span>
+    <span class="chip">Jules コーディング</span>
+  </div>
+</div>
+
+<!-- 1. プラン比較 -->
+<section class="section">
+  <h2>1. プラン比較 — AI Free / Plus / Pro / Ultra</h2>
+  <p>2026年1月に AI Plus（$7.99/月）が追加され、現在4層構成。<strong>個人で最もコスパが良いのは AI Pro（$19.99/月）</strong>。</p>
+
+  <div class="plan-grid">
+    <div class="plan-card">
+      <h3>AI Free</h3>
+      <div class="plan-price">無料</div>
+      <ul>
+        <li>Gemini 3.5 Flash</li>
+        <li>基本チャット</li>
+        <li>画像入力</li>
+        <li>Live Voice（制限付き）</li>
+        <li>Gemini アプリ（Web・iOS・Android）</li>
+      </ul>
+    </div>
+    <div class="plan-card">
+      <h3>AI Plus</h3>
+      <div class="plan-price">$7.99<span style="font-size:1rem;">/月</span></div>
+      <ul>
+        <li>Gemini 3.1 Pro（中程度アクセス）</li>
+        <li>Deep Research（制限付き）</li>
+        <li>Gems（基本）</li>
+        <li>2TB Google One</li>
+      </ul>
+    </div>
+    <div class="plan-card featured">
+      <span class="badge badge-purple">おすすめ</span>
+      <h3>AI Pro</h3>
+      <div class="plan-price">$19.99<span style="font-size:1rem;">/月</span></div>
+      <ul>
+        <li>Gemini 3.1 Pro（高優先アクセス）</li>
+        <li>Deep Research（無制限に近い）</li>
+        <li>Gems 完全対応</li>
+        <li>Canvas 完全対応</li>
+        <li>1M トークンコンテキスト</li>
+        <li>Audio Overviews（高クォータ）</li>
+        <li>5TB Google One</li>
+        <li>Jules（コーディング AI）高制限</li>
+        <li>1,000 Flow credits / 月</li>
+      </ul>
+    </div>
+    <div class="plan-card">
+      <h3>AI Ultra</h3>
+      <div class="plan-price">$249.99<span style="font-size:1rem;">/月</span></div>
+      <ul>
+        <li>全機能の最大制限</li>
+        <li>25,000 Flow credits / 月</li>
+        <li>Antigravity 5x higher limits</li>
+        <li>Gemini Omni 優先アクセス</li>
+        <li>Deep Research Max</li>
+        <li>30TB Google One</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="highlight-box">
+    <p>💡 <strong>日本円換算目安</strong>: AI Pro ≈ 3,000円/月、AI Ultra ≈ 37,500円/月。Google One AI Premium（NotebookLM Plus 込み）は ¥2,900/月で AI Pro 相当。円での直接購入は為替レート依存。</p>
+  </div>
+</section>
+
+<!-- 2. Deep Research -->
+<section class="section">
+  <h2>2. Deep Research — 自律型 AI リサーチエージェント</h2>
+  <p>Deep Research は Gemini アプリの中で最も強力な機能。<strong>数百のウェブサイトを自律的に巡回し、10〜20ページの引用付きレポートを5〜15分で生成</strong>する。</p>
+
+  <div class="grid">
+    <div class="card">
+      <span class="badge badge-purple">能力</span>
+      <h3>何ができるか</h3>
+      <ul>
+        <li>数百のウェブサイトを自律巡回・情報統合</li>
+        <li>Gmail・Drive・Google Chat も検索対象に含められる</li>
+        <li>構造化されたレポート（目次・見出し・引用リスト）を生成</li>
+        <li>PDF・ドキュメントを手動でアップロードして参照可能</li>
+        <li>レポートを Canvas でインタラクティブコンテンツに変換</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="badge badge-purple">出力</span>
+      <h3>レポート仕様</h3>
+      <ul>
+        <li>10〜20ページ（複雑なトピックほど長い）</li>
+        <li>全主張に出典 URL が付く</li>
+        <li>生成時間: 5〜15分（自動調査中はバックグラウンドで動作）</li>
+        <li>Google ドキュメントにエクスポート可能</li>
+        <li>Deep Research Max（Ultra のみ）: さらに深い調査</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="badge badge-purple">ベストユースケース</span>
+      <h3>何に使うか</h3>
+      <ul>
+        <li>市場調査・競合分析</li>
+        <li>学術論文レビュー</li>
+        <li>M&amp;A デューデリジェンス</li>
+        <li>技術選定レポート</li>
+        <li>副業・事業立案の下調べ</li>
+        <li>薬物毒性・医学的安全性調査</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="tip-box">
+    <strong>プロンプト例:</strong> 「AI コーディングアシスタント市場を分析してください。主要プレイヤー・価格戦略・差別化機能・ユーザー満足度・2026〜2027年の予測トレンドを含む8ページ以上のレポートにしてください。」→ 15分後に競合15社の比較表・機能マトリクス・トレンド分析付きレポートが生成される。
+  </div>
+
+  <div class="highlight-box">
+    <p>📡 <strong>Deep Research API</strong>: Gemini API（Vertex AI 経由）からも Deep Research エージェントを呼び出せる。プログラムから調査レポート生成を自動化したい場合は <a href="ai-studio.html">ai-studio.html</a> と <a href="vertex-ai.html">vertex-ai.html</a> を参照。</p>
+  </div>
+</section>
+
+<!-- 3. Gems -->
+<section class="section">
+  <h2>3. Gems — カスタム AI アシスタント</h2>
+  <p>Gems は<strong>特定の目的・口調・専門知識に特化した自分専用の AI を作成・保存</strong>する機能。一度作ると再利用でき、他のユーザーと共有もできる。</p>
+
+  <div class="grid">
+    <div class="card">
+      <h3>Gem の作り方</h3>
+      <ol>
+        <li>Gemini アプリ → 「Gem を探す」→ 「新しい Gem」</li>
+        <li>名前・説明・システムプロンプト（指示・口調・禁止事項）を設定</li>
+        <li>参照ファイルをアップロード（PDF・テキスト等）</li>
+        <li>保存・テスト → 即利用開始</li>
+      </ol>
+    </div>
+    <div class="card">
+      <h3>共有と権限管理</h3>
+      <ul>
+        <li><strong>閲覧権限</strong>: 他のユーザーが見られるだけ</li>
+        <li><strong>使用権限</strong>: その Gem と会話できる</li>
+        <li><strong>編集権限</strong>: 設定を変更できる</li>
+        <li>Google Drive と同じ権限モデル</li>
+        <li>チーム・組織での共有に対応</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>活用例</h3>
+      <ul>
+        <li>📝 <strong>ライティングコーチ</strong>: 自分の文体を学習させた文章校正 AI</li>
+        <li>💼 <strong>営業アシスタント</strong>: 自社製品の仕様書をアップロードした提案書作成 AI</li>
+        <li>🎨 <strong>クリエイティブ相談</strong>: 世界観設定書を読み込んだキャラクター設計 AI</li>
+        <li>🔬 <strong>研究整理</strong>: 特定分野の論文を参照する要約 AI</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 4. Canvas -->
+<section class="section">
+  <h2>4. Canvas — インタラクティブコンテンツ作成</h2>
+  <p>Canvas は Gemini の回答や Deep Research レポートを<strong>インタラクティブな形式に変換</strong>するツール。単なるテキストを「体験できるコンテンツ」にする。</p>
+
+  <div class="grid">
+    <div class="card">
+      <h3>変換できる形式</h3>
+      <ul>
+        <li>📊 <strong>インタラクティブビジュアライゼーション</strong>: グラフ・チャート・地図</li>
+        <li>🎯 <strong>クイズ・小テスト</strong>: 学習コンテンツに変換</li>
+        <li>🎙 <strong>Audio Overview</strong>: ポッドキャスト形式に（NotebookLM 相当）</li>
+        <li>📱 <strong>インタラクティブ記事</strong>: クリック可能なコンテンツ</li>
+        <li>📄 <strong>Google ドキュメント</strong>にエクスポート</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Deep Research との連携</h3>
+      <p>Deep Research で生成したレポートを Canvas に渡すと:</p>
+      <ul>
+        <li>長文レポート → スライド形式に変換</li>
+        <li>統計データ → グラフに自動変換</li>
+        <li>比較表 → インタラクティブフィルター付きに</li>
+        <li>学術内容 → 理解確認クイズに</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>クリエイター向け活用</h3>
+      <ul>
+        <li>動画スクリプトをインタラクティブ絵コンテに</li>
+        <li>世界観設定書をクリッカブルなキャラクター図鑑に</li>
+        <li>分析レポートを視覚的なダッシュボードに</li>
+        <li>研究メモをリスナー向けポッドキャスト原稿に</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 5. Live Voice -->
+<section class="section">
+  <h2>5. Gemini Live — リアルタイム音声会話</h2>
+  <p>Gemini Live はリアルタイムの音声会話機能。スマートフォンアプリから<strong>ハンズフリーで Gemini と対話</strong>でき、移動中・作業中でも AI を活用できる。</p>
+
+  <div class="grid">
+    <div class="card">
+      <h3>主な特徴</h3>
+      <ul>
+        <li>自然な会話テンポでのリアルタイム応答</li>
+        <li>途中で割り込み・修正が可能（ストリーミング）</li>
+        <li>全4プランに含まれる（無料も利用可）</li>
+        <li>iOS・Android アプリで利用</li>
+        <li>Gemini アプリを別アプリと重ねて利用可能（Android）</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>活用シーン</h3>
+      <ul>
+        <li>🚶 移動中のブレインストーミング</li>
+        <li>🍳 料理しながら手順確認</li>
+        <li>🎧 通勤中の語学練習（英会話相手として）</li>
+        <li>🖥 コーディング中のペアプログラミング補助</li>
+        <li>📚 読書中の内容確認・質疑応答</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Gemini Omni との違い</h3>
+      <ul>
+        <li>Live Voice: テキスト↔音声のリアルタイム変換</li>
+        <li>Gemini Omni: 画像・動画・音声の統合マルチモーダル処理（AI Pro 以上）</li>
+        <li>Omni はカメラ映像を見ながらリアルタイム解析も可能</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 6. Google Workspace AI -->
+<section class="section">
+  <h2 class="blue">6. Google Workspace AI — Gemini in Docs / Sheets / Gmail / Meet</h2>
+  <p>Google One AI Premium（= AI Pro 相当）に含まれる Workspace AI 機能。毎日使うアプリの中に Gemini が統合されている。</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>アプリ</th><th>主な AI 機能</th><th>活用例</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Google Docs</strong></td>
+          <td>Help me write / 要約 / リライト / 翻訳 / Imagen 4 統合</td>
+          <td>下書きから完成稿まで AI が共著、会議議事録の自動整形</td>
+        </tr>
+        <tr>
+          <td><strong>Google Sheets</strong></td>
+          <td>Help me organize / 関数生成 / データ分析・グラフ提案</td>
+          <td>「売上データから季節パターンを分析して」で数式＋グラフを自動生成</td>
+        </tr>
+        <tr>
+          <td><strong>Gmail</strong></td>
+          <td>Help me write / メール要約 / 返信提案 / スレッド整理</td>
+          <td>長いメールスレッドを3行で要約、丁寧な返信ドラフトを自動生成</td>
+        </tr>
+        <tr>
+          <td><strong>Google Meet</strong></td>
+          <td>会議の自動要約 / アクションアイテム抽出 / 翻訳字幕</td>
+          <td>1時間の会議をリアルタイムで要約、次のアクションを自動リスト化</td>
+        </tr>
+        <tr>
+          <td><strong>Google Slides</strong></td>
+          <td>スライド生成 / デザイン提案 / Imagen 4 で画像挿入</td>
+          <td>箇条書きのアウトラインからスライドデッキを自動作成</td>
+        </tr>
+        <tr>
+          <td><strong>Google Vids</strong></td>
+          <td>スクリプト→動画化 / Imagen 4 / Veo 統合（一部）</td>
+          <td>説明文書から自動的に動画スライドを生成</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="highlight-box blue">
+    <p>🏢 <strong>Workspace Business プラン</strong>: 法人向けには Google Workspace Business Plus / Enterprise に Gemini が含まれる。個人向け Google One AI Premium とは別体系。価格・機能は Google Workspace の料金ページを確認。</p>
+  </div>
+</section>
+
+<!-- 7. Jules — コーディング AI -->
+<section class="section">
+  <h2>7. Jules — AI コーディングエージェント</h2>
+  <p>Jules は Google が提供する非同期コーディング AI エージェント。GitHub リポジトリに接続し、<strong>バックグラウンドでコードを修正・実装・テスト</strong>する。</p>
+  <div class="grid">
+    <div class="card">
+      <h3>特徴</h3>
+      <ul>
+        <li>GitHub リポジトリに直接接続</li>
+        <li>Issue の内容を読んで自動修正 PR を作成</li>
+        <li>バックグラウンド実行（非同期・放置可能）</li>
+        <li>AI Pro で高制限アクセス</li>
+        <li>エンジン: Gemini 3.5 Flash</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>vs Antigravity との違い</h3>
+      <ul>
+        <li><strong>Jules</strong>: Issue → PR の非同期自動化、GitHub ネイティブ</li>
+        <li><strong>Antigravity</strong>: リアルタイム対話・マルチエージェント・デスクトップ IDE</li>
+        <li>Jules は「ながら作業」向け、Antigravity は「集中作業」向け</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>活用シナリオ</h3>
+      <ul>
+        <li>バグレポートの Issue を Jules に割り当てる</li>
+        <li>外出中に Jules がバックグラウンドで修正</li>
+        <li>帰宅後に PR をレビューしてマージ</li>
+        <li>テスト追加・ドキュメント更新も自動化</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 8. 実例 -->
+<section class="section">
+  <h2>8. 最新の驚くべき実例 12選</h2>
+  <div class="example-grid">
+    <div class="example-card">
+      <div class="tag">リサーチ</div>
+      <h4>AI コーディング市場 — 8ページレポートを15分で</h4>
+      <p>Deep Research で AI コーディングアシスタント市場を調査。競合15社の価格・機能比較表・ユーザー満足度・2026年予測トレンドを含む8ページレポートを15分で生成。手動調査なら数日かかる。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">医薬</div>
+      <h4>薬物毒性レポート — デューデリジェンスに活用</h4>
+      <p>製薬会社が Deep Research を使って候補化合物の毒性・副作用に関する既存研究を網羅的に調査。数十本の論文を統合した安全性レポートを数時間で作成し、M&amp;A 審査に活用。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">フリーランス</div>
+      <h4>Gems で専用ライティング AI を構築</h4>
+      <p>コピーライターが自分の過去作品100本を Gem に学習させ、クライアント別の文体・禁止ワード・トーンを設定。案件ごとの初稿作成時間を2時間から30分に削減。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">教育</div>
+      <h4>Deep Research → Canvas でインタラクティブ教材</h4>
+      <p>教師が Deep Research で授業トピックを調査 → Canvas でクイズと図解付きインタラクティブ記事に変換 → 生徒に配布。授業準備時間が週8時間から2時間に短縮。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">クリエイター</div>
+      <h4>1M コンテキストで小説全文を一括分析</h4>
+      <p>作家が書き途中の10万文字の小説原稿を Gemini Advanced にアップロード。伏線・矛盾・キャラクターの一貫性を一括チェック。通常のチャット AI では分割が必要な長さも一括処理。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">ビジネス</div>
+      <h4>競合分析レポートを会議室で即提示</h4>
+      <p>スタートアップの経営陣が投資家ミーティング前日に Deep Research で競合の最新動向を調査。15分でプレゼン用の競合比較スライドの材料となる引用付き20ページレポートを生成。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">Gmail 活用</div>
+      <h4>200通のメールを朝10分でさばく</h4>
+      <p>ビジネスパーソンが Gemini in Gmail を使い長いスレッドをすべて3行要約→優先度判断→返信ドラフト生成のフローを確立。メール処理時間が1日2時間から30分未満に。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">音声活用</div>
+      <h4>通勤中の Live Voice で英語学習</h4>
+      <p>英語学習者が Gemini Live を英会話相手として毎日30分活用。ネイティブ表現の指摘・会話練習・単語説明をリアルタイムで受け取れるため、英会話レッスン費用をゼロ化。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">投資</div>
+      <h4>決算書を Deep Research で即分析</h4>
+      <p>個人投資家が企業の決算書 PDF を Deep Research にアップロードし、業績トレンド・リスク要因・セグメント分析を含む投資判断レポートを生成。アナリストレポート購読費を削減。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">開発</div>
+      <h4>Jules が Issue 10件を一晩で修正</h4>
+      <p>スタートアップのエンジニアが退勤前に10件のバグ Issue を Jules に割り当て。翌朝全件に PR が作成されており、レビューとマージのみで午前中に完了。深夜残業が不要に。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">リーガル</div>
+      <h4>契約書レビュー Gem の構築</h4>
+      <p>中小企業の経営者が「NDA・業務委託契約書のリスク条項を指摘する」Gem を構築。法律事務所への相談前の一次スクリーニングに活用し、弁護士相談料を月3万円削減。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">市場実績</div>
+      <h4>Google が発表: Deep Research の平均レポート長13ページ</h4>
+      <p>Google の公式データによると Deep Research の平均生成レポート長は13ページ、平均生成時間は8分。競合の ChatGPT Deep Research と比較して引用数が多く構造化されているとユーザー調査で評価。</p>
+    </div>
+  </div>
+</section>
+
+<!-- 9. プラン選択ガイド -->
+<section class="section">
+  <h2>9. どのプランを選ぶか — 判断チャート</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>ユーザータイプ</th><th>推奨プラン</th><th>決め手</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>AIを試したいだけ</td><td>AI Free</td><td>無料で基本機能は十分</td></tr>
+        <tr><td>毎日使うが費用を抑えたい</td><td>AI Plus（$7.99）</td><td>Gemini 3.1 Pro + 基本 Deep Research</td></tr>
+        <tr><td>リサーチ・コンテンツ制作・開発を仕事で使う</td><td class="ok"><strong>AI Pro（$19.99）</strong></td><td>Deep Research 無制限 + Gems + Canvas + 1M context</td></tr>
+        <tr><td>映像制作・Flow を本格活用</td><td>AI Ultra（$249.99）</td><td>25,000 Flow credits / 月が決め手</td></tr>
+        <tr><td>NotebookLM Plus も欲しい（日本）</td><td>Google One AI Premium（¥2,900）</td><td>AI Pro 相当 + NotebookLM Plus + 2TB Drive</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 10. 更新履歴 -->
+<section class="section">
+  <h2>10. 更新履歴と関連リンク</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>日付</th><th>内容</th></tr></thead>
+      <tbody>
+        <tr><td>2024-12</td><td>Deep Research リリース（Gemini Advanced）</td></tr>
+        <tr><td>2025</td><td>Gems 共有機能拡張、Canvas 一般提供、Jules ベータ</td></tr>
+        <tr><td>2026-01</td><td>AI Plus（$7.99）プランを新設・全世界展開</td></tr>
+        <tr><td>2026-05-19</td><td>I/O 2026: Gemini Omni 統合・Deep Research Max・AI Ultra 機能拡充</td></tr>
+        <tr><td>2026-05-31</td><td>本ページ作成</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <ul>
+    <li><a href="notebooklm.html">notebooklm.html</a> — NotebookLM（Deep Research との使い分けが重要）</li>
+    <li><a href="gemini.html">gemini.html</a> — Gemini API・モデルスペック</li>
+    <li><a href="ai-studio.html">ai-studio.html</a> — Google AI Studio（開発者向けプレイグラウンド）</li>
+    <li><a href="vertex-ai.html">vertex-ai.html</a> — Vertex AI（エンタープライズ基盤）</li>
+    <li><a href="anti-gravity.html">anti-gravity.html</a> — Antigravity 2.0（コーディングエージェント）</li>
+    <li><a href="google-ecosystem.html">google-ecosystem.html</a> — Google AI エコシステム総覧</li>
+  </ul>
+</section>
+
+</main>
+
+<footer>
+  <p>最終更新: 2026-05-31 | <a href="../../index.html">Hub トップ</a> | <a href="./index.html">LLM 深掘り一覧</a> | <a href="./google-ecosystem.html">Google AI エコシステム</a></p>
+</footer>
+</body>
+</html>
