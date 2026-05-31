@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Google Imagen 4 / Whisk — AI 画像生成 | Tech Workbench</title>
+<title>Google Imagen 4 — AI 画像生成（Whisk 終了・Flow へ統合）| Tech Workbench</title>
 <style>
 :root {
     --accent: #e8437a;
@@ -78,7 +78,7 @@ footer a { color:var(--muted); }
   <a href="../../index.html">Hub</a> <span>›</span>
   <a href="./index.html">LLM 個別深掘り</a> <span>›</span>
   <a href="./google-ecosystem.html">Google AI エコシステム</a> <span>›</span>
-  Imagen 4 / Whisk
+  Imagen 4（Whisk → Flow 統合済み）
 </nav>
 
 <main class="page-wrap">
@@ -194,40 +194,38 @@ footer a { color:var(--muted); }
   </div>
 </section>
 
-<!-- 3. Whisk -->
+<!-- 3. Whisk EOL -->
 <section class="section">
-  <h2 class="amber">3. Whisk — 画像リミックスツール</h2>
-  <p>Whisk は Imagen を基盤とした<strong>画像合成・リミックスツール</strong>。テキストプロンプトではなく、<strong>「被写体」「シーン」「スタイル」の3枚の参照画像</strong>を入力として新しい画像を生成する。</p>
+  <h2 class="amber">3. Whisk — 2026年4月30日 サービス終了 → Flow に統合</h2>
 
-  <div class="highlight-box amber">
-    <p>🎨 アクセス: <strong>labs.google.com/whisk</strong>（Google Labs 実験的機能）。Gemini アプリからもアクセス可能。無料（Google アカウント必要）。</p>
+  <div class="highlight-box amber" style="border-color:#f97316; background:rgba(249,115,22,0.1);">
+    <p>🚨 <strong>Whisk は 2026年4月30日をもってシャットダウンされました。</strong> 全機能は <a href="flow.html">Google Flow</a> に統合済みです。既存のWhisk ライブラリは移行期間（〜4/30）を過ぎると自動削除されました。新規の Whisk 利用はできません。</p>
   </div>
+
+  <p><strong>統合の経緯:</strong> 2026年2月25日に Google が Flow・Whisk・ImageFX の統合を発表。Flow が唯一の統合クリエイティブスタジオとして、Whisk の画像リミックス機能・ImageFX（Nano Banana）の画像生成機能を取り込みました。</p>
 
   <div class="grid">
     <div class="card">
-      <h3 class="amber">3入力の仕組み</h3>
-      <p>① <strong>被写体</strong>画像（何を描くか）<br>② <strong>シーン</strong>画像（どこで・どんな状況）<br>③ <strong>スタイル</strong>画像（どんな画風・トーン）<br>→ Gemini が意図を読み取り Imagen で合成生成。</p>
-    </div>
-    <div class="card">
-      <h3 class="amber">Imagen との違い</h3>
+      <h3 class="amber">Whisk が持っていた機能</h3>
       <ul>
-        <li><strong>Imagen</strong>: テキストプロンプト → 画像</li>
-        <li><strong>Whisk</strong>: 画像 × 画像 → 新画像</li>
-        <li>参照画像があれば指示が少なくても意図通りに</li>
-        <li>プロンプトが苦手な人にも直感的</li>
+        <li>「被写体」「シーン」「スタイル」3枚の参照画像を入力して新画像を生成</li>
+        <li>テキストプロンプト不要の直感的リミックス</li>
+        <li>コンセプトアート・スタイル転送に活用</li>
+        <li>labs.google.com/whisk でアクセス可能だった</li>
       </ul>
     </div>
     <div class="card">
-      <h3 class="amber">主な用途</h3>
+      <h3 class="amber">Flow で代替する方法</h3>
       <ul>
-        <li>コンセプトアート・トンマナ確認</li>
-        <li>SNS サムネイルのバリエーション展開</li>
-        <li>実写キャラを漫画・イラスト調に変換</li>
-        <li>商品を異なるシーン・環境に配置</li>
-        <li>ムードボード・スタイルテスト</li>
+        <li>Flow の「Ingredients（素材）」機能で参照画像をアップロード</li>
+        <li>Subject / Style 参照として画像を指定してから生成</li>
+        <li>ただし Whisk の3パネル UI（被写体/シーン/スタイル同時指定）は廃止</li>
+        <li>詳細は <a href="flow.html">flow.html</a> を参照</li>
       </ul>
     </div>
   </div>
+
+  <p style="font-size:0.88rem; color:var(--muted);">⚠️ 旧 Whisk の「Subject / Scene / Style 同時指定」という専用ワークフローは Flow には移植されていません。Flow での参照画像指定は可能ですが、Whisk 固有の3パネル体験は失われました。</p>
 </section>
 
 <!-- 4. アクセス方法と料金 -->
@@ -545,8 +543,8 @@ for i, img in enumerate(response.generated_images):
   <div class="highlight-box amber">
     <p>🛠 <strong>AI Studio → Vertex AI 移行フロー</strong>: Google AI Studio で無料プロトタイプ → コードエクスポート → Vertex AI で本番スケール。Imagen 4 はこのフローをそのまま使える。詳細は <a href="ai-studio.html">ai-studio.html</a>。</p>
   </div>
-  <div class="highlight-box green">
-    <p>🎨 <strong>Whisk → Ingredients ブリッジ</strong>: Whisk でスタイル・キャラクターを視覚的に確定させてから Imagen 4 で量産、その素材を Flow Ingredients に渡すワークフローが映像制作クリエイターに注目されている。</p>
+  <div class="highlight-box amber" style="border-color:#f97316; background:rgba(249,115,22,0.08);">
+    <p>🚨 <strong>Whisk は 2026/04/30 終了・Flow に統合</strong>: 旧 Whisk の参照画像リミックス機能は Flow の Ingredients 機能で代替可能。詳細は <a href="flow.html">flow.html</a> を参照。</p>
   </div>
 </section>
 
