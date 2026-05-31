@@ -423,6 +423,51 @@
     </div>
 
     <div class="panel">
+      <div class="adr" id="014-four-category-index">
+        <h3>ADR-014: index.html を 4 カテゴリ構造に再編、Microsoft AI をエンタープライズ専用セクションに分離</h3>
+        <div class="meta"><span class="status accepted">ACCEPTED</span> 2026-05-31</div>
+
+        <h4>Context（背景）</h4>
+        <p>
+          Microsoft AI エコシステム（M365 Copilot / Power Platform / Copilot Studio / Azure AI Foundry / Phi-4）を追加した結果、
+          従来の「3カテゴリ構造（制作・技術コア / リファレンス / ハブ運用）」では Google AI と Microsoft AI が同一カードに混在するようになった。
+          Google AI は生成コンテンツ制作（ALIGN_Lab 文脈）、Microsoft AI はエンタープライズ生産性（別文脈）という性格の違いを
+          index.html のナビゲーションに反映する必要があった。また デモ・比較ノート群（demos/）も同じエンタープライズ文脈に属することが明確になった。
+        </p>
+
+        <h4>Decision（決定）</h4>
+        <p>
+          index.html のカテゴリを以下の <strong>4 構造に再編</strong>：
+        </p>
+        <ul>
+          <li>🎬 <strong>生成AI・クリエイター</strong>（旧「制作・技術コア」＋Google AI カード新設）</li>
+          <li>💼 <strong>エンタープライズAI・生産性</strong>（新設：Microsoft AI spotlight ＋ AI ツール比較ノート）</li>
+          <li>📚 <strong>LLMナレッジ & テック</strong>（旧「リファレンス」：Microsoft 分離後の横断LLM知識）</li>
+          <li>🛠 <strong>ハブ運用</strong>（変更なし）</li>
+        </ul>
+        <p>
+          「ブリーフィング・配布資料」という表現も「AI ツール比較・導入検討ノート」に改め、
+          公開リポとして中立的な書き方に統一。会社・本業への言及はサイト上に出さない。
+        </p>
+
+        <h4>Consequences（結果）</h4>
+        <ul>
+          <li>+ Google AI（クリエイター文脈）と Microsoft AI（エンタープライズ文脈）が明確に分離され、ナビゲーションの意図が伝わりやすくなった</li>
+          <li>+ 外部から見ても「生成AIと企業向けAIの両方を研究している人のハブ」として自然に読める</li>
+          <li>+ demos/ が「AI ツール比較ノート」として文脈を持つようになった</li>
+          <li>− 物理ファイルは引き続き workbench/knowledge/ に置かれており、表示カテゴリとパスが乖離（ADR-005 と同じ許容範囲）</li>
+        </ul>
+
+        <h4>関連</h4>
+        <ul>
+          <li><a href="#002-three-category-refactor">ADR-002</a>: 旧3カテゴリ構造（本 ADR により上書き）</li>
+          <li><a href="#007-creator-spotlight">ADR-007</a>: Creator System の主軸宣言（引き継ぐ）</li>
+          <li><a href="#013-model-generation-ssot">ADR-013</a>: Microsoft AI 深掘り6ページ新設の直前決断</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="panel">
       <h2>ADR テンプレート（新規記録用）</h2>
       <pre style="background: rgba(255,255,255,0.04); padding: 16px; border-radius: 10px; font-size: 0.85rem; color: #c5d0e3; overflow-x: auto;">
 &lt;div class="adr" id="NNN-slug"&gt;

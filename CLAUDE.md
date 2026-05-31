@@ -92,7 +92,7 @@
 | `claw-stack/` | Claude / PicoClaw / NanoClaw / OpenClaw の比較・導入・運用判断 |
 | `workbench/` | 実務知識・操作ガイド・LLM 個別深掘り（60+ ページ） |
 | `research/` | 調査記事・LLM トラッカー・Industry Trends 長文・AI News 日次・OpenClaw News |
-| `demos/` | ブリーフィング・配布資料アーカイブ（過去のデモ含む参照資料） |
+| `demos/` | AI ツール比較・導入検討ノート集（Codex / Claude Code 実務比較・シナリオ資料）|
 | `logs/` | 変更ログ・実験メモ・TODO・ダッシュボード・四半期レビュー |
 | `_routines/` | 日次運用テンプレート（AI News 等の生成用） |
 
