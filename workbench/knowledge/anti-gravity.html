@@ -500,20 +500,87 @@ print(result.steps)          <span class="cm"># 実行ステップのトレー�
 
 <!-- 9. 更新履歴 -->
 <section class="section">
-  <h2>9. 更新履歴と関連リンク</h2>
+  <h2>9. バージョン比較と更新履歴</h2>
+
+  <p style="color:var(--muted); margin-bottom:16px;">Antigravity は Gemini CLI という別製品を前史として持ち、1.0（2025/11）→ 2.0（2026/05）の2世代で現在の5コンポーネント構成へと拡張された。</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>比較軸</th>
+          <th>Gemini CLI（前史）</th>
+          <th>Antigravity 1.0</th>
+          <th>Antigravity 2.0（現行）</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>リリース</strong></td>
+          <td>2025/06/25</td>
+          <td><strong>2025/11/18</strong>（Gemini 3 と同時）</td>
+          <td><strong>2026/05/19</strong>（I/O 2026）</td>
+        </tr>
+        <tr>
+          <td><strong>デフォルトエンジン</strong></td>
+          <td>Gemini 2.5 Pro<br><span style="font-size:0.82rem;color:var(--muted);">（高負荷時は 2.5 Flash へルーティング）</span></td>
+          <td><strong>Gemini 3.1 Pro</strong> + Gemini 3 Flash<br><span style="font-size:0.82rem;color:var(--muted);">（Gemini 3 と同日発表・同日統合）</span></td>
+          <td><strong>Gemini 3.5 Flash</strong><br><span style="font-size:0.82rem;color:var(--muted);">（前世代 Pro 比 4× 高速・コーディングベンチ上回る）</span></td>
+        </tr>
+        <tr>
+          <td><strong>エントリポイント</strong></td>
+          <td>Terminal / CLI のみ（OSS）</td>
+          <td>Desktop IDE（Editor View + Manager Surface）</td>
+          <td>Desktop IDE + CLI（Go）+ SDK + Managed Agents + Enterprise の5構成</td>
+        </tr>
+        <tr>
+          <td><strong>マルチエージェント</strong></td>
+          <td>なし（シングル）</td>
+          <td>Manager Surface でエージェント非同期管理（実験的）</td>
+          <td>並列サブエージェント・スケジュール実行（正式）</td>
+        </tr>
+        <tr>
+          <td><strong>CLI 実装言語</strong></td>
+          <td>Node.js / OSS（GitHub 10万+ ⭐）</td>
+          <td>（Desktop アプリ主体、CLI は Gemini CLI 継続）</td>
+          <td><strong>Go で完全書き直し</strong>（Gemini CLI は 2026/06/18 廃止）</td>
+        </tr>
+        <tr>
+          <td><strong>主要機能</strong></td>
+          <td>コード生成・説明・リファクタ・Agent Skills・Hooks</td>
+          <td>Editor View・Manager Surface・Artifacts・Knowledge Base</td>
+          <td>上記全て + Managed Agents API（推論 + Linux サンドボックス） + Enterprise Agent Platform</td>
+        </tr>
+        <tr>
+          <td><strong>料金</strong></td>
+          <td>無料（個人、API クォータ制）</td>
+          <td>無料パブリックプレビュー（5時間ごとリフレッシュ制限）</td>
+          <td>Free / AI Pro $19.99 / AI Ultra $100（5× Pro 制限）/ Ultra Premium $200</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="highlight-box" style="margin-top:16px;">
+    <p><strong>補足：</strong> Antigravity 1.0 は "Gemini 1.5 Pro" や "I/O 2024" とは無関係。<strong>Gemini 3 と同日の 2025/11/18 に初登場</strong>し、デフォルトモデルは Gemini 3.1 Pro。Gemini CLI（2025/06）は別の OSS ターミナルツールで、Antigravity の直接的な前身ではなく <em>並走していた別製品</em>。I/O 2026 で Antigravity CLI に統合・廃止された。</p>
+  </div>
+
+  <h2 class="yellow" style="margin-top:32px;">リリース年表</h2>
   <div class="table-wrap">
     <table>
       <thead><tr><th>日付</th><th>内容</th></tr></thead>
       <tbody>
-        <tr><td>2024</td><td>Antigravity 1.0 公開（Google I/O 2024）、Gemini CLI のエージェント機能として</td></tr>
-        <tr><td>2025</td><td>Mission Control UI 追加、マルチエージェント実験的サポート</td></tr>
-        <tr><td>2026-05-19</td><td>I/O 2026: Antigravity 2.0 発表 — Desktop IDE / CLI（Go）/ SDK / Managed Agents / Enterprise の5構成</td></tr>
-        <tr><td>2026-05-19</td><td>Gemini CLI → Antigravity CLI 移行発表</td></tr>
-        <tr><td>2026-05-31</td><td>本ページ大幅改訂（旧 anti-gravity.html を全面刷新）</td></tr>
+        <tr><td>2025/06/25</td><td>Gemini CLI v0.1 公開（OSS・Node.js・デフォルト Gemini 2.5 Pro）。GitHub 100K+ ⭐、PR 6,000件以上を記録</td></tr>
+        <tr><td>2025/11/18</td><td><strong>Antigravity 1.0 公開</strong>（Gemini 3 と同時発表）。デフォルト Gemini 3.1 Pro + Gemini 3 Flash。Desktop IDE（Editor View・Manager Surface・Artifacts・Knowledge Base）。macOS / Windows / Linux 無料パブリックプレビュー</td></tr>
+        <tr><td>2026/05/19</td><td><strong>Antigravity 2.0 発表</strong>（I/O 2026）— Desktop IDE / CLI（Go）/ SDK / Managed Agents / Enterprise の5構成。デフォルト Gemini 3.5 Flash（4× 高速）</td></tr>
+        <tr><td>2026/05/19</td><td>Gemini CLI → Antigravity CLI 移行発表。Gemini Code Assist IDE Extensions も同日廃止告知</td></tr>
+        <tr><td>2026/06/18</td><td>Gemini CLI および Gemini Code Assist Extensions のサービス終了（AI Pro / Ultra / 無料ユーザー全対象）</td></tr>
+        <tr><td>2026/05/31</td><td>本ページ大幅改訂 + バージョン比較表追加（モデル情報を実際の発表に基づき修正）</td></tr>
       </tbody>
     </table>
   </div>
-  <ul>
+
+  <ul style="margin-top:16px;">
     <li><a href="ai-studio.html">ai-studio.html</a> — Google AI Studio（API プレイグラウンド）</li>
     <li><a href="vertex-ai.html">vertex-ai.html</a> — Vertex AI（エンタープライズ基盤、Managed Agents のホスト先）</li>
     <li><a href="gemini-advanced.html">gemini-advanced.html</a> — Gemini Advanced アプリ（Jules / AI Ultra）</li>
@@ -526,7 +593,7 @@ print(result.steps)          <span class="cm"># 実行ステップのトレー�
 </main>
 
 <footer>
-  <p>最終更新: 2026-05-31 | <a href="../../index.html">Hub トップ</a> | <a href="./index.html">LLM 深掘り一覧</a> | <a href="./google-ecosystem.html">Google AI エコシステム</a></p>
+  <p>最終更新: 2026-05-31（バージョン比較表追加・モデル履歴を実際の発表に基づき修正） | <a href="../../index.html">Hub トップ</a> | <a href="./index.html">LLM 深掘り一覧</a> | <a href="./google-ecosystem.html">Google AI エコシステム</a></p>
 </footer>
 </body>
 </html>
