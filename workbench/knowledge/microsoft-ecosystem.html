@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microsoft AI エコシステム総覧 | Tech Workbench</title>
+    <style>
+        :root {
+            --accent: #0078d4;
+            --accent2: #50e6ff;
+            --bg: #0d1117;
+            --surface: #161b22;
+            --surface2: #21262d;
+            --border: rgba(255, 255, 255, 0.08);
+            --text: #e6edf3;
+            --muted: #8b949e;
+            --radius: 12px;
+            --font-mono: "Cascadia Code", "SF Mono", "Consolas", monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Segoe UI", system-ui, sans-serif;
+            color: var(--text);
+            background: var(--bg);
+            padding: 0 0 64px;
+            line-height: 1.7;
+        }
+
+        nav {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 24px;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        nav a {
+            color: var(--accent2);
+            text-decoration: none;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        nav span {
+            margin: 0 6px;
+            opacity: 0.5;
+        }
+
+        .page-wrap {
+            max-width: 1060px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* ---- Hero ---- */
+        .hero {
+            background: linear-gradient(135deg, #004578, #0078d4);
+            border-radius: var(--radius);
+            padding: 56px 48px;
+            margin-top: 32px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+        }
+
+        .hero::after {
+            content: "";
+            position: absolute;
+            right: -120px;
+            bottom: -120px;
+            width: 480px;
+            height: 480px;
+            background: radial-gradient(circle, rgba(80, 230, 255, 0.15), transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero-eyebrow {
+            display: inline-block;
+            background: rgba(80, 230, 255, 0.18);
+            color: var(--accent2);
+            padding: 4px 14px;
+            border-radius: 99px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 18px;
+            border: 1px solid rgba(80, 230, 255, 0.3);
+        }
+
+        .hero h1 {
+            margin: 0 0 18px;
+            font-size: 40px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            line-height: 1.15;
+            color: #fff;
+        }
+
+        .hero .lead {
+            color: rgba(255, 255, 255, 0.78);
+            font-size: 17px;
+            max-width: 760px;
+            margin: 0 0 28px;
+        }
+
+        .hero-nav {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .hero-nav a {
+            color: rgba(255, 255, 255, 0.75);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .hero-nav a:hover {
+            color: #fff;
+        }
+
+        .hero .last-updated {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.5);
+            display: block;
+            margin-bottom: 18px;
+        }
+
+        /* ---- Sections ---- */
+        .section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 36px 40px;
+            margin-top: 28px;
+        }
+
+        .section h2 {
+            margin: 0 0 20px;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--accent);
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section h2 .h2-num {
+            font-size: 13px;
+            font-weight: 400;
+            color: var(--muted);
+            font-family: var(--font-mono);
+        }
+
+        .section p {
+            color: var(--muted);
+            font-size: 15px;
+            margin: 0 0 14px;
+        }
+
+        .section ul {
+            color: var(--muted);
+            font-size: 15px;
+            padding-left: 22px;
+            margin: 0 0 16px;
+        }
+
+        .section ul li {
+            margin-bottom: 10px;
+        }
+
+        .section ul li strong {
+            color: var(--text);
+        }
+
+        /* ---- Map grid ---- */
+        .map-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+            margin-top: 16px;
+        }
+
+        .map-col {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px 18px;
+        }
+
+        .map-col h4 {
+            margin: 0 0 10px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--accent2);
+            font-weight: 700;
+        }
+
+        .map-col ul {
+            margin: 0;
+            padding-left: 16px;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .map-col ul li {
+            margin-bottom: 5px;
+        }
+
+        /* ---- Product card grid ---- */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 0;
+        }
+
+        .card {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 28px 30px;
+            transition: transform 0.18s, border-color 0.18s;
+            position: relative;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(0, 120, 212, 0.4);
+        }
+
+        .card h3 {
+            margin: 0 0 12px;
+            font-size: 17px;
+            font-weight: 700;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .card p {
+            color: var(--muted);
+            font-size: 14px;
+            margin: 0 0 12px;
+        }
+
+        .card ul {
+            color: var(--muted);
+            font-size: 14px;
+            padding-left: 20px;
+            margin: 0 0 14px;
+        }
+
+        .card ul li {
+            margin-bottom: 8px;
+        }
+
+        .card ul li strong {
+            color: var(--text);
+        }
+
+        /* ---- Badges / Pills ---- */
+        .pill {
+            display: inline-block;
+            padding: 2px 9px;
+            border-radius: 5px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .pill-canon {
+            background: rgba(0, 120, 212, 0.2);
+            color: #50a8ff;
+            border: 1px solid rgba(0, 120, 212, 0.35);
+        }
+
+        .pill-qual {
+            background: rgba(139, 148, 158, 0.15);
+            color: #b5bfc9;
+            border: 1px solid rgba(139, 148, 158, 0.25);
+        }
+
+        .pill-open {
+            background: rgba(63, 185, 80, 0.15);
+            color: #56d364;
+            border: 1px solid rgba(63, 185, 80, 0.3);
+        }
+
+        .pill-new {
+            background: rgba(80, 230, 255, 0.15);
+            color: var(--accent2);
+            border: 1px solid rgba(80, 230, 255, 0.3);
+        }
+
+        .pill-ent {
+            background: rgba(255, 166, 0, 0.13);
+            color: #ffa600;
+            border: 1px solid rgba(255, 166, 0, 0.3);
+        }
+
+        /* ---- Info boxes ---- */
+        .highlight-box {
+            background: rgba(0, 120, 212, 0.08);
+            border: 1px solid rgba(0, 120, 212, 0.25);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-top: 12px;
+        }
+
+        .highlight-box p {
+            font-size: 13px;
+            margin: 0;
+            color: var(--text);
+        }
+
+        .warn-box {
+            background: rgba(255, 166, 0, 0.07);
+            border: 1px solid rgba(255, 166, 0, 0.28);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-top: 12px;
+        }
+
+        .warn-box p {
+            font-size: 13px;
+            margin: 0;
+            color: #ffd980;
+        }
+
+        .info-box {
+            background: rgba(63, 185, 80, 0.07);
+            border: 1px solid rgba(63, 185, 80, 0.25);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-top: 12px;
+        }
+
+        .info-box p {
+            font-size: 13px;
+            margin: 0;
+            color: #7ee787;
+        }
+
+        /* ---- Decision table ---- */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            margin-top: 12px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 11px 14px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+
+        th {
+            color: var(--accent);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        td.want {
+            color: var(--text);
+            font-weight: 600;
+            width: 36%;
+        }
+
+        td strong {
+            color: var(--accent2);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.025);
+        }
+
+        /* ---- Role badges ---- */
+        .role-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .role-card {
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 18px 20px;
+        }
+
+        .role-card h4 {
+            margin: 0 0 10px;
+            font-size: 13px;
+            color: var(--accent2);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+
+        .role-card ul {
+            margin: 0;
+            padding-left: 18px;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .role-card ul li {
+            margin-bottom: 6px;
+        }
+
+        /* ---- Footer ---- */
+        footer {
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            padding: 32px 24px;
+            margin-top: 40px;
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        footer .footer-inner {
+            max-width: 1060px;
+            margin: 0 auto;
+        }
+
+        footer h2 {
+            color: var(--accent);
+            font-size: 16px;
+            margin: 0 0 14px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
+        }
+
+        footer ul {
+            padding-left: 20px;
+            margin: 0 0 24px;
+        }
+
+        footer ul li {
+            margin-bottom: 7px;
+        }
+
+        footer a {
+            color: var(--accent2);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        footer p {
+            margin: 0;
+            font-size: 13px;
+        }
+
+        /* ---- Misc ---- */
+        a {
+            color: var(--accent2);
+        }
+
+        code {
+            font-family: var(--font-mono);
+            font-size: 0.88em;
+            background: rgba(255, 255, 255, 0.07);
+            padding: 1px 6px;
+            border-radius: 4px;
+            color: var(--text);
+        }
+
+        @media (max-width: 640px) {
+            .hero {
+                padding: 36px 24px;
+            }
+
+            .hero h1 {
+                font-size: 28px;
+            }
+
+            .section {
+                padding: 24px 20px;
+            }
+
+            .card {
+                padding: 22px 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<nav>
+    <a href="../../index.html">Hub</a>
+    <span>›</span>
+    <a href="./index.html">LLM 個別深掘り</a>
+    <span>›</span>
+    Microsoft AI エコシステム
+</nav>
+
+<main class="page-wrap">
+
+    <!-- ===== HERO ===== -->
+    <div class="hero">
+        <div class="hero-eyebrow">KNOWLEDGE / MICROSOFT ECOSYSTEM</div>
+        <h1>Microsoft AI エコシステム総覧<br>— 何をしたい時にどれを使うか</h1>
+        <p class="lead">
+            M365 Copilot・Copilot Studio・Power Platform・Azure AI Foundry・GitHub Copilot・Phi…。
+            Microsoft の AI 製品はエンタープライズ深部まで広がり、全体像が掴みにくくなっています。
+            本ページは製品スペックの羅列ではなく <strong>「目的から逆引きする意思決定ガイド」</strong>として、
+            用途別にどれを選ぶかを整理します。
+        </p>
+        <span class="last-updated">Last Updated: 2026-05-31 — Build 2026 (6/2〜3) 直前最新。MAI モデル群・GitHub Copilot usage billing・Copilot 部門統合 (2026/03) を反映。</span>
+        <div class="hero-nav">
+            <a href="index.html">← Knowledge Hub へ戻る</a>
+            <a href="github-copilot.html">GitHub Copilot 深掘り →</a>
+            <a href="google-ecosystem.html">Google AI と比較 →</a>
+        </div>
+    </div>
+
+    <!-- ===== このページの読み方 ===== -->
+    <section class="section">
+        <h2>このページの読み方</h2>
+        <p>各製品には情報の確度を示すバッジを付けています。</p>
+        <p>
+            <span class="pill pill-canon">CANON</span>
+            公式ドキュメント・価格ページ・Microsoft Blog など一次情報に裏付けがある事実。<br>
+            <span class="pill pill-open">OPEN</span>
+            オープンウェイト／MIT / Apache 2.0 ライセンスでローカル実行できる製品。<br>
+            <span class="pill pill-new">Build/Ignite</span>
+            カンファレンスで発表済み・GA直前または Preview 中の最新機能。<br>
+            <span class="pill pill-qual">定性</span>
+            公式確証が薄く、日付・数値・料金は記載せず
+            <strong>「用途・できること」中心の定性記述</strong>に留めた項目。
+        </p>
+    </section>
+
+    <!-- ===== 全体像マップ ===== -->
+    <section class="section">
+        <h2><span class="h2-num">01</span> 全体像 — 5つの軸で整理する</h2>
+        <p>
+            Microsoft の AI 製品はざっくり次の5軸に分類すると迷いません。
+            <strong>「Foundation LLM」「Productivity（M365統合）」「Power Platform（ローコード）」「Developer Platform（Azure）」「Open Weights（Phi）」</strong>です。
+            OpenAI との深い連携が軸にあり、GPT-4o / o3 系が各サービスの基盤モデルとして機能しています（2026年5月現在）。
+        </p>
+        <div class="map-grid">
+            <div class="map-col">
+                <h4>Foundation LLM</h4>
+                <ul>
+                    <li><strong>Azure OpenAI Service</strong>（GPT-4o / o3 / o4-mini）</li>
+                    <li>MAI（自社モデル群）</li>
+                    <li>モデルカタログ 1,900+</li>
+                </ul>
+            </div>
+            <div class="map-col">
+                <h4>Productivity</h4>
+                <ul>
+                    <li><strong>Microsoft 365 Copilot</strong></li>
+                    <li>Word / Excel / PowerPoint / Teams / Outlook / OneNote / Loop</li>
+                    <li>Agent Store（70+ 事前ビルド）</li>
+                </ul>
+            </div>
+            <div class="map-col">
+                <h4>Power Platform</h4>
+                <ul>
+                    <li><strong>Copilot Studio</strong></li>
+                    <li>Power Automate AI</li>
+                    <li>Power Apps Copilot</li>
+                    <li>Power BI（Copilot）</li>
+                    <li>AI Builder</li>
+                </ul>
+            </div>
+            <div class="map-col">
+                <h4>Developer Platform</h4>
+                <ul>
+                    <li><strong>Azure AI Foundry</strong></li>
+                    <li>Semantic Kernel / AutoGen</li>
+                    <li>GitHub Copilot</li>
+                    <li>Windows Local AI</li>
+                </ul>
+            </div>
+            <div class="map-col">
+                <h4>Open Weights</h4>
+                <ul>
+                    <li><strong>Phi-4 系</strong>（14B / 3.8B）</li>
+                    <li>MIT ライセンス</li>
+                    <li>ローカル・エッジ実行</li>
+                </ul>
+            </div>
+        </div>
+        <div class="warn-box" style="margin-top:18px;">
+            <p>⚠️ <strong>ブランド整理 (2026/03):</strong> Microsoft は Copilot 部門を Jacob Andreou EVP のもとに統合し、コンシューマー・商用 Copilot チームを一本化。以前は 80+ 製品が "Copilot" を名乗り混乱を招いていたが、現在は階層構造（コンシューマー Copilot → M365 Copilot → Copilot Studio → Azure AI Foundry）として整理されつつある。</p>
+        </div>
+    </section>
+
+    <!-- ===== 製品別カード ===== -->
+    <section class="section">
+        <h2><span class="h2-num">02</span> 製品別ガイド</h2>
+        <p>核となる製品を、用途・確度バッジ・判断軸付きで個別に解説します。</p>
+    </section>
+
+    <div class="card-grid" style="margin-top: 0; padding: 0 20px;">
+
+        <!-- Copilot コンシューマー -->
+        <article class="card">
+            <h3>Copilot（コンシューマー） <span class="pill pill-canon">CANON</span></h3>
+            <p><strong>microsoft.com/copilot から誰でも使える無料 AI アシスタント。</strong>
+            旧 Bing Chat を刷新したもの。テキスト生成・画像生成（DALL-E 3）・Web 検索グラウンディングを提供する「入口」製品。</p>
+            <ul>
+                <li><strong>無料プラン</strong>：Web 検索統合・DALL-E 3 画像生成・1日あたり制限あり</li>
+                <li><strong>Copilot Pro $20/月</strong>：GPT-4o 優先アクセス・M365 アプリへの Copilot 追加・Designer 強化</li>
+                <li>Edge ブラウザ・Windows 11 スタートメニューにも統合</li>
+                <li>Microsoft アカウントで Microsoft Graph（個人の OneDrive / Outlook）を参照可能</li>
+            </ul>
+            <div class="highlight-box">
+                <p>💡 <strong>使う場面：</strong>個人ユーザーが Web 検索連携で素早く調べる・文章を書く・画像を作る。エンタープライズ利用なら M365 Copilot へ移行。</p>
+            </div>
+        </article>
+
+        <!-- M365 Copilot -->
+        <article class="card">
+            <h3>Microsoft 365 Copilot <span class="pill pill-canon">CANON</span> <span class="pill pill-ent">ENTERPRISE</span></h3>
+            <p><strong>Office アプリ全体に埋め込まれたエンタープライズ AI。</strong>
+            Microsoft Graph（メール・チャット・会議・ファイル）を参照しながら、Word / Excel / PowerPoint / Teams / Outlook / OneNote / Loop を横断して動く。</p>
+            <ul>
+                <li><strong>価格：$30/ユーザー/月</strong>（年契約・M365 E3/E5 等ベースライセンス必須）。SMB 向け $18 → 2026/7月以降 $21。</li>
+                <li><strong>Business Chat（BizChat）</strong>：自然言語でメール・会議録・ドキュメントを横断検索して回答。権限外データは参照しない（Entra ゲートで制御）</li>
+                <li><strong>Agent Store：70+ 事前ビルドエージェント</strong>。カスタムエージェントは Copilot Studio で構築</li>
+                <li><strong>Agent2Agent（A2A）プロトコル</strong>（2026/03〜）：複数エージェントが互いに連携して複合タスクを実行</li>
+                <li><strong>Copilot Cowork（2026/03〜）</strong>：Anthropic Claude と共同開発。タスクをプランに変換しバックグラウンド実行</li>
+                <li>Word で長文要約・文体修正、Excel でデータ分析・グラフ生成、Teams 会議の議事録・アクション自動生成</li>
+            </ul>
+            <div class="highlight-box">
+                <p>💡 <strong>使う場面：</strong>M365 を既に使っている企業が、既存の業務フロー（メール・会議・文書作成）を AI で高速化したい場合の第一選択。</p>
+            </div>
+            <div class="highlight-box">
+                <p>📖 詳細は <a href="m365-copilot.html">m365-copilot.html</a> — アプリ別機能・価格詳細・BizChat・エージェント連携・ROI 試算</p>
+            </div>
+        </article>
+
+        <!-- Copilot Studio -->
+        <article class="card">
+            <h3>Copilot Studio <span class="pill pill-canon">CANON</span></h3>
+            <p><strong>ノーコード〜ローコードのカスタムエージェントビルダー。</strong>
+            自社データ・業務フローに合わせたエージェントを Power Platform の UI で構築し、Teams・Web・WhatsApp・M365 に公開できる。</p>
+            <ul>
+                <li><strong>価格：</strong>M365 Copilot ライセンス保有ユーザーの内部利用は追加クレジット不要。外部公開・大量利用は Copilot Credits（$200/月 = 25,000 credits）。PAYG は $0.01/credit（Azure 経由）</li>
+                <li><strong>クレジット消費の目安：</strong>通常レスポンス 1 credit、生成AIレスポンス 2、エージェントアクション 5、Graph グラウンディング 10</li>
+                <li><strong>Work IQ</strong>：インテリジェンスレイヤー。社内の業務知識・コンテキストに合わせてエージェントを調整</li>
+                <li>MCP（Model Context Protocol）対応で外部ツール連携</li>
+                <li>Copilot Studio → Azure AI Foundry への移行パスあり（複雑な要件・高度な安全設計が必要な場合）</li>
+                <li>Teams・WhatsApp・Azure Communication Services (SMS) に1クリック公開</li>
+            </ul>
+            <div class="highlight-box">
+                <p>💡 <strong>使う場面：</strong>IT 部門や業務担当者がプロコードを書かずに自社ナレッジベース連携のチャットボット・業務エージェントを作りたい場合。</p>
+            </div>
+            <div class="highlight-box">
+                <p>📖 詳細は <a href="copilot-studio.html">copilot-studio.html</a> — ビルドステップ・クレジット設計・Foundry との使い分け</p>
+            </div>
+        </article>
+
+        <!-- Power Platform AI -->
+        <article class="card">
+            <h3>Power Platform AI <span class="pill pill-canon">CANON</span></h3>
+            <p><strong>Power Automate / Power Apps / Power BI / AI Builder の AI 統合ライン。</strong>
+            ローコード基盤全体に Copilot が組み込まれ、プログラミング不要で業務自動化・アプリ開発・BI 分析が行える。</p>
+            <ul>
+                <li><strong>Power Automate Copilot：</strong>自然言語でフローを記述するだけでワークフロー自動生成。Azure AI Foundry・MCP 接続でマルチエージェント連携。Workflows Agent・Human-in-the-loop 承認・インテリジェント文書処理（AI Builder 統合）</li>
+                <li><strong>Power Apps Copilot：</strong>業務要件を自然言語で伝えるとアプリとデータモデルを自動生成。新開発体験 vibe.powerapps.com でバイブコーディング的に作成・反復</li>
+                <li><strong>Power BI Copilot：</strong>レポートの自動要約・「先月と比べて売上はどう変化した？」と質問するだけで DAX クエリと可視化を生成</li>
+                <li><strong>AI Builder：</strong>Document Processing Agent（構造化・非構造化文書からデータ抽出）・OCR・感情分析・カスタム予測モデル。Copilot Studio と 2025/9 以降統合</li>
+                <li>2025 Release Wave 2 〜 2026/3：自律エージェント・MCP・AI ファーストな UX を全製品に順次展開</li>
+            </ul>
+            <div class="highlight-box">
+                <p>💡 <strong>使う場面：</strong>市民開発者（IT 非専門の業務担当者）が承認フロー・データ収集アプリ・レポートを自力で作りたい場合。ガバナンスは IT 部門が Power Platform 管理センターで制御。</p>
+            </div>
+            <div class="highlight-box">
+                <p>📖 詳細は <a href="power-platform-ai.html">power-platform-ai.html</a> — 製品ライン比較・AI Builder 料金・実例</p>
+            </div>
+        </article>
+
+        <!-- Azure AI Foundry -->
+        <article class="card">
+            <h3>Azure AI Foundry <span class="pill pill-canon">CANON</span> <span class="pill pill-ent">PRO-CODE</span></h3>
+            <p><strong>エンタープライズ AI 開発の統合プラットフォーム（旧 Azure OpenAI + Azure ML 統合）。</strong>
+            モデルの選択・Fine-tuning・評価・デプロイ・モニタリングをワンプラットフォームで行う。Build 2025 以降「Microsoft Foundry」とも表記。</p>
+            <ul>
+                <li><strong>モデルカタログ 1,900+（Build 2025 時点）→ 11,000+ に拡大（2026年）</strong>：GPT-4o / o3 / o4-mini・Claude（Haiku 4.5 / Sonnet 4.5 / Opus 4.1）・Llama 4・Mistral Large・Phi-4・DeepSeek・Cohere 等</li>
+                <li><strong>Azure OpenAI Service</strong>：GPT 系モデルを SLA 付きで本番提供。プロビジョニングスループット（専用容量）・バッチ API で大量処理</li>
+                <li><strong>Semantic Kernel + AutoGen → Microsoft Agent Framework</strong>（GA 2025）：オープンソース SDK。A2A プロトコル・MCP 対応のマルチエージェントオーケストレーション</li>
+                <li><strong>Foundry Agent Service（GA 2025/05〜）</strong>：エージェントの構築・デプロイ・ガバナンスを一元化。M365 への1クリック公開</li>
+                <li><strong>Azure AI Content Safety / Responsible AI ツール</strong>：ハルシネーション検出・コンテンツフィルタ・コスト予算管理（Build 2026）</li>
+                <li>VPC Service Controls・Microsoft Entra Agent ID でエージェント単位のアクセス制御・監査</li>
+                <li>MAI 自社モデル（MAI-Transcribe-1・MAI-Voice-1・MAI-Image-2）を 2026/05 から開発者向けに提供開始</li>
+            </ul>
+            <div class="highlight-box">
+                <p>💡 <strong>使う場面：</strong>最大のモデル選択肢・SLA・コンプライアンス要件でエンタープライズアプリケーションを構築したい開発チーム。Copilot Studio では要件を満たせない複雑なロジックが必要な場合。</p>
+            </div>
+            <div class="highlight-box">
+                <p>📖 詳細は <a href="azure-ai-foundry.html">azure-ai-foundry.html</a> — Foundry vs Azure ML・モデルカタログ・Semantic Kernel・Agent Service コード例</p>
+            </div>
+        </article>
+
+        <!-- GitHub Copilot -->
+        <article class="card">
+            <h3>GitHub Copilot <span class="pill pill-canon">CANON</span></h3>
+            <p><strong>コーディングエージェントに進化した AI ペアプログラマー。</strong>
+            単なる補完ツールから、GitHub Issue を受け取って自律的に PR を作成する「AI チームメンバー」へ。2026年にコード生成の 46% を占める。</p>
+            <ul>
+                <li><strong>価格（2026/04 時点）：</strong>Free $0 / Pro $10/月 / Pro+ $39/月 / Business $19/ユーザー/月 / Enterprise $39/ユーザー/月。<strong>2026/06/01 から usage-based billing に移行</strong>（ベース価格は変わらず、プレミアムモデル利用はトークン消費ベースに）</li>
+                <li><strong>Agent Mode（VS Code / JetBrains GA 2026/03〜）</strong>：コードベース全体を把握してタスクを自律実行。割り込み不要。</li>
+                <li><strong>Coding Agent（非同期）</strong>：GitHub Issue を割り当てると Cloud VM で独立実装 → PR 自動作成 → CI 失敗なら自動修正。まさに「任せて待つ」設計</li>
+                <li><strong>Agentic Code Review（2026/03〜）</strong>：プロジェクト全コンテキストを参照してレビュー→修正 PR も自動生成</li>
+                <li><strong>GitHub Spark</strong>：自然言語でアプリを記述してライブプレビュー付きで即作成</li>
+                <li><strong>Semantic Code Search</strong>：キーワードではなく概念で関連コードを検索</li>
+                <li>VS Code・JetBrains・Neovim・GitHub.com・CLI から利用可能</li>
+            </ul>
+            <div class="highlight-box">
+                <p>💡 <strong>使う場面：</strong>ソフトウェア開発チームの生産性向上。補完・レビュー・非同期コーディングエージェントを用途に合わせて組み合わせる。</p>
+            </div>
+            <div class="highlight-box">
+                <p>📖 詳細は <a href="github-copilot.html">github-copilot.html</a> — Agent Mode 詳細・Coding Agent フロー・料金比較・vs Cursor / Codex</p>
+            </div>
+        </article>
+
+        <!-- Phi-4 -->
+        <article class="card">
+            <h3>Phi-4 <span class="pill pill-open">OPEN</span> <span class="pill pill-canon">CANON</span></h3>
+            <p><strong>Microsoft のオープンウェイト SLM（小型言語モデル）ファミリー。</strong>
+            MIT ライセンスで商用利用・Fine-tuning・蒸留が無制限。「小さくても賢い」をコンセプトに、671B の DeepSeek-R1 を AIME 2025 で上回るスコアを 14B で実現。</p>
+            <ul>
+                <li><strong>Phi-4-reasoning（14B）</strong>：推論特化。chain-of-thought 学習 + RL で訓練。32K コンテキスト（最大 64K で安定）。AIME 2025 でフル DeepSeek-R1（671B）超え</li>
+                <li><strong>Phi-4-reasoning-plus（14B）</strong>：SFT + RL のハイブリッド。さらに高精度。OpenAI o1-mini・DeepSeek-R1-Distill-Llama-70B を超過</li>
+                <li><strong>Phi-4-mini-reasoning（3.8B）</strong>：エッジ・モバイル向け。数学教育に特化（中学〜博士レベル 100万問以上で訓練）</li>
+                <li><strong>Phi-4-reasoning-vision</strong>（最新）：マルチモーダル推論モデル。グラフ・図表・数式を画像として理解</li>
+                <li>Azure AI Foundry・HuggingFace から取得。Ollama でローカル実行可能</li>
+                <li>Fine-tuning・蒸留に制限なし（MIT）。オンプレ・エッジデバイス・プライベートクラウドに最適</li>
+            </ul>
+            <div class="highlight-box">
+                <p>💡 <strong>使う場面：</strong>データを外に出せない・低レイテンシ必須・API コストを抑えたい・カスタム Fine-tuning が必要な場合。数学・論理推論タスクはコスト対効果が特に高い。</p>
+            </div>
+            <div class="highlight-box">
+                <p>📖 詳細は <a href="phi.html">phi.html</a> — モデル比較・Ollama セットアップ・Fine-tuning ガイド・Gemma 4 / Llama 4 との性能比較</p>
+            </div>
+        </article>
+
+        <!-- Consumer Copilot - Windows ローカル AI -->
+        <article class="card">
+            <h3>Windows Local AI <span class="pill pill-new">Build 2026</span></h3>
+            <p><strong>端末上でオンデバイス推論を実行する API / ランタイム群。</strong>
+            Build 2026 で発表されたロードマップ。NPU（Neural Processing Unit）搭載の Copilot+ PC で、レイテンシゼロ・プライバシー完全分離の AI を実現する。</p>
+            <ul>
+                <li><strong>Windows AI API</strong>：アプリから NPU / GPU を統一 API で呼び出し。Phi-4-mini など SLM をローカル実行</li>
+                <li><strong>Windows Copilot Runtime</strong>：OS レベルで Phi-4 系モデルを管理。アップデートは Windows Update 経由</li>
+                <li>Copilot+ PC（Snapdragon X / Intel Core Ultra / AMD Ryzen AI 搭載）が前提ハードウェア</li>
+                <li>ユースケース：オフライン翻訳・プライバシー優先の文書要約・低レイテンシ音声処理（MAI-Transcribe-1）</li>
+            </ul>
+            <div class="highlight-box">
+                <p>💡 <strong>使う場面：</strong>Copilot+ PC 向けアプリを開発したいエンジニア、またはオフライン・プライバシー優先の AI 処理が必要なエンタープライズ展開。</p>
+            </div>
+            <div class="warn-box">
+                <p>⚠️ Build 2026 (6/2〜3) 直前情報のため、詳細 API 仕様はカンファレンス後に確認すること。</p>
+            </div>
+        </article>
+
+    </div><!-- /.card-grid -->
+
+    <!-- ===== 早見表 ===== -->
+    <section class="section" style="margin-top: 28px;">
+        <h2><span class="h2-num">03</span> 「こういう時はこれ」早見表</h2>
+        <p>目的から逆引きする決定表です。迷ったらここから。</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>やりたいこと</th>
+                    <th>使う製品 / 判断理由</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="want">無料で手軽に AI アシスタントを使いたい（個人）</td>
+                    <td><strong>Copilot（microsoft.com/copilot）</strong> — Web 検索統合・DALL-E 3 画像生成・無料。追加機能は Copilot Pro $20/月</td>
+                </tr>
+                <tr>
+                    <td class="want">Word / Excel / Teams / Outlook を AI でもっと効率化したい</td>
+                    <td><strong>Microsoft 365 Copilot</strong>（$30/ユーザー/月）— M365 テナント内データを権限ゲート付きで参照。BizChat で横断検索</td>
+                </tr>
+                <tr>
+                    <td class="want">会議の議事録・アクションアイテムを自動生成したい</td>
+                    <td><strong>M365 Copilot（Teams Copilot）</strong> — 会議中にリアルタイム要約・出席者ごとのアクション抽出</td>
+                </tr>
+                <tr>
+                    <td class="want">自社ナレッジに接地したチャットボット・エージェントをノーコードで作りたい</td>
+                    <td><strong>Copilot Studio</strong> — SharePoint・Dataverse・外部 API に接続したエージェントを GUI で構築し Teams / Web に公開</td>
+                </tr>
+                <tr>
+                    <td class="want">業務フロー・承認ワークフローを AI で自動化したい（IT 非専門者が）</td>
+                    <td><strong>Power Automate Copilot</strong> — 自然言語でフロー記述→自動生成。Human-in-the-loop 承認も対応</td>
+                </tr>
+                <tr>
+                    <td class="want">データ入力・帳票管理アプリをコードなしで作りたい</td>
+                    <td><strong>Power Apps Copilot</strong> — 業務要件を説明するとアプリとデータモデルを自動生成。vibe.powerapps.com で反復</td>
+                </tr>
+                <tr>
+                    <td class="want">売上データから「なぜ？」を掘り下げるレポートを作りたい</td>
+                    <td><strong>Power BI Copilot</strong> — 自然言語で質問すると DAX クエリ+グラフを自動生成。レポートの自動要約付き</td>
+                </tr>
+                <tr>
+                    <td class="want">請求書・契約書・申請書から自動でデータを抽出したい</td>
+                    <td><strong>AI Builder（Document Processing Agent）</strong> — 構造化・非構造化文書から高精度にフィールド抽出。Power Automate と統合</td>
+                </tr>
+                <tr>
+                    <td class="want">GPT-4o / o3 / Claude / Llama を SLA 付きで本番運用したい</td>
+                    <td><strong>Azure AI Foundry（Azure OpenAI Service）</strong> — 1,900+ モデルカタログ・プロビジョニングスループット・企業向けコンプライアンス</td>
+                </tr>
+                <tr>
+                    <td class="want">複数の AI エージェントを連携させて複雑なタスクを自動化したい（開発者）</td>
+                    <td><strong>Azure AI Foundry + Semantic Kernel / AutoGen（Microsoft Agent Framework）</strong> — A2A・MCP 対応のマルチエージェントオーケストレーション</td>
+                </tr>
+                <tr>
+                    <td class="want">コーディング補完・リファクタリング・PR レビューを AI で高速化したい</td>
+                    <td><strong>GitHub Copilot Pro / Business</strong>（$10〜$19/月）— VS Code / JetBrains に統合。Agent Mode で自律タスク実行</td>
+                </tr>
+                <tr>
+                    <td class="want">GitHub Issue を割り当てるだけで AI にコードを書いてもらいたい（非同期）</td>
+                    <td><strong>GitHub Copilot Coding Agent</strong> — Issue → Cloud VM → 実装 → PR 自動作成 → CI 失敗なら自動修正</td>
+                </tr>
+                <tr>
+                    <td class="want">データを外部に出さず・低レイテンシでローカル AI を動かしたい</td>
+                    <td><strong>Phi-4（MIT ライセンス）</strong> — 14B / 3.8B。Ollama でローカル実行。推論精度は同サイズ最高水準</td>
+                </tr>
+                <tr>
+                    <td class="want">数学・論理推論の SLM を Fine-tuning して組み込みたい</td>
+                    <td><strong>Phi-4-reasoning / Phi-4-mini-reasoning</strong> — MIT ライセンス・蒸留制限なし。671B DeepSeek-R1 を超えるスコア（AIME 2025）を 14B で達成</td>
+                </tr>
+                <tr>
+                    <td class="want">Copilot+ PC 上でオフライン AI 処理・プライバシー保護アプリを作りたい</td>
+                    <td><strong>Windows Local AI（Build 2026〜）</strong> — NPU 活用・Windows AI API・Phi-4-mini をオンデバイス実行</td>
+                </tr>
+                <tr>
+                    <td class="want">エンタープライズで AI エージェントの身元確認・権限管理をしたい</td>
+                    <td><strong>Microsoft Entra Agent ID（Ignite 2025〜）</strong> — エージェントに固有 ID・RBAC・監査ログを付与</td>
+                </tr>
+                <tr>
+                    <td class="want">セキュリティ脅威のトリアージ・インシデント対応を AI で自動化したい</td>
+                    <td><strong>Microsoft Security Copilot</strong>（Defender / Entra / Intune / Purview 統合・12+ 組み込みエージェント）</td>
+                </tr>
+                <tr>
+                    <td class="want">企業内のエージェント一覧を管理・ガバナンスしたい</td>
+                    <td><strong>Agent 365 Control Plane（Ignite 2025〜）</strong> — エージェントレジストリ・承認フロー・不正エージェント排除</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- ===== クリエイター・ビジネス視点 ===== -->
+    <section class="section">
+        <h2><span class="h2-num">04</span> クリエイター・ビジネス視点 — どう組み合わせるか</h2>
+        <p>
+            Microsoft AI の最大の強みは、<strong>「エンタープライズの既存インフラ（M365・Azure・GitHub）と AI を継ぎ目なく接続できること」</strong>にあります。
+            Google の強みがモデル最先端とマルチモーダル表現にあるとすれば、Microsoft の強みは
+            <strong>組織の権限・セキュリティ・ガバナンスを維持したまま AI を業務フローに組み込める</strong>深度です。
+        </p>
+
+        <div class="role-grid">
+            <div class="role-card">
+                <h4>業務生産性（非エンジニア）</h4>
+                <ul>
+                    <li>日常業務 → <strong>M365 Copilot</strong></li>
+                    <li>自動化 → <strong>Power Automate Copilot</strong></li>
+                    <li>アプリ → <strong>Power Apps Copilot</strong></li>
+                    <li>分析 → <strong>Power BI Copilot</strong></li>
+                    <li>文書処理 → <strong>AI Builder</strong></li>
+                </ul>
+            </div>
+            <div class="role-card">
+                <h4>IT 部門・内製開発</h4>
+                <ul>
+                    <li>社内エージェント → <strong>Copilot Studio</strong></li>
+                    <li>本番 API → <strong>Azure AI Foundry</strong></li>
+                    <li>マルチエージェント → <strong>Semantic Kernel / AutoGen</strong></li>
+                    <li>ガバナンス → <strong>Entra Agent ID</strong></li>
+                </ul>
+            </div>
+            <div class="role-card">
+                <h4>ソフトウェア開発チーム</h4>
+                <ul>
+                    <li>日常コーディング → <strong>GitHub Copilot Pro</strong></li>
+                    <li>非同期タスク → <strong>Coding Agent</strong></li>
+                    <li>チームスケール → <strong>Copilot Enterprise</strong></li>
+                    <li>プライベート推論 → <strong>Phi-4</strong></li>
+                </ul>
+            </div>
+            <div class="role-card">
+                <h4>クリエイター（個人・スモールチーム）</h4>
+                <ul>
+                    <li>文章・素材 → <strong>Copilot Pro</strong>（DALL-E 3 統合）</li>
+                    <li>アプリ試作 → <strong>GitHub Spark</strong></li>
+                    <li>ローカル実験 → <strong>Phi-4-mini</strong></li>
+                    <li>動画は → <em>Google Veo / Flow（現時点で MS 優位製品なし）</em></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="highlight-box" style="margin-top:20px;">
+            <p>
+                💡 <strong>「組み合わせの鉄則」：</strong>M365 を基盤として <em>使う側（非エンジニア）は M365 Copilot + Power Platform</em>、
+                <em>作る側（開発チーム）は GitHub Copilot + Azure AI Foundry</em>、
+                <em>プライバシー・コスト最優先はローカル Phi-4</em>、
+                <em>全体ガバナンスは Entra Agent ID + Agent 365</em> と役割で割り当てると、
+                増え続ける製品群でも判断が安定します。
+            </p>
+        </div>
+
+        <div class="warn-box" style="margin-top:16px;">
+            <p>
+                ⚠️ <strong>Google との差別化でよく誤解されること：</strong>
+                動画生成（Veo 系）・高品質マルチモーダル画像（Imagen 4）・音楽生成（Lyria）の領域では現時点で Microsoft に同等製品はありません。
+                コンテンツ制作パイプラインに動画・音楽生成が必要なら Google AI も併用を検討してください。
+                Microsoft の優位は<strong>エンタープライズの既存資産と AI を接続する深度</strong>にあります。
+            </p>
+        </div>
+    </section>
+
+    <!-- ===== Microsoft AI の強み ===== -->
+    <section class="section">
+        <h2><span class="h2-num">05</span> Microsoft AI の強み — Google との差別化</h2>
+        <p>
+            2026年5月現在、Microsoft vs Google の AI 戦争における各社の優位点を整理します。
+            モデル性能の競争は拮抗しており、真の差別化は<strong>エコシステム統合の深さと展開速度</strong>にあります。
+        </p>
+        <ul>
+            <li><strong>テナント境界のセキュリティ：</strong>M365 Copilot のエージェントは Entra（Azure AD）の権限を自動継承。SharePoint ドキュメントや Exchange メールのアクセス権限がそのまま Copilot の参照範囲を規定する。IT 管理者が追加設定不要で情報漏洩を防止できる。</li>
+            <li><strong>開発者エコシステム：</strong>GitHub Copilot は開発者の 62% が利用（Google IDX は 15%）。Visual Studio・VS Code・JetBrains の圧倒的シェアに統合済み。コードの 46% が Copilot で生成される水準。</li>
+            <li><strong>エンタープライズ採用実績：</strong>Fortune 500 企業の 85% が Azure を利用。M365 は世界 4 億人超のビジネスユーザー。AI 導入の「最後の1マイル」（変更管理・IT ポリシー適合）で既存関係が効く。</li>
+            <li><strong>OpenAI との独占的連携：</strong>GPT-4o・o3 系を Azure で提供する独占的パートナーシップ。Anthropic Claude も Foundry 経由で提供（Copilot Cowork での深い統合含む）。</li>
+            <li><strong>ガバナンス・コンプライアンス：</strong>Agent 365（エージェントレジストリ）・Entra Agent ID・Purview 統合で、エージェントの展開・監査・ライフサイクル管理をエンタープライズ標準で実行できる。</li>
+            <li><strong>Phi の小型高精度モデル：</strong>Azure / HuggingFace / Ollama で利用できるオープンウェイト SLM として Phi-4 は業界最高水準。オンプレ・エッジへの AI 展開で Google の Gemma 4 と競合。</li>
+        </ul>
+        <div class="info-box">
+            <p>✅ <strong>Build 2026（6/2〜3）注目点：</strong>MAI 自社モデル（コーディング特化）の詳細・Windows Local AI API・Azure AI Foundry コスト管理ツール・Copilot の新 UI 発表が予定。カンファレンス後にこのページを更新予定。</p>
+        </div>
+    </section>
+
+</main>
+
+<footer>
+    <div class="footer-inner">
+        <h2>関連ページ（クロスリンク）</h2>
+        <ul>
+            <li><a href="m365-copilot.html">m365-copilot.html</a> — Microsoft 365 Copilot 全アプリ詳細（Word / Excel / Teams / BizChat / Agent Store）</li>
+            <li><a href="power-platform-ai.html">power-platform-ai.html</a> — Power Platform AI（Power Automate / Apps / BI / Pages + AI Builder）</li>
+            <li><a href="copilot-studio.html">copilot-studio.html</a> — カスタム Copilot・エージェントビルダー（ビルド手順・クレジット設計・公開チャンネル）</li>
+            <li><a href="azure-ai-foundry.html">azure-ai-foundry.html</a> — Azure AI Foundry（Azure OpenAI / モデルカタログ / Semantic Kernel / Agent Service）</li>
+            <li><a href="phi.html">phi.html</a> — Phi-4 SLM オープンウェイト（モデル比較・Ollama セットアップ・Fine-tuning・性能表）</li>
+            <li><a href="github-copilot.html">github-copilot.html</a> — GitHub Copilot（Agent Mode / Coding Agent / Spark / 料金体系）</li>
+            <li><a href="google-ecosystem.html">google-ecosystem.html</a> — Google AI エコシステム総覧（比較参考）</li>
+            <li><a href="intelligence-matrix.html">intelligence-matrix.html</a> — モデル横断の能力マトリクス</li>
+            <li><a href="slm-guide.html">slm-guide.html</a> — ローカル SLM ガイド（Phi-4 / Gemma 4 / Llama 4 比較）</li>
+            <li><a href="chatgpt.html">chatgpt.html</a> — OpenAI / ChatGPT（Azure OpenAI との関係整理）</li>
+        </ul>
+
+        <h2>主要出典・参照</h2>
+        <ul>
+            <li><a href="https://www.microsoft.com/en-us/microsoft-365-copilot/pricing" target="_blank">Microsoft 365 Copilot Pricing（公式）</a> — $30/ユーザー/月 等の価格情報</li>
+            <li><a href="https://news.microsoft.com/build-2026/" target="_blank">Microsoft Build 2026 公式サイト</a> — MAI モデル・Windows Local AI・Foundry 発表</li>
+            <li><a href="https://www.microsoft.com/en-us/microsoft-365/blog/2025/11/18/microsoft-ignite-2025-copilot-and-agents-built-to-power-the-frontier-firm/" target="_blank">Microsoft Ignite 2025 Blog</a> — Agent 365・Entra Agent ID・Work IQ・IQ Stack</li>
+            <li><a href="https://azure.microsoft.com/en-us/blog/one-year-of-phi-small-language-models-making-big-leaps-in-ai/" target="_blank">Azure Blog: One year of Phi</a> — Phi-4 ファミリー技術詳細</li>
+            <li><a href="https://github.blog/news-insights/company-news/github-copilot-is-moving-to-usage-based-billing/" target="_blank">GitHub Blog: Copilot Usage-based Billing</a> — 2026/06 以降の料金変更</li>
+            <li><a href="https://samexpert.com/microsoft-copilot-reorganisation-march-2026/" target="_blank">SAMexpert: Microsoft Copilot Reorg 2026/03</a> — Copilot 部門統合・Jacob Andreou EVP</li>
+        </ul>
+
+        <p>最終更新: 2026-05-31 | <a href="../../index.html">Hub トップ</a> | <a href="index.html">← Knowledge Hub</a></p>
+    </div>
+</footer>
+
+</body>
+</html>
