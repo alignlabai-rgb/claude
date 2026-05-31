@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Microsoft 365 Copilot — 全 Office AI 機能ガイド | Tech Workbench</title>
+<style>
+:root {
+    --accent: #6264a7;  /* Teams Purple */
+    --accent2: #0078d4; /* M365 Blue */
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #21262d;
+    --border: rgba(255,255,255,0.08);
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --radius: 12px;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; line-height:1.65; font-size:16px; }
+a { color:var(--accent2); text-decoration:none; }
+a:hover { text-decoration:underline; }
+.page-wrap { max-width:960px; margin:0 auto; padding:32px 20px 80px; }
+nav { background:var(--surface); border-bottom:1px solid var(--border); padding:12px 20px; font-size:0.85rem; }
+nav a { color:var(--muted); margin-right:6px; }
+nav a:hover { color:var(--text); }
+nav span { color:var(--muted); margin-right:6px; }
+
+/* Hero */
+.hero { background:linear-gradient(135deg, #2d2d6d, #6264a7); border-radius:var(--radius); padding:48px 40px; margin-bottom:40px; }
+.hero h1 { font-size:2.2rem; font-weight:800; color:#fff; margin-bottom:8px; }
+.hero .sub { color:rgba(255,255,255,0.88); font-size:1.05rem; margin-bottom:24px; max-width:640px; }
+.chips { display:flex; flex-wrap:wrap; gap:8px; }
+.chip { background:rgba(255,255,255,0.18); color:#fff; padding:4px 14px; border-radius:20px; font-size:0.8rem; font-weight:600; }
+
+/* Section */
+.section { margin-bottom:48px; }
+.section > h2 { font-size:1.4rem; font-weight:700; margin-bottom:16px; padding-bottom:8px; border-bottom:2px solid var(--accent); color:var(--accent); }
+.section > h2.blue { border-color:var(--accent2); color:var(--accent2); }
+p { margin-bottom:12px; }
+ul, ol { padding-left:1.5em; margin-bottom:12px; }
+li { margin-bottom:5px; }
+
+/* Grid & Cards */
+.grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:20px; margin-bottom:20px; }
+.card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:24px; }
+.card h3 { font-size:1.05rem; font-weight:700; margin-bottom:10px; color:var(--accent); }
+.card h3.blue { color:var(--accent2); }
+.card .price { font-size:1.4rem; font-weight:800; color:var(--accent2); margin:8px 0 12px; }
+.card .price-sub { font-size:0.82rem; color:var(--muted); }
+
+/* Table */
+.table-wrap { overflow-x:auto; margin:16px 0; }
+table { width:100%; border-collapse:collapse; font-size:0.9rem; }
+th { background:var(--surface2); color:var(--accent); padding:10px 14px; text-align:left; border:1px solid var(--border); }
+th.blue { color:var(--accent2); }
+td { padding:9px 14px; border:1px solid var(--border); vertical-align:top; }
+tr:nth-child(even) td { background:rgba(255,255,255,0.02); }
+
+/* Highlight Box */
+.highlight-box { background:rgba(98,100,167,0.1); border-left:3px solid var(--accent); border-radius:0 8px 8px 0; padding:16px 20px; margin:16px 0; }
+.highlight-box.blue { background:rgba(0,120,212,0.08); border-color:var(--accent2); }
+.highlight-box.green { background:rgba(79,255,176,0.08); border-color:#4fffb0; }
+.highlight-box.orange { background:rgba(251,146,60,0.08); border-color:#fb923c; }
+
+/* Badge */
+.badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:0.75rem; font-weight:700; margin-bottom:10px; }
+.badge-purple { background:rgba(98,100,167,0.2); color:#a5b4fc; border:1px solid rgba(98,100,167,0.4); }
+.badge-blue { background:rgba(0,120,212,0.15); color:#60a5fa; border:1px solid rgba(0,120,212,0.35); }
+.badge-green { background:rgba(79,255,176,0.12); color:#4fffb0; border:1px solid rgba(79,255,176,0.3); }
+.badge-orange { background:rgba(251,146,60,0.12); color:#fb923c; border:1px solid rgba(251,146,60,0.3); }
+.badge-gray { background:rgba(139,148,158,0.15); color:var(--muted); border:1px solid rgba(139,148,158,0.25); }
+
+/* App Cards */
+.app-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:24px; margin-bottom:16px; }
+.app-card h3 { font-size:1.1rem; font-weight:700; margin-bottom:12px; display:flex; align-items:center; gap:10px; }
+.app-card h3.purple { color:var(--accent); }
+.app-card h3.blue { color:var(--accent2); }
+.app-icon { font-size:1.4rem; }
+.use-case { background:var(--surface2); border-radius:8px; padding:12px 16px; margin-top:12px; font-size:0.88rem; color:var(--muted); }
+.use-case strong { color:var(--text); }
+
+/* Examples */
+.example-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; margin:16px 0; }
+.example-card { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:18px; }
+.example-card .tag { font-size:0.72rem; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:6px; }
+.example-card h4 { font-size:0.95rem; font-weight:700; margin-bottom:6px; }
+.example-card p { font-size:0.88rem; color:var(--muted); margin:0; line-height:1.55; }
+
+/* Comparison Table */
+.ok { color:#4fffb0; font-weight:700; }
+.good { color:#86efac; font-weight:600; }
+.partial { color:#facc15; font-weight:600; }
+.no { color:#f85149; }
+
+/* Footer */
+footer { text-align:center; padding:32px 20px; color:var(--muted); font-size:0.85rem; border-top:1px solid var(--border); margin-top:60px; }
+footer a { color:var(--muted); }
+footer a:hover { color:var(--text); }
+
+/* Responsive */
+@media (max-width:640px) {
+  .hero { padding:32px 24px; }
+  .hero h1 { font-size:1.6rem; }
+  .grid { grid-template-columns:1fr; }
+  .example-grid { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="../../index.html">Hub</a> <span>›</span>
+  <a href="./index.html">LLM 個別深掘り</a> <span>›</span>
+  <a href="./microsoft-ecosystem.html">Microsoft AI エコシステム</a> <span>›</span>
+  M365 Copilot
+</nav>
+
+<main class="page-wrap">
+
+<!-- Hero -->
+<div class="hero">
+  <h1>Microsoft 365 Copilot — 全 Office AI 機能ガイド</h1>
+  <p class="sub">Word・Excel・PowerPoint・Outlook・Teams・OneNote・Loop 全アプリに統合された企業向け AI。Microsoft Graph でメール・会議・ファイルを横断参照し、自分のデータだけを使って仕事を加速する。2026年5月最新情報。</p>
+  <div class="chips">
+    <span class="chip">Word Copilot</span>
+    <span class="chip">Excel Copilot</span>
+    <span class="chip">Teams Intelligent Recap</span>
+    <span class="chip">Copilot Pages</span>
+    <span class="chip">$30/user/month</span>
+    <span class="chip">M365 E3/E5</span>
+    <span class="chip">Work IQ</span>
+    <span class="chip">Agent Mode GA</span>
+  </div>
+</div>
+
+<!-- 1. M365 Copilot とは -->
+<section class="section">
+  <h2>1. Microsoft 365 Copilot とは</h2>
+  <p><strong>Microsoft 365 Copilot</strong> は、Word・Excel・PowerPoint・Outlook・Teams・OneNote・Loop など Microsoft 365 の全アプリに AI を統合したエンタープライズ向けサービスです。OpenAI の大規模言語モデル（GPT-5.5 Instant など）と <strong>Microsoft Graph</strong> を組み合わせ、ユーザー自身のメール・会議・ファイル・チャットを文脈として AI に提供します。</p>
+
+  <div class="highlight-box">
+    <p><strong>Microsoft Graph との接続:</strong> Copilot は Microsoft Graph API を通じてユーザーのメール・カレンダー・Teams チャット・SharePoint ドキュメント・OneDrive ファイルを横断参照します。これにより「先週の○○プロジェクトの資料を元に提案書を書いて」といったリクエストが可能になります。</p>
+  </div>
+
+  <div class="highlight-box blue">
+    <p><strong>セキュリティ境界（自分のデータのみ）:</strong> Copilot がアクセスできるのは、ユーザーがアクセス権を持つデータのみです。組織の権限・秘密保持ラベル・コンプライアンスルールはすべて維持されます。プロンプト・レスポンス・参照データは Microsoft の AI 基盤モデルの学習に使用されません（GDPR / EU データ境界にも対応）。</p>
+  </div>
+
+  <div class="highlight-box green">
+    <p><strong>Work IQ（2025年 Ignite 発表）:</strong> Copilot の「知性レイヤー」として登場した Work IQ は、デジタルワークスペースのシグナル（メール・ファイル・チャット・会議）を継続解析し、組織のワークフローを学習します。Copilot がユーザーの仕事スタイルを把握し、より的確なコンテキストを提供することでアシスト精度が向上します。</p>
+  </div>
+
+  <div class="highlight-box orange">
+    <p><strong>Agent Mode 一般公開（2026年4月）:</strong> Word・Excel・PowerPoint での Agent Mode が GA になりました。Copilot が単一プロンプトで多段階の作業（調査 → 作成 → 修正）を自律実行できるようになり、従来の「一問一答」から「仕事の代行」に進化しました。</p>
+  </div>
+
+  <h3 style="margin:20px 0 12px; font-size:1.05rem; color:var(--accent2);">2026年5月 最新モデル選択</h3>
+  <p>M365 Copilot はモデル選択機能を提供しており、以下のモデルが利用可能です:</p>
+  <ul>
+    <li><strong>OpenAI GPT-5.5 Instant</strong> — 日常業務向けの高品質レスポンス。画像分析・STEM 問題に強く、簡潔で無駄のない回答</li>
+    <li><strong>Anthropic Claude Opus 4.8</strong> — 複雑な多段階タスク向け。文書作成・データ分析・プレゼン生成での強力なツール選択と指示遵守</li>
+    <li><strong>Microsoft 独自モデル</strong> — 各アプリに特化した処理（リアルタイム会議文字起こし等）</li>
+  </ul>
+</section>
+
+<!-- 2. 対象プランと料金 -->
+<section class="section">
+  <h2 class="blue">2. 対象プランと料金（2026年最新）</h2>
+
+  <p>Microsoft 365 Copilot は既存の M365 ライセンスへのアドオンとして提供されます。Enterprise 向けと Business 向けで体系が異なります。</p>
+
+  <h3 style="margin:20px 0 12px; font-size:1.05rem; color:var(--accent);">Enterprise 向け（E3/E5 アドオン）</h3>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>プラン</th>
+          <th>月額（/ユーザー）</th>
+          <th>Copilot アドオン</th>
+          <th>合計目安</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Microsoft 365 E3</td>
+          <td>$36/user</td>
+          <td rowspan="2" style="vertical-align:middle; text-align:center;">+$30/user<br><span style="font-size:0.8rem; color:var(--muted);">年間契約</span></td>
+          <td>$66/user/月</td>
+        </tr>
+        <tr>
+          <td>Microsoft 365 E5</td>
+          <td>$57/user</td>
+          <td>$87/user/月</td>
+        </tr>
+        <tr>
+          <td>Office 365 E3/E5</td>
+          <td>$23〜$38/user</td>
+          <td>+$30/user</td>
+          <td>要確認</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 style="margin:20px 0 12px; font-size:1.05rem; color:var(--accent);">Business 向け（SMB / 最大300ユーザー）</h3>
+  <div class="grid">
+    <div class="card">
+      <h3 class="blue">Copilot for Microsoft 365 Business</h3>
+      <div class="price">$18〜$21<span style="font-size:0.9rem;">/user/月</span></div>
+      <div class="price-sub">2026年6月まで $18（プロモ価格）、以降 $21</div>
+      <ul style="margin-top:12px;">
+        <li>Business Basic / Standard / Premium に追加</li>
+        <li>最大300ユーザーまで</li>
+        <li>Word・Excel・PowerPoint・Outlook・Teams 全対応</li>
+        <li>Copilot Chat（旧 Bing Chat Enterprise）含む</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 class="blue">必要な基本ライセンス（Business）</h3>
+      <ul style="margin-top:8px;">
+        <li><strong>Business Basic:</strong> $6/user/月（Webアプリのみ）</li>
+        <li><strong>Business Standard:</strong> $12.50/user/月（フルデスクトップ）</li>
+        <li><strong>Business Premium:</strong> $22/user/月（セキュリティ強化）</li>
+      </ul>
+      <div class="use-case" style="margin-top:16px;">
+        <strong>注:</strong> デスクトップアプリでの Copilot 利用には Business Standard 以上を推奨
+      </div>
+    </div>
+  </div>
+
+  <div class="highlight-box">
+    <p><strong>2026年7月1日 価格改定予定:</strong> Microsoft は 2026年7月1日から商用 M365 ライセンス全般の価格改定を実施予定（AI・セキュリティ・管理機能の拡充に伴う）。導入検討中の場合は改定前のロック価格キャンペーンに注意。</p>
+  </div>
+</section>
+
+<!-- 3. アプリ別詳細 -->
+<section class="section">
+  <h2>3. アプリ別 Copilot 機能詳細</h2>
+
+  <!-- Word -->
+  <div class="app-card">
+    <h3 class="blue"><span class="app-icon">📄</span> Word Copilot</h3>
+    <span class="badge badge-blue">文書作成</span>
+    <span class="badge badge-purple">Agent Mode GA</span>
+    <ul>
+      <li><strong>Draft（下書き生成）</strong>: 「〜について3ページの提案書を作って」と指示するだけでアウトライン・本文を自動生成。PDF や既存ファイルをグラウンドとして使用可能</li>
+      <li><strong>Rewrite（書き換え）</strong>: 選択した段落のトーン変更（フォーマル/カジュアル）・長さ調整・言い換えを即時実行</li>
+      <li><strong>Summarize（要約）</strong>: 長文レポート・契約書・マニュアルを1クリックで要約。文書の「何が重要か」を即把握</li>
+      <li><strong>他ドキュメント参照</strong>: Microsoft Graph 経由でメール・Teams チャット・過去の Word ファイルを参照した文書生成が可能（「先月の議事録を元に今月の報告書を書いて」）</li>
+      <li><strong>Legal Agent（法務特化）</strong>: 契約書レビュー・赤線編集・交渉ポイント抽出を構造化ワークフローで処理。変更提案は「変更履歴」として表示</li>
+      <li><strong>引用付き回答</strong>: Web コンテンツや Work IQ ソースから情報を取得した場合、自動的に引用元を表示して検証を容易に</li>
+      <li><strong>Agent Mode</strong>: 複数のステップ（調査→構成→執筆→校正）を単一プロンプトで自律実行</li>
+    </ul>
+    <div class="use-case">
+      <strong>ユースケース:</strong> 営業チームが複数の提案書テンプレートと過去メールを元に、顧客ごとにカスタマイズされた提案書を5分以内に生成。従来の半日作業が大幅短縮。
+    </div>
+  </div>
+
+  <!-- Excel -->
+  <div class="app-card">
+    <h3 class="blue"><span class="app-icon">📊</span> Excel Copilot</h3>
+    <span class="badge badge-blue">データ分析</span>
+    <span class="badge badge-green">Python 統合</span>
+    <span class="badge badge-purple">Agent Mode GA</span>
+    <ul>
+      <li><strong>自然言語でデータ分析</strong>: 「この売上データから月次トレンドを分析して」と入力するだけで集計・グラフ・インサイトを自動生成</li>
+      <li><strong>Python 統合（Copilot in Excel with Python）</strong>: 自然言語から Python コードを生成し、高度な統計分析・機械学習モデル適用・予測分析を実行（Anaconda との提携）</li>
+      <li><strong>数式生成</strong>: 「売上が先月比10%以上増加した行をハイライトする条件付き書式を作って」と指示するだけで複雑な数式・書式を生成</li>
+      <li><strong>予測列</strong>: 既存データのパターンから将来値を予測する新しい列を追加。在庫・売上・需要予測に活用</li>
+      <li><strong>グラフ自動生成</strong>: データを選択して「このデータに最適なグラフを作って」と指示すると、グラフタイプ選択・軸設定・色付けを自動実行</li>
+      <li><strong>多段階編集（Agent Mode）</strong>: ローカルファイル（Windows/Mac）でも複数ステップの編集を単一プロンプトで自律実行</li>
+      <li><strong>Work IQ 自動コンテキスト</strong>: Excel 編集時に関連メール・会議・チャット・ファイルを自動収集し、より正確な多段階編集を支援</li>
+    </ul>
+    <div class="use-case">
+      <strong>ユースケース:</strong> 経理チームが月次決算データを Excel に貼り付け、「部門別コスト比較と前期比グラフを作成して」と指示するだけで分析レポートが完成。Python 統合により統計的異常値も自動検出。
+    </div>
+  </div>
+
+  <!-- PowerPoint -->
+  <div class="app-card">
+    <h3 class="blue"><span class="app-icon">📊</span> PowerPoint Copilot</h3>
+    <span class="badge badge-blue">プレゼン生成</span>
+    <span class="badge badge-purple">Narrative Builder</span>
+    <span class="badge badge-orange">Agent Mode GA</span>
+    <ul>
+      <li><strong>Narrative Builder</strong>: テーマや要件を入力して Copilot と対話しながら構成を練り、数分でプレゼン初稿を共同作成。PDF・Word 文書をグラウンドとして活用可能</li>
+      <li><strong>ブランドテンプレートから生成</strong>: 組織のブランドガイドラインに沿ったスライドを自動生成。フォント・色・レイアウトを統一</li>
+      <li><strong>スタイル統一（2026年新機能）</strong>: 全スライドのフォント・フォントサイズ・箇条書きスタイルを一括統一。M&A 後の資料整理などに効果的</li>
+      <li><strong>スライド要約</strong>: 長い資料から「エグゼクティブサマリー1枚」を自動生成。経営層向けのサマリーデックを即作成</li>
+      <li><strong>話者ノート自動生成</strong>: 各スライドの内容から、発表者が使いやすい詳細な話者ノートを自動作成</li>
+      <li><strong>AI 画像生成統合</strong>: OpenAI 最新画像生成モデル（DALL-E ベース）を使ってスライド内の画像をその場で生成。プロンプト精度と視覚的品質が 2026年に大幅向上</li>
+      <li><strong>Agent Mode</strong>: 「この Word 文書から15枚のプレゼンを作り、各スライドに関連画像を入れて」を一度に実行</li>
+    </ul>
+    <div class="use-case">
+      <strong>ユースケース:</strong> コンサルタントが100ページの調査レポート（PDF）を元に、クライアント向け15枚のエグゼクティブデックを30分で作成。ブランドテンプレートが自動適用され、デザイン調整不要。
+    </div>
+  </div>
+
+  <!-- Outlook -->
+  <div class="app-card">
+    <h3 class="purple"><span class="app-icon">📧</span> Outlook Copilot</h3>
+    <span class="badge badge-purple">メール管理</span>
+    <span class="badge badge-blue">Agentic Calendar</span>
+    <ul>
+      <li><strong>スレッド要約</strong>: 長い返信チェーンを1クリックでサマリー。「誰が何を決めたか」「次のアクションは何か」を瞬時に把握</li>
+      <li><strong>返信案生成（Draft with Copilot）</strong>: メール内容を踏まえた返信案を自動生成。トーン調整（フォーマル・カジュアル）や長さ変更も可能</li>
+      <li><strong>受信箱 AI 分析（2025〜2026）</strong>: Copilot Chat が受信箱全体・カレンダー・会議データを横断分析。「今週対応が必要なメールは？」「未回答の重要メールは？」を自然言語で問い合わせ</li>
+      <li><strong>優先メール判定</strong>: AI が重要度・緊急度を判断してメールをスコアリング。見逃しリスクを低減</li>
+      <li><strong>Meeting Insights</strong>: 会議前に関連メール・過去の議事録・参加者情報を自動収集してブリーフィングを作成</li>
+      <li><strong>AI コーチング</strong>: 送信前にメールのトーン・明瞭さ・インクルーシブ言語をチェックして改善提案</li>
+      <li><strong>Agentic スケジューリング</strong>: 「来週中に○○さんと1時間の打ち合わせを設定して」と指示するだけで空き時間を探して招待を送信</li>
+    </ul>
+    <div class="use-case">
+      <strong>ユースケース:</strong> 毎朝 200件以上のメールを受け取る部門長が、Copilot の受信箱分析で「今日対応必須の10件」だけをピックアップ。返信案を採用・微修正するだけで対応時間を60%短縮。
+    </div>
+  </div>
+
+  <!-- Teams -->
+  <div class="app-card">
+    <h3 class="purple"><span class="app-icon">👥</span> Teams Copilot</h3>
+    <span class="badge badge-purple">Intelligent Recap</span>
+    <span class="badge badge-blue">Facilitator Agent</span>
+    <span class="badge badge-green">多言語対応</span>
+    <ul>
+      <li><strong>Intelligent Recap（会議後サマリー）</strong>: 録音・文字起こし・PPT データを使い、会議の決定事項・アクションアイテム・キーポイントを自動生成。参加者タイムラインで誰がいつ何を言ったかも確認可能</li>
+      <li><strong>会議中リアルタイム Q&amp;A</strong>: 会議中に「○○さんは予算についてどう言いましたか？」とサイドパネルで検索。会議に遅刻した際も途中参加後すぐに「これまでの流れを教えて」と確認可能</li>
+      <li><strong>アクションアイテム自動抽出</strong>: 会議から TODO・担当者・期限を自動抽出。Planner やメールへの連携も可能</li>
+      <li><strong>Facilitator Meeting Agent</strong>: 招待状・チャットからアジェンダトピックを抽出し、会議中のディスカッションを追跡。会議の進行を AI がサポート</li>
+      <li><strong>録音なしサマリー（2026年6月 GA 予定）</strong>: 録音・文字起こしを保存せずに、ライブコンテキストからのみ AI サマリーを生成。プライバシーに配慮した新モード</li>
+      <li><strong>Video Recap（2026年4〜5月）</strong>: AI が生成した動画版サマリー。キーポイントと関連クリップをナレーション付きで組み合わせた数分のダイジェスト</li>
+      <li><strong>Copilot in Teams Chat</strong>: チャット・チャンネルでも Copilot Chat が利用可能。SharePoint サイト・リストを参照したプロンプトにも対応</li>
+      <li><strong>多言語 Audio Recap</strong>: 英語に加えて日本語・中国語・フランス語・ドイツ語・イタリア語・ポルトガル語・スペイン語の音声サマリーに対応</li>
+    </ul>
+    <div class="use-case">
+      <strong>ユースケース:</strong> グローバルプロジェクトチームが毎週開催する90分会議。Teams Intelligent Recap により、欠席者は5分でサマリーと自分のアクションアイテムを確認。日本語 Audio Recap で英語会議の内容を日本語で把握。
+    </div>
+  </div>
+
+  <!-- OneNote -->
+  <div class="app-card">
+    <h3 class="blue"><span class="app-icon">📓</span> OneNote Copilot</h3>
+    <span class="badge badge-blue">ノート整理</span>
+    <span class="badge badge-purple">Copilot Notebooks</span>
+    <ul>
+      <li><strong>Copilot Notebooks（OneNote 統合）</strong>: ノート・ドキュメント・Webサイト・会議録画を Notebook にまとめ、Copilot がその内容を元に質問応答・分析・要約を実行</li>
+      <li><strong>Study Guide 生成</strong>: ノートの内容から学習ガイド・フラッシュカード・問題集を自動生成。資格勉強・新入社員研修に活用</li>
+      <li><strong>ノート整理・構造化</strong>: 散在したメモを自動的に構造化。箇条書き・見出し・セクション分けを AI が提案</li>
+      <li><strong>アクションアイテム抽出</strong>: 会議録画やノートから TODO・決定事項・フォローアップ項目を自動抽出</li>
+      <li><strong>マインドマップ生成</strong>: ノート内容からマインドマップを自動生成して視覚的に整理</li>
+      <li><strong>Word/PowerPoint 変換</strong>: Notebook の内容から Word 文書や PowerPoint プレゼンを直接生成</li>
+      <li><strong>SharePoint・M365 グループ共有</strong>: Notebook を M365 グループと共有し、チーム全体でナレッジベースとして活用</li>
+    </ul>
+    <div class="use-case">
+      <strong>ユースケース:</strong> HR チームが新入社員研修資料（50ページの OneNote ノート）から研修問題集と Study Guide を自動生成。研修資料の作成時間を従来の1/3に短縮。
+    </div>
+  </div>
+
+  <!-- Loop -->
+  <div class="app-card">
+    <h3 class="purple"><span class="app-icon">🔄</span> Loop Copilot</h3>
+    <span class="badge badge-purple">共同ワークスペース</span>
+    <span class="badge badge-blue">Loop コンポーネント</span>
+    <ul>
+      <li><strong>AI Summary</strong>: Loop ページ・ワークスペースの内容を即座に要約。大量のコラボレーション情報を素早く把握</li>
+      <li><strong>共同ワークスペース</strong>: Teams・Outlook・OneNote 内に埋め込み可能な Loop コンポーネントを AI が生成。会議アジェンダ・TODO リスト・投票を動的に挿入</li>
+      <li><strong>Loop コンポーネント自動生成</strong>: チャットで「このプロジェクトのタスクリストを Loop コンポーネントで作って」と指示するだけで生成</li>
+      <li><strong>リアルタイム共同編集</strong>: 複数人が同時にコンポーネントを編集でき、変更が全アプリに即時反映</li>
+      <li><strong>チャンネル統合</strong>: Teams チャンネルに Loop ページを追加して、文脈を持った作業スペースを構築</li>
+    </ul>
+    <div class="use-case">
+      <strong>ユースケース:</strong> マーケティングチームが週次スプリントの計画に Loop を使用。Copilot が過去の成果データを参照してタスクリストを自動生成し、優先度も提案。チームメンバーが Outlook/Teams どちらからでも同じコンポーネントを編集可能。
+    </div>
+  </div>
+
+  <!-- Copilot Pages -->
+  <div class="app-card">
+    <h3 class="purple"><span class="app-icon">📋</span> Copilot Pages</h3>
+    <span class="badge badge-purple">Wave 2 機能</span>
+    <span class="badge badge-blue">AI 共同文書作成</span>
+    <ul>
+      <li><strong>AI との共同文書作成</strong>: Copilot Chat のレスポンスをページとして保存・編集。AI が提供した情報を雛形に、チームで肉付けして完成文書に仕上げる</li>
+      <li><strong>引用付き回答のページ化</strong>: Copilot が Web・社内データを参照して生成した回答に引用が付き、そのままページとして共有可能</li>
+      <li><strong>チームへの共有</strong>: 作成した Page を M365 グループ・Teams チャンネルに共有。メンバーが継続的に加筆・修正可能</li>
+      <li><strong>Copilot Notebooks 統合</strong>: Notebook から Page を作成・編集し、ノート内容とシームレスに連携</li>
+      <li><strong>SharePoint・OneNote 参照</strong>: ページ作成時に SharePoint コンテンツや OneNote ノートを参照ソースとして指定</li>
+      <li><strong>Word/PPT 変換</strong>: Pages の内容から Word 文書や PowerPoint プレゼンをワンクリックで生成</li>
+    </ul>
+    <div class="use-case">
+      <strong>ユースケース:</strong> リサーチチームが競合分析を依頼すると Copilot が引用付きサマリーを生成 → Page として保存 → チームメンバーが各自の知見を追記 → 最終的に Word 報告書に変換して経営層に提出。
+    </div>
+  </div>
+</section>
+
+<!-- 4. Copilot Chat -->
+<section class="section">
+  <h2 class="blue">4. Copilot Chat（旧 Bing Chat Enterprise）</h2>
+
+  <p><strong>Copilot Chat</strong>（旧称: Bing Chat Enterprise）は、M365 Copilot ライセンスに含まれるチャット型 AI インターフェースです。2025年末から無料版（フリーミアム）も提供開始され、利用の幅が広がっています。</p>
+
+  <div class="grid">
+    <div class="card">
+      <h3>Web グラウンディング</h3>
+      <ul>
+        <li>最新のWeb情報をリアルタイムで参照</li>
+        <li>情報ソースの引用を明示</li>
+        <li>ChatGPT・Perplexity に近い体験を企業環境で</li>
+        <li>データは企業外部に漏洩しない設計（Enterprise Data Protection）</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 class="blue">社内データ参照（Work モード）</h3>
+      <ul>
+        <li>メール・カレンダー・ファイル・Teams を横断検索</li>
+        <li>「先月○○プロジェクトで決まったことは？」をそのまま質問</li>
+        <li>SharePoint リスト・サイトを "/" で参照指定</li>
+        <li>Work IQ により関連コンテキストを自動提供</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>アプリ横断アクセス</h3>
+      <ul>
+        <li>Word・Excel・PowerPoint エージェントをチャットから呼び出し</li>
+        <li>「この Excel ファイルを分析して」と添付・参照が可能</li>
+        <li>Teams チャット・チャンネル・会議でも利用可能</li>
+        <li>Outlook の受信箱全体を対象に問い合わせ</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>CarPlay &amp; モバイル対応（2026年5月）</h3>
+      <ul>
+        <li>Apple CarPlay 対応: 車内でハンズフリーで Copilot Chat を利用</li>
+        <li>iOS/Android アプリのチャット UI を刷新（テキスト書式・引用表示）</li>
+        <li>音声でプロンプト入力・回答聴取が可能</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="highlight-box blue">
+    <p><strong>Copilot Chat の無料版（2025年末〜）:</strong> M365 Copilot ライセンスなしでも一部機能を無料で試用可能。ただし社内データ参照（Work モード）や Word/Excel/PowerPoint エージェントへのフルアクセスは有料ライセンスが必要。</p>
+  </div>
+</section>
+
+<!-- 5. 実例 12選 -->
+<section class="section">
+  <h2>5. 実例 12 選 — 部署・業種別シナリオ</h2>
+
+  <div class="example-grid">
+    <div class="example-card">
+      <div class="tag">営業 / BtoB</div>
+      <h4>提案書の高速カスタマイズ</h4>
+      <p>顧客ごとに異なる提案書を Word Copilot が過去メール・商談ログを参照して自動生成。1社あたり4時間かかっていた作業が30分に短縮。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">マーケティング / コンテンツ</div>
+      <h4>週次レポートの自動化</h4>
+      <p>Excel のキャンペーンデータから Copilot がグラフ生成 → PowerPoint でマネジメント向けデックに変換 → Outlook で自動配信。レポート作成が月8時間の削減。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">HR / 採用</div>
+      <h4>面接メモの構造化と評価シート生成</h4>
+      <p>Teams 会議（面接）の Intelligent Recap を使って候補者の発言をカテゴリ別に整理。評価シートへの転記が自動化され、面接後5分で評価レポートが完成。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">法務 / コンプライアンス</div>
+      <h4>契約書レビューの効率化</h4>
+      <p>Word の Legal Agent が50ページの契約書を解析し、リスク条項・修正提案・交渉ポイントを「変更履歴」形式で出力。初見レビュー時間を半減。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">製造 / 品質保証</div>
+      <h4>品質レポートの多言語展開</h4>
+      <p>日本語で作成した品質報告書を Word Copilot が英語・中国語に翻訳し、フォーマットを統一。海外拠点への配布まで1時間以内に完了。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">経理 / 財務</div>
+      <h4>月次決算の可視化</h4>
+      <p>Excel Copilot with Python が財務データの異常値を自動検出し、前期比グラフと予算差異分析を生成。経理担当者が数式不要で高度な財務分析を実現。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">コンサル / PMO</div>
+      <h4>クライアント向けデック生成</h4>
+      <p>PowerPoint Narrative Builder が100ページの調査レポート（PDF）からエグゼクティブサマリーデック（15枚）を自動生成。クライアントのブランドカラーも自動適用。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">カスタマーサポート</div>
+      <h4>問い合わせ対応の標準化</h4>
+      <p>Outlook Copilot が優先度の高い問い合わせを自動識別し、返信案を提示。よくある質問パターンを学習して回答品質を向上させ、対応時間を40%削減。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">研究開発 / 技術</div>
+      <h4>特許・論文リサーチの加速</h4>
+      <p>Copilot Chat（Web グラウンディング）が最新論文・特許を横断検索し、Copilot Pages に引用付きサマリーを作成。研究チームがリアルタイムで共同編集して知見を蓄積。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">人材開発 / 教育</div>
+      <h4>研修プログラムの自動生成</h4>
+      <p>OneNote の業務マニュアルから Copilot が Study Guide・問題集・フラッシュカードを自動生成。新人研修用コンテンツ作成時間を従来比75%削減。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">経営 / エグゼクティブ</div>
+      <h4>朝の情報ダッシュボード</h4>
+      <p>Copilot Chat が前日の重要メール・会議サマリー・未解決アクションアイテムを収集してモーニングブリーフィングを生成。経営者が朝10分で全体状況を把握。</p>
+    </div>
+    <div class="example-card">
+      <div class="tag">グローバル / 多言語</div>
+      <h4>国際会議のリアルタイム多言語対応</h4>
+      <p>Teams の多言語 Audio Recap により、英語で行われた取締役会の内容を日本語サマリーとアクションアイテムで受け取り。海外本社との情報格差を解消。</p>
+    </div>
+  </div>
+</section>
+
+<!-- 6. vs Google Workspace AI 比較表 -->
+<section class="section">
+  <h2 class="blue">6. Microsoft 365 Copilot vs Google Workspace AI（Gemini）比較</h2>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>比較軸</th>
+          <th class="blue">M365 Copilot</th>
+          <th style="color:#3b82f6;">Google Workspace AI（Gemini）</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>基本料金</strong></td>
+          <td>+$30/user/月（E3/E5 アドオン）<br><span style="font-size:0.82rem; color:var(--muted);">Business は $18〜21/user</span></td>
+          <td><span class="ok">◎</span> 全有料プランに標準搭載（追加料金なし）<br><span style="font-size:0.82rem; color:var(--muted);">Business Standard $14/user に含む</span></td>
+        </tr>
+        <tr>
+          <td><strong>組織データとの統合深度</strong></td>
+          <td><span class="ok">◎</span> Microsoft Graph により全アプリのデータを深く統合。Work IQ で組織パターンも学習</td>
+          <td><span class="good">○</span> Drive・Gmail を参照。Graph 相当の深さには及ばない</td>
+        </tr>
+        <tr>
+          <td><strong>Word / Docs 文書作成</strong></td>
+          <td><span class="ok">◎</span> Agent Mode GA・Legal Agent・Narrative Builder・引用自動表示</td>
+          <td><span class="good">○</span> Help me write・Drive 参照・文体統一機能</td>
+        </tr>
+        <tr>
+          <td><strong>Excel / Sheets データ分析</strong></td>
+          <td><span class="ok">◎</span> Python 統合・予測列・多段階 Agent Mode・Work IQ 自動コンテキスト</td>
+          <td><span class="good">○</span> Help me analyze・数式生成・チャート提案</td>
+        </tr>
+        <tr>
+          <td><strong>PowerPoint / Slides プレゼン</strong></td>
+          <td><span class="ok">◎</span> Narrative Builder・スタイル一括統一・PDF グラウンド・AI 画像生成</td>
+          <td><span class="good">○</span> テーマ入力で生成・Imagen 4 画像生成・スピーカーノート</td>
+        </tr>
+        <tr>
+          <td><strong>Outlook / Gmail メール</strong></td>
+          <td><span class="ok">◎</span> Agentic スケジューリング・受信箱全体分析・AI コーチング・Meeting Insights</td>
+          <td><span class="good">○</span> AI Inbox・Help me write・スレッド要約・Q&amp;A</td>
+        </tr>
+        <tr>
+          <td><strong>会議 AI（Teams / Meet）</strong></td>
+          <td><span class="ok">◎</span> Intelligent Recap・Facilitator Agent・録音なしサマリー・Video Recap・多言語</td>
+          <td><span class="good">○</span> 自動サマリー・Zoom/Teams クロスプラットフォーム・リアルタイム字幕</td>
+        </tr>
+        <tr>
+          <td><strong>ノート / ナレッジ管理</strong></td>
+          <td><span class="ok">◎</span> OneNote Copilot Notebooks・Study Guide・マインドマップ・Loop 統合</td>
+          <td><span class="partial">△</span> NotebookLM（別製品）が強力。Workspace ネイティブ統合は限定的</td>
+        </tr>
+        <tr>
+          <td><strong>動画生成</strong></td>
+          <td><span class="partial">△</span> Copilot でのクリップ生成は限定的（Clipchamp 統合）</td>
+          <td><span class="ok">◎</span> Google Vids（Veo 3・Imagen 4・Lyria 3）が非常に強力</td>
+        </tr>
+        <tr>
+          <td><strong>セキュリティ・コンプライアンス</strong></td>
+          <td><span class="ok">◎</span> Microsoft Purview 統合・感度ラベル継承・GDPR/EU データ境界・Agent 365</td>
+          <td><span class="good">○</span> Workspace 契約でモデル学習に非使用。EU データ居住も対応</td>
+        </tr>
+        <tr>
+          <td><strong>AI エージェント（自律実行）</strong></td>
+          <td><span class="ok">◎</span> Word/Excel/PPT Agent Mode GA・Copilot Studio でカスタムエージェント構築</td>
+          <td><span class="partial">△</span> Gemini 経由でのエージェント機能は拡充中。AppSheet 連携</td>
+        </tr>
+        <tr>
+          <td><strong>エンタープライズ向け成熟度</strong></td>
+          <td><span class="ok">◎</span> 大企業向け機能・ガバナンスが成熟。700万社超の導入実績</td>
+          <td><span class="good">○</span> 中小〜中堅企業で普及。Enterprise 向け強化中</td>
+        </tr>
+        <tr>
+          <td><strong>日本語対応</strong></td>
+          <td><span class="ok">◎</span> 日本語 Audio Recap・OneNote・全アプリで日本語対応</td>
+          <td><span class="good">○</span> Gmail・Docs 等で日本語対応。Vids は英語中心</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="highlight-box">
+    <p><strong>まとめ:</strong> M365 Copilot は組織データとの統合深度・エンタープライズ向けガバナンス・エージェント機能で優位。Google Workspace AI は動画生成と標準プランへの標準搭載（追加費用なし）で優位。既存環境に応じた選択が最もコスト効率が高い。</p>
+  </div>
+</section>
+
+<!-- 7. 日本向け注意点 -->
+<section class="section">
+  <h2 class="blue">7. 日本向け注意点・取得方法</h2>
+
+  <div class="grid">
+    <div class="card">
+      <h3>日本での提供状況</h3>
+      <ul>
+        <li>M365 Copilot は日本でも正式提供済み（2024年1月 GA）</li>
+        <li>住友商事が日本初の M365 Copilot 早期アクセス参加企業（2023年9月）</li>
+        <li>多言語 Audio Recap に日本語が対応（2026年）</li>
+        <li>OneNote・Word・Excel・PowerPoint・Outlook・Teams すべて日本語 UI で利用可能</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 class="blue">日本円 価格目安（2026年5月）</h3>
+      <ul>
+        <li><strong>Copilot Business:</strong> ¥2,698/user/月（税抜）</li>
+        <li><strong>Business Basic:</strong> ¥899/user/月〜</li>
+        <li><strong>Business Standard:</strong> ¥1,874/user/月〜</li>
+        <li><strong>Business Premium:</strong> ¥3,298/user/月〜</li>
+        <li>Enterprise 向けは CSP/EA パートナーへ要見積もり</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>ライセンス取得方法</h3>
+      <ul>
+        <li><strong>Microsoft 直販:</strong> Microsoft 365 管理センターから追加</li>
+        <li><strong>CSP（クラウドソリューションプロバイダー）:</strong> NTT データ・SoftBank・KDDI 等の認定代理店</li>
+        <li><strong>Enterprise Agreement（EA）:</strong> 大企業向け3年契約。ボリュームディスカウント交渉可能</li>
+        <li><strong>Microsoft FastTrack:</strong> 500席以上の導入時に無料の導入支援</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Enterprise vs Business の選び方</h3>
+      <ul>
+        <li><strong>Business（〜300席）:</strong> シンプルな管理・中小企業向け。E3/E5 の高度なコンプライアンス機能は不要な場合に適切</li>
+        <li><strong>Enterprise（E3/E5）:</strong> Purview・Intune・Defender との統合が必要な大企業・規制業界向け。E5 は高度な eDiscovery・DLP も含む</li>
+        <li><strong>判断基準:</strong> 従業員数300名超 または 高度なコンプライアンス要件があれば Enterprise を検討</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="highlight-box orange">
+    <p><strong>日本語対応の注意点:</strong> 一部の新機能（Legal Agent・Video Recap 等）は英語での提供が先行し、日本語展開まで数週間〜数ヶ月遅れる場合があります。最新の日本語対応状況は Microsoft Tech Community Blog（日本語版）または Microsoft Learn リリースノートを参照してください。</p>
+  </div>
+
+  <div class="highlight-box">
+    <p><strong>2026年7月の価格改定に注意:</strong> Microsoft は 2026年7月1日から商用 M365 ライセンスの価格改定を予定しています。導入・更新を検討中の企業は、改定前のロック価格キャンペーン（Microsoft が提供中）を活用することを推奨します。</p>
+  </div>
+</section>
+
+<!-- 8. 最新アップデート -->
+<section class="section">
+  <h2>8. 最新アップデート（2025〜2026）</h2>
+
+  <h3 style="margin-bottom:12px; font-size:1.05rem; color:var(--accent2);">Ignite 2025 主要発表（2025年11月）</h3>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>発表内容</th><th>詳細</th><th>対象</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Work IQ</td>
+          <td>組織の働き方を学習する AI インテリジェンスレイヤー。Copilot の文脈理解精度を向上</td>
+          <td>M365 Copilot 全体</td>
+        </tr>
+        <tr>
+          <td>Word/Excel/PPT エージェント</td>
+          <td>Copilot Chat からアプリエージェントを呼び出して直接ファイルを生成・編集</td>
+          <td>全 Copilot ライセンス</td>
+        </tr>
+        <tr>
+          <td>Agent 365</td>
+          <td>組織内のエージェント全体を管理・ガバナンスするコントロールプレーン</td>
+          <td>IT 管理者向け</td>
+        </tr>
+        <tr>
+          <td>Security Copilot エージェント</td>
+          <td>Defender・Entra・Intune・Purview に 70+ のセキュリティエージェントを統合</td>
+          <td>M365 E5</td>
+        </tr>
+        <tr>
+          <td>Copilot Pages の強化</td>
+          <td>SharePoint・OneNote 参照、Word/PPT 変換、M365 グループ共有対応</td>
+          <td>M365 Copilot</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 style="margin:20px 0 12px; font-size:1.05rem; color:var(--accent2);">2026年 Q1〜Q2 主要アップデート</h3>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>時期</th><th>アップデート</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>2026年1月</td>
+          <td>Custom AI Summary（Teams 会議サマリーのテンプレートカスタマイズ）GA</td>
+        </tr>
+        <tr>
+          <td>2026年2月</td>
+          <td>Teams 5大 AI アップグレード発表（Visual Insights・Video Recap 等）</td>
+        </tr>
+        <tr>
+          <td>2026年3月</td>
+          <td>SharePoint サイト参照プロンプト（/ コマンド）・Teams 会議サマリー SharePoint 共有</td>
+        </tr>
+        <tr>
+          <td>2026年4月</td>
+          <td>Word/Excel/PowerPoint Agent Mode 一般公開（GA）・Video Recap ロールアウト開始</td>
+        </tr>
+        <tr>
+          <td>2026年5月</td>
+          <td>新デザイン（タスク対応プロンプトライン）・CarPlay 対応・Claude Opus 4.8 / GPT-5.5 Instant 追加</td>
+        </tr>
+        <tr>
+          <td>2026年6月（予定）</td>
+          <td>録音なし会議サマリー GA・多言語 Audio Recap 拡充</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p>関連: <a href="microsoft-ecosystem.html">Microsoft AI エコシステム総覧</a> &nbsp;|&nbsp; <a href="copilot-studio.html">Copilot Studio</a> &nbsp;|&nbsp; <a href="azure-ai-foundry.html">Azure AI Foundry</a> &nbsp;|&nbsp; <a href="workspace-ai.html">Google Workspace AI</a> &nbsp;|&nbsp; <a href="gemini-advanced.html">Gemini Advanced</a></p>
+  <p style="margin-top:8px;">最終更新: 2026-05-31 &nbsp;|&nbsp; <a href="../../index.html">Hub トップ</a> &nbsp;|&nbsp; <a href="index.html">← Knowledge Hub</a></p>
+</footer>
+</body>
+</html>
