@@ -1,0 +1,782 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Google Flow 完全ガイド — AI フィルムメイキング × Veo 3 | Tech Workbench</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --panel: #101418;
+      --muted: #94a3b8;
+      --text: #e2e8f0;
+      --accent: #a855f7;
+      --accent-soft: rgba(168,85,247,0.12);
+      --accent-border: rgba(168,85,247,0.28);
+      --accent-grad: linear-gradient(135deg,#a855f7,#ec4899);
+      --veo: #f97316;
+      --veo-soft: rgba(249,115,22,0.1);
+      --veo-border: rgba(249,115,22,0.28);
+      --green: #34d399;
+      --green-soft: rgba(52,211,153,0.1);
+      --blue: #60a5fa;
+      --blue-soft: rgba(96,165,250,0.1);
+      --red: #f87171;
+      --red-soft: rgba(248,113,113,0.1);
+      --border: rgba(255,255,255,0.08);
+      --radius: 16px;
+      --font-mono: "SF Mono","Consolas",monospace;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;font-family:"Segoe UI","SF Pro Display",system-ui,sans-serif;color:var(--text);background:var(--bg);padding:32px 20px 64px;line-height:1.7}
+    .shell{max-width:1020px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+    a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline;color:#c084fc}
+
+    header.hero{background:var(--panel);border:1px solid var(--accent-border);border-radius:var(--radius);padding:44px 40px;position:relative;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+    header.hero::before{content:"";position:absolute;top:0;left:0;width:100%;height:4px;background:var(--accent-grad)}
+    header.hero::after{content:"";position:absolute;right:-80px;bottom:-80px;width:360px;height:360px;background:radial-gradient(circle,rgba(168,85,247,.08),transparent 70%);pointer-events:none}
+    .meta-tag{display:inline-block;background:var(--accent-soft);color:var(--accent);padding:4px 12px;border-radius:99px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;border:1px solid var(--accent-border)}
+    h1{margin:0 0 14px;font-size:44px;font-weight:800;letter-spacing:-1px;line-height:1.1;background:linear-gradient(to right,#fff,#e879f9);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .lead{margin:0 0 28px;color:var(--muted);font-size:1.05rem;max-width:780px;line-height:1.8}
+    .nav-pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+    .nav-pills a{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--muted);font-size:.83rem;transition:all .15s}
+    .nav-pills a:hover{border-color:var(--accent-border);color:var(--accent);text-decoration:none}
+    .breadcrumb{font-size:.8rem;color:#4a6a7a;margin-bottom:14px}
+
+    .panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:28px 32px}
+    .panel-accent{border-color:var(--accent-border);background:linear-gradient(135deg,rgba(168,85,247,.04),var(--panel))}
+    .panel-veo{border-color:var(--veo-border);background:linear-gradient(135deg,rgba(249,115,22,.04),var(--panel))}
+    .panel-green{border-color:rgba(52,211,153,.25);background:rgba(52,211,153,.03)}
+    h2{margin:0 0 18px;font-size:1.25rem;font-weight:700;color:#fff}
+    h3{margin:14px 0 8px;font-size:1rem;font-weight:700;color:var(--accent)}
+    h4{margin:12px 0 6px;font-size:.9rem;font-weight:700;color:#cbd5e1}
+    p{margin:0 0 12px;color:var(--muted);font-size:.93rem}
+    ul,ol{padding-left:22px;margin:8px 0}
+    li{margin-bottom:5px;color:var(--muted);font-size:.9rem}
+    strong{color:#e2e8f0}
+    code{font-family:var(--font-mono);background:rgba(255,255,255,.07);padding:2px 7px;border-radius:5px;font-size:.82em;color:#e879f9}
+
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+    @media(max-width:680px){.grid2,.grid3{grid-template-columns:1fr}}
+
+    .card{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;padding:18px 20px}
+    .card-accent{border-color:var(--accent-border);background:var(--accent-soft)}
+    .card-veo{border-color:var(--veo-border);background:var(--veo-soft)}
+    .card-green{border-color:rgba(52,211,153,.25);background:var(--green-soft)}
+    .card-blue{border-color:rgba(96,165,250,.25);background:var(--blue-soft)}
+    .card h4{margin:0 0 6px;color:#e2e8f0}
+
+    .badge{display:inline-block;font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:5px;margin-right:4px;vertical-align:middle}
+    .badge-free{background:rgba(52,211,153,.2);color:#34d399}
+    .badge-pro{background:var(--accent-soft);color:var(--accent)}
+    .badge-ultra{background:rgba(249,115,22,.15);color:#fb923c}
+    .badge-new{background:rgba(248,113,113,.15);color:#f87171}
+    .new-chip{display:inline-block;background:rgba(248,113,113,.2);color:#fca5a5;font-size:.67rem;font-weight:700;padding:1px 6px;border-radius:4px;margin-left:5px;vertical-align:middle}
+
+    table{width:100%;border-collapse:collapse;font-size:.87rem;margin:12px 0}
+    th{text-align:left;padding:9px 12px;background:rgba(168,85,247,.07);color:var(--accent);font-size:.78rem;border-bottom:1px solid rgba(255,255,255,.07);font-weight:700}
+    td{padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--muted);vertical-align:top}
+    td strong{color:#e2e8f0}
+    td.yes{color:#34d399;font-weight:700;text-align:center}
+    td.no{color:#6b7280;text-align:center}
+    td.center{text-align:center}
+
+    .codeblock{background:#070d18;border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:16px 18px;font-family:var(--font-mono);font-size:.8rem;line-height:1.7;overflow-x:auto;white-space:pre;color:#c8d3e3;margin:12px 0}
+    .codeblock .cm{color:#4a6a7a}
+    .codeblock .kw{color:#93c5fd}
+    .codeblock .st{color:#86efac}
+    .codeblock .fn{color:#e879f9}
+    .codeblock .nm{color:#f9a8d4}
+    .codeblock .num{color:#fde68a}
+
+    .note{background:rgba(168,85,247,.06);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:.88rem;color:var(--muted)}
+    .tip{background:rgba(52,211,153,.06);border-left:3px solid var(--green);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:.88rem;color:var(--muted)}
+    .warn{background:rgba(248,113,113,.06);border-left:3px solid var(--red);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:.88rem;color:var(--muted)}
+    .veo-box{background:rgba(249,115,22,.06);border-left:3px solid var(--veo);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:.88rem;color:var(--muted)}
+
+    .flow-step{display:flex;gap:16px;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.04);align-items:flex-start}
+    .flow-step:last-child{border-bottom:none}
+    .flow-num{background:var(--accent-soft);border:1px solid var(--accent-border);color:var(--accent);border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.82rem;flex-shrink:0;margin-top:2px}
+    .flow-body h4{margin:0 0 4px;color:#e2e8f0;font-size:.92rem}
+    .flow-body p{margin:0;font-size:.87rem}
+
+    .tier-row{display:flex;gap:12px;margin:4px 0 16px;flex-wrap:wrap}
+    .tier{flex:1;min-width:160px;border-radius:10px;padding:14px 16px;border:1px solid var(--border)}
+    .tier-free{border-color:rgba(52,211,153,.3);background:rgba(52,211,153,.04)}
+    .tier-pro{border-color:var(--accent-border);background:var(--accent-soft)}
+    .tier-ultra{border-color:var(--veo-border);background:var(--veo-soft)}
+    .tier .tier-name{font-size:.75rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+    .tier .tier-price{font-size:1.35rem;font-weight:800;color:#fff;margin-bottom:4px}
+    .tier .tier-price small{font-size:.7rem;font-weight:400;color:var(--muted)}
+    .tier ul{padding-left:16px;margin:8px 0}
+    .tier li{font-size:.82rem;margin-bottom:4px}
+
+    .veo-model{background:rgba(249,115,22,.04);border:1px solid var(--veo-border);border-radius:12px;padding:16px 18px;margin:8px 0}
+    .veo-model h4{margin:0 0 6px;color:#fb923c;font-size:.92rem}
+    .veo-model .specs{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+    .veo-model .spec{background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.2);border-radius:5px;padding:2px 8px;font-size:.75rem;color:#fdba74}
+
+    small{color:#4a6a7a;font-size:.78rem}
+    .sub{color:#4a6a7a;font-size:.78rem;margin-top:4px}
+  </style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ── HERO ── -->
+  <header class="hero">
+    <div class="breadcrumb"><a href="../../index.html">← Hub Top</a> / <a href="../index.html">Tech Workbench</a> / <a href="index.html">Knowledge</a></div>
+    <div class="meta-tag">Google AI · AI Filmmaking</div>
+    <h1>Google Flow</h1>
+    <p class="lead">
+      Google が提供する AI フィルムメイキングツール。Veo 3（動画）・Imagen 4（静止画）・Gemini（推論）を統合し、
+      テキストプロンプトだけで<strong>映像・台詞・効果音・環境音を同時生成</strong>できる。
+      インディーフィルムメーカーからプロのミュージックビデオ監督まで、<strong>「撮影機材なし」で映画的な映像制作</strong>を実現する。
+      初リリースから 5 ヶ月で <strong>2 億 7500 万本以上の動画が生成</strong>された。
+    </p>
+    <div class="nav-pills">
+      <a href="#what">Flow とは</a>
+      <a href="#veo">Veo モデル</a>
+      <a href="#features">機能一覧</a>
+      <a href="#pricing">料金</a>
+      <a href="#workflow">制作ワークフロー</a>
+      <a href="#io2026">I/O 2026 新機能</a>
+      <a href="#examples">驚くべき実例</a>
+      <a href="#prompts">プロンプト集</a>
+      <a href="#vs">他ツールとの比較</a>
+    </div>
+    <span class="last-updated" style="margin-top:16px">最終更新: 2026-05-31 | labs.google/fx/tools/flow</span>
+  </header>
+
+  <!-- ── WHAT IS ── -->
+  <section class="panel panel-accent" id="what">
+    <h2>Google Flow とは</h2>
+    <div class="grid2">
+      <div>
+        <p>Google Flow は Google Labs が 2025年5月（Google I/O 2025）に発表した AI フィルムメイキングツール。Veo・Imagen・Gemini という Google のフラッグシップモデルを組み合わせた<strong>唯一の統合映像制作環境</strong>で、テキストプロンプトから映画品質の映像クリップを生成できる。</p>
+        <p>単なる「動画生成ツール」との決定的な違いは、<strong>ナラティブを持つ作品</strong>として複数のショットをつなぎ合わせる制作ワークフローを内包していること。スクリプト段階からショット単位の組み立て・書き出しまでを Flow 一本で完結できる。</p>
+        <div class="veo-box"><strong>核心的価値:</strong> 「撮影隊・機材・ロケーション・俳優」がなくてもプロレベルの映像作品を作れる。中世の戦場、宇宙船の内部、深海の生物群……過去には巨大な予算が必要だった映像が、個人クリエイターの手に届く。</div>
+      </div>
+      <div>
+        <h4>基本スペック（2026-05 時点）</h4>
+        <table>
+          <tr><td>提供元</td><td><strong>Google Labs / Google DeepMind</strong></td></tr>
+          <tr><td>ローンチ</td><td><strong>2025年5月</strong>（Google I/O 2025）</td></tr>
+          <tr><td>生成動画数</td><td><strong>2 億 7500 万本以上</strong>（ローンチ後 5 ヶ月）</td></tr>
+          <tr><td>提供地域</td><td><strong>140 以上の国・地域</strong></td></tr>
+          <tr><td>コアエンジン</td><td><strong>Veo 3.1</strong>（動画）+ Imagen 4（画像）+ Gemini 3</td></tr>
+          <tr><td>最長生成時間</td><td><strong>60 秒</strong>（Veo 3.1）</td></tr>
+          <tr><td>最高解像度</td><td><strong>4K</strong>（Veo 3.1）</td></tr>
+          <tr><td>ネイティブ音声</td><td><strong>台詞・効果音・環境音を同時生成</strong></td></tr>
+          <tr><td>関連ツール</td><td>Whisk・ImageFX からの資産移行対応（2026-03〜）</td></tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── VEO MODELS ── -->
+  <section class="panel panel-veo" id="veo">
+    <h2>🎬 Veo モデル ― Flow の心臓部</h2>
+    <p>Flow の映像生成エンジン。Veo 3 から<strong>映像と音声を同時生成</strong>できるようになり、他のツールとの差別化が明確になった。</p>
+
+    <div class="veo-model">
+      <h4>Veo 3（2025年5月 — Google I/O 2025）</h4>
+      <p>業界で初めて<strong>映像・台詞・効果音・環境音を同時生成</strong>する動画モデル。テキストプロンプト「男性が雨の中で傘を持ちながら歩いている」と書くだけで、雨の映像・足音・雨音・必要なら台詞まで一度に生成される。従来は映像と音声を別パイプラインで作ってあとで同期する必要があった。</p>
+      <div class="specs">
+        <span class="spec">映像+音声同時生成</span>
+        <span class="spec">台詞生成（リップシンク）</span>
+        <span class="spec">効果音・環境音</span>
+        <span class="spec">1080p</span>
+        <span class="spec">8秒クリップ</span>
+      </div>
+    </div>
+
+    <div class="veo-model">
+      <h4>Veo 3.1（2025年10月14日）― 現行最上位</h4>
+      <p>Veo 3 をベースに<strong>プロンプト追従性・時間的一貫性（キャラクターと環境がシーン全体を通して安定）・テクスチャのリアルさ</strong>を大幅改善。クローズアップや詳細ショットの品質が向上し、複数人の会話シーンも正確にリップシンク。</p>
+      <div class="specs">
+        <span class="spec">720p / 1080p / 4K</span>
+        <span class="spec">最長60秒</span>
+        <span class="spec">16:9 / 9:16</span>
+        <span class="spec">リップシンク精度±120ms</span>
+        <span class="spec">時間的一貫性向上</span>
+        <span class="spec">画像→動画変換</span>
+      </div>
+    </div>
+
+    <h3 style="margin-top:20px">Veo 3.1 のバリアント</h3>
+    <table>
+      <thead>
+        <tr><th>バリアント</th><th>速度</th><th>品質</th><th>クレジット消費</th><th>用途</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Veo 3.1 Lite</strong></td>
+          <td>最速</td>
+          <td>標準</td>
+          <td><strong>0 クレジット</strong>（無料）</td>
+          <td>アイデア試作・大量バリアント生成</td>
+        </tr>
+        <tr>
+          <td><strong>Veo 3.1 Fast</strong></td>
+          <td>速い</td>
+          <td>高品質</td>
+          <td>20 クレジット / 動画</td>
+          <td>通常の制作作業</td>
+        </tr>
+        <tr>
+          <td><strong>Veo 3.1 Quality</strong></td>
+          <td>遅い</td>
+          <td>最高品質</td>
+          <td>100 クレジット / 動画</td>
+          <td>最終書き出し・クライアント納品</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="note">Veo 3.1 Lite は <strong>0 クレジット</strong>で使える。無料プランでも毎日 50 クレジット + スターター 100 クレジットが付くので、Lite モードなら<strong>事実上無制限</strong>でアイデアを試せる。</div>
+  </section>
+
+  <!-- ── FEATURES ── -->
+  <section class="panel" id="features">
+    <h2>機能一覧</h2>
+    <div class="grid2">
+      <div>
+        <h3>🎥 映像生成コア</h3>
+        <div style="display:flex;flex-direction:column;gap:0">
+          <div class="flow-step">
+            <div class="flow-num">T</div>
+            <div class="flow-body">
+              <h4>テキスト → 動画（Text-to-Video）</h4>
+              <p>自然言語プロンプトから 8〜60 秒の動画クリップを生成。映像・音声・台詞をすべて同時生成。Veo 3.1 Lite はクレジット 0 で利用可。</p>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-num">🖼</div>
+            <div class="flow-body">
+              <h4>画像 → 動画（Frames to Video）</h4>
+              <p>Imagen 4 で生成した静止画、または自分が持ち込んだ写真を起点として動画に変換。Veo 3.1 のアップデートで音声も付加されるようになった。</p>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-num">↔</div>
+            <div class="flow-body">
+              <h4>シーン拡張（Scene Extension）</h4>
+              <p>既存クリップの末尾または先頭を AI で自然に延長する。キャラクター・カメラの物理・音声の一貫性を保ったまま延長できる。</p>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-num">🎬</div>
+            <div class="flow-body">
+              <h4>カメラコントロール（Camera Controls）</h4>
+              <p>テキストまたは UI で<strong>ショット角度・ズーム・カメラムーブメント</strong>を指定。「ドリーイン」「ハンドヘルドカメラで揺らす」「俯瞰から始めてズームイン」などの映画的テクニックを言葉で指示できる。Ultra プランで拡張機能が利用可能。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <h3>🧩 制作ワークフロー機能</h3>
+        <div style="display:flex;flex-direction:column;gap:0">
+          <div class="flow-step">
+            <div class="flow-num">👤</div>
+            <div class="flow-body">
+              <h4>Ingredients（キャラクター一貫性）</h4>
+              <p>参照画像を登録することで、<strong>髪型・服装・顔の特徴・体型がショットをまたいで維持</strong>される。カメラアングルや照明が変わっても同一キャラクターとして認識。従来は手動でプロンプトに詳細を書いても揺らぎが出ていた問題を解消。</p>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-num">⏱</div>
+            <div class="flow-body">
+              <h4>Scenebuilder（タイムラインエディタ）</h4>
+              <p>生成したクリップをドラッグ&ドロップで並べ、トリム・並び替え・書き出しができるタイムラインエディタ。AI 生成トランジションで自然なシーン転換も可能。</p>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-num">📁</div>
+            <div class="flow-body">
+              <h4>Flow TV（ショーケース）</h4>
+              <p>他のクリエイターが作ったクリップと<strong>使用プロンプト</strong>を公開しているギャラリー。気に入った映像のプロンプトをそのまま参考にして自分の制作に活用できる。</p>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-num">🖌</div>
+            <div class="flow-body">
+              <h4>Nano Banana Pro（ワークスペース内画像生成）</h4>
+              <p>Flow のワークスペース内から直接 Imagen 4 レベルの画像を生成できる。背景・小道具・キャラクター素材をプロジェクトから離れずに作成。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:20px">音声生成の詳細（Veo 3.1 ネイティブ音声）</h3>
+    <div class="grid3">
+      <div class="card card-veo">
+        <h4>台詞（Dialogue）</h4>
+        <p>プロンプトで<code>"台詞テキスト"</code>と引用符で囲むと、キャラクターの口の動きに同期した音声が生成される。<strong>リップシンク精度 ±120ms</strong> で、多くのケースで自然に見える。複数キャラクターの会話も対応。</p>
+      </div>
+      <div class="card card-veo">
+        <h4>効果音（Sound Effects）</h4>
+        <p>プロンプトで記述した行動・イベントに対して自動的に効果音が生成・同期される。ドアが閉まる音・波の音・砂利を踏む足音など、映像のタイミングに合わせて配置される。</p>
+      </div>
+      <div class="card card-veo">
+        <h4>環境音（Ambient Audio）</h4>
+        <p>シーンの雰囲気に合った背景音が自動生成される。都市の交通音・森の環境音・カフェの雑踏など、映像に深みを加えるアンビエントトラックが別途指定なしで付く。</p>
+      </div>
+    </div>
+    <div class="tip"><strong>音声活用のコツ:</strong> Veo 3.1 は「音のある世界」を意識してプロンプトを書くと品質が上がる。「静かな図書館」「雨の音がする」「街の喧騒の中」など環境を具体的に描写すること。台詞は短め（1〜2 文）が最もリップシンク精度が高い。</div>
+  </section>
+
+  <!-- ── PRICING ── -->
+  <section class="panel" id="pricing">
+    <h2>料金プラン（2026-05 時点）</h2>
+    <div class="tier-row">
+      <div class="tier tier-free">
+        <div class="tier-name" style="color:#34d399">Free</div>
+        <div class="tier-price">¥0<small>/月</small></div>
+        <ul>
+          <li>スターター: <strong>100 クレジット</strong>（初回のみ）</li>
+          <li>デイリー: <strong>50 クレジット/日</strong>（リセット）</li>
+          <li>Veo 3.1 Lite: <strong>0 クレジット</strong>（実質無制限）</li>
+          <li>カメラコントロール: 基本のみ</li>
+          <li>Scenebuilder: 利用可</li>
+          <li>書き出し: 透かしあり</li>
+        </ul>
+      </div>
+      <div class="tier tier-pro">
+        <div class="tier-name" style="color:var(--accent)">Google AI Pro</div>
+        <div class="tier-price">$19.99<small>/月（¥約2,900）</small></div>
+        <ul>
+          <li>Flow クレジット: <strong>1,000/月</strong></li>
+          <li>Veo 3.1 Fast: <strong>約 50 本</strong>/月</li>
+          <li>Veo 3.1 Quality: <strong>約 10 本</strong>/月</li>
+          <li>Veo 3.1 Lite: <strong>無制限</strong>（0クレジット）</li>
+          <li>カメラコントロール: 拡張版</li>
+          <li>書き出し: 透かしなし</li>
+          <li>NotebookLM Plus・Gemini Advanced も含む</li>
+        </ul>
+      </div>
+      <div class="tier tier-ultra">
+        <div class="tier-name" style="color:#fb923c">Google AI Ultra</div>
+        <div class="tier-price">$249.99<small>/月</small></div>
+        <ul>
+          <li>Flow クレジット: <strong>25,000/月</strong></li>
+          <li>Veo 3.1 Quality: <strong>約 250 本</strong>/月</li>
+          <li>Cinematic Video Overviews（NotebookLM）</li>
+          <li>高度なカメラコントロール全機能</li>
+          <li>20TB Google One ストレージ</li>
+          <li>優先処理</li>
+        </ul>
+      </div>
+    </div>
+    <div class="note"><strong>クレジット早見表:</strong> 1 動画 ≒ Lite: 0 / Fast: 20 / Quality: 100 クレジット。AI Pro の 1,000 クレジットは Fast 50 本、または Lite なら<strong>事実上無制限のプロトタイプ</strong>に使える。</div>
+
+    <h3 style="margin-top:20px">API 経由での利用（Vertex AI）</h3>
+    <table>
+      <thead><tr><th>モデル</th><th>動画あたりの費用</th><th>解像度</th><th>最大秒数</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Veo 3.1 Fast（API）</strong></td><td>$0.35 / 秒</td><td>720p〜1080p</td><td>8秒</td></tr>
+        <tr><td><strong>Veo 3.1 Quality（API）</strong></td><td>$0.70 / 秒</td><td>1080p〜4K</td><td>60秒</td></tr>
+        <tr><td><strong>Veo 3（API, 旧世代）</strong></td><td>$0.25 / 秒</td><td>720p〜1080p</td><td>8秒</td></tr>
+      </tbody>
+    </table>
+    <p><strong>API 用途:</strong> Flow GUI のプロトタイプで品質を確認した後、Vertex AI の Veo API を使ってバッチ生成・アプリ組み込みが可能。</p>
+  </section>
+
+  <!-- ── WORKFLOW ── -->
+  <section class="panel" id="workflow">
+    <h2>実践ワークフロー</h2>
+    <h3>ワークフロー A: ミュージックビデオ制作（楽曲なし → 公開まで）</h3>
+    <div style="display:flex;flex-direction:column;gap:0">
+      <div class="flow-step">
+        <div class="flow-num">1</div>
+        <div class="flow-body">
+          <h4>コンセプトと世界観をテキストで定義</h4>
+          <p>曲のムード・ジャンル・ビジュアルテーマを Gemini に整理させて、各シーンのショットリストを生成。「サビは街灯の下の雨・Aメロは地下鉄・間奏は屋上」など。</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">2</div>
+        <div class="flow-body">
+          <h4>Ingredients でキャラクター設定</h4>
+          <p>主人公の参照画像（Imagen 4 で生成 or 自分の写真）を Ingredients に登録。以降のすべてのクリップでキャラクターの外見が一致する。</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">3</div>
+        <div class="flow-body">
+          <h4>各ショットをプロンプトで生成（Veo 3.1 Lite でラフ確認）</h4>
+          <p>Lite モード（0 クレジット）でラフを大量生成してイメージを固め、OK なショットを Quality モードで再生成して最終素材として確定。</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">4</div>
+        <div class="flow-body">
+          <h4>Scenebuilder でタイムライン組み立て</h4>
+          <p>生成クリップをタイムラインに並べ、曲のビート・歌詞タイミングと同期。必要に応じて Scene Extension で尺を調整。</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">5</div>
+        <div class="flow-body">
+          <h4>書き出し → YouTube / TikTok 公開</h4>
+          <p>Pro プランで透かしなし書き出し。9:16 縦型（TikTok・Reels）と 16:9 横型（YouTube）を両方生成できる。</p>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:20px">ワークフロー B: 短編映画のプリプロダクション代替</h3>
+    <div class="codeblock"><span class="cm"># 従来のプリプロダクション vs Flow での代替</span>
+
+<span class="cm"># 従来（コスト・時間がかかる工程）</span>
+脚本 → コンテ（イラストレーター依頼）→ ロケハン → キャスティング
+衣装・メイク → 撮影（スタジオ/ロケ）→ 編集
+
+<span class="cm"># Flow での代替（1人でも可）</span>
+脚本 → Flow でビジュアルコンテを動画生成 → 監督確認
+  ↓ Veo 3.1 Lite でラフ全シーン生成（0クレジット）
+  ↓ シーン追加・変更をプロンプトで即修正
+  ↓ 最終カットは Quality モードで高品質生成
+  ↓ Scenebuilder でアセンブル編集 → 書き出し
+
+<span class="cm"># Fianna Studios の事例</span>
+<span class="cm"># SF 短編「Echo Station」:</span>
+<span class="cm"># プリプロダクションコスト 65% 削減</span>
+<span class="cm"># 制作期間: 数週間 → 数日に短縮</span></div>
+
+    <h3>ワークフロー C: Veo API を使ったバッチ動画生成（Python）</h3>
+    <div class="codeblock"><span class="cm"># pip install google-cloud-aiplatform</span>
+<span class="kw">import</span> vertexai
+<span class="kw">from</span> vertexai.preview.vision_models <span class="kw">import</span> VideoGenerationModel
+
+vertexai.init(project=<span class="st">"YOUR_PROJECT"</span>, location=<span class="st">"us-central1"</span>)
+
+model = VideoGenerationModel.from_pretrained(<span class="st">"veo-3.1-fast-generate-001"</span>)
+
+operation = model.generate_video(
+    prompt=<span class="st">"""
+    Cinematic close-up of a young woman in a neon-lit alley at night,
+    rain falling, she looks up and says "It's time to go.",
+    camera slowly pulls back revealing the city behind her.
+    Ambient city sounds, rain, 1980s synth music in background.
+    """</span>,
+    aspect_ratio=<span class="st">"16:9"</span>,
+    duration_seconds=<span class="num">8</span>,
+    generate_audio=<span class="nm">True</span>,  <span class="cm"># ネイティブ音声生成を有効化</span>
+)
+operation.result(timeout=<span class="num">180</span>)
+video = operation.result().generated_videos[<span class="num">0</span>]
+video.save(<span class="st">"output.mp4"</span>)
+print(<span class="st">f"生成完了: {video.uri}"</span>)</div>
+
+    <h3 style="margin-top:16px">ワークフロー D: Flow Agent で会話しながら一括制作</h3>
+    <div class="codeblock"><span class="cm"># I/O 2026 で追加された Flow Agent の使い方（GUI）</span>
+
+<span class="cm"># Agent に話しかける形式で複数タスクを一括処理できる</span>
+
+<span class="st">"このプロジェクトで使えるシーンのバリエーションを5パターン生成して"</span>
+→ Flow Agent が 5 本のクリップを一括生成
+
+<span class="st">"主人公のセリフをもっとドラマチックにして別バージョンを3本作って"</span>
+→ 変更箇所だけ差し替えた 3 本を自動生成
+
+<span class="st">"このシーンの次に続くプロットのアイデアを5つ提案して"</span>
+→ ストーリーボードとともにプロット候補を提示
+
+<span class="cm"># 「バッチ生成 + 対話的反復」を手動プロンプトなしで実行</span></div>
+  </section>
+
+  <!-- ── I/O 2026 ── -->
+  <section class="panel" id="io2026">
+    <h2>🆕 I/O 2026 主要アップデート（2026年5月19日）</h2>
+    <div class="grid2">
+      <div class="card card-accent">
+        <h4>① Flow Agent — 会話しながら複数タスクを一括実行</h4>
+        <p>AI アシスタントが制作全体のサポート役として機能。バリアントの一括生成・台詞案の提案・プロットアイデアの提示・アセット整理を、ユーザーとの対話の中で自動的に実行する。「手動で何度も再プロンプト」する工程が不要になる。</p>
+      </div>
+      <div class="card card-accent">
+        <h4>② Gemini Omni Flash 統合</h4>
+        <p>Gemini Omni Flash が Flow に統合され、<strong>実写映像と AI 生成映像の混合（ブレンド）</strong>・会話型の反復が可能に。キャラクターのアイデンティティと声が全シーンで維持されるようになり、ナラティブの一貫性が大幅向上。</p>
+      </div>
+      <div class="card card-accent">
+        <h4>③ Flow Tools — ノーコードで編集ツールを自作</h4>
+        <p>コーディング不要で<strong>自分専用の編集ワークフロー・ユーティリティを Flow 内部で作成</strong>できる機能。「カスタムビデオリサイザー」「特定スタイルへの一括変換ツール」「カスタム VFX ジェネレーター」などを自然言語で構築。</p>
+      </div>
+      <div class="card card-accent">
+        <h4>④ Flow Music — AI 音楽作曲ツール（独立アプリ化）</h4>
+        <p>Flow から分離した AI 音楽制作ツールが独立 iOS アプリとして提供開始。<strong>トラック単位の個別編集</strong>・楽曲の別バージョン生成・歌詞の翻訳・AI 生成ミュージックビデオ（Gemini Omni 使用）が可能。映像制作と音楽制作が完全連携。</p>
+      </div>
+      <div class="card card-accent">
+        <h4>⑤ モバイルアプリ（iOS / Android）</h4>
+        <p>Flow 本体の Build モード体験がモバイルアプリで利用可能に。スマートフォンから外出中にクリップを反復生成・確認・共有。デスクトップとの継続的な連携が前提で設計されている。</p>
+      </div>
+      <div class="card card-accent">
+        <h4>⑥ 140+ 国・地域へ展開拡大</h4>
+        <p>I/O 2026 に合わせて提供国が大幅に拡大。日本でも正式に利用可能。これまで待機リスト制だったアクセスが一般公開へ移行。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── REAL WORLD EXAMPLES ── -->
+  <section class="panel panel-accent" id="examples">
+    <h2>🌟 驚くべき実例 12 選（2025〜2026）</h2>
+    <p>公式ブログ・事例記事・クリエイターコミュニティから収集。</p>
+
+    <h3 style="margin-top:16px;color:#e879f9">🎵 ミュージックビデオ・エンタメ</h3>
+    <div class="grid2">
+      <div class="card">
+        <h4>① Talwiinder「Dil Mera Part 2」— 中世の騎士、資金ゼロで実現</h4>
+        <p>インドのシンガーソングライター Talwiinder がフィルムメーカー Bowdhitya と組んで、楽曲「Dil Mera Part 2」の MV を Flow で制作。<strong>中世の城・甲冑を着けた騎士・戦場の映像</strong>をプロンプトだけで生成。「従来ならインディークリエイターには到底無理なプロダクション規模」を実現したと Google 公式ブログで紹介。制作費は通常の大型 MV の数十分の一。</p>
+        <p class="sub">出典: Google 公式ブログ "How Talwiinder is Reimagining Music Videos with Flow" (2025)</p>
+      </div>
+      <div class="card">
+        <h4>② Fianna Studios「Echo Station」— SF 短編のプリプロ 65% コスト削減</h4>
+        <p>独立系スタジオ Fianna Studios が SF 短編映画「Echo Station」のプリプロダクション全体を Flow で実施。スタジオセット・宇宙船の内装・SF 衣装など<strong>通常は多大な予算が必要な場面を AI 生成でプロトタイプ</strong>。<strong>プリプロダクションコストを 65% 削減</strong>し、制作期間を「数週間から数日」に短縮したと報告。</p>
+        <p class="sub">出典: evolutionaihub.com / blog.designhero.tv (2026)</p>
+      </div>
+    </div>
+
+    <h3 style="margin-top:20px;color:#e879f9">🎬 フィルムメーカー・クリエイター</h3>
+    <div class="grid2">
+      <div class="card">
+        <h4>③ 「時計が星の川に溶ける」シーン — 不可能な映像を 1 プロンプトで</h4>
+        <p>あるインディーフィルムメーカーが夢のようなシュールなシーケンスのために Flow を使用。<strong>「時計が溶けて星の川になる」</strong>という物理的に撮影不可能な場面を生成し、「結果は驚異的（staggering）だった」とレビュー。2026 年には Flow が制作における役割を「カメラ・オペレーターからワールドビルダーへ」根本的に変えたと述べている。</p>
+        <p class="sub">出典: blog.designhero.tv "The Ultimate Filmmaker's Hack? Google Flow Explained" (2026)</p>
+      </div>
+      <div class="card">
+        <h4>④ Flow TV で「使ったプロンプト付き」映像をシェア — 学習コミュニティ化</h4>
+        <p>Flow TV は単なるギャラリーでなく、各クリップに<strong>使用されたプロンプトがそのまま公開</strong>されている。「このシネマティックな光の表現はどう書いたのか」を逆引きできる。初心者が上達できる学習コミュニティとして機能しており、特定スタイルのプロンプトパターンが共有・発展し続けている。</p>
+        <p class="sub">出典: labs.google/fx/tools/flow — Flow TV 公式機能</p>
+      </div>
+      <div class="card">
+        <h4>⑤ eToro — 複数市場向け広告キャンペーンを Veo で多言語展開</h4>
+        <p>グローバル取引・投資プラットフォーム eToro が Veo（Flow の映像エンジン）で広告キャンペーン動画を制作。<strong>複数市場に向けて文化的に適切なビデオコンテンツを迅速に生成</strong>。各国のローカライズ対応にかかる時間とコストを大幅に削減。</p>
+        <p class="sub">出典: Google Cloud 公式事例 2025</p>
+      </div>
+      <div class="card">
+        <h4>⑥ AdVon Commerce — 93,673 製品の動画を 1 ヶ月でカタログ化</h4>
+        <p>EC コンテンツ企業 AdVon が Veo を使って大手小売業の製品紹介動画を大量生成。<strong>93,673 製品のカタログを 1 ヶ月以内に処理</strong>（従来は最大 1 年）。スポーツ用品クライアントでは検索順位 30% 向上、売上 <strong>67% 増加（＋1,700 万ドル）</strong>を達成。</p>
+        <p class="sub">出典: Google Cloud 公式事例 2025</p>
+      </div>
+    </div>
+
+    <h3 style="margin-top:20px;color:#e879f9">🆕 I/O 2026 発表時点の最新事例</h3>
+    <div class="grid2">
+      <div class="card card-green">
+        <h4>⑦ Flow Agent でバリアント 5 本を一括生成 — 対話的反復</h4>
+        <p>I/O 2026 で披露されたデモ。監督が「このシーンで 5 パターンのバリアントを作って」と言うだけで、Flow Agent が自律的に 5 本のクリップを一括生成。「このキャラクターのセリフをよりドラマチックにして」「次のシーンの候補を 3 つ提案して」など会話を継続しながら映像が育っていく過程が示された。</p>
+        <p class="sub">出典: Google I/O 2026 Flow 発表セッション / androidheadlines.com 2026-05-19</p>
+      </div>
+      <div class="card card-green">
+        <h4>⑧ Gemini Omni Flash — 実写と AI 生成映像の融合</h4>
+        <p>I/O 2026 で実装。スマートフォンで撮影した自分の部屋の映像を Flow に取り込み、<strong>AI 生成の宇宙空間をシームレスに合成</strong>するデモが披露された。Gemini Omni Flash が実写とアニメーションの境界を解消し、「誰でも VFX スタジオを持てる」時代を示した。</p>
+        <p class="sub">出典: fonearena.com / business-standard.com I/O 2026 レポート</p>
+      </div>
+      <div class="card card-green">
+        <h4>⑨ Flow Tools でノーコード VFX ツールを自作</h4>
+        <p>I/O 2026 で発表された Flow Tools を使い、クリエイターが<strong>「映像内の特定の色を別の色に一括置換するツール」</strong>を自然言語のみで作成するデモが紹介された。技術的なコーディング知識ゼロで、自分だけのカスタム編集ワークフローを構築できることを示した。</p>
+        <p class="sub">出典: theoutpost.ai / 9to5google.com I/O 2026 (2026-05-19)</p>
+      </div>
+      <div class="card card-green">
+        <h4>⑩ Flow Music + MV 生成 — 楽曲 → ミュージックビデオを全自動</h4>
+        <p>Flow Music（独立 iOS アプリ）で AI 作曲した楽曲をそのまま Flow に連携し、<strong>楽曲の雰囲気・BPM・歌詞から自動的にミュージックビデオを生成</strong>。歌詞の翻訳機能も内蔵されており、多言語版の MV を数分で生成できる。作曲 → MV 制作 → 多言語版公開の全工程が 1 人で完結する。</p>
+        <p class="sub">出典: androidheadlines.com / fonearena.com I/O 2026 レポート</p>
+      </div>
+    </div>
+
+    <h3 style="margin-top:20px;color:#e879f9">📊 規模を示す数字</h3>
+    <div class="grid3">
+      <div class="card" style="text-align:center">
+        <div style="font-size:2rem;font-weight:800;color:var(--accent)">2.75億</div>
+        <p style="margin:4px 0;font-size:.85rem">本の動画を生成<br><small>（ローンチ後 5 ヶ月）</small></p>
+      </div>
+      <div class="card" style="text-align:center">
+        <div style="font-size:2rem;font-weight:800;color:var(--veo)">140+</div>
+        <p style="margin:4px 0;font-size:.85rem">カ国・地域で提供<br><small>（I/O 2026 時点）</small></p>
+      </div>
+      <div class="card" style="text-align:center">
+        <div style="font-size:2rem;font-weight:800;color:var(--green)">0 円</div>
+        <p style="margin:4px 0;font-size:.85rem">Veo 3.1 Lite は無料<br><small>（クレジット消費なし）</small></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── PROMPT GUIDE ── -->
+  <section class="panel" id="prompts">
+    <h2>プロンプト実践ガイド</h2>
+    <p>Veo 3.1 は詳細な映画的記述を理解する。以下のフレームワークで書くと品質が上がる。</p>
+
+    <h3>基本構造: 5 要素フレームワーク</h3>
+    <div class="codeblock"><span class="cm"># [被写体] + [アクション] + [環境] + [カメラ] + [音声]</span>
+
+<span class="st">"若い女性探偵が雨に濡れながら薄暗い路地を歩いている。"</span>   <span class="cm"># 被写体 + アクション</span>
+<span class="st">"1940年代のノワール都市、霧と街灯の反射。"</span>             <span class="cm"># 環境</span>
+<span class="st">"ローアングルから始まり、カメラがゆっくりと引いていく。"</span>  <span class="cm"># カメラワーク</span>
+<span class="st">"雨の音、遠くのジャズ、彼女が「誰かに見られてる」とつぶやく。"</span> <span class="cm"># 音声</span></div>
+
+    <h3 style="margin-top:16px">プロンプトパターン集</h3>
+    <table>
+      <thead><tr><th>ジャンル</th><th>効果的なキーワード</th><th>避けるべき記述</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>シネマティック</strong></td>
+          <td>cinematic lighting / shallow depth of field / golden hour / anamorphic lens flare</td>
+          <td>「映画っぽく」など抽象的な指示</td>
+        </tr>
+        <tr>
+          <td><strong>カメラムーブ</strong></td>
+          <td>slow dolly in / tracking shot / handheld camera shake / aerial drone shot / extreme close-up</td>
+          <td>カメラ指示なし（デフォルトになる）</td>
+        </tr>
+        <tr>
+          <td><strong>音声指示</strong></td>
+          <td>"セリフをここに" (引用符必須) / ambient city sounds / foley footsteps on gravel</td>
+          <td>音声の具体的描写なし</td>
+        </tr>
+        <tr>
+          <td><strong>時代・スタイル</strong></td>
+          <td>35mm film grain / 8mm vintage / Studio Ghibli inspired / Wes Anderson symmetrical</td>
+          <td>「かっこいい感じで」など感覚的な表現</td>
+        </tr>
+        <tr>
+          <td><strong>照明</strong></td>
+          <td>neon-lit / soft diffused light / harsh overhead fluorescent / candlelight / bioluminescent</td>
+          <td>「いい照明で」</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 style="margin-top:16px">台詞を含む場合の書き方</h3>
+    <div class="codeblock"><span class="cm"># 台詞は必ず引用符で囲む</span>
+<span class="st">"老人が海を見ながらゆっくり振り返り「もう戻れない」と静かに言う。"</span>
+<span class="st">"波音が背景に流れ、風が彼の白髪をなびかせる。カメラは顔をミディアムクローズアップ。"</span>
+
+<span class="cm"># 複数キャラクターの会話</span>
+<span class="st">"二人の宇宙飛行士がコントロールパネルの前で対峙している。"</span>
+<span class="st">"一人目が「準備はいいか？」と言い、もう一人が「行くしかない」と答える。"</span>
+<span class="st">"宇宙船のハム音と警告音が鳴り響く。"</span></div>
+  </section>
+
+  <!-- ── COMPARISON ── -->
+  <section class="panel" id="vs">
+    <h2>他の AI 動画ツールとの比較</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>ツール</th>
+          <th>ネイティブ音声</th>
+          <th>キャラクター一貫性</th>
+          <th>最長動画</th>
+          <th>無料枠</th>
+          <th>強み</th>
+          <th>弱み</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Google Flow</strong><br><small>（Veo 3.1）</small></td>
+          <td class="yes">✓ 台詞・SFX・環境音</td>
+          <td class="yes">✓ Ingredients</td>
+          <td>60 秒（Quality）</td>
+          <td class="yes">✓ Lite は 0 クレジット</td>
+          <td>音声一体型・Google エコシステム・Scenebuilder・Flow Agent</td>
+          <td>Cinematic Video / Flow Agent は Ultra 限定</td>
+        </tr>
+        <tr>
+          <td><strong>OpenAI Sora</strong></td>
+          <td class="no">✗（別途 TTS 必要）</td>
+          <td>部分的</td>
+          <td>20 秒</td>
+          <td class="no">✗（Plus $20〜）</td>
+          <td>映像の物理演算・クオリティ</td>
+          <td>音声なし・API 未公開</td>
+        </tr>
+        <tr>
+          <td><strong>Runway Gen-3</strong></td>
+          <td class="no">✗</td>
+          <td>部分的</td>
+          <td>16 秒</td>
+          <td>制限あり</td>
+          <td>プロ映像編集との統合</td>
+          <td>音声なし・コスト高</td>
+        </tr>
+        <tr>
+          <td><strong>Kling 2.0</strong></td>
+          <td>部分的</td>
+          <td class="yes">✓</td>
+          <td>3 分</td>
+          <td>制限あり</td>
+          <td>長尺動画・コスト効率</td>
+          <td>日本語 UI なし・音声品質</td>
+        </tr>
+        <tr>
+          <td><strong>Pika 2.0</strong></td>
+          <td>部分的</td>
+          <td>部分的</td>
+          <td>10 秒</td>
+          <td class="yes">✓ 制限あり</td>
+          <td>モバイル操作・手軽さ</td>
+          <td>クオリティ・機能が限定的</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="tip"><strong>選択の判断基準:</strong> 音声（台詞・効果音）が必要 → Flow 一択。長尺（3 分超）が必要 → Kling。既存プロ映像編集ツールとの統合 → Runway。Google エコシステム（AI Studio・NotebookLM）と連携したい → Flow。</div>
+  </section>
+
+  <!-- ── CREATOR ECOSYSTEM ── -->
+  <section class="panel">
+    <h2>Google 創作エコシステムとの連携</h2>
+    <div class="grid2">
+      <div>
+        <h4>NotebookLM → Flow のワークフロー</h4>
+        <ul>
+          <li>NotebookLM で資料・インタビュー・設定書を整理 → ブリーフィングドキュメント生成</li>
+          <li>ブリーフィングを Flow に渡して映像プロットに変換</li>
+          <li>さらに NotebookLM の <strong>Cinematic Video Overviews</strong> の出力は内部的に Veo 3 を使用</li>
+        </ul>
+
+        <h4 style="margin-top:14px">AI Studio → Veo API → 自動化</h4>
+        <ul>
+          <li>AI Studio で映像プロンプトを試作・確認</li>
+          <li>Veo API（Vertex AI）でバッチ生成・アプリ組み込み</li>
+          <li>EC サイト・マーケティングの自動化パイプラインを構築</li>
+        </ul>
+      </div>
+      <div>
+        <h4>資産移行（2026年3月〜）</h4>
+        <ul>
+          <li><strong>Whisk</strong>（画像コラージュツール）のすべてのプロジェクトと生成資産を Flow ライブラリに直接転送可能</li>
+          <li><strong>ImageFX</strong> の生成画像を Flow の Ingredients（キャラクター素材）として活用</li>
+          <li>各ツールで作った素材が 1 つのフローに集約される設計</li>
+        </ul>
+
+        <h4 style="margin-top:14px">Gemini との連携</h4>
+        <ul>
+          <li>Gemini Advanced で脚本・ショットリストを生成 → Flow でそのまま映像化</li>
+          <li>Flow Agent が Gemini の推論力を借りて対話的にプロット提案</li>
+          <li>Gemini Omni で実写映像解析 → AI 生成映像とのシームレスな合成</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── REFERENCES ── -->
+  <section class="panel">
+    <h2>参照リンク</h2>
+    <ul>
+      <li><a href="https://labs.google/fx/tools/flow" target="_blank" rel="noopener">labs.google/fx/tools/flow</a> — Flow 本体</li>
+      <li><a href="https://deepmind.google/models/veo/" target="_blank" rel="noopener">deepmind.google/models/veo/</a> — Veo モデル公式ページ</li>
+      <li><a href="https://blog.google/innovation-and-ai/products/google-flow-veo-ai-filmmaking-tool/" target="_blank" rel="noopener">Google 公式ブログ — Flow 発表（2025-05）</a></li>
+      <li><a href="https://blog.google/innovation-and-ai/products/veo-updates-flow/" target="_blank" rel="noopener">Google 公式ブログ — Veo 3.1 + Flow アップデート</a></li>
+      <li><a href="google-ecosystem.html">Google AI エコシステム総覧</a> — Gemini / NotebookLM / AI Studio との全体像</li>
+      <li><a href="gemini.html">Gemini 深掘り</a> — モデルスペック・ベンチマーク</li>
+      <li><a href="notebooklm.html">NotebookLM 完全ガイド</a> — Cinematic Video Overviews（Veo 3 活用）</li>
+      <li><a href="ai-studio.html">Google AI Studio 完全ガイド</a> — Veo API 経由の開発</li>
+      <li><a href="../../research/gemini-recent-updates.html">Gemini 最新アップデート</a> — Veo / Flow のリリース追跡</li>
+    </ul>
+    <p style="margin-top:12px"><small>最終更新: 2026-05-31 | 料金・クレジット数は最新の公式ページで確認すること。</small></p>
+  </section>
+
+</div>
+</body>
+</html>
