@@ -70,26 +70,39 @@
       トラッカーは「正本（SSOT）」であるため、情報の正確さを最優先し、
       <strong>外部の公式ソースから直接調べて反映する</strong>こと。
     </div>
-    <h3>使ってよいソース</h3>
+    <h3>① 一次ソースの定義（2026-06 再定義）</h3>
+    <p>トラッカーに書ける「事実」は <strong>Tier 1（一次ソース）で確認できたものだけ</strong>。Tier 2 以下は「何を調べるか」の起点にしてよいが、<strong>記載の根拠にはしない</strong>。</p>
+    <table>
+      <thead><tr><th>Tier</th><th>ソース</th><th>使い方</th></tr></thead>
+      <tbody>
+        <tr><td><strong style="color:#4FFFB0;">Tier 1<br>一次</strong></td><td>ベンダー<strong>公式ドメイン</strong>の：発表ブログ／モデルカード・モデル一覧／API ドキュメント・changelog／release notes／公式 HuggingFace・GitHub（オープン系）</td><td>✅ これだけが記載の根拠</td></tr>
+        <tr><td><strong style="color:#fcd34d;">Tier 2<br>起点のみ</strong></td><td>本ハブ daily-news、まとめサイト、テックメディア、YouTube、SNS の伝聞、Claude の記憶</td><td>🔶 「注目トピック」の起点に可。<strong>必ず Tier 1 で裏取り</strong>してから書く</td></tr>
+        <tr><td><strong style="color:#ff8080;">Tier 3<br>不可</strong></td><td>未確認の噂・リーク、Tier 1 で確認できなかった情報</td><td>❌ 書かない（空白でよい）</td></tr>
+      </tbody>
+    </table>
+
+    <h3>② チャンネル網羅の原則（Qwen 3.7 取りこぼしの教訓）</h3>
+    <p><strong>1社 = 1サイトではない。</strong>同じベンダーでも情報が複数チャンネルに分散する。下の「チャンネル型」を<strong>毎回ぜんぶ当たる</strong>こと。1つの型しか見ないと別の型にあるモデルを取りこぼす（例: Qwen の Max-Preview は商用サイト <code>qwen.ai</code>、オープン版は HuggingFace — 後者だけ見て 3.7 を一度見落とした）。</p>
     <ul>
-      <li>✅ 各ベンダーの公式ブログ・公式発表ページ</li>
-      <li>✅ 公式 API ドキュメント・Changelog</li>
-      <li>✅ 公式 GitHub リリースノート</li>
-      <li>✅ 公式 HuggingFace モデルカード（Qwen / GLM 等オープン系）</li>
-      <li>✅ ベンダー公式の X / SNS アカウントの発表（二次確認として）</li>
+      <li><strong>① 発表</strong> — 公式ブログ / news（新モデル・大型発表）</li>
+      <li><strong>② モデルカード・一覧</strong> — docs のモデルページ / DeepMind model cards（<em>現行モデルの権威ある正</em>）</li>
+      <li><strong>③ API・開発者 changelog</strong> — platform / docs の changelog</li>
+      <li><strong>④ プレビュー・研究先行</strong> — red.anthropic.com / qwen.ai Max-Preview / Google "preview" チャンネル / help-center の research preview など（<em>ここが最も見落としやすい</em>）</li>
+      <li><strong>⑤ オープンウェイト</strong> — HuggingFace / GitHub（Qwen・GLM 等）</li>
+      <li><strong>⑥ コンシューマーアプリ release notes</strong> — ChatGPT / Gemini app / Claude apps</li>
+      <li><strong>⑦ エンタープライズ・クラウド</strong> — Vertex AI / Bedrock / Azure AI Foundry の release notes</li>
     </ul>
-    <h3>使ってはいけないソース</h3>
+
+    <h3>③ モデルのステータスを必ず明記する</h3>
+    <p>同じ「最新」でも段階が違う。トラッカーには<strong>どの段階かを必ず書く</strong>（曖昧な「最新」は禁止）。</p>
     <ul>
-      <li>❌ <strong>このサイトの daily-news / ai-news（research/ai-news/）</strong></li>
-      <li>❌ まとめサイト・テックブログ（公式の一次情報として使用すること）</li>
-      <li>❌ 確認できない X ポスト・リーク情報</li>
-      <li>❌ Claude 自身の学習データ（カットオフ以降は不正確の可能性）</li>
+      <li><strong>GA</strong>（正式・本番利用可） / <strong>Preview・Public Preview</strong>（本番可だが変更・廃止予告あり） / <strong>Experimental・Research Preview</strong>（実験・限定）</li>
+      <li><strong>Open-weight</strong>（重み公開）か <strong>Closed</strong>（API / chat のみ）か</li>
+      <li><strong>Announced but not shipped</strong>（発表のみ・未出荷／施行前）← 未来日付の施行予定はこの扱い。確定事実と混ぜない</li>
     </ul>
-    <div class="note">
-      デイリーニュースは「何に注目すべきか」のシグナルとして読む分には有益。
-      しかしトラッカーに書く内容の<strong>ファクトの根拠</strong>としては使わない。
-      「daily-news で見た」は起点にしてよいが、必ず公式ソースで一次確認してから書く。
-    </div>
+
+    <h3>④ 確認できなければ書かない</h3>
+    <p>Tier 1 で裏が取れない情報は「確認できなかった」と記録し、<strong>空白のまま次月へ持ち越す</strong>。不正確を書くより空白が正しい。「YouTube で見た」「噂で聞いた」は Tier 2 起点 → Tier 1 で確認できなければ不採用（Qwen 3.7 は逆に Tier 1 で確認できたので採用、という判断の型）。</p>
   </div>
 
   <!-- 対象ページと公式ソース -->
@@ -100,9 +113,11 @@
     <div class="vendor-block">
       <div class="vendor-name">🟣 Anthropic (Claude) — <code>research/claude-recent-updates.html</code></div>
       <div class="vendor-sources">
-        <div><span class="src-label">ブログ</span><a href="https://www.anthropic.com/news" target="_blank">anthropic.com/news</a></div>
-        <div><span class="src-label">API Changelog</span><a href="https://docs.anthropic.com/en/release-notes/api" target="_blank">docs.anthropic.com/en/release-notes/api</a></div>
-        <div><span class="src-label">モデル一覧</span><a href="https://docs.anthropic.com/en/docs/about-claude/models/overview" target="_blank">docs.anthropic.com/en/docs/about-claude/models/overview</a></div>
+        <div><span class="src-label">①発表</span><a href="https://www.anthropic.com/news" target="_blank">anthropic.com/news</a> / <a href="https://www.anthropic.com/research" target="_blank">/research</a></div>
+        <div><span class="src-label">②モデル一覧</span><a href="https://docs.anthropic.com/en/docs/about-claude/models/overview" target="_blank">docs.anthropic.com/.../models/overview</a></div>
+        <div><span class="src-label">③API/changelog</span><a href="https://docs.anthropic.com/en/release-notes/overview" target="_blank">docs.anthropic.com/en/release-notes/overview</a></div>
+        <div><span class="src-label">④プレビュー</span><a href="https://red.anthropic.com/" target="_blank">red.anthropic.com</a>（Frontier Red Team・Mythos 等の preview / Project Glasswing）</div>
+        <div><span class="src-label">⑥アプリ</span><a href="https://docs.anthropic.com/en/release-notes/claude-apps" target="_blank">release-notes/claude-apps</a>（claude.ai / Cowork / Chrome / mobile） / <a href="https://docs.anthropic.com/en/release-notes/claude-code" target="_blank">claude-code</a></div>
         <div><span class="src-label">料金</span><a href="https://www.anthropic.com/pricing" target="_blank">anthropic.com/pricing</a></div>
       </div>
     </div>
@@ -110,9 +125,12 @@
     <div class="vendor-block">
       <div class="vendor-name">🟢 OpenAI (ChatGPT) — <code>research/chatgpt-recent-updates.html</code></div>
       <div class="vendor-sources">
-        <div><span class="src-label">ブログ</span><a href="https://openai.com/news" target="_blank">openai.com/news</a></div>
-        <div><span class="src-label">API Changelog</span><a href="https://platform.openai.com/docs/changelog" target="_blank">platform.openai.com/docs/changelog</a></div>
-        <div><span class="src-label">モデル一覧</span><a href="https://platform.openai.com/docs/models" target="_blank">platform.openai.com/docs/models</a></div>
+        <div style="color:#ff8080;font-size:.8rem;margin-bottom:2px;">⚠️ OpenAI は最も分散。Model Release Notes（help center）が見落とし注意</div>
+        <div><span class="src-label">①発表</span><a href="https://openai.com/news" target="_blank">openai.com/news</a></div>
+        <div><span class="src-label">②モデル一覧</span><a href="https://platform.openai.com/docs/models" target="_blank">platform.openai.com/docs/models</a></div>
+        <div><span class="src-label">②モデルrelease notes</span><a href="https://help.openai.com/en/articles/9624314-model-release-notes" target="_blank">help.openai.com — Model Release Notes</a></div>
+        <div><span class="src-label">③API changelog</span><a href="https://platform.openai.com/docs/changelog" target="_blank">platform changelog</a> / <a href="https://developers.openai.com/codex/changelog" target="_blank">Codex changelog</a></div>
+        <div><span class="src-label">⑥アプリ</span><a href="https://help.openai.com/en/articles/6825453-chatgpt-release-notes" target="_blank">ChatGPT Release Notes</a>（Enterprise/Edu/Business/macOS は別記事）</div>
         <div><span class="src-label">料金</span><a href="https://openai.com/api/pricing" target="_blank">openai.com/api/pricing</a></div>
       </div>
     </div>
@@ -120,21 +138,24 @@
     <div class="vendor-block">
       <div class="vendor-name">🔵 Google (Gemini) — <code>research/gemini-recent-updates.html</code></div>
       <div class="vendor-sources">
-        <div><span class="src-label">ブログ</span><a href="https://blog.google/technology/google-deepmind/" target="_blank">blog.google/technology/google-deepmind/</a></div>
-        <div><span class="src-label">AI Blog</span><a href="https://ai.google.dev/news" target="_blank">ai.google.dev/news</a></div>
-        <div><span class="src-label">モデル一覧</span><a href="https://ai.google.dev/gemini-api/docs/models/gemini" target="_blank">ai.google.dev/gemini-api/docs/models/gemini</a></div>
+        <div style="color:#ff8080;font-size:.8rem;margin-bottom:2px;">⚠️ Google は stable/preview/latest/experimental の4チャンネル表記あり。ステータス確認必須</div>
+        <div><span class="src-label">①発表</span><a href="https://blog.google/technology/google-deepmind/" target="_blank">blog.google/technology/google-deepmind/</a></div>
+        <div><span class="src-label">②モデルカード</span><a href="https://deepmind.google/models/" target="_blank">deepmind.google/models</a>（DeepMind 公式モデルカード）</div>
+        <div><span class="src-label">③API/changelog</span><a href="https://ai.google.dev/gemini-api/docs/models" target="_blank">ai.google.dev/.../models</a> / <a href="https://ai.google.dev/gemini-api/docs/changelog" target="_blank">changelog</a></div>
+        <div><span class="src-label">⑦クラウド</span><a href="https://docs.cloud.google.com/vertex-ai/generative-ai/docs/release-notes" target="_blank">Vertex AI release notes</a> / Model Garden（preview 配信）</div>
+        <div><span class="src-label">⑥アプリ</span><a href="https://gemini.google.com/updates" target="_blank">gemini.google.com/updates</a></div>
         <div><span class="src-label">料金</span><a href="https://ai.google.dev/pricing" target="_blank">ai.google.dev/pricing</a></div>
-        <div><span class="src-label">Gemini App更新</span><a href="https://gemini.google.com/updates" target="_blank">gemini.google.com/updates</a></div>
       </div>
     </div>
 
     <div class="vendor-block">
       <div class="vendor-name">⚡ xAI (Grok) — <code>research/grok-recent-updates.html</code></div>
       <div class="vendor-sources">
-        <div><span class="src-label">公式サイト</span><a href="https://x.ai/news" target="_blank">x.ai/news</a></div>
-        <div><span class="src-label">API ドキュメント</span><a href="https://docs.x.ai/docs/overview" target="_blank">docs.x.ai/docs/overview</a></div>
-        <div><span class="src-label">モデル一覧</span><a href="https://docs.x.ai/docs/models" target="_blank">docs.x.ai/docs/models</a></div>
-        <div><span class="src-label">xAI 公式X</span><a href="https://x.com/xai" target="_blank">x.com/xai</a>（発表の二次確認用）</div>
+        <div><span class="src-label">①発表</span><a href="https://x.ai/news" target="_blank">x.ai/news</a></div>
+        <div><span class="src-label">②モデル一覧</span><a href="https://docs.x.ai/developers/models" target="_blank">docs.x.ai/developers/models</a>（grok-4.3 / grok-build-0.1 等の個別ページ）</div>
+        <div><span class="src-label">③API release notes</span><a href="https://docs.x.ai/developers/release-notes" target="_blank">docs.x.ai/developers/release-notes</a></div>
+        <div><span class="src-label">③Build CLI</span><a href="https://x.ai/build/changelog" target="_blank">x.ai/build/changelog</a>（Grok Build は別プロダクト）</div>
+        <div><span class="src-label">公式X</span><a href="https://x.com/xai" target="_blank">x.com/xai</a>（二次確認用）</div>
       </div>
     </div>
 
@@ -150,12 +171,13 @@
     </div>
 
     <div class="vendor-block">
-      <div class="vendor-name">🔴 Zhipu AI (GLM) — <code>research/glm-recent-updates.html</code></div>
+      <div class="vendor-name">🔴 Zhipu AI / Z.ai (GLM) — <code>research/glm-recent-updates.html</code></div>
       <div class="vendor-sources">
-        <div><span class="src-label">公式サイト</span><a href="https://zhipuai.cn/" target="_blank">zhipuai.cn</a></div>
-        <div><span class="src-label">HuggingFace</span><a href="https://huggingface.co/THUDM" target="_blank">huggingface.co/THUDM</a>（モデルカード）</div>
-        <div><span class="src-label">GitHub</span><a href="https://github.com/THUDM/GLM-4" target="_blank">github.com/THUDM/GLM-4</a>（Releases タブ）</div>
-        <div><span class="src-label">BigModel API</span><a href="https://open.bigmodel.cn/" target="_blank">open.bigmodel.cn</a>（API・料金）</div>
+        <div style="color:#ff8080;font-size:.8rem;margin-bottom:2px;">⚠️ ブランド移行: Zhipu → Z.ai（HF/GitHub は zai-org に移行）。英語は z.ai、中国語は bigmodel.cn の2系統</div>
+        <div><span class="src-label">①発表/ブログ</span><a href="https://z.ai/blog" target="_blank">z.ai/blog</a> / <a href="https://www.zhipuai.cn/en" target="_blank">zhipuai.cn/en</a></div>
+        <div><span class="src-label">②③release notes</span><a href="https://docs.z.ai/release-notes/new-released" target="_blank">docs.z.ai/release-notes/new-released</a>（新モデルの正）</div>
+        <div><span class="src-label">⑤オープンウェイト</span><a href="https://huggingface.co/zai-org" target="_blank">huggingface.co/zai-org</a> / <a href="https://github.com/zai-org" target="_blank">github.com/zai-org</a></div>
+        <div><span class="src-label">API/料金</span><a href="https://docs.bigmodel.cn/" target="_blank">docs.bigmodel.cn</a> / <a href="https://open.bigmodel.cn/" target="_blank">open.bigmodel.cn</a>（中国語・API/料金）</div>
       </div>
     </div>
   </div>
