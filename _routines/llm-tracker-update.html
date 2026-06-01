@@ -10,6 +10,7 @@
     .panel { background:#111a2b; border:1px solid rgba(255,255,255,0.08); border-radius:18px; padding:22px 26px; }
     .panel-accent { border-color:rgba(61,216,197,.3); }
     .panel-yellow { border-color:rgba(252,211,77,.3); }
+    .panel-red { border-color:rgba(255,90,90,.35); }
     a { color:#75d7c0; text-decoration:none; }
     a:hover { text-decoration:underline; }
     h1 { margin:6px 0; font-size:1.7rem; }
@@ -33,105 +34,214 @@
     @media(max-width:640px) { .grid2 { grid-template-columns:1fr; } }
     .card { background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.07); border-radius:12px; padding:14px 16px; }
     .note { background:rgba(61,216,197,.06); border-left:3px solid #3dd8c5; border-radius:0 8px 8px 0; padding:10px 14px; margin:10px 0; font-size:.87rem; color:#c5d0e3; }
+    .warn { background:rgba(255,90,90,.07); border-left:4px solid #ff5a5a; border-radius:0 8px 8px 0; padding:12px 16px; margin:10px 0; font-size:.88rem; color:#c5d0e3; }
+    .warn strong { color:#ff8080; }
     table { width:100%; border-collapse:collapse; font-size:.86rem; }
     th { text-align:left; padding:8px 11px; background:rgba(61,216,197,.07); color:#3dd8c5; font-size:.78rem; border-bottom:1px solid rgba(255,255,255,.07); }
     td { padding:8px 11px; border-bottom:1px solid rgba(255,255,255,.04); color:#c5d0e3; vertical-align:top; }
     td strong { color:#edf2fb; }
+    td a { font-size:.82rem; }
     small { color:#4a6a7a; font-size:.78rem; }
     .breadcrumb { font-size:.8rem; color:#4a6a7a; margin-bottom:8px; }
+    .vendor-block { background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.07); border-radius:12px; padding:14px 16px; margin:8px 0; }
+    .vendor-name { font-weight:700; color:#edf2fb; font-size:.92rem; margin-bottom:6px; }
+    .vendor-sources { display:flex; flex-direction:column; gap:4px; }
+    .vendor-sources a { font-size:.83rem; color:#75d7c0; }
+    .src-label { font-size:.72rem; color:#4a6a7a; margin-right:4px; }
   </style>
 </head>
 <body>
 <div class="shell">
 
   <div class="panel panel-accent">
-    <div class="breadcrumb"><a href="../index.html">← Hub Top</a> / _routines</div>
+    <div class="breadcrumb"><a href="../index.html">← Hub Top</a> / <a href="index.html">_routines</a></div>
     <span class="badge badge-teal">月次ルーティン</span>
     <h1>LLM トラッカー更新</h1>
-    <p style="color:#c5d0e3;margin:8px 0 0;font-size:.95rem;">毎月初に実施。6 ベンダーの最新モデル情報・API 変更・料金改定を各トラッカーページに反映する。所要時間: 約 30〜45 分（Claude セッション）。</p>
-    <p style="margin-top:8px"><small>最終更新: 2026-05-30 | 実施頻度: 月1回（月初5日以内）</small></p>
+    <p style="color:#c5d0e3;margin:8px 0 0;font-size:.95rem;">毎月初（5日以内）に実施。6 ベンダーの最新モデル情報・API 変更・料金改定を各トラッカーページに反映する。所要時間: 約 30〜45 分（Claude セッション）。</p>
+    <p style="margin-top:8px"><small>最終更新: 2026-06-01 | 実施頻度: 月1回（月初5日以内）</small></p>
   </div>
 
-  <!-- 対象ページ -->
+  <!-- ソースポリシー（最重要） -->
+  <div class="panel panel-red">
+    <h2>⚠️ ソースポリシー（最重要）</h2>
+    <div class="warn">
+      <strong>デイリーニュース（research/ai-news/）はソースにしない。</strong><br>
+      デイリーニュースは速報性優先であり、噂・未確認情報・バージョン誤りを含む場合がある。
+      トラッカーは「正本（SSOT）」であるため、情報の正確さを最優先し、
+      <strong>外部の公式ソースから直接調べて反映する</strong>こと。
+    </div>
+    <h3>使ってよいソース</h3>
+    <ul>
+      <li>✅ 各ベンダーの公式ブログ・公式発表ページ</li>
+      <li>✅ 公式 API ドキュメント・Changelog</li>
+      <li>✅ 公式 GitHub リリースノート</li>
+      <li>✅ 公式 HuggingFace モデルカード（Qwen / GLM 等オープン系）</li>
+      <li>✅ ベンダー公式の X / SNS アカウントの発表（二次確認として）</li>
+    </ul>
+    <h3>使ってはいけないソース</h3>
+    <ul>
+      <li>❌ <strong>このサイトの daily-news / ai-news（research/ai-news/）</strong></li>
+      <li>❌ まとめサイト・テックブログ（公式の一次情報として使用すること）</li>
+      <li>❌ 確認できない X ポスト・リーク情報</li>
+      <li>❌ Claude 自身の学習データ（カットオフ以降は不正確の可能性）</li>
+    </ul>
+    <div class="note">
+      デイリーニュースは「何に注目すべきか」のシグナルとして読む分には有益。
+      しかしトラッカーに書く内容の<strong>ファクトの根拠</strong>としては使わない。
+      「daily-news で見た」は起点にしてよいが、必ず公式ソースで一次確認してから書く。
+    </div>
+  </div>
+
+  <!-- 対象ページと公式ソース -->
   <div class="panel">
-    <h2>更新対象トラッカーページ</h2>
-    <table>
-      <thead><tr><th>ベンダー</th><th>ファイル</th><th>主な更新情報源</th><th>前回更新</th></tr></thead>
-      <tbody>
-        <tr><td><strong>Anthropic (Claude)</strong></td><td><code>research/claude-recent-updates.html</code></td><td>Anthropic ブログ / API changelog</td><td>2026-05-29</td></tr>
-        <tr><td><strong>OpenAI (ChatGPT)</strong></td><td><code>research/chatgpt-recent-updates.html</code></td><td>OpenAI ブログ / platform changelog</td><td>2026-05-29</td></tr>
-        <tr><td><strong>Google (Gemini)</strong></td><td><code>research/gemini-recent-updates.html</code></td><td>Google AI Blog / DeepMind blog</td><td>2026-05-29</td></tr>
-        <tr><td><strong>xAI (Grok)</strong></td><td><code>research/grok-recent-updates.html</code></td><td>x.ai / X社発表</td><td>2026-05-30</td></tr>
-        <tr><td><strong>Qwen (Alibaba)</strong></td><td><code>research/qwen-recent-updates.html</code></td><td>Qwen Blog / HuggingFace</td><td>2026-05-30</td></tr>
-        <tr><td><strong>GLM (Zhipu AI)</strong></td><td><code>research/glm-recent-updates.html</code></td><td>zhipuai.cn / GitHub</td><td>2026-05-30</td></tr>
-      </tbody>
-    </table>
-    <div class="note" style="margin-top:12px">
-      <strong>優先度:</strong> Claude → ChatGPT → Gemini の順（ALIGN_Lab の実装依存度順）。時間が足りない場合は上位 3 ベンダーを優先。
+    <h2>更新対象トラッカーと公式ソース一覧</h2>
+    <p style="color:#7f92ac;font-size:.85rem;margin-bottom:12px;">各ベンダーの情報を調べる際は、以下の URL を WebSearch / WebFetch の起点にすること。</p>
+
+    <div class="vendor-block">
+      <div class="vendor-name">🟣 Anthropic (Claude) — <code>research/claude-recent-updates.html</code></div>
+      <div class="vendor-sources">
+        <div><span class="src-label">ブログ</span><a href="https://www.anthropic.com/news" target="_blank">anthropic.com/news</a></div>
+        <div><span class="src-label">API Changelog</span><a href="https://docs.anthropic.com/en/release-notes/api" target="_blank">docs.anthropic.com/en/release-notes/api</a></div>
+        <div><span class="src-label">モデル一覧</span><a href="https://docs.anthropic.com/en/docs/about-claude/models/overview" target="_blank">docs.anthropic.com/en/docs/about-claude/models/overview</a></div>
+        <div><span class="src-label">料金</span><a href="https://www.anthropic.com/pricing" target="_blank">anthropic.com/pricing</a></div>
+      </div>
+    </div>
+
+    <div class="vendor-block">
+      <div class="vendor-name">🟢 OpenAI (ChatGPT) — <code>research/chatgpt-recent-updates.html</code></div>
+      <div class="vendor-sources">
+        <div><span class="src-label">ブログ</span><a href="https://openai.com/news" target="_blank">openai.com/news</a></div>
+        <div><span class="src-label">API Changelog</span><a href="https://platform.openai.com/docs/changelog" target="_blank">platform.openai.com/docs/changelog</a></div>
+        <div><span class="src-label">モデル一覧</span><a href="https://platform.openai.com/docs/models" target="_blank">platform.openai.com/docs/models</a></div>
+        <div><span class="src-label">料金</span><a href="https://openai.com/api/pricing" target="_blank">openai.com/api/pricing</a></div>
+      </div>
+    </div>
+
+    <div class="vendor-block">
+      <div class="vendor-name">🔵 Google (Gemini) — <code>research/gemini-recent-updates.html</code></div>
+      <div class="vendor-sources">
+        <div><span class="src-label">ブログ</span><a href="https://blog.google/technology/google-deepmind/" target="_blank">blog.google/technology/google-deepmind/</a></div>
+        <div><span class="src-label">AI Blog</span><a href="https://ai.google.dev/news" target="_blank">ai.google.dev/news</a></div>
+        <div><span class="src-label">モデル一覧</span><a href="https://ai.google.dev/gemini-api/docs/models/gemini" target="_blank">ai.google.dev/gemini-api/docs/models/gemini</a></div>
+        <div><span class="src-label">料金</span><a href="https://ai.google.dev/pricing" target="_blank">ai.google.dev/pricing</a></div>
+        <div><span class="src-label">Gemini App更新</span><a href="https://gemini.google.com/updates" target="_blank">gemini.google.com/updates</a></div>
+      </div>
+    </div>
+
+    <div class="vendor-block">
+      <div class="vendor-name">⚡ xAI (Grok) — <code>research/grok-recent-updates.html</code></div>
+      <div class="vendor-sources">
+        <div><span class="src-label">公式サイト</span><a href="https://x.ai/news" target="_blank">x.ai/news</a></div>
+        <div><span class="src-label">API ドキュメント</span><a href="https://docs.x.ai/docs/overview" target="_blank">docs.x.ai/docs/overview</a></div>
+        <div><span class="src-label">モデル一覧</span><a href="https://docs.x.ai/docs/models" target="_blank">docs.x.ai/docs/models</a></div>
+        <div><span class="src-label">xAI 公式X</span><a href="https://x.com/xai" target="_blank">x.com/xai</a>（発表の二次確認用）</div>
+      </div>
+    </div>
+
+    <div class="vendor-block">
+      <div class="vendor-name">🟡 Alibaba (Qwen) — <code>research/qwen-recent-updates.html</code></div>
+      <div class="vendor-sources">
+        <div><span class="src-label">ブログ</span><a href="https://qwenlm.github.io/" target="_blank">qwenlm.github.io</a></div>
+        <div><span class="src-label">HuggingFace</span><a href="https://huggingface.co/Qwen" target="_blank">huggingface.co/Qwen</a>（モデルカード・リリースノート）</div>
+        <div><span class="src-label">GitHub</span><a href="https://github.com/QwenLM/Qwen" target="_blank">github.com/QwenLM/Qwen</a>（Releases タブ）</div>
+        <div><span class="src-label">Alibaba Cloud</span><a href="https://www.alibabacloud.com/blog" target="_blank">alibabacloud.com/blog</a>（大型発表時）</div>
+      </div>
+    </div>
+
+    <div class="vendor-block">
+      <div class="vendor-name">🔴 Zhipu AI (GLM) — <code>research/glm-recent-updates.html</code></div>
+      <div class="vendor-sources">
+        <div><span class="src-label">公式サイト</span><a href="https://zhipuai.cn/" target="_blank">zhipuai.cn</a></div>
+        <div><span class="src-label">HuggingFace</span><a href="https://huggingface.co/THUDM" target="_blank">huggingface.co/THUDM</a>（モデルカード）</div>
+        <div><span class="src-label">GitHub</span><a href="https://github.com/THUDM/GLM-4" target="_blank">github.com/THUDM/GLM-4</a>（Releases タブ）</div>
+        <div><span class="src-label">BigModel API</span><a href="https://open.bigmodel.cn/" target="_blank">open.bigmodel.cn</a>（API・料金）</div>
+      </div>
     </div>
   </div>
 
   <!-- 実施手順 -->
   <div class="panel panel-yellow">
     <h2>実施手順（Claude セッションで実行）</h2>
+
     <div class="step">
       <div class="step-num">1</div>
       <div class="step-body">
-        <h3>前月比較 — 何が変わったか把握</h3>
-        <p>各トラッカーページの「最近の更新」セクションを読み、前月末時点での最新モデル名・バージョンを控える。git log で当該ファイルの最終コミット日も確認する。</p>
+        <h3>現状把握 — トラッカーの前回更新日と最新エントリを確認</h3>
+        <p>各トラッカーページの冒頭エントリと最終更新日を読んで「どこまで反映済みか」を把握する。これがこのセッションの調査範囲の起点になる。</p>
       </div>
     </div>
+
     <div class="step">
       <div class="step-num">2</div>
       <div class="step-body">
-        <h3>新情報の収集（Web 検索）</h3>
-        <p>Claude に WebSearch で各ベンダーの直近 30 日のリリース情報を調査させる。確認項目: ① 新モデルリリース ② API 仕様変更（入出力トークン上限・モダリティ） ③ 料金改定 ④ 廃止予告</p>
-        <div class="pre"># Claude への指示テンプレート
-「[ベンダー名] の [前月日付] 以降の以下情報を調査してください:
-1. 新モデルリリース（モデルID・機能概要・対象プラン）
-2. API 仕様変更（context window・vision対応・tool use）
-3. 料金改定（input/output $/1M tokens）
-4. 廃止・非推奨モデルの予告
-情報源: 公式ブログ・公式ドキュメント・GitHub リリースノートを優先」</div>
+        <h3>公式ソースから直接調査（WebSearch / WebFetch）</h3>
+        <p>上の「公式ソース一覧」の URL を使って、前回更新日以降の新情報を調べる。<strong>daily-news は参照しない。</strong></p>
+        <div class="pre"># Claude への指示テンプレート（1ベンダーあたり）
+「[ベンダー名] の [前回更新日] 以降の情報を以下の公式URLから調べてください:
+  - [公式ブログURL]
+  - [API Changelog URL]
+  - [モデル一覧URL]
+
+確認すること:
+1. 新モデルのリリース（モデルID・コンテキスト長・マルチモーダル対応・対象プラン）
+2. API 仕様変更（input/output トークン上限・新機能・廃止機能）
+3. 料金改定（$/1M tokens の input/output）
+4. 廃止・非推奨の予告
+
+情報が公式ページで確認できない場合は、そのことを明示すること。
+推測や日次ニュースの引用は不可。」</div>
+        <div class="note">
+          公式ページにアクセスできなかった・情報が見つからなかった場合は、
+          「確認できなかった」と記録する。空白のまま次月に持ち越してよい。
+          不正確な情報を書くよりも空白の方が正しい。
+        </div>
       </div>
     </div>
+
     <div class="step">
       <div class="step-num">3</div>
       <div class="step-body">
-        <h3>トラッカーページの更新</h3>
-        <p>収集した情報を対象ファイルの「最近の更新」セクション冒頭に追記する。既存エントリは削除せず下に残す（最新が上）。フォーマット例:</p>
+        <h3>トラッカーページへの反映</h3>
+        <p>各トラッカーファイルの「最近の更新」セクション冒頭に追記する（最新が上・既存は下に残す）。確認した URL を出典として明記する。</p>
         <div class="pre">&lt;!-- 新エントリ（先頭に追加）--&gt;
 &lt;div class="update-entry"&gt;
   &lt;span class="date"&gt;2026-06-01&lt;/span&gt;
   &lt;span class="badge badge-teal"&gt;NEW&lt;/span&gt;
   &lt;strong&gt;モデル名 X.Y リリース&lt;/strong&gt;
   &lt;p&gt;概要説明。前バージョンとの差分を 2〜3 文で。&lt;/p&gt;
+  &lt;p class="src"&gt;出典: &lt;a href="[公式URL]"&gt;[ベンダー] 公式ブログ&lt;/a&gt;&lt;/p&gt;
 &lt;/div&gt;</div>
+        <div class="warn">
+          <strong>公式で確認できなかった情報は書かない。</strong>
+          「～らしい」「～と言われている」レベルの情報はデイリーニュース側に留める。
+          トラッカーは確認済み情報だけを載せる。
+        </div>
       </div>
     </div>
+
     <div class="step">
       <div class="step-num">4</div>
       <div class="step-body">
-        <h3>claw-stack/comparison.html の確認</h3>
-        <p>新モデルが claw-stack/comparison.html の「LLM エンジン」欄に反映されているか確認。OpenClaw が使う LLM に変更があれば更新する。</p>
+        <h3>整合性確認（任意・重大変更があった場合のみ）</h3>
+        <p>廃止モデル・大幅な仕様変更があった場合のみ、以下も確認・更新する。小規模更新はトラッカーのみで完結させてよい。</p>
+        <ul>
+          <li><code>claw-stack/comparison.html</code> の LLM エンジン欄</li>
+          <li><code>creator-system/</code> 内でモデル名を直接参照しているページ</li>
+          <li><code>workbench/knowledge/[vendor].html</code>（個別深掘りページ）</li>
+        </ul>
       </div>
     </div>
+
     <div class="step">
       <div class="step-num">5</div>
       <div class="step-body">
-        <h3>workbench/knowledge/ 個別ページの確認</h3>
-        <p>重大な仕様変更（モデル廃止・APIレート大幅変更）があれば、<code>workbench/knowledge/[vendor].html</code> にも反映する。小規模更新はトラッカーのみで OK。</p>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-num">6</div>
-      <div class="step-body">
         <h3>コミット & プッシュ</h3>
         <div class="pre">git add research/*-recent-updates.html
-git commit -m "Monthly LLM tracker update — 2026-XX-XX
+git commit -m "chore: 月次 LLM トラッカー更新 YYYY-MM
 
-Updated: claude, chatgpt, gemini, grok, qwen, glm trackers
-Key changes: [変更点の概要]"
+更新ベンダー: claude, chatgpt, gemini, grok, qwen, glm
+主な変更: [変更点の概要]
+ソース: 各ベンダー公式ブログ・APIドキュメント"
 git push</div>
       </div>
     </div>
@@ -142,26 +252,40 @@ git push</div>
     <h2>完了チェックリスト</h2>
     <div class="grid2">
       <div class="card">
+        <h3>ソース品質</h3>
+        <ul>
+          <li>□ 全エントリに公式ソース URL を明記したか</li>
+          <li>□ daily-news を根拠に使っていないか</li>
+          <li>□ 確認できなかった情報は空白にしたか（推測で埋めていないか）</li>
+          <li>□ バージョン番号は公式ページで目視確認したか</li>
+        </ul>
+      </div>
+      <div class="card">
         <h3>コンテンツ</h3>
         <ul>
-          <li>□ 6 ベンダー全トラッカー確認（または上位 3 優先）</li>
+          <li>□ 6 ベンダー確認（または上位 3 優先: Claude → ChatGPT → Gemini）</li>
           <li>□ 新モデルリリース情報を反映</li>
-          <li>□ API 仕様変更を反映（あれば）</li>
-          <li>□ 料金変更を反映（あれば）</li>
+          <li>□ API 仕様変更・料金変更を反映（あれば）</li>
           <li>□ 廃止予告を反映（あれば）</li>
           <li>□ 各ページの「最終更新」日付を更新</li>
         </ul>
       </div>
-      <div class="card">
-        <h3>整合性</h3>
-        <ul>
-          <li>□ comparison.html の LLM 欄と整合しているか</li>
-          <li>□ creator-system 各ページで参照しているモデル名が正しいか</li>
-          <li>□ openclaw.html の判定エンジン記述と一致しているか</li>
-          <li>□ コミットメッセージに変更概要を記載したか</li>
-        </ul>
-      </div>
     </div>
+  </div>
+
+  <!-- デイリーニュースとの役割分担 -->
+  <div class="panel">
+    <h2>デイリーニュースとトラッカーの役割分担</h2>
+    <table>
+      <thead><tr><th>観点</th><th>デイリーニュース（ai-news/）</th><th>月次トラッカー</th></tr></thead>
+      <tbody>
+        <tr><td><strong>目的</strong></td><td>動向把握・気づき・速報</td><td>正本（SSOT）の維持</td></tr>
+        <tr><td><strong>正確さ</strong></td><td>速報性 &gt; 正確さ（噂でも掲載OK）</td><td>正確さ最優先（公式確認のみ）</td></tr>
+        <tr><td><strong>ソース</strong></td><td>Web全般（未確認含む）</td><td>公式ブログ・APIドキュメント・GitHub のみ</td></tr>
+        <tr><td><strong>更新頻度</strong></td><td>毎日</td><td>月1回（月初5日以内）</td></tr>
+        <tr><td><strong>デイリーニュースを</strong><br><strong>トラッカーに使う</strong></td><td colspan="2" style="color:#ff8080;font-weight:700;text-align:center;">❌ 禁止。daily-news が「注目トピックのシグナル」になることはよいが、ファクトの根拠にはしない。</td></tr>
+      </tbody>
+    </table>
   </div>
 
   <!-- 参照リンク -->
