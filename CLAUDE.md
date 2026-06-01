@@ -5,7 +5,7 @@
 実験的に運用する前提はありますが、それは「壊してよい」という意味ではありません。
 正しい前提は `安全に更新し、必要なら戻せるようにする` です。
 
-**最終更新:** 2026-05-31
+**最終更新:** 2026-06-01
 
 ---
 
@@ -48,7 +48,8 @@
 ### 💼 エンタープライズAI・生産性
 
 - **Microsoft AI エコシステム**（spotlight）— M365 Copilot / Power Platform / Copilot Studio / Azure AI Foundry / Phi-4
-- **Briefings & 配布資料** — AI ツール活用のデモ・配布資料アーカイブ（demos/）
+- **深掘りガイド群** — Power Automate 完全実践（実例50選）/ Power Platform 実践大全 / Copilot Studio 実践大全
+- **AI ツール比較ノート** — Codex / Claude Code 実務比較・シナリオ資料（demos/）
 
 > ⚠️ Google AI は「生成AI・クリエイター」、Microsoft AI は「エンタープライズAI・生産性」に分離。
 > 両エコシステムは `workbench/knowledge/` に物理ファイルが置かれているが、表示カテゴリは異なる。
