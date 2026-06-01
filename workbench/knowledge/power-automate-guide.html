@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Power Automate 完全実践ガイド — 実例50選 & 設計パターン詳解 | Tech Workbench</title>
+<style>
+:root {
+    --accent: #0078d4;
+    --accent2: #8b5cf6;
+    --accent3: #f59e0b;
+    --green: #16a34a;
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #21262d;
+    --border: rgba(255,255,255,0.08);
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --radius: 12px;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; line-height:1.65; font-size:16px; }
+a { color:var(--accent); text-decoration:none; }
+a:hover { text-decoration:underline; }
+.page-wrap { max-width:1000px; margin:0 auto; padding:32px 20px 80px; }
+nav { background:var(--surface); border-bottom:1px solid var(--border); padding:12px 20px; font-size:0.85rem; }
+nav a { color:var(--muted); margin-right:6px; }
+nav span { color:var(--muted); margin-right:6px; }
+
+.hero { background:linear-gradient(135deg, rgba(0,50,110,0.8), rgba(0,100,180,0.5), rgba(0,120,212,0.25)); border:1px solid rgba(0,120,212,0.35); border-radius:var(--radius); padding:48px 40px; margin-bottom:40px; }
+.hero h1 { font-size:2.2rem; font-weight:800; color:#fff; margin-bottom:8px; }
+.hero .sub { color:rgba(255,255,255,0.88); font-size:1.05rem; margin-bottom:24px; max-width:720px; }
+.stat-row { display:flex; gap:14px; flex-wrap:wrap; }
+.stat { background:rgba(0,0,0,0.35); border:1px solid rgba(0,120,212,0.35); border-radius:8px; padding:12px 18px; text-align:center; min-width:100px; }
+.stat .val { font-size:1.5rem; font-weight:800; color:#60a5fa; }
+.stat .lbl { font-size:0.72rem; color:var(--muted); margin-top:2px; }
+
+.toc { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:24px 28px; margin-bottom:40px; }
+.toc h2 { font-size:0.82rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; margin-bottom:14px; }
+.toc ol { padding-left:20px; }
+.toc li { margin-bottom:5px; font-size:0.93rem; }
+.toc a { color:var(--text); }
+.toc a:hover { color:#60a5fa; }
+
+.section { margin-bottom:56px; }
+.section-header { display:flex; align-items:center; gap:12px; margin-bottom:24px; padding-bottom:12px; border-bottom:2px solid var(--accent); }
+.section-num { background:var(--accent); color:#fff; font-size:0.75rem; font-weight:700; padding:3px 9px; border-radius:4px; }
+.section-header h2 { font-size:1.4rem; font-weight:700; color:#60a5fa; }
+.section-header.purple { border-color:var(--accent2); }
+.section-header.purple .section-num { background:var(--accent2); }
+.section-header.purple h2 { color:#c4b5fd; }
+.section-header.amber { border-color:var(--accent3); }
+.section-header.amber .section-num { background:var(--accent3); color:#000; }
+.section-header.amber h2 { color:var(--accent3); }
+.section-header.green { border-color:var(--green); }
+.section-header.green .section-num { background:var(--green); }
+.section-header.green h2 { color:#4ade80; }
+
+.card-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; margin-bottom:24px; }
+.card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:20px; }
+.card h3 { font-size:1rem; font-weight:700; margin-bottom:8px; }
+.card p { font-size:0.875rem; color:var(--muted); line-height:1.6; }
+.card.blue { border-color:rgba(0,120,212,0.4); }
+.card.purple { border-color:rgba(139,92,246,0.4); }
+.card.green { border-color:rgba(22,163,74,0.4); }
+.card.amber { border-color:rgba(245,158,11,0.4); }
+.card.red { border-color:rgba(220,38,38,0.4); }
+
+.table-wrap { overflow-x:auto; margin-bottom:24px; }
+table { width:100%; border-collapse:collapse; font-size:0.875rem; }
+th { background:var(--surface2); color:var(--muted); font-weight:600; padding:10px 14px; text-align:left; border-bottom:1px solid var(--border); }
+td { padding:10px 14px; border-bottom:1px solid rgba(255,255,255,0.04); vertical-align:top; }
+tr:hover td { background:rgba(255,255,255,0.02); }
+td code { background:rgba(0,120,212,0.15); color:#60a5fa; padding:1px 5px; border-radius:3px; font-size:0.8rem; }
+
+.code-block { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:16px 20px; font-family:'SF Mono',Consolas,monospace; font-size:0.825rem; overflow-x:auto; margin-bottom:16px; line-height:1.75; color:#cdd9e5; }
+.code-block .kw { color:#f97583; }
+.code-block .str { color:#9ecbff; }
+.code-block .cm { color:#6a737d; font-style:italic; }
+.code-block .fn { color:#b392f0; }
+.code-block .var { color:#79b8ff; }
+.code-block .num { color:#f8c555; }
+.code-block .op { color:#ffa657; }
+
+.callout { border-left:3px solid var(--accent); background:rgba(0,120,212,0.07); padding:14px 18px; border-radius:0 8px 8px 0; margin-bottom:20px; font-size:0.9rem; }
+.callout.purple { border-color:var(--accent2); background:rgba(139,92,246,0.07); }
+.callout.amber { border-color:var(--accent3); background:rgba(245,158,11,0.07); }
+.callout.green { border-color:var(--green); background:rgba(22,163,74,0.07); }
+.callout.red { border-color:#dc2626; background:rgba(220,38,38,0.07); }
+.callout strong { color:var(--text); }
+
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:24px; }
+.three-col { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-bottom:24px; }
+@media(max-width:680px){ .two-col,.three-col { grid-template-columns:1fr; } }
+
+.tag { display:inline-block; font-size:0.7rem; font-weight:700; padding:2px 8px; border-radius:4px; margin-bottom:6px; background:rgba(0,120,212,0.15); color:#60a5fa; text-transform:uppercase; letter-spacing:.06em; }
+.tag.purple { background:rgba(139,92,246,0.15); color:#c4b5fd; }
+.tag.green { background:rgba(22,163,74,0.15); color:#4ade80; }
+.tag.amber { background:rgba(245,158,11,0.15); color:var(--accent3); }
+.tag.red { background:rgba(220,38,38,0.15); color:#f87171; }
+.tag.gray { background:rgba(139,148,158,0.15); color:var(--muted); }
+
+.chips { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+.chip { background:rgba(0,120,212,0.12); color:#60a5fa; border:1px solid rgba(0,120,212,0.25); border-radius:20px; padding:3px 10px; font-size:0.75rem; font-weight:600; }
+.chip.purple { background:rgba(139,92,246,0.12); color:#c4b5fd; border-color:rgba(139,92,246,0.25); }
+.chip.green { background:rgba(22,163,74,0.12); color:#4ade80; border-color:rgba(22,163,74,0.25); }
+.chip.amber { background:rgba(245,158,11,0.12); color:var(--accent3); border-color:rgba(245,158,11,0.25); }
+
+/* 実例カード */
+.example-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:14px; margin-bottom:28px; }
+.example { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:16px 18px; }
+.example .ex-num { font-size:0.7rem; font-weight:700; color:var(--muted); margin-bottom:4px; }
+.example h4 { font-size:0.95rem; font-weight:700; margin-bottom:6px; color:var(--text); }
+.example .trigger { font-size:0.78rem; color:#60a5fa; margin-bottom:4px; }
+.example p { font-size:0.82rem; color:var(--muted); line-height:1.55; }
+.example.blue { border-color:rgba(0,120,212,0.35); }
+.example.purple { border-color:rgba(139,92,246,0.35); }
+.example.green { border-color:rgba(22,163,74,0.35); }
+.example.amber { border-color:rgba(245,158,11,0.35); }
+
+h3 { font-size:1rem; font-weight:700; margin-bottom:10px; margin-top:20px; color:var(--text); }
+
+.build-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:14px; }
+.build-item { background:var(--surface); border:1px solid rgba(0,120,212,0.25); border-radius:10px; padding:16px; }
+.build-item .status { font-size:0.7rem; font-weight:700; color:#4ade80; text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; }
+.build-item .status.preview { color:var(--accent3); }
+.build-item h4 { font-size:0.95rem; font-weight:700; margin-bottom:6px; }
+.build-item p { font-size:0.82rem; color:var(--muted); }
+
+footer { background:var(--surface); border-top:1px solid var(--border); margin-top:60px; padding:24px 20px; text-align:center; font-size:0.85rem; color:var(--muted); }
+footer a { color:var(--muted); }
+footer a:hover { color:var(--text); }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="../../index.html">Hub</a><span>›</span>
+  <a href="index.html">Tech Workbench</a><span>›</span>
+  <a href="power-platform-guide.html">Power Platform 実践大全</a><span>›</span>
+  <span style="color:var(--text);">Power Automate 完全実践ガイド</span>
+</nav>
+
+<div class="page-wrap">
+
+<div class="hero">
+  <div class="tag" style="background:rgba(0,120,212,0.2);color:#93c5fd;margin-bottom:12px;">Microsoft Power Automate</div>
+  <h1>Power Automate 完全実践ガイド</h1>
+  <p class="sub">フロー種別・式言語・制御フロー・SharePoint/Teams 連携・部署別実例50選・RPA・プレミアムコネクタ・デバッグまで、現場で使いこなすための詳解リファレンス</p>
+  <div class="stat-row">
+    <div class="stat"><div class="val">3</div><div class="lbl">フロー種別</div></div>
+    <div class="stat"><div class="val">900+</div><div class="lbl">コネクタ</div></div>
+    <div class="stat"><div class="val">50</div><div class="lbl">実例</div></div>
+    <div class="stat"><div class="val">5分/月</div><div class="lbl">標準実行上限</div></div>
+    <div class="stat"><div class="val">RPA</div><div class="lbl">Desktop Flow</div></div>
+  </div>
+</div>
+
+<div class="toc">
+  <h2>目次</h2>
+  <ol>
+    <li><a href="#flow-types">フロー種別の完全解説 — Cloud / Desktop / BPF</a></li>
+    <li><a href="#expressions">式言語（Expression）マスターガイド</a></li>
+    <li><a href="#control-flow">高度な制御フロー — 並列・ループ・スコープ・子フロー</a></li>
+    <li><a href="#sharepoint">SharePoint 連携パターン集</a></li>
+    <li><a href="#teams">Teams 連携 & Adaptive Cards 実践</a></li>
+    <li><a href="#examples">部署別・業種別 実例50選</a></li>
+    <li><a href="#rpa">Power Automate Desktop（RPA）深掘り</a></li>
+    <li><a href="#premium">プレミアムコネクタ活用 — HTTP / SQL / Azure / SAP</a></li>
+    <li><a href="#limits">制限・パフォーマンス設計</a></li>
+    <li><a href="#debug">デバッグ & トラブルシューティング</a></li>
+    <li><a href="#copilot">Copilot でフロー生成 & Build 2026</a></li>
+  </ol>
+</div>
+
+<!-- ===== 01: FLOW TYPES ===== -->
+<section class="section" id="flow-types">
+  <div class="section-header">
+    <span class="section-num">01</span>
+    <h2>フロー種別の完全解説</h2>
+  </div>
+
+  <div class="card-grid">
+    <div class="card blue">
+      <div class="tag">Instant Flow</div>
+      <h3>即時フロー（手動起動）</h3>
+      <p>モバイルアプリのボタン・Power Apps からのボタン・Teams のアダプティブカードで起動。入力パラメータを受け取れる。</p>
+      <div class="chips"><span class="chip">モバイルボタン</span><span class="chip">Power Apps 呼出</span><span class="chip">Teams ボタン</span></div>
+    </div>
+    <div class="card blue">
+      <div class="tag">Scheduled Flow</div>
+      <h3>スケジュールフロー</h3>
+      <p>指定した間隔・時刻に自動実行。「繰り返し」トリガー。分・時間・日・週・月単位で設定。タイムゾーン指定が重要。</p>
+      <div class="chips"><span class="chip">日次バッチ</span><span class="chip">週次レポート</span><span class="chip">月末処理</span></div>
+    </div>
+    <div class="card blue">
+      <div class="tag">Automated Flow</div>
+      <h3>自動フロー（イベント駆動）</h3>
+      <p>外部イベント（ファイル追加・メール受信・行変更等）をトリガーに自動起動。最も多用されるタイプ。</p>
+      <div class="chips"><span class="chip">ファイル追加</span><span class="chip">メール受信</span><span class="chip">レコード変更</span></div>
+    </div>
+    <div class="card purple">
+      <div class="tag purple">Desktop Flow</div>
+      <h3>デスクトップフロー（RPA）</h3>
+      <p>Power Automate Desktop で録画したUI操作を自動化。有人（アテンデッド）・無人（アンアテンデッド）を選択。</p>
+      <div class="chips"><span class="chip purple">Windows UI</span><span class="chip purple">Web操作</span><span class="chip purple">Excel/SAP</span></div>
+    </div>
+    <div class="card amber">
+      <div class="tag amber">BPF</div>
+      <h3>ビジネスプロセスフロー</h3>
+      <p>Dataverse レコードに紐づくステージ進行管理。営業商談・審査フロー等の「状態遷移」を視覚化。Model-driven App と連携。</p>
+      <div class="chips"><span class="chip amber">ステージ管理</span><span class="chip amber">SLA制御</span><span class="chip amber">Dataverse</span></div>
+    </div>
+    <div class="card green">
+      <div class="tag green">Child Flow</div>
+      <h3>子フロー（モジュール化）</h3>
+      <p>「ソリューション」内で定義した別フローを呼び出す。共通ロジック（通知送信・ログ書込等）をライブラリ化して再利用。</p>
+      <div class="chips"><span class="chip green">再利用</span><span class="chip green">モジュール化</span><span class="chip green">テスト容易</span></div>
+    </div>
+  </div>
+
+  <h3>主要トリガー完全一覧</h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>トリガー</th><th>コネクタ</th><th>ポーリング間隔</th><th>主なユースケース</th></tr>
+      <tr><td>ファイルが作成または変更された時</td><td>SharePoint</td><td>1〜15分</td><td>ドキュメント申請・PDF変換</td></tr>
+      <tr><td>アイテムが作成された時</td><td>SharePoint</td><td>1〜15分</td><td>リスト申請フォーム受付</td></tr>
+      <tr><td>アイテムが作成または変更された時</td><td>SharePoint</td><td>1〜15分</td><td>ステータス変更検知</td></tr>
+      <tr><td>新しいメールが届いた時（V3）</td><td>Office 365 Outlook</td><td>Webhook</td><td>メール解析・自動返信・チケット起票</td></tr>
+      <tr><td>メンションされた時</td><td>Microsoft Teams</td><td>Webhook</td><td>チャット起点の承認フロー</td></tr>
+      <tr><td>行が追加・変更・削除された時</td><td>Dataverse</td><td>Webhook</td><td>CRM更新通知・マスタ同期</td></tr>
+      <tr><td>行が追加された時</td><td>SQL Server</td><td>ポーリング</td><td>基幹DB更新検知（プレミアム）</td></tr>
+      <tr><td>繰り返し</td><td>スケジュール</td><td>任意設定</td><td>定期バッチ・レポート生成</td></tr>
+      <tr><td>HTTP要求の受信時</td><td>Request</td><td>即時（Webhook）</td><td>外部システムからの呼び出し受付</td></tr>
+      <tr><td>Forms 回答が送信された時</td><td>Microsoft Forms</td><td>1〜5分</td><td>アンケート→DB格納→通知</td></tr>
+      <tr><td>承認が完了した時</td><td>Approvals</td><td>Webhook</td><td>承認結果を起点に次アクション</td></tr>
+      <tr><td>ボタンがクリックされた時</td><td>Power Apps</td><td>即時</td><td>Canvas App から複雑処理を呼び出し</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ===== 02: EXPRESSIONS ===== -->
+<section class="section" id="expressions">
+  <div class="section-header purple">
+    <span class="section-num">02</span>
+    <h2>式言語（Expression）マスターガイド</h2>
+  </div>
+
+  <div class="callout purple">
+    <strong>Power Automate の式は Azure Logic Apps と同じ Workflow Expression Language。</strong> 動的コンテンツだけでは対応できない処理（文字列整形・日付計算・配列操作・条件評価）はすべて式で解決する。GUI の「式」タブに入力する。
+  </div>
+
+  <h3>文字列操作</h3>
+  <div class="code-block"><span class="cm">// 結合</span>
+<span class="fn">concat</span>(<span class="str">'申請ID-'</span>, <span class="fn">string</span>(triggerOutputs()?[<span class="str">'body/ID'</span>]))
+
+<span class="cm">// 部分取得</span>
+<span class="fn">substring</span>(variables(<span class="str">'email'</span>), <span class="num">0</span>, <span class="fn">indexOf</span>(variables(<span class="str">'email'</span>), <span class="str">'@'</span>))  <span class="cm">// @ より前</span>
+<span class="fn">last</span>(<span class="fn">split</span>(variables(<span class="str">'email'</span>), <span class="str">'@'</span>))  <span class="cm">// @ より後（ドメイン部）</span>
+
+<span class="cm">// 置換・トリム</span>
+<span class="fn">replace</span>(variables(<span class="str">'text'</span>), <span class="str">'　'</span>, <span class="str">' '</span>)  <span class="cm">// 全角スペース→半角</span>
+<span class="fn">trim</span>(variables(<span class="str">'text'</span>))
+
+<span class="cm">// 大文字小文字</span>
+<span class="fn">toUpper</span>(variables(<span class="str">'status'</span>))
+<span class="fn">toLower</span>(variables(<span class="str">'email'</span>))
+
+<span class="cm">// 含む判定（条件式で使用）</span>
+<span class="fn">contains</span>(variables(<span class="str">'subject'</span>), <span class="str">'緊急'</span>)
+<span class="fn">startsWith</span>(variables(<span class="str">'filename'</span>), <span class="str">'INV-'</span>)
+<span class="fn">endsWith</span>(variables(<span class="str">'filename'</span>), <span class="str">'.pdf'</span>)
+
+<span class="cm">// 長さ</span>
+<span class="fn">length</span>(variables(<span class="str">'text'</span>))
+
+<span class="cm">// 改行コードの除去（Teamsメッセージ等に有用）</span>
+<span class="fn">replace</span>(<span class="fn">replace</span>(variables(<span class="str">'text'</span>), <span class="str">'\r\n'</span>, <span class="str">' '</span>), <span class="str">'\n'</span>, <span class="str">' '</span>)</div>
+
+  <h3>日時操作</h3>
+  <div class="code-block"><span class="cm">// 現在時刻（UTC）</span>
+<span class="fn">utcNow</span>()  <span class="cm">// → 2026-05-31T10:00:00.0000000Z</span>
+
+<span class="cm">// フォーマット変換</span>
+<span class="fn">formatDateTime</span>(<span class="fn">utcNow</span>(), <span class="str">'yyyy-MM-dd'</span>)       <span class="cm">// → 2026-05-31</span>
+<span class="fn">formatDateTime</span>(<span class="fn">utcNow</span>(), <span class="str">'yyyy年M月d日'</span>)       <span class="cm">// → 2026年5月31日</span>
+<span class="fn">formatDateTime</span>(<span class="fn">utcNow</span>(), <span class="str">'HH:mm'</span>)             <span class="cm">// → 19:00 (UTCなので注意)</span>
+
+<span class="cm">// タイムゾーン変換（日本時間）</span>
+<span class="fn">convertTimeZone</span>(<span class="fn">utcNow</span>(), <span class="str">'UTC'</span>, <span class="str">'Tokyo Standard Time'</span>)
+<span class="cm">// 日本時間でフォーマット</span>
+<span class="fn">formatDateTime</span>(<span class="fn">convertTimeZone</span>(<span class="fn">utcNow</span>(), <span class="str">'UTC'</span>, <span class="str">'Tokyo Standard Time'</span>), <span class="str">'yyyy-MM-dd HH:mm'</span>)
+
+<span class="cm">// 加算・減算</span>
+<span class="fn">addDays</span>(<span class="fn">utcNow</span>(), <span class="num">7</span>)       <span class="cm">// 7日後</span>
+<span class="fn">addDays</span>(<span class="fn">utcNow</span>(), <span class="op">-</span><span class="num">1</span>)      <span class="cm">// 昨日</span>
+<span class="fn">addHours</span>(<span class="fn">utcNow</span>(), <span class="num">9</span>)      <span class="cm">// 9時間後</span>
+<span class="fn">addMinutes</span>(<span class="fn">utcNow</span>(), <span class="num">30</span>)   <span class="cm">// 30分後</span>
+
+<span class="cm">// 差分（日数）</span>
+<span class="fn">div</span>(<span class="fn">sub</span>(<span class="fn">ticks</span>(variables(<span class="str">'deadline'</span>)), <span class="fn">ticks</span>(<span class="fn">utcNow</span>())), <span class="num">864000000000</span>)
+<span class="cm">// ticks差を100ナノ秒単位から日数に変換</span></div>
+
+  <h3>配列・JSON操作</h3>
+  <div class="code-block"><span class="cm">// 配列の要素数</span>
+<span class="fn">length</span>(variables(<span class="str">'items'</span>))
+
+<span class="cm">// 最初・最後の要素</span>
+<span class="fn">first</span>(variables(<span class="str">'items'</span>))
+<span class="fn">last</span>(variables(<span class="str">'items'</span>))
+
+<span class="cm">// 特定プロパティだけ取り出す（配列→配列）</span>
+<span class="cm">// ※ Select アクション（データ操作）を使うと GUI で設定可能</span>
+
+<span class="cm">// 配列に値が含まれるか</span>
+<span class="fn">contains</span>(variables(<span class="str">'approvers'</span>), <span class="str">'user@example.com'</span>)
+
+<span class="cm">// JSONの特定キー取得</span>
+body(<span class="str">'Parse_JSON'</span>)?[<span class="str">'results'</span>]?[<span class="num">0</span>]?[<span class="str">'name'</span>]
+
+<span class="cm">// union（配列のマージ）</span>
+<span class="fn">union</span>(variables(<span class="str">'list1'</span>), variables(<span class="str">'list2'</span>))
+
+<span class="cm">// intersection（共通要素）</span>
+<span class="fn">intersection</span>(variables(<span class="str">'list1'</span>), variables(<span class="str">'list2'</span>))</div>
+
+  <h3>条件・型変換</h3>
+  <div class="code-block"><span class="cm">// 三項演算子的な使い方</span>
+<span class="fn">if</span>(<span class="fn">equals</span>(variables(<span class="str">'status'</span>), <span class="str">'Approved'</span>), <span class="str">'承認済み'</span>, <span class="str">'未承認'</span>)
+
+<span class="cm">// null チェック</span>
+<span class="fn">if</span>(<span class="fn">empty</span>(triggerOutputs()?[<span class="str">'body/comment'</span>]), <span class="str">'コメントなし'</span>, triggerOutputs()?[<span class="str">'body/comment'</span>])
+<span class="fn">coalesce</span>(triggerOutputs()?[<span class="str">'body/manager'</span>], <span class="str">'manager@example.com'</span>)  <span class="cm">// null なら代替値</span>
+
+<span class="cm">// 型変換</span>
+<span class="fn">string</span>(<span class="num">12345</span>)          <span class="cm">// 数値→文字列</span>
+<span class="fn">int</span>(<span class="str">'42'</span>)             <span class="cm">// 文字列→整数</span>
+<span class="fn">float</span>(<span class="str">'3.14'</span>)         <span class="cm">// 文字列→小数</span>
+<span class="fn">bool</span>(<span class="str">'true'</span>)          <span class="cm">// 文字列→真偽値</span>
+<span class="fn">json</span>(<span class="str">'{"key":"val"}'</span>)  <span class="cm">// 文字列→JSONオブジェクト</span>
+<span class="fn">base64</span>(variables(<span class="str">'text'</span>))      <span class="cm">// Base64エンコード</span>
+<span class="fn">base64ToString</span>(variables(<span class="str">'enc'</span>)) <span class="cm">// Base64デコード</span>
+
+<span class="cm">// 数値演算</span>
+<span class="fn">add</span>(<span class="num">100</span>, <span class="num">200</span>)          <span class="cm">// 加算</span>
+<span class="fn">sub</span>(<span class="num">500</span>, <span class="num">150</span>)          <span class="cm">// 減算</span>
+<span class="fn">mul</span>(<span class="num">3</span>, <span class="num">1.08</span>)           <span class="cm">// 乗算（税込）</span>
+<span class="fn">div</span>(<span class="num">1000</span>, <span class="num">3</span>)           <span class="cm">// 除算</span>
+<span class="fn">mod</span>(<span class="num">10</span>, <span class="num">3</span>)             <span class="cm">// 余り → 1</span></div>
+
+  <h3>よく使う動的コンテンツのパス</h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>取得したい値</th><th>式</th></tr>
+      <tr><td>SharePoint アイテムID</td><td><code>triggerOutputs()?['body/ID']</code></td></tr>
+      <tr><td>SharePoint 作成者メール</td><td><code>triggerOutputs()?['body/Author/Email']</code></td></tr>
+      <tr><td>Outlookメール本文（HTML除去）</td><td><code>triggerOutputs()?['body/body/content']</code>（ContentType がテキストの場合）</td></tr>
+      <tr><td>Forms 回答者メール</td><td><code>triggerOutputs()?['body/responder']</code></td></tr>
+      <tr><td>承認結果</td><td><code>outputs('承認の開始と待機')?['body/outcome']</code></td></tr>
+      <tr><td>承認コメント</td><td><code>outputs('承認の開始と待機')?['body/responses'][0]['comments']</code></td></tr>
+      <tr><td>HTTP応答ボディ</td><td><code>body('HTTP')</code></td></tr>
+      <tr><td>HTTP ステータスコード</td><td><code>outputs('HTTP')?['statusCode']</code></td></tr>
+      <tr><td>ループ内の現在アイテム</td><td><code>items('Apply_to_each')?['ColumnName']</code></td></tr>
+      <tr><td>フロー実行ID</td><td><code>workflow()?['run']?['name']</code></td></tr>
+      <tr><td>環境名</td><td><code>workflow()?['tags']?['environmentName']</code></td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ===== 03: CONTROL FLOW ===== -->
+<section class="section" id="control-flow">
+  <div class="section-header">
+    <span class="section-num">03</span>
+    <h2>高度な制御フロー</h2>
+  </div>
+
+  <h3>並列分岐（Parallel Branch）</h3>
+  <div class="callout">
+    <strong>並列分岐は「同時に実行できるアクション群を分ける」もので、それぞれの結果を待って次に進む。</strong> 例：PDF生成・Teams通知・DB記録を同時実行して全完了後に完了メールを送る。
+  </div>
+  <div class="code-block"><span class="cm">// 設計例：申請受付後の並列処理</span>
+[申請フォーム受信]
+  ↓ 並列分岐 ─────────────────────────────────────┐
+  │ 分岐A: SharePoint にレコード作成               │
+  │ 分岐B: 申請者に受付メール送信                  │
+  │ 分岐C: 承認者に Teams 通知                    │
+  └─────────────────────────────────────────────────┘
+  ↓ （全分岐完了後）
+[承認フロー開始]</div>
+
+  <h3>Do Until ループ（条件を満たすまで繰り返す）</h3>
+  <div class="code-block"><span class="cm">// 例：外部APIのステータスが "completed" になるまでポーリング</span>
+変数初期化: status = <span class="str">""</span>
+変数初期化: count = <span class="num">0</span>
+
+Do Until:
+  条件: <span class="fn">equals</span>(variables(<span class="str">'status'</span>), <span class="str">'completed'</span>)
+  上限: 回数 <span class="num">10</span> / タイムアウト PT1H
+  ─────────────────────────────
+  HTTP GET: /api/job/{jobId}/status
+  JSON解析: レスポンス
+  変数設定: status = body('Parse_JSON')?['status']
+  条件:
+    status が <span class="str">'failed'</span> → Teams エラー通知 → 終了
+  遅延: 30秒
+
+[完了後の処理]</div>
+
+  <h3>Apply to each — 並列度の設定</h3>
+  <div class="callout amber">
+    <strong>「Apply to each」はデフォルトで直列実行（1件ずつ）。設定の「同時実行の制御」をオンにすると並列度1〜50で動かせる。</strong> ただし順序が重要な処理（DB書込み順序が決まっている等）には使わない。
+  </div>
+  <div class="two-col">
+    <div>
+      <h3>並列化が有効なケース</h3>
+      <ul style="font-size:0.875rem;color:var(--muted);padding-left:18px;line-height:2;">
+        <li>独立したメール送信（1000人への一斉送信）</li>
+        <li>独立したファイル変換処理</li>
+        <li>各行のAPI呼び出し（順序不問）</li>
+        <li>外部サービスへの書き込み（べき等な処理）</li>
+      </ul>
+    </div>
+    <div>
+      <h3>並列化してはいけないケース</h3>
+      <ul style="font-size:0.875rem;color:var(--muted);padding-left:18px;line-height:2;">
+        <li>採番・連番の払い出し</li>
+        <li>後続が前の結果に依存する処理</li>
+        <li>API のレートリミットがある処理</li>
+        <li>同一レコードへの書き込み（競合する）</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>スコープ（Scope）— エラー境界の設計</h3>
+  <div class="code-block"><span class="cm">// ベストプラクティス構造</span>
+スコープ: <span class="str">"Try"</span>  ← メイン処理をまとめる
+  → アクション1
+  → アクション2
+  → アクション3
+
+スコープ: <span class="str">"Catch"</span>  ← 実行条件: 「失敗した場合に実行」
+  → Teams にエラー通知
+      本文: <span class="fn">concat</span>(<span class="str">'エラー: '</span>, actions(<span class="str">'Scope_Try'</span>)?[<span class="str">'error'</span>]?[<span class="str">'message'</span>])
+  → Dataverse エラーログ書込
+      フロー名: workflow()?[<span class="str">'name'</span>]
+      実行ID: workflow()?[<span class="str">'run'</span>]?[<span class="str">'name'</span>]
+      エラー詳細: <span class="fn">string</span>(actions(<span class="str">'Scope_Try'</span>)?[<span class="str">'error'</span>])
+  → 終了（失敗として）
+
+スコープ: <span class="str">"Finally"</span>  ← 実行条件: 「スキップされた場合に実行」を含む
+  → 常に実行したい後処理（ロック解除など）</div>
+
+  <h3>子フロー設計パターン</h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>子フロー名</th><th>入力</th><th>出力</th><th>呼び出し元</th></tr>
+      <tr><td>共通通知フロー</td><td>宛先・件名・本文・優先度</td><td>成否</td><td>全申請フロー</td></tr>
+      <tr><td>エラーログ書込フロー</td><td>フロー名・エラー詳細・実行ID</td><td>ログID</td><td>全フローの Catch スコープ</td></tr>
+      <tr><td>ユーザー情報取得フロー</td><td>メールアドレス</td><td>表示名・部署・上長メール</td><td>承認フロー全般</td></tr>
+      <tr><td>PDF生成フロー</td><td>テンプレート名・データJSON</td><td>ファイルURL</td><td>契約・請求書フロー</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ===== 04: SHAREPOINT ===== -->
+<section class="section" id="sharepoint">
+  <div class="section-header green">
+    <span class="section-num">04</span>
+    <h2>SharePoint 連携パターン集</h2>
+  </div>
+
+  <div class="callout green">
+    <strong>SharePoint は Power Automate で最多利用のコネクタ。</strong> リスト（構造化データ）とドキュメントライブラリ（ファイル）の2軸で考える。大量アイテムの操作は「フィルタークエリ」と「上位の取得件数」を必ず設定してパフォーマンスを守る。
+  </div>
+
+  <h3>リスト操作の頻出パターン</h3>
+  <div class="code-block"><span class="cm">// ① 複数アイテム取得（フィルター付き）</span>
+アクション: 「複数の項目の取得」
+サイト: https://contoso.sharepoint.com/sites/HR
+リスト: 申請リスト
+フィルタークエリ: Status eq <span class="str">'Pending'</span> and Created ge <span class="str">'2026-05-01'</span>
+上位の取得件数: <span class="num">500</span>
+列の絞り込み: ID,Title,ApplicantEmail,Status,Created
+
+<span class="cm">// ② アイテム更新</span>
+アクション: 「項目の更新」
+ID: triggerOutputs()?[<span class="str">'body/ID'</span>]
+Status: <span class="str">'Approved'</span>
+ApprovedAt: <span class="fn">utcNow</span>()
+ApproverComment: outputs(<span class="str">'承認の開始と待機'</span>)?[<span class="str">'body/responses'</span>][<span class="num">0</span>][<span class="str">'comments'</span>]
+
+<span class="cm">// ③ ファイルをメタデータ付きでアップロード</span>
+アクション: 「ファイルの作成」
+フォルダーパス: /Shared Documents/Reports/2026
+ファイル名: <span class="fn">concat</span>(<span class="fn">formatDateTime</span>(<span class="fn">utcNow</span>(), <span class="str">'yyyyMM'</span>), <span class="str">'_売上レポート.xlsx'</span>)
+ファイルコンテンツ: outputs(<span class="str">'Excel作成'</span>)?[<span class="str">'body'</span>]
+
+アクション: 「ファイルプロパティの更新」（メタデータ列を更新）
+報告月: <span class="fn">formatDateTime</span>(<span class="fn">utcNow</span>(), <span class="str">'yyyy-MM'</span>)
+作成者部署: variables(<span class="str">'dept'</span>)</div>
+
+  <h3>大量データ処理のパターン（ページング）</h3>
+  <div class="code-block"><span class="cm">// SharePoint リストが5000件超の場合のページング</span>
+
+変数初期化: skipToken = <span class="str">""</span>
+変数初期化: allItems = []
+
+Do Until: <span class="fn">empty</span>(variables(<span class="str">'skipToken'</span>)) <span class="op">AND</span> count > <span class="num">0</span>
+  複数の項目の取得:
+    フィルター: Active eq true
+    上位の取得件数: <span class="num">5000</span>
+    ページトークン: variables(<span class="str">'skipToken'</span>)
+    ↓
+  変数追加: allItems += body の value
+  変数設定: skipToken = body の @odata.nextLink (空なら終了)
+
+<span class="cm">// ※「設定」で「ページ分割」をオンにすると自動ページングも可能</span>
+<span class="cm">// 閾値: 100000 件まで対応（推奨値）</span></div>
+
+  <h3>SharePoint 電子署名・承認ドキュメント管理フロー</h3>
+  <div class="code-block"><span class="cm">// ドキュメント承認の完全フロー</span>
+トリガー: [ドキュメントライブラリ] ファイルが作成された
+  フォルダー: /申請中
+  ↓
+条件: ファイル名が <span class="str">'.pdf'</span> で終わる
+  ↓ Yes
+承認の開始と待機:
+  承認者: <span class="fn">split</span>(triggerOutputs()?[<span class="str">'body/{Author}/Email'</span>], <span class="str">';'</span>)
+  タイトル: <span class="fn">concat</span>(<span class="str">'【承認依頼】'</span>, triggerOutputs()?[<span class="str">'body/{Name}'</span>])
+  詳細: ファイルリンクを含む説明文
+  タイムアウト: PT72H  <span class="cm">// 3日</span>
+  ↓
+Switch (outcome):
+  'Approve' → ファイルを /承認済み フォルダへ移動
+              メタデータ: 承認日・承認者を更新
+              申請者にメール送信
+  'Reject'  → ファイルを /差戻し フォルダへ移動
+              申請者にコメント付き差戻しメール
+  タイムアウト → 上長にエスカレーションメール</div>
+</section>
+
+<!-- ===== 05: TEAMS ===== -->
+<section class="section" id="teams">
+  <div class="section-header purple">
+    <span class="section-num">05</span>
+    <h2>Teams 連携 & Adaptive Cards 実践</h2>
+  </div>
+
+  <h3>Adaptive Card で操作UIを埋め込む</h3>
+  <div class="callout purple">
+    <strong>Adaptive Cards を Teams チャットに送ることで、フローの途中にインタラクティブなUIを挟める。</strong> 承認ボタン・フォーム入力・選択肢を Teams 上で完結させられるため、メールより圧倒的に回収率が高い。
+  </div>
+  <div class="code-block"><span class="cm">// Adaptive Card の基本構造（JSON）</span>
+{
+  <span class="str">"type"</span>: <span class="str">"AdaptiveCard"</span>,
+  <span class="str">"version"</span>: <span class="str">"1.4"</span>,
+  <span class="str">"body"</span>: [
+    {
+      <span class="str">"type"</span>: <span class="str">"TextBlock"</span>,
+      <span class="str">"text"</span>: <span class="str">"【承認依頼】申請ID: ${申請ID}"</span>,
+      <span class="str">"size"</span>: <span class="str">"Large"</span>, <span class="str">"weight"</span>: <span class="str">"Bolder"</span>
+    },
+    {
+      <span class="str">"type"</span>: <span class="str">"FactSet"</span>,
+      <span class="str">"facts"</span>: [
+        { <span class="str">"title"</span>: <span class="str">"申請者"</span>, <span class="str">"value"</span>: <span class="str">"${申請者名}"</span> },
+        { <span class="str">"title"</span>: <span class="str">"金額"</span>, <span class="str">"value"</span>: <span class="str">"${金額}円"</span> },
+        { <span class="str">"title"</span>: <span class="str">"理由"</span>, <span class="str">"value"</span>: <span class="str">"${理由}"</span> }
+      ]
+    },
+    {
+      <span class="str">"type"</span>: <span class="str">"Input.Text"</span>,
+      <span class="str">"id"</span>: <span class="str">"comment"</span>,
+      <span class="str">"placeholder"</span>: <span class="str">"コメント（任意）"</span>,
+      <span class="str">"isMultiline"</span>: <span class="kw">true</span>
+    }
+  ],
+  <span class="str">"actions"</span>: [
+    { <span class="str">"type"</span>: <span class="str">"Action.Submit"</span>, <span class="str">"title"</span>: <span class="str">"✅ 承認"</span>, <span class="str">"data"</span>: { <span class="str">"action"</span>: <span class="str">"approve"</span> } },
+    { <span class="str">"type"</span>: <span class="str">"Action.Submit"</span>, <span class="str">"title"</span>: <span class="str">"❌ 差戻し"</span>, <span class="str">"data"</span>: { <span class="str">"action"</span>: <span class="str">"reject"</span> } }
+  ]
+}</div>
+
+  <div class="code-block"><span class="cm">// Power Automate での送信＆応答待ちアクション</span>
+アクション: 「アダプティブカードを Teams ユーザーに投稿して応答を待機」
+受信者: 承認者のメールアドレス
+メッセージ: 上記 Adaptive Card JSON（動的コンテンツで変数を埋め込む）
+応答を待機: オン（最大72時間）
+  ↓
+応答の取得:
+  action: outputs?[<span class="str">'body/data/action'</span>]    <span class="cm">// 'approve' or 'reject'</span>
+  comment: outputs?[<span class="str">'body/data/comment'</span>]  <span class="cm">// テキスト入力の内容</span></div>
+
+  <h3>Teams チャンネル投稿パターン</h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>パターン</th><th>アクション</th><th>ユースケース</th></tr>
+      <tr><td>チャンネルへのメッセージ</td><td>「チャンネルにメッセージを投稿する」</td><td>日次レポート・アラート通知</td></tr>
+      <tr><td>返信スレッド</td><td>「チャンネルのメッセージに返信する」</td><td>既存スレッドに結果を追記</td></tr>
+      <tr><td>1:1 チャット</td><td>「チャットまたはチャネルでメッセージを投稿する」（個人）</td><td>個別通知・承認依頼</td></tr>
+      <tr><td>Bot として投稿</td><td>「フローボットとしてチャットまたはチャネルにメッセージを投稿する」</td><td>自動化ボットからの通知</td></tr>
+      <tr><td>会議作成</td><td>「オンライン会議を作成する」（Teams コネクタ）</td><td>申請承認後にキックオフ会議を自動作成</td></tr>
+    </table>
+  </div>
+
+  <h3>Mention（@メンション）を含むメッセージ</h3>
+  <div class="code-block"><span class="cm">// @メンション付きTeamsメッセージの本文</span>
+<span class="fn">concat</span>(
+  <span class="str">'&lt;at&gt;'</span>, triggerOutputs()?[<span class="str">'body/Author/DisplayName'</span>], <span class="str">'&lt;/at&gt; さん、'</span>,
+  <span class="str">'申請が承認されました。&lt;br&gt;承認者コメント: '</span>,
+  outputs(<span class="str">'承認の開始と待機'</span>)?[<span class="str">'body/responses'</span>][<span class="num">0</span>][<span class="str">'comments'</span>]
+)
+<span class="cm">// Mentions配列も別途設定が必要（GUIの「メンション」欄）</span></div>
+</section>
+
+<!-- ===== 06: EXAMPLES ===== -->
+<section class="section" id="examples">
+  <div class="section-header amber">
+    <span class="section-num">06</span>
+    <h2>部署別・業種別 実例50選</h2>
+  </div>
+
+  <h3>総務・人事（HR）</h3>
+  <div class="example-grid">
+    <div class="example blue">
+      <div class="ex-num">例 01</div>
+      <h4>入社オンボーディング自動化</h4>
+      <div class="trigger">▶ Dataverse 新入社員レコード作成</div>
+      <p>Azure AD アカウント作成 → Microsoft 365 ライセンス付与 → Teams ウェルカムメッセージ送信 → 必要なチャンネルへ自動追加 → 備品申請フォームURLを送付</p>
+    </div>
+    <div class="example blue">
+      <div class="ex-num">例 02</div>
+      <h4>有給申請ワークフロー</h4>
+      <div class="trigger">▶ Forms 回答送信 / SharePoint リスト追加</div>
+      <p>申請内容を SharePoint に記録 → 上長に Teams Adaptive Card で承認依頼 → 承認結果をカレンダー（Outlook）に反映 → 申請者・HR に結果メール</p>
+    </div>
+    <div class="example blue">
+      <div class="ex-num">例 03</div>
+      <h4>退職処理チェックリスト</h4>
+      <div class="trigger">▶ HR SharePoint リスト「退職日確定」更新</div>
+      <p>IT・総務・経理・情シス に Planner タスクを並列作成 → 各担当者に Teamsメッセージ → 退職日当日に未完了タスクを上長へエスカレーション</p>
+    </div>
+    <div class="example blue">
+      <div class="ex-num">例 04</div>
+      <h4>契約更新アラート（月次）</h4>
+      <div class="trigger">▶ 毎月1日 スケジュール</div>
+      <p>Dataverse の契約テーブルから60日以内に更新期限の契約を取得 → 担当者に個別 Teams通知 → 期限順に並べた一覧をチャンネルに投稿</p>
+    </div>
+    <div class="example blue">
+      <div class="ex-num">例 05</div>
+      <h4>勤怠異常検知・アラート</h4>
+      <div class="trigger">▶ 毎日9:30 スケジュール</div>
+      <p>勤怠システム API（HTTP）から打刻なし社員リストを取得 → 各自の上長メールを Graph API で取得 → 上長に Teams メッセージ</p>
+    </div>
+    <div class="example blue">
+      <div class="ex-num">例 06</div>
+      <h4>月次給与明細配布</h4>
+      <div class="trigger">▶ 毎月25日 スケジュール</div>
+      <p>SharePoint の給与フォルダから社員IDでPDFを特定 → 各社員の個人フォルダにコピー → 「マイファイルに給与明細を格納しました」メール一斉送信</p>
+    </div>
+  </div>
+
+  <h3>経理・財務</h3>
+  <div class="example-grid">
+    <div class="example green">
+      <div class="ex-num">例 07</div>
+      <h4>請求書処理自動化（AI Builder）</h4>
+      <div class="trigger">▶ SharePoint ドキュメントライブラリにPDF追加</div>
+      <p>AI Builder 請求書処理モデルで仕入先・金額・期日を抽出 → Dataverse に書込み → 会計システムAPI（HTTP）へ転送 → 経理担当者に確認依頼Teams通知</p>
+    </div>
+    <div class="example green">
+      <div class="ex-num">例 08</div>
+      <h4>経費申請・承認フロー</h4>
+      <div class="trigger">▶ Power Apps 経費申請アプリからの呼出</div>
+      <p>金額に応じて承認者を動的に決定（〜5万:直属上長、〜50万:部長、それ以上:役員）→ 順次承認（Multi-stage Approval）→ 全承認後に経費精算システムへAPI送信</p>
+    </div>
+    <div class="example green">
+      <div class="ex-num">例 09</div>
+      <h4>支払期日アラート（週次）</h4>
+      <div class="trigger">▶ 毎週月曜 8:00 スケジュール</div>
+      <p>Dataverse 買掛金テーブルから7日以内に支払期日を迎えるレコードを取得 → 仕入先別にグループ化 → 経理チャンネルにサマリーを投稿</p>
+    </div>
+    <div class="example green">
+      <div class="ex-num">例 10</div>
+      <h4>予算超過アラート</h4>
+      <div class="trigger">▶ Dataverse 費用レコード作成</div>
+      <p>当月の費用集計を Dataverse で計算 → 予算テーブルと比較 → 80%超過で担当者に警告 → 100%超過で部長・財務部にエスカレーション</p>
+    </div>
+    <div class="example green">
+      <div class="ex-num">例 11</div>
+      <h4>月次締め処理通知</h4>
+      <div class="trigger">▶ 毎月末最終営業日 17:00 スケジュール</div>
+      <p>各部門長に「今月の経費入力期限は本日です」Teams通知 → 翌営業日に未入力者をリストアップして再通知</p>
+    </div>
+    <div class="example green">
+      <div class="ex-num">例 12</div>
+      <h4>Excel 売上レポート自動生成</h4>
+      <div class="trigger">▶ 毎月1日 7:00 スケジュール</div>
+      <p>SQL Server から先月売上データを取得（SQL コネクタ）→ Excel Online でテンプレートに書込み → SharePoint に保存 → 経営陣に配信メール</p>
+    </div>
+  </div>
+
+  <h3>営業・マーケティング</h3>
+  <div class="example-grid">
+    <div class="example purple">
+      <div class="ex-num">例 13</div>
+      <h4>リード自動ルーティング</h4>
+      <div class="trigger">▶ Dataverse リードレコード作成</div>
+      <p>業種・地域・規模をもとにスコアリング → 担当営業を自動アサイン → CRM の担当者を更新 → 担当者に Teams でリード詳細を通知</p>
+    </div>
+    <div class="example purple">
+      <div class="ex-num">例 14</div>
+      <h4>商談停滞アラート（週次）</h4>
+      <div class="trigger">▶ 毎週月曜 スケジュール</div>
+      <p>Dataverse 商談テーブルから14日以上更新のない「交渉中」商談を取得 → 担当者・上長に Teams 通知 → 商談一覧を Sales チャンネルに投稿</p>
+    </div>
+    <div class="example purple">
+      <div class="ex-num">例 15</div>
+      <h4>見積書自動生成</h4>
+      <div class="trigger">▶ Power Apps 見積アプリからの呼出</div>
+      <p>Dataverse の商品マスタから単価取得 → Word テンプレートに差し込み（Word Online コネクタ）→ PDF変換 → SharePoint 保存 → 顧客メールに添付送信</p>
+    </div>
+    <div class="example purple">
+      <div class="ex-num">例 16</div>
+      <h4>競合情報・ニュース収集（日次）</h4>
+      <div class="trigger">▶ 毎朝 7:00 スケジュール</div>
+      <p>Bing News Search API（HTTP）でキーワード検索 → AI Builder Prompt で要約 → Teams マーケティングチャンネルに「今日の競合動向」投稿</p>
+    </div>
+    <div class="example purple">
+      <div class="ex-num">例 17</div>
+      <h4>イベント申込み処理</h4>
+      <div class="trigger">▶ Microsoft Forms 回答送信</div>
+      <p>Dataverse に参加者レコード作成 → 確認メール（Outlook）送信 → Outlook カレンダーに会議招待を送付 → 定員に達したら受付停止フラグ更新</p>
+    </div>
+    <div class="example purple">
+      <div class="ex-num">例 18</div>
+      <h4>顧客アンケート自動送付</h4>
+      <div class="trigger">▶ Dataverse 商談「成約」ステータス変更</div>
+      <p>成約から3日後にトリガー（遅延アクション）→ 顧客にForms URLをメール送付 → 回答があったらCRMにNPS記録 → 低スコアは担当者に即時アラート</p>
+    </div>
+  </div>
+
+  <h3>IT・システム運用</h3>
+  <div class="example-grid">
+    <div class="example amber">
+      <div class="ex-num">例 19</div>
+      <h4>ITヘルプデスクチケット自動起票</h4>
+      <div class="trigger">▶ Outlook メール受信（特定アドレス宛）</div>
+      <p>AI Builder でメール本文からカテゴリ・優先度を分類 → Dataverse にチケット作成 → 優先度に応じて担当者をアサイン → Teams「IT支援」チャンネルに投稿</p>
+    </div>
+    <div class="example amber">
+      <div class="ex-num">例 20</div>
+      <h4>Azure リソース使用量アラート</h4>
+      <div class="trigger">▶ 毎日 8:00 スケジュール</div>
+      <p>Azure Cost Management API（HTTP）でサブスクリプションの日次コストを取得 → 閾値超過時に IT 部門 Teams チャンネルに警告 → Dataverse にコスト履歴を記録</p>
+    </div>
+    <div class="example amber">
+      <div class="ex-num">例 21</div>
+      <h4>ソフトウェアライセンス管理</h4>
+      <div class="trigger">▶ 毎月1日 スケジュール</div>
+      <p>Microsoft 365 Graph API でライセンス割当状況を取得 → 90日以上未使用ライセンスをリストアップ → IT 管理者に Teams 通知 → 自動回収の承認依頼</p>
+    </div>
+    <div class="example amber">
+      <div class="ex-num">例 22</div>
+      <h4>ゲストアカウント棚卸し</h4>
+      <div class="trigger">▶ 毎週スケジュール</div>
+      <p>Graph API で90日以上サインインのないゲストユーザーを取得 → 招待者にTeams確認依頼 → 返答なし14日後に自動無効化</p>
+    </div>
+    <div class="example amber">
+      <div class="ex-num">例 23</div>
+      <h4>障害報告の自動エスカレーション</h4>
+      <div class="trigger">▶ 監視ツールからの Webhook（HTTP受信）</div>
+      <p>重大度をパース → P1はオンコール担当者に即時Teams通知＆電話 → Dataverse にインシデント記録 → 30分以内に未対応なら上長にエスカレーション</p>
+    </div>
+    <div class="example amber">
+      <div class="ex-num">例 24</div>
+      <h4>定期バックアップ確認</h4>
+      <div class="trigger">▶ 毎朝 6:00 スケジュール</div>
+      <p>バックアップシステムAPI（HTTP）で前日のバックアップ結果を取得 → 失敗があればIT管理者にTeams緊急通知 → 結果をSharePointログリストに記録</p>
+    </div>
+  </div>
+
+  <h3>法務・コンプライアンス</h3>
+  <div class="example-grid">
+    <div class="example red">
+      <div class="ex-num">例 25</div>
+      <h4>契約書レビュー依頼フロー</h4>
+      <div class="trigger">▶ SharePoint「契約書受付」フォルダにPDF追加</div>
+      <p>AI Builder Prompt で契約種別・リスク条項を抽出 → 担当弁護士に Teams 通知 → レビュー完了後に電子署名フロー（Adobe Sign / DocuSign API）を起動</p>
+    </div>
+    <div class="example red">
+      <div class="ex-num">例 26</div>
+      <h4>NDA 期限管理</h4>
+      <div class="trigger">▶ 毎月1日 スケジュール</div>
+      <p>Dataverse NDA テーブルから3ヶ月以内に期限切れの契約を取得 → 担当者・法務部に更新検討依頼 Teams 通知 → Planner に更新タスクを作成</p>
+    </div>
+    <div class="example red">
+      <div class="ex-num">例 27</div>
+      <h4>コンプライアンス研修受講管理</h4>
+      <div class="trigger">▶ Forms 受講完了アンケート送信</div>
+      <p>Dataverse の受講履歴テーブルを更新 → 未受講者一覧を月次で管理者にレポート → 期限超過者には自動リマインダーを週次で送信</p>
+    </div>
+  </div>
+
+  <h3>製造・物流・在庫</h3>
+  <div class="example-grid">
+    <div class="example blue">
+      <div class="ex-num">例 28</div>
+      <h4>在庫不足アラート</h4>
+      <div class="trigger">▶ Dataverse 在庫テーブル行更新</div>
+      <p>在庫数が安全在庫を下回ったら → 購買担当者に Teams 通知 → 発注フォームを自動起票 → 仕入先にメール（取引先連絡先から自動取得）</p>
+    </div>
+    <div class="example blue">
+      <div class="ex-num">例 29</div>
+      <h4>出荷予定日変更通知</h4>
+      <div class="trigger">▶ Dataverse 受注テーブル「出荷予定日」変更</div>
+      <p>顧客の担当者メールを CRM から取得 → 変更前後の日付を記載したメールを自動送信 → 営業担当者に CC で通知</p>
+    </div>
+    <div class="example blue">
+      <div class="ex-num">例 30</div>
+      <h4>品質検査結果の自動報告</h4>
+      <div class="trigger">▶ モバイルアプリ（Power Apps）から検査結果送信</div>
+      <p>Dataverse に検査レコード保存 → 不合格品は製造責任者にアラート → 検査証明書PDF生成 → SharePoint に格納 → 顧客ポータルページ（Power Pages）に公開</p>
+    </div>
+  </div>
+
+  <h3>カスタマーサポート</h3>
+  <div class="example-grid">
+    <div class="example purple">
+      <div class="ex-num">例 31</div>
+      <h4>問い合わせ自動トリアージ</h4>
+      <div class="trigger">▶ Outlook 問い合わせメール受信</div>
+      <p>AI Builder 感情分析 + キーフレーズ抽出 → カテゴリ・緊急度を判定 → Dataverse にケース作成 → 担当チームに割振り → SLA タイマー開始</p>
+    </div>
+    <div class="example purple">
+      <div class="ex-num">例 32</div>
+      <h4>SLAブリーチ警告</h4>
+      <div class="trigger">▶ 毎時スケジュール</div>
+      <p>未解決ケースの経過時間を計算 → SLAの80%消化時点で担当者に警告 → 超過時に管理者へエスカレーション → Dataverse にブリーチ記録</p>
+    </div>
+    <div class="example purple">
+      <div class="ex-num">例 33</div>
+      <h4>CSAT アンケート自動送付</h4>
+      <div class="trigger">▶ Dataverse ケース「解決済み」更新</div>
+      <p>解決から24時間後に Forms URL をメール送付 → 回答をDataverseに記録 → スコア3以下は即時に上長にアラート → 月次CSAT集計をPower BIに反映</p>
+    </div>
+  </div>
+
+  <h3>Microsoft 365 生産性向上</h3>
+  <div class="example-grid">
+    <div class="example green">
+      <div class="ex-num">例 34</div>
+      <h4>会議議事録の自動配布</h4>
+      <div class="trigger">▶ Teams 会議終了（Graph API Webhook）</div>
+      <p>Teams Premium のトランスクリプトを取得 → AI Builder Prompt で議事録・アクションアイテムを生成 → 参加者全員にメール送付 → Planner にタスク自動作成</p>
+    </div>
+    <div class="example green">
+      <div class="ex-num">例 35</div>
+      <h4>重要メールの自動タグ付け＆転送</h4>
+      <div class="trigger">▶ Outlook 新着メール</div>
+      <p>AI Builder 感情分析で「クレーム」「緊急」を検出 → 重要フラグ付与 → Teamsの専用チャンネルに転送 → 担当者にモバイル通知</p>
+    </div>
+    <div class="example green">
+      <div class="ex-num">例 36</div>
+      <h4>SharePoint ドキュメントの期限管理</h4>
+      <div class="trigger">▶ 毎週月曜 スケジュール</div>
+      <p>SharePoint ライブラリの「レビュー期日」列を確認 → 期日14日前に文書オーナーにリマインダー → 期日超過でチェックリスト列を自動更新</p>
+    </div>
+    <div class="example green">
+      <div class="ex-num">例 37</div>
+      <h4>チームへの新メンバー歓迎フロー</h4>
+      <div class="trigger">▶ Teams チームへのメンバー追加</div>
+      <p>歓迎メッセージをチャンネルに自動投稿 → 必要なチャンネルに自動追加 → オンボーディングドキュメントリンクをDMで送付</p>
+    </div>
+    <div class="example green">
+      <div class="ex-num">例 38</div>
+      <h4>定例報告書の自動集計</h4>
+      <div class="trigger">▶ 毎週金曜 17:00 スケジュール</div>
+      <p>各部門の SharePoint リストから週次実績を取得 → Excel テンプレートに集計 → 全社レポートを生成して経営陣にメール → Teams 役員チャンネルに投稿</p>
+    </div>
+  </div>
+
+  <h3>外部API・高度な連携</h3>
+  <div class="example-grid">
+    <div class="example amber">
+      <div class="ex-num">例 39</div>
+      <h4>為替レートの自動取得・記録</h4>
+      <div class="trigger">▶ 毎営業日 9:00 スケジュール</div>
+      <p>為替API（HTTP）から USD/EUR/CNY レートを取得 → Dataverse レートテーブルに記録 → 前日比で大幅変動（±2%以上）は財務部にアラート</p>
+    </div>
+    <div class="example amber">
+      <div class="ex-num">例 40</div>
+      <h4>GitHub → Teams Issue通知</h4>
+      <div class="trigger">▶ HTTP Webhook（GitHub Webhook設定）</div>
+      <p>GitHub の Issue 作成・クローズ・PR マージを Teams 開発チャンネルにリアルタイム通知 → Dataverse に開発ログとして蓄積</p>
+    </div>
+    <div class="example amber">
+      <div class="ex-num">例 41</div>
+      <h4>Stripe 決済通知フロー</h4>
+      <div class="trigger">▶ HTTP Webhook（Stripe Webhook）</div>
+      <p>Stripe の payment.succeeded / payment.failed イベントを受信 → Dataverse に売上記録 → 成功は顧客に自動領収書メール → 失敗は営業にアラート</p>
+    </div>
+    <div class="example amber">
+      <div class="ex-num">例 42</div>
+      <h4>Salesforce → Dataverse 同期</h4>
+      <div class="trigger">▶ 毎時スケジュール</div>
+      <p>Salesforce API（HTTP + OAuth）から更新された取引先・商談を取得 → Dataverse に Upsert → 差分を同期ログテーブルに記録</p>
+    </div>
+  </div>
+
+  <h3>AI活用・生成AI連携</h3>
+  <div class="example-grid">
+    <div class="example purple">
+      <div class="ex-num">例 43</div>
+      <h4>長文ドキュメントの自動要約</h4>
+      <div class="trigger">▶ SharePoint 特定フォルダにファイル追加</div>
+      <p>SharePoint からファイルコンテンツを取得 → AI Builder Prompt（GPT）でポイントを3〜5点に要約 → SharePoint 列「AI要約」に書き戻し → 担当者にTeams通知</p>
+    </div>
+    <div class="example purple">
+      <div class="ex-num">例 44</div>
+      <h4>多言語メール自動翻訳・返信</h4>
+      <div class="trigger">▶ Outlook 特定フォルダへのメール受信</div>
+      <p>Azure Translator API（HTTP）で本文を日本語に翻訳 → AI Builder Prompt で返信文案を生成 → 担当者に「この返信でよいですか？」Teams確認 → 承認後に自動送信</p>
+    </div>
+    <div class="example purple">
+      <div class="ex-num">例 45</div>
+      <h4>求人票自動生成</h4>
+      <div class="trigger">▶ Power Apps 採用依頼フォームから呼出</div>
+      <p>職種・スキル要件・待遇をパラメータとして受取 → AI Builder Prompt で求人票を生成 → Word テンプレートに差し込み → 承認後に採用サイトAPIへ投稿</p>
+    </div>
+  </div>
+
+  <h3>RPA（Desktop Flow）活用実例</h3>
+  <div class="example-grid">
+    <div class="example blue">
+      <div class="ex-num">例 46</div>
+      <h4>基幹システム（ERP）への自動入力</h4>
+      <div class="trigger">▶ Dataverse 発注レコード承認完了</div>
+      <p>Desktop Flow でERP画面を操作 → 発注番号・品目・数量・単価を1行ずつ入力 → 確定ボタンをクリック → 成功/エラーをクラウドフローに返却 → Dataverse に処理結果を記録</p>
+    </div>
+    <div class="example blue">
+      <div class="ex-num">例 47</div>
+      <h4>Webサイトからのデータ収集</h4>
+      <div class="trigger">▶ 毎日スケジュール（クラウドフロー起動）</div>
+      <p>Desktop Flow で競合他社の価格ページを開く → テーブルデータを抽出 → CSVとして保存 → クラウドフローで読み込んでDataverseに記録 → Power BIで価格推移可視化</p>
+    </div>
+    <div class="example blue">
+      <div class="ex-num">例 48</div>
+      <h4>Excel 集計・社内システム転記</h4>
+      <div class="trigger">▶ 月次スケジュール / ボタン起動</div>
+      <p>複数Excelファイルを読み込んで集計 → 社内Webシステムにログイン → 集計値を画面フォームに転記 → 完了後にスクリーンショットをSharePointに保存</p>
+    </div>
+  </div>
+
+  <h3>Power Pages・外部向けポータル連携</h3>
+  <div class="example-grid">
+    <div class="example green">
+      <div class="ex-num">例 49</div>
+      <h4>取引先ポータルの申請受付</h4>
+      <div class="trigger">▶ Dataverse（Power Pages経由）行追加</div>
+      <p>取引先が Power Pages ポータルで申請を送信 → Dataverse にレコード作成 → 社内担当者に Teams通知 → 審査完了後にポータルのステータスを更新 → 取引先にメール</p>
+    </div>
+    <div class="example green">
+      <div class="ex-num">例 50</div>
+      <h4>外部パートナーへのレポート定期配信</h4>
+      <div class="trigger">▶ 毎月スケジュール</div>
+      <p>Dataverse からパートナー別の実績データを取得 → Power BI API でパートナー別レポートを生成 → PDF エクスポート → Outlook で各パートナー担当者にメール送付</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 07: RPA ===== -->
+<section class="section" id="rpa">
+  <div class="section-header purple">
+    <span class="section-num">07</span>
+    <h2>Power Automate Desktop（RPA）深掘り</h2>
+  </div>
+
+  <h3>アーキテクチャ — クラウドフローとの連携構造</h3>
+  <div class="code-block"><span class="cm">// Cloud Flow → Desktop Flow の呼び出し構造</span>
+
+[クラウドフロー]
+  トリガー: スケジュール / SharePoint / Dataverse
+  ↓
+  変数設定: input_data = JSON.stringify(データ)
+  ↓
+  アクション: 「デスクトップフローを実行する」
+    マシンまたはマシングループ: <span class="str">"RPA_WorkerPC_01"</span>
+    デスクトップフロー: <span class="str">"ERP入力フロー"</span>
+    実行モード: <span class="str">"無人 (Unattended)"</span>
+    入力変数: input_data → Desktop Flow の InputJSON
+  ↓
+  出力変数の取得: result_status, error_message
+  ↓
+  条件分岐: result_status == <span class="str">"success"</span>
+
+[デスクトップフロー（Power Automate Desktop）]
+  入力変数: InputJSON (テキスト)
+  ↓
+  JSON を解析してレコードリストを取得
+  ↓
+  For Each レコード:
+    → ERP アプリウィンドウをフォアグラウンドに
+    → UI要素を特定（セレクター）
+    → テキストを入力
+    → ボタンをクリック
+    → 成功確認メッセージを待機
+  ↓
+  出力変数: result_status = "success" / "failed"</div>
+
+  <h3>セレクター設計の鉄則</h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>属性</th><th>安定性</th><th>推奨度</th><th>説明</th></tr>
+      <tr><td>AutomationId</td><td>高</td><td>★★★</td><td>開発者が意図的に設定した固有ID。最も安定</td></tr>
+      <tr><td>Name（ラベルテキスト）</td><td>中〜高</td><td>★★★</td><td>UI表示テキスト。言語変更・ローカライズで壊れる</td></tr>
+      <tr><td>Class</td><td>中</td><td>★★</td><td>UI フレームワーク依存。バージョンアップで変わりやすい</td></tr>
+      <tr><td>XPath / CSS</td><td>低〜中</td><td>★</td><td>Web用。DOMが動的に変わると壊れる</td></tr>
+      <tr><td>Index（位置）</td><td>低</td><td>×</td><td>画面構成が変わると即死。最終手段のみ</td></tr>
+      <tr><td>画像認識</td><td>低</td><td>△</td><td>解像度・テーマ変更に弱い。従来RPA向け</td></tr>
+    </table>
+  </div>
+
+  <h3>エラーハンドリング（Desktop Flow）</h3>
+  <div class="code-block"><span class="cm">// On Block Error アクション（各操作ブロックに設定）</span>
+エラー発生時:
+  → スクリーンショットを撮影
+      保存先: <span class="str">%TEMP%\rpa_error_%DateTime%_screenshot.png</span>
+  → エラーメッセージを変数に格納
+      error_text = <span class="fn">LastErrorMessage</span>
+  → ログファイルに追記
+      ファイル: C:\RPA_Logs\error_log.txt
+      内容: <span class="fn">concat</span>(DateTime, <span class="str">" | "</span>, FlowName, <span class="str">" | "</span>, error_text)
+  → 出力変数: result_status = <span class="str">"failed"</span>
+  → フロー終了（エラー情報をクラウドフローに返す）
+
+<span class="cm">// クラウドフローでスクリーンショットをSharePointにアップロードして記録</span></div>
+
+  <h3>ライセンス早見表（RPA）</h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>ライセンス</th><th>有人実行</th><th>無人実行</th><th>価格目安</th></tr>
+      <tr><td>Power Automate Desktop（単体）</td><td>○（ローカル）</td><td>×</td><td>無料（Windowsに同梱）</td></tr>
+      <tr><td>Power Automate Premium</td><td>○（クラウド連携）</td><td>×</td><td>$15/ユーザー/月</td></tr>
+      <tr><td>Power Automate Premium + RPA add-on</td><td>○</td><td>○（1 bot）</td><td>$15 + $150/bot/月</td></tr>
+      <tr><td>Process Mining add-on</td><td colspan="2">業務プロセスの可視化・ボトルネック分析</td><td>別途</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ===== 08: PREMIUM CONNECTORS ===== -->
+<section class="section" id="premium">
+  <div class="section-header green">
+    <span class="section-num">08</span>
+    <h2>プレミアムコネクタ活用</h2>
+  </div>
+
+  <h3>HTTP コネクタ — 最強の汎用ツール</h3>
+  <div class="callout green">
+    <strong>「HTTP」コネクタはコネクタが存在しない REST API を直接呼び出せる。</strong> 認証（API Key / OAuth / Basic / Managed Identity）も設定可能。外部サービス連携の最終手段として必ずマスターする。
+  </div>
+  <div class="code-block"><span class="cm">// HTTP コネクタの設定例（Azure OpenAI 呼び出し）</span>
+メソッド: <span class="str">POST</span>
+URI: https://myopenai.openai.azure.com/openai/deployments/gpt-4o/chat/completions?api-version=2024-02-01
+ヘッダー:
+  api-key: @{parameters('AOAI_API_KEY')}  <span class="cm">← フロー パラメータで管理</span>
+  Content-Type: application/json
+本文:
+{
+  <span class="str">"messages"</span>: [
+    { <span class="str">"role"</span>: <span class="str">"system"</span>, <span class="str">"content"</span>: <span class="str">"あなたは業務アシスタントです。"</span> },
+    { <span class="str">"role"</span>: <span class="str">"user"</span>: <span class="str">"content"</span>: <span class="str">"@{triggerBody()?['text']}"</span> }
+  ],
+  <span class="str">"max_tokens"</span>: <span class="num">1000</span>
+}
+再試行ポリシー: 指数バックオフ (4回, PT7S)
+
+<span class="cm">// JSON の解析 → choices[0].message.content を取得</span></div>
+
+  <h3>Microsoft Graph API — M365全機能へのアクセス</h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>操作</th><th>HTTP メソッド & エンドポイント</th></tr>
+      <tr><td>ユーザー情報取得</td><td><code>GET /v1.0/users/{upn}</code></td></tr>
+      <tr><td>ユーザーの上長取得</td><td><code>GET /v1.0/users/{upn}/manager</code></td></tr>
+      <tr><td>グループメンバー一覧</td><td><code>GET /v1.0/groups/{id}/members</code></td></tr>
+      <tr><td>Teamsメッセージ送信</td><td><code>POST /v1.0/teams/{teamId}/channels/{channelId}/messages</code></td></tr>
+      <tr><td>カレンダーイベント作成</td><td><code>POST /v1.0/users/{upn}/events</code></td></tr>
+      <tr><td>SharePoint リスト操作</td><td><code>GET /v1.0/sites/{siteId}/lists/{listId}/items</code></td></tr>
+      <tr><td>OneDrive ファイル操作</td><td><code>GET /v1.0/users/{upn}/drive/items/{itemId}</code></td></tr>
+      <tr><td>ライセンス割当確認</td><td><code>GET /v1.0/users/{upn}/licenseDetails</code></td></tr>
+    </table>
+  </div>
+  <div class="callout">
+    <strong>認証:</strong> HTTP with Azure AD コネクタ（プレミアム）を使うか、Azure AD アプリ登録でクライアントシークレットを取得して Bearer トークンを発行する。Managed Identity（Power Platform 2024〜）が使えれば最もセキュアで管理しやすい。
+  </div>
+
+  <h3>SQL Server コネクタ</h3>
+  <div class="code-block"><span class="cm">// ストアドプロシージャの実行</span>
+アクション: 「ストアドプロシージャの実行 (V2)」
+サーバー: sql-server.database.windows.net
+データベース: SalesDB
+プロシージャ: usp_GenerateMonthlyReport
+パラメータ:
+  @StartDate: <span class="fn">formatDateTime</span>(<span class="fn">addDays</span>(<span class="fn">utcNow</span>(), <span class="op">-</span><span class="num">30</span>), <span class="str">'yyyy-MM-dd'</span>)
+  @EndDate: <span class="fn">formatDateTime</span>(<span class="fn">utcNow</span>(), <span class="str">'yyyy-MM-dd'</span>)
+
+<span class="cm">// カスタムクエリ（行の取得 V2）</span>
+クエリ: SELECT TOP 1000 OrderID, CustomerName, Amount
+        FROM Orders
+        WHERE CreatedAt >= '@{formatDateTime(addDays(utcNow(),-7),'yyyy-MM-dd')}'
+        AND Status = 'Pending'
+        ORDER BY Amount DESC</div>
+</section>
+
+<!-- ===== 09: LIMITS ===== -->
+<section class="section" id="limits">
+  <div class="section-header amber">
+    <span class="section-num">09</span>
+    <h2>制限・パフォーマンス設計</h2>
+  </div>
+
+  <h3>主要な制限値（2026年6月現在）</h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>制限項目</th><th>標準（無料/365）</th><th>Premium</th><th>注意点</th></tr>
+      <tr><td>フロー実行回数/日</td><td>6,000回</td><td>無制限（プロセス単位課金）</td><td>接続プールの共有に注意</td></tr>
+      <tr><td>APIコール数/接続/分</td><td>コネクタ依存（SharePoint:600/分）</td><td>同左</td><td>大量ループで超過しやすい</td></tr>
+      <tr><td>フロー実行タイムアウト</td><td>30日</td><td>30日</td><td>承認待ちはタイムアウトを設定</td></tr>
+      <tr><td>フロー定義サイズ</td><td>8MB</td><td>8MB</td><td>大きなJSONをフロー内に埋め込まない</td></tr>
+      <tr><td>Add to array変数 の要素数</td><td>上限なし（実質メモリ依存）</td><td>同左</td><td>数万件はDataverseで処理すべき</td></tr>
+      <tr><td>SharePoint ポーリング間隔</td><td>最短1分</td><td>最短1分</td><td>Webhookより遅延が出る場合あり</td></tr>
+      <tr><td>承認タイムアウト</td><td>最大30日</td><td>最大30日</td><td>ISO 8601形式で指定</td></tr>
+      <tr><td>Outlook コネクタAPI制限</td><td>300コール/60秒</td><td>同左</td><td>一斉送信は遅延（Delay）を挿入</td></tr>
+    </table>
+  </div>
+
+  <h3>スロットリング（API制限）への対処</h3>
+  <div class="code-block"><span class="cm">// 大量メール送信時のレート制御</span>
+Apply to each (並列度: 1 ← 直列化して制限回避)
+  → Outlook メール送信
+  → 遅延: <span class="num">2</span>秒  <span class="cm">// 送信間隔を空ける</span>
+
+<span class="cm">// SharePoint 大量アイテム更新時</span>
+Apply to each (並列度: 5)
+  → SharePoint 項目の更新
+  → 遅延: 1秒
+
+<span class="cm">// HTTP API がレートリミット 429 を返した場合</span>
+条件: outputs('HTTP')?['statusCode'] == <span class="num">429</span>
+  Yes → 遅延: <span class="num">60</span>秒 → 同じHTTPアクションを再実行
+  No  → 通常処理継続</div>
+</section>
+
+<!-- ===== 10: DEBUG ===== -->
+<section class="section" id="debug">
+  <div class="section-header">
+    <span class="section-num">10</span>
+    <h2>デバッグ & トラブルシューティング</h2>
+  </div>
+
+  <div class="three-col">
+    <div class="card blue">
+      <h3>実行履歴の確認</h3>
+      <p>make.powerautomate.com → フロー → 「28日間の実行履歴」。失敗したアクションをクリックすると入力・出力・エラーメッセージを確認できる。JSONをコピーして外部エディタで整形すると読みやすい。</p>
+    </div>
+    <div class="card blue">
+      <h3>テストモード</h3>
+      <p>フロー編集画面の「テスト」→「自動（最近の実行を使用）」で前回の実行データを入力として再実行できる。実際にコネクタを動かさずに式だけテストしたい場合は「手動」を選ぶ。</p>
+    </div>
+    <div class="card blue">
+      <h3>実行の再送信</h3>
+      <p>失敗した実行を「再送信」すると同じ入力データでフローを再実行できる。修正後の動作確認に最適。ただし冪等でない処理（二重書込み等）に注意。</p>
+    </div>
+  </div>
+
+  <h3>よくあるエラーと対処法</h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>エラー</th><th>原因</th><th>対処</th></tr>
+      <tr><td><code>Flow run timed out</code></td><td>承認・HTTP待機が30日を超えた</td><td>タイムアウト時間を明示設定、期限通知フローを別途用意</td></tr>
+      <tr><td><code>The response did not match the expected schema</code></td><td>「JSONの解析」のスキーマと実データが不一致</td><td>実際のレスポンスJSON で「スキーマの生成」ボタンを再実行</td></tr>
+      <tr><td><code>Request limit exceeded</code></td><td>APIコール数制限に到達</td><td>Apply to each の並列度を下げる、遅延を入れる</td></tr>
+      <tr><td><code>Connection is not valid</code></td><td>コネクタの認証が切れた（パスワード変更等）</td><td>接続を削除して再作成、または「接続の修正」</td></tr>
+      <tr><td><code>Item does not exist</code></td><td>SharePoint/Dataverseのレコードが削除済み</td><td>「項目の取得」前に存在確認の条件分岐を追加</td></tr>
+      <tr><td><code>InvalidTemplate</code></td><td>式の文法エラー（括弧の過不足等）</td><td>式エディタで構文チェック。concatの引数数を確認</td></tr>
+      <tr><td><code>WorkflowOperationFailed - delegation</code></td><td>Power Apps の委任警告が実行時に問題化</td><td>Dataverse ビュー + サーバー側フィルターに変更</td></tr>
+      <tr><td><code>DLP policy violation</code></td><td>フローがDLPで使用禁止の組合せのコネクタを使っている</td><td>管理者にDLPポリシーの確認・修正を依頼</td></tr>
+    </table>
+  </div>
+
+  <h3>Monitor（監視）ツールの活用</h3>
+  <div class="callout">
+    <strong>Power Automate の Monitor（make.powerautomate.com → モニター）では、全フローの実行状況をリアルタイムで一覧表示できる。</strong> 失敗率が高いフローを素早く特定し、アラートを設定することでSLA管理が可能。管理者は環境全体の実行状況を確認できる。
+  </div>
+</section>
+
+<!-- ===== 11: COPILOT & BUILD 2026 ===== -->
+<section class="section" id="copilot">
+  <div class="section-header green">
+    <span class="section-num">11</span>
+    <h2>Copilot でフロー生成 & Build 2026</h2>
+  </div>
+
+  <h3>Copilot によるフロー生成のコツ</h3>
+  <div class="callout green">
+    <strong>プロンプトは「トリガー + やりたいこと + 使うサービス名」を具体的に書くほど精度が上がる。</strong> 生成されたフローはそのまま使わず、コネクタの接続・変数名・エラー処理を必ず見直してから本番化する。
+  </div>
+  <div class="two-col">
+    <div>
+      <h3>効果的なプロンプト例</h3>
+      <div class="code-block"><span class="str">"SharePoint の「申請リスト」に新しいアイテムが追加されたとき、</span>
+<span class="str">申請者の上長（Active Directory から取得）に</span>
+<span class="str">Teams の Adaptive Card で承認依頼を送り、</span>
+<span class="str">承認結果に応じて SharePoint のステータス列を更新して</span>
+<span class="str">申請者にメールで結果を通知するフローを作って"</span></div>
+    </div>
+    <div>
+      <h3>Copilot 修正の活用</h3>
+      <div class="code-block"><span class="str">"承認タイムアウトを72時間に設定して"</span>
+<span class="str">"エラー発生時に Teams の #エラー通知 チャンネルに</span>
+<span class="str"> エラーメッセージと実行IDを送るアクションを追加して"</span>
+<span class="str">"Apply to each の並列度を5に設定して"</span></div>
+    </div>
+  </div>
+
+  <h3>Build 2026 Power Automate 主要アップデート</h3>
+  <div class="build-grid">
+    <div class="build-item">
+      <div class="status">GA</div>
+      <h4>Copilot Studio 統合キャンバス（Workflows）</h4>
+      <p>Power Automate フローを Copilot Studio のオーサリング画面内で直接作成・編集できる統合キャンバス。エージェントとフローの設計が一体化。</p>
+    </div>
+    <div class="build-item">
+      <div class="status">GA</div>
+      <h4>エージェントフロー（Agentic Step）</h4>
+      <p>フロー内に「AIエージェントに判断させる」ステップを追加可能に。条件分岐をLLMに委ねる新しい設計パラダイム。Copilot Studio のエージェントを呼び出せる。</p>
+    </div>
+    <div class="build-item">
+      <div class="status">GA</div>
+      <h4>Process Mining のフロー推奨</h4>
+      <p>Process Mining で分析した業務プロセスから「ここを自動化すべき」ポイントを検出し、Power Automate フローのテンプレートを自動推奨。</p>
+    </div>
+    <div class="build-item">
+      <div class="status preview">Preview</div>
+      <h4>Desktop Flow — Computer-Using Agent</h4>
+      <p>CUA がUI操作の「意図」を理解してセレクターが壊れた箇所を自動補完。従来RPA の最大弱点（UI変更による破損）を AI で解消。</p>
+    </div>
+    <div class="build-item">
+      <div class="status preview">Preview</div>
+      <h4>フロー実行の一時停止・再開</h4>
+      <p>実行中のフローを管理者が意図的に一時停止し、後から再開できる機能。長時間実行フローの運用管理が大幅に改善。</p>
+    </div>
+    <div class="build-item">
+      <div class="status">GA</div>
+      <h4>Power Automate + GitHub Actions 連携</h4>
+      <p>pac CLI を使ったソリューションの CI/CD パイプライン（GitHub Actions / Azure DevOps）が整備。フローの ALM を DevOps ワークフローに組み込める。</p>
+    </div>
+  </div>
+</section>
+
+</div><!-- /page-wrap -->
+
+<footer>
+  <p>📖 関連: <a href="power-platform-guide.html">Power Platform 実践大全</a> &nbsp;|&nbsp; <a href="power-platform-ai.html">Power Platform 概要</a> &nbsp;|&nbsp; <a href="copilot-studio-guide.html">Copilot Studio 実践大全</a> &nbsp;|&nbsp; <a href="microsoft-ecosystem.html">Microsoft AI エコシステム総覧</a></p>
+  <p style="margin-top:8px;">最終更新: 2026-06-01 &nbsp;|&nbsp; <a href="../../index.html">Hub トップ</a> &nbsp;|&nbsp; <a href="index.html">← Knowledge Hub</a></p>
+</footer>
+
+</body>
+</html>
