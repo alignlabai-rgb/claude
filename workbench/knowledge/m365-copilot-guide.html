@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Microsoft 365 Copilot 実践大全 — アプリ別プロンプト集 & 業務シナリオ50選 | Tech Workbench</title>
+<style>
+:root {
+    --accent: #0078d4;
+    --accent2: #8b5cf6;
+    --accent3: #f59e0b;
+    --green: #16a34a;
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #21262d;
+    --border: rgba(255,255,255,0.08);
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --radius: 12px;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; line-height:1.65; font-size:16px; }
+a { color:var(--accent); text-decoration:none; }
+a:hover { text-decoration:underline; }
+.page-wrap { max-width:1000px; margin:0 auto; padding:32px 20px 80px; }
+nav { background:var(--surface); border-bottom:1px solid var(--border); padding:12px 20px; font-size:0.85rem; }
+nav a { color:var(--muted); margin-right:6px; }
+nav span { color:var(--muted); margin-right:6px; }
+
+.hero { background:linear-gradient(135deg, rgba(0,50,110,0.8), rgba(0,100,180,0.5), rgba(0,120,212,0.25)); border:1px solid rgba(0,120,212,0.35); border-radius:var(--radius); padding:48px 40px; margin-bottom:40px; }
+.hero h1 { font-size:2.2rem; font-weight:800; color:#fff; margin-bottom:8px; }
+.hero .sub { color:rgba(255,255,255,0.88); font-size:1.05rem; margin-bottom:24px; max-width:720px; }
+.stat-row { display:flex; gap:14px; flex-wrap:wrap; }
+.stat { background:rgba(0,0,0,0.35); border:1px solid rgba(0,120,212,0.35); border-radius:8px; padding:12px 18px; text-align:center; min-width:100px; }
+.stat .val { font-size:1.5rem; font-weight:800; color:#60a5fa; }
+.stat .lbl { font-size:0.72rem; color:var(--muted); margin-top:2px; }
+
+.toc { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:24px 28px; margin-bottom:40px; }
+.toc h2 { font-size:0.82rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; margin-bottom:14px; }
+.toc ol { padding-left:20px; }
+.toc li { margin-bottom:5px; font-size:0.93rem; }
+.toc a { color:var(--text); }
+.toc a:hover { color:#60a5fa; }
+
+.section { margin-bottom:56px; }
+.section-header { display:flex; align-items:center; gap:12px; margin-bottom:24px; padding-bottom:12px; border-bottom:2px solid var(--accent); }
+.section-num { background:var(--accent); color:#fff; font-size:0.75rem; font-weight:700; padding:3px 9px; border-radius:4px; }
+.section-header h2 { font-size:1.4rem; font-weight:700; color:#60a5fa; }
+.section-header.purple { border-color:var(--accent2); }
+.section-header.purple .section-num { background:var(--accent2); }
+.section-header.purple h2 { color:#c4b5fd; }
+.section-header.amber { border-color:var(--accent3); }
+.section-header.amber .section-num { background:var(--accent3); color:#000; }
+.section-header.amber h2 { color:var(--accent3); }
+.section-header.green { border-color:var(--green); }
+.section-header.green .section-num { background:var(--green); }
+.section-header.green h2 { color:#4ade80; }
+
+.card-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; margin-bottom:24px; }
+.card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:20px; }
+.card h3 { font-size:1rem; font-weight:700; margin-bottom:8px; }
+.card p { font-size:0.875rem; color:var(--muted); line-height:1.6; }
+.card.blue { border-color:rgba(0,120,212,0.4); }
+.card.purple { border-color:rgba(139,92,246,0.4); }
+.card.green { border-color:rgba(22,163,74,0.4); }
+.card.amber { border-color:rgba(245,158,11,0.4); }
+
+.table-wrap { overflow-x:auto; margin-bottom:24px; }
+table { width:100%; border-collapse:collapse; font-size:0.875rem; }
+th { background:var(--surface2); color:var(--muted); font-weight:600; padding:10px 14px; text-align:left; border-bottom:1px solid var(--border); }
+td { padding:10px 14px; border-bottom:1px solid rgba(255,255,255,0.04); vertical-align:top; }
+tr:hover td { background:rgba(255,255,255,0.02); }
+td code { background:rgba(0,120,212,0.15); color:#60a5fa; padding:1px 5px; border-radius:3px; font-size:0.8rem; }
+
+/* プロンプトブロック */
+.prompt-block { background:var(--surface2); border:1px solid rgba(0,120,212,0.3); border-left:4px solid var(--accent); border-radius:0 8px 8px 0; padding:14px 18px; margin-bottom:14px; font-size:0.875rem; line-height:1.7; }
+.prompt-block .label { font-size:0.7rem; font-weight:700; color:#60a5fa; text-transform:uppercase; letter-spacing:.06em; margin-bottom:6px; }
+.prompt-block .text { color:var(--text); font-style:italic; }
+.prompt-block .note { font-size:0.78rem; color:var(--muted); margin-top:6px; }
+.prompt-block.purple { border-color:rgba(139,92,246,0.3); border-left-color:var(--accent2); }
+.prompt-block.purple .label { color:#c4b5fd; }
+.prompt-block.green { border-color:rgba(22,163,74,0.3); border-left-color:var(--green); }
+.prompt-block.green .label { color:#4ade80; }
+.prompt-block.amber { border-color:rgba(245,158,11,0.3); border-left-color:var(--accent3); }
+.prompt-block.amber .label { color:var(--accent3); }
+
+.callout { border-left:3px solid var(--accent); background:rgba(0,120,212,0.07); padding:14px 18px; border-radius:0 8px 8px 0; margin-bottom:20px; font-size:0.9rem; }
+.callout.purple { border-color:var(--accent2); background:rgba(139,92,246,0.07); }
+.callout.amber { border-color:var(--accent3); background:rgba(245,158,11,0.07); }
+.callout.green { border-color:var(--green); background:rgba(22,163,74,0.07); }
+.callout strong { color:var(--text); }
+
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:24px; }
+.three-col { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-bottom:24px; }
+@media(max-width:680px){ .two-col,.three-col { grid-template-columns:1fr; } }
+
+.tag { display:inline-block; font-size:0.7rem; font-weight:700; padding:2px 8px; border-radius:4px; margin-bottom:6px; background:rgba(0,120,212,0.15); color:#60a5fa; text-transform:uppercase; letter-spacing:.06em; }
+.tag.purple { background:rgba(139,92,246,0.15); color:#c4b5fd; }
+.tag.green { background:rgba(22,163,74,0.15); color:#4ade80; }
+.tag.amber { background:rgba(245,158,11,0.15); color:var(--accent3); }
+.tag.red { background:rgba(220,38,38,0.15); color:#f87171; }
+
+.chips { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+.chip { background:rgba(0,120,212,0.12); color:#60a5fa; border:1px solid rgba(0,120,212,0.25); border-radius:20px; padding:3px 10px; font-size:0.75rem; font-weight:600; }
+.chip.purple { background:rgba(139,92,246,0.12); color:#c4b5fd; border-color:rgba(139,92,246,0.25); }
+.chip.green { background:rgba(22,163,74,0.12); color:#4ade80; border-color:rgba(22,163,74,0.25); }
+.chip.amber { background:rgba(245,158,11,0.12); color:var(--accent3); border-color:rgba(245,158,11,0.25); }
+
+/* 実例カード */
+.example-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:14px; margin-bottom:28px; }
+.example { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:16px 18px; }
+.example .ex-num { font-size:0.7rem; font-weight:700; color:var(--muted); margin-bottom:4px; }
+.example h4 { font-size:0.95rem; font-weight:700; margin-bottom:6px; }
+.example .app { font-size:0.78rem; color:#60a5fa; margin-bottom:4px; }
+.example p { font-size:0.82rem; color:var(--muted); line-height:1.55; }
+.example.blue { border-color:rgba(0,120,212,0.35); }
+.example.purple { border-color:rgba(139,92,246,0.35); }
+.example.green { border-color:rgba(22,163,74,0.35); }
+.example.amber { border-color:rgba(245,158,11,0.35); }
+.example.red { border-color:rgba(220,38,38,0.35); }
+
+h3 { font-size:1rem; font-weight:700; margin-bottom:10px; margin-top:20px; color:var(--text); }
+
+.build-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:14px; }
+.build-item { background:var(--surface); border:1px solid rgba(0,120,212,0.25); border-radius:10px; padding:16px; }
+.build-item .status { font-size:0.7rem; font-weight:700; color:#4ade80; text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; }
+.build-item .status.preview { color:var(--accent3); }
+.build-item h4 { font-size:0.95rem; font-weight:700; margin-bottom:6px; }
+.build-item p { font-size:0.82rem; color:var(--muted); }
+
+footer { background:var(--surface); border-top:1px solid var(--border); margin-top:60px; padding:24px 20px; text-align:center; font-size:0.85rem; color:var(--muted); }
+footer a { color:var(--muted); }
+footer a:hover { color:var(--text); }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="../../index.html">Hub</a><span>›</span>
+  <a href="index.html">Tech Workbench</a><span>›</span>
+  <a href="m365-copilot.html">M365 Copilot</a><span>›</span>
+  <span style="color:var(--text);">実践大全</span>
+</nav>
+
+<div class="page-wrap">
+
+<div class="hero">
+  <div class="tag" style="background:rgba(0,120,212,0.2);color:#93c5fd;margin-bottom:12px;">Microsoft 365 Copilot</div>
+  <h1>M365 Copilot 実践大全</h1>
+  <p class="sub">Word · Excel · PowerPoint · Teams · Outlook · OneNote · Loop · Copilot Pages · BizChat — アプリ別プロンプト集・業務シナリオ50選・Graph コネクタ・管理者展開ガイド・Build 2026 完全収録</p>
+  <div class="stat-row">
+    <div class="stat"><div class="val">8</div><div class="lbl">対応アプリ</div></div>
+    <div class="stat"><div class="val">50</div><div class="lbl">業務シナリオ</div></div>
+    <div class="stat"><div class="val">Graph</div><div class="lbl">コネクタ連携</div></div>
+    <div class="stat"><div class="val">BizChat</div><div class="lbl">AI アシスタント</div></div>
+    <div class="stat"><div class="val">Build 2026</div><div class="lbl">最新機能</div></div>
+  </div>
+</div>
+
+<div class="toc">
+  <h2>目次</h2>
+  <ol>
+    <li><a href="#bizchat">Microsoft 365 Chat（BizChat）完全活用 — Work モード・Graph コネクタ・プロンプト術</a></li>
+    <li><a href="#word">Word Copilot 実践 — 文書生成・校正・変換プロンプト集</a></li>
+    <li><a href="#excel">Excel Copilot 実践 — データ分析・数式生成・ビジュアル化</a></li>
+    <li><a href="#powerpoint">PowerPoint Copilot 実践 — プレゼン自動生成・デザイン指示</a></li>
+    <li><a href="#teams">Teams Copilot 実践 — 会議要約・アクション抽出・Intelligent Recap</a></li>
+    <li><a href="#outlook">Outlook Copilot 実践 — メール起草・スレッド要約・コーチング</a></li>
+    <li><a href="#onenote-loop">OneNote / Loop / Copilot Pages 実践</a></li>
+    <li><a href="#scenarios">部署別 業務シナリオ50選</a></li>
+    <li><a href="#admin">管理者設定 & 展開ガイド — ライセンス・DLP・センシティビティ</a></li>
+    <li><a href="#build2026">Build 2026 アップデート — Copilot Actions・Agent Mode・Copilot Tuning</a></li>
+  </ol>
+</div>
+
+<!-- ===== 01: BizChat ===== -->
+<section class="section" id="bizchat">
+  <div class="section-header">
+    <span class="section-num">01</span>
+    <h2>Microsoft 365 Chat（BizChat）完全活用</h2>
+  </div>
+
+  <div class="callout">
+    <strong>BizChat（Microsoft 365 Chat）は M365 Copilot の中核。</strong> Web 検索（Web モード）と社内データ参照（Work モード）を切り替えられる AI アシスタント。Graph コネクタで社内の全データソースをつなぐことで真価を発揮する。
+  </div>
+
+  <h3>Web モード vs Work モード</h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>モード</th><th>参照データ</th><th>典型ユースケース</th><th>注意点</th></tr>
+      <tr><td><strong>Web モード</strong></td><td>Bing Web 検索（最新情報）</td><td>市場調査・競合情報・最新ニュース収集</td><td>社内データにはアクセスしない</td></tr>
+      <tr><td><strong>Work モード</strong></td><td>Teams メッセージ・メール・ファイル・Dataverse（Graph経由）</td><td>社内文書検索・会議振返り・担当者検索</td><td>ユーザーがアクセス権を持つデータのみ参照</td></tr>
+    </table>
+  </div>
+
+  <h3>BizChat 高精度プロンプト術</h3>
+  <div class="prompt-block">
+    <div class="label">Work モード — 社内文書横断検索</div>
+    <div class="text">「先月の〇〇プロジェクトの進捗報告書の要点をまとめて。Teams のメッセージとメールも含めて」</div>
+    <div class="note">💡 ファイル名がわからなくても文脈で検索できる。期間や関係者名を加えると精度が上がる。</div>
+  </div>
+  <div class="prompt-block">
+    <div class="label">Work モード — 担当者・専門家の特定</div>
+    <div class="text">「Azure OpenAI の導入に詳しい社内の人を教えて。最近その話題でチャットやメールをしている人」</div>
+    <div class="note">💡 Graph API が社員のコミュニケーション履歴から専門性を推定して提示する。</div>
+  </div>
+  <div class="prompt-block">
+    <div class="label">Work モード — 会議内容の横断まとめ</div>
+    <div class="text">「今月 Teams で開催した〇〇チームの会議をすべて振り返り、未完了のアクションアイテムを一覧にして」</div>
+    <div class="note">💡 Intelligent Recap のデータを横断的に集約できる。</div>
+  </div>
+  <div class="prompt-block purple">
+    <div class="label">Web モード — 競合調査</div>
+    <div class="text">「[競合社名] の最新製品発表と価格改定について、今週のニュースをまとめて。営業提案書用に3つのポイントで」</div>
+    <div class="note">💡 Web モードに切り替えてから使う。「営業提案書用に」と用途を伝えると出力が整う。</div>
+  </div>
+
+  <h3>Microsoft Graph コネクタ — 社外データを Copilot に接続</h3>
+  <div class="callout purple">
+    <strong>Graph コネクタを使うと SharePoint・Teams 以外の外部データも BizChat から参照可能になる。</strong> Salesforce・ServiceNow・Confluence・GitHub・Jira などの外部サービスを M365 Copilot のナレッジとして取り込める。管理者が Microsoft 365 管理センターから設定。
+  </div>
+  <div class="table-wrap">
+    <table>
+      <tr><th>コネクタ</th><th>接続先</th><th>Copilot での活用例</th></tr>
+      <tr><td>Salesforce</td><td>顧客情報・商談・活動履歴</td><td>「〇〇社との最新商談状況を教えて」</td></tr>
+      <tr><td>ServiceNow</td><td>IT チケット・ナレッジベース</td><td>「過去に類似のシステム障害はあった？」</td></tr>
+      <tr><td>Confluence</td><td>社内 Wiki・技術ドキュメント</td><td>「オンボーディング手順書の要点を教えて」</td></tr>
+      <tr><td>GitHub</td><td>Issue・PR・コード</td><td>「リポジトリの未クローズ Issue 一覧をまとめて」</td></tr>
+      <tr><td>Azure DevOps</td><td>バックログ・スプリント</td><td>「今スプリントの残タスクと担当者は？」</td></tr>
+      <tr><td>カスタムコネクタ</td><td>任意の REST API</td><td>社内基幹システム・業務DB</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ===== 02: WORD ===== -->
+<section class="section" id="word">
+  <div class="section-header purple">
+    <span class="section-num">02</span>
+    <h2>Word Copilot 実践</h2>
+  </div>
+
+  <h3>文書生成プロンプト集</h3>
+  <div class="prompt-block purple">
+    <div class="label">ゼロから文書を生成（Draft with Copilot）</div>
+    <div class="text">「新規サービス導入提案書を作成して。背景・課題・解決策・期待効果・スケジュールの構成で、読者は経営層、2ページ以内で」</div>
+    <div class="note">💡 構成・読者・ボリュームを最初に伝える。"2ページ以内" などの制約が出力品質を高める。</div>
+  </div>
+  <div class="prompt-block purple">
+    <div class="label">既存ファイルから文書生成（/参照ファイル指定）</div>
+    <div class="text">「[会議メモ.docx] の内容をもとに、議事録を正式フォーマットで作成して。決定事項・アクションアイテム・期限の表を含めて」</div>
+    <div class="note">💡 / を入力するとファイル・メール・会議を参照できる。OneDrive・SharePoint のファイルも可。</div>
+  </div>
+  <div class="prompt-block purple">
+    <div class="label">文体変換（Rewrite）</div>
+    <div class="text">「このメール文面を、社外の重要顧客向けに丁寧なビジネス敬語に書き直して。現状の内容・主張はそのままで」</div>
+    <div class="note">💡 選択テキストに対して右クリック → Rewrite、またはサイドパネルから指示。</div>
+  </div>
+  <div class="prompt-block purple">
+    <div class="label">要約（Summarize）</div>
+    <div class="text">「この文書の要点を5箇条で、それぞれ1文で教えて」</div>
+    <div class="note">💡 長大レポートや契約書の初読みに有効。</div>
+  </div>
+  <div class="prompt-block purple">
+    <div class="label">表・データの挿入</div>
+    <div class="text">「本文中の競合比較の説明を、製品名・価格・特徴・推奨用途の4列比較表に変換して」</div>
+  </div>
+
+  <h3>Word Copilot でよく使うコマンド早見表</h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>操作</th><th>場所</th><th>プロンプト例</th></tr>
+      <tr><td>新規ドラフト生成</td><td>空白文書 → Draft ボタン</td><td>「〇〇についての報告書を書いて」</td></tr>
+      <tr><td>選択テキストの書き直し</td><td>テキスト選択 → Rewrite</td><td>「もっと簡潔に」「箇条書きに変換」</td></tr>
+      <tr><td>文書全体の要約</td><td>サイドパネル → Summarize</td><td>「このドキュメントの要点は？」</td></tr>
+      <tr><td>トーン調整</td><td>サイドパネル → 指示入力</td><td>「フォーマルに」「カジュアルに」「説得力を高めて」</td></tr>
+      <tr><td>参照文書から生成</td><td>サイドパネル → / → ファイル選択</td><td>「[spec.xlsx] をもとに要件定義書を作って」</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ===== 03: EXCEL ===== -->
+<section class="section" id="excel">
+  <div class="section-header green">
+    <span class="section-num">03</span>
+    <h2>Excel Copilot 実践</h2>
+  </div>
+
+  <div class="callout green">
+    <strong>Excel Copilot は「テーブルに変換済みのデータ」に最も強く機能する。</strong> 分析前にデータをテーブル（Ctrl+T）に変換してから使う。自然言語で数式・グラフ・PivotTable の作成を指示できる。
+  </div>
+
+  <h3>データ分析プロンプト集</h3>
+  <div class="prompt-block green">
+    <div class="label">データの要約・インサイト抽出</div>
+    <div class="text">「このデータの主なトレンドと外れ値を教えて。3つの重要な洞察をまとめて」</div>
+    <div class="note">💡 Copilot が自動でグラフや統計サマリーとともに回答してくれる。</div>
+  </div>
+  <div class="prompt-block green">
+    <div class="label">数式の自動生成</div>
+    <div class="text">「売上列と原価列から粗利率を計算する数式を E 列に追加して。% 表示で」</div>
+    <div class="note">💡 「F 列の前月比を自動計算する XLOOKUP と IFERROR の組み合わせ数式を提案して」のような複雑な数式も対応。</div>
+  </div>
+  <div class="prompt-block green">
+    <div class="label">条件付き書式の設定</div>
+    <div class="text">「売上が前月比 -10% 以下の行を赤く、+20% 以上の行を緑でハイライトして」</div>
+  </div>
+  <div class="prompt-block green">
+    <div class="label">ピボットテーブル & グラフ生成</div>
+    <div class="text">「部門別・月別の売上集計ピボットテーブルを新シートに作成して。棒グラフも追加して」</div>
+  </div>
+  <div class="prompt-block green">
+    <div class="label">データのフィルター・並び替え指示</div>
+    <div class="text">「受注金額が100万円以上で、かつ納品日が今月中の行だけを表示して」</div>
+    <div class="note">💡 Copilot は表示を変えた上で元に戻す方法も提示してくれる。</div>
+  </div>
+
+  <h3>Python in Excel（プレミアム機能）</h3>
+  <div class="callout">
+    <strong>Microsoft 365 Personal/Family/Business 以上では Python in Excel が利用可能。</strong> Copilot に「Python で〜分析して」と指示すると、pandas・matplotlib・seaborn を使った高度な分析コードを自動生成してセル内で実行する。
+  </div>
+  <div class="prompt-block">
+    <div class="label">Python in Excel 活用例</div>
+    <div class="text">「Python を使って、このデータの相関行列をヒートマップで可視化して」</div>
+    <div class="note">💡 「予測モデルを作って来月の売上を予測して」のような機械学習タスクも可能。</div>
+  </div>
+</section>
+
+<!-- ===== 04: POWERPOINT ===== -->
+<section class="section" id="powerpoint">
+  <div class="section-header amber">
+    <span class="section-num">04</span>
+    <h2>PowerPoint Copilot 実践</h2>
+  </div>
+
+  <h3>プレゼン自動生成プロンプト集</h3>
+  <div class="prompt-block amber">
+    <div class="label">ゼロからプレゼン生成</div>
+    <div class="text">「新製品 [製品名] の営業提案プレゼンを10スライドで作って。アジェンダ・課題・解決策・デモ・料金・Q&Aの構成で、対象は IT 部門長」</div>
+    <div class="note">💡 スライド枚数・構成・ターゲットを明示。社内テンプレートを先に適用してから生成すると書式が揃う。</div>
+  </div>
+  <div class="prompt-block amber">
+    <div class="label">Word 文書からスライド生成（最強パターン）</div>
+    <div class="text">「[提案書.docx] の内容をもとに、エグゼクティブサマリー用の5スライドを作って。各スライドに1つのキーメッセージとサポートデータを入れて」</div>
+    <div class="note">💡 既存の Word 文書・PDF・Teams 会議メモからスライドを生成できる。</div>
+  </div>
+  <div class="prompt-block amber">
+    <div class="label">スライドの追加・改善</div>
+    <div class="text">「3枚目のスライドに、競合との比較表を追加して。価格・機能・サポート対応の3軸で」</div>
+  </div>
+  <div class="prompt-block amber">
+    <div class="label">デザイン & レイアウト調整</div>
+    <div class="text">「このスライドのテキストが多すぎる。重要ポイントを3点に絞り、残りはスピーカーノートに移して」</div>
+    <div class="note">💡 Designer 機能（デザインアイデア）と組み合わせると見た目も一気に改善する。</div>
+  </div>
+  <div class="prompt-block amber">
+    <div class="label">発表練習支援（Presenter Coach）</div>
+    <div class="text">「このプレゼンの発表原稿を日本語で書いて。各スライド2〜3分を想定して、自然な口語体で」</div>
+  </div>
+</section>
+
+<!-- ===== 05: TEAMS ===== -->
+<section class="section" id="teams">
+  <div class="section-header">
+    <span class="section-num">05</span>
+    <h2>Teams Copilot 実践</h2>
+  </div>
+
+  <h3>Intelligent Recap（会議の自動要約）</h3>
+  <div class="callout">
+    <strong>Teams Premium / M365 Copilot のライセンスがあれば、会議終了後に自動で議事録・ToDoアクション・要約が生成される。</strong> 参加できなかった会議のキャッチアップに絶大な効果を発揮する。
+  </div>
+  <div class="prompt-block">
+    <div class="label">会議後の振り返り（Meeting Recap）</div>
+    <div class="text">「この会議でどんな決定がなされた？誰が何を担当することになった？」</div>
+    <div class="note">💡 会議の「要約」タブで Copilot に追加質問できる。トランスクリプトがある会議のみ。</div>
+  </div>
+  <div class="prompt-block">
+    <div class="label">特定の参加者の発言を確認</div>
+    <div class="text">「[名前] が予算について何を言っていた？タイムスタンプも教えて」</div>
+  </div>
+  <div class="prompt-block">
+    <div class="label">自分が参加していない会議のキャッチアップ</div>
+    <div class="text">「昨日の製品ロードマップ会議で自分（[自分の名前]）に関係するアクションはあった？」</div>
+  </div>
+  <div class="prompt-block">
+    <div class="label">会議中のリアルタイム活用</div>
+    <div class="text">「（会議中）今まで話し合われた内容を3点でまとめて」 / 「（会議中）この議題について意見が出ていない参加者は誰？」</div>
+    <div class="note">💡 会議中に Teams チャットパネルの Copilot に質問できる（要トランスクリプト有効化）。</div>
+  </div>
+
+  <h3>チャット・チャンネルでの活用</h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>場面</th><th>プロンプト例</th></tr>
+      <tr><td>長いスレッドのキャッチアップ</td><td>「このチャンネルの今週の議論を要約して。未解決の質問もリストアップして」</td></tr>
+      <tr><td>返信文案の生成</td><td>「この質問に対して、〇〇の観点から回答の文案を提案して」</td></tr>
+      <tr><td>重要メッセージの検索</td><td>「〇〇プロジェクトについてのメッセージを先月分から探して」</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ===== 06: OUTLOOK ===== -->
+<section class="section" id="outlook">
+  <div class="section-header purple">
+    <span class="section-num">06</span>
+    <h2>Outlook Copilot 実践</h2>
+  </div>
+
+  <h3>メール起草プロンプト集</h3>
+  <div class="prompt-block purple">
+    <div class="label">メール起草（Draft with Copilot）</div>
+    <div class="text">「[クライアント名] への提案遅延のお詫びと、新しいスケジュールの連絡メールを書いて。謝罪は丁寧に、新日程は来週金曜提出で」</div>
+    <div class="note">💡 「トーン：プロフェッショナル」「長さ：短め」「詳細度：詳細」の3スライダーで調整可。</div>
+  </div>
+  <div class="prompt-block purple">
+    <div class="label">返信メールの自動生成</div>
+    <div class="text">「このメールに対して、参加できない旨と代替日程の提案を添えて返信して。月曜・水曜の午後が空いている」</div>
+  </div>
+  <div class="prompt-block purple">
+    <div class="label">スレッドの要約</div>
+    <div class="text">「このメールスレッドの要点を3つにまとめて。特に自分へのアクション依頼事項があれば最初に出して」</div>
+    <div class="note">💡 長いCC付きスレッドの把握に特に有効。</div>
+  </div>
+  <div class="prompt-block purple">
+    <div class="label">Coaching（メール品質改善）</div>
+    <div class="text">（送信前にCopilotの「コーチ」機能を使う）「このメールのトーン・明確さ・説得力を評価して。改善案も提示して」</div>
+    <div class="note">💡 Outlook の Copilot パネル → 「コーチ」タブ。感情的になりがちなメールを書いた時に特に有用。</div>
+  </div>
+
+  <h3>スケジュール最適化</h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>機能</th><th>使い方</th></tr>
+      <tr><td>会議日程の自動提案</td><td>「来週、営業チーム5名の空き時間を確認して30分の会議を設定して」</td></tr>
+      <tr><td>会議の準備</td><td>「明日14時の会議の議題・参加者の関連メールを要約して準備シートを作って」</td></tr>
+      <tr><td>フォローアップリマインダー</td><td>Copilot が返信待ちメールを自動検出して通知（設定で有効化）</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ===== 07: ONENOTE / LOOP / PAGES ===== -->
+<section class="section" id="onenote-loop">
+  <div class="section-header green">
+    <span class="section-num">07</span>
+    <h2>OneNote / Loop / Copilot Pages 実践</h2>
+  </div>
+
+  <div class="three-col">
+    <div class="card green">
+      <div class="tag green">OneNote</div>
+      <h3>ノート要約・整理</h3>
+      <p>「このノートブックの先月分を要約して。カテゴリ別に整理されたインデックスページを作って」。手書きメモの OCR テキスト化 + 構造化も得意。</p>
+    </div>
+    <div class="card blue">
+      <div class="tag">Loop</div>
+      <h3>リアルタイム共同作業</h3>
+      <p>Loop コンポーネントをチャット・メール・会議に埋め込み、全員がリアルタイムで同じコンテンツを編集。Copilot が各コンポーネント内でコンテンツを生成・補完する。</p>
+    </div>
+    <div class="card purple">
+      <div class="tag purple">Copilot Pages</div>
+      <h3>AI 生成コンテンツの保存・共有</h3>
+      <p>BizChat の回答を「ページに追加」でそのまま共有可能なドキュメントに変換。チームで同時編集しながら Copilot に追記させられる。会議後の議事録共有に最適。</p>
+    </div>
+  </div>
+
+  <h3>Loop × Teams 連携パターン</h3>
+  <div class="prompt-block">
+    <div class="label">会議後の共同アクションリスト作成</div>
+    <div class="text">Intelligent Recap の ToDoアクション → 「Copilot Pages に保存」→ Teams チャットに共有 → 全員がリアルタイムで担当者・期限を記入</div>
+    <div class="note">💡 メールでの議事録送付よりも完了率が高い（全員が同じ場所を更新するため）。</div>
+  </div>
+  <div class="prompt-block purple">
+    <div class="label">ブレインストーミングの構造化</div>
+    <div class="text">「このブレインストーミングのメモを、テーマ別にグループ化して優先順位をつけて。実行可能なアクションとアイデアを分けて整理して」</div>
+  </div>
+</section>
+
+<!-- ===== 08: SCENARIOS ===== -->
+<section class="section" id="scenarios">
+  <div class="section-header amber">
+    <span class="section-num">08</span>
+    <h2>部署別 業務シナリオ50選</h2>
+  </div>
+
+  <h3>経営・経営企画</h3>
+  <div class="example-grid">
+    <div class="example blue">
+      <div class="ex-num">例 01</div>
+      <h4>役員会向け月次レポート自動生成</h4>
+      <div class="app">▶ Excel + PowerPoint Copilot</div>
+      <p>各部門の Excel 実績データを参照 → PowerPoint で「役員会レポート・12スライド・経営層向け」を生成 → Copilot Chat で前月比コメントを追記</p>
+    </div>
+    <div class="example blue">
+      <div class="ex-num">例 02</div>
+      <h4>競合動向レポートの週次生成</h4>
+      <div class="app">▶ BizChat（Web モード）</div>
+      <p>毎週月曜に「競合A・B・Cの先週の発表・ニュースをまとめて。営業戦略に影響する項目を特に詳しく」と BizChat に投げて Word に保存・配布</p>
+    </div>
+    <div class="example blue">
+      <div class="ex-num">例 03</div>
+      <h4>中期計画ドキュメントの整合性確認</h4>
+      <div class="app">▶ Word Copilot（/参照）</div>
+      <p>「[中計2026.docx] と [事業計画.xlsx] を参照して、数値の矛盾点や記述の一貫性がない箇所を指摘して」</p>
+    </div>
+  </div>
+
+  <h3>営業・マーケティング</h3>
+  <div class="example-grid">
+    <div class="example purple">
+      <div class="ex-num">例 04</div>
+      <h4>商談準備シートの自動生成</h4>
+      <div class="app">▶ BizChat（Work + Web モード）</div>
+      <p>「[顧客名] との明日の商談の準備をして。過去メール・Teams の会話を要約して、今日のWeb情報から会社の最新動向を加えて、提案すべきポイントを整理して」</p>
+    </div>
+    <div class="example purple">
+      <div class="ex-num">例 05</div>
+      <h4>提案書の高速ドラフト</h4>
+      <div class="app">▶ Word Copilot</div>
+      <p>「[RFP.pdf] の要件に応える提案書を作って。技術構成・スケジュール・費用概算・実績・次のステップの5セクション、15ページ以内で」</p>
+    </div>
+    <div class="example purple">
+      <div class="ex-num">例 06</div>
+      <h4>商談後のフォローメール生成</h4>
+      <div class="app">▶ Outlook Copilot + Teams Recap</div>
+      <p>商談会議の Intelligent Recap を確認 → 「この会議の内容をもとに、議論した課題・提案した解決策・次のステップを記載したフォローアップメールを書いて」</p>
+    </div>
+    <div class="example purple">
+      <div class="ex-num">例 07</div>
+      <h4>マーケティングコンテンツ量産</h4>
+      <div class="app">▶ Word Copilot</div>
+      <p>「[製品仕様書.docx] から、SNS 投稿用（140字）・メルマガ用（300字）・LP 用（500字）の3パターンのコピーを生成して」</p>
+    </div>
+    <div class="example purple">
+      <div class="ex-num">例 08</div>
+      <h4>Sales Deck の即席更新</h4>
+      <div class="app">▶ PowerPoint Copilot</div>
+      <p>「この営業デッキの競合比較スライドを更新して。[新機能リスト.docx] の情報を反映して、差別化ポイントを3つに絞って」</p>
+    </div>
+  </div>
+
+  <h3>人事・総務</h3>
+  <div class="example-grid">
+    <div class="example green">
+      <div class="ex-num">例 09</div>
+      <h4>求人票の生成・複数バリエーション</h4>
+      <div class="app">▶ Word Copilot</div>
+      <p>「データエンジニアの求人票を作って。[要件定義.docx] の仕様に基づいて、LinkedIn 向け・自社 HP 向け・転職エージェント向けの3バージョンで」</p>
+    </div>
+    <div class="example green">
+      <div class="ex-num">例 10</div>
+      <h4>評価フィードバックの文章化</h4>
+      <div class="app">▶ Word / BizChat</div>
+      <p>「以下のメモをもとに、部下への360度評価フィードバックを書いて。強み2点・改善点2点・来期への期待を含む400字程度でプロフェッショナルな文体で」</p>
+    </div>
+    <div class="example green">
+      <div class="ex-num">例 11</div>
+      <h4>研修資料の自動生成</h4>
+      <div class="app">▶ PowerPoint Copilot</div>
+      <p>「新入社員向けコンプライアンス研修のスライドを作って。[社内ガイドライン.pdf] を参照して、クイズスライドを3枚含む20スライド構成で」</p>
+    </div>
+    <div class="example green">
+      <div class="ex-num">例 12</div>
+      <h4>社内アンケート結果の分析・レポート</h4>
+      <div class="app">▶ Excel + Word Copilot</div>
+      <p>「[エンゲージメント調査.xlsx] を分析して、部門別スコアの比較表と、スコアが低い部門の特徴・改善提案を含む人事レポートを作って」</p>
+    </div>
+  </div>
+
+  <h3>経理・財務</h3>
+  <div class="example-grid">
+    <div class="example amber">
+      <div class="ex-num">例 13</div>
+      <h4>財務サマリーレポートの自動化</h4>
+      <div class="app">▶ Excel + PowerPoint Copilot</div>
+      <p>「[月次P&L.xlsx] を分析して、前年同月比・前月比・通期予算比の3軸で比較し、主要な差異を説明するスライドを5枚生成して」</p>
+    </div>
+    <div class="example amber">
+      <div class="ex-num">例 14</div>
+      <h4>経費精算の異常検知メモ</h4>
+      <div class="app">▶ Excel Copilot</div>
+      <p>「この経費データで、平均から2標準偏差以上外れている項目と、同一人物が短期間に多数申請している行をハイライトして」</p>
+    </div>
+    <div class="example amber">
+      <div class="ex-num">例 15</div>
+      <h4>予算策定テンプレートの作成</h4>
+      <div class="app">▶ Excel Copilot</div>
+      <p>「来期の部門予算策定用テンプレートを作って。前年実績・今期見込み・来期計画・差異・コメント列を含む、部門長が入力しやすい形式で」</p>
+    </div>
+  </div>
+
+  <h3>IT・システム</h3>
+  <div class="example-grid">
+    <div class="example red">
+      <div class="ex-num">例 16</div>
+      <h4>インシデント報告書の生成</h4>
+      <div class="app">▶ Word Copilot + Teams Recap</div>
+      <p>「昨日のシステム障害に関する Teams の会話と[ログメモ.txt]をもとに、発生時刻・原因・対応内容・再発防止策を含む公式インシデント報告書を作って」</p>
+    </div>
+    <div class="example red">
+      <div class="ex-num">例 17</div>
+      <h4>技術仕様書のレビューと改善</h4>
+      <div class="app">▶ Word Copilot</div>
+      <p>「[設計書.docx] をレビューして、曖昧な記述・矛盾・抜け漏れを指摘して。特に非機能要件の記述が十分かを確認して」</p>
+    </div>
+    <div class="example red">
+      <div class="ex-num">例 18</div>
+      <h4>セキュリティポリシー文書の更新</h4>
+      <div class="app">▶ Word Copilot（Web モード参照）</div>
+      <p>「[現行セキュリティポリシー.docx] を、最新の Microsoft Secure Score の推奨事項と NIST SP 800-53 に照らして更新すべき箇所を提案して」</p>
+    </div>
+  </div>
+
+  <h3>法務・コンプライアンス</h3>
+  <div class="example-grid">
+    <div class="example blue">
+      <div class="ex-num">例 19</div>
+      <h4>契約書のリスク条項チェック</h4>
+      <div class="app">▶ Word Copilot</div>
+      <p>「[契約書.docx] を読んで、自社にとって不利な条項・曖昧な解釈が可能な条項・抜け漏れている保護条項を箇条書きで指摘して」</p>
+    </div>
+    <div class="example blue">
+      <div class="ex-num">例 20</div>
+      <h4>社内規程の対比整理</h4>
+      <div class="app">▶ Word Copilot（/参照）</div>
+      <p>「[旧規程.docx] と [新規程.docx] を比較して、変更点の一覧表を作って。影響を受ける業務プロセスも推測して記載して」</p>
+    </div>
+  </div>
+
+  <h3>カスタマーサポート</h3>
+  <div class="example-grid">
+    <div class="example purple">
+      <div class="ex-num">例 21</div>
+      <h4>FAQ ドキュメントの自動生成</h4>
+      <div class="app">▶ Word Copilot + BizChat</div>
+      <p>「[問い合わせログ.xlsx] の過去1年分の質問を分析して、上位20件の FAQ と回答を作成して。回答は初心者にも分かりやすい言葉で」</p>
+    </div>
+    <div class="example purple">
+      <div class="ex-num">例 22</div>
+      <h4>クレームメールへの対応文案</h4>
+      <div class="app">▶ Outlook Copilot</div>
+      <p>「このクレームメールに対して、誠実な謝罪・原因説明・再発防止策・補償内容を含む返信を書いて。顧客との関係を維持できるトーンで」</p>
+    </div>
+  </div>
+
+  <h3>プロジェクト管理・全社共通</h3>
+  <div class="example-grid">
+    <div class="example green">
+      <div class="ex-num">例 23</div>
+      <h4>プロジェクト状況レポートの生成</h4>
+      <div class="app">▶ BizChat（Work モード）+ Word</div>
+      <p>「〇〇プロジェクトに関するここ2週間の Teams・メールをまとめて。進捗状況・課題・リスク・次のマイルストーンを経営報告フォーマットで」</p>
+    </div>
+    <div class="example green">
+      <div class="ex-num">例 24</div>
+      <h4>会議の事前準備シート</h4>
+      <div class="app">▶ BizChat + Outlook Copilot</div>
+      <p>「明日10時の [会議名] の事前準備をして。関連メール・前回の議事録・参加者のプロフィールを要約して、自分が確認すべき論点を3つ提示して」</p>
+    </div>
+    <div class="example green">
+      <div class="ex-num">例 25</div>
+      <h4>週次報告書の自動作成</h4>
+      <div class="app">▶ BizChat（Work モード）</div>
+      <p>「今週自分が対応したメール・参加した会議・完了したタスクをまとめて、週次報告書の下書きを作って」</p>
+    </div>
+    <div class="example green">
+      <div class="ex-num">例 26</div>
+      <h4>多言語メール対応</h4>
+      <div class="app">▶ Outlook / Word Copilot</div>
+      <p>「この英語メールを日本語で要約して、返信を英語で書いて。返信内容：来週木曜に30分のオンライン会議を提案。Zoom URL は後で送る。」</p>
+    </div>
+    <div class="example green">
+      <div class="ex-num">例 27</div>
+      <h4>オンボーディング資料の作成</h4>
+      <div class="app">▶ Word + PowerPoint Copilot</div>
+      <p>「新メンバー向けオンボーディング資料を作って。[組織図.pptx] と [業務フロー.docx] を参照して、最初の30日間のロードマップを含む20スライド構成で」</p>
+    </div>
+    <div class="example green">
+      <div class="ex-num">例 28</div>
+      <h4>ナレッジ移管ドキュメントの生成</h4>
+      <div class="app">▶ Word Copilot + BizChat</div>
+      <p>「退職予定の [担当者] の業務引き継ぎ書を作って。[業務メモ.onenote] と過去6ヶ月のメール・Teams 会話から重要業務・連絡先・注意事項を整理して」</p>
+    </div>
+  </div>
+
+  <h3>Copilot Pages 活用シナリオ</h3>
+  <div class="example-grid">
+    <div class="example blue">
+      <div class="ex-num">例 29</div>
+      <h4>調査結果の共同編集ドキュメント</h4>
+      <div class="app">▶ BizChat → Copilot Pages</div>
+      <p>BizChat で市場調査 → 「Copilot Pages に保存」→ チームメンバーにリンク共有 → 全員がリアルタイムで追記・Copilot が追加情報を補完</p>
+    </div>
+    <div class="example blue">
+      <div class="ex-num">例 30</div>
+      <h4>会議アクションの即時共有</h4>
+      <div class="app">▶ Teams Recap → Copilot Pages</div>
+      <p>Intelligent Recap のアクションアイテムを Copilot Pages に保存 → Teams チャンネルに投稿 → 担当者が直接ページで進捗を更新</p>
+    </div>
+  </div>
+
+  <h3>Excel × BizChat 高度活用</h3>
+  <div class="example-grid">
+    <div class="example amber">
+      <div class="ex-num">例 31</div>
+      <h4>売上予測モデルの構築支援</h4>
+      <div class="app">▶ Excel Copilot（Python in Excel）</div>
+      <p>「[過去3年売上.xlsx] の月次データを使って、季節性を考慮した来四半期の売上予測モデルを Python で作って。予測区間も表示して」</p>
+    </div>
+    <div class="example amber">
+      <div class="ex-num">例 32</div>
+      <h4>大量データの自動クレンジング</h4>
+      <div class="app">▶ Excel Copilot</div>
+      <p>「このデータの重複行を削除して、空白セルを "未入力" で埋めて、電話番号列を統一フォーマット（000-0000-0000）に変換して」</p>
+    </div>
+  </div>
+
+  <h3>外部パートナー・顧客対応</h3>
+  <div class="example-grid">
+    <div class="example purple">
+      <div class="ex-num">例 33</div>
+      <h4>RFP への回答文書生成</h4>
+      <div class="app">▶ Word Copilot</div>
+      <p>「[RFP.pdf] の質問事項に対して、[会社概要.docx] と [実績集.docx] を参照して、各項目への回答文書を生成して。評価者が比較しやすい簡潔な箇条書きで」</p>
+    </div>
+    <div class="example purple">
+      <div class="ex-num">例 34</div>
+      <h4>パートナー向けニュースレターの生成</h4>
+      <div class="app">▶ Word + BizChat</div>
+      <p>「今月の自社アップデートと業界ニュースをまとめた取引先向けメールマガジンを書いて。読了時間3分以内、ポジティブなトーンで」</p>
+    </div>
+  </div>
+
+  <h3>製造・研究開発</h3>
+  <div class="example-grid">
+    <div class="example red">
+      <div class="ex-num">例 35</div>
+      <h4>試験報告書の自動生成</h4>
+      <div class="app">▶ Word Copilot（/参照）</div>
+      <p>「[試験データ.xlsx] と [テスト仕様書.docx] を参照して、ISO準拠の試験報告書を作って。合否判定・不合格の詳細・再試験推奨事項を含めて」</p>
+    </div>
+    <div class="example red">
+      <div class="ex-num">例 36</div>
+      <h4>特許調査サマリーの生成</h4>
+      <div class="app">▶ BizChat（Web モード）</div>
+      <p>「[技術分野] における過去5年間の主要特許トレンドをまとめて。主要プレーヤーと技術方向性を表形式で整理して」</p>
+    </div>
+  </div>
+
+  <h3>研修・教育・ナレッジ管理</h3>
+  <div class="example-grid">
+    <div class="example blue">
+      <div class="ex-num">例 37</div>
+      <h4>e-Learning コンテンツの原稿生成</h4>
+      <div class="app">▶ Word + PowerPoint Copilot</div>
+      <p>「[マニュアル.docx] をもとに、15分で完了できる e-Learning モジュールを設計して。学習目標・本文・クイズ5問・まとめのセクション構成で」</p>
+    </div>
+    <div class="example blue">
+      <div class="ex-num">例 38</div>
+      <h4>ベストプラクティス集の作成</h4>
+      <div class="app">▶ BizChat（Work モード）</div>
+      <p>「社内の Teams・SharePoint から〇〇に関するノウハウや成功事例を集めて、ベストプラクティス集のドラフトを作って」</p>
+    </div>
+  </div>
+
+  <h3>生産性向上・個人活用</h3>
+  <div class="example-grid">
+    <div class="example green">
+      <div class="ex-num">例 39</div>
+      <h4>To-Do リストの優先順位付け</h4>
+      <div class="app">▶ BizChat（Work モード）</div>
+      <p>「自分のメール・Teams メッセージ・会議のアクションアイテムを集めて、今日やるべきこと TOP5 を緊急度×重要度で整理して」</p>
+    </div>
+    <div class="example green">
+      <div class="ex-num">例 40</div>
+      <h4>長い報告書の即時キャッチアップ</h4>
+      <div class="app">▶ Word Copilot</div>
+      <p>「この100ページのレポートで自分（[担当領域]）に関係する箇所を抜き出して、5分で読める要約を作って」</p>
+    </div>
+    <div class="example green">
+      <div class="ex-num">例 41</div>
+      <h4>プレゼンの話し言葉スクリプト生成</h4>
+      <div class="app">▶ PowerPoint Copilot</div>
+      <p>「このスライドを使って10分でプレゼンする際のスピーカーノート（話し言葉）を書いて。各スライド45秒〜1分で収まるように」</p>
+    </div>
+    <div class="example green">
+      <div class="ex-num">例 42</div>
+      <h4>日報・週報の自動生成</h4>
+      <div class="app">▶ BizChat（Work モード）</div>
+      <p>「今日自分が参加した会議・送受信したメール・完了したタスクから日報を生成して。明日の予定も Teams カレンダーから引いて追記して」</p>
+    </div>
+  </div>
+
+  <h3>BizChat 深掘り活用</h3>
+  <div class="example-grid">
+    <div class="example amber">
+      <div class="ex-num">例 43</div>
+      <h4>社内エキスパートの発掘</h4>
+      <div class="app">▶ BizChat（Work モード）</div>
+      <p>「クラウドセキュリティに詳しい社員を探して。最近その話題でメール・チャットをしている人や、関連ファイルを作成している人を教えて」</p>
+    </div>
+    <div class="example amber">
+      <div class="ex-num">例 44</div>
+      <h4>プロジェクトの健全性チェック</h4>
+      <div class="app">▶ BizChat（Work モード）</div>
+      <p>「〇〇プロジェクトの Teams チャンネル・メール・会議から、現在抱えているリスクと未解決の課題を洗い出して」</p>
+    </div>
+    <div class="example amber">
+      <div class="ex-num">例 45</div>
+      <h4>承認待ちアイテムの一括確認</h4>
+      <div class="app">▶ BizChat（Work モード）</div>
+      <p>「現在自分に承認依頼が来ているメール・Teams メッセージ・Approvals の一覧を作って。期限が近い順に並べて」</p>
+    </div>
+    <div class="example amber">
+      <div class="ex-num">例 46</div>
+      <h4>組織変更の影響調査</h4>
+      <div class="app">▶ BizChat（Work モード）</div>
+      <p>「[部門名] の組織変更に関するアナウンスを探して、自分のチームが対応すべき変更点・連絡先の変更をまとめて」</p>
+    </div>
+  </div>
+
+  <h3>Copilot × Power Platform 連携</h3>
+  <div class="example-grid">
+    <div class="example blue">
+      <div class="ex-num">例 47</div>
+      <h4>Copilot から Power Automate フローを起動</h4>
+      <div class="app">▶ BizChat + Power Automate</div>
+      <p>BizChat 上で「〇〇の申請フローを開始して」と指示 → Copilot Connector 経由で Power Automate フローが起動 → 結果を BizChat に返答</p>
+    </div>
+    <div class="example blue">
+      <div class="ex-num">例 48</div>
+      <h4>Excel データを Dataverse に一括登録</h4>
+      <div class="app">▶ Excel Copilot + Power Automate</div>
+      <p>「この Excel の顧客リストを Dataverse の顧客テーブルに取り込む方法を教えて」 → Copilot が Power Automate フローのデザインを提案</p>
+    </div>
+    <div class="example blue">
+      <div class="ex-num">例 49</div>
+      <h4>Power BI レポートへの質問</h4>
+      <div class="app">▶ BizChat + Power BI Copilot</div>
+      <p>BizChat で「先月の売上ダッシュボードの概要を教えて」→ Power BI コネクタ経由でレポートデータを参照して自然言語で回答（要Fabric F64+）</p>
+    </div>
+    <div class="example blue">
+      <div class="ex-num">例 50</div>
+      <h4>Copilot Studio エージェントとの連携</h4>
+      <div class="app">▶ Teams + Copilot Studio</div>
+      <p>組織固有の業務ナレッジ（社内規程・製品仕様・手順書）をナレッジ接続した Copilot Studio ボットを Teams に展開し、BizChat では対応できない社内固有の Q&A を処理</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 09: ADMIN ===== -->
+<section class="section" id="admin">
+  <div class="section-header purple">
+    <span class="section-num">09</span>
+    <h2>管理者設定 & 展開ガイド</h2>
+  </div>
+
+  <h3>展開前のチェックリスト</h3>
+  <div class="callout purple">
+    <strong>M365 Copilot は「ライセンスを割り当てるだけで使える」が、管理者が設定しないと情報漏洩リスクやコンプライアンス違反につながる。</strong> 展開前に必ず以下の設定を確認する。
+  </div>
+  <div class="table-wrap">
+    <table>
+      <tr><th>確認項目</th><th>設定場所</th><th>推奨設定</th></tr>
+      <tr><td><strong>センシティビティラベル</strong></td><td>Microsoft Purview</td><td>機密文書に「極秘」「社外秘」ラベルを付与。Copilot がラベルを考慮してアクセス制御</td></tr>
+      <tr><td><strong>SharePoint 過剰共有の修正</strong></td><td>SharePoint 管理センター</td><td>Copilot は現ユーザーの権限でのみ参照。「全員共有」ファイルが意図せず参照される可能性あり</td></tr>
+      <tr><td><strong>Copilot のデータ学習オプトアウト</strong></td><td>Microsoft 365 管理センター → 設定 → Copilot</td><td>テナントデータが Microsoft のモデル学習に使われない設定（デフォルトオフ）を確認</td></tr>
+      <tr><td><strong>DLP ポリシー</strong></td><td>Microsoft Purview → DLP</td><td>Copilot の入出力に DLP ポリシーを適用可能（機密情報の検出・ブロック）</td></tr>
+      <tr><td><strong>Audit Log（監査ログ）</strong></td><td>Microsoft Purview → 監査</td><td>Copilot の利用履歴を記録。コンプライアンス調査に必要</td></tr>
+      <tr><td><strong>Copilot Dashboard</strong></td><td>Viva Insights 管理センター</td><td>利用率・生産性向上の測定。ROI 試算に活用</td></tr>
+    </table>
+  </div>
+
+  <h3>ライセンス管理と展開戦略</h3>
+  <div class="two-col">
+    <div class="card blue">
+      <h3>パイロット展開の進め方</h3>
+      <p style="font-size:0.875rem;color:var(--muted);line-height:1.7;">① アーリーアダプター50人でパイロット開始 → ② Copilot Dashboard で利用率・满足度を2週間計測 → ③ ユースケースを整理して社内 FAQ を作成 → ④ 部門展開 → ⑤ 全社展開。「全員同時展開」は混乱の元。</p>
+    </div>
+    <div class="card purple">
+      <h3>Copilot Adoption Center の活用</h3>
+      <p style="font-size:0.875rem;color:var(--muted);line-height:1.7;">Microsoft が提供する無料の展開支援リソース。シナリオ別プロンプト集・チェンジマネジメントガイド・トレーニングビデオを即利用可能。<code>adoption.microsoft.com/copilot</code> から入手。</p>
+    </div>
+  </div>
+
+  <h3>Copilot Activity Report — 利用状況の把握</h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>指標</th><th>確認場所</th><th>目安・活用法</th></tr>
+      <tr><td>アクティブユーザー数</td><td>Microsoft 365 管理センター → レポート</td><td>展開後4週間でのアクティブ率50%以上が目標</td></tr>
+      <tr><td>機能別利用率</td><td>Viva Insights Copilot Dashboard</td><td>Teams Recap・Outlook Draft が特に効果大。利用率の低い機能はトレーニングを追加</td></tr>
+      <tr><td>時間節約量</td><td>Viva Insights</td><td>Copilot が「X時間の節約」と算出。ROI 報告に使用</td></tr>
+      <tr><td>ユーザー満足度</td><td>Copilot Dashboard の NPS</td><td>定期的に収集し、低スコア者にはトレーニングを提供</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ===== 10: BUILD 2026 ===== -->
+<section class="section" id="build2026">
+  <div class="section-header green">
+    <span class="section-num">10</span>
+    <h2>Build 2026 アップデート</h2>
+  </div>
+
+  <div class="build-grid">
+    <div class="build-item">
+      <div class="status">GA</div>
+      <h4>Copilot Actions（自律タスク実行）</h4>
+      <p>BizChat に「毎朝9時に昨日の未読メールを要約して Teams に投稿して」と指示するだけで繰り返しタスクを自律実行。Power Automate との統合で複雑なワークフローも自然言語で設定可能。</p>
+    </div>
+    <div class="build-item">
+      <div class="status">GA</div>
+      <h4>Agent Mode in Microsoft 365</h4>
+      <p>BizChat が複数ステップの目標を自律的に達成する「エージェントモード」が GA。「来週の役員会用に売上データを集めてスライドを作って関係者に共有して」を一気通貫で実行。</p>
+    </div>
+    <div class="build-item">
+      <div class="status">GA</div>
+      <h4>Copilot Tuning（組織固有の微調整）</h4>
+      <p>組織の文書・コミュニケーションスタイル・専門用語を学習した Fine-tuned Copilot を作成可能。品質基準・社内用語・文体を Copilot に反映させ、出力の一貫性を向上。</p>
+    </div>
+    <div class="build-item">
+      <div class="status">GA</div>
+      <h4>Researcher & Analyst エージェント</h4>
+      <p>深い調査・分析に特化した2つの専用エージェントが M365 Copilot に統合。Researcher は Web + 社内データの横断調査、Analyst は Python によるデータ分析を自律実行。</p>
+    </div>
+    <div class="build-item">
+      <div class="status preview">Preview</div>
+      <h4>Copilot × SAP・Workday 統合</h4>
+      <p>SAP・Workday・Dynamics 365 への接続が強化され、BizChat から直接 ERP・HRM のデータを参照・更新できるコネクタが Preview 提供開始。</p>
+    </div>
+    <div class="build-item">
+      <div class="status preview">Preview</div>
+      <h4>Real-Time Audio Summarization in Teams</h4>
+      <p>Teams 電話（PSTN 通話含む）のリアルタイム文字起こし + 要約が Preview。営業電話のフォローアップメール自動生成まで一貫して対応。</p>
+    </div>
+    <div class="build-item">
+      <div class="status">GA</div>
+      <h4>Copilot in Excel — Python による高度分析</h4>
+      <p>Copilot が Python in Excel のコードを自動生成して高度な統計分析・予測モデリングを実行する機能が GA。データサイエンスの知識なしに本格分析が可能に。</p>
+    </div>
+    <div class="build-item">
+      <div class="status">GA</div>
+      <h4>Copilot Pages の全テナント展開</h4>
+      <p>Copilot Pages が M365 Copilot ライセンス所持者全員に GA。BizChat の回答を即座にページ化してチームで共同編集する機能がデフォルトで利用可能に。</p>
+    </div>
+  </div>
+</section>
+
+</div><!-- /page-wrap -->
+
+<footer>
+  <p>📖 関連: <a href="m365-copilot.html">M365 Copilot 概要</a> &nbsp;|&nbsp; <a href="copilot-studio-guide.html">Copilot Studio 実践大全</a> &nbsp;|&nbsp; <a href="power-automate-guide.html">Power Automate 完全実践ガイド</a> &nbsp;|&nbsp; <a href="microsoft-ecosystem.html">Microsoft AI エコシステム総覧</a></p>
+  <p style="margin-top:8px;">最終更新: 2026-06-01 &nbsp;|&nbsp; <a href="../../index.html">Hub トップ</a> &nbsp;|&nbsp; <a href="index.html">← Knowledge Hub</a></p>
+</footer>
+
+</body>
+</html>
