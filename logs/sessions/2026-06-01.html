@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2026-06-01 セッションログ | Logs</title>
+  <style>
+    body { font-family: "Segoe UI", "Noto Sans JP", system-ui, sans-serif; margin: 0; background: #0b1220; color: #edf2fb; line-height: 1.7; padding: 28px 18px 56px; }
+    .shell { max-width: 1080px; margin: 0 auto; display: grid; gap: 18px; }
+    .panel { background: #111a2b; border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 22px 24px; }
+    a { color: #75d7c0; }
+    h1, h2, h3 { margin: 0 0 10px; }
+    h2 { color: #fcd34d; font-size: 1.15rem; border-bottom: 2px solid rgba(244,184,96,0.25); padding-bottom: 6px; margin-bottom: 14px; }
+    h3 { color: #75d7c0; font-size: 1rem; margin: 14px 0 6px; }
+    p, li { color: #c5d0e3; }
+    code { font-family: "Fira Code", "Consolas", monospace; background: rgba(255,255,255,0.06); padding: 1px 6px; border-radius: 5px; font-size: 0.86em; color: #a5f3d0; }
+    .meta-row { display: flex; flex-wrap: wrap; gap: 14px; font-size: 0.85rem; color: #7f92ac; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .meta-row span strong { color: #c5d0e3; }
+    .phase { background: rgba(255,255,255,0.03); border-left: 3px solid #3dd8c5; padding: 14px 18px; border-radius: 10px; margin: 14px 0; }
+    .phase h3 { color: #3dd8c5; }
+    .phase .out { color: #7f92ac; font-size: 0.86rem; }
+    .phase ul { margin: 6px 0 0; padding-left: 20px; }
+    .phase li { font-size: 0.9rem; }
+    .phase.purple { border-color: #a78bfa; }
+    .phase.purple h3 { color: #c4a0ff; }
+    .phase.orange { border-color: #f7b733; }
+    .phase.orange h3 { color: #f7b733; }
+    .summary-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; margin: 10px 0; }
+    .tile { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 12px; text-align: center; }
+    .tile .v { color: #3dd8c5; font-size: 1.4rem; font-weight: 800; }
+    .tile .l { color: #7f92ac; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; margin-top: 4px; }
+    .commit { background: rgba(0,0,0,0.4); border-left: 3px solid #fcd34d; padding: 10px 14px; border-radius: 8px; font-family: "Fira Code", monospace; font-size: 0.84rem; color: #c5d0e3; margin: 8px 0; }
+    .commit .hash { color: #fcd34d; font-weight: 700; margin-right: 8px; }
+    .decision { background: rgba(167,139,250,0.05); border: 1px solid rgba(167,139,250,0.2); border-radius: 10px; padding: 12px 16px; margin: 8px 0; }
+    .decision h4 { color: #c4a0ff; margin: 0 0 4px; font-size: .9rem; }
+    .decision p { margin: 0; font-size: .86rem; }
+    .correction { background: rgba(247,183,51,0.06); border: 1px solid rgba(247,183,51,0.25); border-radius: 10px; padding: 12px 16px; margin: 8px 0; }
+    .correction h4 { color: #f7b733; margin: 0 0 4px; font-size: .9rem; }
+    .correction p { margin: 0; font-size: .86rem; }
+    table { width: 100%; border-collapse: collapse; font-size: .87rem; }
+    th { text-align: left; padding: 8px 11px; background: rgba(61,216,197,.07); color: #3dd8c5; font-size: .78rem; border-bottom: 1px solid rgba(255,255,255,.07); }
+    td { padding: 8px 11px; border-bottom: 1px solid rgba(255,255,255,.04); color: #c5d0e3; vertical-align: top; }
+    td strong { color: #edf2fb; }
+    small { color: #7f92ac; font-size: .8rem; }
+  </style>
+</head>
+<body>
+  <div class="shell">
+
+    <div class="panel">
+      <p><a href="../index.html">← Logs</a> / <a href="index.html">セッションログ一覧</a> / <a href="../../index.html">Hub Top</a></p>
+      <h1>2026-06-01 セッションログ</h1>
+      <p>Microsoft 実践ガイドスイート完成 → ゼロベース再監査（理念照合）→ 主軸（Creator System）への回帰。フルクローン化と接続マップ新設までを実施。複数セッション（コンテキスト圧縮をまたいで継続）。</p>
+      <div class="meta-row">
+        <span>日付: <strong>2026-06-01</strong></span>
+        <span>ブランチ: <strong>main / claude/creators-pipeline-enhancement-t5IUQ</strong></span>
+        <span>関連ADR: <strong>ADR-014（4カテゴリ構造）/ ADR-011（主軸集中）</strong></span>
+        <span>セッション形式: <strong>Claude 単独（コンテキスト圧縮あり）</strong></span>
+      </div>
+    </div>
+
+    <!-- サマリー数値 -->
+    <div class="panel">
+      <h2>サマリー数値</h2>
+      <div class="summary-tiles">
+        <div class="tile"><div class="v">5</div><div class="l">新規ページ</div></div>
+        <div class="tile"><div class="v">~4,900</div><div class="l">追加行数（推定）</div></div>
+        <div class="tile"><div class="v">10</div><div class="l">nav 伝播ページ</div></div>
+        <div class="tile"><div class="v">94→150</div><div class="l">履歴（unshallow）</div></div>
+        <div class="tile"><div class="v">2</div><div class="l">ゼロベース監査</div></div>
+      </div>
+    </div>
+
+    <!-- セッション目的 -->
+    <div class="panel">
+      <h2>セッションの目的と経緯</h2>
+      <p><strong>発端:</strong> 前セッションからの継続。以下の流れで進行した。</p>
+      <ol>
+        <li>Microsoft 実践ガイドスイートの最後のピース（M365 Copilot 実践大全）を完成・各所にリンク</li>
+        <li>「理念に照らしてゼロベースで、追加すべきものを整理して」— 再監査を実施</li>
+        <li>監査で判明した「重心ズレ」を踏まえ、主軸（Creator System）へエネルギーを戻す</li>
+        <li>リポジトリをフルクローン化（shallow → full）して全履歴・全ブランチを取得</li>
+      </ol>
+    </div>
+
+    <!-- Phase 1: Microsoft suite -->
+    <div class="panel">
+      <h2>Phase 1 — Microsoft 実践ガイドスイート完成（💼 エンタープライズ）</h2>
+      <div class="phase purple">
+        <h3>4ガイドが出揃った</h3>
+        <div class="out">workbench/knowledge/ に「実践大全」シリーズが完成。各ガイドを概要ページ・index・サイトマップから二重動線で接続。</div>
+        <ul>
+          <li><code>copilot-studio-guide.html</code>（~995行）— 3モード設計・Knowledge Source・Analytics</li>
+          <li><code>power-platform-guide.html</code>（~799行）— Power Fx・DAX・ALM・CoE Kit・Build 2026</li>
+          <li><code>power-automate-guide.html</code>（~1,270行）— 実例50選・式言語・RPA</li>
+          <li><code>m365-copilot-guide.html</code>（~956行）— BizChat・アプリ別プロンプト・シナリオ50選</li>
+          <li>intelligence-matrix に Google I/O 2026 + Microsoft Build 2026（5/19-21）を追記</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Phase 2: 再監査 -->
+    <div class="panel">
+      <h2>Phase 2 — ゼロベース再監査（理念照合）</h2>
+      <p>CLAUDE.md・operating-principles・strategy 一式・decisions（ADR）と、creator-system / claw-stack / research の実コンテンツを突き合わせた。3 つの探索エージェントを並行起動して俯瞰したのち、フルクローン後に実ファイルを精読して検証。</p>
+      <div class="phase">
+        <h3>最大の発見: 理念と実態の「重心ズレ」</h3>
+        <ul>
+          <li>宣言上の主軸（力点）は 🎬 生成AI・クリエイター（Creator System）</li>
+          <li>しかし直近の制作エネルギーはほぼ全て 💼 エンタープライズ（Microsoft 4ガイド）に投下されていた</li>
+          <li>→ 次のエネルギーは主軸に戻すべき、と理念が示している</li>
+        </ul>
+      </div>
+      <div class="correction">
+        <h4>監査の自己訂正（重要）</h4>
+        <p>探索エージェントが行数カウントと<strong>古い hub-health データ</strong>に依存したため、初期監査は実態よりギャップを誇張していた。フルクローン後に精読して訂正：① 漫画パイプラインは実装が浅いどころかフォールバック・複数キャラ合成・設計意図まで完備で<strong>むしろ厚い</strong>。② claw-stack は「47日 stale」ではなく <strong>2026-06-01 / OpenClaw 5/24 反映済み</strong>。③ _routines/ の月次 LLM トラッカー更新ルーチンは 5/30 に既設。エージェント任せにせず読み込んで確認することの重要性を再確認。</p>
+      </div>
+    </div>
+
+    <!-- Phase 3: 主軸への回帰 -->
+    <div class="panel">
+      <h2>Phase 3 — 主軸への回帰：接続マップ新設</h2>
+      <div class="phase orange">
+        <h3>creator-system/stack-map.html（新規）— 技術スタック × パイプライン接続マップ</h3>
+        <div class="out">roadmap Phase 3 の未着手項目「技術スタックと各パイプラインを接続する対応表」を実装。📚ナレッジ層と🎬主軸を繋ぐ背骨。</div>
+        <ul>
+          <li>スタックを4レイヤーで整理（L1頭脳 / L2生成 / L3制御評価 / L4配信運用）</li>
+          <li>中核「5工程 × スタック対応表」— 工程・担うモデル・レイヤー・深掘り参照・代替/フォールバックを1行に</li>
+          <li>各工程から workbench/knowledge の深掘りページ（Gemini/Veo/Imagen/ComfyUI/NotebookLM）へ直結</li>
+          <li>「ナレッジ層との接続」— 型番はトラッカー正本、マップは構造維持という役割分担を明記</li>
+          <li>設計意図セクション — 既存の「比較」「フロー」と問いが違うため3枚目の地図を保つ理由を記録</li>
+          <li>nav エントリを creator-system 全10ページに伝播（R-07 ナビ崩壊の予防）</li>
+        </ul>
+      </div>
+      <div class="phase">
+        <h3>接続・記録の更新</h3>
+        <ul>
+          <li>overview.html 参照表・top index サブリンク・site-map に接続マップを surface</li>
+          <li>roadmap.html Phase 3「次」項目を「完了」へ（stack-map.html で実装済み）</li>
+          <li>本セッションログ新設で session-log 運用を復活（前回 5/30 から継続）</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- キー決断 -->
+    <div class="panel">
+      <h2>キー決断（次のセッションへの引き継ぎ）</h2>
+      <div class="decision">
+        <h4>決断 1: 監査は「読んで確かめる」を最終根拠とする</h4>
+        <p>探索エージェントの行数/ダッシュボード依存の結論を鵜呑みにせず、フルクローン後に実ファイルを精読して訂正した。今後も主軸の重要判断は実コンテンツの精読を一次情報とする。</p>
+      </div>
+      <div class="decision">
+        <h4>決断 2: 接続マップは3枚目の地図として独立させた</h4>
+        <p>genai-tools（選定の問い）・overview（手順の問い）と統合せず、stack-map（参照の問い）を独立保持。読み手の入口が違うため。モデル名が古びたら stack-map ではなくトラッカー側を更新する設計。</p>
+      </div>
+      <div class="decision">
+        <h4>決断 3: 主軸は想定以上に成熟していた → 次は「薄さ」より「繋ぎ」と「鮮度」</h4>
+        <p>Creator System は実装まで厚く完備。今後の伸びしろは新規実装より、カテゴリ間の回遊（接続）と運用ルーチンの定着。月次反映ルーチン（LLMトラッカー / Industry Trends）の運用開始が次の焦点。</p>
+      </div>
+    </div>
+
+    <!-- コミット履歴 -->
+    <div class="panel">
+      <h2>コミット履歴</h2>
+      <div class="commit"><span class="hash">[1]</span> chore: ゼロベース俯瞰アップデート（2026-06-01）</div>
+      <div class="commit"><span class="hash">[2]</span> fix: 残動線修正・更新日補正（ゼロベース監査 Phase A）</div>
+      <div class="commit"><span class="hash">[3]</span> feat: M365 Copilot 実践大全を新設・各所にリンク追加</div>
+      <div class="commit"><span class="hash">[4]</span> feat: 技術スタック×パイプライン接続マップ新設（主軸回帰・session-log 復活）</div>
+    </div>
+
+    <!-- フッター -->
+    <div class="panel">
+      <p style="color:#7f92ac;font-size:.85rem;margin:0">次回セッション: 月次反映ルーチン（LLM トラッカー6本 / Industry Trends）の<strong>運用開始</strong>。または next-actions.html で次の優先タスクを確認。</p>
+      <p style="color:#4a6a7a;font-size:.78rem;margin:8px 0 0">関連: <a href="../hub-health.html">hub-health</a> / <a href="../next-actions.html">next-actions</a> / <a href="../../creator-system/stack-map.html">stack-map（本セッション成果）</a> / <a href="../../foundations/decisions.html">decisions（ADR）</a></p>
+    </div>
+
+  </div>
+</body>
+</html>

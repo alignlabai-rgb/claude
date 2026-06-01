@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>技術スタック × パイプライン接続マップ — AI Creator Hub</title>
+  <meta name="description" content="LLM・生成モデル・制御/評価・配信の各レイヤーが、制作パイプラインのどの工程を担うかを1枚に対応づける接続マップ。ナレッジ深掘りページと主軸パイプラインを繋ぐ navigational spine。">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .map-table{width:100%;border-collapse:collapse;font-size:.88rem;margin-top:1rem}
+    .map-table th{text-align:left;padding:11px 14px;background:rgba(61,216,197,.08);color:#3dd8c5;font-size:.78rem;border-bottom:1px solid var(--border);white-space:nowrap}
+    .map-table td{padding:11px 14px;border-bottom:1px solid var(--border);color:var(--text-muted);vertical-align:top;line-height:1.6}
+    .map-table td strong{color:var(--text)}
+    .map-table a{color:#3dd8c5;text-decoration:none}
+    .map-table a:hover{text-decoration:underline}
+    .map-table tr:last-child td{border-bottom:none}
+    .layer-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.4rem 1.5rem}
+    .layer-card .layer-head{display:flex;align-items:center;gap:.7rem;margin-bottom:.6rem}
+    .layer-card .layer-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
+    .layer-card h3{margin:0;font-size:1rem}
+    .layer-card .layer-tools{font-size:.82rem;color:var(--text-muted);line-height:1.85;margin-top:.5rem}
+    @media(max-width:720px){.map-table{font-size:.8rem}.map-table th,.map-table td{padding:8px 9px}}
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">AI Creator Hub</div>
+  <ul class="nav-links">
+    <li><a href="index.html">ホーム</a></li>
+    <li><a href="topic-generator.html">ネタ生成</a></li>
+    <li><a href="video-pipeline.html">動画制作</a></li>
+    <li><a href="manga-pipeline.html">漫画制作</a></li>
+    <li><a href="evaluation.html">評価システム</a></li>
+    <li><a href="monetization.html">マネタイズ</a></li>
+    <li><a href="openclaw.html">OpenClaw連携</a></li>
+    <li><a href="kpi-dashboard.html">KPI</a></li>
+    <li><a href="genai-tools.html">生成ツール比較</a></li>
+    <li><a href="overview.html" style="color:#3dd8c5;">全体フロー</a></li>
+    <li><a href="stack-map.html" class="active">接続マップ</a></li>
+    <li><a href="../research/openclaw-news/index.html" style="color: #4FFFB0;">🦞 OpenClaw情報</a></li>
+  </ul>
+  <div class="nav-hamburger"><span></span><span></span><span></span></div>
+</nav>
+
+<div class="page-hero">
+  <div class="section-label">技術スタック × パイプライン接続マップ</div>
+  <h1>どのモデルが<br><span style="background: linear-gradient(135deg,#00D4FF,#6C3CE1); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">どの工程を担うか</span></h1>
+  <p>散在する LLM・生成モデル・制御/評価ツールが、制作パイプラインのどのステージで効くのかを1枚に対応づける。ナレッジ深掘りページ（📚）と主軸パイプライン（🎬）を繋ぐ背骨。</p>
+</div>
+
+<!-- なぜこのページがあるか -->
+<section class="section">
+  <div class="section-inner">
+    <div class="two-col">
+      <div>
+        <div class="section-label">このページの狙い</div>
+        <h2 class="section-title">「比較」でも「フロー」でもなく<br>スタックと工程の対応</h2>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+          ハブには既に2種類の地図があります。
+          <a href="genai-tools.html" style="color:#3dd8c5;">生成ツール比較</a>は「どのツールが優れているか」の選定軸、
+          <a href="overview.html" style="color:#3dd8c5;">全体フロー</a>は「工程の順番」を示します。
+          しかし「<strong style="color:var(--text);">ネタ生成にはどのモデルの頭脳が要り、評価には何が動き、深掘りはどのページを読めばいいのか</strong>」を
+          一望できる対応表がありませんでした。このページはその欠けていた背骨を埋めます。
+        </p>
+        <ul class="checklist">
+          <li>工程ごとに「担うモデル・ツール」を明示</li>
+          <li>各ツールの深掘りページ（workbench/knowledge）へ直結</li>
+          <li>代替・フォールバック先を併記して移行に強く</li>
+          <li>モデル世代交代に追従する仕組みへ接続</li>
+        </ul>
+      </div>
+      <div>
+        <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem;">
+          <h3 style="margin-bottom: 1.25rem; font-size: 1rem; color: var(--text-muted);">スタックの4レイヤー</h3>
+          <div class="code-block">
+<span class="cm"># 制作スタックを4層で捉える</span>
+<span class="fn">L1 頭脳</span>    : LLM（構成・脚本・判断）
+<span class="fn">L2 生成</span>    : 動画/画像/音声/音楽モデル
+<span class="fn">L3 制御評価</span>: ControlNet / CLIP / Vision
+<span class="fn">L4 配信運用</span>: 投稿API / オーケストレーション
+
+<span class="cm"># ツール名は半年で変わる。</span>
+<span class="cm"># 「どの層のどの問題を解くか」は変わらない。</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4レイヤー -->
+<section class="section" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-label">スタックの全体像</div>
+    <h2 class="section-title">4つのレイヤーと担当ツール</h2>
+    <div class="card-grid" style="margin-top:1.5rem;">
+      <div class="layer-card">
+        <div class="layer-head">
+          <div class="layer-icon" style="background:rgba(108,60,225,.15);">🧠</div>
+          <h3>L1 — 頭脳（LLM）</h3>
+        </div>
+        <p style="color:var(--text-muted);font-size:.84rem;margin:0;">ネタ発想・ストーリー構造化・脚本・コマ割り設計・評価の自然言語判断を担う中枢。</p>
+        <div class="layer-tools">
+          <strong style="color:var(--text);">担当:</strong> Claude Opus 4.8 / Sonnet 4.6・Gemini 3.1 Pro・GPT-5.5<br>
+          <strong style="color:var(--text);">深掘り:</strong>
+          <a href="../workbench/knowledge/claude-model.html" style="color:#3dd8c5;">Claude</a> /
+          <a href="../workbench/knowledge/gemini.html" style="color:#3dd8c5;">Gemini</a> /
+          <a href="../workbench/knowledge/chatgpt.html" style="color:#3dd8c5;">ChatGPT</a>
+        </div>
+      </div>
+      <div class="layer-card">
+        <div class="layer-head">
+          <div class="layer-icon" style="background:rgba(0,212,255,.15);">🎬</div>
+          <h3>L2 — 生成エンジン</h3>
+        </div>
+        <p style="color:var(--text-muted);font-size:.84rem;margin:0;">テキスト/画像を動画・キービジュアル・音声・音楽へ変換する生成モデル群。</p>
+        <div class="layer-tools">
+          <strong style="color:var(--text);">担当:</strong> Veo 3・Runway・Kling（動画）/ SDXL・Imagen 4 Ultra（画像）/ ElevenLabs（音声）/ Suno（音楽）<br>
+          <strong style="color:var(--text);">深掘り:</strong>
+          <a href="../workbench/knowledge/veo.html" style="color:#3dd8c5;">Veo</a> /
+          <a href="../workbench/knowledge/imagen.html" style="color:#3dd8c5;">Imagen</a> /
+          <a href="../workbench/knowledge/lyria.html" style="color:#3dd8c5;">Lyria</a> /
+          <a href="genai-tools.html" style="color:#3dd8c5;">生成ツール比較</a>
+        </div>
+      </div>
+      <div class="layer-card">
+        <div class="layer-head">
+          <div class="layer-icon" style="background:rgba(255,158,0,.15);">🎛</div>
+          <h3>L3 — 制御・評価</h3>
+        </div>
+        <p style="color:var(--text-muted);font-size:.84rem;margin:0;">生成の一貫性を制御し、出力品質を機械採点して公開可否を判定する層。</p>
+        <div class="layer-tools">
+          <strong style="color:var(--text);">担当:</strong> ComfyUI・ControlNet・IP-Adapter・LoRA（制御）/ CLIP・Gemini 3.1 Pro Vision（評価）<br>
+          <strong style="color:var(--text);">深掘り:</strong>
+          <a href="../workbench/knowledge/comfyui.html" style="color:#3dd8c5;">ComfyUI 完全ガイド</a> /
+          <a href="evaluation.html" style="color:#3dd8c5;">評価システム</a>
+        </div>
+      </div>
+      <div class="layer-card">
+        <div class="layer-head">
+          <div class="layer-icon" style="background:rgba(0,220,130,.15);">🚀</div>
+          <h3>L4 — 配信・運用</h3>
+        </div>
+        <p style="color:var(--text-muted);font-size:.84rem;margin:0;">完成物をプラットフォームへ投稿し、全工程を自動オーケストレーションする層。</p>
+        <div class="layer-tools">
+          <strong style="color:var(--text);">担当:</strong> YouTube / note / Kindle API・NotebookLM（派生）/ OpenClaw・PicoClaw・Signal<br>
+          <strong style="color:var(--text);">深掘り:</strong>
+          <a href="../workbench/knowledge/notebooklm.html" style="color:#3dd8c5;">NotebookLM</a> /
+          <a href="../claw-stack/index.html" style="color:#3dd8c5;">Claw Stack</a> /
+          <a href="openclaw.html" style="color:#3dd8c5;">OpenClaw 連携</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 中核: 工程×スタック対応表 -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label">中核マップ</div>
+    <h2 class="section-title">5工程 × スタック対応表</h2>
+    <p style="color: var(--text-muted); margin-bottom: 1rem; max-width:740px;">
+      各工程で「実際に何が動くか」と「詰まったときの逃げ道（代替）」、そして仕組みを深く知りたいときの参照先を1行にまとめました。
+      パイプライン詳細は各工程名のリンクから。
+    </p>
+    <div style="overflow-x:auto;">
+    <table class="map-table">
+      <thead>
+        <tr><th>工程</th><th>担うモデル・ツール</th><th>レイヤー</th><th>深掘り / 参照</th><th>代替・フォールバック</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong><a href="topic-generator.html">① ネタ生成</a></strong></td>
+          <td>Claude / Gemini 3.1 Pro でトレンド→企画スコアリング</td>
+          <td>L1</td>
+          <td><a href="../workbench/knowledge/gemini.html">Gemini</a> / <a href="../workbench/knowledge/claude-model.html">Claude</a></td>
+          <td>GPT-5.5 に切替。スコア基準は維持</td>
+        </tr>
+        <tr>
+          <td><strong>② 構造化・脚本</strong><br><span style="font-size:.78rem;">（共通前処理）</span></td>
+          <td>Claude Sonnet 4.6 / Gemini 3.1 Pro でシーン・セリフ・カメラ割りに構造化</td>
+          <td>L1</td>
+          <td><a href="overview.html">全体フロー</a> / <a href="../workbench/knowledge/claude-model.html">Claude</a></td>
+          <td>長尺は Opus 4.8、コスト優先は Sonnet/Flash</td>
+        </tr>
+        <tr>
+          <td><strong><a href="video-pipeline.html">③ 動画生成</a></strong></td>
+          <td>Veo 3 / Runway（本編）+ ElevenLabs（音声）+ Suno（BGM）+ FFmpeg（結合）</td>
+          <td>L2</td>
+          <td><a href="../workbench/knowledge/veo.html">Veo</a> / <a href="genai-tools.html">生成ツール比較</a></td>
+          <td>コスト嵩む工程は Kling へ。音声は OpenVoice 等ローカルTTS</td>
+        </tr>
+        <tr>
+          <td><strong><a href="manga-pipeline.html">③' 漫画生成</a></strong></td>
+          <td>SDXL + ComfyUI + LoRA + ControlNet + IP-Adapter。参照画は Imagen 4 Ultra</td>
+          <td>L2 / L3</td>
+          <td><a href="../workbench/knowledge/comfyui.html">ComfyUI 完全ガイド</a> / <a href="../workbench/knowledge/imagen.html">Imagen</a></td>
+          <td>LoRA破損時は IP-Adapter のみで代替（<a href="manga-pipeline.html#lora-fallback">フォールバック設計</a>）</td>
+        </tr>
+        <tr>
+          <td><strong><a href="evaluation.html">④ 品質評価</a></strong></td>
+          <td>Gemini 3.1 Pro Vision（採点）+ CLIP（一貫性類似度）+ HITL 閾値判定</td>
+          <td>L3 / L1</td>
+          <td><a href="evaluation.html">評価システム</a></td>
+          <td>Vision採点不調時は CLIP単独+ルールベース。境界例は人間レビュー</td>
+        </tr>
+        <tr>
+          <td><strong><a href="monetization.html">⑤ 配信・マネタイズ</a></strong></td>
+          <td>YouTube Data / note / Kindle(KDP) API 自動投稿。NotebookLM で派生コンテンツ</td>
+          <td>L4</td>
+          <td><a href="monetization.html">マネタイズ</a> / <a href="../workbench/knowledge/notebooklm.html">NotebookLM</a></td>
+          <td>API認証失効時は下書き保存→HITL通知。手動公開へ退避</td>
+        </tr>
+        <tr style="background:rgba(79,255,176,.04);">
+          <td><strong><a href="openclaw.html">⟳ オーケストレーション</a></strong></td>
+          <td>OpenClaw / PicoClaw が全工程を YAML ワークフローで連結。Signal で HITL 通知</td>
+          <td>全層横断</td>
+          <td><a href="../claw-stack/index.html">Claw Stack</a> / <a href="openclaw.html">OpenClaw 連携</a></td>
+          <td>OpenClaw 障害時は工程単位で手動実行へ縮退</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+    <div style="margin-top: 1.25rem; background: rgba(0,212,255,0.06); border: 1px solid rgba(0,212,255,0.2); border-radius: 12px; padding: 1rem; font-size: 0.82rem; color: var(--text-muted);">
+      💡 「②構造化」は動画・漫画で共通の前処理。同じ構造化結果を両パイプラインに流すことで API コストと処理時間を削減する設計（詳細は <a href="manga-pipeline.html#" style="color:#3dd8c5;">漫画パイプラインの並列実行アーキテクチャ</a>）。
+    </div>
+  </div>
+</section>
+
+<!-- モデル世代交代への追従 -->
+<section class="section" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-label">ナレッジ層との接続</div>
+    <h2 class="section-title">モデルが世代交代しても<br>マップを腐らせない</h2>
+    <div class="two-col">
+      <div>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+          このマップの弱点は「半年でモデル名が古くなる」こと。
+          そこで具体モデル名は <strong style="color:var(--text);">📚 LLMナレッジ</strong> 側のトラッカーを正本とし、
+          このページは「<strong style="color:var(--text);">どの層の何を担うか</strong>」という構造の記述に徹します。
+          最新の型番・価格・性能はトラッカーで確認し、マップは工程対応の地図として長く使う——という役割分担です。
+        </p>
+        <ul class="checklist">
+          <li>型番・価格の最新値 → LLM トラッカー6本を正本に</li>
+          <li>新モデルの台頭 → intelligence-matrix で時系列把握</li>
+          <li>このマップ → 工程対応の構造を維持（更新頻度低）</li>
+        </ul>
+      </div>
+      <div>
+        <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--text-muted);">追従の正本（📚 側）</h3>
+        <div style="display:flex;flex-direction:column;gap:.6rem;">
+          <a href="../workbench/knowledge/intelligence-matrix.html" style="text-decoration:none;"><div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:.85rem 1rem;"><strong style="color:var(--text);font-size:.88rem;">🗓 Intelligence Matrix</strong><br><span style="font-size:.8rem;color:var(--text-muted);">モデル登場の時系列・世代交代の俯瞰</span></div></a>
+          <a href="../research/index.html" style="text-decoration:none;"><div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:.85rem 1rem;"><strong style="color:var(--text);font-size:.88rem;">📡 LLM Updates Hub（6トラッカー）</strong><br><span style="font-size:.8rem;color:var(--text-muted);">Claude / ChatGPT / Gemini / Grok / Qwen / GLM の最新</span></div></a>
+          <a href="genai-tools.html" style="text-decoration:none;"><div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:.85rem 1rem;"><strong style="color:var(--text);font-size:.88rem;">🛠 生成ツール比較</strong><br><span style="font-size:.8rem;color:var(--text-muted);">動画/画像/音楽モデルの選定軸</span></div></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 設計意図 -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label">設計意図</div>
+    <h2 class="section-title">なぜ3枚目の地図が要るのか</h2>
+    <p style="color: var(--text-muted); margin-bottom: 2rem; max-width: 720px;">
+      地図が3枚（比較・フロー・接続）あると重複に見えるかもしれません。それぞれ問いが違います。
+      将来のセッションが「統合すべきか」を検討するときの判断軸として記録します。
+    </p>
+    <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem; display: flex; gap: 1.25rem; align-items: flex-start;">
+        <div style="background: rgba(0,212,255,0.15); border-radius: 10px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0;">🧭</div>
+        <div>
+          <div style="font-weight: 700; margin-bottom: 0.35rem;">3枚の地図が答える問いの違い</div>
+          <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.8;">
+            <strong style="color:var(--text);">生成ツール比較</strong>＝「どれが優れているか」（選定の問い）。
+            <strong style="color:var(--text);">全体フロー</strong>＝「どの順番で流れるか」（手順の問い）。
+            <strong style="color:var(--text);">接続マップ</strong>＝「どの工程で何が動き、深掘りはどこを読むか」（参照の問い）。
+            読み手の入口が違うため、統合せず3枚を保つ。
+          </div>
+        </div>
+      </div>
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem; display: flex; gap: 1.25rem; align-items: flex-start;">
+        <div style="background: rgba(108,60,225,0.15); border-radius: 10px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0;">🔗</div>
+        <div>
+          <div style="font-weight: 700; margin-bottom: 0.35rem;">📚ナレッジと🎬主軸を繋ぐ背骨にした理由</div>
+          <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.8;">
+            workbench/knowledge の深掘りページ（Gemini・Veo・ComfyUI 等）は単体では「制作のどこで使うのか」が見えにくい。
+            主軸パイプライン側からも「この工程の技術を深く知りたい」導線が弱かった。
+            このマップが両者の双方向リンクを一手に引き受けることで、カテゴリをまたぐ回遊を成立させる
+            （ロードマップ Phase 3「制作システムとの接続強化」の実装）。
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top: 1.5rem; background: rgba(0,212,255,0.06); border: 1px solid rgba(0,212,255,0.2); border-radius: 12px; padding: 1rem; font-size: 0.82rem; color: var(--text-muted);">
+      💡 将来のセッションへ: モデル名が古くなったらこのページではなく LLM トラッカー側を更新する。このマップは「工程×レイヤー」の構造だけを保ち、更新頻度を低く保つのが設計上の意図。
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">AI Creator Hub</div>
+    <nav>
+      <a href="index.html">ホーム</a>
+      <a href="overview.html">全体フロー</a>
+      <a href="stack-map.html">接続マップ</a>
+      <a href="genai-tools.html">生成ツール比較</a>
+      <a href="evaluation.html">評価システム</a>
+      <a href="openclaw.html">OpenClaw連携</a>
+    </nav>
+    <p>AI Creator Hub — AIでコンテンツをつくり、稼ぐ</p>
+    <p style="font-size:0.8rem;opacity:0.65;">最終更新: 2026-06-01（新設：技術スタック×パイプライン接続マップ。ロードマップ Phase 3「接続強化」の実装）</p>
+  </div>
+</footer>
+
+<script src="main.js"></script>
+</body>
+</html>
