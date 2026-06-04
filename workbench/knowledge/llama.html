@@ -267,8 +267,8 @@
             <div class="meta-tag">INTELLIGENCE / META</div>
             <span class="eyebrow">The Open Standard (開かれた標準)</span>
             <h1>Llama</h1>
-            <p class="lead">オープンウェイト LLM の事実上の標準。Meta の現行「Llama 3.3」は、性能首位を狙うより「誰でも自前で動かせる土台」として君臨し、ツール・派生モデル・量子化版が最も豊富に揃う"困ったらこれ"の安全牌です。</p>
-            <span class="last-updated">Last Updated: 2026.05.30（世代確認: Llama 3.3 が現行・新世代の確報なし）</span>
+            <p class="lead">オープンウェイト LLM の事実上の標準。Meta の現行「Llama 4」（Scout / Maverick）は MoE × ネイティブマルチモーダルへと進化。Scout は業界最大の 10M トークンコンテキストを持ち、派生モデル・量子化版・推論ツールの厚みはあらゆるオープンモデルの中で最も豊富です。</p>
+            <span class="last-updated">Last Updated: 2026.06.04（Llama 4 Scout / Maverick リリース確認・世代更新）</span>
             <br>
             <a class="back" href="../index.html">← Workbenchへ戻る</a>
             <a class="back" href="slm-guide.html" style="margin-left:14px;">📐 SLM / ローカル運用ガイド →</a>
@@ -280,22 +280,22 @@
                 <div class="spec-grid">
                     <div class="spec-item">
                         <span class="spec-label">Latest Model</span>
-                        <span class="spec-value">Llama 3.3</span>
+                        <span class="spec-value">Llama 4 Scout / Maverick</span>
                     </div>
                     <div class="spec-item">
-                        <span class="spec-label">Philosophy</span>
-                        <span class="spec-value">Open Weights</span>
+                        <span class="spec-label">Architecture</span>
+                        <span class="spec-value">MoE・Native Multimodal</span>
                     </div>
                     <div class="spec-item">
                         <span class="spec-label">Context</span>
-                        <span class="spec-value">128k</span>
+                        <span class="spec-value">Scout: 10M / Maverick: 1M</span>
                     </div>
                     <div class="spec-item">
                         <span class="spec-label">Strength</span>
                         <span class="spec-value">Ecosystem & Tooling</span>
                     </div>
                 </div>
-                <p>Llama は Meta が公開するオープンウェイトのファミリーです。最大の価値は単体ベンチの高さではなく、<strong>エコシステムの厚み</strong>——情報・派生モデル・量子化版・推論ツールのどれを取っても一番揃っている、という「枯れた安心感」にあります。ツール使用・関数呼び出しにも対応します。</p>
+                <p>Llama は Meta が公開するオープンウェイトのファミリーです。現行 Llama 4 は <strong>MoE（Mixture-of-Experts）× ネイティブマルチモーダル</strong>に進化。Scout（17B active / 16 experts・10M コンテキスト）と Maverick（17B active / 128 experts・1M コンテキスト）の2モデルが公開済み。最大の価値は単体ベンチの高さではなく、<strong>エコシステムの厚み</strong>——情報・派生モデル・量子化版・推論ツールのどれを取っても一番揃っている「枯れた安心感」にあります。</p>
             </article>
 
             <article class="card">
@@ -307,6 +307,47 @@
                     <li><strong>派生の土台</strong>: 多くのファインチューン版・特化版が Llama をベースに作られており、その上に乗るだけで選択肢が広がる。</li>
                 </ul>
             </article>
+        </section>
+
+        <section class="card">
+            <h2>Llama 4 — 現行世代スペック（2025-04-05 リリース）</h2>
+            <p>Llama 4 は MoE アーキテクチャとネイティブマルチモーダル（テキスト・画像の early fusion）を統合した世代。現在公開されているのは Scout と Maverick の2モデル。</p>
+            <div style="display:flex; gap:20px; flex-wrap:wrap; margin-top:12px;">
+                <div style="flex:1; min-width:260px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); border-radius:10px; padding:16px;">
+                    <div style="font-size:0.78rem; font-weight:700; color:#60a5fa; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:6px;">Scout — ローカル・長文</div>
+                    <div style="font-size:1.5rem; font-weight:800; color:#fff; margin-bottom:8px;">17B active / 16 experts</div>
+                    <ul style="font-size:0.88rem; color:#cbd5e1; margin:0; padding-left:18px;">
+                        <li>総パラメータ: <strong>~109B</strong></li>
+                        <li>コンテキスト: <strong>10M トークン</strong>（業界最大）</li>
+                        <li>シングル H100 でint4量子化により動作</li>
+                        <li>~40T トークンで事前学習</li>
+                        <li>ローカル・長文処理・RAG に最適</li>
+                        <li>Ollama: <code>ollama run llama4-scout</code></li>
+                    </ul>
+                </div>
+                <div style="flex:1; min-width:260px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); border-radius:10px; padding:16px;">
+                    <div style="font-size:0.78rem; font-weight:700; color:#a78bfa; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:6px;">Maverick — 高性能</div>
+                    <div style="font-size:1.5rem; font-weight:800; color:#fff; margin-bottom:8px;">17B active / 128 experts</div>
+                    <ul style="font-size:0.88rem; color:#cbd5e1; margin:0; padding-left:18px;">
+                        <li>総パラメータ: <strong>~400B</strong></li>
+                        <li>コンテキスト: <strong>1M トークン</strong></li>
+                        <li>BF16 / FP8量子化版の両方公開</li>
+                        <li>GPT-4o / Gemini 2.0 Flash を複数ベンチで超え</li>
+                        <li>~22T トークンで事前学習</li>
+                        <li>Codestral 相当のコーディング性能</li>
+                    </ul>
+                </div>
+                <div style="flex:1; min-width:260px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); border-radius:10px; padding:16px;">
+                    <div style="font-size:0.78rem; font-weight:700; color:#fbbf24; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:6px;">Behemoth — 学習中（未公開）</div>
+                    <div style="font-size:1.5rem; font-weight:800; color:#fff; margin-bottom:8px;">〜2T パラメータ</div>
+                    <ul style="font-size:0.88rem; color:#cbd5e1; margin:0; padding-left:18px;">
+                        <li>GPT-4.5 / Claude Sonnet 3.7 / Gemini 2.0 Pro を STEM で超え</li>
+                        <li>Scout / Maverick の蒸留ティーチャーモデル</li>
+                        <li>公開は未定（学習継続中）</li>
+                    </ul>
+                </div>
+            </div>
+            <p style="margin-top:14px; font-size:0.85rem; color:#7f92ac;">出典: <a href="https://ai.meta.com/blog/llama-4-multimodal-intelligence/" target="_blank">Meta AI Blog — The Llama 4 herd</a> / <a href="https://huggingface.co/meta-llama" target="_blank">HuggingFace meta-llama（公式）</a>（2025-04-05）</p>
         </section>
 
         <section class="card">
@@ -386,7 +427,7 @@
                 <li><a href="qwen.html">Qwen 深掘り</a> / <a href="mistral.html">Mistral 深掘り</a> — 他のオープンウェイト勢</li>
             </ul>
             <p style="margin:0 0 6px;"><strong style="color:#fff;">出典:</strong> 本ハブ canon（<code>workbench/knowledge/slm-guide.html</code>・<code>bonsai-8b.html</code>・<code>intelligence-matrix.html</code>）および Meta 公開のオープンウェイト系列に関する一般情報。具体の日付・ベンチ数値は確報のあるものに限定し、それ以外は定性記述としています。</p>
-            <p style="margin:0;"><strong style="color:#fff;">Last Updated:</strong> 2026-05-30</p>
+            <p style="margin:0;"><strong style="color:#fff;">Last Updated:</strong> 2026-06-04（Llama 4 Scout / Maverick 世代更新）</p>
         </footer>
     </div>
 </body>

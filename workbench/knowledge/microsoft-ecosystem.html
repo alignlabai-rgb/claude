@@ -542,7 +542,7 @@
             本ページは製品スペックの羅列ではなく <strong>「目的から逆引きする意思決定ガイド」</strong>として、
             用途別にどれを選ぶかを整理します。
         </p>
-        <span class="last-updated">Last Updated: 2026-05-31 — Build 2026 (6/2〜3) 直前最新。MAI モデル群・GitHub Copilot usage billing・Copilot 部門統合 (2026/03) を反映。</span>
+        <span class="last-updated">Last Updated: 2026-06-04 — Build 2026 (6/2〜3) 反映済み。MAI 7モデル群（Thinking-1・Image-2.5・Voice-2・Transcribe-1.5）/ Microsoft IQ（Web IQ 含む）/ Foundry Local 追記。</span>
         <div class="hero-nav">
             <a href="index.html">← Knowledge Hub へ戻る</a>
             <a href="github-copilot.html">GitHub Copilot 深掘り →</a>
@@ -723,7 +723,7 @@
                 <li><strong>Foundry Agent Service（GA 2025/05〜）</strong>：エージェントの構築・デプロイ・ガバナンスを一元化。M365 への1クリック公開</li>
                 <li><strong>Azure AI Content Safety / Responsible AI ツール</strong>：ハルシネーション検出・コンテンツフィルタ・コスト予算管理（Build 2026）</li>
                 <li>VPC Service Controls・Microsoft Entra Agent ID でエージェント単位のアクセス制御・監査</li>
-                <li>MAI 自社モデル（MAI-Transcribe-1・MAI-Voice-1・MAI-Image-2）を 2026/05 から開発者向けに提供開始</li>
+                <li><strong>MAI モデル群（Build 2026 公開）</strong>: 自社開発7モデルを Microsoft Foundry で展開（下記 MAI セクション参照）</li>
             </ul>
             <div class="highlight-box">
                 <p>💡 <strong>使う場面：</strong>最大のモデル選択肢・SLA・コンプライアンス要件でエンタープライズアプリケーションを構築したい開発チーム。Copilot Studio では要件を満たせない複雑なロジックが必要な場合。</p>
@@ -791,7 +791,7 @@
                 <p>💡 <strong>使う場面：</strong>Copilot+ PC 向けアプリを開発したいエンジニア、またはオフライン・プライバシー優先の AI 処理が必要なエンタープライズ展開。</p>
             </div>
             <div class="warn-box">
-                <p>⚠️ Build 2026 (6/2〜3) 直前情報のため、詳細 API 仕様はカンファレンス後に確認すること。</p>
+                <p>✅ Build 2026（6/2〜3）完了。Windows AI API・Phi-4-mini オンデバイス実行の詳細はカンファレンス資料（<a href="https://news.microsoft.com/build-2026/" target="_blank">news.microsoft.com/build-2026</a>）を参照。</p>
             </div>
         </article>
 
@@ -969,8 +969,50 @@
             <li><strong>ガバナンス・コンプライアンス：</strong>Agent 365（エージェントレジストリ）・Entra Agent ID・Purview 統合で、エージェントの展開・監査・ライフサイクル管理をエンタープライズ標準で実行できる。</li>
             <li><strong>Phi の小型高精度モデル：</strong>Azure / HuggingFace / Ollama で利用できるオープンウェイト SLM として Phi-4 は業界最高水準。オンプレ・エッジへの AI 展開で Google の Gemma 4 と競合。</li>
         </ul>
-        <div class="info-box">
-            <p>✅ <strong>Build 2026（6/2〜3）注目点：</strong>MAI 自社モデル（コーディング特化）の詳細・Windows Local AI API・Azure AI Foundry コスト管理ツール・Copilot の新 UI 発表が予定。カンファレンス後にこのページを更新予定。</p>
+        <div style="background:rgba(0,120,212,0.1); border:1px solid rgba(0,120,212,0.3); border-radius:8px; padding:14px 18px; margin-top:16px;">
+            <p style="margin:0 0 10px; font-weight:700; color:#60a5fa;">🚀 Microsoft Build 2026（6/2〜3）— 主要発表サマリー</p>
+            <ul style="margin:0; padding-left:20px; font-size:0.9rem;">
+                <li><strong>MAI（Microsoft AI）7モデル群</strong>: MAI-Thinking-1（35B active・256K・推論）/ MAI-Image-2.5（テキスト→画像・画像→画像）/ MAI-Voice-2（音声クローニング・10言語+）/ MAI-Transcribe-1.5（音声→テキスト強化版）</li>
+                <li><strong>Microsoft IQ</strong>: エージェントのコンテキスト基盤として GA。Work IQ（M365 ナレッジ）/ Fabric IQ（構造化ビジネスデータ）/ Foundry IQ（エンタープライズ × Web）/ <strong>Web IQ</strong>（新: ライブ外部情報グラウンディング）</li>
+                <li><strong>Foundry Local on Azure Local</strong>: ソブリン AI をオンプレ・主権クラウド環境で構築</li>
+                <li><strong>Toolboxes in Foundry</strong>（パブリックプレビュー）: エージェントをより多くのツール・チャンネルに接続</li>
+                <li>テーマ: 「Be yourself at work」— パーソナライズ × 職場 AI の融合</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- MAI モデル群詳細 -->
+    <section class="section" style="margin-top: 24px;">
+        <h2><span class="h2-num">⊕</span> MAI（Microsoft AI）モデル群 — Build 2026 公開</h2>
+        <p>Anthropic・OpenAI・Meta に依存せず、<strong>Microsoft 自社開発のモデル群</strong>が Microsoft Foundry で展開開始。ゼロから自社データで学習した enterprise-grade モデル群。</p>
+        <div class="card-grid" style="gap:14px;">
+            <article class="card" style="border-color:rgba(0,120,212,0.4);">
+                <h3>MAI-Thinking-1 <span class="pill pill-new">Private Preview</span></h3>
+                <p><strong>35B active パラメータ・MoE・256K コンテキスト。</strong>複雑な多段階指示・長文推論・コード生成に特化。エンタープライズグレードのクリーンデータでゼロ蒸留学習。</p>
+                <ul>
+                    <li>盲目テストで Sonnet 4.6 より独立評価者に好まれる</li>
+                    <li>SWE Bench Pro のコーディングで Opus 4.6 相当</li>
+                    <li>MoE により能力はスケールせずコンピュートはスケール</li>
+                    <li>Microsoft Foundry でプライベートプレビュー（アクセスリクエスト受付中）</li>
+                </ul>
+            </article>
+            <article class="card" style="border-color:rgba(0,120,212,0.3);">
+                <h3>MAI-Image-2.5 / MAI-Image-2.5-Flash</h3>
+                <p>テキスト→画像と画像→画像の<strong>両ワークロードに対応する</strong>初の MAI 画像モデル。Flash バリアントは速度・コスト最適化版。</p>
+                <ul>
+                    <li>テキストプロンプトから高品質画像生成</li>
+                    <li>既存画像の編集・スタイル変換も対応</li>
+                    <li>Microsoft Foundry で利用可能</li>
+                </ul>
+            </article>
+            <article class="card" style="border-color:rgba(0,120,212,0.3);">
+                <h3>MAI-Voice-2 / MAI-Transcribe-1.5</h3>
+                <p><strong>MAI-Voice-2</strong>: 音声クローニング・音声プロンプティングを10言語以上に対応。<strong>MAI-Transcribe-1.5</strong>: コンテンツバイアシング（ドメイン語彙の優先）と精度向上を加えた最新 STT モデル。</p>
+                <ul>
+                    <li>MAI-Voice-2: リアルタイム音声エージェント・ナレーション自動化</li>
+                    <li>MAI-Transcribe-1.5: 業界特有語彙の認識精度向上・会議文字起こし</li>
+                </ul>
+            </article>
         </div>
     </section>
 
@@ -1002,7 +1044,7 @@
             <li><a href="https://samexpert.com/microsoft-copilot-reorganisation-march-2026/" target="_blank">SAMexpert: Microsoft Copilot Reorg 2026/03</a> — Copilot 部門統合・Jacob Andreou EVP</li>
         </ul>
 
-        <p>最終更新: 2026-05-31 | <a href="../../index.html">Hub トップ</a> | <a href="index.html">← Knowledge Hub</a></p>
+        <p>最終更新: 2026-06-04（Build 2026 反映・MAI 7モデル群・Microsoft IQ 追記） | <a href="../../index.html">Hub トップ</a> | <a href="index.html">← Knowledge Hub</a></p>
     </div>
 </footer>
 
