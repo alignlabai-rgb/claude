@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Word Copilot エージェントモード（Edit with Copilot）完全実践ガイド | Tech Workbench</title>
+<style>
+:root {
+    --accent: #185abd;
+    --accent2: #2b7cd3;
+    --accent3: #8b5cf6;
+    --green: #16a34a;
+    --amber: #f59e0b;
+    --red: #dc2626;
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #21262d;
+    --border: rgba(255,255,255,0.08);
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --radius: 12px;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; line-height:1.65; font-size:16px; }
+a { color:var(--accent2); text-decoration:none; }
+a:hover { text-decoration:underline; }
+.page-wrap { max-width:1000px; margin:0 auto; padding:32px 20px 80px; }
+nav { background:var(--surface); border-bottom:1px solid var(--border); padding:12px 20px; font-size:0.85rem; }
+nav a { color:var(--muted); margin-right:6px; }
+nav span { color:var(--muted); margin-right:6px; }
+
+.hero { background:linear-gradient(135deg, rgba(10,40,100,0.95), rgba(24,90,189,0.55), rgba(43,124,211,0.2)); border:1px solid rgba(24,90,189,0.45); border-radius:var(--radius); padding:48px 40px; margin-bottom:40px; }
+.hero h1 { font-size:2.2rem; font-weight:800; color:#fff; margin-bottom:8px; }
+.hero .sub { color:rgba(255,255,255,0.88); font-size:1.05rem; margin-bottom:24px; max-width:720px; }
+.stat-row { display:flex; gap:14px; flex-wrap:wrap; }
+.stat { background:rgba(0,0,0,0.35); border:1px solid rgba(24,90,189,0.45); border-radius:8px; padding:12px 18px; text-align:center; min-width:100px; }
+.stat .val { font-size:1.4rem; font-weight:800; color:#60a5fa; }
+.stat .lbl { font-size:0.72rem; color:var(--muted); margin-top:2px; }
+
+.toc { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:24px 28px; margin-bottom:40px; }
+.toc h2 { font-size:0.82rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; margin-bottom:14px; }
+.toc ol { padding-left:20px; }
+.toc li { margin-bottom:5px; font-size:0.93rem; }
+.toc a { color:var(--text); }
+.toc a:hover { color:#60a5fa; }
+
+.section { margin-bottom:56px; }
+.section-header { display:flex; align-items:center; gap:12px; margin-bottom:24px; padding-bottom:12px; border-bottom:2px solid var(--accent); }
+.section-num { background:var(--accent); color:#fff; font-size:0.75rem; font-weight:700; padding:3px 9px; border-radius:4px; }
+.section-header h2 { font-size:1.4rem; font-weight:700; color:#60a5fa; }
+.section-header.purple { border-color:var(--accent3); }
+.section-header.purple .section-num { background:var(--accent3); }
+.section-header.purple h2 { color:#c4b5fd; }
+.section-header.green { border-color:var(--green); }
+.section-header.green .section-num { background:var(--green); }
+.section-header.green h2 { color:#4ade80; }
+.section-header.amber { border-color:var(--amber); }
+.section-header.amber .section-num { background:var(--amber); color:#000; }
+.section-header.amber h2 { color:var(--amber); }
+.section-header.red { border-color:var(--red); }
+.section-header.red .section-num { background:var(--red); }
+.section-header.red h2 { color:#f87171; }
+
+.card-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; margin-bottom:24px; }
+.card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:20px; }
+.card h3 { font-size:1rem; font-weight:700; margin-bottom:8px; color:var(--text); }
+.card p { font-size:0.875rem; color:var(--muted); line-height:1.6; }
+.card.blue { border-color:rgba(24,90,189,0.5); }
+.card.purple { border-color:rgba(139,92,246,0.4); }
+.card.green { border-color:rgba(22,163,74,0.4); }
+.card.amber { border-color:rgba(245,158,11,0.4); }
+
+.table-wrap { overflow-x:auto; margin-bottom:24px; }
+table { width:100%; border-collapse:collapse; font-size:0.875rem; }
+th { background:var(--surface2); color:var(--muted); font-weight:600; padding:10px 14px; text-align:left; border-bottom:1px solid var(--border); }
+td { padding:10px 14px; border-bottom:1px solid rgba(255,255,255,0.04); vertical-align:top; }
+tr:hover td { background:rgba(255,255,255,0.02); }
+
+.callout { border-left:3px solid var(--accent); background:rgba(24,90,189,0.08); padding:14px 18px; border-radius:0 8px 8px 0; margin-bottom:20px; font-size:0.9rem; }
+.callout.purple { border-color:var(--accent3); background:rgba(139,92,246,0.07); }
+.callout.green { border-color:var(--green); background:rgba(22,163,74,0.07); }
+.callout.amber { border-color:var(--amber); background:rgba(245,158,11,0.07); }
+.callout.red { border-color:var(--red); background:rgba(220,38,38,0.07); }
+.callout strong { color:var(--text); }
+
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:24px; }
+@media(max-width:680px){ .two-col { grid-template-columns:1fr; } }
+
+.tag { display:inline-block; font-size:0.7rem; font-weight:700; padding:2px 8px; border-radius:4px; margin-bottom:6px; }
+.tag.blue { background:rgba(24,90,189,0.2); color:#60a5fa; }
+.tag.purple { background:rgba(139,92,246,0.15); color:#c4b5fd; }
+.tag.green { background:rgba(22,163,74,0.15); color:#4ade80; }
+.tag.amber { background:rgba(245,158,11,0.15); color:var(--amber); }
+.tag.red { background:rgba(220,38,38,0.15); color:#f87171; }
+.tag.gray { background:rgba(139,148,158,0.15); color:var(--muted); }
+
+.prompt-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:14px; margin-bottom:28px; }
+.prompt-card { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:16px 18px; }
+.prompt-card .p-num { font-size:0.7rem; font-weight:700; color:var(--muted); margin-bottom:4px; }
+.prompt-card h4 { font-size:0.88rem; font-weight:700; margin-bottom:8px; color:var(--text); }
+.prompt-card .p-text { font-size:0.82rem; color:#60a5fa; font-family:'SF Mono',Consolas,monospace; background:rgba(24,90,189,0.1); border:1px solid rgba(24,90,189,0.25); border-radius:6px; padding:8px 10px; margin-bottom:6px; line-height:1.6; }
+.prompt-card p { font-size:0.8rem; color:var(--muted); }
+.prompt-card.purple { border-color:rgba(139,92,246,0.35); }
+.prompt-card.purple .p-text { color:#c4b5fd; background:rgba(139,92,246,0.08); border-color:rgba(139,92,246,0.2); }
+.prompt-card.green { border-color:rgba(22,163,74,0.35); }
+.prompt-card.green .p-text { color:#4ade80; background:rgba(22,163,74,0.08); border-color:rgba(22,163,74,0.2); }
+.prompt-card.amber { border-color:rgba(245,158,11,0.35); }
+.prompt-card.amber .p-text { color:var(--amber); background:rgba(245,158,11,0.08); border-color:rgba(245,158,11,0.2); }
+
+.step-list { counter-reset:steps; list-style:none; padding-left:0; margin-bottom:20px; }
+.step-list li { counter-increment:steps; display:flex; gap:14px; margin-bottom:12px; align-items:flex-start; font-size:0.9rem; }
+.step-list li::before { content:counter(steps); background:var(--accent); color:#fff; font-size:0.75rem; font-weight:800; min-width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:2px; }
+.step-list.purple li::before { background:var(--accent3); }
+.step-list.green li::before { background:var(--green); }
+
+.phase-row { display:grid; grid-template-columns:repeat(4, 1fr); gap:12px; margin-bottom:20px; }
+.phase { background:var(--surface2); border-radius:10px; padding:14px 16px; border-top:3px solid var(--accent); text-align:center; }
+.phase .phase-num { font-size:0.65rem; font-weight:700; color:#60a5fa; text-transform:uppercase; letter-spacing:.1em; margin-bottom:4px; }
+.phase h4 { font-size:0.9rem; font-weight:700; color:var(--text); margin-bottom:4px; }
+.phase p { font-size:0.78rem; color:var(--muted); line-height:1.45; }
+@media(max-width:680px){ .phase-row { grid-template-columns:1fr 1fr; } }
+
+.chips { display:flex; flex-wrap:wrap; gap:6px; margin-top:14px; }
+.chip { background:rgba(24,90,189,0.15); color:#60a5fa; border:1px solid rgba(24,90,189,0.3); border-radius:20px; padding:3px 10px; font-size:0.78rem; font-weight:600; }
+.chip.frontier { background:rgba(245,158,11,0.12); color:var(--amber); border-color:rgba(245,158,11,0.3); }
+
+footer { text-align:center; padding:32px 20px; color:var(--muted); font-size:0.85rem; border-top:1px solid var(--border); margin-top:60px; }
+footer a { color:var(--muted); }
+footer a:hover { color:var(--text); }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="../../index.html">Hub</a> <span>›</span>
+  <a href="./index.html">LLM 個別深掘り</a> <span>›</span>
+  <a href="./m365-copilot.html">M365 Copilot</a> <span>›</span>
+  Word エージェントモード
+</nav>
+
+<main class="page-wrap">
+
+<div class="hero">
+  <div class="chips" style="margin-bottom:14px;">
+    <span class="chip">GA: 2026-04-22</span>
+    <span class="chip">Build 2026 デフォルト</span>
+    <span class="chip">追跡変更 統合</span>
+    <span class="chip chip frontier">Legal Agent (Frontier/US)</span>
+  </div>
+  <h1>📝 Word Copilot<br>エージェントモード完全ガイド</h1>
+  <p class="sub">Plan → Research → Draft → Review の4フェーズで長文ドキュメントを自律的に起草・編集。Claude Opus 4.8 / GPT-5.5 の LLM 選択・Word レベルの追跡変更統合・Legal Agent によるプレイブック駆動契約レビュー。2026年6月最新情報。</p>
+  <div class="stat-row">
+    <div class="stat"><div class="val">2026/4/22</div><div class="lbl">GA 日</div></div>
+    <div class="stat"><div class="val">3,000 P</div><div class="lbl">要約可能ページ数</div></div>
+    <div class="stat"><div class="val">3 本</div><div class="lbl">参照ファイル</div></div>
+    <div class="stat"><div class="val">Work IQ</div><div class="lbl">自動グラウンディング</div></div>
+  </div>
+</div>
+
+<div class="toc">
+  <h2>目次</h2>
+  <ol>
+    <li><a href="#s1">エージェントモードとは — Plan/Research/Draft/Review サイクル</a></li>
+    <li><a href="#s2">有効化・アクセス方法</a></li>
+    <li><a href="#s3">LLM モデル選択ガイド</a></li>
+    <li><a href="#s4">コア機能詳解</a></li>
+    <li><a href="#s5">追跡変更 × Copilot — Word レベル精度</a></li>
+    <li><a href="#s6">参照ドキュメント × グラウンディング</a></li>
+    <li><a href="#s7">Legal Agent for Word（Frontier/US 限定）</a></li>
+    <li><a href="#s8">Work IQ — 自動グラウンディング</a></li>
+    <li><a href="#s9">実践プロンプト集 20 選</a></li>
+    <li><a href="#s10">上級活用シナリオ</a></li>
+    <li><a href="#s11">ライセンス・制限・注意点</a></li>
+  </ol>
+</div>
+
+<section class="section" id="s1">
+  <div class="section-header">
+    <span class="section-num">01</span>
+    <h2>エージェントモードとは — Plan/Research/Draft/Review サイクル</h2>
+  </div>
+
+  <div class="callout">
+    <strong>正式名称：</strong>2026年4月22日の GA 時に "Agent Mode" から <strong>"Edit with Copilot"</strong> に改称。Build 2026（5月19〜21日）でデフォルト機能となりました。本ガイドでは通称「エージェントモード」を使用します。2025年9月29日に「Vibe Working」構想として初発表、2026年11月に Word Online でプレビュー開始、2026年4月22日に GA。
+  </div>
+
+  <h3 style="font-size:1.05rem; margin-bottom:16px;">4フェーズの自律ワークフロー</h3>
+  <div class="phase-row">
+    <div class="phase">
+      <div class="phase-num">Phase 1</div>
+      <h4>Plan</h4>
+      <p>文書構成・アウトラインを設計。目的・読者・形式を整理して実行計画を提示。ユーザーが承認・修正できる。</p>
+    </div>
+    <div class="phase">
+      <div class="phase-num">Phase 2</div>
+      <h4>Research</h4>
+      <p>Microsoft Graph 経由でメール・会議メモ・ファイル・SharePoint を検索。アクセス権を尊重して関連情報を自動収集。</p>
+    </div>
+    <div class="phase">
+      <div class="phase-num">Phase 3</div>
+      <h4>Draft</h4>
+      <p>対象読者・トーンに合わせてコンテンツを生成。参照ファイルと Graph 情報を統合してドキュメントを起草。</p>
+    </div>
+    <div class="phase">
+      <div class="phase-num">Phase 4</div>
+      <h4>Review</h4>
+      <p>論理的整合性・品質を自己チェック後に出力。追跡変更で変更箇所を明示。ユーザーがレビュー・修正できる。</p>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>観点</th><th>旧 Copilot</th><th>エージェントモード（Edit with Copilot）</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>動作方式</td><td>提案テキストを提示（ユーザーが挿入）</td><td>ドキュメントを直接自律編集</td></tr>
+        <tr><td>ワークフロー</td><td>1ステップの単発応答</td><td>Plan→Research→Draft→Review の4フェーズ</td></tr>
+        <tr><td>確認質問</td><td>なし（単方向）</td><td>読者・トーン・フォーマット・範囲を逆質問</td></tr>
+        <tr><td>追跡変更</td><td>なし</td><td><strong>Word レベル精度</strong>で変更を自動追跡・表示</td></tr>
+        <tr><td>コメント管理</td><td>なし</td><td>コメント追加・返信・解決を自律実行</td></tr>
+        <tr><td>文書要約</td><td>300ページまで</td><td><strong>3,000ページ</strong>まで対応</td></tr>
+        <tr><td>LLM 選択</td><td>なし</td><td>GPT-5.5 / Claude Opus 4.8 / Think Deeper 等から選択</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 style="font-size:1.05rem; margin-bottom:12px;">リリースタイムライン</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>日付</th><th>マイルストーン</th></tr></thead>
+      <tbody>
+        <tr><td>2025年9月29日</td><td>「Vibe Working」構想発表 — Agent Mode と Office Agent を初公開</td></tr>
+        <tr><td>2025年11月</td><td>Word Online（Web版）でエージェントモード プレビュー開始（M365 Copilot ライセンスユーザー向け）</td></tr>
+        <tr><td>2026年2月</td><td>Word Online での Copilot Chat ユーザー（非 M365 Copilot ライセンス）にも展開</td></tr>
+        <tr><td>2026年4月22日</td><td><strong>GA（一般提供開始）</strong> — Windows デスクトップ版で "Edit with Copilot" として全 M365 Copilot ユーザーへ</td></tr>
+        <tr><td>2026年4月30日</td><td>Legal Agent for Word（Frontier/US 限定）プレビュー開始</td></tr>
+        <tr><td>2026年5月</td><td>Claude Opus 4.8 追加・GPT-5.5 Thinking（Think Deeper）展開</td></tr>
+        <tr><td>2026年5月19〜21日</td><td><strong>Build 2026</strong> — エージェントモードを Office 365 Copilot のデフォルトと宣言</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="section" id="s2">
+  <div class="section-header">
+    <span class="section-num">02</span>
+    <h2>有効化・アクセス方法</h2>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <h3 style="font-size:1rem; margin-bottom:10px;">デスクトップ Word（Windows）</h3>
+      <ol class="step-list">
+        <li>Word ドキュメントを開く</li>
+        <li>リボン「ホーム」→ <strong>「Copilot」</strong> ボタンをクリック（または文書余白の Copilot アイコン）</li>
+        <li>右側に Copilot ペインが開く（Build 2026 以降はデフォルトでエージェントモード）</li>
+        <li>ペイン上部の<strong>モデルピッカー</strong>で LLM を選択</li>
+        <li>追跡変更・コメント管理機能はデスクトップ版先行（Web/Mac は順次対応予定）</li>
+      </ol>
+    </div>
+    <div>
+      <h3 style="font-size:1rem; margin-bottom:10px;">Word Online（Web ブラウザ）</h3>
+      <ol class="step-list purple">
+        <li>OneDrive / SharePoint でファイルを開く</li>
+        <li>右上の <strong>「Copilot」</strong> ボタンをクリック</li>
+        <li>エージェントモードは 2025年11月から利用可能</li>
+        <li>基本的なドラフト・編集機能は対応済み</li>
+        <li>Word レベル追跡変更・コメント管理は「coming soon」（2026年6月時点）</li>
+      </ol>
+    </div>
+  </div>
+
+  <h3 style="font-size:1rem; margin-bottom:12px; margin-top:4px;">モデル選択の手順</h3>
+  <ol class="step-list">
+    <li>Copilot ペインを開く</li>
+    <li>ペイン右上の<strong>モデルセレクターのドロップダウン</strong>をクリック（デフォルトは「Auto」表示）</li>
+    <li><strong>Quick Response</strong>（速度優先）、<strong>Think Deeper</strong>（長時間推論）、<strong>Claude Opus 4.8</strong>、<strong>More</strong>（追加 GPT バージョン）から選択</li>
+    <li>選択はプロンプトごとに可能。いつでも切り替え可能。</li>
+  </ol>
+</section>
+
+<section class="section" id="s3">
+  <div class="section-header purple">
+    <span class="section-num">03</span>
+    <h2>LLM モデル選択ガイド</h2>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>モデル</th><th>提供元</th><th>特徴</th><th>向いているタスク</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Auto（自動）</strong></td><td>Microsoft</td><td>クエリの複雑さに応じてモデルを自動ルーティング</td><td>普段使い・迷ったらこれ</td></tr>
+        <tr><td><strong>GPT-5.5 Instant</strong></td><td>OpenAI</td><td>2026年5月〜デフォルト。速くクリーンな出力</td><td>一般的な起草・書き換え・要約</td></tr>
+        <tr><td><strong>Think Deeper（GPT-5.5 Thinking）</strong></td><td>OpenAI</td><td>長時間推論モード。複雑なロジック・分析に優れる</td><td>戦略文書・複雑な論証・構成設計</td></tr>
+        <tr><td><strong>Claude Opus 4.8</strong></td><td>Anthropic</td><td>2026年5月追加。長文・複合タスク・指示遵守に最適化</td><td>長文起草・複数ステップ編集・精緻な文体調整</td></tr>
+        <tr><td>Claude Sonnet 4.5</td><td>Anthropic</td><td>早期ロールアウト（2026年3〜4月）。Opus の前世代</td><td>一般的な文書作成・バランス型</td></tr>
+        <tr><td>GPT-5.3 / 5.4</td><td>OpenAI</td><td>「More」から選択可能</td><td>特定のタスクに応じて</td></tr>
+        <tr><td>Quick Response</td><td>—</td><td>速度優先</td><td>短い文書・簡単な修正・即座の確認</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card-grid">
+    <div class="card blue">
+      <h3>📄 長文・複合文書</h3>
+      <p>研究報告書・事業計画書・マニュアル → <strong>Claude Opus 4.8</strong> または <strong>Think Deeper</strong></p>
+    </div>
+    <div class="card purple">
+      <h3>⚡ 日常的な起草・編集</h3>
+      <p>メール下書き・議事録・1ページ資料 → <strong>GPT-5.5 Instant（Auto）</strong></p>
+    </div>
+    <div class="card amber">
+      <h3>🔬 複雑な分析・論証</h3>
+      <p>戦略分析・競合レポート・政策文書 → <strong>Think Deeper</strong></p>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>Claude モデルの注意点：</strong>企業環境では IT 管理者が M365 管理センターで Anthropic をサブプロセッサとして有効化が必要。EU/EFTA/UK では 2026年4月3日に管理者向けトグルが追加されましたが、デフォルト無効。Anthropic モデル使用時のデータ処理は EU データバウンダリ（EUDB）外で実行されます。
+  </div>
+</section>
+
+<section class="section" id="s4">
+  <div class="section-header">
+    <span class="section-num">04</span>
+    <h2>コア機能詳解</h2>
+  </div>
+
+  <div class="card-grid">
+    <div class="card blue">
+      <div class="tag blue">起草</div>
+      <h3>マルチステップ文書起草</h3>
+      <p>プロンプト1文から4フェーズで完全なドキュメントを生成。読者・トーン・フォーマットを逆質問してから起草開始。中間結果を見て方向修正が可能。</p>
+    </div>
+    <div class="card blue">
+      <div class="tag blue">編集</div>
+      <h3>構成変更・セクション再編</h3>
+      <p>文書全体の再構成（セクション順序変更・統合・分割）、見出し階層の変更、段落レベルの移動を自律実行。大量の手動作業を1プロンプトで完了。</p>
+    </div>
+    <div class="card blue">
+      <div class="tag blue">変換</div>
+      <h3>トーン・スタイル変換</h3>
+      <p>「社内向けカジュアル」→「投資家向けフォーマル」、「技術者向け詳細」→「経営幹部向け要約」などオーディエンスに合わせた全文変換。</p>
+    </div>
+    <div class="card purple">
+      <div class="tag purple">要約</div>
+      <h3>大規模文書の要約</h3>
+      <p><strong>最大 3,000 ページ</strong>の文書を要約可能（旧 Copilot の 10 倍）。複数ファイルの統合要約・エグゼクティブサマリー生成にも対応。</p>
+    </div>
+    <div class="card purple">
+      <div class="tag purple">コメント</div>
+      <h3>コメント管理</h3>
+      <p>Copilot がコメントを追加・返信・解決できる。チームのコメントスレッドを読んでアクションリストを抽出する機能も。コメントは正確なテキスト箇所にアンカーされる。</p>
+    </div>
+    <div class="card green">
+      <div class="tag green">レイアウト</div>
+      <h3>文書レイアウト管理</h3>
+      <p>ヘッダー・フッター・目次の挿入・更新、ページ番号・日付のフィールド追加、段組み・余白の設定変更をプロンプトで実行。</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="s5">
+  <div class="section-header green">
+    <span class="section-num">05</span>
+    <h2>追跡変更 × Copilot — Word レベル精度</h2>
+  </div>
+
+  <div class="callout green">
+    <strong>大幅な改善：</strong>エージェントモードの追跡変更は<strong>Word レベルの精度</strong>（旧 Copilot の段落レベルより細かい）で変更を記録します。Copilot が編集した箇所はすべて追跡変更として表示され、通常の変更承認/拒否ワークフローと完全に統合されています。
+  </div>
+
+  <div class="two-col">
+    <div>
+      <h3 style="font-size:1rem; margin-bottom:10px;">追跡変更の動作</h3>
+      <ul style="color:var(--muted); font-size:0.9rem; padding-left:18px; line-height:1.8;">
+        <li>Copilot の編集は<strong>デフォルトで追跡変更として表示</strong></li>
+        <li>事前に追跡変更を有効にする必要なし（Copilot インタフェースから直接有効化可能）</li>
+        <li>ドキュメントに既存の追跡変更がある場合も自動でトラッキング</li>
+        <li>すべての変更は<strong>完全に元に戻せる</strong></li>
+        <li>標準の承認/拒否ボタンで確認・適用または却下</li>
+      </ul>
+    </div>
+    <div>
+      <h3 style="font-size:1rem; margin-bottom:10px;">承認フロー</h3>
+      <ul style="color:var(--muted); font-size:0.9rem; padding-left:18px; line-height:1.8;">
+        <li>Copilot が提案した変更を1つずつ<strong>承認</strong>または<strong>拒否</strong></li>
+        <li>「すべての変更を承認」で一括適用</li>
+        <li>変更の前後を比較しながら確認可能</li>
+        <li>追跡変更オフの場合は直接編集に切り替え</li>
+        <li>変更履歴は文書の git 履歴のような役割を果たす</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout amber">
+    <strong>展開状況（2026年6月時点）：</strong>Word レベルの追跡変更機能は<strong>Windows デスクトップ版（Current Channel）</strong>で先行提供中。Word Online（Web版）と Mac 版は "coming soon" ステータス。
+  </div>
+</section>
+
+<section class="section" id="s6">
+  <div class="section-header blue">
+    <span class="section-num">06</span>
+    <h2>参照ドキュメント × グラウンディング</h2>
+  </div>
+
+  <div class="card-grid">
+    <div class="card blue">
+      <div class="tag blue">ファイル参照</div>
+      <h3>最大 3 ファイルを参照</h3>
+      <p>Copilot プロンプト欄の「/」を入力するか「ファイル参照」ボタンで OneDrive/SharePoint のファイルを検索して添付。Word・PowerPoint・Excel・PDF・TXT に対応。</p>
+    </div>
+    <div class="card blue">
+      <div class="tag blue">Notebooks</div>
+      <h3>Copilot Notebooks グラウンディング</h3>
+      <p>Copilot Notebooks（最大 300 参照）を使ってスコープを絞ったグラウンディングが可能。Web URL（2026年5月〜）・OneNote・Copilot Pages も参照ソースとして追加可能。</p>
+    </div>
+    <div class="card purple">
+      <div class="tag purple">Pages 連携</div>
+      <h3>Copilot Pages → Word 変換</h3>
+      <p>Copilot Pages（Loop ベースの永続的 AI ドキュメント）を Word 文書に変換できる。Pages は Notebooks の参照ソースとしても利用可能。</p>
+    </div>
+    <div class="card green">
+      <div class="tag green">Graph</div>
+      <h3>Microsoft Graph 自動グラウンディング</h3>
+      <p>エージェントモードの Research フェーズで Graph 経由のメール・会議・ファイルを自動参照。「@メンション」不要で関連情報を自動収集。アクセス権は厳守。</p>
+    </div>
+  </div>
+
+  <h3 style="font-size:1rem; margin-bottom:12px; margin-top:8px;">参照ファイルの効果的な使い方</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>ユースケース</th><th>参照ファイルの使い方</th></tr></thead>
+      <tbody>
+        <tr><td>テンプレートに沿った文書生成</td><td>既存のテンプレート Word ファイルを参照に追加して「このテンプレートの形式で〜を作成して」と指示</td></tr>
+        <tr><td>前回版との整合性確保</td><td>前回バージョンの文書を参照に追加して「前回版と整合性を保ちながら更新して」と指示</td></tr>
+        <tr><td>複数資料の統合</td><td>3つのリサーチ文書を参照に追加して「これらを統合した要約レポートを作成して」と指示</td></tr>
+        <tr><td>スタイル・ブランドの一貫性</td><td>ブランドガイドライン PDF を参照に追加して「このガイドラインに準拠した文章に修正して」と指示</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="section" id="s7">
+  <div class="section-header amber">
+    <span class="section-num">07</span>
+    <h2>Legal Agent for Word（Frontier/US 限定）</h2>
+  </div>
+
+  <div class="callout amber">
+    <strong>提供状況（2026年6月時点）：</strong>Legal Agent は <span style="color:var(--amber); font-weight:700;">米国テナント限定 / Frontier プログラム参加必須 / Windows デスクトップ版のみ</span> のプレビュー機能です（2026年4月30日発表）。一般提供（GA）の日程は未発表。
+  </div>
+
+  <h3 style="font-size:1rem; margin-bottom:12px;">Legal Agent の機能</h3>
+  <div class="card-grid">
+    <div class="card amber">
+      <div class="tag amber">法務</div>
+      <h3>プレイブック駆動の契約レビュー</h3>
+      <p>組織の法的スタンダード・承認済み言語・交渉ポジションを記載した「プレイブック」を基に、契約書を条項ごとにレビュー。プレイブックとの不一致箇所を自動検出・修正提案。</p>
+    </div>
+    <div class="card amber">
+      <div class="tag amber">追跡変更</div>
+      <h3>Tracked Changes での修正提案</h3>
+      <p>提案された変更はすべて追跡変更として出力。各変更には変更理由を説明するインライン コメントが自動追加。弁護士が変更の根拠を即座に確認できる。</p>
+    </div>
+    <div class="card amber">
+      <div class="tag amber">交渉履歴</div>
+      <h3>既存追跡変更の保持</h3>
+      <p>既存の追跡変更が含まれる文書（交渉中の契約書）を処理可能。過去の修正履歴を保持しながら新しい提案のみを追加。交渉の文脈が失われない。</p>
+    </div>
+  </div>
+
+  <h3 style="font-size:1rem; margin-bottom:12px; margin-top:8px;">Legal Agent のワークフロー</h3>
+  <ol class="step-list">
+    <li><strong>プレイブック提供：</strong>組織の法的スタンダード・承認済み言語・交渉ポジションを記載したドキュメントを Copilot に提供</li>
+    <li><strong>プレイブック解析：</strong>Agent がプレイブックを構造化されたレビュー指示のシリーズに分解</li>
+    <li><strong>条項ごとのレビュー：</strong>契約書の各条項をプレイブックと照合して不一致を特定</li>
+    <li><strong>修正提案の出力：</strong>不一致箇所に追跡変更（赤線）とコメント（変更理由）を自動追加</li>
+    <li><strong>弁護士によるレビュー：</strong>提案された変更を承認/拒否/修正。最終決定は人間が行う</li>
+  </ol>
+
+  <div class="callout red">
+    <strong>免責事項：</strong>Legal Agent は法的アドバイスを提供するものではなく、資格を持つ法律の専門家の代替ではありません。すべての出力は必ず人間の弁護士がレビューしてください。利用可能条件：米国テナント / Frontier 参加 / M365 Copilot ライセンス / 管理者による Anthropic モデル有効化 / Windows デスクトップ版 Current Channel。
+  </div>
+</section>
+
+<section class="section" id="s8">
+  <div class="section-header">
+    <span class="section-num">08</span>
+    <h2>Work IQ — 自動グラウンディング</h2>
+  </div>
+
+  <p style="color:var(--muted); margin-bottom:16px;"><strong>Work IQ</strong> は Microsoft が「Copilot と組織のエージェントをパーソナライズするインテリジェンス層」と定義するコンテキスト基盤です。Word エージェントモードの Research フェーズで自動的に機能します。</p>
+
+  <div class="card-grid">
+    <div class="card blue">
+      <h3>📧 メール・Teams コンテキスト</h3>
+      <p>「プロジェクト A の提案書を作って」→ 関連するメールスレッド・Teams チャットから自動的にコンテキスト収集。@メンション不要で関連情報が自動グラウンドされる。</p>
+    </div>
+    <div class="card blue">
+      <h3>📅 会議・カレンダー情報</h3>
+      <p>「先週の戦略会議の決定事項をまとめたメモを作って」→ Teams 会議の文字起こし・議事録から自動収集。会議の文脈を踏まえた起草が可能。</p>
+    </div>
+    <div class="card blue">
+      <h3>📁 SharePoint・ファイル</h3>
+      <p>組織の SharePoint サイト・OneDrive のファイルを検索して関連コンテンツを自動参照。アクセス権を厳守（ユーザーが閲覧権限を持つファイルのみ）。</p>
+    </div>
+  </div>
+
+  <div class="callout blue">
+    <strong>Work IQ のデータ範囲：</strong>平均的な Fortune 500 企業の Work IQ データフットプリントは 600+ テラバイト（Microsoft 内部データより）。これだけの組織データを Copilot がリアルタイムで参照・統合して文書生成品質を向上させます。Work IQ API は 2026年6月16日に GA。
+  </div>
+</section>
+
+<section class="section" id="s9">
+  <div class="section-header amber">
+    <span class="section-num">09</span>
+    <h2>実践プロンプト集 20 選</h2>
+  </div>
+
+  <p style="color:var(--muted); font-size:0.88rem; margin-bottom:20px;">最適プロンプト構造（公式推奨）：<strong>「[成果物] を [対象読者] 向けに作成して。主要メッセージは [1文]。トーン：[2語]。制約：[長さ・テンプレート・ブランド要素]」</strong></p>
+
+  <h3 style="font-size:0.95rem; margin-bottom:14px; color:#60a5fa;">📄 文書起草・新規作成（5選）</h3>
+  <div class="prompt-grid">
+    <div class="prompt-card">
+      <div class="p-num">PROMPT 01</div>
+      <h4>事業計画書</h4>
+      <div class="p-text">新規事業の事業計画書を経営幹部向けに作成してください。市場分析・競合・財務計画・リスクの構成で、フォーマルで説得力のある文体で、最大 10 ページで</div>
+      <p>Copilot が「どの事業ですか？」「市場規模のデータはありますか？」と逆質問した後に起草開始。</p>
+    </div>
+    <div class="prompt-card">
+      <div class="p-num">PROMPT 02</div>
+      <h4>研修マニュアル</h4>
+      <div class="p-text">新入社員向けのオンボーディングマニュアルを作成してください。入社初日・最初の90日・1年間の3フェーズ構成で、親しみやすく実践的な文体で</div>
+      <p>3フェーズ構成を指定することで Copilot の構成質問が減り精度が向上。</p>
+    </div>
+    <div class="prompt-card">
+      <div class="p-num">PROMPT 03</div>
+      <h4>提案書</h4>
+      <div class="p-text">[参照ファイルを追加] この資料を基に、課題→解決策→実施計画→費用対効果の構成で5ページの提案書を作成してください。クライアント向けの丁寧な文体で</div>
+      <p>参照ファイルを使って既存資料から提案書を自動生成。</p>
+    </div>
+    <div class="prompt-card">
+      <div class="p-num">PROMPT 04</div>
+      <h4>議事録</h4>
+      <div class="p-text">[会議の文字起こしを貼り付け] この会議内容から、決定事項・アクションアイテム・担当者・期日を含む議事録を作成してください。箇条書き形式で</div>
+      <p>文字起こしをそのままプロンプトに貼り付けて構造化した議事録に変換。</p>
+    </div>
+    <div class="prompt-card">
+      <div class="p-num">PROMPT 05</div>
+      <h4>週次レポート</h4>
+      <div class="p-text">先週のプロジェクト進捗を上司向けに報告するレポートを作成してください。達成事項・課題・来週の計画を含む1ページ以内で、簡潔なビジネス文体で</div>
+      <p>Work IQ が過去のメール・Teams を参照して自動的に情報を収集・統合。</p>
+    </div>
+  </div>
+
+  <h3 style="font-size:0.95rem; margin-bottom:14px; margin-top:8px; color:#c4b5fd;">✏️ 文書編集・改善（5選）</h3>
+  <div class="prompt-grid">
+    <div class="prompt-card purple">
+      <div class="p-num">PROMPT 06</div>
+      <h4>トーン変換</h4>
+      <div class="p-text">この文書のトーンを「技術者向けの詳細な説明文体」から「経営幹部向けの簡潔なエグゼクティブサマリー文体」に全文変換してください</div>
+      <p>オーディエンスが変わっても同じ内容を素早く再利用できる。</p>
+    </div>
+    <div class="prompt-card purple">
+      <div class="p-num">PROMPT 07</div>
+      <h4>構成変更</h4>
+      <div class="p-text">この文書の構成を「問題提起→分析→解決策→アクション」の SCQA 形式に変更してください。追跡変更をオンにして実行してください</div>
+      <p>追跡変更指定で変更箇所を一目で確認しながら承認/拒否できる。</p>
+    </div>
+    <div class="prompt-card purple">
+      <div class="p-num">PROMPT 08</div>
+      <h4>文章の明確化</h4>
+      <div class="p-text">この文書で曖昧な表現・専門用語の説明不足・論理の飛躍がある箇所を特定して、明確で読みやすい表現に改善してください</div>
+      <p>Think Deeper モデルで論理的整合性の精査 + 改善提案の生成。</p>
+    </div>
+    <div class="prompt-card purple">
+      <div class="p-num">PROMPT 09</div>
+      <h4>長さの調整</h4>
+      <div class="p-text">この10ページの報告書を2ページのエグゼクティブサマリーに圧縮してください。重要な数値・結論・推奨アクションは必ず残してください</div>
+      <p>Claude Opus 4.8 推奨。長文の要点を正確に抽出。</p>
+    </div>
+    <div class="prompt-card purple">
+      <div class="p-num">PROMPT 10</div>
+      <h4>コメント対応</h4>
+      <div class="p-text">この文書のすべてのコメントを読んで、コメントの指摘に対応する修正を行い、対応済みのコメントを解決してください</div>
+      <p>コメント管理機能を活用。レビューサイクルの効率化に。</p>
+    </div>
+  </div>
+
+  <h3 style="font-size:0.95rem; margin-bottom:14px; margin-top:8px; color:#4ade80;">📊 要約・分析・変換（5選）</h3>
+  <div class="prompt-grid">
+    <div class="prompt-card green">
+      <div class="p-num">PROMPT 11</div>
+      <h4>長文要約</h4>
+      <div class="p-text">[参照ファイル: 長文レポート] このレポートを5つの主要な洞察に絞って1ページで要約してください。対象は経営幹部で、意思決定に直結する情報を優先して</div>
+      <p>最大 3,000 ページまで対応。Claude Opus 4.8 で精度の高い要約。</p>
+    </div>
+    <div class="prompt-card green">
+      <div class="p-num">PROMPT 12</div>
+      <h4>複数文書の統合要約</h4>
+      <div class="p-text">[3つの参照ファイルを追加] これらの3つのリサーチレポートを統合して、共通の知見・相違点・推奨アクションを含む総合サマリーを作成してください</div>
+      <p>最大 3 ファイルの同時参照で統合分析。</p>
+    </div>
+    <div class="prompt-card green">
+      <div class="p-num">PROMPT 13</div>
+      <h4>文書 → メール変換</h4>
+      <div class="p-text">この Word 文書を要約して、件名・主要メッセージ・アクションアイテムを含む送信準備済みのメールに変換してください</div>
+      <p>Word 文書からメール本文を自動生成。報告書配布を効率化。</p>
+    </div>
+    <div class="prompt-card green">
+      <div class="p-num">PROMPT 14</div>
+      <h4>箇条書き → 文章化</h4>
+      <div class="p-text">この箇条書きのアウトラインをフォーマルなプロポーザル文書に展開してください。各項目を 200〜300 字の段落に展開して、論理的なつながりを持たせて</div>
+      <p>アウトラインから完全な文書への拡張。提案書・報告書作成の定番。</p>
+    </div>
+    <div class="prompt-card green">
+      <div class="p-num">PROMPT 15</div>
+      <h4>目次の自動生成・更新</h4>
+      <div class="p-text">この文書に Heading スタイルを使った目次を挿入して、現在の見出し構造を反映した目次に自動更新してください</div>
+      <p>レイアウト管理機能を活用。長文文書のナビゲーション整備。</p>
+    </div>
+  </div>
+
+  <h3 style="font-size:0.95rem; margin-bottom:14px; margin-top:8px; color:var(--amber);">⚖️ 専門文書・高度活用（5選）</h3>
+  <div class="prompt-grid">
+    <div class="prompt-card amber">
+      <div class="p-num">PROMPT 16</div>
+      <h4>契約書レビュー（Legal Agent）</h4>
+      <div class="p-text">[プレイブック参照] このプレイブックの基準で契約書を条項ごとにレビューして、不一致箇所を追跡変更と理由コメントで提示してください</div>
+      <p>⚠️ Frontier/US/Windows デスクトップ限定。弁護士の最終確認が必須。</p>
+    </div>
+    <div class="prompt-card amber">
+      <div class="p-num">PROMPT 17</div>
+      <h4>ポリシー文書の一括更新</h4>
+      <div class="p-text">この社内ポリシー文書を最新の規制変更（[変更内容を参照ファイルで提供]）に合わせて更新してください。変更箇所はすべて追跡変更で表示して</div>
+      <p>規制対応・ポリシー改訂作業の大幅効率化。追跡変更で変更点を透明化。</p>
+    </div>
+    <div class="prompt-card amber">
+      <div class="p-num">PROMPT 18</div>
+      <h4>RFP・提案依頼書への回答</h4>
+      <div class="p-text">[RFP ファイルを参照] [会社実績ファイルを参照] このRFPの各要件に対して、会社実績を根拠に盛り込みながら回答書を作成してください</div>
+      <p>2ファイル参照でRFP要件と自社実績を統合した回答書を自動生成。</p>
+    </div>
+    <div class="prompt-card amber">
+      <div class="p-num">PROMPT 19</div>
+      <h4>Think Deeper で深掘り分析</h4>
+      <div class="p-text">（モデルを Think Deeper に変更して）この業界の競合分析レポートを作成してください。5社の強み・弱み・戦略的示唆を含む、論理的根拠が明確な文書で</div>
+      <p>Think Deeper（GPT-5.5 Thinking）で複雑な分析・論証が必要なレポートに。</p>
+    </div>
+    <div class="prompt-card amber">
+      <div class="p-num">PROMPT 20</div>
+      <h4>多言語版の生成</h4>
+      <div class="p-text">この日本語文書を英語に翻訳してください。専門用語は業界標準の英語表現を使い、文書の構成・形式はそのまま維持してください</div>
+      <p>グローバル展開する文書の多言語版を高精度に生成。Claude Opus 4.8 推奨。</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="s10">
+  <div class="section-header blue">
+    <span class="section-num">10</span>
+    <h2>上級活用シナリオ</h2>
+  </div>
+
+  <div class="card-grid">
+    <div class="card blue">
+      <div class="tag blue">法務</div>
+      <h3>契約書ドラフト ← → レビュー サイクル</h3>
+      <p>Copilot で契約書ドラフト生成（参照ファイル: テンプレート）→ 交渉を経て変更が追加 → Legal Agent（Frontier）でプレイブック照合・赤線提案 → 弁護士が最終承認。ドラフトから最終版まで一貫して Word 上で完結。</p>
+    </div>
+    <div class="card purple">
+      <div class="tag purple">Cowork</div>
+      <h3>Word + PowerPoint + Email の同時生成</h3>
+      <p>Copilot Cowork（Frontier/GA 予定）を使って「戦略提案書（Word）・プレゼン（PowerPoint）・要約メール（Outlook）を同時生成」の1プロンプトで3つの成果物を一括作成。</p>
+    </div>
+    <div class="card green">
+      <div class="tag green">Notebooks</div>
+      <h3>研究レポートの自動合成</h3>
+      <p>Copilot Notebooks に調査資料・Web ページ・会議メモ（最大 300 参照）を蓄積 → Word Agent が Notebooks コンテキストを使って構造化レポートを自動生成。リサーチから執筆まで一貫したワークフロー。</p>
+    </div>
+    <div class="card amber">
+      <div class="tag amber">HR</div>
+      <h3>人事ポリシー文書の継続更新</h3>
+      <p>既存ポリシー文書を参照ファイルに指定 + 最新規制 PDF を追加 → 「前回版と整合性を保ちながら規制変更を反映して、追跡変更ですべての変更を表示して」の1プロンプトで更新。</p>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>Critique モード（Frontier）：</strong>高度なリサーチタスクでは「Critique」機能（GPT が起草し Claude がレビュー）と「Council」機能（複数モデルが並行生成し第3モデルが比較）も利用可能。研究ベンチマークで従来比 13.8% 向上を達成。
+  </div>
+</section>
+
+<section class="section" id="s11">
+  <div class="section-header red">
+    <span class="section-num">11</span>
+    <h2>ライセンス・制限・注意点</h2>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>項目</th><th>詳細</th></tr></thead>
+      <tbody>
+        <tr><td><strong>必要ライセンス</strong></td><td>Microsoft 365 Copilot アドオン（約 $30/ユーザー/月）、またはM365 Personal/Family/Premium。</td></tr>
+        <tr><td><strong>追跡変更精度</strong></td><td>Word レベル精度はデスクトップ版 Windows 先行。Web/Mac は "coming soon"（2026年6月時点）。</td></tr>
+        <tr><td><strong>Claude モデル</strong></td><td>IT 管理者による Anthropic サブプロセッサ有効化が必要。EU/EFTA/UK ではデフォルト無効。Anthropic モデルのデータ処理は EU データバウンダリ外で実行。</td></tr>
+        <tr><td><strong>Legal Agent</strong></td><td>米国テナント / Frontier プログラム参加必須 / Windows デスクトップのみ / Anthropic モデル有効化必須。法的アドバイスではない。</td></tr>
+        <tr><td><strong>参照ファイル</strong></td><td>最大 3 ファイル（OneDrive/SharePoint に保存されている必要あり）。ローカルファイルは直接参照不可。</td></tr>
+        <tr><td><strong>Copilot Notebooks</strong></td><td>最大 300 参照でグラウンディング。Web URL 参照は 2026年5月〜。</td></tr>
+        <tr><td><strong>政府クラウド</strong></td><td>モデル選択機能（Claude 等）は政府/主権クラウドテナントでは利用不可。</td></tr>
+        <tr><td><strong>Cowork / Critique</strong></td><td>クロスアプリ生成（Cowork）・Critique/Council モードは Frontier プログラム先行。GA タイムラインは未発表。</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout red">
+    <strong>重要：</strong>Copilot が生成・編集した文書の内容は必ず人間がレビューしてください。特に法的・財務的・医療的内容を含む文書は、専門家による最終確認を行ってください。追跡変更を活用して、AI の変更を明確に把握した上で承認することを推奨します。
+  </div>
+</section>
+
+<div style="background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:24px 28px;">
+  <h2 style="font-size:1rem; font-weight:700; margin-bottom:14px; color:var(--muted);">関連ページ</h2>
+  <div class="card-grid" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr));">
+    <a href="./copilot-excel-agent.html" style="display:block;"><div class="card" style="border-color:rgba(29,131,72,0.4);">
+      <h3 style="color:#4ade80;">📊 Excel エージェントモード</h3>
+      <p>=COPILOT 関数・Python in Excel・財務モデル自動化</p>
+    </div></a>
+    <a href="./copilot-powerpoint-agent.html" style="display:block;"><div class="card" style="border-color:rgba(200,80,20,0.4);">
+      <h3 style="color:#fb923c;">🎨 PowerPoint エージェントモード</h3>
+      <p>画像生成 4 モデル・フルデッキ自動作成・Brand Kit</p>
+    </div></a>
+    <a href="./m365-copilot.html" style="display:block;"><div class="card">
+      <h3>M365 Copilot 概要</h3>
+      <p>全アプリの機能一覧・ライセンス・スタートガイド</p>
+    </div></a>
+    <a href="./m365-copilot-guide.html" style="display:block;"><div class="card">
+      <h3>M365 Copilot 実践大全</h3>
+      <p>全アプリ横断のプロンプト集・業務シナリオ 50 選</p>
+    </div></a>
+  </div>
+</div>
+
+</main>
+
+<footer>
+  <p>最終更新: 2026-06-05 | <a href="./index.html">LLM 個別深掘り</a> | <a href="../../index.html">Hub トップ</a></p>
+  <p style="margin-top:6px; font-size:0.8rem;">出典: <a href="https://www.microsoft.com/en-us/microsoft-365/blog/2026/04/22/copilots-agentic-capabilities-in-word-excel-and-powerpoint-are-generally-available/" target="_blank" rel="noopener">Microsoft 365 Blog — GA発表 (2026-04-22)</a> | <a href="https://techcommunity.microsoft.com/blog/microsoft365copilotblog/word-legal-agent-in-frontier/4516218" target="_blank" rel="noopener">Legal Agent 発表 (2026-04-30)</a> | <a href="https://learn.microsoft.com/en-us/microsoft-365/copilot/wordexcelppt-agents" target="_blank" rel="noopener">Learn Microsoft — Word/Excel/PPT Agents</a></p>
+</footer>
+
+</body>
+</html>

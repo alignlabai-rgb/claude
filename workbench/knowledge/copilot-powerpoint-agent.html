@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PowerPoint Copilot エージェントモード（Edit with Copilot）完全実践ガイド | Tech Workbench</title>
+<style>
+:root {
+    --accent: #c43e00;
+    --accent2: #0078d4;
+    --accent3: #8b5cf6;
+    --green: #16a34a;
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #21262d;
+    --border: rgba(255,255,255,0.08);
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --radius: 12px;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; line-height:1.65; font-size:16px; }
+a { color:var(--accent2); text-decoration:none; }
+a:hover { text-decoration:underline; }
+.page-wrap { max-width:1000px; margin:0 auto; padding:32px 20px 80px; }
+nav { background:var(--surface); border-bottom:1px solid var(--border); padding:12px 20px; font-size:0.85rem; }
+nav a { color:var(--muted); margin-right:6px; }
+nav span { color:var(--muted); margin-right:6px; }
+
+.hero { background:linear-gradient(135deg, rgba(90,20,0,0.95), rgba(180,60,10,0.55), rgba(200,80,20,0.2)); border:1px solid rgba(196,62,0,0.45); border-radius:var(--radius); padding:48px 40px; margin-bottom:40px; }
+.hero h1 { font-size:2.2rem; font-weight:800; color:#fff; margin-bottom:8px; }
+.hero .sub { color:rgba(255,255,255,0.88); font-size:1.05rem; margin-bottom:24px; max-width:720px; }
+.stat-row { display:flex; gap:14px; flex-wrap:wrap; }
+.stat { background:rgba(0,0,0,0.35); border:1px solid rgba(196,62,0,0.45); border-radius:8px; padding:12px 18px; text-align:center; min-width:100px; }
+.stat .val { font-size:1.4rem; font-weight:800; color:#fb923c; }
+.stat .lbl { font-size:0.72rem; color:var(--muted); margin-top:2px; }
+
+.toc { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:24px 28px; margin-bottom:40px; }
+.toc h2 { font-size:0.82rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; margin-bottom:14px; }
+.toc ol { padding-left:20px; }
+.toc li { margin-bottom:5px; font-size:0.93rem; }
+.toc a { color:var(--text); }
+.toc a:hover { color:#fb923c; }
+
+.section { margin-bottom:56px; }
+.section-header { display:flex; align-items:center; gap:12px; margin-bottom:24px; padding-bottom:12px; border-bottom:2px solid var(--accent); }
+.section-num { background:var(--accent); color:#fff; font-size:0.75rem; font-weight:700; padding:3px 9px; border-radius:4px; }
+.section-header h2 { font-size:1.4rem; font-weight:700; color:#fb923c; }
+.section-header.blue { border-color:var(--accent2); }
+.section-header.blue .section-num { background:var(--accent2); }
+.section-header.blue h2 { color:#60a5fa; }
+.section-header.purple { border-color:var(--accent3); }
+.section-header.purple .section-num { background:var(--accent3); }
+.section-header.purple h2 { color:#c4b5fd; }
+.section-header.green { border-color:var(--green); }
+.section-header.green .section-num { background:var(--green); }
+.section-header.green h2 { color:#4ade80; }
+.section-header.amber { border-color:#f59e0b; }
+.section-header.amber .section-num { background:#f59e0b; color:#000; }
+.section-header.amber h2 { color:#f59e0b; }
+.section-header.red { border-color:#dc2626; }
+.section-header.red .section-num { background:#dc2626; }
+.section-header.red h2 { color:#f87171; }
+
+.card-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; margin-bottom:24px; }
+.card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:20px; }
+.card h3 { font-size:1rem; font-weight:700; margin-bottom:8px; color:var(--text); }
+.card p { font-size:0.875rem; color:var(--muted); line-height:1.6; }
+.card.orange { border-color:rgba(196,62,0,0.5); }
+.card.blue { border-color:rgba(0,120,212,0.4); }
+.card.purple { border-color:rgba(139,92,246,0.4); }
+.card.green { border-color:rgba(22,163,74,0.4); }
+
+.table-wrap { overflow-x:auto; margin-bottom:24px; }
+table { width:100%; border-collapse:collapse; font-size:0.875rem; }
+th { background:var(--surface2); color:var(--muted); font-weight:600; padding:10px 14px; text-align:left; border-bottom:1px solid var(--border); }
+td { padding:10px 14px; border-bottom:1px solid rgba(255,255,255,0.04); vertical-align:top; }
+tr:hover td { background:rgba(255,255,255,0.02); }
+td strong { color:var(--text); }
+
+.callout { border-left:3px solid var(--accent); background:rgba(196,62,0,0.08); padding:14px 18px; border-radius:0 8px 8px 0; margin-bottom:20px; font-size:0.9rem; }
+.callout.blue { border-color:var(--accent2); background:rgba(0,120,212,0.07); }
+.callout.purple { border-color:var(--accent3); background:rgba(139,92,246,0.07); }
+.callout.green { border-color:var(--green); background:rgba(22,163,74,0.07); }
+.callout.amber { border-color:#f59e0b; background:rgba(245,158,11,0.07); }
+.callout.red { border-color:#dc2626; background:rgba(220,38,38,0.07); }
+.callout strong { color:var(--text); }
+
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:24px; }
+.three-col { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-bottom:24px; }
+@media(max-width:680px){ .two-col,.three-col { grid-template-columns:1fr; } }
+
+.tag { display:inline-block; font-size:0.7rem; font-weight:700; padding:2px 8px; border-radius:4px; margin-bottom:6px; }
+.tag.orange { background:rgba(196,62,0,0.2); color:#fb923c; }
+.tag.blue { background:rgba(0,120,212,0.15); color:#60a5fa; }
+.tag.purple { background:rgba(139,92,246,0.15); color:#c4b5fd; }
+.tag.green { background:rgba(22,163,74,0.15); color:#4ade80; }
+.tag.amber { background:rgba(245,158,11,0.15); color:#f59e0b; }
+
+.skill-card { background:var(--surface2); border-radius:10px; padding:18px 20px; border-left:3px solid var(--accent); }
+.skill-card h4 { font-size:0.95rem; font-weight:700; margin-bottom:6px; color:#fb923c; }
+.skill-card p { font-size:0.85rem; color:var(--muted); }
+
+.prompt-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:14px; margin-bottom:28px; }
+.prompt-card { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:16px 18px; }
+.prompt-card .p-num { font-size:0.7rem; font-weight:700; color:var(--muted); margin-bottom:4px; }
+.prompt-card h4 { font-size:0.88rem; font-weight:700; margin-bottom:8px; color:var(--text); }
+.prompt-card .p-text { font-size:0.82rem; color:#fb923c; font-family:'SF Mono',Consolas,monospace; background:rgba(196,62,0,0.1); border:1px solid rgba(196,62,0,0.25); border-radius:6px; padding:8px 10px; margin-bottom:6px; line-height:1.6; }
+.prompt-card p { font-size:0.8rem; color:var(--muted); }
+.prompt-card.blue { border-color:rgba(0,120,212,0.35); }
+.prompt-card.blue .p-text { color:#60a5fa; background:rgba(0,120,212,0.08); border-color:rgba(0,120,212,0.2); }
+.prompt-card.purple { border-color:rgba(139,92,246,0.35); }
+.prompt-card.purple .p-text { color:#c4b5fd; background:rgba(139,92,246,0.08); border-color:rgba(139,92,246,0.2); }
+.prompt-card.green { border-color:rgba(22,163,74,0.35); }
+.prompt-card.green .p-text { color:#4ade80; background:rgba(22,163,74,0.08); border-color:rgba(22,163,74,0.2); }
+
+.step-list { counter-reset:steps; list-style:none; padding-left:0; margin-bottom:20px; }
+.step-list li { counter-increment:steps; display:flex; gap:14px; margin-bottom:12px; align-items:flex-start; font-size:0.9rem; }
+.step-list li::before { content:counter(steps); background:var(--accent); color:#fff; font-size:0.75rem; font-weight:800; min-width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:2px; }
+.step-list.blue li::before { background:var(--accent2); }
+.step-list.purple li::before { background:var(--accent3); }
+
+.img-model-card { background:var(--surface); border-radius:var(--radius); padding:20px; border-top:3px solid var(--accent); margin-bottom:0; }
+.img-model-card h3 { font-size:1rem; font-weight:700; margin-bottom:6px; }
+.img-model-card .provider { font-size:0.75rem; color:var(--muted); margin-bottom:8px; }
+.img-model-card p { font-size:0.85rem; color:var(--muted); line-height:1.55; }
+.img-model-card.new { border-top-color:#8b5cf6; }
+.img-model-card.new h3 { color:#c4b5fd; }
+.img-model-card.openai { border-top-color:var(--accent2); }
+.img-model-card.openai h3 { color:#60a5fa; }
+.img-model-card.bfl { border-top-color:#4ade80; }
+.img-model-card.bfl h3 { color:#4ade80; }
+
+.chips { display:flex; flex-wrap:wrap; gap:6px; margin-top:14px; }
+.chip { background:rgba(196,62,0,0.15); color:#fb923c; border:1px solid rgba(196,62,0,0.3); border-radius:20px; padding:3px 10px; font-size:0.78rem; font-weight:600; }
+
+footer { text-align:center; padding:32px 20px; color:var(--muted); font-size:0.85rem; border-top:1px solid var(--border); margin-top:60px; }
+footer a { color:var(--muted); }
+footer a:hover { color:var(--text); }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="../../index.html">Hub</a> <span>›</span>
+  <a href="./index.html">LLM 個別深掘り</a> <span>›</span>
+  <a href="./m365-copilot.html">M365 Copilot</a> <span>›</span>
+  PowerPoint エージェントモード
+</nav>
+
+<main class="page-wrap">
+
+<div class="hero">
+  <div class="chips" style="margin-bottom:14px;">
+    <span class="chip">GA: 2026-04-22</span>
+    <span class="chip">Build 2026 デフォルト</span>
+    <span class="chip">画像生成 4 モデル</span>
+    <span class="chip">マルチファイル 5 本</span>
+  </div>
+  <h1>🎨 PowerPoint Copilot<br>エージェントモード完全ガイド</h1>
+  <p class="sub">GPT-5.5・Claude Opus 4.8・MAI-Image-2.5・Flux.2 Flex を組み合わせた自律型プレゼン作成エージェント。ブリーフ 1 文から完全なスライドデッキを自動構築。画像生成・ブランドキット・マルチファイル対応。2026年6月最新情報。</p>
+  <div class="stat-row">
+    <div class="stat"><div class="val">2026/4/22</div><div class="lbl">GA 日</div></div>
+    <div class="stat"><div class="val">5 本</div><div class="lbl">マルチファイル参照</div></div>
+    <div class="stat"><div class="val">4+</div><div class="lbl">画像生成モデル</div></div>
+    <div class="stat"><div class="val">Brand Kit</div><div class="lbl">ブランド自動準拠</div></div>
+  </div>
+</div>
+
+<div class="toc">
+  <h2>目次</h2>
+  <ol>
+    <li><a href="#s1">エージェントモードとは — 旧 Copilot との違い</a></li>
+    <li><a href="#s2">有効化・アクセス方法</a></li>
+    <li><a href="#s3">テキスト LLM モデル選択</a></li>
+    <li><a href="#s4">画像生成モデル選択 — PowerPoint 特有の強み</a></li>
+    <li><a href="#s5">コア機能詳解 — デッキ作成ワークフロー</a></li>
+    <li><a href="#s6">ビルトインスキル（1クリック）</a></li>
+    <li><a href="#s7">マルチファイル対応 — Word・PDF・Excel から生成</a></li>
+    <li><a href="#s8">ブランドキット × Copilot</a></li>
+    <li><a href="#s9">PowerPoint Live × Teams</a></li>
+    <li><a href="#s10">実践プロンプト集 20 選</a></li>
+    <li><a href="#s11">上級活用シナリオ</a></li>
+    <li><a href="#s12">ライセンス・制限・注意点</a></li>
+  </ol>
+</div>
+
+<section class="section" id="s1">
+  <div class="section-header">
+    <span class="section-num">01</span>
+    <h2>エージェントモードとは — 旧 Copilot との違い</h2>
+  </div>
+
+  <div class="callout">
+    <strong>正式名称：</strong>2026年4月22日の GA（一般提供開始）時に "Agent Mode" から <strong>"Edit with Copilot"</strong> に改称。Build 2026（5月19〜21日）でデフォルト機能となりました。本ガイドでは通称「エージェントモード」を使用します。
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>観点</th><th>旧 Copilot</th><th>エージェントモード（Edit with Copilot）</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>動作方式</td><td>提案・回答のみ（ユーザーが実行）</td><td>自律的にマルチステップ操作を実行</td></tr>
+        <tr><td>デッキ生成</td><td>部分的なスライド提案</td><td>アウトラインから全スライドを一括生成</td></tr>
+        <tr><td>逆質問</td><td>なし（単方向）</td><td>対象・スタイル・枚数を<strong>確認質問</strong>してから実行</td></tr>
+        <tr><td>参照ファイル</td><td>限定的</td><td>最大 <strong>5 ファイル</strong>（Word・PDF・Excel・PPT）を参照</td></tr>
+        <tr><td>Web 参照</td><td>なし</td><td>公開 Web ページ URL をソースとして追加可能</td></tr>
+        <tr><td>画像生成</td><td>基本的なデザイン提案</td><td>GPT-Image・MAI-Image-2.5・Flux.2 Flex 等から選択</td></tr>
+        <tr><td>Brand Kit</td><td>手動適用</td><td>SharePoint ブランドキットを自動参照・適用</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 style="font-size:1.05rem; margin-bottom:12px;">デッキ作成の流れ</h3>
+  <ol class="step-list">
+    <li><strong>プロンプト入力：</strong>「Q4決算の役員向け10スライドのデッキが必要」など大まかな指示を入力</li>
+    <li><strong>逆質問：</strong>Copilot が対象オーディエンス・スタイル・スライド枚数・使用するファイルを確認質問。回答することで精度が向上する。</li>
+    <li><strong>アウトライン提示：</strong>スライド構成案（タイトル・各スライドの要点）を提示。ユーザーが承認・修正できる。</li>
+    <li><strong>一括生成：</strong>承認後、Copilot がスライドを自動生成。レイアウト・デザインテーマ・スピーカーノートまで一括作成。</li>
+    <li><strong>反復精緻化：</strong>チャットで追加指示「3枚目のグラフを棒グラフに変更」「ブランドカラーに合わせて」と継続改善。</li>
+  </ol>
+</section>
+
+<section class="section" id="s2">
+  <div class="section-header">
+    <span class="section-num">02</span>
+    <h2>有効化・アクセス方法</h2>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <h3 style="font-size:1rem; margin-bottom:10px;">デスクトップ PowerPoint（Windows/Mac）</h3>
+      <ol class="step-list">
+        <li>ファイルを開く（新規 or 既存）</li>
+        <li>リボン「ホーム」→ <strong>「Copilot」</strong> ボタンをクリック</li>
+        <li>右側に Copilot ペインが開く</li>
+        <li>Build 2026 以降はエージェントモードがデフォルト</li>
+        <li>ペイン上部の<strong>モデルピッカー</strong>でテキスト LLM・画像モデルを選択</li>
+      </ol>
+    </div>
+    <div>
+      <h3 style="font-size:1rem; margin-bottom:10px;">PowerPoint Online（Web）</h3>
+      <ol class="step-list blue">
+        <li>OneDrive / SharePoint でファイルを開く</li>
+        <li>右上の <strong>「Copilot」</strong> ボタンをクリック</li>
+        <li>機能はデスクトップ版とほぼ同等</li>
+        <li>Web 版は新機能の先行展開が多い</li>
+        <li>ブランドキット機能は Microsoft 365 Copilot アプリとの連携が必要</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="s3">
+  <div class="section-header blue">
+    <span class="section-num">03</span>
+    <h2>テキスト LLM モデル選択</h2>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>モデル</th><th>提供元</th><th>特徴</th><th>向いているタスク</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Auto（自動）</strong></td><td>Microsoft</td><td>タスクに最適なモデルを自動選択。デフォルト</td><td>普段使い・迷ったらこれ</td></tr>
+        <tr><td><strong>GPT-5.5 / ChatGPT</strong></td><td>OpenAI</td><td>高速・クリーンな出力。構成設計が得意</td><td>アウトライン作成・スライド構成・スピーカーノート</td></tr>
+        <tr><td><strong>Claude Opus 4.8</strong></td><td>Anthropic</td><td>長文理解・論理構造・ストーリーラインの整合性</td><td>報告書→プレゼン変換・複雑なナラティブ設計</td></tr>
+        <tr><td><strong>Claude Opus 4.7</strong></td><td>Anthropic</td><td>高速・ツール選択の精度向上</td><td>反復的な修正・多スライド一括処理</td></tr>
+        <tr><td>Think Deeper</td><td>—</td><td>長時間推論モード。深い分析が必要な場合</td><td>複雑な業界分析デッキ・論証設計</td></tr>
+        <tr><td>Quick Response</td><td>—</td><td>速度優先</td><td>スピーカーノート追加・単純な書き換え</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout">
+    <strong>Claude モデルの注意点：</strong>企業環境では IT 管理者が M365 管理センターで Anthropic をサブプロセッサとして有効化する必要があります。EU/EFTA/UK テナントではデフォルト無効。
+  </div>
+</section>
+
+<section class="section" id="s4">
+  <div class="section-header purple">
+    <span class="section-num">04</span>
+    <h2>画像生成モデル選択 — PowerPoint 特有の強み</h2>
+  </div>
+
+  <div class="callout purple">
+    <strong>PowerPoint の独自性：</strong>Excel と異なり、PowerPoint の Copilot ペインには<strong>テキスト LLM とは別に画像生成モデルを選択できるピッカー</strong>があります。4 種類のモデルから用途に合わせて選択可能です。これは PowerPoint がビジュアルコミュニケーションの主役であるため特別に拡充された機能です。
+  </div>
+
+  <div class="card-grid">
+    <div class="img-model-card openai">
+      <div class="tag blue" style="margin-bottom:8px;">GA 済み</div>
+      <h3>GPT-Image</h3>
+      <div class="provider">提供元: OpenAI</div>
+      <p>高品質なフォトリアリスティック画像。プロンプトへの忠実度が高く、複雑なシーンも精度よく表現。旧 DALL-E 3 の後継シリーズ（DALL-E 4 という名称は採用されていない）。</p>
+    </div>
+    <div class="img-model-card bfl">
+      <div class="tag green" style="margin-bottom:8px;">2026年4〜5月展開</div>
+      <h3>Flux.2 Flex</h3>
+      <div class="provider">提供元: Black Forest Labs</div>
+      <p>テキストレンダリング・レイアウト処理に優れた高品質ビジュアル。プレゼン用のインフォグラフィック・アイコン・図解に特に強い。2026年4月下旬〜5月に PowerPoint 展開。</p>
+    </div>
+    <div class="img-model-card">
+      <div class="tag orange" style="margin-bottom:8px;">Microsoft 製</div>
+      <h3>MAI-Image-2 Efficient</h3>
+      <div class="provider">提供元: Microsoft</div>
+      <p>高速・高品質のバランス型。編集ワークフローに最適化されており、既存スライドへの画像追加・差し替えがスムーズ。2026年4月展開。</p>
+    </div>
+    <div class="img-model-card new">
+      <div class="tag purple" style="margin-bottom:8px;">Build 2026 展開中</div>
+      <h3>MAI-Image-2.5</h3>
+      <div class="provider">提供元: Microsoft</div>
+      <p>Microsoft の最先端画像モデル。テキスト→画像・画像→画像編集の両対応。Arena.ai ランキング 3位。<strong>タイポグラフィ・ロゴ・テキスト編集</strong>をナチュラルキューで生成。PPT 向けインフォグラフィック・フロー図生成対応。アイデンティティ一貫性保持・フルフレーム再スタイリングも可能。</p>
+    </div>
+  </div>
+
+  <h3 style="font-size:1rem; margin-bottom:12px; margin-top:8px;">モデル選択ガイド</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>用途</th><th>推奨モデル</th><th>理由</th></tr></thead>
+      <tbody>
+        <tr><td>フォトリアルな写真・情景</td><td>GPT-Image</td><td>プロンプト忠実度が高く、人物・風景の自然な表現に強み</td></tr>
+        <tr><td>インフォグラフィック・フロー図</td><td>Flux.2 Flex または MAI-Image-2.5</td><td>テキスト・レイアウト処理に特化。PPT 向け図解生成に最適</td></tr>
+        <tr><td>既存スライドへの素早い画像追加</td><td>MAI-Image-2 Efficient</td><td>速度重視。編集ワークフロー最適化</td></tr>
+        <tr><td>ロゴ入り・テキスト入り画像</td><td>MAI-Image-2.5</td><td>タイポグラフィ・ブランド要素のナチュラルキュー編集</td></tr>
+        <tr><td>通常使用・自動判断</td><td>Auto</td><td>Copilot がコンテキストに応じて最適モデルを自動選択</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 style="font-size:1rem; margin-bottom:12px; margin-top:16px;">モデルピッカーの使い方</h3>
+  <ol class="step-list purple">
+    <li>Copilot ペインを開く</li>
+    <li>ペイン上部の<strong>モデルピッカー</strong>をクリック</li>
+    <li>「テキストモデル」セクションでテキスト LLM を選択</li>
+    <li>「画像モデル」セクションにスクロールして画像生成モデルを選択</li>
+    <li>画像生成を含むプロンプトを入力（例：「このスライドにブランドに合ったイラストを追加して」）</li>
+  </ol>
+</section>
+
+<section class="section" id="s5">
+  <div class="section-header">
+    <span class="section-num">05</span>
+    <h2>コア機能詳解 — デッキ作成ワークフロー</h2>
+  </div>
+
+  <div class="card-grid">
+    <div class="card orange">
+      <div class="tag orange">生成</div>
+      <h3>フルデッキ一括生成</h3>
+      <p>自然言語の指示から逆質問→アウトライン確認→スライド一括生成の流れで完全なデッキを作成。レイアウト自動選択・コンテンツ配置・デザインテーマ適用まで一貫して実行。</p>
+    </div>
+    <div class="card orange">
+      <div class="tag orange">ノート</div>
+      <h3>スピーカーノート生成</h3>
+      <p>「このスライドにスピーカーノートを追加して」「全スライドに 300 字のノートを入れて」で一括生成。コンテキストを踏まえた自然な発話原稿を自動作成。</p>
+    </div>
+    <div class="card blue">
+      <div class="tag blue">変換</div>
+      <h3>デザイン変換（Visualize this slide）</h3>
+      <p>テキスト中心のスライドをビジュアル重視のデザインに変換。ビルトインスキル「Visualize this slide」で 1 クリック実行。</p>
+    </div>
+    <div class="card blue">
+      <div class="tag blue">構成</div>
+      <h3>スライド構成の再編</h3>
+      <p>「このデッキを5スライドにまとめて」「課題→解決策→効果の構成に変更して」でスライド順序・統合・分割を自動実行。</p>
+    </div>
+    <div class="card purple">
+      <div class="tag purple">Web</div>
+      <h3>Web ページ参照（2026年5月〜）</h3>
+      <p>公開 Web ページの URL をソースとして追加可能。最新情報をコピペなしで取り込み。「このURLを参照して業界概況スライドを作って」で起動。</p>
+    </div>
+    <div class="card purple">
+      <div class="tag purple">AI 画像</div>
+      <h3>AI 画像のスライド自動配置</h3>
+      <p>プレゼン生成時に画像生成モデルを選択すると、各スライドのコンテキストに合わせた画像を自動生成・配置。スタイル指定（フォト/イラスト/インフォグラフィック等）も可能。</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="s6">
+  <div class="section-header green">
+    <span class="section-num">06</span>
+    <h2>ビルトインスキル（1クリック）</h2>
+  </div>
+
+  <p style="color:var(--muted); margin-bottom:20px;">2026年5月展開。Copilot ペインに事前定義の 1 クリックスキルが追加されました。チャットなしで即座に実行できます。</p>
+
+  <div class="three-col">
+    <div class="skill-card">
+      <h4>🔍 Review this presentation</h4>
+      <p>スライドごとに構成・明確さ・ストーリー性の改善提案を提示。「何が伝わりにくいか」「何が足りないか」を AI が分析。</p>
+    </div>
+    <div class="skill-card">
+      <h4>🎨 Visualize this slide</h4>
+      <p>テキスト中心のスライドをビジュアル重視のデザインに自動変換。図表・アイコン・画像を活用したレイアウトに瞬時に変換。</p>
+    </div>
+    <div class="skill-card">
+      <h4>❓ Prepare for Questions</h4>
+      <p>プレゼンの弱点分析と想定 Q&A を自動生成。本番前の準備に活用。発表者が見落としがちな反論も事前把握できる。</p>
+    </div>
+  </div>
+
+  <div class="callout blue">
+    <strong>活用タイミング：</strong>デッキ完成後に「Review this presentation」で全体品質チェック → 問題スライドを「Visualize this slide」で改善 → 「Prepare for Questions」でプレゼン本番に備える、という 3 ステップが効果的です。
+  </div>
+</section>
+
+<section class="section" id="s7">
+  <div class="section-header blue">
+    <span class="section-num">07</span>
+    <h2>マルチファイル対応 — Word・PDF・Excel から生成</h2>
+  </div>
+
+  <div class="callout blue">
+    <strong>最大 5 ファイルを参照：</strong>OneDrive/SharePoint に保存されたファイルを最大 5 本を参照してデッキを生成できます。ファイル名で検索するか URL を貼り付けて指定。異なる種類のファイルを組み合わせることで、多角的な情報を1つのデッキに統合できます。
+  </div>
+
+  <div class="card-grid">
+    <div class="card blue">
+      <div class="tag blue">Word → PPT</div>
+      <h3>Word 文書からプレゼン生成</h3>
+      <p>Word ファイルを参照ソースとして指定してプレゼンを生成。<strong>Word の見出しスタイル（Heading 1/2等）を適用しておくとスライド分割精度が大幅に向上</strong>します。Word 内の画像も取り込み対象。</p>
+    </div>
+    <div class="card blue">
+      <div class="tag blue">Excel → PPT</div>
+      <h3>Excel データを取り込んだデッキ</h3>
+      <p>Excel ファイルを参照ファイルの 1 つとして指定可能。データのハイライト・グラフの説明・KPI サマリーをスライドに組み込み。最大 5 ファイルのうちの 1 本として使用。</p>
+    </div>
+    <div class="card blue">
+      <div class="tag blue">PDF → PPT</div>
+      <h3>PDF・資料からスライド生成</h3>
+      <p>PDF レポートや調査資料を参照して要点を抽出しプレゼンに変換。複数のリサーチ文書をまとめて1つのデッキに統合することも可能。</p>
+    </div>
+  </div>
+
+  <h3 style="font-size:1rem; margin-bottom:12px; margin-top:8px;">マルチファイル指定の手順</h3>
+  <ol class="step-list blue">
+    <li>Copilot ペインを開いてプロンプト入力欄の<strong>「+」ボタン</strong>をクリック</li>
+    <li>OneDrive/SharePoint のファイルを検索または URL を貼り付けて参照先を追加</li>
+    <li>最大 5 ファイルまで追加可能</li>
+    <li>参照ファイルを確認してからプロンプトを入力「これらの資料を元にプレゼンを作成して」</li>
+    <li>Copilot が逆質問後にアウトラインを提示</li>
+  </ol>
+
+  <div class="callout amber">
+    <strong>Word → PPT のコツ：</strong>Word 文書に Heading 1（章タイトル）・Heading 2（節タイトル）スタイルを適用しておくと、Copilot がスライドの区切りを正確に判断します。構造化された文書からはより論理的なデッキが生成されます。
+  </div>
+</section>
+
+<section class="section" id="s8">
+  <div class="section-header amber">
+    <span class="section-num">08</span>
+    <h2>ブランドキット × Copilot</h2>
+  </div>
+
+  <div class="callout">
+    <strong>ブランドキットとは：</strong>組織の承認済みブランド要素（ロゴ・カラー・フォント・画像・アイコン・テンプレート）のコレクションです。SharePoint の <strong>Organization Assets Library（OAL）</strong> と連携し、Copilot がデッキ生成時に自動適用します。
+  </div>
+
+  <div class="two-col">
+    <div>
+      <h3 style="font-size:1rem; margin-bottom:10px;">ブランドキットの動作原理</h3>
+      <ul style="color:var(--muted); font-size:0.9rem; padding-left:18px; line-height:1.8;">
+        <li><strong>テンプレート優先：</strong>ブランドキットよりもテンプレートが先に適用される</li>
+        <li><strong>Brand Kit 補完：</strong>テンプレート適用後に Brand Kit のルールで補完</li>
+        <li>両方設定があれば、テンプレートを土台に Brand Kit でブランド一貫性を担保</li>
+        <li>Brand Kit の画像ライブラリから AI が視覚素材を自動取得・挿入</li>
+      </ul>
+    </div>
+    <div>
+      <h3 style="font-size:1rem; margin-bottom:10px;">管理者タスク</h3>
+      <ul style="color:var(--muted); font-size:0.9rem; padding-left:18px; line-height:1.8;">
+        <li>SharePoint の OAL でブランド画像フォルダを設定</li>
+        <li>M365 Copilot アプリで Brand Kit を作成・公開</li>
+        <li>Brand Kit にはブランドガイドライン・カラーパレット・ボイスを含める</li>
+        <li>承認済みテンプレートを SharePoint テンプレートライブラリに格納</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout green">
+    <strong>活用フロー：</strong>「このWordレポートをもとに、会社のブランドに合わせた10スライドのデッキを作って」→ Copilot が Brand Kit + OAL のテンプレートを参照してブランド準拠デッキを自動生成。デザインチームのレビュー工数を大幅削減。
+  </div>
+</section>
+
+<section class="section" id="s9">
+  <div class="section-header blue">
+    <span class="section-num">09</span>
+    <h2>PowerPoint Live × Teams（2026年5月〜）</h2>
+  </div>
+
+  <div class="card-grid">
+    <div class="card blue">
+      <h3>📺 スライド説明機能</h3>
+      <p>Teams ミーティング中に参加者がスライドのテキストを選択 → Copilot に説明を依頼できる。発表者を中断させずに、自分の画面のみで解説を受信。理解が追いつかない参加者の強い味方。</p>
+    </div>
+    <div class="card blue">
+      <h3>🌐 多言語対応</h3>
+      <p>PowerPoint Live の字幕機能と組み合わせることで、Copilot の解説も字幕表示が可能。国際会議での活用に適している。</p>
+    </div>
+    <div class="card blue">
+      <h3>🔒 個別体験</h3>
+      <p>各参加者が自分のペースで Copilot に質問できる。発表の本流を邪魔せず、参加者全員が自分の疑問を解消できる非同期型学習体験。</p>
+    </div>
+  </div>
+
+  <div class="callout blue">
+    <strong>展開状況：</strong>PowerPoint Live の Copilot 説明機能は 2026年5月中旬〜下旬に展開完了。Microsoft 365 Copilot ライセンス保持者に自動有効化。
+  </div>
+</section>
+
+<section class="section" id="s10">
+  <div class="section-header amber">
+    <span class="section-num">10</span>
+    <h2>実践プロンプト集 20 選</h2>
+  </div>
+
+  <h3 style="font-size:0.95rem; margin-bottom:14px; color:#fb923c;">🎯 デッキ新規作成（5選）</h3>
+  <div class="prompt-grid">
+    <div class="prompt-card">
+      <div class="p-num">PROMPT 01</div>
+      <h4>役員向け決算デッキ</h4>
+      <div class="p-text">Q4 決算の役員向け 10 スライドのデッキが必要です。財務ハイライト・リスク・来期見通しを含めてください</div>
+      <p>Copilot が対象・スタイル・追加情報を逆質問。ファイル参照を追加すると精度向上。</p>
+    </div>
+    <div class="prompt-card">
+      <div class="p-num">PROMPT 02</div>
+      <h4>新規提案デッキ</h4>
+      <div class="p-text">新製品提案用の 8 スライドデッキを作成してください。課題→解決策→機能→導入ロードマップ→ROI の構成で</div>
+      <p>構成を明示することで Copilot の逆質問が減り、より意図に近い出力が得られる。</p>
+    </div>
+    <div class="prompt-card">
+      <div class="p-num">PROMPT 03</div>
+      <h4>研修・勉強会資料</h4>
+      <div class="p-text">M365 Copilot の部門勉強会用 15 スライドの研修資料を作ってください。理解度確認クイズスライドも 2 枚含めて</div>
+      <p>教育コンテンツにも対応。インタラクティブ要素のリクエストも可能。</p>
+    </div>
+    <div class="prompt-card">
+      <div class="p-num">PROMPT 04</div>
+      <h4>Web 情報参照デッキ</h4>
+      <div class="p-text">[URL を追加] このページを参照して AI 業界の最新トレンドを 6 スライドにまとめてください</div>
+      <p>Web 参照機能（2026年5月〜）を活用。最新情報をリアルタイム取り込み。</p>
+    </div>
+    <div class="prompt-card">
+      <div class="p-num">PROMPT 05</div>
+      <h4>競合比較デッキ</h4>
+      <div class="p-text">製品比較の 5 スライドデッキを作成してください。機能比較表・価格帯・強み・弱みを含むスライドを入れて、各スライドに関連するビジュアルも生成してください（Flux.2 Flex で）</div>
+      <p>モデル指定を含む複合プロンプト。画像も一括生成。</p>
+    </div>
+  </div>
+
+  <h3 style="font-size:0.95rem; margin-bottom:14px; margin-top:8px; color:#60a5fa;">📄 ファイルから変換・統合（5選）</h3>
+  <div class="prompt-grid">
+    <div class="prompt-card blue">
+      <div class="p-num">PROMPT 06</div>
+      <h4>Word レポート → デッキ</h4>
+      <div class="p-text">[Word ファイルを追加] このレポートを元に役員向けの 8 スライドプレゼンを作成してください。各スライドにスピーカーノートも追加して</div>
+      <p>Word の見出しスタイル適用で分割精度UP。スピーカーノートも一括生成。</p>
+    </div>
+    <div class="prompt-card blue">
+      <div class="p-num">PROMPT 07</div>
+      <h4>マルチファイル統合</h4>
+      <div class="p-text">[Word・Excel・PDF を追加] これらの3つのファイルの内容を統合して、戦略レビュー用の 12 スライドデッキを作成してください</div>
+      <p>最大 5 ファイルの同時参照。複数部署の資料をまとめたデッキ作成に。</p>
+    </div>
+    <div class="prompt-card blue">
+      <div class="p-num">PROMPT 08</div>
+      <h4>既存デッキのリフレッシュ</h4>
+      <div class="p-text">[既存 PPT を追加] このデッキを現代的なデザインに更新してください。内容は維持しつつ、レイアウトとビジュアルを刷新して</div>
+      <p>コンテンツを保持しながらデザインのみ刷新。リブランディングに。</p>
+    </div>
+    <div class="prompt-card blue">
+      <div class="p-num">PROMPT 09</div>
+      <h4>要約デッキ</h4>
+      <div class="p-text">[30 ページの Word 文書を追加] このドキュメントのエグゼクティブサマリーを 5 スライドにまとめてください。主要な数値と結論を強調して</div>
+      <p>長文資料のダイジェスト作成に最適。Claude Opus 4.8 推奨。</p>
+    </div>
+    <div class="prompt-card blue">
+      <div class="p-num">PROMPT 10</div>
+      <h4>ブランド準拠デッキ</h4>
+      <div class="p-text">[Word ファイルを追加] 会社のブランドキットとテンプレートを使って、このレポートからブランドに準拠した提案書デッキを作成してください</div>
+      <p>Brand Kit + マルチファイルの組み合わせ。デザインチームの工数を大幅削減。</p>
+    </div>
+  </div>
+
+  <h3 style="font-size:0.95rem; margin-bottom:14px; margin-top:8px; color:#c4b5fd;">🎨 画像生成・デザイン（5選）</h3>
+  <div class="prompt-grid">
+    <div class="prompt-card purple">
+      <div class="p-num">PROMPT 11</div>
+      <h4>AI 画像付きスライド</h4>
+      <div class="p-text">このスライドのコンテンツに合ったビジュアルを MAI-Image-2.5 で生成して配置してください。スタイルはモダンなビジネスインフォグラフィックで</div>
+      <p>モデルを指定してインフォグラフィック生成。テキスト・ロゴ入り画像に最適。</p>
+    </div>
+    <div class="prompt-card purple">
+      <div class="p-num">PROMPT 12</div>
+      <h4>フォトリアル背景</h4>
+      <div class="p-text">タイトルスライドの背景として、東京のビジネス街の未来的な夜景をフォトリアルスタイルで生成してください（GPT-Image 使用）</div>
+      <p>GPT-Image でフォトリアルな背景画像を生成。</p>
+    </div>
+    <div class="prompt-card purple">
+      <div class="p-num">PROMPT 13</div>
+      <h4>全スライド画像化</h4>
+      <div class="p-text">このデッキの全スライドについて、各スライドのテーマに合ったアイコン・イラストを Flux.2 Flex で生成して挿入してください</div>
+      <p>全スライド一括での画像生成・配置。統一感のあるビジュアルデッキに。</p>
+    </div>
+    <div class="prompt-card purple">
+      <div class="p-num">PROMPT 14</div>
+      <h4>Visualize スキル適用</h4>
+      <div class="p-text">（テキスト中心のスライドを選択して）「Visualize this slide」スキルを実行してください</div>
+      <p>1クリックスキルの呼び出し。テキスト→ビジュアルの瞬時変換。</p>
+    </div>
+    <div class="prompt-card purple">
+      <div class="p-num">PROMPT 15</div>
+      <h4>Q&A 準備</h4>
+      <div class="p-text">「Prepare for Questions」スキルで、このデッキに対して想定される質問と回答を生成してください</div>
+      <p>発表前の想定問答集を自動生成。プレゼン本番前の最終確認に。</p>
+    </div>
+  </div>
+
+  <h3 style="font-size:0.95rem; margin-bottom:14px; margin-top:8px; color:#4ade80;">✏️ 編集・改善（5選）</h3>
+  <div class="prompt-grid">
+    <div class="prompt-card green">
+      <div class="p-num">PROMPT 16</div>
+      <h4>スライド削減</h4>
+      <div class="p-text">このデッキを 15 スライドから 8 スライドにまとめてください。重要度の低いスライドを統合・削除して核心だけ残して</div>
+      <p>冗長なデッキのスリム化。エグゼクティブ向けに要点を絞る作業を自動化。</p>
+    </div>
+    <div class="prompt-card green">
+      <div class="p-num">PROMPT 17</div>
+      <h4>スピーカーノート一括追加</h4>
+      <div class="p-text">全スライドに 200〜300 字のスピーカーノートを追加してください。発表者が自然に話せるような口語調で</div>
+      <p>デッキ完成後のスピーカーノート一括生成。発表練習用のスクリプトとして活用。</p>
+    </div>
+    <div class="prompt-card green">
+      <div class="p-num">PROMPT 18</div>
+      <h4>トーン調整</h4>
+      <div class="p-text">このデッキの文体を「社内向けの親しみやすい口調」から「投資家向けのフォーマルな口調」に全スライド一括で変換してください</div>
+      <p>オーディエンスに合わせたトーン変換。同じ内容で異なるデッキを即座に生成。</p>
+    </div>
+    <div class="prompt-card green">
+      <div class="p-num">PROMPT 19</div>
+      <h4>全体レビュー</h4>
+      <div class="p-text">「Review this presentation」スキルでデッキ全体を評価して、改善すべき点を優先度順に教えてください</div>
+      <p>1クリックスキルでデッキ品質の客観的評価。盲点の発見に。</p>
+    </div>
+    <div class="prompt-card green">
+      <div class="p-num">PROMPT 20</div>
+      <h4>翻訳デッキ生成</h4>
+      <div class="p-text">このデッキを英語版に翻訳して新しいファイルとして保存してください。スライド構成・デザインはそのままで</div>
+      <p>多言語展開に。グローバル展開するプレゼンの多言語版を即座に生成。</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="s11">
+  <div class="section-header blue">
+    <span class="section-num">11</span>
+    <h2>上級活用シナリオ</h2>
+  </div>
+
+  <div class="card-grid">
+    <div class="card orange">
+      <div class="tag orange">営業</div>
+      <h3>顧客向け提案書自動生成</h3>
+      <p>案件情報 Word + 製品カタログ PDF + 価格表 Excel の 3 ファイルを参照して、顧客ごとにカスタマイズした提案書を自動生成。Brand Kit で統一ブランドを維持。</p>
+    </div>
+    <div class="card blue">
+      <div class="tag blue">経営</div>
+      <h3>月次経営レポート自動化</h3>
+      <p>Copilot Notebooks や Excel から月次データをインポートして経営会議用デッキを自動生成。スピーカーノートも自動作成。毎月の定型作業を大幅短縮。</p>
+    </div>
+    <div class="card purple">
+      <div class="tag purple">研修</div>
+      <h3>社員研修コンテンツ制作</h3>
+      <p>研修テキスト Word から PowerPoint 研修資料を生成 → Visualize スキルでスライドを視覚化 → Prepare for Questions で想定問答作成 → 多言語版を翻訳。全工程を Copilot で完結。</p>
+    </div>
+    <div class="card green">
+      <div class="tag green">IR</div>
+      <h3>投資家向け資料（IR デッキ）</h3>
+      <p>決算資料 Excel + 年次報告書 Word + 競合分析 PDF の 3 ファイルを参照して IR デッキを生成。GPT-Image でプロフェッショナルな表紙画像を生成。トーンをフォーマルに統一。</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="s12">
+  <div class="section-header red">
+    <span class="section-num">12</span>
+    <h2>ライセンス・制限・注意点</h2>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>項目</th><th>詳細</th></tr></thead>
+      <tbody>
+        <tr><td><strong>必要ライセンス</strong></td><td>Microsoft 365 Copilot アドオン（約 $30/ユーザー/月）。M365 Business Standard/Premium または E3/E5 に追加。個人向けは M365 Personal/Family Premium。</td></tr>
+        <tr><td><strong>Claude モデル</strong></td><td>IT 管理者による Anthropic サブプロセッサ有効化が必要。EU/EFTA/UK テナントではデフォルト無効（データ規制）。</td></tr>
+        <tr><td><strong>MAI-Image-2.5</strong></td><td>Build 2026（2026年6月〜）でロールアウト中。全ユーザーへの展開は順次進行。表示されない場合はリリース待ち。</td></tr>
+        <tr><td><strong>Flux.2 Flex</strong></td><td>2026年4月下旬〜5月展開。テナント/リージョンによって展開タイミングが異なる場合あり。</td></tr>
+        <tr><td><strong>参照ファイル上限</strong></td><td>最大 5 ファイル。参照ファイルは OneDrive/SharePoint に保存されている必要あり。ローカルファイルは直接参照不可。</td></tr>
+        <tr><td><strong>Brand Kit 要件</strong></td><td>IT 管理者が SharePoint OAL の設定と M365 Copilot アプリでの Brand Kit 作成・公開が必要。</td></tr>
+        <tr><td><strong>生成画像の著作権</strong></td><td>Copilot が生成した画像の商用利用条件は Microsoft のコンテンツポリシーに準拠。重要な商業用途では利用規約を確認すること。</td></tr>
+        <tr><td><strong>PowerPoint Live</strong></td><td>Teams ミーティング中の Copilot 説明機能は 2026年5月より展開。M365 Copilot ライセンス保持者に自動有効化。</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout red">
+    <strong>重要：</strong>Copilot が生成したスライドの内容・数値・引用は必ず確認してください。特にファイル参照を使用した場合、参照先の情報が正確にスライドに反映されているかを検証することを推奨します。
+  </div>
+</section>
+
+<div style="background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:24px 28px;">
+  <h2 style="font-size:1rem; font-weight:700; margin-bottom:14px; color:var(--muted);">関連ページ</h2>
+  <div class="card-grid" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr));">
+    <a href="./copilot-excel-agent.html" style="display:block;"><div class="card" style="border-color:rgba(29,131,72,0.4);">
+      <h3 style="color:#4ade80;">📊 Excel エージェントモード</h3>
+      <p>=COPILOT 関数・Python in Excel・財務モデル自動化</p>
+    </div></a>
+    <a href="./copilot-word-agent.html" style="display:block;"><div class="card" style="border-color:rgba(0,100,200,0.4);">
+      <h3 style="color:#60a5fa;">📝 Word エージェントモード</h3>
+      <p>追跡変更・Legal Agent・長文起草ガイド</p>
+    </div></a>
+    <a href="./m365-copilot.html" style="display:block;"><div class="card">
+      <h3>M365 Copilot 概要</h3>
+      <p>全アプリの機能一覧・ライセンス・スタートガイド</p>
+    </div></a>
+    <a href="./m365-copilot-guide.html" style="display:block;"><div class="card">
+      <h3>M365 Copilot 実践大全</h3>
+      <p>全アプリ横断のプロンプト集・業務シナリオ 50 選</p>
+    </div></a>
+  </div>
+</div>
+
+</main>
+
+<footer>
+  <p>最終更新: 2026-06-05 | <a href="./index.html">LLM 個別深掘り</a> | <a href="../../index.html">Hub トップ</a></p>
+  <p style="margin-top:6px; font-size:0.8rem;">出典: <a href="https://www.microsoft.com/en-us/microsoft-365/blog/2026/04/22/copilots-agentic-capabilities-in-word-excel-and-powerpoint-are-generally-available/" target="_blank" rel="noopener">Microsoft 365 Blog — GA発表 (2026-04-22)</a> | <a href="https://support.microsoft.com/en-us/topic/choose-your-model-when-editing-with-copilot-in-powerpoint-25ba645b-2932-4f10-a910-fea4ae76d65c" target="_blank" rel="noopener">モデル選択ガイド</a> | <a href="https://microsoft.ai/models/mai-image-2-5/" target="_blank" rel="noopener">MAI-Image-2.5 公式</a></p>
+</footer>
+
+</body>
+</html>

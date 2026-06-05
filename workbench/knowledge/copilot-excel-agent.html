@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Excel Copilot エージェントモード（Edit with Copilot）完全実践ガイド | Tech Workbench</title>
+<style>
+:root {
+    --accent: #1d8348;
+    --accent2: #0078d4;
+    --accent3: #f59e0b;
+    --red: #dc2626;
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #21262d;
+    --border: rgba(255,255,255,0.08);
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --radius: 12px;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; line-height:1.65; font-size:16px; }
+a { color:var(--accent2); text-decoration:none; }
+a:hover { text-decoration:underline; }
+.page-wrap { max-width:1000px; margin:0 auto; padding:32px 20px 80px; }
+nav { background:var(--surface); border-bottom:1px solid var(--border); padding:12px 20px; font-size:0.85rem; }
+nav a { color:var(--muted); margin-right:6px; }
+nav span { color:var(--muted); margin-right:6px; }
+
+.hero { background:linear-gradient(135deg, rgba(0,60,25,0.95), rgba(29,131,72,0.55), rgba(20,100,55,0.2)); border:1px solid rgba(29,131,72,0.4); border-radius:var(--radius); padding:48px 40px; margin-bottom:40px; }
+.hero h1 { font-size:2.2rem; font-weight:800; color:#fff; margin-bottom:8px; }
+.hero .sub { color:rgba(255,255,255,0.88); font-size:1.05rem; margin-bottom:24px; max-width:720px; }
+.stat-row { display:flex; gap:14px; flex-wrap:wrap; }
+.stat { background:rgba(0,0,0,0.35); border:1px solid rgba(29,131,72,0.45); border-radius:8px; padding:12px 18px; text-align:center; min-width:100px; }
+.stat .val { font-size:1.4rem; font-weight:800; color:#4ade80; }
+.stat .lbl { font-size:0.72rem; color:var(--muted); margin-top:2px; }
+
+.toc { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:24px 28px; margin-bottom:40px; }
+.toc h2 { font-size:0.82rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; margin-bottom:14px; }
+.toc ol { padding-left:20px; }
+.toc li { margin-bottom:5px; font-size:0.93rem; }
+.toc a { color:var(--text); }
+.toc a:hover { color:#4ade80; }
+
+.section { margin-bottom:56px; }
+.section-header { display:flex; align-items:center; gap:12px; margin-bottom:24px; padding-bottom:12px; border-bottom:2px solid var(--accent); }
+.section-num { background:var(--accent); color:#fff; font-size:0.75rem; font-weight:700; padding:3px 9px; border-radius:4px; }
+.section-header h2 { font-size:1.4rem; font-weight:700; color:#4ade80; }
+.section-header.blue { border-color:var(--accent2); }
+.section-header.blue .section-num { background:var(--accent2); }
+.section-header.blue h2 { color:#60a5fa; }
+.section-header.amber { border-color:var(--accent3); }
+.section-header.amber .section-num { background:var(--accent3); color:#000; }
+.section-header.amber h2 { color:var(--accent3); }
+.section-header.red { border-color:var(--red); }
+.section-header.red .section-num { background:var(--red); }
+.section-header.red h2 { color:#f87171; }
+
+.card-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; margin-bottom:24px; }
+.card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:20px; }
+.card h3 { font-size:1rem; font-weight:700; margin-bottom:8px; color:var(--text); }
+.card p { font-size:0.875rem; color:var(--muted); line-height:1.6; }
+.card.green { border-color:rgba(29,131,72,0.5); }
+.card.blue { border-color:rgba(0,120,212,0.4); }
+.card.amber { border-color:rgba(245,158,11,0.4); }
+
+.table-wrap { overflow-x:auto; margin-bottom:24px; }
+table { width:100%; border-collapse:collapse; font-size:0.875rem; }
+th { background:var(--surface2); color:var(--muted); font-weight:600; padding:10px 14px; text-align:left; border-bottom:1px solid var(--border); }
+td { padding:10px 14px; border-bottom:1px solid rgba(255,255,255,0.04); vertical-align:top; }
+tr:hover td { background:rgba(255,255,255,0.02); }
+td code { background:rgba(29,131,72,0.15); color:#4ade80; padding:1px 5px; border-radius:3px; font-size:0.82rem; }
+
+.callout { border-left:3px solid var(--accent); background:rgba(29,131,72,0.08); padding:14px 18px; border-radius:0 8px 8px 0; margin-bottom:20px; font-size:0.9rem; }
+.callout.blue { border-color:var(--accent2); background:rgba(0,120,212,0.07); }
+.callout.amber { border-color:var(--accent3); background:rgba(245,158,11,0.07); }
+.callout.red { border-color:var(--red); background:rgba(220,38,38,0.07); }
+.callout strong { color:var(--text); }
+
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:24px; }
+@media(max-width:680px){ .two-col { grid-template-columns:1fr; } }
+
+.tag { display:inline-block; font-size:0.7rem; font-weight:700; padding:2px 8px; border-radius:4px; margin-bottom:6px; }
+.tag.green { background:rgba(29,131,72,0.2); color:#4ade80; }
+.tag.blue { background:rgba(0,120,212,0.15); color:#60a5fa; }
+.tag.amber { background:rgba(245,158,11,0.15); color:var(--accent3); }
+.tag.gray { background:rgba(139,148,158,0.15); color:var(--muted); }
+
+.prompt-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:14px; margin-bottom:28px; }
+.prompt-card { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:16px 18px; }
+.prompt-card .p-num { font-size:0.7rem; font-weight:700; color:var(--muted); margin-bottom:4px; }
+.prompt-card h4 { font-size:0.88rem; font-weight:700; margin-bottom:8px; color:var(--text); }
+.prompt-card .p-text { font-size:0.82rem; color:#4ade80; font-family:'SF Mono',Consolas,monospace; background:rgba(29,131,72,0.1); border:1px solid rgba(29,131,72,0.25); border-radius:6px; padding:8px 10px; margin-bottom:6px; line-height:1.6; }
+.prompt-card p { font-size:0.8rem; color:var(--muted); }
+.prompt-card.blue { border-color:rgba(0,120,212,0.35); }
+.prompt-card.blue .p-text { color:#60a5fa; background:rgba(0,120,212,0.08); border-color:rgba(0,120,212,0.2); }
+.prompt-card.amber { border-color:rgba(245,158,11,0.35); }
+.prompt-card.amber .p-text { color:var(--accent3); background:rgba(245,158,11,0.08); border-color:rgba(245,158,11,0.2); }
+
+.step-list { counter-reset:steps; list-style:none; padding-left:0; margin-bottom:20px; }
+.step-list li { counter-increment:steps; display:flex; gap:14px; margin-bottom:12px; align-items:flex-start; font-size:0.9rem; }
+.step-list li::before { content:counter(steps); background:var(--accent); color:#fff; font-size:0.75rem; font-weight:800; min-width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:2px; }
+.step-list.blue li::before { background:var(--accent2); }
+
+.chips { display:flex; flex-wrap:wrap; gap:6px; margin-top:14px; }
+.chip { background:rgba(29,131,72,0.15); color:#4ade80; border:1px solid rgba(29,131,72,0.3); border-radius:20px; padding:3px 10px; font-size:0.78rem; font-weight:600; }
+
+.code-block { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:14px 18px; font-family:'SF Mono',Consolas,monospace; font-size:0.82rem; color:#cdd9e5; margin-bottom:16px; overflow-x:auto; }
+
+footer { text-align:center; padding:32px 20px; color:var(--muted); font-size:0.85rem; border-top:1px solid var(--border); margin-top:60px; }
+footer a { color:var(--muted); }
+footer a:hover { color:var(--text); }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="../../index.html">Hub</a> <span>›</span>
+  <a href="./index.html">LLM 個別深掘り</a> <span>›</span>
+  <a href="./m365-copilot.html">M365 Copilot</a> <span>›</span>
+  Excel エージェントモード
+</nav>
+
+<main class="page-wrap">
+
+<div class="hero">
+  <div class="chips" style="margin-bottom:14px;">
+    <span class="chip">GA: 2026-04-22</span>
+    <span class="chip">Build 2026 デフォルト</span>
+    <span class="chip">LLM 選択可能</span>
+    <span class="chip">=COPILOT 関数</span>
+  </div>
+  <h1>📊 Excel Copilot<br>エージェントモード完全ガイド</h1>
+  <p class="sub">Plan → Act → Validate の自律サイクルでスプレッドシート作業を変革。GPT-5.5・Claude Opus 4.8 を搭載した AI エージェントが複雑な分析・ダッシュボード構築・財務モデルを一気通貫で実行。2026年6月最新情報。</p>
+  <div class="stat-row">
+    <div class="stat"><div class="val">2026/4/22</div><div class="lbl">GA 日</div></div>
+    <div class="stat"><div class="val">6+</div><div class="lbl">選択可能 LLM</div></div>
+    <div class="stat"><div class="val">+33%</div><div class="lbl">利用率向上</div></div>
+    <div class="stat"><div class="val">Work IQ</div><div class="lbl">自動グラウンディング</div></div>
+  </div>
+</div>
+
+<div class="toc">
+  <h2>目次</h2>
+  <ol>
+    <li><a href="#s1">エージェントモードとは — Plan/Act/Validate サイクル</a></li>
+    <li><a href="#s2">有効化・アクセス方法</a></li>
+    <li><a href="#s3">LLM モデル選択ガイド</a></li>
+    <li><a href="#s4">コア機能詳解</a></li>
+    <li><a href="#s5">=COPILOT 関数 — セルレベル AI</a></li>
+    <li><a href="#s6">Python in Excel × Copilot</a></li>
+    <li><a href="#s7">Work IQ — 自動グラウンディング</a></li>
+    <li><a href="#s8">実践プロンプト集 20 選</a></li>
+    <li><a href="#s9">上級活用シナリオ</a></li>
+    <li><a href="#s10">ライセンス・制限・注意点</a></li>
+  </ol>
+</div>
+
+<section class="section" id="s1">
+  <div class="section-header">
+    <span class="section-num">01</span>
+    <h2>エージェントモードとは — Plan/Act/Validate サイクル</h2>
+  </div>
+
+  <div class="callout">
+    <strong>正式名称：</strong>2026年4月22日の GA（一般提供開始）時に "Agent Mode" から <strong>"Edit with Copilot"</strong> に改称。Build 2026（5月19〜21日）でデフォルト機能となりました。本ガイドでは通称「エージェントモード」を使用します。
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>観点</th><th>旧 Copilot（サイドパネル）</th><th>エージェントモード（Edit with Copilot）</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>動作方式</td><td>提案・回答のみ（ユーザーが実行）</td><td>自律的にマルチステップ操作を実行</td></tr>
+        <tr><td>実行計画</td><td>なし</td><td>実行前に<strong>可視化された実行プラン</strong>を提示（ユーザーが承認）</td></tr>
+        <tr><td>変更プレビュー</td><td>なし</td><td><strong>紫色ハイライト</strong>で変更予定セルを事前表示</td></tr>
+        <tr><td>連続実行</td><td>1ステップずつ手動確認</td><td>エージェントが自律ループで連続実行</td></tr>
+        <tr><td>検証シート</td><td>なし</td><td>処理後に<strong>照合・検証シート</strong>を自動生成</td></tr>
+        <tr><td>LLM 選択</td><td>なし</td><td>GPT-5.5 / Claude Opus 4.8 等から選択可能</td></tr>
+        <tr><td>成果物</td><td>部分的なテキスト提案</td><td>完成したチャート・数式・ピボット・シート一式</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 style="font-size:1.05rem; margin-bottom:12px;">Plan → Act → Validate のサイクル</h3>
+  <ol class="step-list">
+    <li><strong>Plan：</strong>自然言語のプロンプトを受け取り、Copilot が「どのシートを操作するか・どの数式を作るか・何を出力するか」の実行計画を提示。ユーザーが内容を確認・調整できる。</li>
+    <li><strong>Act：</strong>ユーザー承認後、Copilot がワークブックを直接編集。数式作成・ピボット生成・グラフ配置・新シート追加を自律的に連続実行。変更セルは紫色でプレビュー表示される。</li>
+    <li><strong>Validate：</strong>実行後に照合シート（Reconciliation Sheet）を自動生成し、変更内容・行数・差異を記録。共有ブックでは「Copilot edited」ラベルで変更箇所を明示（Show Changes 機能）。</li>
+    <li><strong>Iterate：</strong>結果を見てさらに追加指示。「グラフの色を変えて」「列を追加して」と自然言語でフィードバックを続けられる。</li>
+  </ol>
+
+  <h3 style="font-size:1.05rem; margin-bottom:12px; margin-top:24px;">リリースタイムライン</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>日付</th><th>マイルストーン</th></tr></thead>
+      <tbody>
+        <tr><td>2025年12月</td><td>Excel for the Web でエージェントモード プレビュー開始</td></tr>
+        <tr><td>2026年1月27日</td><td>Excel for Windows デスクトップ でプレビュー提供開始</td></tr>
+        <tr><td>2026年2月〜</td><td>Mac 展開開始・Wave 3 発表</td></tr>
+        <tr><td>2026年4月22日</td><td><strong>GA（一般提供開始）</strong>— "Edit with Copilot" として全 M365 Copilot ユーザーへ</td></tr>
+        <tr><td>2026年5月末</td><td>Claude Opus 4.8 が Excel に対応・Copilot Notebooks → Excel パイプライン GA</td></tr>
+        <tr><td>2026年5月19〜21日</td><td><strong>Build 2026</strong>— エージェントモードを Office 365 Copilot のデフォルトと宣言</td></tr>
+        <tr><td>2026年6月</td><td>=COPILOT 関数のウェブ検索統合が Insider 向け展開、Show Changes 機能 GA</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="section" id="s2">
+  <div class="section-header">
+    <span class="section-num">02</span>
+    <h2>有効化・アクセス方法</h2>
+  </div>
+
+  <div class="callout amber">
+    <strong>前提条件：</strong>ファイルは <strong>OneDrive または SharePoint に保存</strong>し、<strong>自動保存（AutoSave）を有効</strong>にする必要があります。ローカルファイルでも基本機能は動作しますが、フル機能は OneDrive/SharePoint 保存ファイルで利用可能です。
+  </div>
+
+  <div class="two-col">
+    <div>
+      <h3 style="font-size:1rem; margin-bottom:10px;">デスクトップ Excel（Windows/Mac）</h3>
+      <ol class="step-list blue">
+        <li>ファイルを OneDrive/SharePoint に保存して自動保存を確認</li>
+        <li>リボン「ホーム」→ <strong>「Copilot」</strong> ボタンをクリック</li>
+        <li>右側に Copilot ペインが開く（Build 2026 以降はデフォルトでエージェントモード）</li>
+        <li>ペイン上部の <strong>モデルピッカー</strong> から使用 LLM を選択</li>
+        <li>プロンプト入力欄にタスクを入力</li>
+      </ol>
+    </div>
+    <div>
+      <h3 style="font-size:1rem; margin-bottom:10px;">Excel Online（Web ブラウザ）</h3>
+      <ol class="step-list">
+        <li>OneDrive / SharePoint でファイルを開く</li>
+        <li>右上の <strong>「Copilot」</strong> ボタンをクリック</li>
+        <li>Copilot ペインが開く（機能はデスクトップ版と同等）</li>
+        <li>モデル選択も同様に対応</li>
+        <li>Microsoft 推奨：機能の早期アクセスは Web 版先行が多い</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="s3">
+  <div class="section-header blue">
+    <span class="section-num">03</span>
+    <h2>LLM モデル選択ガイド</h2>
+  </div>
+
+  <p style="color:var(--muted); margin-bottom:16px;">Copilot ペイン上部の<strong>モデルピッカー</strong>でいつでも切り替え可能。タスクに合わせて選ぶと精度が大きく変わります。</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>モデル</th><th>提供元</th><th>特徴</th><th>向いているタスク</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Auto（自動）</strong></td><td>Microsoft</td><td>タスクに最適なモデルを自動選択。デフォルト</td><td>普段使い・迷ったらこれ</td></tr>
+        <tr><td><strong>GPT-5.5</strong></td><td>OpenAI</td><td>現在のデフォルト推論モデル。クリーンで高速な出力</td><td>数式生成・一般分析・グラフ作成</td></tr>
+        <tr><td>GPT-5.4</td><td>OpenAI</td><td>5.5 の前世代。引き続き選択可能</td><td>互換性重視の場合</td></tr>
+        <tr><td><strong>Claude Opus 4.8</strong></td><td>Anthropic</td><td>2026年5月末追加。複雑なマルチステップ・長期タスクに最適化</td><td>財務モデル・複合分析・長文データ処理</td></tr>
+        <tr><td><strong>Claude Opus 4.7</strong></td><td>Anthropic</td><td>2026年4月追加。高速・ツール選択の精度向上</td><td>反復処理・複数シート操作</td></tr>
+        <tr><td>Think Deeper</td><td>—</td><td>長時間推論モード。精度優先・速度は遅い</td><td>ロジック検証・複雑な多ステップ設計</td></tr>
+        <tr><td>Quick Response</td><td>—</td><td>速度優先モード</td><td>単純な書式変換・即座の確認</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout">
+    <strong>Claude モデルの注意点：</strong>企業環境では IT 管理者が M365 管理センター →「設定」→「Copilot」→ AI プロバイダー で <strong>Anthropic をサブプロセッサとして有効化</strong>する必要があります。EU/EFTA/UK テナントではデータ規制によりデフォルト無効。モデル選択はブックを閉じるとデフォルトにリセットされます。
+  </div>
+
+  <div class="card-grid">
+    <div class="card green">
+      <h3>📊 複雑な数式・財務モデル</h3>
+      <p>三表連動・感度分析・Monte Carlo → <strong>Claude Opus 4.8</strong> または <strong>Think Deeper</strong></p>
+    </div>
+    <div class="card blue">
+      <h3>⚡ 一般分析・グラフ作成</h3>
+      <p>ピボット・チャート・KPI ダッシュボード → <strong>GPT-5.5（Auto）</strong></p>
+    </div>
+    <div class="card amber">
+      <h3>🔁 反復・大量処理</h3>
+      <p>全シート一括処理・複数テーブル変換 → <strong>Claude Opus 4.7</strong></p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="s4">
+  <div class="section-header">
+    <span class="section-num">04</span>
+    <h2>コア機能詳解</h2>
+  </div>
+
+  <div class="card-grid">
+    <div class="card green">
+      <div class="tag green">数式</div>
+      <h3>Formula AI — 数式生成・修復</h3>
+      <p>目的を日本語で説明すると SUMIFS・XLOOKUP・配列数式・Lambda 等を自動生成。入力中に自動補完（Formula Autocomplete）も機能。壊れた数式の自動検出・修復にも対応。</p>
+    </div>
+    <div class="card green">
+      <div class="tag green">可視化</div>
+      <h3>グラフ・ピボット自動生成</h3>
+      <p>棒グラフ・折れ線・散布図・ウォーターフォール・コンボチャートを自動作成。PivotTable + PivotChart のペアを一括生成。KPI カード付きのサマリーシートも構築可能。</p>
+    </div>
+    <div class="card blue">
+      <div class="tag blue">書式</div>
+      <h3>条件付き書式・ハイライト</h3>
+      <p>「売上目標未達を赤でハイライト」「上位 10% を緑で強調」など自然言語で書式ルールを設定。複合条件・カスタムルールの自動生成に対応。</p>
+    </div>
+    <div class="card blue">
+      <div class="tag blue">整理</div>
+      <h3>データクリーニング</h3>
+      <p>空白セル・重複行・フォーマット不統一を自動検出・修正。テキスト正規化（全角/半角・大文字/小文字）も指示1つで実行。クリーニング結果のサマリーシートを自動生成。</p>
+    </div>
+    <div class="card amber">
+      <div class="tag amber">透明性</div>
+      <h3>Show Changes — 変更追跡</h3>
+      <p>共有ブックで Copilot が編集した箇所に「Copilot edited」ラベルを表示。変更箇所・変更内容・タイムスタンプを記録。AI の編集と人間の編集を明確に区別。</p>
+    </div>
+    <div class="card amber">
+      <div class="tag amber">統合</div>
+      <h3>Copilot Notebooks → Excel</h3>
+      <p>Copilot アプリで作成したノートブック（会議メモ・リサーチ等）から構造化 Excel ファイルを自動生成。「このノートブックから Excel スプレッドシートを作成して」で起動。</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="s5">
+  <div class="section-header blue">
+    <span class="section-num">05</span>
+    <h2>=COPILOT 関数 — セルレベル AI</h2>
+  </div>
+
+  <div class="callout blue">
+    <strong>新機能：</strong><code>=COPILOT()</code> は Excel のセルに直接入力できる AI 関数です。Azure 上の AI モデルを呼び出し、動的な結果をセルに返します。ルックアップテーブルなしでデータを取得・変換できます。
+  </div>
+
+  <div class="code-block">=COPILOT("プロンプトをここに入力")</div>
+
+  <h3 style="font-size:1rem; margin-bottom:12px;">活用例</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>数式例</th><th>返値</th></tr></thead>
+      <tbody>
+        <tr><td><code>=COPILOT("G7諸国と現在の中央銀行金利を一覧で")</code></td><td>各国・金利のリストを動的生成</td></tr>
+        <tr><td><code>=COPILOT("A2の商品名から業界カテゴリを推定して")</code></td><td>カテゴリラベルをセルに返す</td></tr>
+        <tr><td><code>=COPILOT("B2の文章を英語に翻訳して")</code></td><td>翻訳結果をセルに返す</td></tr>
+        <tr><td><code>=COPILOT("C2のテキストから感情（ポジティブ/ネガティブ）を判定して")</code></td><td>感情ラベルをセルに返す</td></tr>
+        <tr><td><code>=COPILOT("最新の為替レート（USD/JPY）を取得して")</code></td><td>ウェブ検索でリアルタイム取得（Insider 展開中）</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout amber">
+    <strong>ウェブ検索統合：</strong>=COPILOT 関数からのウェブ検索（リアルタイムデータ取得）は 2026年6月時点で Insider チャンネルへ展開中です。一般リリースは後続予定。
+  </div>
+</section>
+
+<section class="section" id="s6">
+  <div class="section-header">
+    <span class="section-num">06</span>
+    <h2>Python in Excel × Copilot</h2>
+  </div>
+
+  <p style="color:var(--muted); margin-bottom:16px;">Copilot エージェントモードは <strong>Python in Excel</strong> と統合されており、自然言語で高度な統計・機械学習・データサイエンス操作を実行できます。Python コードを書く必要はありません。</p>
+
+  <div class="card-grid">
+    <div class="card green">
+      <div class="tag green">統計</div>
+      <h3>記述統計・相関分析</h3>
+      <p>「このデータの記述統計と相関行列を計算して」→ pandas/scipy を使った統計分析コードを自動生成・実行。結果を Excel シートに構造化して表示。</p>
+    </div>
+    <div class="card green">
+      <div class="tag green">予測</div>
+      <h3>回帰・予測モデル</h3>
+      <p>「売上予測の線形回帰を作って」→ scikit-learn コードを生成して係数・R²値・残差グラフを出力。Monte Carlo シミュレーション（1,000 回）も1プロンプトで実行可能。</p>
+    </div>
+    <div class="card blue">
+      <div class="tag blue">可視化</div>
+      <h3>高度なグラフ（matplotlib/seaborn）</h3>
+      <p>「相関ヒートマップを作って」「ボックスプロットで分布を見せて」→ Python ベースの高品質グラフを生成し、シートに挿入。カスタム SVG 出力も Python コード経由で可能。</p>
+    </div>
+    <div class="card blue">
+      <div class="tag blue">財務</div>
+      <h3>財務モデル自動化</h3>
+      <p>「仮定シートの GrowthRate・COGS 率を使って3年間の損益計算書を作成して」→ Python で三表連動モデルを構築。感度分析テーブルも自動生成。</p>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>Python in Excel の要件：</strong>Microsoft 365 の Python 対応プランが必要です。組織ポリシーで無効化されている場合があります。計算は Microsoft Cloud の分離された安全な環境（Anaconda）で実行されます。
+  </div>
+</section>
+
+<section class="section" id="s7">
+  <div class="section-header amber">
+    <span class="section-num">07</span>
+    <h2>Work IQ — 自動グラウンディング</h2>
+  </div>
+
+  <p style="color:var(--muted); margin-bottom:16px;"><strong>Work IQ</strong> は Microsoft Graph に基づくコンテキスト層で、Excel でのエージェント編集中に<strong>メール・Teams・SharePoint・カレンダーの関連情報を自動取り込み</strong>します。@メンション等の手動指定は不要です。</p>
+
+  <div class="card-grid">
+    <div class="card amber">
+      <h3>📁 ファイルコンテキスト</h3>
+      <p>「先月の売上報告書（SharePoint）を参照してこのシートを更新して」→ ファイルを直接コンテキストとして取り込み、シートと統合。</p>
+    </div>
+    <div class="card amber">
+      <h3>📧 メール・Teams 参照</h3>
+      <p>「先週の顧客フィードバックメールの要点を集めてこのテーブルに追加して」→ Exchange メール・Teams チャットを参照してシートに反映。</p>
+    </div>
+    <div class="card amber">
+      <h3>📅 会議・カレンダー連携</h3>
+      <p>「先週のミーティング議事録から決定事項をリストアップしてシートに構造化して」→ Teams 会議の文字起こしをアクションリスト化。</p>
+    </div>
+  </div>
+
+  <div class="callout blue">
+    <strong>Work IQ API（2026年6月2日発表、6月16日 GA）：</strong>開発者向けに Chat・Context・Tools・Workspaces の4系統 API が公開されました。サードパーティアプリから Work IQ を活用した Excel 連携が可能になります。
+  </div>
+</section>
+
+<section class="section" id="s8">
+  <div class="section-header amber">
+    <span class="section-num">08</span>
+    <h2>実践プロンプト集 20 選</h2>
+  </div>
+
+  <h3 style="font-size:0.95rem; margin-bottom:14px; color:#4ade80;">📊 データ分析・洞察（5選）</h3>
+  <div class="prompt-grid">
+    <div class="prompt-card">
+      <div class="p-num">PROMPT 01</div>
+      <h4>全体分析サマリー</h4>
+      <div class="p-text">このシートのデータを分析して、主要なトレンド・外れ値・改善が必要な点を3〜5項目で教えてください</div>
+      <p>最初の一手として使える万能プロンプト。全体俯瞰に最適。</p>
+    </div>
+    <div class="prompt-card">
+      <div class="p-num">PROMPT 02</div>
+      <h4>前年比較</h4>
+      <div class="p-text">売上データの前年同期比を計算して、成長率・減少率の上位5項目をサマリーシートにまとめてください</div>
+      <p>YoY 比較 + 自動サマリーシート生成まで一括実行。</p>
+    </div>
+    <div class="prompt-card">
+      <div class="p-num">PROMPT 03</div>
+      <h4>外れ値検出</h4>
+      <div class="p-text">このデータから IQR 法で統計的外れ値を検出し、対象セルを黄色でハイライトして検出サマリーをSheet2に出力してください</div>
+      <p>Python in Excel 経由での統計的外れ値検出と書式設定を組み合わせ。</p>
+    </div>
+    <div class="prompt-card blue">
+      <div class="p-num">PROMPT 04</div>
+      <h4>財務モデル生成</h4>
+      <div class="p-text">仮定シートの GrowthRate・COGSMargin・SGA% を使って3年間の損益計算書・貸借対照表・キャッシュフロー計算書を作成してください</div>
+      <p>三表連動モデルを Claude Opus 4.8 + Python in Excel で一括構築。</p>
+    </div>
+    <div class="prompt-card blue">
+      <div class="p-num">PROMPT 05</div>
+      <h4>Monte Carlo シミュレーション</h4>
+      <div class="p-text">売上に対してMonte Carlo シミュレーション（1,000回試行）を実行し、平均・標準偏差・95%信頼区間をSheet3に表示してください</div>
+      <p>Python in Excel で確率的シミュレーション。リスク分析に。</p>
+    </div>
+  </div>
+
+  <h3 style="font-size:0.95rem; margin-bottom:14px; margin-top:8px; color:#60a5fa;">📈 ダッシュボード・可視化（5選）</h3>
+  <div class="prompt-grid">
+    <div class="prompt-card blue">
+      <div class="p-num">PROMPT 06</div>
+      <h4>KPI ダッシュボード</h4>
+      <div class="p-text">Sheet1のデータを使って「ダッシュボード」シートを新規作成し、売上・利益率・前月比のKPIカードと複合チャートを配置してください</div>
+      <p>マルチシートのダッシュボードを一括構築。経営会議用資料に直結。</p>
+    </div>
+    <div class="prompt-card blue">
+      <div class="p-num">PROMPT 07</div>
+      <h4>ウォーターフォール</h4>
+      <div class="p-text">収益からコストを差し引いた利益構造をウォーターフォールチャートで可視化して、財務サマリーシートに配置してください</div>
+      <p>財務構造の視覚化に最適な定番チャートを自動生成。</p>
+    </div>
+    <div class="prompt-card blue">
+      <div class="p-num">PROMPT 08</div>
+      <h4>感度分析テーブル</h4>
+      <div class="p-text">価格と販売量の2軸感度分析テーブルを作成して、営業利益がゼロ以下のセルを赤でハイライトしてください</div>
+      <p>What-If 分析の定番。条件付き書式との組み合わせで視認性向上。</p>
+    </div>
+    <div class="prompt-card blue">
+      <div class="p-num">PROMPT 09</div>
+      <h4>複合グラフ</h4>
+      <div class="p-text">売上（棒グラフ・左軸）と利益率（折れ線・右軸）の複合グラフをSheet2に作成してください</div>
+      <p>2軸グラフの自動設定。月次レポート用グラフに最適。</p>
+    </div>
+    <div class="prompt-card blue">
+      <div class="p-num">PROMPT 10</div>
+      <h4>スパークライン一括追加</h4>
+      <div class="p-text">各行の12か月推移を示すスパークラインをN列に一括追加し、最大値セルを緑・最小値セルを赤で強調してください</div>
+      <p>全行にスパークライン + 条件付き書式を自動配置。</p>
+    </div>
+  </div>
+
+  <h3 style="font-size:0.95rem; margin-bottom:14px; margin-top:8px; color:var(--accent3);">⚙️ データ処理・整理（5選）</h3>
+  <div class="prompt-grid">
+    <div class="prompt-card amber">
+      <div class="p-num">PROMPT 11</div>
+      <h4>マルチシート統合</h4>
+      <div class="p-text">3つの地域別販売シートを「統合」シートに集約し、行数・合計の照合シートを作成して差異があれば赤でフラグを立ててください</div>
+      <p>Plan/Act/Validate の真価が発揮されるマルチシート処理。</p>
+    </div>
+    <div class="prompt-card amber">
+      <div class="p-num">PROMPT 12</div>
+      <h4>データクリーニング</h4>
+      <div class="p-text">このシートのデータを整理してください：重複削除・日付フォーマット統一・C列の空白をフラグ・整理結果のサマリーをSheet2に出力</div>
+      <p>複合クリーニング処理を1プロンプトで指示。</p>
+    </div>
+    <div class="prompt-card amber">
+      <div class="p-num">PROMPT 13</div>
+      <h4>高度な数式生成</h4>
+      <div class="p-text">A列の商品コードをD列の商品マスタと照合し、一致した場合のE列単価を返す数式をB列に作成してください。見つからない場合は「未登録」と表示</div>
+      <p>XLOOKUP / IFERROR の組み合わせ数式を自然言語から自動生成。</p>
+    </div>
+    <div class="prompt-card amber">
+      <div class="p-num">PROMPT 14</div>
+      <h4>重複検出</h4>
+      <div class="p-text">A列とB列の組み合わせで重複している行を検出し、C列に「重複」フラグを立てて黄色でハイライトしてください</div>
+      <p>COUNTIFS + 条件付き書式の組み合わせを自動設定。</p>
+    </div>
+    <div class="prompt-card amber">
+      <div class="p-num">PROMPT 15</div>
+      <h4>ピボット一括生成</h4>
+      <div class="p-text">このテーブルを元に部門別・月別・商品カテゴリ別の3つのピボットテーブルをそれぞれ別シートに作成してください</div>
+      <p>複数ピボットの並行生成。エージェントの多ステップ実行能力を最大活用。</p>
+    </div>
+  </div>
+
+  <h3 style="font-size:0.95rem; margin-bottom:14px; margin-top:8px; color:var(--muted);">=COPILOT 関数 活用（5選）</h3>
+  <div class="prompt-grid">
+    <div class="prompt-card">
+      <div class="p-num">PROMPT 16</div>
+      <h4>カテゴリ分類</h4>
+      <div class="p-text">=COPILOT("A2の商品名から業界カテゴリ（電子機器/食品/アパレル/その他）を1語で返して")</div>
+      <p>ルックアップテーブルなしで AI 分類。大量データへの一括適用が可能。</p>
+    </div>
+    <div class="prompt-card">
+      <div class="p-num">PROMPT 17</div>
+      <h4>感情分析</h4>
+      <div class="p-text">=COPILOT("B2の顧客コメントの感情をポジティブ/ニュートラル/ネガティブで分類して")</div>
+      <p>顧客フィードバックの感情スコアリングを Excel セル上で実行。</p>
+    </div>
+    <div class="prompt-card">
+      <div class="p-num">PROMPT 18</div>
+      <h4>翻訳</h4>
+      <div class="p-text">=COPILOT("C2の日本語テキストを英語に翻訳して")</div>
+      <p>翻訳関数として使用。多言語データの統一化に。</p>
+    </div>
+    <div class="prompt-card">
+      <div class="p-num">PROMPT 19</div>
+      <h4>データ補完</h4>
+      <div class="p-text">=COPILOT("D2の企業名から本社所在都市（日本の都市名で）を推定して")</div>
+      <p>欠損データの AI 補完。外部データベースなしで情報補填。</p>
+    </div>
+    <div class="prompt-card">
+      <div class="p-num">PROMPT 20</div>
+      <h4>エグゼクティブサマリー</h4>
+      <div class="p-text">=COPILOT("A2:E2の数値データから経営幹部向けの1行インサイトを生成して（100字以内）")</div>
+      <p>数値データを自然言語サマリーに変換。レポート自動化の最終ステップ。</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="s9">
+  <div class="section-header blue">
+    <span class="section-num">09</span>
+    <h2>上級活用シナリオ</h2>
+  </div>
+
+  <div class="card-grid">
+    <div class="card blue">
+      <div class="tag blue">財務</div>
+      <h3>月次財務レポート自動化</h3>
+      <p>「仮定シートから損益・貸借・CF の三表を生成、感度分析テーブルを追加、KPI ダッシュボードシートを作成して」の1プロンプトで月次レポートを自動生成。Work IQ で SharePoint の予算データも参照。</p>
+    </div>
+    <div class="card green">
+      <div class="tag green">営業</div>
+      <h3>営業パイプライン分析</h3>
+      <p>案件データから成約確率・加重売上・ファネル漏洩ポイントを自動算出。Python in Excel で回帰分析、ウォーターフォールチャートでパイプラインを可視化。営業会議資料へ直結。</p>
+    </div>
+    <div class="card amber">
+      <div class="tag amber">運用</div>
+      <h3>KPI 週次トラッキング</h3>
+      <p>データ更新後に「KPI 達成率を計算して赤/黄/緑で色分け、前月比コメントをC列に追記、サマリーをメール本文用に300字でまとめて」の1プロンプトで週次レビュー準備完了。</p>
+    </div>
+    <div class="card blue">
+      <div class="tag blue">HR</div>
+      <h3>人事データ分析</h3>
+      <p>勤怠・評価・採用データを統合してダッシュボードを自動構築。離職率・部門別生産性・採用コストを可視化。=COPILOT 関数で自由回答アンケートの感情分析も実行。</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="s10">
+  <div class="section-header red">
+    <span class="section-num">10</span>
+    <h2>ライセンス・制限・注意点</h2>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>項目</th><th>詳細</th></tr></thead>
+      <tbody>
+        <tr><td><strong>必要ライセンス</strong></td><td>Microsoft 365 Copilot アドオン（約 $30/ユーザー/月）。M365 Business Standard/Premium または E3/E5 に追加。</td></tr>
+        <tr><td><strong>ファイル保存先</strong></td><td>OneDrive または SharePoint への保存 + 自動保存（AutoSave）有効が推奨。ローカルファイルでも基本機能は動作。</td></tr>
+        <tr><td><strong>Claude モデル</strong></td><td>IT 管理者による Anthropic サブプロセッサ有効化が必要。EU/EFTA/UK ではデフォルト無効（データ規制）。政府クラウド（FedRAMP）は未対応。</td></tr>
+        <tr><td><strong>Python in Excel</strong></td><td>追加の Microsoft 365 Python 対応プランが必要。組織ポリシーで無効化されている場合あり。</td></tr>
+        <tr><td><strong>大規模ファイル</strong></td><td>非常に大きなファイル（数十 MB 以上）では応答が遅延。必要範囲にデータを絞ることを推奨。</td></tr>
+        <tr><td><strong>SVG・フローチャート</strong></td><td>Excel Copilot の公式機能としての SVG 直接出力・フローチャート生成は文書化されていません。Python in Excel（matplotlib）を使ったカスタム図表生成は技術的に可能です。</td></tr>
+        <tr><td><strong>データプライバシー</strong></td><td>Work IQ は Microsoft Graph のアクセス権に基づいてデータを参照。権限のないファイルは参照されません。</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout red">
+    <strong>重要：</strong>Copilot が生成した数式・財務モデル・ピボットは必ず確認してください。特に財務データを扱う場合、生成された数式の正確性を手動で検証することを強く推奨します。
+  </div>
+</section>
+
+<div style="background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:24px 28px;">
+  <h2 style="font-size:1rem; font-weight:700; margin-bottom:14px; color:var(--muted);">関連ページ</h2>
+  <div class="card-grid" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr));">
+    <a href="./copilot-powerpoint-agent.html" style="display:block;"><div class="card" style="border-color:rgba(200,80,20,0.4);">
+      <h3 style="color:#fb923c;">🎨 PowerPoint エージェントモード</h3>
+      <p>画像生成モデル・フルデッキ自動作成・Brand Kit</p>
+    </div></a>
+    <a href="./copilot-word-agent.html" style="display:block;"><div class="card" style="border-color:rgba(0,100,200,0.4);">
+      <h3 style="color:#60a5fa;">📝 Word エージェントモード</h3>
+      <p>追跡変更・Legal Agent・長文起草ガイド</p>
+    </div></a>
+    <a href="./m365-copilot.html" style="display:block;"><div class="card">
+      <h3>M365 Copilot 概要</h3>
+      <p>全アプリの機能一覧・ライセンス・スタートガイド</p>
+    </div></a>
+    <a href="./m365-copilot-guide.html" style="display:block;"><div class="card">
+      <h3>M365 Copilot 実践大全</h3>
+      <p>全アプリ横断のプロンプト集・業務シナリオ 50 選</p>
+    </div></a>
+  </div>
+</div>
+
+</main>
+
+<footer>
+  <p>最終更新: 2026-06-05 | <a href="./index.html">LLM 個別深掘り</a> | <a href="../../index.html">Hub トップ</a></p>
+  <p style="margin-top:6px; font-size:0.8rem;">出典: <a href="https://www.microsoft.com/en-us/microsoft-365/blog/2026/04/22/copilots-agentic-capabilities-in-word-excel-and-powerpoint-are-generally-available/" target="_blank" rel="noopener">Microsoft 365 Blog — GA発表 (2026-04-22)</a> | <a href="https://learn.microsoft.com/en-us/microsoft-365/copilot/wordexcelppt-agents" target="_blank" rel="noopener">Learn Microsoft — Word/Excel/PPT Agents</a> | <a href="https://techcommunity.microsoft.com/blog/excelblog/agent-mode-in-excel-is-now-generally-available-on-desktop/4457408" target="_blank" rel="noopener">TechCommunity — Excel Agent Mode GA</a></p>
+</footer>
+
+</body>
+</html>
