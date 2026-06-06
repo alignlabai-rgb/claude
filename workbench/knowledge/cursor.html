@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cursor Editor | Knowledge Base</title>
+    <title>Cursor IDE 完全ガイド 2026 | Knowledge Base</title>
     <style>
         :root {
             --bg: #0b1220;
@@ -54,15 +54,15 @@
             position: absolute;
             top: 0; left: 0;
             width: 100%; height: 4px;
-            background: linear-gradient(90deg, #58a6ff, #d2a8ff);
+            background: linear-gradient(90deg, #58a6ff, #d2a8ff, #58a6ff);
         }
 
         header.hero::after {
             content: "";
             position: absolute;
             right: -60px; top: -60px;
-            width: 260px; height: 260px;
-            background: radial-gradient(circle, rgba(88,166,255,0.12), transparent 70%);
+            width: 320px; height: 320px;
+            background: radial-gradient(circle, rgba(88,166,255,0.1), transparent 70%);
             pointer-events: none;
         }
 
@@ -104,7 +104,7 @@
             margin: 12px 0 20px;
             font-size: 17px;
             color: var(--muted);
-            max-width: 720px;
+            max-width: 760px;
         }
 
         .last-updated {
@@ -123,10 +123,9 @@
             font-size: 14px;
             opacity: 0.8;
         }
-
         .back:hover { opacity: 1; }
 
-        /* Section label */
+        /* Section */
         .section-label {
             font-family: var(--font-mono);
             font-size: 0.7rem;
@@ -150,7 +149,7 @@
             margin: 0 0 20px;
         }
 
-        /* Panel wrapper */
+        /* Panel */
         .panel {
             background: var(--panel);
             border: 1px solid var(--border);
@@ -161,6 +160,7 @@
         /* Grid */
         .grid-2 { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
         .grid-3 { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
 
         /* Feature card */
         .feat-card {
@@ -172,25 +172,11 @@
         }
         .feat-card:hover { border-color: rgba(88,166,255,0.3); }
 
-        .feat-icon {
-            font-size: 1.4rem;
-            margin-bottom: 8px;
-            display: block;
-        }
+        .feat-icon { font-size: 1.4rem; margin-bottom: 8px; display: block; }
+        .feat-title { font-weight: 700; color: #fff; font-size: 0.95rem; margin-bottom: 6px; }
+        .feat-desc { font-size: 0.8rem; color: var(--muted); line-height: 1.6; }
 
-        .feat-title {
-            font-weight: 700;
-            color: #fff;
-            font-size: 0.95rem;
-            margin-bottom: 6px;
-        }
-
-        .feat-desc {
-            font-size: 0.8rem;
-            color: var(--muted);
-            line-height: 1.6;
-        }
-
+        /* Badges */
         .new-badge {
             display: inline-block;
             background: rgba(88,166,255,0.15);
@@ -205,7 +191,35 @@
             vertical-align: middle;
         }
 
-        /* Key badge */
+        .hot-badge {
+            display: inline-block;
+            background: rgba(255,100,80,0.15);
+            color: #ff7b6b;
+            border: 1px solid rgba(255,100,80,0.3);
+            padding: 1px 7px;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+
+        .ent-badge {
+            display: inline-block;
+            background: rgba(210,168,255,0.12);
+            color: var(--accent-2);
+            border: 1px solid rgba(210,168,255,0.25);
+            padding: 1px 7px;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+
+        /* Keyboard keys */
         .key {
             display: inline-block;
             background: rgba(255,255,255,0.1);
@@ -226,8 +240,7 @@
             border-bottom: 1px solid rgba(255,255,255,0.04);
         }
         .shortcut-row:last-child { border-bottom: none; }
-
-        .shortcut-keys { flex-shrink: 0; min-width: 160px; display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+        .shortcut-keys { flex-shrink: 0; min-width: 180px; display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
         .shortcut-desc { font-size: 0.85rem; color: var(--text); }
         .shortcut-note { font-size: 0.76rem; color: var(--muted); margin-top: 2px; }
 
@@ -259,6 +272,11 @@
             background: rgba(88,166,255,0.05);
         }
 
+        .price-card.enterprise-card {
+            border-color: rgba(210,168,255,0.35);
+            background: rgba(210,168,255,0.04);
+        }
+
         .price-name { font-weight: 700; color: #fff; font-size: 0.95rem; margin-bottom: 4px; }
         .price-amount { font-size: 1.6rem; font-weight: 800; color: #fff; line-height: 1; margin: 6px 0 4px; }
         .price-amount span { font-size: 0.85rem; font-weight: 400; color: var(--muted); }
@@ -276,35 +294,227 @@
             color: var(--text);
             line-height: 1.6;
         }
-
         .tip-item strong { color: #fff; }
 
-        /* Highlight bar */
-        .stat-bar {
+        /* Stats */
+        .stat-bar { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 8px; }
+        .stat-item { display: flex; flex-direction: column; gap: 2px; }
+        .stat-value { font-size: 1.5rem; font-weight: 800; color: var(--accent); line-height: 1; }
+        .stat-label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+        /* Timeline */
+        .timeline { display: flex; flex-direction: column; gap: 0; }
+        .tl-item {
             display: flex;
             gap: 20px;
-            flex-wrap: wrap;
-            margin-bottom: 8px;
+            position: relative;
         }
-
-        .stat-item {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
+        .tl-item:not(:last-child)::before {
+            content: "";
+            position: absolute;
+            left: 47px;
+            top: 44px;
+            bottom: -16px;
+            width: 2px;
+            background: rgba(88,166,255,0.15);
         }
-
-        .stat-value {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: var(--accent);
-            line-height: 1;
+        .tl-left {
+            flex-shrink: 0;
+            width: 96px;
+            text-align: right;
+            padding-top: 14px;
         }
-
-        .stat-label {
+        .tl-date {
+            font-family: var(--font-mono);
             font-size: 0.72rem;
             color: var(--muted);
+            line-height: 1.3;
+        }
+        .tl-dot {
+            flex-shrink: 0;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--accent);
+            border: 2px solid var(--bg);
+            margin-top: 19px;
+            box-shadow: 0 0 8px rgba(88,166,255,0.5);
+        }
+        .tl-dot.hot { background: #ff7b6b; box-shadow: 0 0 8px rgba(255,100,80,0.5); }
+        .tl-content {
+            flex: 1;
+            background: rgba(255,255,255,0.025);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+        }
+        .tl-ver { font-weight: 700; color: #fff; font-size: 0.9rem; margin-bottom: 4px; }
+        .tl-desc { font-size: 0.78rem; color: var(--muted); line-height: 1.6; }
+        .tl-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+        .tl-tag {
+            background: rgba(88,166,255,0.1);
+            color: var(--accent);
+            border: 1px solid rgba(88,166,255,0.2);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.68rem;
+            font-weight: 600;
+        }
+
+        /* Agent workflow */
+        .agent-flow {
+            display: flex;
+            gap: 0;
+            align-items: stretch;
+            overflow-x: auto;
+        }
+        .flow-step {
+            flex: 1;
+            min-width: 140px;
+            background: rgba(88,166,255,0.05);
+            border: 1px solid rgba(88,166,255,0.15);
+            border-radius: 10px;
+            padding: 14px 12px;
+            text-align: center;
+            position: relative;
+        }
+        .flow-step + .flow-step {
+            margin-left: 10px;
+        }
+        .flow-step-num {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--accent);
             text-transform: uppercase;
             letter-spacing: 0.05em;
+            display: block;
+            margin-bottom: 4px;
+        }
+        .flow-step-title {
+            font-weight: 700;
+            color: #fff;
+            font-size: 0.82rem;
+            margin-bottom: 6px;
+        }
+        .flow-step-desc { font-size: 0.73rem; color: var(--muted); line-height: 1.5; }
+
+        /* Comparison table */
+        .comp-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+        .comp-table th {
+            padding: 10px 14px;
+            text-align: left;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        .comp-table td {
+            padding: 10px 14px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            color: var(--text);
+            vertical-align: top;
+        }
+        .comp-table tr:last-child td { border-bottom: none; }
+        .comp-table .prod-name {
+            font-weight: 700;
+            color: #fff;
+        }
+        .comp-yes { color: #66e0c2; }
+        .comp-partial { color: #f4b860; }
+        .comp-no { color: #8b949e; }
+
+        /* MCP section */
+        .mcp-flow {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .mcp-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: rgba(255,255,255,0.025);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 16px;
+        }
+        .mcp-icon { font-size: 1.3rem; flex-shrink: 0; }
+        .mcp-title { font-weight: 700; color: #fff; font-size: 0.88rem; margin-bottom: 2px; }
+        .mcp-desc { font-size: 0.78rem; color: var(--muted); }
+
+        /* Info box */
+        .info-box {
+            background: rgba(88,166,255,0.06);
+            border: 1px solid rgba(88,166,255,0.18);
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 0.82rem;
+            color: var(--muted);
+            margin-top: 16px;
+        }
+        .warn-box {
+            background: rgba(244,184,96,0.06);
+            border: 1px solid rgba(244,184,96,0.2);
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 0.82rem;
+            color: var(--muted);
+            margin-top: 16px;
+        }
+        .success-box {
+            background: rgba(102,224,194,0.06);
+            border: 1px solid rgba(102,224,194,0.2);
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 0.82rem;
+            color: var(--muted);
+            margin-top: 16px;
+        }
+
+        /* Code block */
+        .code-block {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 8px;
+            padding: 14px 16px;
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            color: #c9d1d9;
+            overflow-x: auto;
+            margin-top: 10px;
+            line-height: 1.7;
+        }
+        .code-block .cm { color: #8b949e; }
+        .code-block .kw { color: var(--accent-2); }
+        .code-block .st { color: #a5d6ff; }
+        .code-block .val { color: #79c0ff; }
+
+        /* Security badges */
+        .sec-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 12px;
+        }
+        .sec-item {
+            background: rgba(255,255,255,0.025);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 10px;
+            padding: 14px;
+            text-align: center;
+        }
+        .sec-icon { font-size: 1.6rem; margin-bottom: 6px; display: block; }
+        .sec-title { font-weight: 700; color: #fff; font-size: 0.82rem; margin-bottom: 3px; }
+        .sec-desc { font-size: 0.72rem; color: var(--muted); }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 28px; }
+            .panel { padding: 20px; }
+            .stat-bar { gap: 14px; }
+            .stat-value { font-size: 1.2rem; }
+            header.hero { padding: 24px 20px; }
+            .tl-left { width: 60px; }
         }
     </style>
 </head>
@@ -314,10 +524,10 @@
 
         <!-- Hero -->
         <header class="hero">
-            <span class="eyebrow">ENVIRONMENT / EDITOR</span>
-            <h1>Cursor <span class="version-badge">2026</span></h1>
-            <p class="lead">VS Codeのフォークから、エンタープライズ向けAIコーディングプラットフォームへ。Background AgentsとBugBotで、あなたの代わりにコードを書く時代に突入した。</p>
-            <span class="last-updated">Last Updated: 2026.05.30</span>
+            <span class="eyebrow">ENVIRONMENT / AI-NATIVE IDE</span>
+            <h1>Cursor <span class="version-badge">v3.7 · June 2026</span></h1>
+            <p class="lead">VS Codeフォーク出身のAIネイティブIDEがエンタープライズ開発プラットフォームへ進化。Cloud Agents・BugBot・Design Modeで、エージェントが自律的にコードを書き・テストし・PRを提出する時代に突入。</p>
+            <span class="last-updated">Last Updated: 2026-06-06 | v3.7 (June 5, 2026) ベース</span>
             <a class="back" href="../index.html">← Workbenchへ戻る</a>
         </header>
 
@@ -329,186 +539,550 @@
                     <span class="stat-label">企業評価額（2026年）</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-value">80%</span>
+                    <span class="stat-value">$2B</span>
+                    <span class="stat-label">ARR（2026年2月）</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value">72%</span>
+                    <span class="stat-label">Tab補完 採用率</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value">76%</span>
                     <span class="stat-label">BugBot バグ解決率</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-value">60%</span>
-                    <span class="stat-label">Composer 1.5 レイテンシ削減</span>
+                    <span class="stat-value">64%</span>
+                    <span class="stat-label">Fortune 500 採用率</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-value">6</span>
-                    <span class="stat-label">料金プラン（Hobby〜Enterprise）</span>
+                    <span class="stat-label">料金プラン</span>
                 </div>
             </div>
-            <p style="font-size:0.82rem; color:var(--muted); margin:0;">Cursor は2026年に評価額$29.3Bに到達。GitHub Copilotへの最大の挑戦者として、Background AgentsとBugBotが開発ワークフローを根底から変えている。</p>
+            <p style="font-size:0.82rem; color:var(--muted); margin:0;">Cursor は2年足らずで$29.3B評価額・$2B ARRに到達。GitHub Copilotへの最大の挑戦者として、Cloud Agents・BugBot・Design Modeがエンタープライズ開発ワークフローを根底から変えている。</p>
         </div>
 
-        <!-- 2026年の主要新機能 -->
+        <!-- ── VERSION TIMELINE ── -->
         <div class="panel">
-            <div class="section-label">2026 New Features</div>
-            <div class="section-title">2026年の主要アップデート</div>
-            <p class="section-desc">「コード補完」から「コード代行」へ。エージェントが非同期で働く時代。</p>
+            <div class="section-label">Version History</div>
+            <div class="section-title">バージョン履歴（2025後半〜2026年）</div>
+            <p class="section-desc">「補完ツール」から「自律エージェント開発プラットフォーム」へ。主要マイルストーンを時系列で確認。</p>
+
+            <div class="timeline">
+
+                <div class="tl-item">
+                    <div class="tl-left"><div class="tl-date">2026-06-05</div></div>
+                    <div class="tl-dot hot"></div>
+                    <div class="tl-content">
+                        <div class="tl-ver">v3.7 — Design Mode & SDK 更新 <span class="hot-badge">LATEST</span></div>
+                        <div class="tl-desc">Cursor ブラウザ内に <strong>Design Mode</strong> を搭載。クリック・描画・音声でUI変更を指示するとエージェントが即座に反映。Canvas に埋め込みボタン・フルスクリーン共有を追加。SDK のインポートがオンデマンド化（ローカルランタイム未使用時のオーバーヘッド削除）。</div>
+                        <div class="tl-tags">
+                            <span class="tl-tag">Design Mode</span>
+                            <span class="tl-tag">Canvas 強化</span>
+                            <span class="tl-tag">SDK 最適化</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tl-item">
+                    <div class="tl-left"><div class="tl-date">2026-05-20</div></div>
+                    <div class="tl-dot"></div>
+                    <div class="tl-content">
+                        <div class="tl-ver">v3.5 — Cloud Agents 強化 <span class="new-badge">NEW</span></div>
+                        <div class="tl-desc">Cloud Agents がマルチリポジトリ対応に。複数リポジトリを並列で作業する複数エージェントを同時実行可能。エージェントのオンボーディング速度が向上し、マージ可能なPRと成果物（動画・スクリーンショット・ログ）を自動生成。Composer 2.5 も同時リリース。</div>
+                        <div class="tl-tags">
+                            <span class="tl-tag">Cloud Agents</span>
+                            <span class="tl-tag">Multi-Repo</span>
+                            <span class="tl-tag">Composer 2.5</span>
+                            <span class="tl-tag">PR 成果物</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tl-item">
+                    <div class="tl-left"><div class="tl-date">2026-05-07</div></div>
+                    <div class="tl-dot"></div>
+                    <div class="tl-content">
+                        <div class="tl-ver">v3.3 — Build in Parallel & Jira 連携</div>
+                        <div class="tl-desc">複数のサブエージェントを同時並列実行する <strong>Build in Parallel</strong> 機能を追加。Jira チケットをそのままエージェントに渡して実装を依頼できる Jira 連携、よく使うエージェントスキルをチャット欄に固定できる <strong>ピン留めスキルピル</strong> も追加。</div>
+                        <div class="tl-tags">
+                            <span class="tl-tag">Build in Parallel</span>
+                            <span class="tl-tag">Jira 連携</span>
+                            <span class="tl-tag">スキルピル</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tl-item">
+                    <div class="tl-left"><div class="tl-date">2026-03</div></div>
+                    <div class="tl-dot"></div>
+                    <div class="tl-content">
+                        <div class="tl-ver">v3.x — JetBrains プラグイン & BugBot 自己改善</div>
+                        <div class="tl-desc">JetBrains IDE 向け公式プラグインをリリース（VS Code よりは新しく機能は限定的）。BugBot がPRレビューフィードバックから自己学習する機能を追加。解決率が52%→76%に向上し、1回あたりの検出バグ数がほぼ2倍に。</div>
+                        <div class="tl-tags">
+                            <span class="tl-tag">JetBrains Plugin</span>
+                            <span class="tl-tag">BugBot 自己学習</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tl-item">
+                    <div class="tl-left"><div class="tl-date">2026-02-24</div></div>
+                    <div class="tl-dot"></div>
+                    <div class="tl-content">
+                        <div class="tl-ver">Cloud Agents with Computer Use</div>
+                        <div class="tl-desc">各エージェントが専用VM上で<strong>デスクトップ・ブラウザ・UI操作</strong>能力を取得。E2Eテスト・ブラウザ自動化・デプロイ確認まで自律実行。タスクごとに独立したVM（状態共有なし）でセキュリティを確保。</div>
+                        <div class="tl-tags">
+                            <span class="tl-tag">Computer Use</span>
+                            <span class="tl-tag">フル VM</span>
+                            <span class="tl-tag">ブラウザ操作</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tl-item">
+                    <div class="tl-left"><div class="tl-date">2025-中頃</div></div>
+                    <div class="tl-dot"></div>
+                    <div class="tl-content">
+                        <div class="tl-ver">Cursor 1.0 — Background Agents GA</div>
+                        <div class="tl-desc">非同期クラウドエージェント（Background Agents）が全有料プランで一般公開。IDE・Slack・モバイルアプリからの起動に対応。クラウドVM上でリポジトリをclone→ブランチ作成→実装→PR提出まで自律実行。</div>
+                        <div class="tl-tags">
+                            <span class="tl-tag">Background Agents GA</span>
+                            <span class="tl-tag">Slack 連携</span>
+                            <span class="tl-tag">モバイル起動</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ── CORE FEATURES ── -->
+        <div class="panel">
+            <div class="section-label">Core Features</div>
+            <div class="section-title">コア機能 — Tab補完 / Chat / Agent Mode</div>
+            <p class="section-desc">すべての Cursor 体験を支える3つの基盤機能。</p>
+
+            <div class="grid-3">
+                <div class="feat-card">
+                    <span class="feat-icon">⌨️</span>
+                    <div class="feat-title">Cursor Tab（AI補完）</div>
+                    <div class="feat-desc">
+                        Cursor 独自の補完モデルで、次の行だけでなく次の<strong>ブロック全体</strong>を予測補完する。Tab キー1つで確定、Esc で却下。業界平均65%（GitHub Copilot）に対し<strong>72%の採用率</strong>を達成。最近カーソルを動かした箇所や変更パターンを文脈として学習し、コーディングスタイルに合わせた提案を出す。
+                    </div>
+                </div>
+
+                <div class="feat-card">
+                    <span class="feat-icon">💬</span>
+                    <div class="feat-title">Chat（コードベース問答）</div>
+                    <div class="feat-desc">
+                        <kbd class="key">Cmd</kbd>+<kbd class="key">L</kbd> で開くサイドパネル。<code style="font-family:var(--font-mono); font-size:0.82em; background:rgba(255,255,255,0.07); padding:1px 5px; border-radius:3px;">@ファイル</code>・<code style="font-family:var(--font-mono); font-size:0.82em; background:rgba(255,255,255,0.07); padding:1px 5px; border-radius:3px;">@フォルダ</code>・<code style="font-family:var(--font-mono); font-size:0.82em; background:rgba(255,255,255,0.07); padding:1px 5px; border-radius:3px;">@codebase</code>・<code style="font-family:var(--font-mono); font-size:0.82em; background:rgba(255,255,255,0.07); padding:1px 5px; border-radius:3px;">@docs</code>・<code style="font-family:var(--font-mono); font-size:0.82em; background:rgba(255,255,255,0.07); padding:1px 5px; border-radius:3px;">@web</code> でコンテキストを指定。インデックス化されたコードベース全体に対して設計相談・バグ調査・コードレビューが可能。
+                    </div>
+                </div>
+
+                <div class="feat-card">
+                    <span class="feat-icon">🤖</span>
+                    <div class="feat-title">Agent Mode（旧：Composer）</div>
+                    <div class="feat-desc">
+                        <kbd class="key">Cmd</kbd>+<kbd class="key">I</kbd> で起動。複数ファイルにまたがる実装・リファクタ・テスト追加を一括で指示できる。<strong>Composer 2.5</strong>（2026年5月）でより長いタスクの安定実行・指示追従精度が向上。チェックポイント機能で作業の巻き戻しも可能。
+                    </div>
+                </div>
+
+                <div class="feat-card">
+                    <span class="feat-icon">✏️</span>
+                    <div class="feat-title">インライン編集（Cmd+K）</div>
+                    <div class="feat-desc">
+                        コードを選択した状態で <kbd class="key">Cmd</kbd>+<kbd class="key">K</kbd>。選択範囲に直接指示してその場で書き換える。「この関数をTypeScriptに変換」「テストを追加」「エラーハンドリングを追加」などの小さな変更に最適。差分ビューで変更内容を確認してから Accept。
+                    </div>
+                </div>
+
+                <div class="feat-card">
+                    <span class="feat-icon">📌</span>
+                    <div class="feat-title">Notepads（ノートパッド）</div>
+                    <div class="feat-desc">
+                        繰り返し使うコンテキストをスニペットとして保存・再利用できる機能。「このプロジェクトのAPIクライアント仕様」「データベーススキーマ」などをNotepadsに保存し、チャットで <code style="font-family:var(--font-mono); font-size:0.82em; background:rgba(255,255,255,0.07); padding:1px 5px; border-radius:3px;">@notepads</code> で参照。
+                    </div>
+                </div>
+
+                <div class="feat-card">
+                    <span class="feat-icon">🏁</span>
+                    <div class="feat-title">チェックポイント & Shadow Workspace</div>
+                    <div class="feat-desc">
+                        Agent Modeが大きな変更を加える前に自動でチェックポイントを作成。問題が起きた場合は任意のチェックポイントに巻き戻し可能。Shadow Workspaceではエージェントが本体と別の並行コピーで作業し、完成後にマージ。
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── AGENTIC FEATURES ── -->
+        <div class="panel">
+            <div class="section-label">Agentic Capabilities</div>
+            <div class="section-title">エージェント機能大全</div>
+            <p class="section-desc">2026年のCursorの真の差別化ポイント — 開発者が「指示する」だけでAIが「完遂する」アーキテクチャ。</p>
 
             <div class="grid-2">
                 <div class="feat-card">
                     <span class="feat-icon">☁️</span>
-                    <div class="feat-title">Background Agents <span class="new-badge">NEW</span></div>
-                    <div class="feat-desc">クラウドのUbuntu VMがリポジトリをcloneし、ブランチを切って作業し、PRを自動で開く。IDE・Slack・モバイルアプリから起動可能。あなたが寝ている間に実装が進む。</div>
+                    <div class="feat-title">Cloud Agents <span class="new-badge">v3.5</span></div>
+                    <div class="feat-desc">
+                        独立したクラウドVMでエージェントが動作。各タスクに1つのVM（状態共有なし）。ターミナル・ブラウザ・デスクトップUI の操作も可能（Computer Use）。マルチリポジトリ対応で、複数リポジトリを並列処理する複数エージェントを同時起動できる。完了後は<strong>マージ可能なPR + 成果物（動画・スクリーンショット・ログ）</strong>を自動生成して報告。
+                    </div>
+                </div>
+
+                <div class="feat-card">
+                    <span class="feat-icon">⏳</span>
+                    <div class="feat-title">Background Agents（非同期エージェント）</div>
+                    <div class="feat-desc">
+                        IDE・Slack・モバイルアプリから長時間タスクを非同期で実行。エージェントが<strong>数十分〜数時間</strong>かけてリポジトリをclone→ブランチ作成→実装→テスト→PRオープンまで完結。「寝ている間に機能実装が完了している」が現実になった機能。全有料プランで利用可能。
+                    </div>
                 </div>
 
                 <div class="feat-card">
                     <span class="feat-icon">🐛</span>
-                    <div class="feat-title">BugBot <span class="new-badge">NEW</span></div>
-                    <div class="feat-desc">PRを自動レビューし、実際のバグを発見したら独自にクラウドエージェントを起動して修正案をPRに直接提案する。解決率約80%。Pro+以上で利用可能。</div>
+                    <div class="feat-title">BugBot <span class="new-badge">PRO+</span></div>
+                    <div class="feat-desc">
+                        PRがオープンされると自動でコードをレビューし、実際のバグを検出。バグ発見時には<strong>自律的にクラウドエージェントを起動</strong>し、修正・テスト・修正PRの提出まで実行する。解決率は6ヶ月間で<strong>52%→76%</strong>に向上、1回あたりの検出バグ数もほぼ2倍に。フィードバックから自己学習して精度を継続改善。
+                    </div>
                 </div>
 
                 <div class="feat-card">
                     <span class="feat-icon">⚡</span>
-                    <div class="feat-title">Composer 1.5 <span class="new-badge">UPDATE</span></div>
-                    <div class="feat-desc">強化学習を20倍スケールして再訓練。レイテンシ60%削減。複数ファイルにまたがる変更がより正確・高速に。"Beta"が外れ完全に本番品質へ。</div>
+                    <div class="feat-title">Build in Parallel <span class="new-badge">v3.3</span></div>
+                    <div class="feat-desc">
+                        大きなタスクをサブタスクに分解し、<strong>複数のサブエージェントが並列実行</strong>する。例えば「フロントエンド実装」「バックエンドAPI」「テストコード」を3エージェントが同時進行。完了後にマージして整合性チェック。単一エージェント時比で実装速度が大幅に向上。
+                    </div>
                 </div>
 
                 <div class="feat-card">
-                    <span class="feat-icon">🧩</span>
-                    <div class="feat-title">Subagents & Skills <span class="new-badge">NEW</span></div>
-                    <div class="feat-desc">Composerが複雑なタスクを自動的にサブエージェントに分解して並列実行する。スキルとして再利用可能なワークフローを定義・保存できる。</div>
+                    <span class="feat-icon">🎨</span>
+                    <div class="feat-title">Design Mode <span class="hot-badge">v3.7 NEW</span></div>
+                    <div class="feat-desc">
+                        Cursor 内蔵ブラウザ上で<strong>クリック・ドラッグ・音声指示</strong>によるUI変更をエージェントにリアルタイムで伝達する全く新しいワークフロー。「このボタンを右に移動して」「ここのフォントを大きくして」と指示するとエージェントがコードを修正→即反映。デザイナー・PM も直感的に開発に参加できる。
+                    </div>
                 </div>
 
                 <div class="feat-card">
-                    <span class="feat-icon">🔍</span>
-                    <div class="feat-title">Cursor Blame <span class="new-badge">Enterprise</span></div>
-                    <div class="feat-desc">AIが提案したコード変更を追跡・監査するエンタープライズ機能。どのAI提案が採用されたか、誰が承認したかを完全に記録。コンプライアンス要件に対応。</div>
+                    <span class="feat-icon">🔗</span>
+                    <div class="feat-title">Jira 連携 <span class="new-badge">v3.3</span></div>
+                    <div class="feat-desc">
+                        Jira チケットのURLをエージェントに貼り付けるだけで、チケットの内容・受け入れ条件・コメントを自動で取得し実装を開始。「PROJ-123を実装して」の1行指示で設計→実装→PR提出まで完結する。PdM や開発リードがエージェント活用の入口として最も使いやすい連携。
+                    </div>
                 </div>
+            </div>
 
-                <div class="feat-card">
-                    <span class="feat-icon">🔀</span>
-                    <div class="feat-title">Auto モデル切り替え <span class="new-badge">UPDATE</span></div>
-                    <div class="feat-desc">クエリの複雑さ・サーバー負荷・コストを自動判断して最適モデルを選択する"Auto"モードを強化。手動でのモデル切り替えも、タスクごとに即座に変更可能。</div>
+            <!-- Cloud Agent ワークフロー図 -->
+            <div style="margin-top: 24px;">
+                <div style="font-size: 0.78rem; font-weight: 700; color: var(--accent-2); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px;">Cloud Agent ワークフロー（自律実行の流れ）</div>
+                <div class="agent-flow">
+                    <div class="flow-step">
+                        <span class="flow-step-num">Step 1</span>
+                        <div class="flow-step-title">タスク受信</div>
+                        <div class="flow-step-desc">IDE / Slack / モバイルから指示。JiraチケットURL可</div>
+                    </div>
+                    <div class="flow-step">
+                        <span class="flow-step-num">Step 2</span>
+                        <div class="flow-step-title">VM起動 & clone</div>
+                        <div class="flow-step-desc">専用クラウドVMを起動。リポジトリをcloneし、新ブランチを作成</div>
+                    </div>
+                    <div class="flow-step">
+                        <span class="flow-step-num">Step 3</span>
+                        <div class="flow-step-title">実装 & テスト</div>
+                        <div class="flow-step-desc">ターミナル・ブラウザ操作も含む自律実装。CIも実行</div>
+                    </div>
+                    <div class="flow-step">
+                        <span class="flow-step-num">Step 4</span>
+                        <div class="flow-step-title">PR + 成果物</div>
+                        <div class="flow-step-desc">マージ可能なPRを作成。動画・スクリーンショット・ログを添付</div>
+                    </div>
+                    <div class="flow-step">
+                        <span class="flow-step-num">Step 5</span>
+                        <div class="flow-step-title">開発者レビュー</div>
+                        <div class="flow-step-desc">差分を確認してApprove。BugBotが追加チェック</div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- 対応モデル -->
+        <!-- ── RULES & CONTEXT ── -->
+        <div class="panel">
+            <div class="section-label">Rules & Context</div>
+            <div class="section-title">Rules v2 / Notepads / MCP — コンテキスト管理の全体像</div>
+            <p class="section-desc">エージェントに「何を知らせるか」が品質を決める。3層のコンテキスト管理アーキテクチャ。</p>
+
+            <div class="grid-2" style="margin-bottom: 20px;">
+                <div>
+                    <div style="font-weight:700; color:var(--accent); margin-bottom: 10px; font-size:0.9rem;">📄 Cursor Rules v2（.cursor/rules/）</div>
+                    <div style="font-size:0.82rem; color:var(--muted); line-height:1.7; margin-bottom:10px;">
+                        旧 <code style="font-family:var(--font-mono); background:rgba(255,255,255,0.07); padding:1px 5px; border-radius:3px;">.cursorrules</code>（ルートに1ファイル）から、<code style="font-family:var(--font-mono); background:rgba(255,255,255,0.07); padding:1px 5px; border-radius:3px;">.cursor/rules/</code>ディレクトリに移行。<strong>用途別・フォルダ別のルールファイルを複数管理</strong>でき、各ルールが適切なタイミングで適切なコンテキストで読み込まれる。
+                    </div>
+                    <div class="code-block"><span class="cm"># .cursor/rules/ 構成例</span>
+.cursor/rules/
+  ├── <span class="val">global.mdc</span>       <span class="cm"># 常時適用</span>
+  ├── <span class="val">python.mdc</span>       <span class="cm"># .py ファイル時のみ</span>
+  ├── <span class="val">frontend.mdc</span>     <span class="cm"># src/components/ のみ</span>
+  ├── <span class="val">agent.mdc</span>        <span class="cm"># エージェントモード時のみ</span>
+  └── <span class="val">security.mdc</span>     <span class="cm"># セキュリティ制約（常時）</span></div>
+                    <div style="font-size:0.75rem; color:var(--muted); margin-top:8px;">
+                        ルールのスコープは <code style="font-family:var(--font-mono); background:rgba(255,255,255,0.07); padding:1px 5px; border-radius:3px;">Always</code> / <code style="font-family:var(--font-mono); background:rgba(255,255,255,0.07); padding:1px 5px; border-radius:3px;">Auto</code>（ファイルパターン一致）/ <code style="font-family:var(--font-mono); background:rgba(255,255,255,0.07); padding:1px 5px; border-radius:3px;">Agent Requested</code>（エージェント判断）/ <code style="font-family:var(--font-mono); background:rgba(255,255,255,0.07); padding:1px 5px; border-radius:3px;">Manual</code>（手動 @参照）の4種から選択。
+                    </div>
+                </div>
+
+                <div>
+                    <div style="font-weight:700; color:var(--accent-2); margin-bottom: 10px; font-size:0.9rem;">🔌 MCP（Model Context Protocol）</div>
+                    <div style="font-size:0.82rem; color:var(--muted); line-height:1.7; margin-bottom:10px;">
+                        外部ツール・データソースをAIが直接使えるオープンプロトコル。Cursor は <strong>最大40ツール</strong>（全MCPサーバー合計）をエージェントが利用可能。コミュニティ製サーバーは5,000+。設定したMCPサーバーはClaude Code・Windsurf等の他ツールでもそのまま流用可能。
+                    </div>
+                    <div class="mcp-flow">
+                        <div class="mcp-row">
+                            <span class="mcp-icon">🗃️</span>
+                            <div>
+                                <div class="mcp-title">データベース系</div>
+                                <div class="mcp-desc">PostgreSQL / SQLite / MongoDB — スキーマ参照・クエリ実行</div>
+                            </div>
+                        </div>
+                        <div class="mcp-row">
+                            <span class="mcp-icon">🐙</span>
+                            <div>
+                                <div class="mcp-title">GitHub / GitLab</div>
+                                <div class="mcp-desc">PR・Issue・リポジトリ操作を直接エージェントが実行</div>
+                            </div>
+                        </div>
+                        <div class="mcp-row">
+                            <span class="mcp-icon">🔎</span>
+                            <div>
+                                <div class="mcp-title">Web / 検索</div>
+                                <div class="mcp-desc">Brave Search・Tavily — エージェントが最新情報をリアルタイム取得</div>
+                            </div>
+                        </div>
+                        <div class="mcp-row">
+                            <span class="mcp-icon">📡</span>
+                            <div>
+                                <div class="mcp-title">社内ツール・カスタム API</div>
+                                <div class="mcp-desc">任意のREST APIをMCPサーバー化してエージェントから直接呼び出し</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="warn-box">
+                        ⚠️ <strong style="color: #f4b860;">40ツール上限に注意：</strong> 全MCPサーバーのツール合計が40を超えると警告が表示され、エージェントが一部ツールへアクセス不能になる。1サーバーあたり5〜10ツールに絞るのがベストプラクティス。
+                    </div>
+                </div>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.025); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px;">
+                <div style="font-weight:700; color:#fff; margin-bottom:8px; font-size:0.9rem;">@-mention コンテキスト一覧（チャット・Agent Mode 共通）</div>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px; font-size: 0.8rem;">
+                    <span style="background:rgba(88,166,255,0.1); color:var(--accent); border:1px solid rgba(88,166,255,0.2); padding:4px 10px; border-radius:6px; font-family:var(--font-mono);">@ファイル名</span>
+                    <span style="background:rgba(88,166,255,0.1); color:var(--accent); border:1px solid rgba(88,166,255,0.2); padding:4px 10px; border-radius:6px; font-family:var(--font-mono);">@フォルダ名</span>
+                    <span style="background:rgba(88,166,255,0.1); color:var(--accent); border:1px solid rgba(88,166,255,0.2); padding:4px 10px; border-radius:6px; font-family:var(--font-mono);">@codebase</span>
+                    <span style="background:rgba(88,166,255,0.1); color:var(--accent); border:1px solid rgba(88,166,255,0.2); padding:4px 10px; border-radius:6px; font-family:var(--font-mono);">@docs</span>
+                    <span style="background:rgba(88,166,255,0.1); color:var(--accent); border:1px solid rgba(88,166,255,0.2); padding:4px 10px; border-radius:6px; font-family:var(--font-mono);">@web</span>
+                    <span style="background:rgba(88,166,255,0.1); color:var(--accent); border:1px solid rgba(88,166,255,0.2); padding:4px 10px; border-radius:6px; font-family:var(--font-mono);">@notepads</span>
+                    <span style="background:rgba(88,166,255,0.1); color:var(--accent); border:1px solid rgba(88,166,255,0.2); padding:4px 10px; border-radius:6px; font-family:var(--font-mono);">@git</span>
+                    <span style="background:rgba(88,166,255,0.1); color:var(--accent); border:1px solid rgba(88,166,255,0.2); padding:4px 10px; border-radius:6px; font-family:var(--font-mono);">@terminal</span>
+                    <span style="background:rgba(88,166,255,0.1); color:var(--accent); border:1px solid rgba(88,166,255,0.2); padding:4px 10px; border-radius:6px; font-family:var(--font-mono);">@cursor-rules</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── MODELS ── -->
         <div class="panel">
             <div class="section-label">Supported Models</div>
-            <div class="section-title">対応モデル一覧</div>
-            <p class="section-desc">用途に応じてモデルをタスクごとに切り替えられるのがCursorの最大の強み。</p>
+            <div class="section-title">対応モデル一覧（2026年6月）</div>
+            <p class="section-desc">タスクに合わせてモデルをリアルタイム切り替え。Auto モードがコスト・速度・精度を自動最適化。</p>
+
+            <div style="margin-bottom:20px;">
+                <div style="font-size:0.75rem; font-weight:700; color:var(--accent); text-transform:uppercase; margin-bottom:10px;">🟢 Cursor プランでネイティブ対応（クレジットプールから利用）</div>
+                <div style="display:flex; flex-wrap:wrap; gap:0; margin-bottom:12px;">
+                    <span class="model-pill" style="color:#66e0c2; border-color:rgba(102,224,194,0.3); background:rgba(102,224,194,0.08);">● Claude Sonnet 4.5</span>
+                    <span class="model-pill" style="color:#66e0c2; border-color:rgba(102,224,194,0.3); background:rgba(102,224,194,0.08);">● Claude Sonnet 4.6</span>
+                    <span class="model-pill" style="color:#66e0c2; border-color:rgba(102,224,194,0.3); background:rgba(102,224,194,0.08);">● Claude Opus 4.7</span>
+                    <span class="model-pill" style="color:#66e0c2; border-color:rgba(102,224,194,0.3); background:rgba(102,224,194,0.08);">● Claude Opus 4.8</span>
+                    <span class="model-pill" style="color:#60d0ff; border-color:rgba(96,208,255,0.3); background:rgba(96,208,255,0.08);">● GPT-4o</span>
+                    <span class="model-pill" style="color:#60d0ff; border-color:rgba(96,208,255,0.3); background:rgba(96,208,255,0.08);">● GPT-o3</span>
+                    <span class="model-pill" style="color:#60d0ff; border-color:rgba(96,208,255,0.3); background:rgba(96,208,255,0.08);">● GPT-5 / 5.5 ⁽¹⁾</span>
+                    <span class="model-pill" style="color:#d8b4fe; border-color:rgba(216,180,254,0.3); background:rgba(216,180,254,0.08);">● Gemini 2.5 Pro</span>
+                    <span class="model-pill" style="color:#fbbf24; border-color:rgba(251,191,36,0.3); background:rgba(251,191,36,0.08);">● Cursor Tab（独自補完）</span>
+                </div>
+
+                <div style="background: rgba(255,255,255,0.025); border: 1px solid var(--border); border-radius:10px; overflow:hidden;">
+                    <table style="width:100%; border-collapse:collapse; font-size:0.8rem;">
+                        <thead>
+                            <tr style="background: rgba(88,166,255,0.06);">
+                                <th style="padding:10px 14px; text-align:left; color:var(--muted); font-weight:700; border-bottom:1px solid rgba(255,255,255,0.06);">モデル</th>
+                                <th style="padding:10px 14px; text-align:left; color:var(--muted); font-weight:700; border-bottom:1px solid rgba(255,255,255,0.06);">強み</th>
+                                <th style="padding:10px 14px; text-align:left; color:var(--muted); font-weight:700; border-bottom:1px solid rgba(255,255,255,0.06);">主な用途</th>
+                                <th style="padding:10px 14px; text-align:left; color:var(--muted); font-weight:700; border-bottom:1px solid rgba(255,255,255,0.06);">コスト</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding:10px 14px; color:#66e0c2; font-weight:600; border-bottom:1px solid rgba(255,255,255,0.04);">Claude Sonnet 4.5/4.6</td>
+                                <td style="padding:10px 14px; color:var(--text); border-bottom:1px solid rgba(255,255,255,0.04);">速度・コスト効率・コーディング精度</td>
+                                <td style="padding:10px 14px; color:var(--muted); border-bottom:1px solid rgba(255,255,255,0.04);">日常実装・Tab補完・チャット</td>
+                                <td style="padding:10px 14px; color:var(--muted); border-bottom:1px solid rgba(255,255,255,0.04);">低〜中</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:10px 14px; color:#66e0c2; font-weight:600; border-bottom:1px solid rgba(255,255,255,0.04);">Claude Opus 4.7/4.8</td>
+                                <td style="padding:10px 14px; color:var(--text); border-bottom:1px solid rgba(255,255,255,0.04);">最高精度・長大コンテキスト・複雑推論</td>
+                                <td style="padding:10px 14px; color:var(--muted); border-bottom:1px solid rgba(255,255,255,0.04);">設計・大規模リファクタ・アーキテクチャレビュー</td>
+                                <td style="padding:10px 14px; color:var(--muted); border-bottom:1px solid rgba(255,255,255,0.04);">高</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:10px 14px; color:#60d0ff; font-weight:600; border-bottom:1px solid rgba(255,255,255,0.04);">GPT-4o</td>
+                                <td style="padding:10px 14px; color:var(--text); border-bottom:1px solid rgba(255,255,255,0.04);">マルチモーダル・画像理解・汎用性</td>
+                                <td style="padding:10px 14px; color:var(--muted); border-bottom:1px solid rgba(255,255,255,0.04);">UIスクショ解析・図面からコード生成</td>
+                                <td style="padding:10px 14px; color:var(--muted); border-bottom:1px solid rgba(255,255,255,0.04);">中</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:10px 14px; color:#60d0ff; font-weight:600; border-bottom:1px solid rgba(255,255,255,0.04);">GPT-o3</td>
+                                <td style="padding:10px 14px; color:var(--text); border-bottom:1px solid rgba(255,255,255,0.04);">数学・アルゴリズム・推論</td>
+                                <td style="padding:10px 14px; color:var(--muted); border-bottom:1px solid rgba(255,255,255,0.04);">競プロ・最適化・数値アルゴリズム設計</td>
+                                <td style="padding:10px 14px; color:var(--muted); border-bottom:1px solid rgba(255,255,255,0.04);">高</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:10px 14px; color:#d8b4fe; font-weight:600; border-bottom:1px solid rgba(255,255,255,0.04);">Gemini 2.5 Pro</td>
+                                <td style="padding:10px 14px; color:var(--text); border-bottom:1px solid rgba(255,255,255,0.04);">超長コンテキスト（100万トークン）・コード</td>
+                                <td style="padding:10px 14px; color:var(--muted); border-bottom:1px solid rgba(255,255,255,0.04);">巨大リポジトリ解析・モノレポ全体の把握</td>
+                                <td style="padding:10px 14px; color:var(--muted); border-bottom:1px solid rgba(255,255,255,0.04);">中〜高</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:10px 14px; color:#fbbf24; font-weight:600;">Cursor Tab（独自）</td>
+                                <td style="padding:10px 14px; color:var(--text);">超高速・コーディングに特化・72%採用率</td>
+                                <td style="padding:10px 14px; color:var(--muted);">リアルタイム行補完（専用モデル）</td>
+                                <td style="padding:10px 14px; color:var(--muted);">プランに含む</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div style="font-size:0.72rem; color:var(--muted); margin-top:6px;">⁽¹⁾ GPT-5/5.5 の可用性はプラン・地域により異なる場合あり。公式ドキュメントで最新情報を確認推奨。</div>
+            </div>
 
             <div style="margin-bottom:16px;">
-                <div style="font-size:0.75rem; font-weight:700; color:var(--accent); text-transform:uppercase; margin-bottom:10px;">ネイティブ対応（Cursorプラン内で利用）</div>
+                <div style="font-size:0.75rem; font-weight:700; color:var(--muted); text-transform:uppercase; margin-bottom:10px;">🔑 BYOK（自前APIキー）で追加可能</div>
                 <div style="display:flex; flex-wrap:wrap; gap:0;">
-                    <span class="model-pill" style="color:#66e0c2; border-color:rgba(102,224,194,0.3); background:rgba(102,224,194,0.08);">● Claude Sonnet 4.6</span>
-                    <span class="model-pill" style="color:#66e0c2; border-color:rgba(102,224,194,0.3); background:rgba(102,224,194,0.08);">● Claude Opus 4.8</span>
-                    <span class="model-pill" style="color:#60d0ff; border-color:rgba(96,208,255,0.3); background:rgba(96,208,255,0.08);">● GPT-5.5 Instant</span>
-                    <span class="model-pill" style="color:#60d0ff; border-color:rgba(96,208,255,0.3); background:rgba(96,208,255,0.08);">● GPT-5.5</span>
-                    <span class="model-pill" style="color:#d8b4fe; border-color:rgba(210,168,255,0.3); background:rgba(210,168,255,0.08);">● Gemini 3.1 Pro</span>
-                    <span class="model-pill" style="color:#f4b860; border-color:rgba(244,184,96,0.3); background:rgba(244,184,96,0.08);">● Cursor Composer</span>
+                    <span class="model-pill" style="color:#94a3b8; border-color:rgba(148,163,184,0.2); background:rgba(148,163,184,0.05);">Grok（xAI）</span>
+                    <span class="model-pill" style="color:#94a3b8; border-color:rgba(148,163,184,0.2); background:rgba(148,163,184,0.05);">DeepSeek V3 / R2</span>
+                    <span class="model-pill" style="color:#94a3b8; border-color:rgba(148,163,184,0.2); background:rgba(148,163,184,0.05);">Qwen 3（OpenRouter経由）</span>
+                    <span class="model-pill" style="color:#94a3b8; border-color:rgba(148,163,184,0.2); background:rgba(148,163,184,0.05);">Kimi K2（OpenRouter経由）</span>
+                    <span class="model-pill" style="color:#94a3b8; border-color:rgba(148,163,184,0.2); background:rgba(148,163,184,0.05);">任意のOpenAI互換エンドポイント</span>
                 </div>
             </div>
 
             <div>
-                <div style="font-size:0.75rem; font-weight:700; color:var(--muted); text-transform:uppercase; margin-bottom:10px;">🔑 BYOK（自前APIキー持ち込み）で追加可能</div>
-                <div style="display:flex; flex-wrap:wrap; gap:0;">
-                    <span class="model-pill" style="color:#94a3b8; border-color:rgba(148,163,184,0.2); background:rgba(148,163,184,0.05);">Grok 4.3 (xAI)</span>
-                    <span class="model-pill" style="color:#94a3b8; border-color:rgba(148,163,184,0.2); background:rgba(148,163,184,0.05);">DeepSeek V4-Pro</span>
-                    <span class="model-pill" style="color:#94a3b8; border-color:rgba(148,163,184,0.2); background:rgba(148,163,184,0.05);">Qwen 3.6-Plus (OR経由)</span>
-                    <span class="model-pill" style="color:#94a3b8; border-color:rgba(148,163,184,0.2); background:rgba(148,163,184,0.05);">Kimi K2.6 (OR経由)</span>
-                    <span class="model-pill" style="color:#94a3b8; border-color:rgba(148,163,184,0.2); background:rgba(148,163,184,0.05);">任意のOpenAI互換API</span>
+                <div style="font-size:0.75rem; font-weight:700; color: #66e0c2; text-transform:uppercase; margin-bottom:8px;">⚙️ Auto モードの仕組み</div>
+                <div style="font-size:0.82rem; color:var(--muted); line-height:1.7;">
+                    クエリの複雑さ・サーバー負荷・コンテキストウィンドウ使用量・コストを総合判断して最適モデルを自動選択。シンプルな補完にはSonnet、複雑な推論にはOpus/o3、というように動的に切り替わる。Proプランの$20クレジットプールを消費するが、不要な高コストモデルの使用を抑制し、全体コストを最適化する。
                 </div>
             </div>
 
-            <div style="margin-top:14px; background:rgba(88,166,255,0.06); border:1px solid rgba(88,166,255,0.18); border-radius:8px; padding:10px 14px; font-size:0.8rem; color:var(--muted);">
-                💡 <strong style="color:var(--accent);">Tip:</strong> コード生成には <strong style="color:#fff;">Claude Sonnet 4.6</strong>（速度重視）、設計・リファクタには <strong style="color:#fff;">Claude Opus 4.8</strong>（精度重視）、最新情報が必要な調査には <strong style="color:#fff;">GPT-5.5</strong> という使い分けが効果的。
+            <div class="info-box">
+                💡 <strong style="color:var(--accent);">推奨使い分け：</strong>
+                <strong style="color:#fff;">日常実装・補完</strong> → Claude Sonnet 4.6（速度×精度バランス）|
+                <strong style="color:#fff;">設計・アーキテクチャレビュー</strong> → Claude Opus 4.8（最高精度）|
+                <strong style="color:#fff;">数学・アルゴリズム</strong> → GPT-o3 |
+                <strong style="color:#fff;">巨大リポジトリ把握</strong> → Gemini 2.5 Pro |
+                <strong style="color:#fff;">コスト最適</strong> → Auto モード
             </div>
         </div>
 
-        <!-- ショートカット -->
+        <!-- ── SHORTCUTS ── -->
         <div class="panel">
             <div class="section-label">Keyboard Shortcuts</div>
-            <div class="section-title">必須ショートカット</div>
-            <p class="section-desc">これだけ覚えれば Cursor の本領が発揮できる。</p>
+            <div class="section-title">必須ショートカット（Mac / Windows）</div>
+            <p class="section-desc">これだけ覚えれば Cursor の本領が発揮できる。Macは Cmd、Windowsは Ctrl で読み替え。</p>
 
             <div class="shortcut-row">
                 <div class="shortcut-keys"><span class="key">Cmd</span>+<span class="key">K</span></div>
                 <div>
-                    <div class="shortcut-desc">インラインAI編集（選択範囲に直接指示）</div>
-                    <div class="shortcut-note">「この関数をTypeScriptに変換して」など、カーソル位置のコードを即修正</div>
+                    <div class="shortcut-desc">インラインAI編集（Inline Edit）</div>
+                    <div class="shortcut-note">選択範囲に直接指示してその場で書き換え。「テストを追加」「TypeScriptに変換」など小さな変更に最適</div>
                 </div>
             </div>
             <div class="shortcut-row">
                 <div class="shortcut-keys"><span class="key">Cmd</span>+<span class="key">L</span></div>
                 <div>
-                    <div class="shortcut-desc">チャットパネルを開く</div>
-                    <div class="shortcut-note">コードベース全体を参照した質問が可能。「@codebase」タグで全体検索</div>
+                    <div class="shortcut-desc">AIチャットパネルを開く</div>
+                    <div class="shortcut-note">@codebase・@docs・@webでコンテキストを指定した質問・設計相談・バグ調査が可能</div>
                 </div>
             </div>
             <div class="shortcut-row">
                 <div class="shortcut-keys"><span class="key">Cmd</span>+<span class="key">I</span></div>
                 <div>
-                    <div class="shortcut-desc">Composer 1.5 を起動</div>
-                    <div class="shortcut-note">複数ファイルにまたがる実装・リファクタを一括指示。最も重要なショートカット</div>
+                    <div class="shortcut-desc">Agent Mode（旧Composer）を起動 — 最重要</div>
+                    <div class="shortcut-note">複数ファイルにまたがる実装・リファクタを一括指示。「〇〇機能を実装して」で実行から差分表示まで</div>
                 </div>
             </div>
             <div class="shortcut-row">
                 <div class="shortcut-keys"><span class="key">Tab</span></div>
                 <div>
-                    <div class="shortcut-desc">AI補完の確定</div>
-                    <div class="shortcut-note">次の行・ブロックを予測補完。Copilotより広い範囲を一度に補完できる</div>
+                    <div class="shortcut-desc">AI補完の確定（Cursor Tab）</div>
+                    <div class="shortcut-note">次の行〜ブロック全体を予測して提案。72%の採用率。Esc で却下、→キーで部分採用</div>
                 </div>
             </div>
             <div class="shortcut-row">
                 <div class="shortcut-keys"><span class="key">Cmd</span>+<span class="key">Shift</span>+<span class="key">I</span></div>
                 <div>
-                    <div class="shortcut-desc">Background Agent を起動</div>
-                    <div class="shortcut-note">クラウドVMに非同期でタスクを委託。「〇〇機能を実装してPRを作って」と指示するだけ</div>
+                    <div class="shortcut-desc">Background Agent / Cloud Agent を起動</div>
+                    <div class="shortcut-note">非同期でクラウドVMに委託。「〇〇機能を実装してPRを作成して」で完了まで自律実行</div>
                 </div>
             </div>
             <div class="shortcut-row">
                 <div class="shortcut-keys"><span class="key">@</span></div>
                 <div>
-                    <div class="shortcut-desc">コンテキスト参照（チャット内で使用）</div>
-                    <div class="shortcut-note">@ファイル名・@フォルダ・@codebase・@docs・@web でコンテキストを指定</div>
+                    <div class="shortcut-desc">コンテキスト参照（チャット・Agent Mode内で使用）</div>
+                    <div class="shortcut-note">@ファイル / @フォルダ / @codebase / @docs / @web / @notepads / @git など</div>
                 </div>
             </div>
             <div class="shortcut-row">
                 <div class="shortcut-keys"><span class="key">Cmd</span>+<span class="key">/</span></div>
                 <div>
-                    <div class="shortcut-desc">モデル切り替え</div>
-                    <div class="shortcut-note">現在のチャット・Composerセッションのモデルをその場で変更</div>
+                    <div class="shortcut-desc">モデルをその場で切り替え</div>
+                    <div class="shortcut-note">現在のチャット・Agent Modeセッションのモデルを即時変更。タスクに合わせて都度最適化</div>
+                </div>
+            </div>
+            <div class="shortcut-row">
+                <div class="shortcut-keys"><span class="key">Cmd</span>+<span class="key">Shift</span>+<span class="key">P</span></div>
+                <div>
+                    <div class="shortcut-desc">コマンドパレット</div>
+                    <div class="shortcut-note">Cursor固有コマンド（Rules設定・BugBot設定・MCP管理等）もここからアクセス</div>
                 </div>
             </div>
         </div>
 
-        <!-- 料金プラン -->
+        <!-- ── PRICING ── -->
         <div class="panel">
             <div class="section-label">Pricing 2026</div>
-            <div class="section-title">料金プラン</div>
-            <p class="section-desc">年間払いで20%オフ。個人開発者はPro、チームはTeamsが標準。</p>
+            <div class="section-title">料金プラン（全6プラン）</div>
+            <p class="section-desc">年間払いで20%オフ。クレジットプールが使い切れない場合は翌月繰り越し不可（月次リセット）。過剰利用分は従量課金。</p>
 
-            <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:12px;">
+            <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:12px; margin-bottom:14px;">
 
                 <div class="price-card">
                     <div class="price-name">Hobby</div>
                     <div class="price-amount">$0<span>/月</span></div>
-                    <div class="price-desc">無料枠でまず試す</div>
+                    <div class="price-desc">まず試す・学習用</div>
                     <ul class="price-features">
-                        <li>Tab補完（制限あり）</li>
-                        <li>チャット（制限あり）</li>
-                        <li>GPT-4o / Claude Haiku</li>
+                        <li>Tab補完 ~2,000回/月</li>
+                        <li>スロープレミアム 50回/月</li>
+                        <li>フルエディタ機能</li>
+                        <li>Claude Haiku / GPT-4o mini</li>
+                        <li>クレジットカード不要</li>
                     </ul>
                 </div>
 
                 <div class="price-card popular">
-                    <div style="font-size:0.65rem; font-weight:700; color:var(--accent); text-transform:uppercase; margin-bottom:4px;">最人気</div>
+                    <div style="font-size:0.65rem; font-weight:700; color:var(--accent); text-transform:uppercase; margin-bottom:4px;">最人気 ★</div>
                     <div class="price-name">Pro</div>
                     <div class="price-amount">$20<span>/月</span></div>
-                    <div class="price-desc">個人開発者の標準プラン</div>
+                    <div class="price-desc">個人開発者の標準</div>
                     <ul class="price-features">
-                        <li>Tab補完 無制限</li>
-                        <li>Composer 1.5 利用可</li>
-                        <li>$20分のモデルクレジット付</li>
-                        <li>Claude Sonnet / GPT-5.5 Instant</li>
+                        <li>Tab補完 無制限（Cursor Tab）</li>
+                        <li><strong style="color:#fff;">$20 クレジットプール</strong>/月</li>
+                        <li>Claude Sonnet / GPT-4o / Gemini</li>
+                        <li>Cloud Agents（有料）</li>
+                        <li>Background Agents</li>
+                        <li>MCP・Rules v2</li>
+                        <li>全モデル Auto モード</li>
                     </ul>
                 </div>
 
@@ -518,136 +1092,310 @@
                     <div class="price-desc">ヘビーユーザー向け</div>
                     <ul class="price-features">
                         <li>Proの全機能</li>
-                        <li>BugBot 利用可</li>
+                        <li><strong style="color:#fff;">$60 クレジットプール</strong>/月 (3×)</li>
+                        <li>Claude Opus 4.8 / GPT-o3</li>
+                        <li><strong style="color:#fff;">BugBot 利用可</strong></li>
                         <li>拡張エージェント枠</li>
-                        <li>Claude Opus / GPT-5.5</li>
+                        <li>優先サポート</li>
                     </ul>
                 </div>
 
                 <div class="price-card">
                     <div class="price-name">Ultra</div>
                     <div class="price-amount">$200<span>/月</span></div>
-                    <div class="price-desc">プロフェッショナル向け</div>
+                    <div class="price-desc">AIネイティブ開発者</div>
                     <ul class="price-features">
                         <li>Pro+の全機能</li>
-                        <li>Background Agents 優先</li>
-                        <li>モデルクレジット大幅増</li>
-                        <li>最新モデルへの優先アクセス</li>
+                        <li><strong style="color:#fff;">$200 クレジットプール</strong>/月 (20×)</li>
+                        <li>Background Agents 優先割当</li>
+                        <li>新機能への優先アクセス</li>
+                        <li>最前線モデル（随時追加）</li>
                     </ul>
                 </div>
 
                 <div class="price-card">
                     <div class="price-name">Teams</div>
                     <div class="price-amount">$40<span>/ユーザー/月</span></div>
-                    <div class="price-desc">チーム・スタートアップ向け</div>
+                    <div class="price-desc">チーム・スタートアップ</div>
                     <ul class="price-features">
-                        <li>Pro+の全機能</li>
-                        <li>BugBot Teams（全PR対象）</li>
-                        <li>チーム分析ダッシュボード</li>
-                        <li>一元請求管理</li>
+                        <li>Pro+の全機能（全メンバー）</li>
+                        <li>共有チャット・コマンド・Rules</li>
+                        <li>一元請求・利用分析</li>
+                        <li>SAML/OIDC SSO</li>
+                        <li>組織レベル Privacy Mode</li>
+                        <li>ロールベースアクセス制御</li>
                     </ul>
                 </div>
 
-                <div class="price-card">
+                <div class="price-card enterprise-card">
                     <div class="price-name">Enterprise</div>
                     <div class="price-amount" style="font-size:1.1rem;">要相談</div>
                     <div class="price-desc">大企業・コンプライアンス対応</div>
                     <ul class="price-features">
-                        <li>Cursor Blame（監査ログ）</li>
-                        <li>SAML SSO対応</li>
-                        <li>自社インフラへのデプロイ</li>
-                        <li>SLA・専用サポート</li>
+                        <li>Teamsの全機能</li>
+                        <li><strong style="color:#fff;">プール制クレジット</strong>（組織共有）</li>
+                        <li>SCIM シート管理</li>
+                        <li>AI コード追跡 API</li>
+                        <li>監査ログ（Cursor Blame）</li>
+                        <li>請求書・PO払い対応</li>
+                        <li>専任サポート・SLA</li>
                     </ul>
                 </div>
 
             </div>
 
-            <div style="margin-top:14px; background:rgba(210,168,255,0.06); border:1px solid rgba(210,168,255,0.18); border-radius:8px; padding:10px 14px; font-size:0.8rem; color:var(--muted);">
-                ⚠️ <strong style="color:var(--accent-2);">注意：</strong> BugBot は <strong style="color:#fff;">$40/ユーザー/月</strong> で別途課金（Pro+のオプション）。PRレビューは月200件まで（Proプラン）。
+            <div class="warn-box">
+                ⚠️ <strong style="color: #f4b860;">BugBot の課金について：</strong> BugBot は <strong style="color:#fff;">Pro+ / Teams / Enterprise</strong> で利用可能。クレジットプール消費型のため、利用量に応じてプール残量が減少。大規模プロジェクトでは Ultra または Enterprise プランの検討を推奨。
             </div>
         </div>
 
-        <!-- Vibe Coding ベストプラクティス -->
+        <!-- ── ENTERPRISE & SECURITY ── -->
         <div class="panel">
-            <div class="section-label">Vibe Coding Tips</div>
-            <div class="section-title">Cursor × Vibe Coding ベストプラクティス</div>
-            <p class="section-desc">より速く、より深く、AIと協働するための実践的なテクニック。</p>
+            <div class="section-label">Enterprise & Security</div>
+            <div class="section-title">エンタープライズ機能 & セキュリティ</div>
+            <p class="section-desc">Fortune 500の64%が採用。SOC 2 Type IIとゼロデータ保持（ZDR）でコンプライアンス要件に対応。</p>
+
+            <div class="sec-grid" style="margin-bottom:20px;">
+                <div class="sec-item">
+                    <span class="sec-icon">🔒</span>
+                    <div class="sec-title">SOC 2 Type II</div>
+                    <div class="sec-desc">AWS インフラ上で取得済み。定期ペネトレーションテスト実施</div>
+                </div>
+                <div class="sec-item">
+                    <span class="sec-icon">🛡️</span>
+                    <div class="sec-title">Privacy Mode + ZDR</div>
+                    <div class="sec-desc">モデルプロバイダーへのゼロデータ保持を保証。Enterprise はデフォルト ON</div>
+                </div>
+                <div class="sec-item">
+                    <span class="sec-icon">🔑</span>
+                    <div class="sec-title">SAML/OIDC SSO</div>
+                    <div class="sec-desc">Teams以上で対応。Okta・Azure AD・Google Workspace等と連携</div>
+                </div>
+                <div class="sec-item">
+                    <span class="sec-icon">👥</span>
+                    <div class="sec-title">SCIM シート管理</div>
+                    <div class="sec-desc">Enterprise のみ。IdP から自動でユーザー管理・プロビジョニング</div>
+                </div>
+                <div class="sec-item">
+                    <span class="sec-icon">📋</span>
+                    <div class="sec-title">Cursor Blame（監査ログ）</div>
+                    <div class="sec-desc">AIが提案したコードの追跡・誰がいつ採用したかを完全記録</div>
+                </div>
+                <div class="sec-item">
+                    <span class="sec-icon">🏢</span>
+                    <div class="sec-title">AI コード追跡 API</div>
+                    <div class="sec-desc">外部SIEMへのログ連携・カスタムポリシー適用に対応</div>
+                </div>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.025); border: 1px solid var(--border); border-radius:10px; padding:16px 20px;">
+                <div style="font-weight:700; color:#fff; margin-bottom:10px; font-size:0.88rem;">🛡️ ゼロデータ保持（ZDR）の仕組み</div>
+                <div style="font-size:0.82rem; color:var(--muted); line-height:1.8;">
+                    Cursor は以下すべてのモデルプロバイダーと<strong style="color:#fff;">ZDR契約</strong>を締結済み：
+                    <strong style="color:#66e0c2;">Anthropic（Claude）</strong> /
+                    <strong style="color:#60d0ff;">OpenAI（GPT）</strong> /
+                    <strong style="color:#d8b4fe;">Google Vertex AI（Gemini）</strong> /
+                    <strong style="color:#f4b860;">xAI（Grok）</strong>。
+                    Privacy Mode 有効時、各プロバイダーはデータをモデル学習に使用せず、リクエスト完了後に保持しないことを法的に保証。
+                    Privacy Mode は Settings &gt; Privacy から有効化。Teams/Enterprise では管理者がorg全体に強制適用可能。
+                </div>
+            </div>
+        </div>
+
+        <!-- ── COMPETITIVE COMPARISON ── -->
+        <div class="panel">
+            <div class="section-label">Competitive Landscape 2026</div>
+            <div class="section-title">主要AIコーディングツール比較（2026年6月）</div>
+            <p class="section-desc">Cursorを軸に、GitHub Copilot・Windsurf・Claude Code との実際の差を整理。</p>
+
+            <div style="overflow-x: auto; border-radius:10px; border: 1px solid var(--border);">
+                <table class="comp-table">
+                    <thead>
+                        <tr>
+                            <th>ツール</th>
+                            <th>Tab補完</th>
+                            <th>エージェント</th>
+                            <th>マルチモデル</th>
+                            <th>IDE形態</th>
+                            <th>月額（個人）</th>
+                            <th>市場シェア</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="background: rgba(88,166,255,0.04);">
+                            <td><span class="prod-name">Cursor</span><br><span style="font-size:0.72rem; color:var(--muted);">v3.7 · 2026年6月</span></td>
+                            <td><span class="comp-yes">◎ 72%採用率</span><br><span style="font-size:0.72rem; color:var(--muted);">独自Tabモデル</span></td>
+                            <td><span class="comp-yes">◎ Cloud Agents</span><br><span style="font-size:0.72rem; color:var(--muted);">BugBot / 並列</span></td>
+                            <td><span class="comp-yes">◎ 8+モデル</span><br><span style="font-size:0.72rem; color:var(--muted);">Auto/BYOK対応</span></td>
+                            <td>VS Code フォーク<br><span style="font-size:0.72rem; color:var(--muted);">+JetBrains Plugin</span></td>
+                            <td><strong style="color:#fff;">$20〜</strong><br><span style="font-size:0.72rem; color:var(--muted);">Pro / Pro+ / Ultra</span></td>
+                            <td><span style="font-size:0.82rem; color:var(--accent);">$2B ARR</span><br><span style="font-size:0.72rem; color:var(--muted);">$29.3B評価</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="prod-name">GitHub Copilot</span><br><span style="font-size:0.72rem; color:var(--muted);">Microsoft傘下</span></td>
+                            <td><span class="comp-partial">○ 65%採用率</span><br><span style="font-size:0.72rem; color:var(--muted);">Codex系モデル</span></td>
+                            <td><span class="comp-partial">○ Workspace</span><br><span style="font-size:0.72rem; color:var(--muted);">Extensions対応</span></td>
+                            <td><span class="comp-partial">○ GPT-4o / Claude</span><br><span style="font-size:0.72rem; color:var(--muted);">モデル選択可</span></td>
+                            <td>拡張機能<br><span style="font-size:0.72rem; color:var(--muted);">全主要IDEに対応</span></td>
+                            <td><strong style="color:#fff;">$10〜</strong><br><span style="font-size:0.72rem; color:var(--muted);">Individual / Business</span></td>
+                            <td><span style="font-size:0.82rem; color:var(--accent);">42%シェア</span><br><span style="font-size:0.72rem; color:var(--muted);">2,000万ユーザー</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="prod-name">Windsurf</span><br><span style="font-size:0.72rem; color:var(--muted);">Codeium → OpenAI買収</span></td>
+                            <td><span class="comp-yes">◎ 最速 &lt;150ms</span><br><span style="font-size:0.72rem; color:var(--muted);">Cursor比でも高速</span></td>
+                            <td><span class="comp-partial">○ Cascade</span><br><span style="font-size:0.72rem; color:var(--muted);">Cursor比約80%</span></td>
+                            <td><span class="comp-partial">○ 複数モデル</span><br><span style="font-size:0.72rem; color:var(--muted);">選択肢はやや少ない</span></td>
+                            <td>VS Code フォーク<br><span style="font-size:0.72rem; color:var(--muted);">OpenAI買収後不確実</span></td>
+                            <td><strong style="color:#fff;">$15〜</strong><br><span style="font-size:0.72rem; color:var(--muted);">Cursor比75%の価格</span></td>
+                            <td><span style="font-size:0.82rem; color:var(--muted);">買収後方向性未定</span><br><span style="font-size:0.72rem; color:var(--muted);">2026年Q1〜</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="prod-name">Claude Code</span><br><span style="font-size:0.72rem; color:var(--muted);">Anthropic製 CLI</span></td>
+                            <td><span class="comp-no">△ 非対応</span><br><span style="font-size:0.72rem; color:var(--muted);">CLIツール</span></td>
+                            <td><span class="comp-yes">◎ CLI エージェント</span><br><span style="font-size:0.72rem; color:var(--muted);">Claude 最新モデル直結</span></td>
+                            <td><span class="comp-no">△ Claude専用</span><br><span style="font-size:0.72rem; color:var(--muted);">Opus/Sonnet</span></td>
+                            <td>CLIのみ<br><span style="font-size:0.72rem; color:var(--muted);">IDE非依存・軽量</span></td>
+                            <td><strong style="color:#fff;">API従量制</strong><br><span style="font-size:0.72rem; color:var(--muted);">Max: $100/月</span></td>
+                            <td><span style="font-size:0.82rem; color:var(--accent);">$200M ARR</span><br><span style="font-size:0.72rem; color:var(--muted);">6ヶ月で達成</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="margin-top: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div class="success-box" style="margin-top:0;">
+                    ✅ <strong style="color: #66e0c2;">Cursor が明確に勝る点：</strong><br>
+                    Cloud Agents の成熟度・BugBot の自律修正・モデル選択の柔軟性・Tab補完の採用率・エンタープライズ機能の充実度
+                </div>
+                <div class="info-box" style="margin-top:0;">
+                    ℹ️ <strong style="color:var(--accent);">GitHub Copilot の強み：</strong><br>
+                    IDE対応の広さ（全主要IDE）・企業での実績（Fortune 100の90%）・Microsoft/GitHub エコシステムとの統合
+                </div>
+            </div>
+        </div>
+
+        <!-- ── CURSOR vs CLAUDE CODE ── -->
+        <div class="panel">
+            <div class="section-label">vs Claude Code</div>
+            <div class="section-title">Cursor vs Claude Code — どちらを使うか</div>
+            <p class="section-desc">両者は競合ではなく補完関係。目的に応じた使い分けが最強。</p>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                <div style="background:rgba(88,166,255,0.05); border:1px solid rgba(88,166,255,0.2); border-radius:12px; padding:18px 20px;">
+                    <div style="font-weight:700; color:var(--accent); font-size:1rem; margin-bottom:12px;">🖥️ Cursor が有利な場面</div>
+                    <ul style="padding-left:16px; font-size:0.83rem; color:var(--muted); display:flex; flex-direction:column; gap:7px; margin:0;">
+                        <li>GUIベースで視覚的にコードを書きたい</li>
+                        <li>Tab補完でリアルタイムに提案を受けながら実装したい</li>
+                        <li>複数モデルを柔軟に使い分けたい（Claude / GPT / Gemini）</li>
+                        <li>BugBot を CI に組み込み、PR自動レビューを実現したい</li>
+                        <li>Cloud Agents で非同期並列タスクを走らせたい</li>
+                        <li>Design Mode で UI変更をブラウザから直接指示したい</li>
+                        <li>チームで Rules・Notepads・MCP設定を共有したい</li>
+                        <li>JetBrains ユーザーも Cursor を試したい</li>
+                    </ul>
+                </div>
+                <div style="background:rgba(102,224,194,0.05); border:1px solid rgba(102,224,194,0.2); border-radius:12px; padding:18px 20px;">
+                    <div style="font-weight:700; color:#66e0c2; font-size:1rem; margin-bottom:12px;">💻 Claude Code が有利な場面</div>
+                    <ul style="padding-left:16px; font-size:0.83rem; color:var(--muted); display:flex; flex-direction:column; gap:7px; margin:0;">
+                        <li>CLI・ターミナル主体の開発環境に直接組み込みたい</li>
+                        <li>Claudeの最新モデル（Opus 4.8）を即座に・直接使いたい</li>
+                        <li>スクリプト・バッチ処理・自動化パイプラインをAIで書きたい</li>
+                        <li>既存のVS Code / Vim / Emacs 環境を変えたくない</li>
+                        <li>SSH越しのリモートサーバー上でエージェントを動かしたい</li>
+                        <li>コスト単価を最小化してAPIを直接制御したい</li>
+                        <li>CI/CDパイプライン内にAIエージェントを組み込みたい</li>
+                        <li>IDEに依存しない軽量な環境が必要</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="success-box">
+                🏆 <strong style="color: #66e0c2;">最強の組み合わせ：</strong>
+                <strong style="color:#fff;">日常の機能実装・UI開発・チームコラボ → Cursor</strong>（Cloud Agents + BugBot + Design Mode）。
+                <strong style="color:#fff;">CI/CD統合・バッチ自動化・ターミナル主体の作業 → Claude Code</strong>。
+                両者を場面で使い分けるのが2026年のベストプラクティス。
+            </div>
+        </div>
+
+        <!-- ── BEST PRACTICES ── -->
+        <div class="panel">
+            <div class="section-label">Best Practices 2026</div>
+            <div class="section-title">Cursor 実践 Tips & ベストプラクティス</div>
+            <p class="section-desc">より速く・より深く・より安全にAIと協働するための実践的テクニック。</p>
 
             <div class="grid-2" style="gap:10px;">
 
                 <div class="tip-item">
-                    <strong>① .cursorrules でプロジェクトの文脈を先に渡す</strong><br>
-                    ルートに <code style="font-size:0.8em; background:rgba(255,255,255,0.07); padding:1px 5px; border-radius:3px;">.cursorrules</code> ファイルを置き、技術スタック・命名規則・禁止事項を記述。毎回説明せずに済む。
+                    <strong>① Rules v2 でプロジェクトの文脈を先に定義する</strong><br>
+                    <code style="font-family:var(--font-mono); font-size:0.8em; background:rgba(255,255,255,0.07); padding:1px 5px; border-radius:3px;">.cursor/rules/</code> ディレクトリに「スタック設定」「命名規則」「禁止パターン」「エージェント行動制約」を分離して記述。旧来の <code style="font-family:var(--font-mono); font-size:0.8em; background:rgba(255,255,255,0.07); padding:1px 5px; border-radius:3px;">.cursorrules</code> より細粒度の制御が可能。
                 </div>
 
                 <div class="tip-item">
-                    <strong>② Composerは「要件」を渡して実装を任せる</strong><br>
-                    コードを書くのではなく、「ユーザー認証機能を実装して。JWTを使い、refreshトークンも対応して」のように仕様を渡す。
+                    <strong>② Agent Modeは「要件」を渡して実装を任せる</strong><br>
+                    コードを書くのではなく「ユーザー認証機能を実装して。JWTを使い、refreshトークンも対応、バリデーションにZodを使って」のように<strong>仕様を渡す</strong>。実装→テスト→差分確認→Acceptのループで高品質コードが生まれる。
                 </div>
 
                 <div class="tip-item">
-                    <strong>③ @codebase で全体感を持たせる</strong><br>
-                    チャットで <code style="font-size:0.8em; background:rgba(255,255,255,0.07); padding:1px 5px; border-radius:3px;">@codebase</code> を付けると、インデックス済みの全ファイルを参照した回答が得られる。設計相談に有効。
+                    <strong>③ @codebase で全体感を持たせてから質問する</strong><br>
+                    設計相談・バグ調査の前に <code style="font-family:var(--font-mono); font-size:0.8em; background:rgba(255,255,255,0.07); padding:1px 5px; border-radius:3px;">@codebase</code> を付与するとインデックス済みの全ファイルを参照した回答が得られる。「このアーキテクチャのどこに新機能を追加すべきか？」などの設計相談に特に有効。
                 </div>
 
                 <div class="tip-item">
-                    <strong>④ Background Agentで「火付け → 離席 → 確認」フロー</strong><br>
-                    大きめのタスクをBackground Agentに投げてSlackで通知を受け取り、PRをレビューするだけ。待ち時間をゼロにできる。
+                    <strong>④ Cloud Agent は「火付け → 離席 → 成果物確認」で使う</strong><br>
+                    大きめのタスクをCloud/Background Agentに投げてSlack/モバイルで通知を受け取り、PRの成果物（動画・スクショ）を確認してApprove。待ち時間ゼロで複数フィーチャーを並行実装できる。
                 </div>
 
                 <div class="tip-item">
-                    <strong>⑤ BugBotをCIに組み込む</strong><br>
-                    PRがオープンされると自動レビューが走り、バグがあれば修正PRまで作ってくれる。レビュー待ち時間を劇的に削減。
+                    <strong>⑤ BugBot を CI ブランチ保護と組み合わせる</strong><br>
+                    PRがオープンされると自動レビューが走り、バグがあれば修正PRまで作成。さらにブランチ保護ルールでBugBotの承認を必須にすると、品質ゲートが自動化される。チームのコードレビュー時間を大幅削減。
                 </div>
 
                 <div class="tip-item">
-                    <strong>⑥ モデルをタスクで使い分ける</strong><br>
-                    補完・説明 → Sonnet（速い）、設計・レビュー → Opus（精度）、Cursor Composer モードのみ → Auto（コスト最適）。
+                    <strong>⑥ MCPサーバーは「薄く・専用に」設計する</strong><br>
+                    1サーバーあたり5〜10ツールに絞る。40ツール上限を超えるとエージェントがツールを見失う。「DB用」「GitHub用」「社内API用」と役割を分けて管理。Claude Code等でも同じ設定が使える。
                 </div>
 
                 <div class="tip-item">
-                    <strong>⑦ エラーメッセージをそのまま貼る</strong><br>
-                    スタックトレースやコンパイルエラーをチャットにそのまま貼り付けるだけで原因と修正コードが返ってくる。コピペするだけで良い。
+                    <strong>⑦ Notepads で頻出コンテキストを再利用する</strong><br>
+                    「データベーススキーマ」「APIクライアント仕様」「デザインシステムのトークン一覧」などをNotepadsに保存。毎回説明せずに <code style="font-family:var(--font-mono); font-size:0.8em; background:rgba(255,255,255,0.07); padding:1px 5px; border-radius:3px;">@notepads/schema</code> と参照するだけ。チームで共有するとさらに効果的。
                 </div>
 
                 <div class="tip-item">
-                    <strong>⑧ Composer の差分は必ず確認してから Accept</strong><br>
-                    AIは意図しない既存コードを書き換えることがある。差分ビューで変更点を一通り確認してから Accept するのが安全。
+                    <strong>⑧ エラーをそのまま貼る + チェックポイントを活用する</strong><br>
+                    スタックトレース・コンパイルエラーをチャットにそのまま貼り付けるだけで原因と修正コードが返ってくる。大きな変更をAgent Modeに任せる前にチェックポイントを作成（または自動作成を確認）しておくと、問題発生時に安全に巻き戻せる。
                 </div>
 
+                <div class="tip-item">
+                    <strong>⑨ Privacy Mode はデフォルトで有効にしておく</strong><br>
+                    Settings &gt; Privacy で Privacy Mode をON（特にチームはorg全体に適用）。全モデルプロバイダーとのZDR契約により、コードが学習データに使われることがない。企業利用では必須の設定。
+                </div>
+
+                <div class="tip-item">
+                    <strong>⑩ Composer の差分は必ず確認してから Accept</strong><br>
+                    エージェントは意図しない既存コードを書き換えることがある。差分ビューで変更点を一通り確認してから Accept。特に大規模リファクタでは Reject All → 部分的に再指示 のフローも活用。Auto → Opus に切り替えて精度を上げるのも有効。
+                </div>
+
+            </div>
+
+            <div class="info-box">
+                💡 <strong style="color:var(--accent);">エージェントルールの重要原則（agent.mdc 推奨記述）：</strong>
+                「新しいnpmパッケージを使う前に <code style="font-family:var(--font-mono);">npm list &lt;package&gt;</code> で存在確認」
+                「.env / config ファイルをユーザー確認なしに削除しない」
+                「セキュリティ脆弱性を発見したら即停止して報告」
+                「コミット前にユーザーレビューを必須とする」
+                — これらをルールに入れておくと、エージェントが暴走するリスクを大幅に低減できる。
             </div>
         </div>
 
-        <!-- Claude Code との使い分け -->
-        <div class="panel">
-            <div class="section-label">vs Claude Code</div>
-            <div class="section-title">Cursor vs Claude Code — どちらを使うか</div>
-            <p class="section-desc">2026年時点での実用的な選択基準。どちらも持つのがベスト。</p>
-
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
-                <div style="background:rgba(88,166,255,0.05); border:1px solid rgba(88,166,255,0.2); border-radius:12px; padding:18px 20px;">
-                    <div style="font-weight:700; color:var(--accent); font-size:1rem; margin-bottom:12px;">Cursor が勝る場面</div>
-                    <ul style="padding-left:16px; font-size:0.82rem; color:var(--muted); display:flex; flex-direction:column; gap:6px; margin:0;">
-                        <li>GUIベースの開発環境が好みな場合</li>
-                        <li>複数モデルを柔軟に切り替えたい</li>
-                        <li>BugBotによるPR自動レビューを組み込みたい</li>
-                        <li>Background Agentで非同期並列タスクを走らせたい</li>
-                        <li>チームで共有した開発環境を作りたい</li>
-                    </ul>
-                </div>
-                <div style="background:rgba(102,224,194,0.05); border:1px solid rgba(102,224,194,0.2); border-radius:12px; padding:18px 20px;">
-                    <div style="font-weight:700; color:#66e0c2; font-size:1rem; margin-bottom:12px;">Claude Code が勝る場面</div>
-                    <ul style="padding-left:16px; font-size:0.82rem; color:var(--muted); display:flex; flex-direction:column; gap:6px; margin:0;">
-                        <li>CLIベースで軽快に動かしたい</li>
-                        <li>Claudeの最新モデル（Opus 4.8）を最速で使いたい</li>
-                        <li>自分のターミナル環境に直接組み込みたい</li>
-                        <li>スクリプト・バッチ処理をAIで自動化したい</li>
-                        <li>コスト単価を最小化したい（CLAUDE_MODEL指定で細かく制御）</li>
-                    </ul>
-                </div>
+        <!-- Footer -->
+        <div style="background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 32px; display: flex; flex-wrap:wrap; gap: 16px; align-items: center; justify-content: space-between;">
+            <div style="font-size:0.8rem; color:var(--muted);">
+                <strong style="color:#fff;">Cursor IDE 完全ガイド 2026</strong> | v3.7（2026年6月5日）ベース |
+                <a href="https://cursor.com/changelog" style="color:var(--accent); text-decoration:none;" target="_blank">公式 Changelog →</a>
             </div>
-            <div style="margin-top:12px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:8px; padding:12px 14px; font-size:0.82rem; color:var(--muted);">
-                🏆 <strong style="color:#fff;">推奨：</strong> 日常の実装はCursorで。CI/CD統合・バッチ自動化・ターミナル主体の作業はClaude Code。<strong style="color:#fff;">両刀使いが最強</strong>。
+            <div style="display:flex; gap:16px; flex-wrap:wrap;">
+                <a href="../index.html" style="color:var(--accent); text-decoration:none; font-size:0.82rem;">← Workbench</a>
+                <a href="claude-code.html" style="color:var(--accent); text-decoration:none; font-size:0.82rem;">Claude Code →</a>
+                <a href="vibe-coding.html" style="color:var(--accent); text-decoration:none; font-size:0.82rem;">Vibe Coding →</a>
             </div>
         </div>
 
