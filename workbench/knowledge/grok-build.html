@@ -1,0 +1,1182 @@
+<!doctype html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grok Build 完全ガイド 2026 | xAI Dev Stack | Knowledge Base</title>
+    <style>
+        :root {
+            --bg: #0a0e1a;
+            --panel: #101520;
+            --muted: #94a3b8;
+            --text: #e2e8f0;
+            --accent: #f59e0b;
+            --accent-2: #a78bfa;
+            --accent-3: #34d399;
+            --border: rgba(255,255,255,0.07);
+            --shadow: 0 8px 32px rgba(0,0,0,0.5);
+            --radius: 14px;
+            --font-mono: "SF Mono","Consolas",monospace;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0; min-height: 100vh;
+            font-family: "Segoe UI","SF Pro Display",system-ui,sans-serif;
+            color: var(--text); background: var(--bg);
+            padding: 32px 20px 80px; line-height: 1.6;
+        }
+        .shell { max-width: 1080px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
+
+        /* Hero */
+        header.hero {
+            background: var(--panel); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 40px 40px 32px;
+            position: relative; overflow: hidden;
+        }
+        header.hero::before {
+            content: ""; position: absolute; top: 0; left: 0;
+            width: 100%; height: 4px;
+            background: linear-gradient(90deg, #f59e0b, #fb923c, #a78bfa);
+        }
+        header.hero::after {
+            content: ""; position: absolute; right: -80px; top: -80px;
+            width: 340px; height: 340px;
+            background: radial-gradient(circle, rgba(245,158,11,0.08), transparent 70%);
+            pointer-events: none;
+        }
+        .eyebrow {
+            font-family: var(--font-mono); color: var(--accent);
+            font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.1em; margin-bottom: 10px; display: block;
+        }
+        h1 { margin: 0 0 8px; font-size: 40px; color: #fff; font-weight: 800; letter-spacing: -0.5px; }
+        .version-badge {
+            display: inline-block; background: rgba(245,158,11,0.15); color: var(--accent);
+            border: 1px solid rgba(245,158,11,0.35); padding: 3px 10px; border-radius: 99px;
+            font-size: 0.75rem; font-weight: 600; margin-left: 10px; vertical-align: middle; position: relative; top: -4px;
+        }
+        .lead { margin: 12px 0 20px; font-size: 17px; color: var(--muted); max-width: 760px; }
+        .last-updated { font-family: var(--font-mono); font-size: 11px; color: var(--muted); opacity: 0.6; display: block; margin-bottom: 16px; }
+        .back { color: var(--accent); text-decoration: none; font-weight: 600; font-size: 14px; opacity: 0.8; }
+        .back:hover { opacity: 1; }
+
+        /* Panels */
+        .panel { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px 32px; }
+        .section-label { font-family: var(--font-mono); font-size: 0.7rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+        .section-title { font-size: 1.2rem; font-weight: 800; color: #fff; margin: 0 0 6px; }
+        .section-desc { font-size: 0.85rem; color: var(--muted); margin: 0 0 20px; }
+
+        /* Grids */
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+
+        /* Feature card */
+        .feat-card {
+            background: rgba(255,255,255,0.025); border: 1px solid var(--border);
+            border-radius: 12px; padding: 18px 20px; transition: border-color 0.2s;
+        }
+        .feat-card:hover { border-color: rgba(245,158,11,0.3); }
+        .feat-icon { font-size: 1.4rem; margin-bottom: 8px; display: block; }
+        .feat-title { font-weight: 700; color: #fff; font-size: 0.95rem; margin-bottom: 6px; }
+        .feat-desc { font-size: 0.8rem; color: var(--muted); line-height: 1.6; }
+
+        /* Badges */
+        .new-badge {
+            display: inline-block; background: rgba(245,158,11,0.15); color: var(--accent);
+            border: 1px solid rgba(245,158,11,0.3); padding: 1px 7px; border-radius: 4px;
+            font-size: 0.65rem; font-weight: 700; text-transform: uppercase; margin-left: 6px; vertical-align: middle;
+        }
+        .coming-badge {
+            display: inline-block; background: rgba(167,139,250,0.15); color: var(--accent-2);
+            border: 1px solid rgba(167,139,250,0.3); padding: 1px 7px; border-radius: 4px;
+            font-size: 0.65rem; font-weight: 700; text-transform: uppercase; margin-left: 6px; vertical-align: middle;
+        }
+        .beta-badge {
+            display: inline-block; background: rgba(52,211,153,0.12); color: var(--accent-3);
+            border: 1px solid rgba(52,211,153,0.25); padding: 1px 7px; border-radius: 4px;
+            font-size: 0.65rem; font-weight: 700; text-transform: uppercase; margin-left: 6px; vertical-align: middle;
+        }
+
+        /* Key */
+        .key {
+            display: inline-block; background: rgba(255,255,255,0.1); padding: 2px 7px;
+            border-radius: 5px; font-family: var(--font-mono); font-size: 0.82em;
+            color: #fff; border: 1px solid rgba(255,255,255,0.15);
+        }
+
+        /* Stats */
+        .stat-bar { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 10px; }
+        .stat-item { display: flex; flex-direction: column; gap: 2px; }
+        .stat-value { font-size: 1.5rem; font-weight: 800; color: var(--accent); line-height: 1; }
+        .stat-label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+        /* Timeline */
+        .timeline { display: flex; flex-direction: column; gap: 0; }
+        .tl-item { display: flex; gap: 20px; position: relative; }
+        .tl-item:not(:last-child)::before {
+            content: ""; position: absolute; left: 47px; top: 44px; bottom: -16px;
+            width: 2px; background: rgba(245,158,11,0.15);
+        }
+        .tl-left { flex-shrink: 0; width: 96px; text-align: right; padding-top: 14px; }
+        .tl-date { font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); line-height: 1.3; }
+        .tl-dot {
+            flex-shrink: 0; width: 12px; height: 12px; border-radius: 50%;
+            background: var(--accent); border: 2px solid var(--bg); margin-top: 19px;
+            box-shadow: 0 0 8px rgba(245,158,11,0.5);
+        }
+        .tl-dot.purple { background: var(--accent-2); box-shadow: 0 0 8px rgba(167,139,250,0.5); }
+        .tl-dot.green { background: var(--accent-3); box-shadow: 0 0 8px rgba(52,211,153,0.5); }
+        .tl-content {
+            flex: 1; background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+            border-radius: 10px; padding: 12px 16px; margin-bottom: 16px;
+        }
+        .tl-ver { font-weight: 700; color: #fff; font-size: 0.9rem; margin-bottom: 4px; }
+        .tl-desc { font-size: 0.78rem; color: var(--muted); line-height: 1.6; }
+        .tl-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+        .tl-tag {
+            background: rgba(245,158,11,0.1); color: var(--accent);
+            border: 1px solid rgba(245,158,11,0.2); padding: 2px 8px;
+            border-radius: 4px; font-size: 0.68rem; font-weight: 600;
+        }
+        .tl-tag.purple { background: rgba(167,139,250,0.1); color: var(--accent-2); border-color: rgba(167,139,250,0.2); }
+        .tl-tag.green { background: rgba(52,211,153,0.1); color: var(--accent-3); border-color: rgba(52,211,153,0.2); }
+
+        /* Flow */
+        .flow-steps { display: flex; gap: 0; align-items: stretch; overflow-x: auto; }
+        .flow-step {
+            flex: 1; min-width: 140px; background: rgba(245,158,11,0.05);
+            border: 1px solid rgba(245,158,11,0.15); border-radius: 10px;
+            padding: 14px 12px; text-align: center;
+        }
+        .flow-step + .flow-step { margin-left: 10px; }
+        .flow-step-num { font-size: 0.65rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 4px; }
+        .flow-step-icon { font-size: 1.4rem; display: block; margin-bottom: 6px; }
+        .flow-step-title { font-weight: 700; color: #fff; font-size: 0.85rem; margin-bottom: 6px; }
+        .flow-step-desc { font-size: 0.73rem; color: var(--muted); line-height: 1.5; }
+
+        /* Agent card */
+        .agent-card {
+            background: rgba(255,255,255,0.025); border: 1px solid var(--border);
+            border-radius: 12px; padding: 16px 18px;
+        }
+        .agent-name { font-size: 1.05rem; font-weight: 800; color: #fff; margin-bottom: 4px; }
+        .agent-role { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+        .agent-desc { font-size: 0.8rem; color: var(--muted); line-height: 1.6; }
+
+        /* Model pill */
+        .model-pill {
+            display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px;
+            border-radius: 99px; font-size: 0.82rem; font-weight: 600; border: 1px solid; margin: 4px;
+        }
+
+        /* Price cards */
+        .price-card {
+            background: rgba(255,255,255,0.025); border: 1px solid var(--border);
+            border-radius: 12px; padding: 18px; display: flex; flex-direction: column;
+        }
+        .price-card.popular { border-color: rgba(245,158,11,0.4); background: rgba(245,158,11,0.04); }
+        .price-name { font-weight: 700; color: #fff; font-size: 0.92rem; margin-bottom: 4px; }
+        .price-amount { font-size: 1.5rem; font-weight: 800; color: #fff; line-height: 1; margin: 6px 0 4px; }
+        .price-amount span { font-size: 0.82rem; font-weight: 400; color: var(--muted); }
+        .price-desc { font-size: 0.76rem; color: var(--muted); margin-bottom: 10px; }
+        .price-features { font-size: 0.76rem; color: var(--muted); padding-left: 14px; margin: 0; }
+        .price-features li { margin-bottom: 4px; }
+
+        /* Connector row */
+        .connector-row {
+            display: flex; align-items: center; gap: 14px;
+            background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+            border-radius: 10px; padding: 11px 15px;
+        }
+        .conn-icon { font-size: 1.3rem; flex-shrink: 0; }
+        .conn-title { font-weight: 700; color: #fff; font-size: 0.86rem; margin-bottom: 2px; }
+        .conn-desc { font-size: 0.76rem; color: var(--muted); }
+
+        /* Code block */
+        .code-block {
+            background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 8px; padding: 14px 16px; font-family: var(--font-mono);
+            font-size: 0.78rem; color: #e2e8f0; overflow-x: auto; line-height: 1.75;
+        }
+        .code-block .cm { color: #64748b; }
+        .code-block .kw { color: var(--accent); }
+        .code-block .st { color: #a5d6ff; }
+        .code-block .val { color: var(--accent-3); }
+        .code-block .cmd { color: #fb923c; }
+
+        /* Info/warn boxes */
+        .info-box { background: rgba(245,158,11,0.06); border: 1px solid rgba(245,158,11,0.18); border-radius: 8px; padding: 12px 16px; font-size: 0.82rem; color: var(--muted); margin-top: 16px; }
+        .warn-box { background: rgba(251,146,60,0.06); border: 1px solid rgba(251,146,60,0.2); border-radius: 8px; padding: 12px 16px; font-size: 0.82rem; color: var(--muted); margin-top: 16px; }
+        .success-box { background: rgba(52,211,153,0.06); border: 1px solid rgba(52,211,153,0.2); border-radius: 8px; padding: 12px 16px; font-size: 0.82rem; color: var(--muted); margin-top: 16px; }
+        .purple-box { background: rgba(167,139,250,0.06); border: 1px solid rgba(167,139,250,0.2); border-radius: 8px; padding: 12px 16px; font-size: 0.82rem; color: var(--muted); margin-top: 16px; }
+
+        /* Comparison table */
+        .comp-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+        .comp-table th { padding: 10px 14px; text-align: left; font-size: 0.72rem; font-weight: 700; color: var(--muted); text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .comp-table td { padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--text); vertical-align: top; }
+        .comp-table tr:last-child td { border-bottom: none; }
+        .comp-yes { color: #34d399; }
+        .comp-partial { color: #f59e0b; }
+        .comp-no { color: #64748b; }
+
+        /* Tip items */
+        .tip-item { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 14px 16px; font-size: 0.83rem; color: var(--text); line-height: 1.6; }
+        .tip-item strong { color: #fff; }
+
+        /* Benchmark bar */
+        .bench-item { margin-bottom: 12px; }
+        .bench-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+        .bench-label { font-size: 0.82rem; color: var(--text); font-weight: 600; }
+        .bench-value { font-size: 0.82rem; color: var(--muted); font-family: var(--font-mono); }
+        .bench-bar-bg { background: rgba(255,255,255,0.06); border-radius: 99px; height: 8px; }
+        .bench-bar-fill { height: 8px; border-radius: 99px; }
+
+        /* Pillar cards */
+        .pillar-card {
+            background: rgba(255,255,255,0.025); border: 1px solid var(--border);
+            border-radius: 12px; padding: 22px; text-align: center;
+        }
+        .pillar-num { font-size: 1.8rem; font-weight: 900; color: var(--accent); line-height: 1; margin-bottom: 4px; }
+        .pillar-title { font-weight: 700; color: #fff; font-size: 1rem; margin-bottom: 6px; }
+        .pillar-desc { font-size: 0.78rem; color: var(--muted); line-height: 1.6; }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 28px; }
+            .panel { padding: 20px; }
+            header.hero { padding: 24px 20px; }
+            .stat-bar { gap: 14px; }
+            .stat-value { font-size: 1.2rem; }
+            .tl-left { width: 60px; }
+        }
+    </style>
+</head>
+<body>
+<div class="shell">
+
+    <!-- Hero -->
+    <header class="hero">
+        <span class="eyebrow">xAI / DEVELOPER TOOLS</span>
+        <h1>Grok Build <span class="version-badge">May 2026 · Early Beta</span></h1>
+        <p class="lead">xAI初のターミナル型コーディングエージェント。最大8つの並列AIエージェントが「計画→検索→構築」の3段階ワークフローを自律実行。ゼロコード送信のローカルファーストプライバシーと、X/Grok独自のリアルタイムフィードで他のCLIツールと一線を画す。</p>
+        <span class="last-updated">Last Updated: 2026-06-06 | Grok Build Early Beta（2026年5月14日）ベース</span>
+        <a class="back" href="../index.html">← Workbenchへ戻る</a>
+    </header>
+
+    <!-- KPI bar -->
+    <div class="panel">
+        <div class="stat-bar">
+            <div class="stat-item">
+                <span class="stat-value">8</span>
+                <span class="stat-label">並列エージェント数</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">256K</span>
+                <span class="stat-label">コンテキスト（トークン）</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">70.8%</span>
+                <span class="stat-label">SWE-Bench スコア</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">100+</span>
+                <span class="stat-label">トークン/秒（生成速度）</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">$1/$2</span>
+                <span class="stat-label">API単価（M tokens in/out）</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">0</span>
+                <span class="stat-label">コード送信（ローカルファースト）</span>
+            </div>
+        </div>
+        <p style="font-size:0.82rem; color:var(--muted); margin:0;">xAI が2026年5月に一気に投下した開発者向け3本柱：<strong style="color:#fff;">Grok Build</strong>（CLIエージェント）+ <strong style="color:#fff;">Grok Skills</strong>（再利用ワークフロー）+ <strong style="color:#fff;">Grok Connectors</strong>（外部ツール統合）。Claude Code や Codex CLI へのxAIの明確な回答。</p>
+    </div>
+
+    <!-- xAI Dev Stack 全体像 -->
+    <div class="panel">
+        <div class="section-label">xAI Dev Stack 2026</div>
+        <div class="section-title">3本柱の全体像 — Build / Skills / Connectors</div>
+        <p class="section-desc">2026年5月にxAIが開発者向けに投入した3つのピース。単体でも強力だが、組み合わせることで完全な自律開発パイプラインが完成する。</p>
+
+        <div class="grid-3">
+            <div class="pillar-card">
+                <div class="pillar-num">①</div>
+                <div class="pillar-title">Grok Build</div>
+                <div style="font-size:0.72rem; color:var(--accent); font-weight:700; text-transform:uppercase; margin-bottom:8px;">ターミナル コーディングエージェント</div>
+                <div class="pillar-desc">Claude Code / Codex CLI と同系統のCLIエージェント。最大8つの並列サブエージェントが「計画→検索→構築」を実行。ゼロコード送信のプライバシーファースト設計。</div>
+                <div style="margin-top:10px; font-size:0.72rem; color:var(--muted);">リリース: 2026年5月14日 | 早期ベータ</div>
+            </div>
+            <div class="pillar-card">
+                <div class="pillar-num">②</div>
+                <div class="pillar-title">Grok Skills</div>
+                <div style="font-size:0.72rem; color:var(--accent-2); font-weight:700; text-transform:uppercase; margin-bottom:8px;">再利用可能ワークフロー</div>
+                <div class="pillar-desc">.zip / .skill / .md 形式の再利用パック。Claude Code の CLAUDE.md・.claude/rules/・スキルプラグインと明示的互換。エコシステムを競わず取り込む戦略。</div>
+                <div style="margin-top:10px; font-size:0.72rem; color:var(--muted);">リリース: 2026年5月14日</div>
+            </div>
+            <div class="pillar-card">
+                <div class="pillar-num">③</div>
+                <div class="pillar-title">Grok Connectors</div>
+                <div style="font-size:0.72rem; color:var(--accent-3); font-weight:700; text-transform:uppercase; margin-bottom:8px;">外部ツール統合</div>
+                <div class="pillar-desc">GitHub / Notion / Linear / Google Workspace / Microsoft 365 のネイティブ統合 + カスタムMCPサーバー持ち込み（Bring-Your-Own-MCP）。</div>
+                <div style="margin-top:10px; font-size:0.72rem; color:var(--muted);">Wave 1: 5月6日 | Wave 2: 5月22日</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- リリースタイムライン -->
+    <div class="panel">
+        <div class="section-label">Timeline</div>
+        <div class="section-title">xAI 開発者向けリリース履歴（2026年）</div>
+        <p class="section-desc">Grok Build 登場までの道のりと、前後に展開された関連リリースを時系列で整理。</p>
+
+        <div class="timeline">
+            <div class="tl-item">
+                <div class="tl-left"><div class="tl-date">2026-05-22</div></div>
+                <div class="tl-dot green"></div>
+                <div class="tl-content">
+                    <div class="tl-ver">Connectors Wave 2 — Vercel / Canva / Gamma / S&amp;P Global <span class="new-badge">LATEST</span></div>
+                    <div class="tl-desc">第2弾コネクター追加。フロントエンドデプロイ（Vercel）、デザイン（Canva）、プレゼン（Gamma）、金融データ（S&P Global）が統合。開発→デプロイ→デザインまでの全パイプラインをGrokがカバー。</div>
+                    <div class="tl-tags"><span class="tl-tag green">Vercel</span><span class="tl-tag green">Canva</span><span class="tl-tag green">Gamma</span><span class="tl-tag green">S&P Global</span></div>
+                </div>
+            </div>
+            <div class="tl-item">
+                <div class="tl-left"><div class="tl-date">2026-05-21</div></div>
+                <div class="tl-dot"></div>
+                <div class="tl-content">
+                    <div class="tl-ver">Grok Build → OpenCode 経由で SuperGrok 全体に開放</div>
+                    <div class="tl-desc">SuperGrok Heavy 限定だったアクセスを、SuperGrok（$30）・X Premium+ ユーザーも OpenCode 開発環境経由で利用可能に。アクセス対象が大幅拡大。</div>
+                    <div class="tl-tags"><span class="tl-tag">SuperGrok 開放</span><span class="tl-tag">OpenCode</span></div>
+                </div>
+            </div>
+            <div class="tl-item">
+                <div class="tl-left"><div class="tl-date">2026-05-14</div></div>
+                <div class="tl-dot" style="background: var(--accent); box-shadow: 0 0 12px rgba(245,158,11,0.7);"></div>
+                <div class="tl-content">
+                    <div class="tl-ver">🚀 Grok Build 早期ベータ発表 + Grok Skills 同時リリース</div>
+                    <div class="tl-desc">xAI初のコーディングCLIエージェント「Grok Build」がSuperGrok Heavy向けに公開。8並列サブエージェント・256Kコンテキスト・ローカルファーストプライバシー・SWE-Bench 70.8%。grok-build-0.1 モデルも API で同時公開。Grok Skills（.skill / .md パック、CLAUDE.md 互換）も同日リリース。IDE連携7社（Cursor・Cline・Roo Code等）と無料期間を提供。</div>
+                    <div class="tl-tags"><span class="tl-tag">Grok Build</span><span class="tl-tag">grok-build-0.1 API</span><span class="tl-tag">Grok Skills</span><span class="tl-tag">8 Parallel Agents</span><span class="tl-tag">IDE 7社連携</span></div>
+                </div>
+            </div>
+            <div class="tl-item">
+                <div class="tl-left"><div class="tl-date">2026-05-06</div></div>
+                <div class="tl-dot green"></div>
+                <div class="tl-content">
+                    <div class="tl-ver">Grok Connectors Wave 1 — GitHub / Notion / Linear / Google / Microsoft</div>
+                    <div class="tl-desc">GitHub・Notion・Linear・Google Workspace（Gmail/Drive/Docs/Calendar）・Microsoft 365（Teams/Outlook/OneDrive）をネイティブ統合。Bring-Your-Own-MCP（任意のMCPサーバー持ち込み）も同時対応。</div>
+                    <div class="tl-tags"><span class="tl-tag green">GitHub</span><span class="tl-tag green">Notion</span><span class="tl-tag green">Linear</span><span class="tl-tag green">Google</span><span class="tl-tag green">Microsoft 365</span><span class="tl-tag green">BYO-MCP</span></div>
+                </div>
+            </div>
+            <div class="tl-item">
+                <div class="tl-left"><div class="tl-date">2026-04-30</div></div>
+                <div class="tl-dot purple"></div>
+                <div class="tl-content">
+                    <div class="tl-ver">Grok 4.3 リリース — 200万トークンコンテキスト・動画入力</div>
+                    <div class="tl-desc">コンテキスト窓が最大200万トークンに拡大。ネイティブ動画入力、チャット内スライド生成機能を追加。SuperGrok Heavy では当日から完全利用可能。API: $1.25/M in・$2.50/M out。</div>
+                    <div class="tl-tags"><span class="tl-tag purple">Grok 4.3</span><span class="tl-tag purple">2M Context</span><span class="tl-tag purple">Video Input</span><span class="tl-tag purple">Slide Gen</span></div>
+                </div>
+            </div>
+            <div class="tl-item">
+                <div class="tl-left"><div class="tl-date">2026-03-25</div></div>
+                <div class="tl-dot"></div>
+                <div class="tl-content">
+                    <div class="tl-ver">SuperGrok Lite（$10/月）ローンチ</div>
+                    <div class="tl-desc">$30のSuperGrokより低価格の入門プランを追加。Grok 4アクセス（制限あり）と基本機能を月$10で提供。コンシューマープランが6層体制に整備。</div>
+                    <div class="tl-tags"><span class="tl-tag">SuperGrok Lite</span><span class="tl-tag">$10/月</span></div>
+                </div>
+            </div>
+            <div class="tl-item">
+                <div class="tl-left"><div class="tl-date">2026-02-17</div></div>
+                <div class="tl-dot purple"></div>
+                <div class="tl-content">
+                    <div class="tl-ver">Grok 4.20 ベータ — 4エージェント協調システム</div>
+                    <div class="tl-desc">Grok（Coordinator）・Harper（Research + X Firehose）・Benjamin（Logic / Math）・Lucas（Creative）の4エージェントが並列思考・相互検証する新アーキテクチャ。幻覚率を12%→4.2%（65%削減）に低減。同一モデルウェイト共有でコストはシングルパスの1.5〜2.5倍。</div>
+                    <div class="tl-tags"><span class="tl-tag purple">Grok 4.20</span><span class="tl-tag purple">4-Agent</span><span class="tl-tag purple">幻覚率65%削減</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grok Build コア機能 -->
+    <div class="panel">
+        <div class="section-label">Core Features</div>
+        <div class="section-title">Grok Build コア機能</div>
+        <p class="section-desc">Claude Code と同じターミナルネイティブ思想でありながら、並列エージェント・X Firehose・ローカルファーストで独自の差別化を打ち出す。</p>
+
+        <div class="grid-2">
+            <div class="feat-card">
+                <span class="feat-icon">⚡</span>
+                <div class="feat-title">8並列サブエージェント <span class="new-badge">唯一</span></div>
+                <div class="feat-desc">大規模タスクを最大8つのサブエージェントに分解し、<strong style="color:#fff;">別ブランチで並列実行</strong>。他のどのラボのCLIツールよりも積極的なマルチエージェントアーキテクチャ。各サブエージェントが独立したコンテキストで計画→実装→検証を完結させ、最後に統合する。</div>
+            </div>
+            <div class="feat-card">
+                <span class="feat-icon">🗺️</span>
+                <div class="feat-title">Plan-Review-Execute ワークフロー</div>
+                <div class="feat-desc">実装前に<strong style="color:#fff;">必ずステップバイステップの計画を提示</strong>し、承認・編集・拒否を受け付ける。計画承認後にファイル編集・シェルコマンドを実行し、変更はコミット前にレビュー可能なDiff形式で表示。不意打ちの書き換えを防ぐ。</div>
+            </div>
+            <div class="feat-card">
+                <span class="feat-icon">🔒</span>
+                <div class="feat-title">ローカルファースト プライバシー <span class="beta-badge">設計原則</span></div>
+                <div class="feat-desc">コードは<strong style="color:#fff;">すべてローカルマシン上で処理</strong>し、ソースコードはxAIサーバーへ送信されない。.gitignore に記載の機密情報は自動除外。通信はTLS 1.3。企業規模のインフラ設定なしで、個人の有料サブスクリプションだけで機密コードベースを安全に扱える。</div>
+            </div>
+            <div class="feat-card">
+                <span class="feat-icon">🏆</span>
+                <div class="feat-title">Arena Mode <span class="coming-badge">COMING SOON</span></div>
+                <div class="feat-desc">コードトレースで確認済みの実装準備完了機能。複数エージェントの出力をアルゴリズムが自動評価・ランキングし、<strong style="color:#fff;">開発者がレビューする前に最良コードを自動選出</strong>する。8つの実装候補から最適解が1つ自動提示される予定。現ベータには未搭載、正式リリースで有効化見込み。</div>
+            </div>
+            <div class="feat-card">
+                <span class="feat-icon">📋</span>
+                <div class="feat-title">CLAUDE.md / AGENTS.md ネイティブ読み込み</div>
+                <div class="feat-desc">Claude Code スタイルの <code style="font-family:var(--font-mono); background:rgba(255,255,255,0.07); padding:1px 4px; border-radius:3px; font-size:0.85em;">CLAUDE.md</code>・<code style="font-family:var(--font-mono); background:rgba(255,255,255,0.07); padding:1px 4px; border-radius:3px; font-size:0.85em;">.claude/rules/</code>・<code style="font-family:var(--font-mono); background:rgba(255,255,255,0.07); padding:1px 4px; border-radius:3px; font-size:0.85em;">AGENTS.md</code> を自動読み込みする。既存のClaude Code ワークフローをそのままGrok Build に持ち込み可能。「エコシステムを競わず取り込む」戦略の体現。</div>
+            </div>
+            <div class="feat-card">
+                <span class="feat-icon">🔌</span>
+                <div class="feat-title">ACP（Agent Client Protocol）対応</div>
+                <div class="feat-desc"><code style="font-family:var(--font-mono); background:rgba(255,255,255,0.07); padding:1px 4px; border-radius:3px; font-size:0.85em;">grok agent stdio</code> コマンドでIDEや外部ツールとの統合が可能。Cursor・Cline・Roo Code・opencode 等がネイティブ統合済み。自社エージェントループへの組み込みにも対応。</div>
+            </div>
+            <div class="feat-card">
+                <span class="feat-icon">🌐</span>
+                <div class="feat-title">リアルタイム X / Web 検索（Live Search）</div>
+                <div class="feat-desc">X（旧Twitter）フィードとウェブをリアルタイム検索してコードの根拠・最新ドキュメント・エラー情報を取得。1日<strong style="color:#fff;">6,800万件の英語X投稿</strong>をミリ秒単位で取り込む Firehose アクセスは他のCLIツールに存在しない唯一の強み。</div>
+            </div>
+            <div class="feat-card">
+                <span class="feat-icon">🖥️</span>
+                <div class="feat-title">3つの動作モード</div>
+                <div class="feat-desc">
+                    <strong style="color:#fff;">① TUI</strong>（マウス対応フルスクリーン）— 通常の対話型利用<br>
+                    <strong style="color:#fff;">② Headless CLI</strong>（<code style="font-family:var(--font-mono); font-size:0.85em;">grok -p ...</code>）— スクリプト・自動化パイプライン<br>
+                    <strong style="color:#fff;">③ ACP mode</strong>（<code style="font-family:var(--font-mono); font-size:0.85em;">grok agent stdio</code>）— IDE・外部ツール統合
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3段階ワークフロー -->
+    <div class="panel">
+        <div class="section-label">Workflow</div>
+        <div class="section-title">Plan → Search → Build — 3段階実行フロー</div>
+        <p class="section-desc">Grok Build はいきなりコードを書かない。3段階の構造化ワークフローで、透明性と品質を両立する。</p>
+
+        <div class="flow-steps" style="margin-bottom: 24px;">
+            <div class="flow-step">
+                <span class="flow-step-num">Stage 1</span>
+                <span class="flow-step-icon">🗺️</span>
+                <div class="flow-step-title">Plan（計画）</div>
+                <div class="flow-step-desc">タスクを分析し、変更ファイル・実行コマンド・サブエージェント分担計画を提示。開発者が承認・修正・却下を行う。</div>
+            </div>
+            <div class="flow-step">
+                <span class="flow-step-num">Stage 2</span>
+                <span class="flow-step-icon">🔍</span>
+                <div class="flow-step-title">Search（検索）</div>
+                <div class="flow-step-desc">コードベースをスキャン。必要に応じてX Firehose / Web / ドキュメントをリアルタイム検索し、最新かつ正確な実装情報を収集。</div>
+            </div>
+            <div class="flow-step">
+                <span class="flow-step-num">Stage 3</span>
+                <span class="flow-step-icon">🔨</span>
+                <div class="flow-step-title">Build（実装）</div>
+                <div class="flow-step-desc">最大8並列サブエージェントがブランチ上で並列実装。完了後はDiff形式で変更を提示し、開発者がコミット前に確認。</div>
+            </div>
+            <div class="flow-step">
+                <span class="flow-step-num">Arena（予定）</span>
+                <span class="flow-step-icon">🏆</span>
+                <div class="flow-step-title">Arena Mode（評価）</div>
+                <div class="flow-step-desc">複数エージェントの出力をアルゴリズムが自動評価・ランキング。最良コードを1つ自動選出して開発者に提示。</div>
+            </div>
+        </div>
+
+        <!-- SWE-Bench comparison -->
+        <div style="margin-bottom: 16px;">
+            <div style="font-size:0.78rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:12px;">SWE-Bench Verified スコア比較（2026年5月時点）</div>
+            <div class="bench-item">
+                <div class="bench-header"><span class="bench-label">OpenAI Codex CLI</span><span class="bench-value">88.7%</span></div>
+                <div class="bench-bar-bg"><div class="bench-bar-fill" style="width:88.7%; background: linear-gradient(90deg, #60a5fa, #818cf8);"></div></div>
+            </div>
+            <div class="bench-item">
+                <div class="bench-header"><span class="bench-label">Claude Code</span><span class="bench-value">87.6%</span></div>
+                <div class="bench-bar-bg"><div class="bench-bar-fill" style="width:87.6%; background: linear-gradient(90deg, #34d399, #059669);"></div></div>
+            </div>
+            <div class="bench-item">
+                <div class="bench-header"><span class="bench-label">Grok Build（grok-build-0.1）</span><span class="bench-value">70.8%</span></div>
+                <div class="bench-bar-bg"><div class="bench-bar-fill" style="width:70.8%; background: linear-gradient(90deg, #f59e0b, #fb923c);"></div></div>
+            </div>
+        </div>
+        <div class="warn-box">
+            ⚠️ <strong style="color: #fb923c;">ベンチマーク解釈の注意：</strong> Grok Build は早期ベータ（v0.1）での数値。並列エージェント・Arena Mode・リアルタイム検索の組み合わせ効果はSWE-Bench単一スコアには反映されていない。コードベース規模・リアルタイム情報要求度が高いタスクでは順位が異なる可能性がある。
+        </div>
+    </div>
+
+    <!-- Grok Skills -->
+    <div class="panel">
+        <div class="section-label">Grok Skills</div>
+        <div class="section-title">Grok Skills — 再利用可能ワークフローパック</div>
+        <p class="section-desc">プロジェクト固有のコンテキスト・手順・ツール設定を.skill / .md パックとして保存・共有・インストールするシステム。</p>
+
+        <div class="grid-2" style="margin-bottom: 20px;">
+            <div>
+                <div style="font-weight:700; color:var(--accent); margin-bottom:10px; font-size:0.9rem;">📦 スキルのフォーマット</div>
+                <div class="feat-card" style="margin-bottom:8px;">
+                    <div class="feat-title">.md（Markdownドキュメント）</div>
+                    <div class="feat-desc">CLAUDE.md・AGENTS.md と同フォーマット。プロジェクトのスタック・命名規則・禁止事項・テストコマンドを記述。Grok Build が起動時に自動読み込み。</div>
+                </div>
+                <div class="feat-card" style="margin-bottom:8px;">
+                    <div class="feat-title">.skill（スキルファイル）</div>
+                    <div class="feat-desc">ツール設定・プロンプトテンプレート・ワークフロー定義をまとめたパック。インストール・バージョン管理・共有が可能。</div>
+                </div>
+                <div class="feat-card">
+                    <div class="feat-title">.zip（パッケージ）</div>
+                    <div class="feat-desc">複数ファイルをまとめた配布パック。チームや公開リポジトリからのインストールに使用。</div>
+                </div>
+            </div>
+            <div>
+                <div style="font-weight:700; color:var(--accent-2); margin-bottom:10px; font-size:0.9rem;">🔄 Claude Code エコシステムとの互換性</div>
+                <div style="font-size:0.82rem; color:var(--muted); line-height:1.8; margin-bottom:12px;">
+                    Grok Skillsは以下をそのまま読み込む：<br>
+                    <strong style="color:#fff;">CLAUDE.md</strong>（プロジェクト設定）<br>
+                    <strong style="color:#fff;">.claude/rules/</strong>（ルールファイル群）<br>
+                    <strong style="color:#fff;">AGENTS.md</strong>（エージェント指示）<br>
+                    <strong style="color:#fff;">Claude Code スキルパック</strong><br><br>
+                    Claude Code や Cursor で構築したワークフローをゼロコストでGrok Buildに移植できる。
+                </div>
+                <div class="code-block"><span class="cm"># スキルの検索・インストール</span>
+<span class="cmd">grok</span> skill search <span class="st">"next.js deployment"</span>
+<span class="cmd">grok</span> skill install @namespace/skill-name
+
+<span class="cm"># プロジェクトにCLAUDE.mdがあれば自動適用</span>
+<span class="val">ls</span> CLAUDE.md   <span class="cm"># → Grok Build が起動時に読み込む</span></div>
+            </div>
+        </div>
+
+        <div class="info-box">
+            💡 <strong style="color:var(--accent);">推奨ベストプラクティス：</strong> CLAUDE.md にプロジェクトのスタック・命名規則・禁止パターン・テストコマンドを記述してからGrok Build を起動する。Claude Code ユーザーはそのままファイルが使われる。エージェント行動制約（コミット前にユーザー確認必須 / .env削除禁止等）もここに記述する。
+        </div>
+    </div>
+
+    <!-- Grok Connectors -->
+    <div class="panel">
+        <div class="section-label">Grok Connectors</div>
+        <div class="section-title">外部ツール統合 — Connectors 完全リスト</div>
+        <p class="section-desc">GitHubリポジトリ・Jira系チケット・デザイン・デプロイまで、開発パイプライン全体をGrok が直接操作できる。</p>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+            <div>
+                <div style="font-size:0.72rem; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Wave 1（2026年5月6日）</div>
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                    <div class="connector-row">
+                        <span class="conn-icon">🐙</span>
+                        <div>
+                            <div class="conn-title">GitHub</div>
+                            <div class="conn-desc">リポジトリ・Issue・PR操作。コード検索・PR要約・変更レビュー・ワークフロー自動化</div>
+                        </div>
+                    </div>
+                    <div class="connector-row">
+                        <span class="conn-icon">📝</span>
+                        <div>
+                            <div class="conn-title">Notion</div>
+                            <div class="conn-desc">ページ・データベース・Wiki を直接検索・編集。設計ドキュメントをコンテキストとして参照</div>
+                        </div>
+                    </div>
+                    <div class="connector-row">
+                        <span class="conn-icon">📐</span>
+                        <div>
+                            <div class="conn-title">Linear</div>
+                            <div class="conn-desc">タスク・Issue・ロードマップを直接参照。チケットからGrok Build が実装を開始</div>
+                        </div>
+                    </div>
+                    <div class="connector-row">
+                        <span class="conn-icon">🔵</span>
+                        <div>
+                            <div class="conn-title">Google Workspace</div>
+                            <div class="conn-desc">Gmail・Drive・Docs・Calendar。仕様書・会議メモ・要件をコンテキストに</div>
+                        </div>
+                    </div>
+                    <div class="connector-row">
+                        <span class="conn-icon">🟦</span>
+                        <div>
+                            <div class="conn-title">Microsoft 365</div>
+                            <div class="conn-desc">Teams・Outlook・OneDrive 統合。社内コミュニケーションをエージェントが参照</div>
+                        </div>
+                    </div>
+                    <div class="connector-row">
+                        <span class="conn-icon">🔌</span>
+                        <div>
+                            <div class="conn-title">Bring-Your-Own-MCP</div>
+                            <div class="conn-desc">既存のMCPサーバーを指定するだけで統合。Cursor・Claude Code のMCP設定も流用可</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div style="font-size:0.72rem; font-weight:700; color:var(--accent-3); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Wave 2（2026年5月22日）</div>
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                    <div class="connector-row">
+                        <span class="conn-icon">▲</span>
+                        <div>
+                            <div class="conn-title">Vercel</div>
+                            <div class="conn-desc">フロントエンドのデプロイ・プレビュー・ドメイン管理。実装→デプロイをGrokが一貫して実行</div>
+                        </div>
+                    </div>
+                    <div class="connector-row">
+                        <span class="conn-icon">🎨</span>
+                        <div>
+                            <div class="conn-title">Canva</div>
+                            <div class="conn-desc">デザインアセットの参照・生成支援。デザインシステムをコーディングに反映</div>
+                        </div>
+                    </div>
+                    <div class="connector-row">
+                        <span class="conn-icon">✨</span>
+                        <div>
+                            <div class="conn-title">Gamma</div>
+                            <div class="conn-desc">プレゼンテーション・ドキュメント生成。コードのドキュメント化・報告書自動生成</div>
+                        </div>
+                    </div>
+                    <div class="connector-row">
+                        <span class="conn-icon">📊</span>
+                        <div>
+                            <div class="conn-title">S&amp;P Global</div>
+                            <div class="conn-desc">金融データへのリアルタイムアクセス。FinTech開発で市場データをコード内に直接取り込み</div>
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-top: 12px; background: rgba(52,211,153,0.06); border: 1px solid rgba(52,211,153,0.2); border-radius: 8px; padding: 10px 14px; font-size: 0.78rem; color: var(--muted);">
+                    ✅ <strong style="color:var(--accent-3);">MCP互換性：</strong> Bring-Your-Own-MCP により、Claude Code や Cursor で設定済みのMCPサーバーをそのままGrok Connectorsとして使用できる。設定ファイルのコピーだけで移行完了。
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Search & X Firehose -->
+    <div class="panel">
+        <div class="section-label">Live Search</div>
+        <div class="section-title">X Firehose × Live Search — Grok Build 唯一の強み</div>
+        <p class="section-desc">他のすべてのコーディングCLIに存在しない差別化機能。リアルタイムX投稿とウェブ検索をコーディング文脈に統合する。</p>
+
+        <div class="grid-2" style="margin-bottom: 20px;">
+            <div class="feat-card">
+                <span class="feat-icon">⚡</span>
+                <div class="feat-title">X Firehose リアルタイム統合</div>
+                <div class="feat-desc">
+                    1日<strong style="color:#fff;">6,800万件の英語Xポスト</strong>をミリ秒単位で処理。最新のバグ報告・ライブラリ更新・API変更・セキュリティ脆弱性情報がコーディングに即反映される。Grok 4.20のHarperエージェントが担当。
+                    <br><br>
+                    特に有効なユースケース：<br>
+                    • ライブラリの未文書化の破壊的変更<br>
+                    • セキュリティ脆弱性の最新情報<br>
+                    • トレンドエラー・スタックオーバーフロー類似事例<br>
+                    • API仕様変更（非公式情報含む）
+                </div>
+            </div>
+            <div class="feat-card">
+                <span class="feat-icon">🌐</span>
+                <div class="feat-title">Live Search API（開発者向け）</div>
+                <div class="feat-desc">
+                    xAI APIから Live Search を直接呼び出せる開発者向けAPI。<strong style="color:#fff;">限定期間中は無料ベータ</strong>で提供中。
+                    <br><br>
+                    設定可能なパラメータ：<br>
+                    • 検索ソース: <code style="font-family:var(--font-mono); font-size:0.85em;">x</code> / <code style="font-family:var(--font-mono); font-size:0.85em;">web</code> / <code style="font-family:var(--font-mono); font-size:0.85em;">both</code><br>
+                    • 時間範囲の指定<br>
+                    • 結果件数の上限<br>
+                    • ドメインフィルター<br><br>
+                    Agent Tools API: <code style="font-family:var(--font-mono); font-size:0.85em;">web_search</code> / <code style="font-family:var(--font-mono); font-size:0.85em;">x_search</code> / <code style="font-family:var(--font-mono); font-size:0.85em;">code_execution</code>
+                </div>
+            </div>
+        </div>
+
+        <div class="code-block"><span class="cm"># Live Search API 使用例（Python）</span>
+<span class="kw">from</span> xai_sdk <span class="kw">import</span> Client
+
+client = Client(api_key=<span class="st">"xai-..."</span>)
+response = client.chat.completions.create(
+    model=<span class="st">"grok-4.3"</span>,
+    messages=[{<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: <span class="st">"この実装方法の最新の問題点をXで調べて"</span>}],
+    tools=[{
+        <span class="st">"type"</span>: <span class="st">"x_search"</span>,
+        <span class="st">"x_search"</span>: {
+            <span class="st">"sources"</span>: [<span class="st">"x"</span>, <span class="st">"web"</span>],
+            <span class="st">"time_range"</span>: <span class="st">"7d"</span>,
+            <span class="st">"max_results"</span>: 20
+        }
+    }]
+)</div>
+    </div>
+
+    <!-- Models -->
+    <div class="panel">
+        <div class="section-label">Models</div>
+        <div class="section-title">xAI モデル一覧（2026年6月）</div>
+        <p class="section-desc">Grok Build専用モデルから汎用フロンティアモデルまで。用途に応じた使い分けが重要。</p>
+
+        <div style="overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); margin-bottom: 20px;">
+            <table style="width:100%; border-collapse:collapse; font-size:0.8rem;">
+                <thead>
+                    <tr style="background: rgba(245,158,11,0.06);">
+                        <th style="padding:11px 14px; text-align:left; color:var(--muted); font-weight:700; border-bottom:1px solid rgba(255,255,255,0.06);">モデル</th>
+                        <th style="padding:11px 14px; text-align:left; color:var(--muted); font-weight:700; border-bottom:1px solid rgba(255,255,255,0.06);">コンテキスト</th>
+                        <th style="padding:11px 14px; text-align:left; color:var(--muted); font-weight:700; border-bottom:1px solid rgba(255,255,255,0.06);">価格（/Mトークン）</th>
+                        <th style="padding:11px 14px; text-align:left; color:var(--muted); font-weight:700; border-bottom:1px solid rgba(255,255,255,0.06);">特徴</th>
+                        <th style="padding:11px 14px; text-align:left; color:var(--muted); font-weight:700; border-bottom:1px solid rgba(255,255,255,0.06);">主な用途</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="background: rgba(245,158,11,0.03);">
+                        <td style="padding:10px 14px; color:var(--accent); font-weight:700; border-bottom:1px solid rgba(255,255,255,0.04);">grok-build-0.1</td>
+                        <td style="padding:10px 14px; color:var(--text); border-bottom:1px solid rgba(255,255,255,0.04);">256K</td>
+                        <td style="padding:10px 14px; color:var(--text); border-bottom:1px solid rgba(255,255,255,0.04);">$1 in / $2 out<br><span style="font-size:0.72rem; color:var(--muted);">キャッシュ読み込み $0.20</span></td>
+                        <td style="padding:10px 14px; color:var(--muted); border-bottom:1px solid rgba(255,255,255,0.04);">コーディング専用・推論常時ON・100+tok/s・マルチモーダル</td>
+                        <td style="padding:10px 14px; color:var(--muted); border-bottom:1px solid rgba(255,255,255,0.04);">Grok Build CLI・自社エージェントへの組み込み</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:10px 14px; color:var(--accent-2); font-weight:700; border-bottom:1px solid rgba(255,255,255,0.04);">Grok 4.3</td>
+                        <td style="padding:10px 14px; color:var(--text); border-bottom:1px solid rgba(255,255,255,0.04);">2M（200万）</td>
+                        <td style="padding:10px 14px; color:var(--text); border-bottom:1px solid rgba(255,255,255,0.04);">$1.25 in / $2.50 out</td>
+                        <td style="padding:10px 14px; color:var(--muted); border-bottom:1px solid rgba(255,255,255,0.04);">動画入力・スライド生成・最長コンテキスト</td>
+                        <td style="padding:10px 14px; color:var(--muted); border-bottom:1px solid rgba(255,255,255,0.04);">大規模コードベース解析・動画解析・超長文分析</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:10px 14px; color:var(--accent-2); font-weight:700; border-bottom:1px solid rgba(255,255,255,0.04);">Grok 4.20</td>
+                        <td style="padding:10px 14px; color:var(--text); border-bottom:1px solid rgba(255,255,255,0.04);">256K</td>
+                        <td style="padding:10px 14px; color:var(--text); border-bottom:1px solid rgba(255,255,255,0.04);">未公開</td>
+                        <td style="padding:10px 14px; color:var(--muted); border-bottom:1px solid rgba(255,255,255,0.04);">4エージェント協調・幻覚率4.2%・X Firehose統合</td>
+                        <td style="padding:10px 14px; color:var(--muted); border-bottom:1px solid rgba(255,255,255,0.04);">複雑推論・リアルタイム情報が必要な分析・研究</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:10px 14px; color:var(--accent-3); font-weight:700; border-bottom:1px solid rgba(255,255,255,0.04);">Grok 4.1 Fast</td>
+                        <td style="padding:10px 14px; color:var(--text); border-bottom:1px solid rgba(255,255,255,0.04);">—</td>
+                        <td style="padding:10px 14px; color:var(--text); border-bottom:1px solid rgba(255,255,255,0.04);">$0.20 in / $0.50 out<br><span style="font-size:0.72rem; color:var(--muted);">キャッシュ $0.05</span></td>
+                        <td style="padding:10px 14px; color:var(--muted); border-bottom:1px solid rgba(255,255,255,0.04);">超高速・超低コスト・プロンプトキャッシュ対応</td>
+                        <td style="padding:10px 14px; color:var(--muted); border-bottom:1px solid rgba(255,255,255,0.04);">高頻度バッチ処理・コスト重視の推論タスク</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:10px 14px; color:#64748b; font-weight:700;">Grok 5（予定）</td>
+                        <td style="padding:10px 14px; color:var(--text);">未公開</td>
+                        <td style="padding:10px 14px; color:var(--text);">未定</td>
+                        <td style="padding:10px 14px; color:var(--muted);">MoE 6兆パラメータ・Colossus 2で訓練中</td>
+                        <td style="padding:10px 14px; color:var(--muted);">2026年Q2〜公開予定（詳細は後述）</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div style="display: flex; flex-wrap:wrap; gap: 8px; margin-bottom: 16px;">
+            <div style="font-size:0.75rem; font-weight:700; color:var(--muted); text-transform:uppercase; width:100%; margin-bottom:4px;">ネイティブ対応モデル（API）</div>
+            <span class="model-pill" style="color:var(--accent); border-color:rgba(245,158,11,0.3); background:rgba(245,158,11,0.08);">● grok-build-0.1（コーディング専用）</span>
+            <span class="model-pill" style="color:var(--accent-2); border-color:rgba(167,139,250,0.3); background:rgba(167,139,250,0.08);">● Grok 4.3（200万ctx）</span>
+            <span class="model-pill" style="color:var(--accent-2); border-color:rgba(167,139,250,0.3); background:rgba(167,139,250,0.08);">● Grok 4.20（4エージェント）</span>
+            <span class="model-pill" style="color:var(--accent-3); border-color:rgba(52,211,153,0.3); background:rgba(52,211,153,0.08);">● Grok 4.1 Fast（最低コスト）</span>
+        </div>
+
+        <div class="info-box">
+            💡 <strong style="color:var(--accent);">grok-build-0.1の特徴：</strong> 推論（Reasoning）が常時ONで切ることができない。すべての応答に構造化分析が入る設計のため、シンプルなクエリにもコストがかかる点に注意。Grok 4.1 Fast（推論なし）とのコスト比較で使い分けを検討する。
+        </div>
+    </div>
+
+    <!-- Grok 4.20 Multi-Agent -->
+    <div class="panel">
+        <div class="section-label">Grok 4.20 Architecture</div>
+        <div class="section-title">Grok 4.20 — 4エージェント協調システムの解剖</div>
+        <p class="section-desc">2026年2月17日ベータ開始。同一モデルウェイトで4つのエージェントが並列思考・相互検証し、幻覚率を65%削減した独自アーキテクチャ。</p>
+
+        <div class="grid-2" style="margin-bottom: 20px;">
+            <div class="agent-card">
+                <div class="agent-name">⚡ Grok（Captain）</div>
+                <div class="agent-role" style="color: var(--accent);">コーディネーター / 最終統合</div>
+                <div class="agent-desc">他3エージェントの出力を統合・調停し、最終回答を生成する指揮エージェント。矛盾する出力を解決し、整合的な結論を導出する。</div>
+            </div>
+            <div class="agent-card">
+                <div class="agent-name">🔍 Harper</div>
+                <div class="agent-role" style="color: #60a5fa;">リサーチ / X Firehose</div>
+                <div class="agent-desc">リアルタイムWeb検索・X Firehose（1日6,800万投稿）を処理する情報収集エージェント。最新ニュース・トレンド・API変更情報をミリ秒単位で取得。</div>
+            </div>
+            <div class="agent-card">
+                <div class="agent-name">🧮 Benjamin</div>
+                <div class="agent-role" style="color: var(--accent-3);">論理 / 数学 / コード検証</div>
+                <div class="agent-desc">数学的推論・コード正確性検証・論理整合性チェックを担当。他エージェントの出力に誤りがあれば異議を提起する。</div>
+            </div>
+            <div class="agent-card">
+                <div class="agent-name">🎨 Lucas</div>
+                <div class="agent-role" style="color: var(--accent-2);">クリエイティブ / 発散思考</div>
+                <div class="agent-desc">代替アプローチ・創造的解決策・非線形思考を提供するクリエイティブエージェント。逆張り分析も担当。</div>
+            </div>
+        </div>
+
+        <div style="background: rgba(255,255,255,0.025); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; margin-bottom: 16px;">
+            <div style="font-weight:700; color:#fff; margin-bottom:8px; font-size:0.88rem;">🔬 コスト効率の仕組み</div>
+            <div style="font-size:0.82rem; color:var(--muted); line-height:1.8;">
+                4エージェントは<strong style="color:#fff;">同一のモデルウェイトを共有</strong>し、プレフィックスKVキャッシュと入力コンテキストを共通化する。これにより4並列の限界コストは「4倍」ではなく<strong style="color:#fff;">1.5〜2.5倍程度</strong>に抑制される。エージェント間のディベート（中間出力の相互検証）が幻覚率を<strong style="color:var(--accent-3);">12% → 4.2%（65%削減）</strong>に低減。
+            </div>
+        </div>
+
+        <div class="purple-box">
+            🔑 <strong style="color:var(--accent-2);">アクセス：</strong> Grok 4.20 は SuperGrok（月$30）・X Premium+ ユーザーで利用可能。API での多エージェント推論の価格は未公開。SuperGrok Heavy（月$300）では Grok 4 Heavy（256Kコンテキスト・並列テスト時計算）のフルアクセスが可能。
+        </div>
+    </div>
+
+    <!-- インストール & セットアップ -->
+    <div class="panel">
+        <div class="section-label">Setup</div>
+        <div class="section-title">インストール & セットアップ完全手順</div>
+        <p class="section-desc">macOS / Linux / Windows（WSL）対応。SuperGrok Heavy または X Premium+ アカウントが前提。</p>
+
+        <div class="grid-2" style="margin-bottom: 20px;">
+            <div>
+                <div style="font-weight:700; color:var(--accent); margin-bottom:10px; font-size:0.9rem;">📦 インストール</div>
+                <div class="code-block"><span class="cm"># macOS / Linux / WSL</span>
+<span class="cmd">curl</span> -fsSL https://x.ai/cli/install.sh | bash
+
+<span class="cm"># 初回起動（ブラウザでOAuth認証）</span>
+<span class="cmd">grok</span>
+
+<span class="cm"># ヘッドレス環境（APIキー設定）</span>
+<span class="kw">export</span> GROK_CODE_XAI_API_KEY=<span class="st">"xai-..."</span>
+<span class="cmd">grok</span>
+
+<span class="cm"># バージョン確認</span>
+<span class="cmd">grok</span> --version</div>
+            </div>
+            <div>
+                <div style="font-weight:700; color:var(--accent); margin-bottom:10px; font-size:0.9rem;">⚙️ 主要コマンド</div>
+                <div class="code-block"><span class="cm"># 通常起動（TUI）</span>
+<span class="cmd">grok</span>
+
+<span class="cm"># ヘッドレス（スクリプト用）</span>
+<span class="cmd">grok</span> -p <span class="st">"README を更新して"</span>
+
+<span class="cm"># ACP モード（IDE統合）</span>
+<span class="cmd">grok</span> agent stdio
+
+<span class="cm"># 計画モード→実行</span>
+/mode plan   <span class="cm"># 計画確認</span>
+/mode code   <span class="cm"># 実行に切り替え</span>
+
+<span class="cm"># スキル操作</span>
+<span class="cmd">grok</span> skill search <span class="st">"next.js"</span>
+<span class="cmd">grok</span> skill install @namespace/name</div>
+            </div>
+        </div>
+
+        <div style="background: rgba(255,255,255,0.025); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px;">
+            <div style="font-weight:700; color:#fff; margin-bottom:10px; font-size:0.88rem;">🚀 IDE連携パートナー（無料期間提供中）</div>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                <span style="background:rgba(245,158,11,0.1); color:var(--accent); border:1px solid rgba(245,158,11,0.2); padding:5px 12px; border-radius:6px; font-size:0.8rem; font-weight:600;">Cursor</span>
+                <span style="background:rgba(245,158,11,0.1); color:var(--accent); border:1px solid rgba(245,158,11,0.2); padding:5px 12px; border-radius:6px; font-size:0.8rem; font-weight:600;">Cline</span>
+                <span style="background:rgba(245,158,11,0.1); color:var(--accent); border:1px solid rgba(245,158,11,0.2); padding:5px 12px; border-radius:6px; font-size:0.8rem; font-weight:600;">Roo Code</span>
+                <span style="background:rgba(245,158,11,0.1); color:var(--accent); border:1px solid rgba(245,158,11,0.2); padding:5px 12px; border-radius:6px; font-size:0.8rem; font-weight:600;">Kilo Code</span>
+                <span style="background:rgba(245,158,11,0.1); color:var(--accent); border:1px solid rgba(245,158,11,0.2); padding:5px 12px; border-radius:6px; font-size:0.8rem; font-weight:600;">opencode</span>
+                <span style="background:rgba(245,158,11,0.1); color:var(--accent); border:1px solid rgba(245,158,11,0.2); padding:5px 12px; border-radius:6px; font-size:0.8rem; font-weight:600;">Windsurf</span>
+                <span style="background:rgba(245,158,11,0.1); color:var(--accent); border:1px solid rgba(245,158,11,0.2); padding:5px 12px; border-radius:6px; font-size:0.8rem; font-weight:600;">GitHub Copilot</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 料金プラン -->
+    <div class="panel">
+        <div class="section-label">Pricing 2026</div>
+        <div class="section-title">料金プラン全体図（コンシューマー + API）</div>
+        <p class="section-desc">コンシューマー6層 + APIの2軸。Grok Build アクセスには SuperGrok Heavy（$300）または SuperGrok / X Premium+ + OpenCode が必要。</p>
+
+        <div style="font-size:0.78rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:10px;">コンシューマープラン</div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(190px, 1fr)); gap:10px; margin-bottom:20px;">
+            <div class="price-card">
+                <div class="price-name">Free</div>
+                <div class="price-amount">$0<span>/月</span></div>
+                <div class="price-desc">基本Grokアクセス</div>
+                <ul class="price-features">
+                    <li>Grok 3アクセス（制限あり）</li>
+                    <li>X統合チャット</li>
+                    <li>Grok Build: 非対応</li>
+                </ul>
+            </div>
+            <div class="price-card">
+                <div class="price-name">SuperGrok Lite</div>
+                <div class="price-amount">$10<span>/月</span></div>
+                <div class="price-desc">2026年3月25日開始</div>
+                <ul class="price-features">
+                    <li>Grok 4アクセス（制限あり）</li>
+                    <li>SuperGrokとFreeの中間</li>
+                    <li>Grok Build: 非対応</li>
+                </ul>
+            </div>
+            <div class="price-card popular">
+                <div style="font-size:0.65rem; font-weight:700; color:var(--accent); text-transform:uppercase; margin-bottom:4px;">おすすめ</div>
+                <div class="price-name">SuperGrok</div>
+                <div class="price-amount">$30<span>/月</span></div>
+                <div class="price-desc">Grok 4 フルアクセス</div>
+                <ul class="price-features">
+                    <li>Grok 4 / 4.20 フル</li>
+                    <li><strong style="color:#fff;">Grok Build（OpenCode経由）</strong></li>
+                    <li>Grok Connectors</li>
+                    <li>Deep Research モード</li>
+                </ul>
+            </div>
+            <div class="price-card">
+                <div class="price-name">X Premium+</div>
+                <div class="price-amount">$40<span>/月</span></div>
+                <div class="price-desc">X プラットフォーム込み</div>
+                <ul class="price-features">
+                    <li>SuperGrok相当のGrokアクセス</li>
+                    <li><strong style="color:#fff;">Grok Build（OpenCode経由）</strong></li>
+                    <li>X広告非表示・優先表示</li>
+                    <li>$395/年（20%オフ）</li>
+                </ul>
+            </div>
+            <div class="price-card" style="border-color: rgba(245,158,11,0.4); background: rgba(245,158,11,0.04);">
+                <div style="font-size:0.65rem; font-weight:700; color:var(--accent); text-transform:uppercase; margin-bottom:4px;">Grok Build 専用アクセス</div>
+                <div class="price-name">SuperGrok Heavy</div>
+                <div class="price-amount">$300<span>/月</span></div>
+                <div class="price-desc">ヘビー開発者・プロ向け</div>
+                <ul class="price-features">
+                    <li><strong style="color:#fff;">Grok Build 初期アクセス</strong></li>
+                    <li>Grok 4.3 完全版（当日から）</li>
+                    <li>Grok 4 Heavy（256K・並列推論）</li>
+                    <li>最高レートリミット</li>
+                    <li>新機能への最優先アクセス</li>
+                </ul>
+            </div>
+        </div>
+
+        <div style="font-size:0.78rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:10px;">API プラン</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">
+            <div class="price-card">
+                <div class="price-name">API 無料クレジット</div>
+                <div class="price-amount">$175<span>/月相当</span></div>
+                <div class="price-desc">データ共有プログラム経由</div>
+                <ul class="price-features">
+                    <li>xAI データ共有に参加した開発者向け</li>
+                    <li>全APIモデルに適用可能</li>
+                    <li>Live Search API（β）は期間限定無料</li>
+                </ul>
+            </div>
+            <div class="price-card">
+                <div class="price-name">API 従量課金</div>
+                <div class="price-amount" style="font-size:1rem;">トークン単価制</div>
+                <div class="price-desc">クレジット超過後</div>
+                <ul class="price-features">
+                    <li>grok-build-0.1: $1/$2/M</li>
+                    <li>Grok 4.3: $1.25/$2.50/M</li>
+                    <li>Grok 4.1 Fast: $0.20/$0.50/M</li>
+                    <li>Enterprise: ZDR・GDPR・SOC2</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="warn-box">
+            ⚠️ <strong style="color:#fb923c;">注意：</strong> Grok Build は2026年6月時点でまだ<strong style="color:#fff;">早期ベータ</strong>。Arena Mode 未搭載・SWE-Bench は Claude Code/Codex CLI より低い。$300/月のSuperGrok Heavy は「最速アクセス」への投資であり、プロダクション環境での全面採用はロードマップ進展を見て判断する。
+        </div>
+    </div>
+
+    <!-- 競合比較 -->
+    <div class="panel">
+        <div class="section-label">Competitive Comparison</div>
+        <div class="section-title">AIコーディングCLI 3強比較（2026年6月）</div>
+        <p class="section-desc">Grok Build vs Claude Code vs OpenAI Codex CLI — 機能・スコア・価格・差別化ポイントを正直に比較。</p>
+
+        <div style="overflow-x:auto; border-radius:10px; border:1px solid var(--border); margin-bottom:16px;">
+            <table class="comp-table">
+                <thead>
+                    <tr>
+                        <th>項目</th>
+                        <th style="color:var(--accent);">Grok Build</th>
+                        <th style="color:#34d399;">Claude Code</th>
+                        <th style="color:#60a5fa;">OpenAI Codex CLI</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="font-weight:700; color:#fff;">SWE-Bench Verified</td>
+                        <td><span class="comp-partial">70.8%</span></td>
+                        <td><span class="comp-yes">87.6%</span></td>
+                        <td><span class="comp-yes">88.7%</span></td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight:700; color:#fff;">並列エージェント数</td>
+                        <td><span class="comp-yes">最大8（業界最多）</span></td>
+                        <td><span class="comp-partial">1（直列）</span></td>
+                        <td><span class="comp-partial">限定的</span></td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight:700; color:#fff;">コード送信</td>
+                        <td><span class="comp-yes">ゼロ（ローカルファースト）</span></td>
+                        <td><span class="comp-partial">Anthropic API経由</span></td>
+                        <td><span class="comp-partial">OpenAI API経由</span></td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight:700; color:#fff;">リアルタイム検索</td>
+                        <td><span class="comp-yes">X Firehose + Web</span></td>
+                        <td><span class="comp-no">標準では非対応</span></td>
+                        <td><span class="comp-partial">Web検索（制限あり）</span></td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight:700; color:#fff;">CLAUDE.md互換</td>
+                        <td><span class="comp-yes">ネイティブ読み込み</span></td>
+                        <td><span class="comp-yes">ネイティブ</span></td>
+                        <td><span class="comp-partial">AGENTS.md</span></td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight:700; color:#fff;">コンテキスト</td>
+                        <td><span class="comp-partial">256K（grok-build-0.1）</span></td>
+                        <td><span class="comp-yes">200K（Opus 4.8）</span></td>
+                        <td><span class="comp-yes">200K（o3）</span></td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight:700; color:#fff;">API価格（in/out）</td>
+                        <td><span class="comp-yes">$1/$2 per M</span></td>
+                        <td><span class="comp-partial">$3/$15（Opus 4.8）</span></td>
+                        <td><span class="comp-partial">モデルにより異なる</span></td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight:700; color:#fff;">IDE統合</td>
+                        <td><span class="comp-yes">7パートナー（ACP）</span></td>
+                        <td><span class="comp-yes">VS Code・JetBrains</span></td>
+                        <td><span class="comp-partial">限定的</span></td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight:700; color:#fff;">外部ツール統合</td>
+                        <td><span class="comp-yes">Connectors（9+） + MCP</span></td>
+                        <td><span class="comp-yes">MCP（5000+サーバー）</span></td>
+                        <td><span class="comp-partial">MCP対応</span></td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight:700; color:#fff;">成熟度</td>
+                        <td><span class="comp-partial">早期ベータ（v0.1）</span></td>
+                        <td><span class="comp-yes">GA・実績あり</span></td>
+                        <td><span class="comp-yes">GA・実績あり</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="success-box" style="margin-top:0;">
+                ✅ <strong style="color:var(--accent-3);">Grok Build が明確に勝る点：</strong><br>
+                X Firehose リアルタイム検索 / 最大8並列エージェント（業界最多）/ ローカルファーストプライバシー / API最安値クラス（$1/$2）/ CLAUDE.md ネイティブ互換
+            </div>
+            <div class="warn-box" style="margin-top:0;">
+                ⚠️ <strong style="color:#fb923c;">現時点での弱点：</strong><br>
+                SWE-Bench スコアが競合より17〜18pp低い / Arena Mode 未搭載 / 早期ベータで不安定 / SuperGrok Heavy $300/月は高コスト / エコシステムの成熟度が低い
+            </div>
+        </div>
+    </div>
+
+    <!-- ベストプラクティス -->
+    <div class="panel">
+        <div class="section-label">Best Practices</div>
+        <div class="section-title">Grok Build 実践 Tips（2026年版）</div>
+        <p class="section-desc">ベータ段階の今だからこそ知っておくべき、効果的な使い方と落とし穴回避策。</p>
+
+        <div class="grid-2" style="gap:10px;">
+            <div class="tip-item">
+                <strong>① まず CLAUDE.md でプロジェクト文脈を定義してから起動</strong><br>
+                Claude Code ユーザーは既存の CLAUDE.md がそのまま使える。新規プロジェクトでは「スタック・命名規則・テストコマンド・エージェント行動制約」を記述してから <code style="font-family:var(--font-mono); font-size:0.85em;">grok</code> を実行。毎回説明する手間がゼロになる。
+            </div>
+            <div class="tip-item">
+                <strong>② /mode plan で必ず計画を確認してから実行</strong><br>
+                ベータ段階のため予期しない変更が起きることがある。大きなタスクは必ず <code style="font-family:var(--font-mono); font-size:0.85em;">/mode plan</code> で計画を確認・修正してから <code style="font-family:var(--font-mono); font-size:0.85em;">/mode code</code> で実行。「計画を直してから実行する」習慣がリスクを大幅に減らす。
+            </div>
+            <div class="tip-item">
+                <strong>③ 並列エージェントは大きなタスクに使う</strong><br>
+                小さな修正には並列エージェントは不要でコストの無駄。「機能Aの実装＋テスト＋ドキュメント更新」「フロント・バック・テストを同時に」のような<strong>複数サブタスクに分解できるタスク</strong>に使うと真価が発揮される。
+            </div>
+            <div class="tip-item">
+                <strong>④ X Firehose 検索はライブラリ最新情報取得に活用</strong><br>
+                ライブラリのバージョンアップ・破壊的変更・未文書化の不具合は、公式ドキュメントより X の開発者投稿に先に出る。「この実装で問題が報告されていないか X で確認して」をプロンプトに入れると精度が上がる。
+            </div>
+            <div class="tip-item">
+                <strong>⑤ Connectors は Linear または GitHub チケットから起動する</strong><br>
+                「PROJ-123を実装して」の1行で Linear チケットの仕様・受け入れ条件を自動取得して実装開始。Jira と同様のワークフローで、PdMや開発リードが非開発者でもエージェントを効果的に活用できる最短ルート。
+            </div>
+            <div class="tip-item">
+                <strong>⑥ Headless モードでCI/CDに組み込む</strong><br>
+                <code style="font-family:var(--font-mono); font-size:0.85em;">GROK_CODE_XAI_API_KEY</code> を環境変数に設定し、<code style="font-family:var(--font-mono); font-size:0.85em;">grok -p "..."</code> でスクリプトから呼び出せる。PRのドキュメント生成・コードレビューコメント・テストケース追加などをCIパイプラインに組み込める。
+            </div>
+            <div class="tip-item">
+                <strong>⑦ grok-build-0.1（推論常時ON）とGrok 4.1 Fast を使い分ける</strong><br>
+                grok-build-0.1 は推論が切れないため複雑なコーディングに最適だが、単純な情報取得・定型処理にはオーバースペック。シンプルなバッチ処理・変換タスクには Grok 4.1 Fast（$0.20/$0.50）でコストを10分の1以下に抑制できる。
+            </div>
+            <div class="tip-item">
+                <strong>⑧ Bring-Your-Own-MCP で既存ツールを即統合</strong><br>
+                Cursor や Claude Code で設定済みのMCPサーバー設定ファイルをそのまま指定するだけ。DB直接クエリ・社内APIアクセス・カスタムツールをGrok Build から呼び出せる。新たなサーバー構築は不要。
+            </div>
+        </div>
+
+        <div class="info-box">
+            💡 <strong style="color:var(--accent);">エージェント安全ルール（CLAUDE.md 推奨記述）：</strong>
+            「コミット前に必ずユーザー確認を求める」
+            「.env / 設定ファイルを確認なしに削除しない」
+            「新パッケージインストール前にpackage.jsonを確認する」
+            「セキュリティ脆弱性発見時は即停止して報告する」
+            — Grok Build はベータ段階のため、エージェント制約をルールに明記することで予期しない動作を大幅に防げる。
+        </div>
+    </div>
+
+    <!-- Grok 5 ロードマップ -->
+    <div class="panel">
+        <div class="section-label">Roadmap</div>
+        <div class="section-title">Grok 5 & xAI ロードマップ（2026年下半期）</div>
+        <p class="section-desc">Grok Build v0.1 の次のステップと、ベースモデルとなる Grok 5 の全情報。</p>
+
+        <div class="grid-2" style="margin-bottom: 20px;">
+            <div>
+                <div style="font-weight:700; color:var(--accent); margin-bottom:10px; font-size:0.9rem;">🚀 Grok 5（訓練中）</div>
+                <div class="feat-card">
+                    <span class="feat-icon">🧠</span>
+                    <div class="feat-title">規模・アーキテクチャ</div>
+                    <div class="feat-desc">Mixture-of-Experts（MoE）アーキテクチャで総パラメータ数<strong style="color:#fff;">約6兆（一説では10兆）</strong>。クエリごとに一部パラメータのみ活性化するため、推論コストは総パラメータ数に比例しない。7種類のバリアントモデルを同時訓練中。</div>
+                </div>
+            </div>
+            <div>
+                <div style="font-weight:700; color:var(--accent-2); margin-bottom:10px; font-size:0.9rem;">🏭 Colossus 2（訓練インフラ）</div>
+                <div class="feat-card">
+                    <span class="feat-icon">⚡</span>
+                    <div class="feat-title">世界初 ギガワット級AIクラスター</div>
+                    <div class="feat-desc">テネシー州メンフィスの Colossus 2 は2026年1月に<strong style="color:#fff;">1GW（ギガワット）</strong>での稼働を確認。2026年4月に<strong style="color:#fff;">1.5GWへの拡張</strong>も完了。人類史上最大規模のAI訓練インフラ。</div>
+                </div>
+            </div>
+        </div>
+
+        <div style="background: rgba(255,255,255,0.025); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; margin-bottom: 16px;">
+            <div style="font-weight:700; color:#fff; margin-bottom:10px; font-size:0.88rem;">📅 Grok Build 今後のロードマップ</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 0.82rem; color: var(--muted);">
+                <div>
+                    <div style="color:var(--accent); font-weight:700; margin-bottom:4px;">✅ 実装済み</div>
+                    <ul style="padding-left:16px; margin:0; display:flex; flex-direction:column; gap:4px;">
+                        <li>8並列エージェント（5月14日）</li>
+                        <li>Grok Skills（CLAUDE.md互換）</li>
+                        <li>Connectors 9+（Wave 1・2）</li>
+                        <li>grok-build-0.1 API公開</li>
+                        <li>ACP（IDE統合プロトコル）</li>
+                    </ul>
+                </div>
+                <div>
+                    <div style="color:var(--accent-2); font-weight:700; margin-bottom:4px;">🔜 近日予定</div>
+                    <ul style="padding-left:16px; margin:0; display:flex; flex-direction:column; gap:4px;">
+                        <li><strong style="color:#fff;">Arena Mode</strong>（コード確認済み・未公開）</li>
+                        <li>Grok 5 ベースモデル統合</li>
+                        <li>SuperGrok Heavy 以外への完全展開</li>
+                        <li>Windows ネイティブ対応</li>
+                        <li>エンタープライズ向け管理機能</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="purple-box">
+            🔭 <strong style="color:var(--accent-2);">中長期展望：</strong> Grok 5 が Grok Build のベースモデルになれば、SWE-Bench スコアの大幅改善（70.8% → 80%超）が期待される。Arena Mode の公開と合わせて、Claude Code・Codex CLI との差を急速に縮める可能性がある。2026年下半期の最大の注目ポイント。
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div style="background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:20px 32px; display:flex; flex-wrap:wrap; gap:16px; align-items:center; justify-content:space-between;">
+        <div style="font-size:0.8rem; color:var(--muted);">
+            <strong style="color:#fff;">Grok Build 完全ガイド 2026</strong> | Early Beta（2026年5月14日）ベース |
+            <a href="https://x.ai/cli" style="color:var(--accent); text-decoration:none;" target="_blank">公式: x.ai/cli →</a>
+        </div>
+        <div style="display:flex; gap:16px; flex-wrap:wrap;">
+            <a href="grok.html" style="color:var(--accent); text-decoration:none; font-size:0.82rem;">← Grok 概要</a>
+            <a href="cursor.html" style="color:var(--accent); text-decoration:none; font-size:0.82rem;">Cursor →</a>
+            <a href="claude-code.html" style="color:var(--accent); text-decoration:none; font-size:0.82rem;">Claude Code →</a>
+            <a href="openai-codex.html" style="color:var(--accent); text-decoration:none; font-size:0.82rem;">Codex CLI →</a>
+            <a href="../index.html" style="color:var(--accent); text-decoration:none; font-size:0.82rem;">← Workbench</a>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>
