@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Microsoft Agent Framework 完全ガイド | Claude Workspace</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --surface2: #21262d;
+      --border: #30363d;
+      --text: #e6edf3;
+      --text-muted: #8b949e;
+      --accent: #0078d4;
+      --accent-2: #50e6ff;
+      --accent-3: #7c3aed;
+      --accent-4: #10b981;
+      --warn: #f59e0b;
+      --danger: #ef4444;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+    header {
+      background: linear-gradient(135deg, #0078d4 0%, #00b4d8 40%, #50e6ff 100%);
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+    header .badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 20px;
+      padding: 0.3rem 1rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 1rem;
+      letter-spacing: 0.05em;
+    }
+    header h1 {
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 0.5rem;
+    }
+    header .sub {
+      font-size: 1.1rem;
+      color: rgba(255,255,255,0.85);
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    nav.toc {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 1.5rem;
+      font-size: 0.85rem;
+    }
+    nav.toc a { color: var(--accent-2); text-decoration: none; }
+    nav.toc a:hover { text-decoration: underline; }
+    main { max-width: 1080px; margin: 0 auto; padding: 2rem; }
+    section { margin-bottom: 3.5rem; }
+    h2 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: 1.2rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    h3 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin: 1.5rem 0 0.8rem;
+      color: var(--accent-2);
+    }
+    h4 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 1rem 0 0.5rem;
+      color: var(--accent-4);
+    }
+    p { margin-bottom: 0.9rem; color: #c9d1d9; }
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .kpi-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.2rem;
+      text-align: center;
+    }
+    .kpi-card .num {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--accent-2);
+      display: block;
+    }
+    .kpi-card .label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.3rem;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .card.blue { border-left: 4px solid var(--accent); }
+    .card.teal { border-left: 4px solid var(--accent-2); }
+    .card.purple { border-left: 4px solid var(--accent-3); }
+    .card.green { border-left: 4px solid var(--accent-4); }
+    .card.warn { border-left: 4px solid var(--warn); }
+    .grid2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.2rem;
+    }
+    .grid3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+    .badge-pill {
+      display: inline-block;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 20px;
+      padding: 0.2rem 0.7rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      margin: 0.15rem;
+    }
+    .badge-pill.green { background: var(--accent-4); }
+    .badge-pill.purple { background: var(--accent-3); }
+    .badge-pill.warn { background: var(--warn); color: #000; }
+    .badge-pill.teal { background: #00b4d8; }
+    pre {
+      background: #0d1117;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.2rem;
+      overflow-x: auto;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      margin: 1rem 0;
+    }
+    code { font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+    .code-comment { color: #8b949e; }
+    .code-keyword { color: #ff7b72; }
+    .code-string { color: #a5d6ff; }
+    .code-func { color: #d2a8ff; }
+    .code-class { color: #ffa657; }
+    .code-num { color: #79c0ff; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+      margin: 1rem 0;
+    }
+    th {
+      background: var(--surface2);
+      padding: 0.7rem 1rem;
+      text-align: left;
+      color: var(--text);
+      font-weight: 600;
+      border: 1px solid var(--border);
+    }
+    td {
+      padding: 0.65rem 1rem;
+      border: 1px solid var(--border);
+      color: #c9d1d9;
+      vertical-align: top;
+    }
+    tr:hover td { background: var(--surface2); }
+    .timeline {
+      position: relative;
+      padding-left: 1.5rem;
+      border-left: 2px solid var(--accent);
+    }
+    .timeline-item {
+      position: relative;
+      margin-bottom: 1.5rem;
+    }
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -1.9rem;
+      top: 0.4rem;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--accent);
+      border: 2px solid var(--bg);
+    }
+    .timeline-item .date {
+      font-size: 0.8rem;
+      color: var(--accent-2);
+      font-weight: 600;
+      margin-bottom: 0.2rem;
+    }
+    .timeline-item .title {
+      font-weight: 700;
+      color: var(--text);
+    }
+    .timeline-item .desc {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin-top: 0.2rem;
+    }
+    .arch-diagram {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      font-size: 0.85rem;
+    }
+    .arch-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin: 0.5rem 0;
+    }
+    .arch-box {
+      background: var(--accent);
+      color: #fff;
+      border-radius: 6px;
+      padding: 0.4rem 0.9rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .arch-box.teal { background: #00b4d8; color: #000; }
+    .arch-box.purple { background: var(--accent-3); }
+    .arch-box.green { background: var(--accent-4); }
+    .arch-box.gray { background: var(--surface); border: 1px solid var(--border); color: var(--text); }
+    .arch-arrow { color: var(--text-muted); font-size: 1.2rem; }
+    .pattern-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.2rem;
+      text-align: center;
+    }
+    .pattern-card .icon { font-size: 2rem; margin-bottom: 0.5rem; }
+    .pattern-card h4 { color: var(--text); margin: 0.3rem 0; }
+    .pattern-card p { font-size: 0.82rem; margin: 0; }
+    .notice {
+      background: rgba(0,120,212,0.1);
+      border: 1px solid rgba(0,120,212,0.3);
+      border-radius: 8px;
+      padding: 1rem 1.2rem;
+      margin-bottom: 1.2rem;
+      font-size: 0.9rem;
+    }
+    .notice.warn {
+      background: rgba(245,158,11,0.1);
+      border-color: rgba(245,158,11,0.3);
+    }
+    .notice.green {
+      background: rgba(16,185,129,0.1);
+      border-color: rgba(16,185,129,0.3);
+    }
+    ul, ol { padding-left: 1.5rem; margin-bottom: 0.8rem; color: #c9d1d9; }
+    li { margin-bottom: 0.3rem; }
+    footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 2rem;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+    footer a { color: var(--accent-2); text-decoration: none; }
+    @media (max-width: 640px) {
+      main { padding: 1rem; }
+      header { padding: 2rem 1rem; }
+      .grid2, .grid3 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="badge">Microsoft Build 2026 対応 — 2026年6月更新</div>
+  <h1>Microsoft Agent Framework</h1>
+  <div class="sub">AutoGen × Semantic Kernel 統合。エンタープライズ向け最強のマルチエージェント基盤。<br>MAF v1.0 GA + Windows Agent Framework + Azure Agentic Services 完全解説</div>
+</header>
+
+<nav class="toc">
+  <a href="#overview">概要</a>
+  <a href="#timeline">タイムライン</a>
+  <a href="#architecture">アーキテクチャ</a>
+  <a href="#components">コアコンポーネント</a>
+  <a href="#patterns">マルチエージェントパターン</a>
+  <a href="#providers">LLMプロバイダー</a>
+  <a href="#mcp-a2a">MCP + A2A</a>
+  <a href="#waf">Windows Agent Framework</a>
+  <a href="#azure-agentic">Azure Agentic Services</a>
+  <a href="#code">コード実装例</a>
+  <a href="#enterprise">エンタープライズ機能</a>
+  <a href="#comparison">競合比較</a>
+  <a href="#pricing">料金・ライセンス</a>
+  <a href="#quickstart">クイックスタート</a>
+</nav>
+
+<main>
+
+<!-- KPI -->
+<section id="overview">
+  <h2>📊 Microsoft Agent Framework 概要</h2>
+
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <span class="num">v1.0</span>
+      <div class="label">GA リリース（2026年4月）</div>
+    </div>
+    <div class="kpi-card">
+      <span class="num">6</span>
+      <div class="label">対応 LLM プロバイダー</div>
+    </div>
+    <div class="kpi-card">
+      <span class="num">MIT</span>
+      <div class="label">ライセンス（完全 OSS）</div>
+    </div>
+    <div class="kpi-card">
+      <span class="num">2言語</span>
+      <div class="label">Python + .NET 両対応</div>
+    </div>
+    <div class="kpi-card">
+      <span class="num">5種</span>
+      <div class="label">マルチエージェントパターン</div>
+    </div>
+    <div class="kpi-card">
+      <span class="num">A2A + MCP</span>
+      <div class="label">プロトコル標準対応</div>
+    </div>
+  </div>
+
+  <div class="notice">
+    <strong>🏗️ Microsoft Agent Framework（MAF）とは:</strong>
+    AutoGen（会話型マルチエージェント）と Semantic Kernel（プロダクション向け AI オーケストレーション）を統合した、Microsoft 公式のエンタープライズ向けエージェント開発基盤。2026年4月に v1.0 が GA リリースされ、Microsoft Build 2026（5月19〜21日）で「Agentic OS としての Windows」ビジョンと共に全面刷新が発表された。
+  </div>
+
+  <div class="grid2">
+    <div class="card blue">
+      <h3>🧱 統合の背景</h3>
+      <p>AutoGen は Microsoft Research が2023年に発表した会話型マルチエージェントフレームワーク。Semantic Kernel（SK）は Azure OpenAI 向けプロダクション SDKとして並行開発されていた。両プロジェクトは長らく独立していたが、2025年後半から統合作業が始まり、2026年4月の MAF v1.0 で完全に統一。</p>
+      <ul>
+        <li>AutoGen v0.4 のランタイムを MAF のコアに採用</li>
+        <li>Semantic Kernel のプラグイン・メモリシステムを継承</li>
+        <li>新インターフェース: <code>AgentRuntime</code> + <code>AgentChat</code></li>
+      </ul>
+    </div>
+    <div class="card teal">
+      <h3>🌐 エコシステムの位置づけ</h3>
+      <p>MAF は Microsoft の Agentic AI 戦略の中心に位置し、Azure AI Foundry / Copilot Studio / Power Platform と深く統合する。</p>
+      <ul>
+        <li>Azure AI Foundry: ホスト型エージェントのデプロイ先</li>
+        <li>Copilot Studio: ノーコード UX のバックエンド</li>
+        <li>Power Automate: ビジネスフロー自動化との接続</li>
+        <li>Microsoft 365 Copilot: Teams/Word/Excel 連携エージェント</li>
+        <li>Windows: OS レベルの Computer Use 実行環境</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- タイムライン -->
+<section id="timeline">
+  <h2>📅 MAF タイムライン</h2>
+
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="date">2023年10月</div>
+      <div class="title">AutoGen v0.1 発表</div>
+      <div class="desc">Microsoft Research が会話型マルチエージェント OSS を公開。ConversableAgent パターンが起点。</div>
+    </div>
+    <div class="timeline-item">
+      <div class="date">2024年1月</div>
+      <div class="title">Semantic Kernel v1.0 GA</div>
+      <div class="desc">Azure OpenAI 向けプロダクション SDK が安定版に。Plugin / Memory / Planner システム確立。</div>
+    </div>
+    <div class="timeline-item">
+      <div class="date">2024年10月</div>
+      <div class="title">AutoGen v0.4 リリース — 非同期ランタイム</div>
+      <div class="desc">AsyncIO ベースの分散実行モデルに移行。Magentic-One（汎用マルチエージェント）発表。</div>
+    </div>
+    <div class="timeline-item">
+      <div class="date">2025年4月</div>
+      <div class="title">統合プレビュー公開</div>
+      <div class="desc">AutoGen × Semantic Kernel 統合ブランチを GitHub でプレビュー公開。開発者向け先行 API 提供開始。</div>
+    </div>
+    <div class="timeline-item">
+      <div class="date">2025年11月</div>
+      <div class="title">A2A Protocol 対応 + Windows Agent Framework ベータ</div>
+      <div class="desc">Google A2A プロトコル v0.5 をサポート。WAF（Windows Agent Framework）をベータ公開。Computer Use 統合実験。</div>
+    </div>
+    <div class="timeline-item">
+      <div class="date">2026年4月2〜3日</div>
+      <div class="title">MAF v1.0 GA リリース</div>
+      <div class="desc">microsoft/agent-framework として GitHub 公開。Python 3.10+ / .NET 8+ 両対応。A2A v1.0・MCP 完全対応。6 LLM プロバイダー標準サポート。</div>
+    </div>
+    <div class="timeline-item">
+      <div class="date">2026年5月19〜21日</div>
+      <div class="title">Microsoft Build 2026 — "Windows = Agentic OS"</div>
+      <div class="desc">Satya Nadella が「Windows はエージェント実行環境になる」を宣言。Windows Agent Framework v1.0 GA、Azure Agentic Services 発表。Copilot Studio + MAF の統合 SaaS ティアも発表。</div>
+    </div>
+    <div class="timeline-item">
+      <div class="date">2026年6月（現在）</div>
+      <div class="title">MAF v1.1 プレビュー</div>
+      <div class="desc">CodeAct 強化版、Hosted Agents マルチリージョン対応、Phi-4 Reasoning ネイティブ統合。</div>
+    </div>
+  </div>
+</section>
+
+<!-- アーキテクチャ -->
+<section id="architecture">
+  <h2>🏗️ MAF アーキテクチャ</h2>
+
+  <div class="arch-diagram">
+    <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:1rem;">Microsoft Agent Framework — レイヤー構造</div>
+
+    <div class="arch-row">
+      <div class="arch-box gray">Copilot Studio UI</div>
+      <div class="arch-box gray">Azure AI Foundry</div>
+      <div class="arch-box gray">カスタム App</div>
+      <div class="arch-box gray">Windows Desktop</div>
+    </div>
+    <div class="arch-arrow">↕ A2A Protocol / REST</div>
+
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1rem;margin:0.5rem 0;">
+      <div style="font-weight:600;font-size:0.85rem;margin-bottom:0.5rem;color:var(--accent-2)">MAF Core — Agent Runtime</div>
+      <div class="arch-row">
+        <div class="arch-box">AgentChat</div>
+        <div class="arch-box">Agent Harness</div>
+        <div class="arch-box">Hosted Agents</div>
+        <div class="arch-box purple">CodeAct Runtime</div>
+      </div>
+    </div>
+
+    <div class="arch-arrow">↕ Orchestration Layer</div>
+
+    <div class="arch-row">
+      <div class="arch-box green">Sequential Chain</div>
+      <div class="arch-box green">Concurrent Fan-out</div>
+      <div class="arch-box teal">Handoff</div>
+      <div class="arch-box teal">Group Chat</div>
+      <div class="arch-box" style="background:#7c3aed">Magentic-One</div>
+    </div>
+
+    <div class="arch-arrow">↕ Tool Layer (MCP)</div>
+
+    <div class="arch-row">
+      <div class="arch-box gray">Web Search</div>
+      <div class="arch-box gray">File System</div>
+      <div class="arch-box gray">Code Execution</div>
+      <div class="arch-box gray">Database</div>
+      <div class="arch-box gray">API Call</div>
+      <div class="arch-box gray">Computer Use</div>
+    </div>
+
+    <div class="arch-arrow">↕ LLM Providers</div>
+
+    <div class="arch-row">
+      <div class="arch-box">Azure OpenAI</div>
+      <div class="arch-box">OpenAI</div>
+      <div class="arch-box" style="background:#d97706">Claude</div>
+      <div class="arch-box" style="background:#ef4444">Amazon Bedrock</div>
+      <div class="arch-box" style="background:#1a73e8">Google Gemini</div>
+      <div class="arch-box gray">Ollama</div>
+    </div>
+  </div>
+
+  <div class="grid2" style="margin-top:1.5rem;">
+    <div class="card blue">
+      <h3>🔄 AgentRuntime</h3>
+      <p>MAF のコアエンジン。エージェントのライフサイクル管理・メッセージルーティング・状態管理を担当。AutoGen v0.4 の非同期ランタイムを基盤に、SK のプラグインシステムを統合。</p>
+      <ul>
+        <li><strong>SingleThreadedAgentRuntime:</strong> ローカル開発・テスト用</li>
+        <li><strong>WorkerAgentRuntime:</strong> 分散マルチプロセス実行</li>
+        <li><strong>GrpcAgentRuntime:</strong> gRPC 経由クロスホスト実行</li>
+        <li>メッセージは型安全（Pydantic モデル）</li>
+      </ul>
+    </div>
+    <div class="card purple">
+      <h3>💬 AgentChat API</h3>
+      <p>高レベルの会話型マルチエージェント API。複雑な Runtime API を抽象化し、直感的なコードでマルチエージェント会話を実装できる。</p>
+      <ul>
+        <li><code>AssistantAgent</code>: ツール呼び出し対応汎用エージェント</li>
+        <li><code>UserProxyAgent</code>: ヒューマンインザループ用</li>
+        <li><code>RoundRobinGroupChat</code>: 順番に発言</li>
+        <li><code>SelectorGroupChat</code>: LLM が次の発言者を選択</li>
+        <li>終了条件: MaxTurns / TextMentionTermination など</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- コアコンポーネント -->
+<section id="components">
+  <h2>🧩 コアコンポーネント詳解</h2>
+
+  <div class="grid2">
+    <div class="card green">
+      <h3>🔧 Agent Harness</h3>
+      <p>エージェントの「箱庭」。ツール・メモリ・セキュリティポリシーを 1 つの設定で宣言的に定義し、エージェントに注入する。</p>
+      <pre><code><span class="code-class">AgentHarness</span>(
+  tools=[web_search, code_exec, file_io],
+  memory=<span class="code-class">AzureCosmosMemory</span>(),
+  policy=<span class="code-class">ContentSafetyPolicy</span>(),
+  max_tokens=<span class="code-num">8192</span>,
+)</code></pre>
+      <ul>
+        <li>ツール: MCP サーバー / カスタム関数 / OpenAPI 自動解析</li>
+        <li>メモリ: Azure Cosmos DB / Redis / インメモリ</li>
+        <li>ポリシー: Azure AI Content Safety 統合</li>
+      </ul>
+    </div>
+    <div class="card teal">
+      <h3>☁️ Hosted Agents</h3>
+      <p>エージェントを Azure 上でサーバーレスにホスト。デプロイ・スケーリング・監視を自動化。</p>
+      <ul>
+        <li>Azure Container Apps ベース（自動スケール 0→N）</li>
+        <li>Azure AI Foundry からワンクリックデプロイ</li>
+        <li>エンドポイント自動生成（REST + A2A 対応）</li>
+        <li>Azure Monitor / Application Insights 統合</li>
+        <li>マルチリージョン対応（v1.1 プレビュー）</li>
+      </ul>
+    </div>
+    <div class="card blue">
+      <h3>🖥️ CodeAct Runtime</h3>
+      <p>エージェントが Python コードを動的生成・実行するサンドボックス環境。ReAct の「ツール呼び出し」より高い表現力。</p>
+      <ul>
+        <li>Azure Container Instances でセキュア実行</li>
+        <li>各実行は独立したサンドボックス（コード漏洩なし）</li>
+        <li>pandas / numpy / matplotlib 等の科学計算ライブラリ利用可</li>
+        <li>実行結果（テキスト + 画像）をエージェントにフィードバック</li>
+        <li>タイムアウト・メモリ上限・ネットワーク制限を設定可</li>
+      </ul>
+    </div>
+    <div class="card purple">
+      <h3>🧠 Semantic Kernel プラグイン</h3>
+      <p>SK のプラグインシステムが MAF に統合。既存の SK コードを MAF エージェントのツールとして再利用可能。</p>
+      <ul>
+        <li>プラグイン = 関数の集合（OpenAI Tool Format 準拠）</li>
+        <li>OpenAPI スペックから自動生成: <code>KernelPlugin.from_openapi()</code></li>
+        <li>MCP サーバーから自動生成: <code>KernelPlugin.from_mcp()</code></li>
+        <li>Semantic Function（プロンプトテンプレート）も継承</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- マルチエージェントパターン -->
+<section id="patterns">
+  <h2>🔀 マルチエージェントパターン</h2>
+
+  <p>MAF は5種類のオーケストレーションパターンを標準提供する。</p>
+
+  <div class="grid3">
+    <div class="pattern-card">
+      <div class="icon">🔗</div>
+      <h4>Sequential</h4>
+      <p>エージェント A → B → C の直列実行。前のエージェントの出力が次の入力になる。パイプライン処理に最適。</p>
+    </div>
+    <div class="pattern-card">
+      <div class="icon">🌐</div>
+      <h4>Concurrent</h4>
+      <p>複数エージェントを並列起動。扇形（fan-out）でサブタスクを分散し、結果を集約（fan-in）。大規模調査・並列生成に最適。</p>
+    </div>
+    <div class="pattern-card">
+      <div class="icon">🤝</div>
+      <h4>Handoff</h4>
+      <p>エージェントが「担当外」と判断した場合に別エージェントに転送。カスタマーサポートの部署振り分け等に最適。</p>
+    </div>
+    <div class="pattern-card">
+      <div class="icon">💬</div>
+      <h4>Group Chat</h4>
+      <p>複数エージェントが同一スレッドで議論。SelectorGroupChat なら LLM が次の発言者を決定。コードレビュー・多角的分析に最適。</p>
+    </div>
+    <div class="pattern-card">
+      <div class="icon">🔵</div>
+      <h4>Magentic-One</h4>
+      <p>汎用マルチエージェント実装。Orchestrator + FileSurfer + WebSurfer + Coder + ComputerTerminal の5エージェント構成。AutoBench II 最高スコア。</p>
+    </div>
+  </div>
+
+  <div class="card warn" style="margin-top:1.5rem;">
+    <h3>⚡ Magentic-One 詳細</h3>
+    <p>Microsoft Research が設計した汎用マルチエージェントシステム。複雑な実世界タスクをエージェントチームで解決する。</p>
+    <div class="grid2">
+      <div>
+        <h4>5エージェントの役割:</h4>
+        <ul>
+          <li><strong>Orchestrator:</strong> タスク分解・エージェント割り当て・進捗追跡</li>
+          <li><strong>WebSurfer:</strong> ブラウザ操作・Web 検索・スクレイピング</li>
+          <li><strong>FileSurfer:</strong> ファイル読み取り・PDF/Office 解析</li>
+          <li><strong>Coder:</strong> コード生成・デバッグ・テスト実行</li>
+          <li><strong>ComputerTerminal:</strong> シェル実行・システム操作</li>
+        </ul>
+      </div>
+      <div>
+        <h4>ベンチマーク結果（2026年6月）:</h4>
+        <ul>
+          <li>GAIA Benchmark Level 1: 72.3%</li>
+          <li>GAIA Benchmark Level 2: 51.8%</li>
+          <li>WebArena: 44.2%</li>
+          <li>AssistantBench: 38.7%</li>
+          <li>SWE-Bench（コード）: 45.1%（単体エージェントとして）</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LLM プロバイダー -->
+<section id="providers">
+  <h2>🤖 対応 LLM プロバイダー</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>プロバイダー</th>
+        <th>設定クラス</th>
+        <th>対応モデル例</th>
+        <th>特記事項</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Azure OpenAI</strong> ⭐</td>
+        <td><code>AzureOpenAIChatCompletionClient</code></td>
+        <td>GPT-4o, o3, o4-mini</td>
+        <td>MAF のデフォルト。Azure RBAC / VNet 統合。Managed Identity 対応</td>
+      </tr>
+      <tr>
+        <td><strong>OpenAI</strong></td>
+        <td><code>OpenAIChatCompletionClient</code></td>
+        <td>GPT-4o, o3, o4-mini</td>
+        <td>API Key 認証。Responses API 対応</td>
+      </tr>
+      <tr>
+        <td><strong>Anthropic Claude</strong></td>
+        <td><code>AnthropicChatCompletionClient</code></td>
+        <td>Claude Sonnet 4.6, Opus 4.8</td>
+        <td>Amazon Bedrock 経由も可。拡張思考（Extended Thinking）対応</td>
+      </tr>
+      <tr>
+        <td><strong>Amazon Bedrock</strong></td>
+        <td><code>BedrockChatCompletionClient</code></td>
+        <td>Claude 3.7 Sonnet, Llama 3.1, Titan</td>
+        <td>AWS IAM 認証。SageMaker エンドポイントも可</td>
+      </tr>
+      <tr>
+        <td><strong>Google Gemini</strong></td>
+        <td><code>GeminiChatCompletionClient</code></td>
+        <td>Gemini 2.5 Pro, Flash, Nano</td>
+        <td>Google AI Studio / Vertex AI 両対応。2M コンテキスト</td>
+      </tr>
+      <tr>
+        <td><strong>Ollama</strong></td>
+        <td><code>OllamaChatCompletionClient</code></td>
+        <td>Llama 3.2, Phi-4, Mistral, Qwen</td>
+        <td>ローカル実行専用。エアギャップ環境・プライバシー優先ケース</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="notice green">
+    <strong>💡 Phi-4 ネイティブ統合（MAF v1.1 プレビュー）:</strong>
+    Microsoft 自社モデル Phi-4 / Phi-4 Reasoning が MAF に直接統合。Azure AI Foundry の Phi-4 エンドポイントに対して特別最適化されたクライアントが提供される。ローカル実行（Ollama + Phi-4）とクラウド実行（Azure + Phi-4）を同じコードで切り替え可能。
+  </div>
+</section>
+
+<!-- MCP + A2A -->
+<section id="mcp-a2a">
+  <h2>🔗 MCP + A2A プロトコル統合</h2>
+
+  <div class="grid2">
+    <div class="card teal">
+      <h3>🔧 MCP（Model Context Protocol）</h3>
+      <p>Anthropic が設計したエージェント↔ツール標準プロトコル。MAF では <code>KernelPlugin.from_mcp()</code> で MCP サーバーをワンライン統合。</p>
+      <pre><code><span class="code-keyword">from</span> autogen_ext.tools.mcp <span class="code-keyword">import</span> MCPToolAdapter
+<span class="code-keyword">from</span> autogen_agentchat.agents <span class="code-keyword">import</span> AssistantAgent
+
+<span class="code-comment"># MCP サーバーを自動接続</span>
+tools = <span class="code-keyword">await</span> MCPToolAdapter.from_server(
+    server_url=<span class="code-string">"http://localhost:8000/mcp"</span>
+)
+
+agent = <span class="code-class">AssistantAgent</span>(
+    name=<span class="code-string">"researcher"</span>,
+    model_client=model_client,
+    tools=tools,
+)</code></pre>
+      <ul>
+        <li>5,000+ コミュニティ MCP サーバーを即利用</li>
+        <li>stdio / HTTP+SSE 両モード対応</li>
+        <li>ツール仕様を自動解析して JSON Schema 生成</li>
+      </ul>
+    </div>
+    <div class="card blue">
+      <h3>🌐 A2A（Agent-to-Agent Protocol）</h3>
+      <p>Google が主導する Agent ↔ Agent 通信標準。MAF は A2A v1.0 に完全対応。エージェントを A2A エンドポイントとして公開し、他フレームワークと相互接続できる。</p>
+      <pre><code><span class="code-keyword">from</span> autogen_ext.interop.a2a <span class="code-keyword">import</span> A2AServer
+
+<span class="code-comment"># MAF エージェントを A2A で公開</span>
+server = <span class="code-class">A2AServer</span>(
+    agent=my_agent,
+    agent_card=<span class="code-class">AgentCard</span>(
+        name=<span class="code-string">"Research Agent"</span>,
+        capabilities={<span class="code-string">"streaming"</span>: <span class="code-keyword">True</span>},
+        authentication={<span class="code-string">"schemes"</span>: [<span class="code-string">"Bearer"</span>]},
+    )
+)
+<span class="code-keyword">await</span> server.start(port=<span class="code-num">8080</span>)</code></pre>
+      <ul>
+        <li>Agent Card を <code>/.well-known/agent-card.json</code> で自動公開</li>
+        <li>Salesforce / SAP / Google エージェントと相互接続</li>
+        <li>ストリーミング（SSE）+ Webhook 両対応</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="notice">
+    <strong>🔑 MAF が A2A + MCP 両対応の意味:</strong>
+    MCP でツール（データベース、API、ファイル）を呼び出し、A2A で他ベンダーのエージェントと連携できる。これにより MAF エージェントは Microsoft エコシステムを超え、Google/Salesforce/SAP のエージェントと協業する「相互運用可能なエンタープライズ AI インフラ」になる。
+  </div>
+</section>
+
+<!-- Windows Agent Framework -->
+<section id="waf">
+  <h2>🪟 Windows Agent Framework（WAF）</h2>
+
+  <div class="notice green">
+    <strong>Microsoft Build 2026 主要発表:</strong>
+    Satya Nadella 基調講演で「Windows is the new agentic operating system」と宣言。WAF v1.0 GA が同日発表された。
+  </div>
+
+  <div class="grid2">
+    <div class="card blue">
+      <h3>🖥️ WAF とは</h3>
+      <p>Windows / Windows 365 / Azure Arc 上でエージェントが OS を直接操作できるようにするフレームワーク。UI Automation API・Win32・UWP・WinUI3・Web ブラウザを統一的に操作。</p>
+      <ul>
+        <li><strong>Computer Use:</strong> マウス・キーボード・スクリーン読み取り</li>
+        <li><strong>App Control:</strong> Win32/UWP/PWA を起動・操作・閉じる</li>
+        <li><strong>File System:</strong> NTFS ファイル操作（権限付き）</li>
+        <li><strong>Windows Search:</strong> コンテキスト認識検索統合</li>
+        <li><strong>Recall Integration:</strong> Windows Recall の AI 記憶活用</li>
+      </ul>
+    </div>
+    <div class="card green">
+      <h3>☁️ Windows 365 + Azure Arc</h3>
+      <p>クラウド PC 上でエージェントを実行。物理デバイスを必要とせず、スケーラブルな「仮想デスクトップ操作エージェント」を構築できる。</p>
+      <ul>
+        <li><strong>Windows 365 Agentic:</strong> 仮想 Windows 環境でのエージェント実行（1セッション = 1 Cloud PC）</li>
+        <li><strong>Azure Arc:</strong> ハイブリッド環境（オンプレ + クラウド）での一元管理</li>
+        <li><strong>セキュリティ:</strong> Azure AD 認証 + Intune ポリシー準拠</li>
+        <li><strong>監査ログ:</strong> 全操作を Microsoft Purview に記録</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>WAF 実装例 — Excel 自動化エージェント</h3>
+  <pre><code><span class="code-keyword">from</span> autogen_ext.tools.windows <span class="code-keyword">import</span> WindowsComputerTool
+<span class="code-keyword">from</span> autogen_agentchat.agents <span class="code-keyword">import</span> AssistantAgent
+
+<span class="code-comment"># Windows Computer Use ツールを初期化</span>
+computer = <span class="code-class">WindowsComputerTool</span>(
+    screenshot_interval=<span class="code-num">0.5</span>,
+    click_delay=<span class="code-num">0.1</span>,
+    sandbox=<span class="code-keyword">True</span>,  <span class="code-comment"># Azure Container Instances でサンドボックス実行</span>
+)
+
+excel_agent = <span class="code-class">AssistantAgent</span>(
+    name=<span class="code-string">"excel_operator"</span>,
+    model_client=azure_openai_client,
+    tools=[computer],
+    system_message=<span class="code-string">"""
+    あなたは Excel 操作の専門エージェントです。
+    Computer Use ツールを使って実際の Excel アプリを操作します。
+    """</span>
+)
+
+<span class="code-comment"># タスク: 売上データを集計してグラフ作成</span>
+result = <span class="code-keyword">await</span> excel_agent.run(
+    task=<span class="code-string">"売上データ.xlsx を開いて月別集計表を作成し、棒グラフを追加してください"</span>
+)</code></pre>
+
+  <div class="notice warn">
+    <strong>⚠️ WAF セキュリティ設計原則:</strong>
+    エージェントは最小権限原則に基づき動作。実行前に「実行する操作の一覧」をユーザーに提示し承認を取る「Human-in-the-Loop ゲート」がデフォルトで有効。Purview への監査ログ記録は Azure Government / FedRAMP 環境では必須。
+  </div>
+</section>
+
+<!-- Azure Agentic Services -->
+<section id="azure-agentic">
+  <h2>☁️ Azure Agentic Services（Build 2026 発表）</h2>
+
+  <p>Microsoft Build 2026 で発表された、Azure のエージェント向け PaaS サービス群。MAF + Azure の組み合わせを SaaS として提供。</p>
+
+  <div class="grid3">
+    <div class="card blue">
+      <h3>🏪 Azure AI Agent Service</h3>
+      <p>エージェントをフルマネージドで実行。コードデプロイ不要、API キーとシステムプロンプトだけで動かせる。</p>
+      <ul>
+        <li>Azure AI Foundry Studio から GUI 設定</li>
+        <li>スレッド管理・ファイル検索・Code Interpreter 内蔵</li>
+        <li>プロビジョンドスループット対応</li>
+      </ul>
+    </div>
+    <div class="card teal">
+      <h3>🔍 Azure AI Search Integration</h3>
+      <p>エンタープライズ検索をエージェントのメモリとして統合。SharePoint / OneDrive / Blob Storage を自動インデックス化。</p>
+      <ul>
+        <li>ベクトル検索 + キーワード検索のハイブリッド</li>
+        <li>セマンティックランキング</li>
+        <li>権限付き RAG（Azure AD グループ単位）</li>
+      </ul>
+    </div>
+    <div class="card purple">
+      <h3>📊 Azure AI Evaluation</h3>
+      <p>エージェントの品質・安全性・信頼性を自動評価。CI/CD パイプラインに組み込みエージェントの品質ゲートを実施。</p>
+      <ul>
+        <li>Ground Truth 比較・幻覚検出</li>
+        <li>Azure Responsible AI ダッシュボード</li>
+        <li>Red-team 自動テスト機能</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card green" style="margin-top:1rem;">
+    <h3>🔐 Azure AI Content Safety（エージェント統合）</h3>
+    <p>Build 2026 でエージェント向け Content Safety が大幅強化。マルチターン会話でのジェイルブレイク検出・有害コンテンツフィルタ・プロンプトインジェクション防御を、エージェントの各ターンに自動適用。</p>
+    <div class="grid2">
+      <ul>
+        <li>Prompt Shields: ダイレクト + インダイレクト攻撃の両方を検出</li>
+        <li>Groundedness Detection: 回答がソースに基づいているか自動チェック</li>
+        <li>Protected Material Detection: 著作権コンテンツ混入防止</li>
+      </ul>
+      <ul>
+        <li>レイテンシ追加: 平均 50ms（高速パスあり）</li>
+        <li>カスタムブロックリスト: 企業固有のNGワード設定</li>
+        <li>多言語対応: 日本語完全サポート</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- コード実装例 -->
+<section id="code">
+  <h2>💻 コード実装例</h2>
+
+  <h3>基本: AssistantAgent + ツール使用（Python）</h3>
+  <pre><code><span class="code-keyword">import</span> asyncio
+<span class="code-keyword">from</span> autogen_agentchat.agents <span class="code-keyword">import</span> AssistantAgent
+<span class="code-keyword">from</span> autogen_agentchat.messages <span class="code-keyword">import</span> TextMessage
+<span class="code-keyword">from</span> autogen_ext.models.openai <span class="code-keyword">import</span> AzureOpenAIChatCompletionClient
+<span class="code-keyword">from</span> autogen_ext.tools.mcp <span class="code-keyword">import</span> MCPToolAdapter
+
+<span class="code-keyword">async def</span> <span class="code-func">main</span>():
+    <span class="code-comment"># Azure OpenAI クライアント</span>
+    model_client = <span class="code-class">AzureOpenAIChatCompletionClient</span>(
+        azure_deployment=<span class="code-string">"gpt-4o"</span>,
+        api_version=<span class="code-string">"2025-01-01-preview"</span>,
+        azure_endpoint=<span class="code-string">"https://YOUR-ENDPOINT.openai.azure.com/"</span>,
+        <span class="code-comment"># Managed Identity 推奨（API Key 不要）</span>
+    )
+
+    <span class="code-comment"># MCP サーバーからツールを自動取得</span>
+    tools = <span class="code-keyword">await</span> <span class="code-class">MCPToolAdapter</span>.from_server(<span class="code-string">"http://localhost:8000/mcp"</span>)
+
+    agent = <span class="code-class">AssistantAgent</span>(
+        name=<span class="code-string">"research_agent"</span>,
+        model_client=model_client,
+        tools=tools,
+        system_message=<span class="code-string">"あなたは調査専門エージェントです。"</span>,
+    )
+
+    response = <span class="code-keyword">await</span> agent.on_messages(
+        [<span class="code-class">TextMessage</span>(content=<span class="code-string">"MAF v1.0 の主要機能を調べてください"</span>, source=<span class="code-string">"user"</span>)],
+        cancellation_token=None,
+    )
+    print(response.chat_message.content)
+
+asyncio.run(<span class="code-func">main</span>())</code></pre>
+
+  <h3>マルチエージェント: グループチャット（コードレビュー）</h3>
+  <pre><code><span class="code-keyword">from</span> autogen_agentchat.teams <span class="code-keyword">import</span> SelectorGroupChat
+<span class="code-keyword">from</span> autogen_agentchat.conditions <span class="code-keyword">import</span> TextMentionTermination
+
+<span class="code-comment"># 3エージェント定義</span>
+coder = <span class="code-class">AssistantAgent</span>(
+    name=<span class="code-string">"coder"</span>, model_client=model_client,
+    system_message=<span class="code-string">"Pythonコードを書く専門家です。コーディングタスクを担当します。"</span>
+)
+reviewer = <span class="code-class">AssistantAgent</span>(
+    name=<span class="code-string">"code_reviewer"</span>, model_client=model_client,
+    system_message=<span class="code-string">"コードレビューの専門家です。セキュリティ・可読性・パフォーマンスをチェックします。"</span>
+)
+tester = <span class="code-class">AssistantAgent</span>(
+    name=<span class="code-string">"tester"</span>, model_client=model_client, tools=[code_exec_tool],
+    system_message=<span class="code-string">"テストエンジニアです。コードを実行してバグを発見します。"</span>
+)
+
+<span class="code-comment"># APPROVE という言葉で終了</span>
+termination = <span class="code-class">TextMentionTermination</span>(<span class="code-string">"APPROVE"</span>)
+
+<span class="code-comment"># LLM が次の発言者を選択するグループチャット</span>
+team = <span class="code-class">SelectorGroupChat</span>(
+    participants=[coder, reviewer, tester],
+    model_client=model_client,
+    termination_condition=termination,
+)
+
+result = <span class="code-keyword">await</span> team.run(
+    task=<span class="code-string">"非同期 Web スクレイパーを実装し、コードレビューとテストを完了してください"</span>
+)
+print(result.messages[-<span class="code-num">1</span>].content)</code></pre>
+
+  <h3>C# / .NET 実装例</h3>
+  <pre><code><span class="code-keyword">using</span> Microsoft.AgentFramework;
+<span class="code-keyword">using</span> Microsoft.AgentFramework.Agents;
+<span class="code-keyword">using</span> Microsoft.AgentFramework.Teams;
+<span class="code-keyword">using</span> Microsoft.SemanticKernel;
+
+<span class="code-comment">// Semantic Kernel と MAF を統合</span>
+<span class="code-keyword">var</span> kernel = <span class="code-class">Kernel</span>.CreateBuilder()
+    .AddAzureOpenAIChatCompletion(<span class="code-string">"gpt-4o"</span>, endpoint, credential)
+    .Build();
+
+<span class="code-comment">// MAF エージェントに SK プラグインを注入</span>
+<span class="code-keyword">var</span> agent = <span class="code-keyword">new</span> <span class="code-class">AssistantAgent</span>(<span class="code-string">"assistant"</span>)
+{
+    ModelClient = kernel.GetRequiredService&lt;<span class="code-class">IChatCompletionService</span>&gt;(),
+    Tools = kernel.Plugins.SelectMany(p => p.GetFunctionsMetadata()),
+    SystemMessage = <span class="code-string">"あなたは Azure 専門のエージェントです。"</span>
+};
+
+<span class="code-comment">// Handoff パターン: 専門エージェントに転送</span>
+<span class="code-keyword">var</span> orchestrator = <span class="code-keyword">new</span> <span class="code-class">HandoffOrchestrator</span>([
+    (<span class="code-string">"Azure support"</span>, azureAgent),
+    (<span class="code-string">"Billing"</span>, billingAgent),
+    (<span class="code-string">"Security"</span>, securityAgent),
+]);
+
+<span class="code-keyword">var</span> result = <span class="code-keyword">await</span> orchestrator.RunAsync(<span class="code-string">"Azure OpenAI のクォータを増やしたい"</span>);</code></pre>
+</section>
+
+<!-- エンタープライズ機能 -->
+<section id="enterprise">
+  <h2>🏢 エンタープライズ機能</h2>
+
+  <div class="grid2">
+    <div class="card blue">
+      <h3>🔐 セキュリティ</h3>
+      <ul>
+        <li><strong>Azure AD / Entra ID 統合:</strong> RBAC でエージェントごとに権限制御</li>
+        <li><strong>Managed Identity:</strong> API Key 不要、証明書ベース認証</li>
+        <li><strong>Customer Managed Keys:</strong> 暗号鍵のお客様管理</li>
+        <li><strong>Private Endpoint:</strong> VNet 内での完全分離実行</li>
+        <li><strong>Zero Trust:</strong> すべてのエージェント間通信を mTLS で保護</li>
+        <li><strong>Prompt Injection 防御:</strong> Content Safety Prompt Shields 統合</li>
+      </ul>
+    </div>
+    <div class="card green">
+      <h3>📋 コンプライアンス</h3>
+      <ul>
+        <li>SOC 2 Type II / ISO 27001 / ISO 27018</li>
+        <li>GDPR / CCPA 対応（データ所在地選択可能）</li>
+        <li>FedRAMP High（Azure Government 上）</li>
+        <li>HIPAA BAA（医療機関向け）</li>
+        <li>Microsoft Purview: 全エージェント操作の監査ログ</li>
+        <li>データ保持ポリシーの自動適用</li>
+      </ul>
+    </div>
+    <div class="card teal">
+      <h3>📊 可観測性</h3>
+      <ul>
+        <li><strong>Azure Monitor:</strong> エージェントメトリクス（レイテンシ・トークン消費・エラー率）</li>
+        <li><strong>Application Insights:</strong> 分散トレーシング（スパン単位）</li>
+        <li><strong>MAF Telemetry:</strong> エージェント会話の全ターンをロギング</li>
+        <li><strong>Grafana ダッシュボード:</strong> テンプレート付き即利用可能</li>
+        <li><strong>OpenTelemetry:</strong> 標準準拠でサードパーティ APM 連携</li>
+      </ul>
+    </div>
+    <div class="card purple">
+      <h3>🚀 スケーリング</h3>
+      <ul>
+        <li>Hosted Agents: Azure Container Apps で自動スケール</li>
+        <li>WorkerAgentRuntime: Ray / KEDA ベースの分散実行</li>
+        <li>プロビジョンドスループット: 予測可能なレイテンシ SLA</li>
+        <li>グローバルロードバランシング: 最寄りリージョンに自動ルーティング</li>
+        <li>エージェントプール: コールドスタート 0 の常時温機状態</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 競合比較 -->
+<section id="comparison">
+  <h2>⚔️ 競合フレームワーク比較</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>比較軸</th>
+        <th>MAF v1.0</th>
+        <th>LangGraph</th>
+        <th>CrewAI</th>
+        <th>Amazon Bedrock Agents</th>
+        <th>Google ADK</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>学習コスト</strong></td>
+        <td>中（SK知識あれば低）</td>
+        <td>高（グラフ理論要）</td>
+        <td>低（直感的）</td>
+        <td>中（AWS知識要）</td>
+        <td>中（Google Cloud知識要）</td>
+      </tr>
+      <tr>
+        <td><strong>エンタープライズ成熟度</strong></td>
+        <td>⭐⭐⭐⭐⭐</td>
+        <td>⭐⭐⭐</td>
+        <td>⭐⭐⭐</td>
+        <td>⭐⭐⭐⭐</td>
+        <td>⭐⭐⭐</td>
+      </tr>
+      <tr>
+        <td><strong>ローカル LLM</strong></td>
+        <td>✅ Ollama</td>
+        <td>✅ Ollama / LM Studio</td>
+        <td>✅ Ollama</td>
+        <td>❌ AWS 必須</td>
+        <td>❌ Google 必須</td>
+      </tr>
+      <tr>
+        <td><strong>A2A 対応</strong></td>
+        <td>✅ ネイティブ</td>
+        <td>✅（v0.2+）</td>
+        <td>✅（v0.90+）</td>
+        <td>✅（実験的）</td>
+        <td>✅ ネイティブ</td>
+      </tr>
+      <tr>
+        <td><strong>MCP 対応</strong></td>
+        <td>✅ ネイティブ</td>
+        <td>✅ ネイティブ</td>
+        <td>✅（v0.85+）</td>
+        <td>✅（実験的）</td>
+        <td>✅ ネイティブ</td>
+      </tr>
+      <tr>
+        <td><strong>Computer Use</strong></td>
+        <td>✅ WAF 統合</td>
+        <td>△（サードパーティ）</td>
+        <td>△（サードパーティ）</td>
+        <td>❌</td>
+        <td>✅ Android/Chrome</td>
+      </tr>
+      <tr>
+        <td><strong>Azure 統合</strong></td>
+        <td>⭐⭐⭐⭐⭐</td>
+        <td>⭐⭐</td>
+        <td>⭐⭐</td>
+        <td>⭐</td>
+        <td>⭐</td>
+      </tr>
+      <tr>
+        <td><strong>ライセンス</strong></td>
+        <td>MIT（完全 OSS）</td>
+        <td>MIT</td>
+        <td>MIT</td>
+        <td>Apache 2.0</td>
+        <td>Apache 2.0</td>
+      </tr>
+      <tr>
+        <td><strong>マネージドサービス</strong></td>
+        <td>Azure AI Foundry</td>
+        <td>LangSmith Cloud</td>
+        <td>CrewAI Cloud</td>
+        <td>Bedrock Agents</td>
+        <td>Vertex AI Agents</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="notice">
+    <strong>使い分け指針:</strong>
+    Microsoft 環境（Azure / M365）を使用している企業なら MAF が最有力。AWS 中心企業は Bedrock Agents、Google Cloud 中心なら ADK が自然な選択。LangGraph はグラフベースの精密なフロー制御が必要なケース向け。CrewAI はプロトタイプ迅速構築向けだが本番スケールでの実績はやや少ない。
+  </div>
+</section>
+
+<!-- 料金 -->
+<section id="pricing">
+  <h2>💰 料金・ライセンス</h2>
+
+  <div class="grid2">
+    <div class="card blue">
+      <h3>📦 MAF 本体（OSS）</h3>
+      <p><strong>完全無料（MIT ライセンス）</strong></p>
+      <ul>
+        <li>GitHub: <code>microsoft/agent-framework</code></li>
+        <li>PyPI: <code>pip install autogen-agentchat autogen-ext</code></li>
+        <li>NuGet: <code>Microsoft.AgentFramework</code></li>
+        <li>ローカル実行（Ollama）なら LLM コストも無料</li>
+      </ul>
+    </div>
+    <div class="card teal">
+      <h3>☁️ Azure マネージドサービス</h3>
+      <p>以下のサービスは別途 Azure 課金:</p>
+      <ul>
+        <li><strong>Azure AI Foundry:</strong> LLM トークン + ホスティング</li>
+        <li><strong>Hosted Agents:</strong> Container Apps vCPU/メモリ課金</li>
+        <li><strong>CodeAct Runtime:</strong> Container Instances 実行時間</li>
+        <li><strong>AI Content Safety:</strong> 1,000 テキストレコードあたり $1</li>
+        <li><strong>Azure AI Search:</strong> インデックスサイズ + クエリ数</li>
+        <li><strong>Windows 365 Agentic:</strong> ライセンス費用（要問い合わせ）</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="notice warn">
+    <strong>💡 コスト最適化のポイント:</strong>
+    (1) 開発・テストは Ollama + Phi-4 でローカル実行→コスト 0。
+    (2) 本番は Azure AI Foundry のプロビジョンドスループットで予算管理。
+    (3) Hosted Agents は最小レプリカ 0 に設定して夜間コストを削減。
+    (4) CodeAct Runtime のタイムアウトを短く設定して無駄な実行を防ぐ。
+  </div>
+</section>
+
+<!-- クイックスタート -->
+<section id="quickstart">
+  <h2>🚀 クイックスタート</h2>
+
+  <div class="card blue">
+    <h3>インストール</h3>
+    <pre><code><span class="code-comment"># Python（推奨: 3.11+）</span>
+pip install autogen-agentchat autogen-ext[azure,mcp,a2a]
+
+<span class="code-comment"># .NET 8+</span>
+dotnet add package Microsoft.AgentFramework
+dotnet add package Microsoft.AgentFramework.Azure
+dotnet add package Microsoft.AgentFramework.MCP</code></pre>
+  </div>
+
+  <div class="card green">
+    <h3>5分で動かす — 最小実装</h3>
+    <pre><code><span class="code-keyword">import</span> asyncio, os
+<span class="code-keyword">from</span> autogen_agentchat.agents <span class="code-keyword">import</span> AssistantAgent
+<span class="code-keyword">from</span> autogen_agentchat.messages <span class="code-keyword">import</span> TextMessage
+<span class="code-keyword">from</span> autogen_ext.models.openai <span class="code-keyword">import</span> OpenAIChatCompletionClient
+
+<span class="code-keyword">async def</span> <span class="code-func">main</span>():
+    client = <span class="code-class">OpenAIChatCompletionClient</span>(
+        model=<span class="code-string">"gpt-4o"</span>,
+        api_key=os.environ[<span class="code-string">"OPENAI_API_KEY"</span>]
+    )
+    agent = <span class="code-class">AssistantAgent</span>(<span class="code-string">"assistant"</span>, model_client=client)
+    resp = <span class="code-keyword">await</span> agent.on_messages(
+        [<span class="code-class">TextMessage</span>(content=<span class="code-string">"MAFとは何ですか？"</span>, source=<span class="code-string">"user"</span>)],
+        cancellation_token=None
+    )
+    print(resp.chat_message.content)
+
+asyncio.run(<span class="code-func">main</span>())</code></pre>
+  </div>
+
+  <div class="grid3">
+    <div class="card">
+      <h4>📚 公式ドキュメント</h4>
+      <ul>
+        <li>GitHub: microsoft/agent-framework</li>
+        <li>Docs: microsoft.github.io/autogen</li>
+        <li>Azure AI Foundry: ai.azure.com</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>🧪 サンプル・チュートリアル</h4>
+      <ul>
+        <li>Jupyter ノートブック付きサンプル集</li>
+        <li>Azure AI Foundry ギャラリー</li>
+        <li>Microsoft Learn パスウェイ</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>💬 コミュニティ</h4>
+      <ul>
+        <li>GitHub Discussions</li>
+        <li>Discord: autogen.community</li>
+        <li>Twitter/X: @autogen_ai</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p>最終更新: 2026年6月 | MAF v1.0 GA / Microsoft Build 2026 対応</p>
+  <p>
+    <a href="../index.html">← Knowledge Hub に戻る</a> |
+    <a href="a2a-protocol.html">A2A Protocol →</a> |
+    <a href="agent-memory.html">エージェントメモリ →</a>
+  </p>
+  <p style="margin-top:0.5rem;font-size:0.8rem;">出典: GitHub microsoft/agent-framework, Microsoft Build 2026 Keynote, Azure AI Foundry ドキュメント</p>
+</footer>
+
+</body>
+</html>

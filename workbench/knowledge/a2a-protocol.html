@@ -1,0 +1,520 @@
+<!doctype html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A2A Protocol 完全ガイド | Agent-to-Agent | Knowledge Base</title>
+    <style>
+        :root {
+            --bg: #070e1a;
+            --panel: #0d1825;
+            --muted: #8fadc8;
+            --text: #dceeff;
+            --accent: #00c9b1;
+            --accent-2: #5b8dee;
+            --accent-3: #f6a623;
+            --border: rgba(0,201,177,0.12);
+            --radius: 14px;
+            --font-mono: "SF Mono","Consolas",monospace;
+        }
+        * { box-sizing: border-box; }
+        body { margin:0; min-height:100vh; font-family:"Segoe UI","SF Pro Display",system-ui,sans-serif; color:var(--text); background:var(--bg); padding:32px 20px 80px; line-height:1.65; }
+        .shell { max-width:1080px; margin:0 auto; display:flex; flex-direction:column; gap:24px; }
+
+        header.hero { background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:40px 40px 32px; position:relative; overflow:hidden; }
+        header.hero::before { content:""; position:absolute; top:0; left:0; width:100%; height:4px; background:linear-gradient(90deg,#00c9b1,#5b8dee,#f6a623); }
+        header.hero::after { content:""; position:absolute; right:-80px; top:-80px; width:320px; height:320px; background:radial-gradient(circle,rgba(0,201,177,0.07),transparent 70%); pointer-events:none; }
+        .eyebrow { font-family:var(--font-mono); color:var(--accent); font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:10px; display:block; }
+        h1 { margin:0 0 8px; font-size:38px; color:#fff; font-weight:800; letter-spacing:-0.5px; }
+        .version-badge { display:inline-block; background:rgba(0,201,177,0.15); color:var(--accent); border:1px solid rgba(0,201,177,0.3); padding:3px 10px; border-radius:99px; font-size:0.75rem; font-weight:600; margin-left:10px; vertical-align:middle; position:relative; top:-4px; }
+        .lead { margin:12px 0 20px; font-size:16px; color:var(--muted); max-width:760px; }
+        .last-updated { font-family:var(--font-mono); font-size:11px; color:var(--muted); opacity:0.6; display:block; margin-bottom:16px; }
+        .back { color:var(--accent); text-decoration:none; font-weight:600; font-size:14px; opacity:0.8; }
+        .back:hover { opacity:1; }
+
+        .panel { background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:28px 32px; }
+        .section-label { font-family:var(--font-mono); font-size:0.7rem; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:6px; }
+        .section-title { font-size:1.2rem; font-weight:800; color:#fff; margin:0 0 6px; }
+        .section-desc { font-size:0.85rem; color:var(--muted); margin:0 0 20px; }
+
+        .grid-2 { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:16px; }
+        .grid-3 { display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:14px; }
+
+        .feat-card { background:rgba(255,255,255,0.025); border:1px solid var(--border); border-radius:12px; padding:18px 20px; transition:border-color 0.2s; }
+        .feat-card:hover { border-color:rgba(0,201,177,0.3); }
+        .feat-icon { font-size:1.4rem; margin-bottom:8px; display:block; }
+        .feat-title { font-weight:700; color:#fff; font-size:0.95rem; margin-bottom:6px; }
+        .feat-desc { font-size:0.8rem; color:var(--muted); line-height:1.6; }
+
+        .new-badge { display:inline-block; background:rgba(0,201,177,0.15); color:var(--accent); border:1px solid rgba(0,201,177,0.3); padding:1px 7px; border-radius:4px; font-size:0.65rem; font-weight:700; text-transform:uppercase; margin-left:6px; vertical-align:middle; }
+        .blue-badge { display:inline-block; background:rgba(91,141,238,0.15); color:var(--accent-2); border:1px solid rgba(91,141,238,0.3); padding:1px 7px; border-radius:4px; font-size:0.65rem; font-weight:700; text-transform:uppercase; margin-left:6px; vertical-align:middle; }
+
+        .stat-bar { display:flex; gap:20px; flex-wrap:wrap; margin-bottom:10px; }
+        .stat-item { display:flex; flex-direction:column; gap:2px; }
+        .stat-value { font-size:1.5rem; font-weight:800; color:var(--accent); line-height:1; }
+        .stat-label { font-size:0.72rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; }
+
+        .code-block { background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:14px 16px; font-family:var(--font-mono); font-size:0.77rem; color:#dceeff; overflow-x:auto; line-height:1.75; margin-top:10px; }
+        .code-block .cm { color:#4a6a8a; }
+        .code-block .kw { color:var(--accent); }
+        .code-block .st { color:#a5d6ff; }
+        .code-block .val { color:var(--accent-3); }
+        .code-block .ty { color:var(--accent-2); }
+
+        .info-box { background:rgba(0,201,177,0.06); border:1px solid rgba(0,201,177,0.18); border-radius:8px; padding:12px 16px; font-size:0.82rem; color:var(--muted); margin-top:16px; }
+        .warn-box { background:rgba(246,166,35,0.06); border:1px solid rgba(246,166,35,0.2); border-radius:8px; padding:12px 16px; font-size:0.82rem; color:var(--muted); margin-top:16px; }
+        .blue-box { background:rgba(91,141,238,0.06); border:1px solid rgba(91,141,238,0.18); border-radius:8px; padding:12px 16px; font-size:0.82rem; color:var(--muted); margin-top:16px; }
+
+        /* Protocol stack */
+        .proto-layer { display:flex; flex-direction:column; gap:8px; }
+        .proto-item { display:flex; align-items:center; gap:14px; background:rgba(255,255,255,0.025); border:1px solid var(--border); border-radius:10px; padding:12px 16px; }
+        .proto-badge { flex-shrink:0; width:80px; text-align:center; font-family:var(--font-mono); font-size:0.78rem; font-weight:700; padding:4px 8px; border-radius:6px; }
+        .proto-name { font-weight:700; color:#fff; font-size:0.88rem; margin-bottom:2px; }
+        .proto-desc { font-size:0.76rem; color:var(--muted); }
+
+        /* Task lifecycle */
+        .lifecycle { display:flex; align-items:center; gap:0; flex-wrap:wrap; margin:16px 0; }
+        .lc-step { background:rgba(0,201,177,0.08); border:1px solid rgba(0,201,177,0.2); border-radius:8px; padding:10px 14px; text-align:center; min-width:110px; }
+        .lc-step.active { background:rgba(0,201,177,0.15); border-color:rgba(0,201,177,0.4); }
+        .lc-step.error { background:rgba(255,80,80,0.08); border-color:rgba(255,80,80,0.25); }
+        .lc-arrow { color:var(--muted); font-size:1.1rem; padding:0 8px; }
+        .lc-state { font-weight:700; color:#fff; font-size:0.82rem; }
+        .lc-desc { font-size:0.68rem; color:var(--muted); margin-top:2px; }
+
+        /* Org list */
+        .org-chip { display:inline-block; background:rgba(91,141,238,0.1); color:var(--accent-2); border:1px solid rgba(91,141,238,0.2); padding:4px 10px; border-radius:6px; font-size:0.78rem; font-weight:600; margin:3px; }
+
+        /* Compare table */
+        .comp-table { width:100%; border-collapse:collapse; font-size:0.8rem; }
+        .comp-table th { padding:10px 14px; text-align:left; font-size:0.72rem; font-weight:700; color:var(--muted); text-transform:uppercase; border-bottom:1px solid rgba(255,255,255,0.07); }
+        .comp-table td { padding:10px 14px; border-bottom:1px solid rgba(255,255,255,0.04); color:var(--text); vertical-align:top; }
+        .comp-table tr:last-child td { border-bottom:none; }
+        .comp-yes { color:#34d399; }
+        .comp-no { color:#64748b; }
+        .comp-partial { color:var(--accent-3); }
+
+        .tip-item { background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:10px; padding:14px 16px; font-size:0.83rem; color:var(--text); line-height:1.6; }
+        .tip-item strong { color:#fff; }
+
+        @media(max-width:600px){ h1{font-size:26px;} .panel{padding:20px;} header.hero{padding:24px 20px;} }
+    </style>
+</head>
+<body>
+<div class="shell">
+
+    <!-- Hero -->
+    <header class="hero">
+        <span class="eyebrow">AGENT PROTOCOL / INTEROPERABILITY</span>
+        <h1>A2A Protocol <span class="version-badge">v1.0 · 2026</span></h1>
+        <p class="lead">Googleが主導するエージェント間通信の公開標準。MCP が「エージェント ↔ ツール」ならA2Aは「エージェント ↔ エージェント」。150社超が採用し、OpenClaw・Hermes・Grok Build・Claude Code が互いに仕事を委任し合える時代の基盤プロトコル。</p>
+        <span class="last-updated">Last Updated: 2026-06-07 | A2A v1.0（2026年4月 本番運用）ベース</span>
+        <a class="back" href="../index.html">← Workbenchへ戻る</a>
+    </header>
+
+    <!-- KPI -->
+    <div class="panel">
+        <div class="stat-bar">
+            <div class="stat-item"><span class="stat-value">150+</span><span class="stat-label">採用組織（2026年4月）</span></div>
+            <div class="stat-item"><span class="stat-value">v1.0</span><span class="stat-label">本番運用バージョン</span></div>
+            <div class="stat-item"><span class="stat-value">50→150</span><span class="stat-label">1年でのパートナー増加</span></div>
+            <div class="stat-item"><span class="stat-value">JSON-RPC</span><span class="stat-label">転送プロトコル（2.0）</span></div>
+            <div class="stat-item"><span class="stat-value">MIT</span><span class="stat-label">ライセンス</span></div>
+        </div>
+        <p style="font-size:0.82rem;color:var(--muted);margin:0;">2025年4月にGoogleが50社以上のパートナーと共に発表。1年後の2026年4月に参加組織が150社超に到達しv1.0が本番稼働。MCPが「縦の統合」（エージェントとツール）ならA2Aは「横の統合」（エージェント同士の委任・協調）を担う相補的プロトコル。</p>
+    </div>
+
+    <!-- MCP vs A2A ポジション整理 -->
+    <div class="panel">
+        <div class="section-label">Protocol Ecosystem</div>
+        <div class="section-title">A2A の立ち位置 — プロトコルエコシステム全体図</div>
+        <p class="section-desc">A2Aはゼロから生まれたのではなく、MCP（ツール統合）の"横"を埋める存在として設計された。</p>
+
+        <div class="proto-layer" style="margin-bottom:20px;">
+            <div class="proto-item">
+                <div class="proto-badge" style="background:rgba(0,201,177,0.15);color:var(--accent);border:1px solid rgba(0,201,177,0.3);">A2A</div>
+                <div>
+                    <div class="proto-name">Agent ↔ Agent（エージェント間委任）</div>
+                    <div class="proto-desc">異なるベンダー・フレームワーク・クラウドで動くエージェント同士が、タスクの委任・進捗共有・成果物受け渡しを行う。「OpenClaw が Hermes に検索タスクを委任する」がA2A。</div>
+                </div>
+            </div>
+            <div class="proto-item">
+                <div class="proto-badge" style="background:rgba(91,141,238,0.12);color:var(--accent-2);border:1px solid rgba(91,141,238,0.25);">MCP</div>
+                <div>
+                    <div class="proto-name">Agent ↔ Tool（エージェントとツール統合）</div>
+                    <div class="proto-desc">エージェントがデータベース・API・ファイルシステム等の外部ツールを呼び出す標準。AnthropicのMCPはすでに5,000+サーバーを持つ事実上の標準。A2AはMCPと競合しない。</div>
+                </div>
+            </div>
+            <div class="proto-item">
+                <div class="proto-badge" style="background:rgba(246,166,35,0.12);color:var(--accent-3);border:1px solid rgba(246,166,35,0.25);">ACP</div>
+                <div>
+                    <div class="proto-name">Agent Client Protocol（IDE/ツール統合）</div>
+                    <div class="proto-desc">Grok Buildが採用するプロトコル。エージェントを外部IDE・ツールに組み込む際の通信仕様。A2A・MCPとは異なるレイヤー。</div>
+                </div>
+            </div>
+        </div>
+
+        <div style="background:rgba(255,255,255,0.025);border:1px solid var(--border);border-radius:10px;padding:14px 18px;">
+            <div style="font-weight:700;color:#fff;margin-bottom:8px;font-size:0.88rem;">🔗 3プロトコルの使い分け図</div>
+            <div style="font-size:0.82rem;color:var(--muted);line-height:1.9;">
+                <strong style="color:#fff;">ユーザー</strong> →（自然言語）→
+                <strong style="color:var(--accent);">メインエージェント（例：OpenClaw）</strong><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;↓ <em style="color:var(--accent);">A2A</em> ↓ サブエージェントへタスク委任（例：Hermes に記憶検索）<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;↓ <em style="color:var(--accent-2);">MCP</em> ↓ ツール呼び出し（例：GitHub / DB / Web検索）<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;↓ <em style="color:var(--accent-3);">ACP</em> ↓ IDE統合（例：Cursor から起動）
+            </div>
+        </div>
+    </div>
+
+    <!-- 技術仕様 -->
+    <div class="panel">
+        <div class="section-label">Specification</div>
+        <div class="section-title">技術仕様の全体像</div>
+        <p class="section-desc">A2Aは既存のWeb標準（HTTP・JSON・OAuth）を最大限に活用するシンプルな設計。新規技術は不要。</p>
+
+        <div class="grid-2" style="margin-bottom:20px;">
+            <div>
+                <div style="font-weight:700;color:var(--accent);margin-bottom:10px;font-size:0.9rem;">📡 転送層</div>
+                <div class="feat-card" style="margin-bottom:8px;">
+                    <div class="feat-title">HTTP + JSON-RPC 2.0</div>
+                    <div class="feat-desc">すべての通信はHTTPS上のJSON-RPC 2.0。新しいネットワークプロトコルは不要で、既存のAPIゲートウェイやロードバランサーがそのまま動く。</div>
+                </div>
+                <div class="feat-card" style="margin-bottom:8px;">
+                    <div class="feat-title">SSE（Server-Sent Events）</div>
+                    <div class="feat-desc">長時間タスクのストリーミング進捗報告に使用。エージェントが途中経過をリアルタイムにクライアントへ送信できる。WebSocketより軽量。</div>
+                </div>
+                <div class="feat-card">
+                    <div class="feat-title">Push Notifications（Webhook）</div>
+                    <div class="feat-desc">非同期タスク完了時に指定URLへプッシュ。エージェントを「火付けて離席」する非同期ワークフローの基盤。</div>
+                </div>
+            </div>
+            <div>
+                <div style="font-weight:700;color:var(--accent-2);margin-bottom:10px;font-size:0.9rem;">🔐 認証・セキュリティ</div>
+                <div class="feat-card" style="margin-bottom:8px;">
+                    <div class="feat-title">OAuth 2.0 / Bearer Token</div>
+                    <div class="feat-desc">Agent Card に認証スキームを宣言。Basic / Bearer / OAuth 2.0 から選択。エージェント間の認証はHTTPヘッダー経由で既存インフラと統合できる。</div>
+                </div>
+                <div class="feat-card" style="margin-bottom:8px;">
+                    <div class="feat-title">Agent Card による能力開示</div>
+                    <div class="feat-desc"><code style="font-family:var(--font-mono);font-size:0.85em;">https://&lt;host&gt;/.well-known/agent-card.json</code> に自身の能力・エンドポイント・認証要件を公開。クライアントがGET一発で発見できる。</div>
+                </div>
+                <div class="feat-card">
+                    <div class="feat-title">マルチモーダル対応</div>
+                    <div class="feat-desc">テキスト・画像・ファイル・構造化データを統一的に扱う。エージェント間でPDF・画像・コードファイルを渡すことが可能。</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Agent Card JSON -->
+        <div style="font-weight:700;color:#fff;margin-bottom:8px;font-size:0.88rem;">📋 Agent Card の構造（.well-known/agent-card.json）</div>
+        <div class="code-block"><span class="cm">// エージェントが公開する「名刺」。クライアントはここを読んで能力を知る</span>
+{
+  <span class="kw">"name"</span>: <span class="st">"Research Agent"</span>,
+  <span class="kw">"description"</span>: <span class="st">"Web検索・文書要約・情報収集に特化したエージェント"</span>,
+  <span class="kw">"url"</span>: <span class="st">"https://agents.example.com/research"</span>,
+  <span class="kw">"version"</span>: <span class="st">"1.2.0"</span>,
+  <span class="kw">"provider"</span>: {
+    <span class="kw">"organization"</span>: <span class="st">"Example Corp"</span>,
+    <span class="kw">"url"</span>: <span class="st">"https://example.com"</span>
+  },
+  <span class="kw">"capabilities"</span>: {
+    <span class="kw">"streaming"</span>: <span class="val">true</span>,       <span class="cm">// SSEストリーミング対応</span>
+    <span class="kw">"pushNotifications"</span>: <span class="val">true</span>,  <span class="cm">// Webhook対応</span>
+    <span class="kw">"stateTransitionHistory"</span>: <span class="val">true</span>
+  },
+  <span class="kw">"authentication"</span>: {
+    <span class="kw">"schemes"</span>: [<span class="st">"Bearer"</span>]
+  },
+  <span class="kw">"defaultInputModes"</span>: [<span class="st">"text"</span>, <span class="st">"file"</span>],
+  <span class="kw">"defaultOutputModes"</span>: [<span class="st">"text"</span>, <span class="st">"data"</span>],
+  <span class="kw">"skills"</span>: [
+    {
+      <span class="kw">"id"</span>: <span class="st">"web-search"</span>,
+      <span class="kw">"name"</span>: <span class="st">"Web Search"</span>,
+      <span class="kw">"description"</span>: <span class="st">"リアルタイムWeb検索と結果要約"</span>,
+      <span class="kw">"tags"</span>: [<span class="st">"search"</span>, <span class="st">"research"</span>, <span class="st">"realtime"</span>]
+    }
+  ]
+}</div>
+    </div>
+
+    <!-- Task Lifecycle -->
+    <div class="panel">
+        <div class="section-label">Task Lifecycle</div>
+        <div class="section-title">タスクのライフサイクル</div>
+        <p class="section-desc">A2Aのタスクは明確な状態遷移で管理される。クライアントはどのタイミングでも状態を問い合わせられる。</p>
+
+        <div class="lifecycle">
+            <div class="lc-step">
+                <div class="lc-state">submitted</div>
+                <div class="lc-desc">委任受付</div>
+            </div>
+            <div class="lc-arrow">→</div>
+            <div class="lc-step active">
+                <div class="lc-state">working</div>
+                <div class="lc-desc">実行中（SSE更新）</div>
+            </div>
+            <div class="lc-arrow">→</div>
+            <div class="lc-step">
+                <div class="lc-state">input-required</div>
+                <div class="lc-desc">追加入力待ち</div>
+            </div>
+            <div class="lc-arrow">→</div>
+            <div class="lc-step active" style="background:rgba(52,211,153,0.12);border-color:rgba(52,211,153,0.35);">
+                <div class="lc-state" style="color:#34d399;">completed</div>
+                <div class="lc-desc">成功完了</div>
+            </div>
+            <div class="lc-arrow">|</div>
+            <div class="lc-step error">
+                <div class="lc-state" style="color:#f87171;">failed</div>
+                <div class="lc-desc">エラー</div>
+            </div>
+            <div class="lc-arrow">|</div>
+            <div class="lc-step error">
+                <div class="lc-state" style="color:#94a3b8;">canceled</div>
+                <div class="lc-desc">キャンセル</div>
+            </div>
+        </div>
+
+        <div class="grid-2" style="margin-top:16px;">
+            <div>
+                <div style="font-weight:700;color:#fff;margin-bottom:8px;font-size:0.88rem;">🐍 クライアント実装例（Python）</div>
+                <div class="code-block"><span class="kw">import</span> httpx
+<span class="kw">import</span> json
+
+<span class="cm"># 1. Agent Card を取得してエージェントを発見</span>
+card = httpx.get(
+    <span class="st">"https://agents.example.com/.well-known/agent-card.json"</span>
+).json()
+
+<span class="cm"># 2. タスクを送信（委任）</span>
+task_req = {
+    <span class="st">"jsonrpc"</span>: <span class="st">"2.0"</span>,
+    <span class="st">"method"</span>: <span class="st">"tasks/send"</span>,
+    <span class="st">"id"</span>: <span class="st">"req-001"</span>,
+    <span class="st">"params"</span>: {
+        <span class="st">"message"</span>: {
+            <span class="st">"role"</span>: <span class="st">"user"</span>,
+            <span class="st">"parts"</span>: [{
+                <span class="st">"type"</span>: <span class="st">"text"</span>,
+                <span class="st">"text"</span>: <span class="st">"2026年6月の量子コンピュータ動向を調査して"</span>
+            }]
+        }
+    }
+}
+resp = httpx.post(
+    card[<span class="st">"url"</span>],
+    json=task_req,
+    headers={<span class="st">"Authorization"</span>: <span class="st">"Bearer &lt;token&gt;"</span>}
+)
+task_id = resp.json()[<span class="st">"result"</span>][<span class="st">"id"</span>]
+
+<span class="cm"># 3. SSEでストリーミング受信</span>
+<span class="kw">with</span> httpx.stream(<span class="st">"GET"</span>,
+    <span class="st">f"</span>{card[<span class="st">'url'</span>]}<span class="st">/tasks/{task_id}/stream"</span>,
+    headers={<span class="st">"Authorization"</span>: <span class="st">"Bearer &lt;token&gt;"</span>}
+) <span class="kw">as</span> stream:
+    <span class="kw">for</span> line <span class="kw">in</span> stream.iter_lines():
+        <span class="kw">if</span> line.startswith(<span class="st">"data:"</span>):
+            event = json.loads(line[5:])
+            print(event[<span class="st">"status"</span>], event.get(<span class="st">"progress"</span>, <span class="st">""</span>))</div>
+            </div>
+            <div>
+                <div style="font-weight:700;color:#fff;margin-bottom:8px;font-size:0.88rem;">🖥️ サーバー実装例（Python）</div>
+                <div class="code-block"><span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI
+<span class="kw">from</span> sse_starlette <span class="kw">import</span> EventSourceResponse
+<span class="kw">import</span> asyncio
+
+app = FastAPI()
+
+<span class="cm"># Agent Card エンドポイント</span>
+@app.get(<span class="st">"/.well-known/agent-card.json"</span>)
+<span class="kw">async def</span> agent_card():
+    <span class="kw">return</span> {
+        <span class="st">"name"</span>: <span class="st">"My Research Agent"</span>,
+        <span class="st">"url"</span>: <span class="st">"https://myagent.example.com"</span>,
+        <span class="st">"capabilities"</span>: {<span class="st">"streaming"</span>: <span class="val">True</span>},
+        <span class="st">"skills"</span>: [{<span class="st">"id"</span>: <span class="st">"research"</span>}]
+    }
+
+<span class="cm"># タスク受信エンドポイント</span>
+@app.post(<span class="st">"/tasks/send"</span>)
+<span class="kw">async def</span> receive_task(request: dict):
+    task_id = generate_id()
+    <span class="cm"># 非同期でタスク実行を開始</span>
+    asyncio.create_task(run_task(task_id, request))
+    <span class="kw">return</span> {
+        <span class="st">"jsonrpc"</span>: <span class="st">"2.0"</span>,
+        <span class="st">"result"</span>: {
+            <span class="st">"id"</span>: task_id,
+            <span class="st">"status"</span>: {<span class="st">"state"</span>: <span class="st">"submitted"</span>}
+        }
+    }
+
+<span class="cm"># SSEストリームエンドポイント</span>
+@app.get(<span class="st">"/tasks/{task_id}/stream"</span>)
+<span class="kw">async def</span> stream_task(task_id: str):
+    <span class="kw">async def</span> generate():
+        <span class="kw">async for</span> update <span class="kw">in</span> get_updates(task_id):
+            <span class="kw">yield</span> {<span class="st">"data"</span>: json.dumps(update)}
+    <span class="kw">return</span> EventSourceResponse(generate())</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 採用組織 -->
+    <div class="panel">
+        <div class="section-label">Adoption</div>
+        <div class="section-title">採用組織 150社超（2026年4月時点）</div>
+        <p class="section-desc">ローンチ時50社 → 1年で150社超に急拡大。エンタープライズAIの標準プロトコルとして定着しつつある。</p>
+
+        <div style="margin-bottom:16px;">
+            <div style="font-size:0.75rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:10px;">主要参加組織（確認済み）</div>
+            <div>
+                <span class="org-chip">Google</span><span class="org-chip">Salesforce</span><span class="org-chip">SAP</span><span class="org-chip">IBM</span>
+                <span class="org-chip">ServiceNow</span><span class="org-chip">Workday</span><span class="org-chip">Atlassian</span><span class="org-chip">Box</span>
+                <span class="org-chip">Cohere</span><span class="org-chip">Langchain</span><span class="org-chip">MongoDB</span><span class="org-chip">PayPal</span>
+                <span class="org-chip">Deloitte</span><span class="org-chip">Accenture</span><span class="org-chip">Amazon Bedrock</span><span class="org-chip">+ 135社以上</span>
+            </div>
+        </div>
+
+        <div style="background:rgba(255,255,255,0.025);border:1px solid var(--border);border-radius:10px;padding:14px 18px;">
+            <div style="font-weight:700;color:#fff;margin-bottom:8px;font-size:0.88rem;">📅 Google Cloud Next 2026 での発表</div>
+            <div style="font-size:0.82rem;color:var(--muted);line-height:1.8;">
+                Google Cloud Next 2026 にて A2A v1.0 の本番稼働を正式発表。<strong style="color:#fff;">Vertex AI Agent Engine</strong> が A2A をネイティブサポートし、Google Cloud 上で動くエージェントが自動的に A2A 対応エージェントとして公開される。A2A + MCP の「完全なエージェント相互運用スタック」をGoogle が主導していることを再確認。
+            </div>
+        </div>
+
+        <div class="info-box" style="margin-top:12px;">
+            🌐 <strong style="color:var(--accent);">オープン仕様：</strong> A2A は MIT ライセンスのオープン仕様。<a href="https://a2a-protocol.org" style="color:var(--accent);">a2a-protocol.org</a> と GitHub <code style="font-family:var(--font-mono);font-size:0.85em;">a2aproject/A2A</code> で全仕様が公開。誰でも A2A 準拠エージェントを実装・公開できる。
+        </div>
+    </div>
+
+    <!-- OpenClaw / Hermes での活用 -->
+    <div class="panel">
+        <div class="section-label">Practical Use Cases</div>
+        <div class="section-title">OpenClaw / Hermes との組み合わせシナリオ</div>
+        <p class="section-desc">A2A が実装されると、このハブで扱う自律エージェントたちがどう協調するかの具体例。</p>
+
+        <div class="grid-2">
+            <div class="feat-card">
+                <span class="feat-icon">🦀</span>
+                <div class="feat-title">OpenClaw → Hermes（記憶委任）</div>
+                <div class="feat-desc">OpenClaw がタスクを受けた際、Hermes の過去記憶を検索したい場合に A2A でタスク委任。「先週の設計議論の結論を教えて」を Hermes に委任し、結果を受け取って回答に組み込む。</div>
+            </div>
+            <div class="feat-card">
+                <span class="feat-icon">🔨</span>
+                <div class="feat-title">メインエージェント → Grok Build（コーディング委任）</div>
+                <div class="feat-desc">汎用エージェントが「この仕様を実装してPRを作って」をコーディング特化エージェント（Grok Build / Claude Code）に A2A 経由で委任。PR成果物を受け取って確認するだけ。</div>
+            </div>
+            <div class="feat-card">
+                <span class="feat-icon">🔍</span>
+                <div class="feat-title">Orchestrator → Research Agent（情報収集）</div>
+                <div class="feat-desc">複数の調査タスクを複数の検索特化エージェントに並列委任。各エージェントの A2A Agent Card を読んで能力を確認し、最適なエージェントに自動ルーティング。</div>
+            </div>
+            <div class="feat-card">
+                <span class="feat-icon">🏢</span>
+                <div class="feat-title">エンタープライズ：部門間エージェント連携</div>
+                <div class="feat-desc">HR部門エージェント・Finance部門エージェント・IT部門エージェントが A2A で相互接続。ベンダーが異なっても（Salesforce / SAP / ServiceNow）統一プロトコルで協調動作。</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 競合プロトコル比較 -->
+    <div class="panel">
+        <div class="section-label">Comparison</div>
+        <div class="section-title">競合・関連プロトコルとの比較</div>
+        <p class="section-desc">A2A 以外のエージェント間通信アプローチとの位置関係。</p>
+
+        <div style="overflow-x:auto;border-radius:10px;border:1px solid var(--border);">
+            <table class="comp-table">
+                <thead>
+                    <tr>
+                        <th>プロトコル</th><th>主体</th><th>目的</th><th>採用状況</th><th>オープン性</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="background:rgba(0,201,177,0.03);">
+                        <td><strong style="color:var(--accent);">A2A</strong></td>
+                        <td>Google主導</td>
+                        <td>エージェント↔エージェント委任・協調</td>
+                        <td><span class="comp-yes">150社+、v1.0本番</span></td>
+                        <td><span class="comp-yes">MIT・完全公開</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong style="color:var(--accent-2);">MCP</strong></td>
+                        <td>Anthropic主導</td>
+                        <td>エージェント↔ツール統合</td>
+                        <td><span class="comp-yes">5000+サーバー・事実上の標準</span></td>
+                        <td><span class="comp-yes">MIT・完全公開</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>ANP</strong></td>
+                        <td>中国系コミュニティ</td>
+                        <td>エージェントネットワーク（分散型）</td>
+                        <td><span class="comp-partial">小規模・実験段階</span></td>
+                        <td><span class="comp-yes">オープン</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Agora</strong></td>
+                        <td>学術研究</td>
+                        <td>マルチエージェント通信研究</td>
+                        <td><span class="comp-no">研究段階</span></td>
+                        <td><span class="comp-yes">学術公開</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>OpenAI Swarm</strong></td>
+                        <td>OpenAI</td>
+                        <td>マルチエージェントオーケストレーション</td>
+                        <td><span class="comp-partial">実験的・単一ベンダー</span></td>
+                        <td><span class="comp-partial">OSS だが OpenAI 中心</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="blue-box">
+            💡 <strong style="color:var(--accent-2);">MCP と A2A は補完関係：</strong> 現在の実務では「MCP でツールを統合 → A2A でエージェント同士を連携」の2層構成が推奨。どちらか一方ではなく、両方を採用するのが2026年のベストプラクティス。
+        </div>
+    </div>
+
+    <!-- セキュリティ -->
+    <div class="panel">
+        <div class="section-label">Security</div>
+        <div class="section-title">セキュリティ設計と注意点</div>
+
+        <div class="grid-3">
+            <div class="feat-card">
+                <span class="feat-icon">🔑</span>
+                <div class="feat-title">OAuth 2.0 による認証</div>
+                <div class="feat-desc">エージェント間の認証はHTTPヘッダーのBearerトークン。スコープを絞ってタスク委任できる権限を最小化することが推奨。</div>
+            </div>
+            <div class="feat-card">
+                <span class="feat-icon">🔒</span>
+                <div class="feat-title">TLS 必須</div>
+                <div class="feat-desc">すべての通信はTLS 1.2以上。平文通信は仕様上サポート外。プロダクション環境では証明書の自動更新（Let's Encrypt等）を設定する。</div>
+            </div>
+            <div class="feat-card">
+                <span class="feat-icon">⚠️</span>
+                <div class="feat-title">Agent Card 改ざんリスク</div>
+                <div class="feat-desc">悪意ある Agent Card への接続を防ぐため、ドメイン検証・証明書ピニングの実装を推奨。未知のエージェントからのタスク委任は審査を挟む設計に。</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:20px 32px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between;">
+        <div style="font-size:0.8rem;color:var(--muted);">
+            <strong style="color:#fff;">A2A Protocol 完全ガイド 2026</strong> | v1.0 本番稼働 |
+            <a href="https://a2a-protocol.org" style="color:var(--accent);text-decoration:none;" target="_blank">公式: a2a-protocol.org →</a>
+        </div>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;">
+            <a href="openclaw.html" style="color:var(--accent);text-decoration:none;font-size:0.82rem;">OpenClaw →</a>
+            <a href="hermes-agent.html" style="color:var(--accent);text-decoration:none;font-size:0.82rem;">Hermes Agent →</a>
+            <a href="microsoft-agent-framework.html" style="color:var(--accent);text-decoration:none;font-size:0.82rem;">Microsoft MAF →</a>
+            <a href="../index.html" style="color:var(--accent);text-decoration:none;font-size:0.82rem;">← Workbench</a>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

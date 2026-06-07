@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>エージェントメモリ完全ガイド — Mem0 / Supermemory / ClawMem | Claude Workspace</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --surface2: #21262d;
+      --border: #30363d;
+      --text: #e6edf3;
+      --text-muted: #8b949e;
+      --accent: #8b5cf6;
+      --accent-2: #a78bfa;
+      --accent-3: #06b6d4;
+      --accent-4: #10b981;
+      --warn: #f59e0b;
+      --danger: #ef4444;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+    header {
+      background: linear-gradient(135deg, #4c1d95 0%, #6d28d9 40%, #a78bfa 100%);
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+    header .badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 20px;
+      padding: 0.3rem 1rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 1rem;
+      letter-spacing: 0.05em;
+    }
+    header h1 {
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 0.5rem;
+    }
+    header .sub {
+      font-size: 1.1rem;
+      color: rgba(255,255,255,0.85);
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    nav.toc {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 1.5rem;
+      font-size: 0.85rem;
+    }
+    nav.toc a { color: var(--accent-2); text-decoration: none; }
+    nav.toc a:hover { text-decoration: underline; }
+    main { max-width: 1080px; margin: 0 auto; padding: 2rem; }
+    section { margin-bottom: 3.5rem; }
+    h2 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: 1.2rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    h3 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin: 1.5rem 0 0.8rem;
+      color: var(--accent-2);
+    }
+    h4 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 1rem 0 0.5rem;
+      color: var(--accent-4);
+    }
+    p { margin-bottom: 0.9rem; color: #c9d1d9; }
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .kpi-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.2rem;
+      text-align: center;
+    }
+    .kpi-card .num {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--accent-2);
+      display: block;
+    }
+    .kpi-card .label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.3rem;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .card.purple { border-left: 4px solid var(--accent); }
+    .card.teal { border-left: 4px solid var(--accent-3); }
+    .card.green { border-left: 4px solid var(--accent-4); }
+    .card.warn { border-left: 4px solid var(--warn); }
+    .card.blue { border-left: 4px solid #3b82f6; }
+    .grid2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.2rem;
+    }
+    .grid3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+    pre {
+      background: #0d1117;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.2rem;
+      overflow-x: auto;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      margin: 1rem 0;
+    }
+    code { font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+    .code-comment { color: #8b949e; }
+    .code-keyword { color: #ff7b72; }
+    .code-string { color: #a5d6ff; }
+    .code-func { color: #d2a8ff; }
+    .code-class { color: #ffa657; }
+    .code-num { color: #79c0ff; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+      margin: 1rem 0;
+    }
+    th {
+      background: var(--surface2);
+      padding: 0.7rem 1rem;
+      text-align: left;
+      color: var(--text);
+      font-weight: 600;
+      border: 1px solid var(--border);
+    }
+    td {
+      padding: 0.65rem 1rem;
+      border: 1px solid var(--border);
+      color: #c9d1d9;
+      vertical-align: top;
+    }
+    tr:hover td { background: var(--surface2); }
+    .arch-diagram {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      font-size: 0.85rem;
+      margin: 1rem 0;
+    }
+    .arch-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin: 0.5rem 0;
+    }
+    .arch-box {
+      background: var(--accent);
+      color: #fff;
+      border-radius: 6px;
+      padding: 0.4rem 0.9rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .arch-box.teal { background: var(--accent-3); }
+    .arch-box.green { background: var(--accent-4); }
+    .arch-box.gray { background: var(--surface); border: 1px solid var(--border); color: var(--text); }
+    .arch-box.warn { background: var(--warn); color: #000; }
+    .arch-arrow { color: var(--text-muted); font-size: 1.2rem; }
+    .notice {
+      background: rgba(139,92,246,0.1);
+      border: 1px solid rgba(139,92,246,0.3);
+      border-radius: 8px;
+      padding: 1rem 1.2rem;
+      margin-bottom: 1.2rem;
+      font-size: 0.9rem;
+    }
+    .notice.warn {
+      background: rgba(245,158,11,0.1);
+      border-color: rgba(245,158,11,0.3);
+    }
+    .notice.green {
+      background: rgba(16,185,129,0.1);
+      border-color: rgba(16,185,129,0.3);
+    }
+    .notice.teal {
+      background: rgba(6,182,212,0.1);
+      border-color: rgba(6,182,212,0.3);
+    }
+    ul, ol { padding-left: 1.5rem; margin-bottom: 0.8rem; color: #c9d1d9; }
+    li { margin-bottom: 0.3rem; }
+    .tool-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      padding: 1rem 1.5rem;
+      background: var(--surface2);
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+    .tool-icon { font-size: 2.5rem; }
+    .tool-header h3 { margin: 0; color: var(--text); }
+    .tool-header .meta { font-size: 0.82rem; color: var(--text-muted); }
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+    }
+    .pricing-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.2rem;
+      text-align: center;
+    }
+    .pricing-card .plan { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; }
+    .pricing-card .price { font-size: 1.8rem; font-weight: 800; color: var(--accent-2); }
+    .pricing-card .price sup { font-size: 1rem; }
+    .pricing-card .per { font-size: 0.75rem; color: var(--text-muted); }
+    .pricing-card ul { text-align: left; margin-top: 0.8rem; font-size: 0.8rem; }
+    footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 2rem;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+    footer a { color: var(--accent-2); text-decoration: none; }
+    @media (max-width: 640px) {
+      main { padding: 1rem; }
+      header { padding: 2rem 1rem; }
+      .grid2, .grid3 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="badge">2026年6月最新版 — Mem0 / Supermemory / ClawMem / Cloudflare</div>
+  <h1>エージェントメモリ 完全ガイド</h1>
+  <div class="sub">AI エージェントに「記憶」を持たせる。Mem0・Supermemory・ClawMem・Cloudflare Agent Memory の仕組み・使い方・比較を徹底解説。</div>
+</header>
+
+<nav class="toc">
+  <a href="#overview">エージェントメモリとは</a>
+  <a href="#mem0">Mem0</a>
+  <a href="#supermemory">Supermemory</a>
+  <a href="#clawmem">ClawMem</a>
+  <a href="#cloudflare">Cloudflare Agent Memory</a>
+  <a href="#comparison">ツール比較</a>
+  <a href="#patterns">実践パターン</a>
+  <a href="#code">統合コード例</a>
+</nav>
+
+<main>
+
+<!-- 概要 -->
+<section id="overview">
+  <h2>🧠 エージェントメモリとは</h2>
+
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <span class="num">4種</span>
+      <div class="label">主要メモリソリューション</div>
+    </div>
+    <div class="kpi-card">
+      <span class="num">3層</span>
+      <div class="label">メモリアーキテクチャ</div>
+    </div>
+    <div class="kpi-card">
+      <span class="num">40%↑</span>
+      <div class="label">Mem0 採用で会話品質向上</div>
+    </div>
+    <div class="kpi-card">
+      <span class="num">OSS</span>
+      <div class="label">ClawMem / Cloudflare は完全無料</div>
+    </div>
+  </div>
+
+  <div class="notice">
+    <strong>🤔 なぜエージェントメモリが必要か:</strong>
+    LLM は本来「無記憶」だ。毎回のリクエストで会話が完全にリセットされるため、ユーザーの好み・過去の指示・プロジェクトの文脈を引き継げない。エージェントメモリは LLM の外部に「記憶庫」を設け、会話をまたいで文脈を保持する。チャットボットが数週間後のユーザー問い合わせに「先月おっしゃっていた件ですね」と対応できるのはこの仕組みのおかげ。
+  </div>
+
+  <div class="arch-diagram">
+    <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:1rem;">エージェントメモリ — 全体アーキテクチャ</div>
+
+    <div class="arch-row">
+      <div class="arch-box gray">ユーザー入力</div>
+    </div>
+    <div class="arch-arrow">↓</div>
+    <div class="arch-row">
+      <div class="arch-box warn">Memory Retrieval（関連記憶を検索）</div>
+    </div>
+    <div class="arch-arrow">↓ 記憶をコンテキストに注入</div>
+    <div class="arch-row">
+      <div class="arch-box" style="background:#4c1d95;padding:0.8rem 2rem;">LLM（Claude / GPT / Gemini）</div>
+    </div>
+    <div class="arch-arrow">↓ 応答生成後</div>
+    <div class="arch-row">
+      <div class="arch-box warn">Memory Storage（新しい記憶を抽出・保存）</div>
+    </div>
+    <div class="arch-arrow" style="font-size:0.8rem;">保存先:</div>
+    <div class="arch-row">
+      <div class="arch-box teal">ベクトル DB（意味検索）</div>
+      <div class="arch-box green">グラフ DB（関係性）</div>
+      <div class="arch-box gray">KV ストア（高速参照）</div>
+    </div>
+  </div>
+
+  <h3>メモリの3スコープ</h3>
+  <div class="grid3">
+    <div class="card">
+      <h4>👤 ユーザーメモリ</h4>
+      <p>ユーザー固有の情報（好み・スキル・過去の発言）。セッションをまたいで永続化。「ユーザーXは Pythonが得意で、詳しい説明を好む」など。</p>
+    </div>
+    <div class="card">
+      <h4>💬 セッションメモリ</h4>
+      <p>現在の会話スレッド内の短期記憶。会話が終わると通常消去。スレッド内の前の発言を参照するために使う。</p>
+    </div>
+    <div class="card">
+      <h4>🤖 エージェントメモリ</h4>
+      <p>エージェント自体の知識・手順・学習内容。「このプロジェクトではテストを先に書く」など、エージェントの行動指針として機能。</p>
+    </div>
+  </div>
+</section>
+
+<!-- Mem0 -->
+<section id="mem0">
+  <h2>🟢 Mem0</h2>
+
+  <div class="tool-header">
+    <div class="tool-icon">🟢</div>
+    <div>
+      <h3>Mem0 — The Memory Layer for AI</h3>
+      <div class="meta">GitHub: mem0ai/mem0 | PyPI: mem0ai | MIT ライセンス | 2024年創業 → 2026年商用化</div>
+    </div>
+  </div>
+
+  <div class="notice green">
+    <strong>Mem0 の核心価値:</strong>
+    シングルコマンド（<code>pip install mem0ai</code>）で AI エージェントに永続メモリを追加。ホスト型 API と自己ホスト型の両方で提供。Claude Code / Cursor / OpenClaw 等との MCP 統合も完備。
+  </div>
+
+  <div class="grid2">
+    <div class="card purple">
+      <h3>🏗️ 3層アーキテクチャ</h3>
+      <p>Mem0 は3種のデータベースを組み合わせ、高速・高精度なメモリ検索を実現する。</p>
+      <ul>
+        <li><strong>ベクトル DB（Qdrant / Chroma / Pinecone / pgvector）:</strong> 会話の意味的内容を埋め込みベクトルとして保存。類似した記憶をコサイン類似度で検索。</li>
+        <li><strong>グラフ DB（Neo4j / Falkordb）:</strong> エンティティ間の関係性を保存。「ユーザーが使用するプロジェクトAとプロジェクトBの関係」など複雑な参照に強い。</li>
+        <li><strong>KV ストア（Redis / 組み込み）:</strong> ユーザー設定・頻繁にアクセスする記憶のキャッシュ。ミリ秒レベルの低レイテンシ参照に使用。</li>
+      </ul>
+    </div>
+    <div class="card teal">
+      <h3>🔬 新アルゴリズム（2026年4月）</h3>
+      <p>Mem0 は2026年4月に記憶の抽出・検索アルゴリズムを全面刷新。</p>
+      <ul>
+        <li><strong>Single-pass Hierarchical Extraction:</strong> LLM への問い合わせを従来比で削減。会話から記憶を抽出するコストが約40%低下。</li>
+        <li><strong>Multi-signal Retrieval:</strong> ベクトル類似度・グラフ関係・時系列・頻度の4信号を組み合わせてランキング。関連する記憶の精度が大幅向上。</li>
+        <li><strong>Conflict Resolution:</strong> 矛盾する記憶（「好きな言語は Python」→「最近 Rust に移行した」）を自動解決し、最新情報を優先。</li>
+        <li><strong>Memory Decay:</strong> 古い記憶に低いウェイトを付与し、フレッシュな情報が優先されるよう自動調整。</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>主要機能</h3>
+  <div class="grid3">
+    <div class="card">
+      <h4>💾 add()</h4>
+      <p>メッセージリストから自動的に重要情報を抽出して保存。LLM が「何を記憶すべきか」を判断。</p>
+    </div>
+    <div class="card">
+      <h4>🔍 search()</h4>
+      <p>クエリに関連する記憶を検索。ユーザーID でスコープを絞り込み可能。</p>
+    </div>
+    <div class="card">
+      <h4>📋 get_all()</h4>
+      <p>特定ユーザーの全記憶を取得。管理UI でも確認・編集可能。</p>
+    </div>
+    <div class="card">
+      <h4>✏️ update()</h4>
+      <p>既存の記憶を更新。矛盾する情報が入力された場合に自動呼び出し。</p>
+    </div>
+    <div class="card">
+      <h4>🗑️ delete()</h4>
+      <p>特定の記憶を削除。GDPR 対応の「忘れる権利」実装に必須。</p>
+    </div>
+    <div class="card">
+      <h4>📊 history()</h4>
+      <p>特定記憶の変遷を追跡。「いつ何が変わったか」を監査ログとして記録。</p>
+    </div>
+  </div>
+
+  <h3>コード例 — 基本的な使い方</h3>
+  <pre><code><span class="code-keyword">from</span> mem0 <span class="code-keyword">import</span> Memory
+<span class="code-keyword">from</span> anthropic <span class="code-keyword">import</span> Anthropic
+
+<span class="code-comment"># インメモリで即起動（プロトタイプ用）</span>
+m = <span class="code-class">Memory</span>()
+
+<span class="code-comment"># 本番: 設定ファイルで DB を指定</span>
+config = {
+    <span class="code-string">"vector_store"</span>: {
+        <span class="code-string">"provider"</span>: <span class="code-string">"qdrant"</span>,
+        <span class="code-string">"config"</span>: {<span class="code-string">"host"</span>: <span class="code-string">"localhost"</span>, <span class="code-string">"port"</span>: <span class="code-num">6333</span>}
+    },
+    <span class="code-string">"graph_store"</span>: {
+        <span class="code-string">"provider"</span>: <span class="code-string">"neo4j"</span>,
+        <span class="code-string">"config"</span>: {<span class="code-string">"url"</span>: <span class="code-string">"bolt://localhost:7687"</span>}
+    },
+    <span class="code-string">"llm"</span>: {
+        <span class="code-string">"provider"</span>: <span class="code-string">"anthropic"</span>,
+        <span class="code-string">"config"</span>: {<span class="code-string">"model"</span>: <span class="code-string">"claude-sonnet-4-6"</span>}
+    }
+}
+m = <span class="code-class">Memory</span>.from_config(config)
+
+<span class="code-comment"># ユーザー "alice" の会話を記憶</span>
+messages = [
+    {<span class="code-string">"role"</span>: <span class="code-string">"user"</span>, <span class="code-string">"content"</span>: <span class="code-string">"私はPythonとRustが好きで、型安全なコードを重視します"</span>},
+    {<span class="code-string">"role"</span>: <span class="code-string">"assistant"</span>, <span class="code-string">"content"</span>: <span class="code-string">"承知しました。型安全な実装を心がけます"</span>},
+]
+m.add(messages, user_id=<span class="code-string">"alice"</span>)
+
+<span class="code-comment"># 次の会話で関連記憶を検索して注入</span>
+client = <span class="code-class">Anthropic</span>()
+
+<span class="code-keyword">def</span> <span class="code-func">chat_with_memory</span>(user_message: str, user_id: str):
+    memories = m.search(query=user_message, user_id=user_id, limit=<span class="code-num">5</span>)
+    context = <span class="code-string">"\n"</span>.join([f<span class="code-string">"- {mem['memory']}"</span> <span class="code-keyword">for</span> mem <span class="code-keyword">in</span> memories[<span class="code-string">"results"</span>]])
+
+    system = f<span class="code-string">"""ユーザーに関する記憶:
+{context}
+
+上記の記憶を考慮して回答してください。"""</span>
+
+    response = client.messages.create(
+        model=<span class="code-string">"claude-sonnet-4-6"</span>,
+        max_tokens=<span class="code-num">1024</span>,
+        system=system,
+        messages=[{<span class="code-string">"role"</span>: <span class="code-string">"user"</span>, <span class="code-string">"content"</span>: user_message}]
+    )
+    <span class="code-comment"># 新しい会話も記憶に追加</span>
+    m.add([
+        {<span class="code-string">"role"</span>: <span class="code-string">"user"</span>, <span class="code-string">"content"</span>: user_message},
+        {<span class="code-string">"role"</span>: <span class="code-string">"assistant"</span>, <span class="code-string">"content"</span>: response.content[<span class="code-num">0</span>].text}
+    ], user_id=user_id)
+    <span class="code-keyword">return</span> response.content[<span class="code-num">0</span>].text
+
+<span class="code-comment"># 別セッションでも alice の好みが引き継がれる</span>
+answer = <span class="code-func">chat_with_memory</span>(<span class="code-string">"APIクライアントの実装を手伝ってください"</span>, <span class="code-string">"alice"</span>)
+<span class="code-comment"># → Rustの型安全な実装例を自動的に優先してくれる</span></code></pre>
+
+  <h3>MCP 統合（Claude Code / Cursor / OpenClaw）</h3>
+  <pre><code><span class="code-comment"># Claude Code の ~/.claude/mcp.json に追加</span>
+{
+  <span class="code-string">"mcpServers"</span>: {
+    <span class="code-string">"mem0"</span>: {
+      <span class="code-string">"command"</span>: <span class="code-string">"uvx"</span>,
+      <span class="code-string">"args"</span>: [<span class="code-string">"mem0-mcp"</span>],
+      <span class="code-string">"env"</span>: {
+        <span class="code-string">"MEM0_API_KEY"</span>: <span class="code-string">"m0-xxxxxx"</span>
+      }
+    }
+  }
+}</code></pre>
+
+  <h3>料金プラン（2026年6月）</h3>
+  <div class="pricing-grid">
+    <div class="pricing-card">
+      <div class="plan">Hobby</div>
+      <div class="price"><sup>$</sup>0</div>
+      <div class="per">/月</div>
+      <ul>
+        <li>10,000 memories</li>
+        <li>1,000 API calls/月</li>
+        <li>ホスト型 API</li>
+        <li>管理 UI</li>
+      </ul>
+    </div>
+    <div class="pricing-card">
+      <div class="plan">Starter</div>
+      <div class="price"><sup>$</sup>19</div>
+      <div class="per">/月</div>
+      <ul>
+        <li>100,000 memories</li>
+        <li>10,000 API calls/月</li>
+        <li>カスタム LLM 設定</li>
+        <li>Email サポート</li>
+      </ul>
+    </div>
+    <div class="pricing-card">
+      <div class="plan">Pro</div>
+      <div class="price"><sup>$</sup>249</div>
+      <div class="per">/月</div>
+      <ul>
+        <li>無制限 memories</li>
+        <li>100,000 API calls/月</li>
+        <li>Graph Memory 有効</li>
+        <li>カスタム Vector DB</li>
+        <li>優先サポート</li>
+      </ul>
+    </div>
+    <div class="pricing-card">
+      <div class="plan">Enterprise</div>
+      <div class="price">要相談</div>
+      <div class="per"></div>
+      <ul>
+        <li>セルフホスト可</li>
+        <li>SLA 保証</li>
+        <li>SSO / SAML</li>
+        <li>専任 CS</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="notice warn" style="margin-top:1rem;">
+    <strong>⚠️ セルフホストと Graph Memory:</strong>
+    自前の Qdrant + Neo4j を使う完全セルフホストは Enterprise または OSS の <code>mem0</code> パッケージを直接使う場合のみ。ホスト型で Graph Memory（Neo4j バックエンド）が使えるのは Pro 以上。
+  </div>
+</section>
+
+<!-- Supermemory -->
+<section id="supermemory">
+  <h2>🔵 Supermemory</h2>
+
+  <div class="tool-header">
+    <div class="tool-icon">🔵</div>
+    <div>
+      <h3>Supermemory — Universal Memory for AI</h3>
+      <div class="meta">MCP: mcp.supermemory.ai/mcp | OpenClaw Plugin | Apache 2.0（OSS コア）</div>
+    </div>
+  </div>
+
+  <div class="notice teal">
+    <strong>Supermemory の差別化:</strong>
+    「AI ツール横断の記憶共有」が核心価値。Claude Code・Cursor・Cline・Hermes・opencode など複数のコーディングエージェントが同じメモリプールを共有できる。また Auto-Recall（会話開始前に自動注入）と Auto-Capture（会話後に自動保存）の完全自動ループが特徴。
+  </div>
+
+  <div class="grid2">
+    <div class="card blue">
+      <h3>⚡ Auto-Recall</h3>
+      <p>AI ターンが始まる前に、プロジェクト・ユーザー・会話の文脈に関連する記憶を自動的に検索し、システムプロンプトに注入する。ユーザーが「覚えておいて」と言わなくても、自然な継続会話が実現。</p>
+      <ul>
+        <li>関連スコア 0.7 以上の記憶のみ注入（ノイズ回避）</li>
+        <li>注入量を token 上限でコントロール（デフォルト 2,000 tokens）</li>
+        <li>プロジェクト単位 / ユーザー単位でスコープ選択可</li>
+      </ul>
+    </div>
+    <div class="card purple">
+      <h3>📝 Auto-Capture</h3>
+      <p>AI ターン終了後に、会話から重要な情報を自動抽出してメモリに保存。毎回「覚えておいて」と入力する手間が不要。</p>
+      <ul>
+        <li>LLM が「記憶すべき情報」を判断（好み・決定・コード等）</li>
+        <li>重複記憶は自動マージ（同じことを何度保存しない）</li>
+        <li>機密情報フィルタ: API Key・パスワード等は自動除外</li>
+        <li>タグ自動付与: #preference #code #decision #task 等</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>MCP 設定（Claude Code）</h3>
+  <pre><code><span class="code-comment"># ~/.claude/mcp.json</span>
+{
+  <span class="code-string">"mcpServers"</span>: {
+    <span class="code-string">"supermemory"</span>: {
+      <span class="code-string">"transport"</span>: {
+        <span class="code-string">"type"</span>: <span class="code-string">"http"</span>,
+        <span class="code-string">"url"</span>: <span class="code-string">"https://mcp.supermemory.ai/mcp"</span>,
+        <span class="code-string">"headers"</span>: {
+          <span class="code-string">"Authorization"</span>: <span class="code-string">"Bearer sm_xxxxxxxxxxxxxx"</span>
+        }
+      }
+    }
+  }
+}
+
+<span class="code-comment"># OpenClaw プラグインとして追加（別の方法）</span>
+openclaw plugins install @supermemory/openclaw-supermemory</code></pre>
+
+  <h3>利用可能な MCP ツール</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>ツール名</th>
+        <th>説明</th>
+        <th>典型的な使用例</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>remember</code></td>
+        <td>特定の情報をメモリに保存</td>
+        <td>「この API キーのフォーマットを覚えておいて」</td>
+      </tr>
+      <tr>
+        <td><code>search_memory</code></td>
+        <td>クエリで関連記憶を検索</td>
+        <td>「以前設定した DB 接続方法を思い出して」</td>
+      </tr>
+      <tr>
+        <td><code>get_memories</code></td>
+        <td>タグ・日時・スコープで絞り込み取得</td>
+        <td>「今週保存したコードスニペットを一覧表示」</td>
+      </tr>
+      <tr>
+        <td><code>forget</code></td>
+        <td>特定の記憶を削除</td>
+        <td>「古いAPIエンドポイントを忘れて」</td>
+      </tr>
+      <tr>
+        <td><code>update_memory</code></td>
+        <td>記憶を更新</td>
+        <td>「プロジェクトのデプロイ先が変わりました」</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>対応クライアント（2026年6月）</h3>
+  <div class="grid3">
+    <div class="card">
+      <h4>🤖 コーディングエージェント</h4>
+      <ul>
+        <li>Claude Code（MCP）</li>
+        <li>Cursor（MCP）</li>
+        <li>Cline（MCP）</li>
+        <li>Roo Code（MCP）</li>
+        <li>opencode（MCP）</li>
+        <li>OpenClaw（プラグイン）</li>
+        <li>Hermes（MCP）</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>💬 チャット UI</h4>
+      <ul>
+        <li>Claude.ai（拡張機能）</li>
+        <li>ChatGPT（プラグイン）</li>
+        <li>Perplexity（コネクタ）</li>
+        <li>Open WebUI（MCP）</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>🔧 SDK / API</h4>
+      <ul>
+        <li>Python SDK</li>
+        <li>TypeScript SDK</li>
+        <li>REST API（直接呼び出し）</li>
+        <li>Webhook サポート</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ClawMem -->
+<section id="clawmem">
+  <h2>🟡 ClawMem（OSS・オンデバイス）</h2>
+
+  <div class="tool-header">
+    <div class="tool-icon">🟡</div>
+    <div>
+      <h3>ClawMem — On-Device Memory for Claude Code</h3>
+      <div class="meta">OSS（MIT）| Claude Code Hooks + MCP Server + Hybrid RAG | 完全ローカル実行</div>
+    </div>
+  </div>
+
+  <div class="notice green">
+    <strong>ClawMem の核心:</strong>
+    外部サービスに一切依存しない完全オンデバイスメモリ。Claude Code の Hooks を使ってセッション開始時・終了時に自動でメモリの読み書きを行う。セキュリティ重視の企業・エアギャップ環境で特に有効。
+  </div>
+
+  <div class="grid2">
+    <div class="card green">
+      <h3>🏗️ アーキテクチャ</h3>
+      <p>3コンポーネントで構成:</p>
+      <ul>
+        <li><strong>Hooks:</strong> Claude Code の <code>PreToolUse</code> / <code>PostToolUse</code> イベントにフックして記憶を自動処理</li>
+        <li><strong>MCP Server:</strong> Claude Code から記憶を検索・保存するための MCP エンドポイント（ローカル stdio）</li>
+        <li><strong>Hybrid RAG:</strong> ローカルのベクトルDB（Chroma/FAISS）+ BM25 全文検索の組み合わせ。GPU 不要で CPU のみ動作。</li>
+      </ul>
+    </div>
+    <div class="card warn">
+      <h3>⚡ 自動メモリループ</h3>
+      <p>Claude Code の Session Hooks で完全自動化:</p>
+      <pre><code><span class="code-comment"># ~/.claude/hooks.json</span>
+{
+  <span class="code-string">"hooks"</span>: {
+    <span class="code-string">"SessionStart"</span>: [{
+      <span class="code-string">"command"</span>: <span class="code-string">"clawmem inject --project $PROJECT_PATH"</span>
+    }],
+    <span class="code-string">"SessionEnd"</span>: [{
+      <span class="code-string">"command"</span>: <span class="code-string">"clawmem capture --session $SESSION_ID"</span>
+    }]
+  }
+}</code></pre>
+      <p style="font-size:0.85rem;">セッション開始時に関連記憶を CLAUDE.md に自動追記 → セッション終了後に会話を解析して記憶を保存。</p>
+    </div>
+  </div>
+
+  <h3>インストール・設定</h3>
+  <pre><code><span class="code-comment"># インストール</span>
+pip install clawmem
+
+<span class="code-comment"># 初期化（~/.clawmem/ にローカルデータベースを作成）</span>
+clawmem init
+
+<span class="code-comment"># MCP サーバーとして Claude Code に登録</span>
+clawmem install --mcp
+
+<span class="code-comment"># 手動で記憶を追加</span>
+clawmem add --text <span class="code-string">"このプロジェクトでは FastAPI + PostgreSQL を使用"</span> \
+            --project my-project \
+            --tags backend,database
+
+<span class="code-comment"># 検索</span>
+clawmem search <span class="code-string">"データベース接続設定"</span> --project my-project
+
+<span class="code-comment"># 全記憶を一覧表示</span>
+clawmem list --project my-project</code></pre>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>✅ ClawMem が向くケース</h4>
+      <ul>
+        <li>セキュリティ要件上、クラウドに情報を送れない</li>
+        <li>エアギャップ（インターネット遮断）環境</li>
+        <li>月額サブスクリプションを払いたくない</li>
+        <li>記憶データを完全に自分でコントロールしたい</li>
+        <li>Claude Code ヘビーユーザー</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>❌ ClawMem が向かないケース</h4>
+      <ul>
+        <li>複数デバイス間で記憶を同期したい（ClawMem は単一デバイス）</li>
+        <li>複数の AI ツール（Claude + ChatGPT 等）で記憶を共有したい</li>
+        <li>チームで記憶を共有したい</li>
+        <li>Claude Code 以外のエージェントでメインで使う</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- Cloudflare Agent Memory -->
+<section id="cloudflare">
+  <h2>🟠 Cloudflare Agent Memory</h2>
+
+  <div class="tool-header">
+    <div class="tool-icon">🟠</div>
+    <div>
+      <h3>Cloudflare Agent Memory — Edge-native Persistence</h3>
+      <div class="meta">Cloudflare Workers AI + Durable Objects + Vectorize | 2025年後半 GA</div>
+    </div>
+  </div>
+
+  <div class="notice">
+    <strong>Cloudflare の独自価値:</strong>
+    エッジ（CDN の各 PoP）でエージェントを実行しながら、そのエージェントの状態・記憶をリアルタイムで永続化できる。Durable Objects でエージェントインスタンスの「生存状態」をグローバルに 1 つだけ維持し、どのリージョンからアクセスしても同じ記憶を参照できる。
+  </div>
+
+  <div class="grid2">
+    <div class="card warn">
+      <h3>🏗️ 技術スタック</h3>
+      <ul>
+        <li><strong>Durable Objects:</strong> エージェントの「生存インスタンス」をグローバルに 1 つ維持。WebSocket でクライアントと常時接続可能。</li>
+        <li><strong>Vectorize:</strong> Cloudflare のベクトルDB（エッジに分散）。エージェントメモリの意味検索。</li>
+        <li><strong>Workers KV:</strong> 高速なキー・バリュー読み取り（リード優先）。設定・ユーザー情報の保存に。</li>
+        <li><strong>R2 Storage:</strong> 大容量の会話ログ・添付ファイルをオブジェクトストレージに保存。</li>
+      </ul>
+    </div>
+    <div class="card green">
+      <h3>📦 agents SDK</h3>
+      <p>Cloudflare が提供する公式エージェント SDK（<code>agents</code> パッケージ）で、メモリ機能が組み込み提供。</p>
+      <pre><code><span class="code-keyword">import</span> { Agent } <span class="code-keyword">from</span> <span class="code-string">'agents'</span>;
+
+<span class="code-keyword">class</span> <span class="code-class">MemoryAgent</span> <span class="code-keyword">extends</span> Agent {
+  <span class="code-comment">// state は Durable Object で永続化</span>
+  <span class="code-keyword">async</span> <span class="code-func">onMessage</span>(msg: Message) {
+    <span class="code-comment">// 関連記憶を検索</span>
+    <span class="code-keyword">const</span> memories = <span class="code-keyword">await</span> <span class="code-keyword">this</span>.vectorize.query(
+      msg.content, { topK: <span class="code-num">5</span> }
+    );
+    <span class="code-comment">// LLM を呼び出して応答生成</span>
+    <span class="code-keyword">const</span> response = <span class="code-keyword">await</span> <span class="code-keyword">this</span>.ai.run(
+      <span class="code-string">'@cf/anthropic/claude-sonnet-4-6'</span>,
+      { messages: [...memories, msg] }
+    );
+    <span class="code-comment">// 新しい情報を記憶に保存</span>
+    <span class="code-keyword">await</span> <span class="code-keyword">this</span>.saveMemory(response);
+    <span class="code-keyword">return</span> response;
+  }
+}</code></pre>
+    </div>
+  </div>
+
+  <h3>Cloudflare Agent Memory の特徴まとめ</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>特徴</th>
+        <th>詳細</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>エッジ実行</strong></td>
+        <td>世界 300+ PoP でエージェントが動作。ユーザーに最も近いサーバーで実行 → 低レイテンシ</td>
+      </tr>
+      <tr>
+        <td><strong>コールドスタートなし</strong></td>
+        <td>Durable Objects はウォーム状態を維持。Serverless Functions のコールドスタート問題がない</td>
+      </tr>
+      <tr>
+        <td><strong>WebSocket 対応</strong></td>
+        <td>エージェントとの双方向常時接続。リアルタイム会話に最適</td>
+      </tr>
+      <tr>
+        <td><strong>料金</strong></td>
+        <td>Workers 無料プラン（100,000リクエスト/日）+ Vectorize（$0.04/1M クエリ）+ Durable Objects（$0.15/GB/月）</td>
+      </tr>
+      <tr>
+        <td><strong>MCP 対応</strong></td>
+        <td>Cloudflare は MCP サーバーホスティングを公式サポート。Workers 上の MCP を外部エージェントに公開可能</td>
+      </tr>
+      <tr>
+        <td><strong>LLM 選択</strong></td>
+        <td>Workers AI 経由で Llama/Mistral/Phi、または外部 API（Anthropic/OpenAI）を呼び出し</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- 比較 -->
+<section id="comparison">
+  <h2>⚔️ ツール比較表</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>比較軸</th>
+        <th>Mem0</th>
+        <th>Supermemory</th>
+        <th>ClawMem</th>
+        <th>Cloudflare Agent Memory</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>実行場所</strong></td>
+        <td>クラウド（または自己ホスト）</td>
+        <td>クラウド</td>
+        <td>オンデバイス（完全ローカル）</td>
+        <td>エッジ（CDN）</td>
+      </tr>
+      <tr>
+        <td><strong>セットアップ難度</strong></td>
+        <td>★★☆☆☆（pip install のみ）</td>
+        <td>★★☆☆☆（MCP 設定のみ）</td>
+        <td>★★★☆☆（Hooks 設定が必要）</td>
+        <td>★★★★☆（Cloudflare 知識必須）</td>
+      </tr>
+      <tr>
+        <td><strong>マルチエージェント対応</strong></td>
+        <td>✅ 完全対応</td>
+        <td>✅ 完全対応</td>
+        <td>△ Claude Code のみ</td>
+        <td>✅ API 経由</td>
+      </tr>
+      <tr>
+        <td><strong>Graph Memory</strong></td>
+        <td>✅ Pro 以上</td>
+        <td>❌</td>
+        <td>❌</td>
+        <td>△（Workers KV でシミュレート）</td>
+      </tr>
+      <tr>
+        <td><strong>プライバシー</strong></td>
+        <td>中（クラウド送信あり）</td>
+        <td>中（クラウド送信あり）</td>
+        <td>最高（ローカルのみ）</td>
+        <td>中（Cloudflare エッジ）</td>
+      </tr>
+      <tr>
+        <td><strong>無料枠</strong></td>
+        <td>10K memories / 1K calls</td>
+        <td>あり（要確認）</td>
+        <td>完全無料（OSS）</td>
+        <td>100K req/日（Workers 無料枠）</td>
+      </tr>
+      <tr>
+        <td><strong>MCP 対応</strong></td>
+        <td>✅</td>
+        <td>✅ ネイティブ</td>
+        <td>✅</td>
+        <td>✅</td>
+      </tr>
+      <tr>
+        <td><strong>Claude Code 統合</strong></td>
+        <td>✅ MCP</td>
+        <td>✅ MCP</td>
+        <td>✅ Hooks + MCP（最も緊密）</td>
+        <td>△ MCP 経由</td>
+      </tr>
+      <tr>
+        <td><strong>チーム共有</strong></td>
+        <td>✅ user_id / agent_id で分離</td>
+        <td>✅ workspace 共有</td>
+        <td>❌（個人のみ）</td>
+        <td>✅ Durable Objects の設計次第</td>
+      </tr>
+      <tr>
+        <td><strong>本番スケール</strong></td>
+        <td>⭐⭐⭐⭐</td>
+        <td>⭐⭐⭐</td>
+        <td>⭐⭐（個人〜小規模）</td>
+        <td>⭐⭐⭐⭐⭐（エッジスケール）</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- 実践パターン -->
+<section id="patterns">
+  <h2>💡 実践パターン — ユースケース別選択ガイド</h2>
+
+  <div class="grid2">
+    <div class="card purple">
+      <h3>🤖 コーディングエージェント（個人）</h3>
+      <p><strong>推奨: ClawMem または Mem0 Hobby</strong></p>
+      <ul>
+        <li>プロジェクト固有の設定・コーディング規約を記憶</li>
+        <li>「このプロジェクトでは型ヒント必須」などの習慣を記憶</li>
+        <li>ClawMem: セキュリティ重視 / 無料で使い放題</li>
+        <li>Mem0 Hobby: 複数 AI ツールをまたいで共有したい場合</li>
+      </ul>
+    </div>
+    <div class="card blue">
+      <h3>🏢 エンタープライズ AI チャットボット</h3>
+      <p><strong>推奨: Mem0 Pro（Graph Memory 有効）</strong></p>
+      <ul>
+        <li>顧客情報・過去の問い合わせ履歴を記憶</li>
+        <li>部署・担当者・契約情報のグラフ関係を保持</li>
+        <li>数百万の user_id を扱うスケール</li>
+        <li>GDPR 対応の forget API で忘れる権利を実装</li>
+      </ul>
+    </div>
+    <div class="card teal">
+      <h3>🌐 高トラフィック Web サービス</h3>
+      <p><strong>推奨: Cloudflare Agent Memory</strong></p>
+      <ul>
+        <li>グローバルユーザーに最低レイテンシで応答</li>
+        <li>リアルタイム会話（WebSocket 常時接続）</li>
+        <li>Vectorize でエッジに記憶を分散配置</li>
+        <li>コールドスタートなし（Durable Objects）</li>
+      </ul>
+    </div>
+    <div class="card green">
+      <h3>🔧 多数の AI ツールを横断利用</h3>
+      <p><strong>推奨: Supermemory</strong></p>
+      <ul>
+        <li>Claude Code・Cursor・ChatGPT を日常的に使い分け</li>
+        <li>どのツールを使っても同じ記憶プールを参照</li>
+        <li>Auto-Recall で「言わなくても分かってくれる」体験</li>
+        <li>Auto-Capture で手動入力ゼロ</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- コード統合例 -->
+<section id="code">
+  <h2>💻 統合コード例</h2>
+
+  <h3>Mem0 + Claude Code カスタムコマンド</h3>
+  <pre><code><span class="code-comment"># ~/.claude/commands/remember.md</span>
+<span class="code-comment">---
+name: remember
+description: 重要な情報を Mem0 に保存
+---</span>
+
+以下の情報を Mem0 に保存してください:
+$ARGUMENTS
+
+mem0 Python SDK を使い、以下のコードを実行:
+
+<span class="code-keyword">from</span> mem0 <span class="code-keyword">import</span> MemoryClient
+client = <span class="code-class">MemoryClient</span>(api_key=<span class="code-string">"$MEM0_API_KEY"</span>)
+client.add(
+    messages=[{<span class="code-string">"role"</span>: <span class="code-string">"user"</span>, <span class="code-string">"content"</span>: <span class="code-string">"$ARGUMENTS"</span>}],
+    user_id=<span class="code-string">"developer"</span>,
+    metadata={<span class="code-string">"project"</span>: <span class="code-string">"$PROJECT_PATH"</span>}
+)</code></pre>
+
+  <h3>Mem0 + MAF（Microsoft Agent Framework）統合</h3>
+  <pre><code><span class="code-keyword">from</span> mem0 <span class="code-keyword">import</span> Memory
+<span class="code-keyword">from</span> autogen_agentchat.agents <span class="code-keyword">import</span> AssistantAgent
+<span class="code-keyword">from</span> autogen_core.tools <span class="code-keyword">import</span> FunctionTool
+
+memory = <span class="code-class">Memory</span>()
+
+<span class="code-comment"># Mem0 操作を MAF ツールとして定義</span>
+<span class="code-keyword">def</span> <span class="code-func">remember</span>(content: str, user_id: str) -> str:
+    <span class="code-string">"""重要な情報を記憶に保存"""</span>
+    memory.add([{<span class="code-string">"role"</span>: <span class="code-string">"user"</span>, <span class="code-string">"content"</span>: content}], user_id=user_id)
+    <span class="code-keyword">return</span> f<span class="code-string">"記憶しました: {content}"</span>
+
+<span class="code-keyword">def</span> <span class="code-func">recall</span>(query: str, user_id: str) -> str:
+    <span class="code-string">"""関連する記憶を検索"""</span>
+    results = memory.search(query=query, user_id=user_id, limit=<span class="code-num">5</span>)
+    <span class="code-keyword">return</span> <span class="code-string">"\n"</span>.join([r[<span class="code-string">"memory"</span>] <span class="code-keyword">for</span> r <span class="code-keyword">in</span> results[<span class="code-string">"results"</span>]])
+
+<span class="code-comment"># MAF エージェントに記憶ツールを注入</span>
+memory_agent = <span class="code-class">AssistantAgent</span>(
+    name=<span class="code-string">"persistent_assistant"</span>,
+    model_client=model_client,
+    tools=[
+        <span class="code-class">FunctionTool</span>(remember, description=<span class="code-string">"重要な情報を記憶に保存する"</span>),
+        <span class="code-class">FunctionTool</span>(recall, description=<span class="code-string">"過去の記憶を検索する"</span>),
+    ],
+    system_message=<span class="code-string">"""
+    あなたは記憶を持つアシスタントです。
+    重要な情報は remember ツールで保存し、
+    過去の文脈が必要な場合は recall ツールで検索してください。
+    """</span>
+)</code></pre>
+
+  <h3>Supermemory + A2A Protocol（エージェント間記憶共有）</h3>
+  <pre><code><span class="code-comment"># エージェント A（リサーチエージェント）が調査結果を記憶</span>
+<span class="code-keyword">import</span> httpx
+
+SUPERMEMORY_URL = <span class="code-string">"https://mcp.supermemory.ai"</span>
+BEARER_TOKEN = <span class="code-string">"sm_xxxxxx"</span>
+headers = {<span class="code-string">"Authorization"</span>: f<span class="code-string">"Bearer {BEARER_TOKEN}"</span>}
+
+<span class="code-keyword">async def</span> <span class="code-func">save_research</span>(finding: str, tags: list[str]):
+    <span class="code-keyword">await</span> httpx.<span class="code-func">post</span>(
+        f<span class="code-string">"{SUPERMEMORY_URL}/memories"</span>,
+        headers=headers,
+        json={<span class="code-string">"content"</span>: finding, <span class="code-string">"tags"</span>: tags}
+    )
+
+<span class="code-comment"># エージェント B（ライティングエージェント）が記憶を検索して活用</span>
+<span class="code-keyword">async def</span> <span class="code-func">get_context_for_writing</span>(topic: str):
+    resp = <span class="code-keyword">await</span> httpx.<span class="code-func">post</span>(
+        f<span class="code-string">"{SUPERMEMORY_URL}/memories/search"</span>,
+        headers=headers,
+        json={<span class="code-string">"query"</span>: topic, <span class="code-string">"limit"</span>: <span class="code-num">10</span>}
+    )
+    <span class="code-keyword">return</span> [m[<span class="code-string">"content"</span>] <span class="code-keyword">for</span> m <span class="code-keyword">in</span> resp.json()[<span class="code-string">"memories"</span>]]
+
+<span class="code-comment"># A2A で連携: リサーチ結果を記憶 → ライティングエージェントが参照</span>
+<span class="code-keyword">await</span> <span class="code-func">save_research</span>(
+    <span class="code-string">"MAF v1.0 は MIT ライセンス。AutoGen + SK の統合版。"</span>,
+    tags=[<span class="code-string">"microsoft"</span>, <span class="code-string">"maf"</span>, <span class="code-string">"research"</span>]
+)
+context = <span class="code-keyword">await</span> <span class="code-func">get_context_for_writing</span>(<span class="code-string">"Microsoft エージェントフレームワーク"</span>)
+<span class="code-comment"># context に記憶した内容が返る → 執筆エージェントがこれを活用</span></code></pre>
+
+  <div class="card green">
+    <h3>🎯 実装ベストプラクティス</h3>
+    <div class="grid2">
+      <ul>
+        <li><strong>記憶は少なく・精密に:</strong> 全会話を丸ごと保存しない。LLM に「記憶すべき情報か」を判断させる</li>
+        <li><strong>スコープを明確に:</strong> user_id / project / agent_id で記憶を分離。意図しない混入を防ぐ</li>
+        <li><strong>定期的に棚卸し:</strong> 古い・矛盾する記憶は明示的に削除。Mem0 の history() で変遷を確認</li>
+        <li><strong>センシティブ情報を除外:</strong> API Key・パスワード・個人情報は記憶しない（Auto-Capture のフィルタを設定）</li>
+      </ul>
+      <ul>
+        <li><strong>検索クエリを工夫:</strong> 「過去の設定」より「PostgreSQL 接続設定」のように具体的なクエリを使う</li>
+        <li><strong>記憶注入量を制御:</strong> 無制限に注入するとコンテキストを圧迫。top-k 5〜10 件を基本とする</li>
+        <li><strong>ユーザーに透明性を:</strong> 「あなたの記憶を確認・削除する方法」をユーザーに提示する</li>
+        <li><strong>GDPR を考慮:</strong> <code>delete()</code> / <code>forget</code> API で「忘れる権利」を必ず実装</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p>最終更新: 2026年6月 | Mem0 v1.1 / Supermemory / ClawMem / Cloudflare Agents 対応</p>
+  <p>
+    <a href="../index.html">← Knowledge Hub に戻る</a> |
+    <a href="a2a-protocol.html">A2A Protocol →</a> |
+    <a href="microsoft-agent-framework.html">Microsoft Agent Framework →</a>
+  </p>
+  <p style="margin-top:0.5rem;font-size:0.8rem;">出典: Mem0 公式ドキュメント, Supermemory Docs, Cloudflare Workers AI ドキュメント, GitHub mem0ai/mem0</p>
+</footer>
+
+</body>
+</html>
