@@ -102,6 +102,54 @@
             color: #666;
             text-decoration: none;
         }
+
+        h2 {
+            font-size: 26px;
+            margin-top: 60px;
+            margin-bottom: 8px;
+            color: var(--accent);
+            border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+            padding-bottom: 8px;
+        }
+
+        .section-intro {
+            color: #888;
+            font-size: 15px;
+            margin-bottom: 36px;
+        }
+
+        code {
+            font-family: monospace;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #fdb;
+            font-size: 14px;
+        }
+
+        .term-num {
+            display: inline-block;
+            width: 28px;
+            height: 28px;
+            background: var(--accent);
+            color: #fff;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 28px;
+            font-size: 13px;
+            font-weight: bold;
+            margin-right: 10px;
+            font-style: normal;
+            flex-shrink: 0;
+        }
+
+        footer {
+            margin-top: 80px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            color: #555;
+            font-size: 14px;
+        }
     </style>
 </head>
 
@@ -116,9 +164,13 @@
             <p>エージェントを指揮（Direct）するために、エンジニアになる必要はありません。<br>
                 しかし、以下の4つの概念だけは「経営資源」として理解してください。</p>
 
+            <!-- =============================================
+                 既存 4 用語
+                 ============================================= -->
+
             <!-- Context -->
             <div class="term-card">
-                <div class="term-title">Context (コンテキスト) <span class="term-analogy">Analogy: "短期記憶の容量"</span></div>
+                <div class="term-title"><span><span class="term-num">1</span>Context (コンテキスト)</span> <span class="term-analogy">Analogy: "短期記憶の容量"</span></div>
                 <p class="term-desc">AIが「一度に頭に入れておける情報量」のことです。Claude
                     Codeのコンテキストウィンドウは巨大ですが、無限ではありません。古い会話や関係ないファイルを読みすぎると、新しい情報が入らなくなります。</p>
                 <div class="business-impact">
@@ -130,7 +182,7 @@
 
             <!-- Token -->
             <div class="term-card">
-                <div class="term-title">Token (トークン) <span class="term-analogy">Analogy: "思考の通貨 / ガソリン"</span></div>
+                <div class="term-title"><span><span class="term-num">2</span>Token (トークン)</span> <span class="term-analogy">Analogy: "思考の通貨 / ガソリン"</span></div>
                 <p class="term-desc">AIが処理するテキストの最小単位（約0.7単語）。AIへの依頼も、AIからの返答も、すべてトークンとして課金されます。</p>
                 <div class="business-impact">
                     <strong>💡 Business Impact</strong>
@@ -141,7 +193,7 @@
 
             <!-- Latency -->
             <div class="term-card">
-                <div class="term-title">Latency (レイテンシ) <span class="term-analogy">Analogy: "思考の待ち時間"</span></div>
+                <div class="term-title"><span><span class="term-num">3</span>Latency (レイテンシ)</span> <span class="term-analogy">Analogy: "思考の待ち時間"</span></div>
                 <p class="term-desc">AIが答えを出し始めるまでの時間。特に賢いモデル（Opus）が深く考える（Reasoning）とき、数十秒の沈黙が発生します。</p>
                 <div class="business-impact">
                     <strong>💡 Business Impact</strong>
@@ -152,7 +204,7 @@
 
             <!-- Agentic -->
             <div class="term-card">
-                <div class="term-title">Agentic (エージェンティック) <span class="term-analogy">Analogy: "自律的 / 手足がある状態"</span>
+                <div class="term-title"><span><span class="term-num">4</span>Agentic (エージェンティック)</span> <span class="term-analogy">Analogy: "自律的 / 手足がある状態"</span>
                 </div>
                 <p class="term-desc">従来のChatbot（話すだけ）とは異なり、ツールを使って「自ら行動できる」状態を指します。ファイルを書き換えたり、コマンドを実行したりする権限を持ちます。</p>
                 <div class="business-impact">
@@ -162,7 +214,147 @@
                 </div>
             </div>
 
+            <!-- =============================================
+                 追加 10 用語（2026年6月 拡充）
+                 ============================================= -->
+
+            <h2>エコシステム・プロトコル系</h2>
+            <p class="section-intro">Claude がチームの外部システムと接続するための規格と仕組み。</p>
+
+            <!-- MCP -->
+            <div class="term-card">
+                <div class="term-title"><span><span class="term-num">5</span>MCP（Model Context Protocol）</span> <span class="term-analogy">Analogy: "AIへの手足の規格"</span></div>
+                <p class="term-desc">Anthropic が策定した<strong>エージェント ↔ ツール通信標準プロトコル</strong>です。MCP サーバーを Claude に接続することで、外部 API・データベース・ファイルシステム・社内システムを Claude が直接操作できるようになります。<br>
+                「どのメーカーのコンセントにも同じプラグで刺せる」電源規格のように、MCP が標準化されたことで、あらゆるツールを Claude に繋げられます。</p>
+                <div class="business-impact">
+                    <strong>💡 Business Impact</strong>
+                    チームの社内ツール（CRM・プロジェクト管理・Slack・データベース）を MCP サーバー化すると、Claude が業務システムを直接操作できるようになります。<br>
+                    例: 「先月の売上データをスプレッドシートにまとめて Slack に投稿して」が1つの指示で完結します。
+                </div>
+            </div>
+
+            <!-- Tool Use -->
+            <div class="term-card">
+                <div class="term-title"><span><span class="term-num">6</span>Tool Use（ツール使用）</span> <span class="term-analogy">Analogy: "AIの手足"</span></div>
+                <p class="term-desc">通常の会話（テキスト生成）とは異なり、<strong>ファイルを読む・コードを実行する・API を叩くなどの「副作用のある操作」</strong>をエージェントが行う機能です。<br>
+                Claude Code が実際にファイルを編集できるのは、この Tool Use 能力があるためです。危険性とメリットが表裏一体であり、どのツールを許可するかの設計が重要になります。</p>
+                <div class="business-impact">
+                    <strong>💡 Business Impact</strong>
+                    「ツールを与える = 権限を委譲する」ことです。<br>
+                    <code>Bash(rm -rf *)</code> を許可すると Claude はファイルを物理削除できます。最小権限の原則（必要なツールだけを渡す）をAIにも適用してください。
+                </div>
+            </div>
+
+            <h2>プロジェクト設定・文書系</h2>
+            <p class="section-intro">Claude にプロジェクトを理解させるための設定ファイルと文書の概念。</p>
+
+            <!-- CLAUDE.md -->
+            <div class="term-card">
+                <div class="term-title"><span><span class="term-num">7</span>CLAUDE.md</span> <span class="term-analogy">Analogy: "会社の就業規則"</span></div>
+                <p class="term-desc">プロジェクトルートに置く Markdown ファイル。Claude がプロジェクトを開始する際に<strong>自動的に最初に読み込まれる文書</strong>です。<br>
+                就業規則が「社員の行動基準を定める」ように、CLAUDE.md は「このプロジェクトでのAIの行動基準」を定めます。技術スタック・コーディング規約・やってはいけないこと・現在の作業フォーカスを書きます。</p>
+                <div class="business-impact">
+                    <strong>💡 Business Impact</strong>
+                    CLAUDE.md がないプロジェクトでは、Claude は毎回「このプロジェクトは何をするものですか？」から始めなければなりません。<br>
+                    一度書けばすべてのセッションで有効。「禁止事項」を書くことで、よくあるAIのミスを事前防止できます。
+                </div>
+            </div>
+
+            <h2>安全・制御系</h2>
+            <p class="section-intro">エージェントの暴走を防ぎ、安全に自動化するための仕組み。</p>
+
+            <!-- Checkpoint -->
+            <div class="term-card">
+                <div class="term-title"><span><span class="term-num">8</span>Checkpoint（チェックポイント）</span> <span class="term-analogy">Analogy: "セーブポイント"</span></div>
+                <p class="term-desc">長時間エージェント実行中に自動で取られる<strong>中間スナップショット</strong>です。タスクが途中で失敗しても、チェックポイントから再開・巻き戻しができます。<br>
+                RPGゲームの「セーブポイント」と同じ概念です。ラスボス直前でセーブしておけば、全滅してもやり直せます。</p>
+                <div class="business-impact">
+                    <strong>💡 Business Impact</strong>
+                    1,000ファイルのリファクタリング中に300ファイル完了時点でエラーが発生しても、ゼロからやり直す必要がありません。<br>
+                    人間が承認する前に「試してみる」安全網としても機能します。
+                </div>
+            </div>
+
+            <!-- Shadow Workspace -->
+            <div class="term-card">
+                <div class="term-title"><span><span class="term-num">11</span>Shadow Workspace（シャドウワークスペース）</span> <span class="term-analogy">Analogy: "下書き帳"</span></div>
+                <p class="term-desc">エージェントがユーザーの実ファイルを変更する前に、<strong>コピー上で作業を試す仕組み</strong>です。ユーザーが変更内容を確認・承認したときのみ実ファイルへの変更が適用されます。<br>
+                Figma のコンポーネントを「下書き」として試してから本番デザインに反映するイメージです。</p>
+                <div class="business-impact">
+                    <strong>💡 Business Impact</strong>
+                    大規模な変更を実ファイルに適用する前にプレビューできます。「想定と違う変更がされていた」リスクをゼロにできます。<br>
+                    初めてのプロジェクト・重要なコードベース・本番環境に近い変更時に特に有効です。
+                </div>
+            </div>
+
+            <!-- Permissions -->
+            <div class="term-card">
+                <div class="term-title"><span><span class="term-num">13</span>Permissions（許可設定）</span> <span class="term-analogy">Analogy: "会社の権限管理"</span></div>
+                <p class="term-desc"><code>allow</code> リストにあるツールのみエージェントが実行できるよう制限する仕組みです。<code>deny</code> リストに <code>Bash(rm -rf *)</code> を入れれば物理削除を禁止できます。<br>
+                社員の権限管理と同じです。一般社員には「読み取り専用」、管理者には「書き込み可」のように、AIにも「最小権限の原則」を適用します。</p>
+                <div class="business-impact">
+                    <strong>💡 Business Impact</strong>
+                    権限を絞ることでAIのミスの影響範囲を限定できます。<br>
+                    開発環境では広めに許可、本番環境では厳しく制限、というように環境ごとに使い分けてください。<code>.claude/settings.json</code> で設定します。
+                </div>
+            </div>
+
+            <!-- Hook -->
+            <div class="term-card">
+                <div class="term-title"><span><span class="term-num">10</span>Hook（フック）</span> <span class="term-analogy">Analogy: "自動トリガー"</span></div>
+                <p class="term-desc">特定のイベント（ツール使用前後・セッション開始終了）に<strong>自動実行されるシェルコマンド</strong>です。「コミット前に必ず lint を実行する」「ファイル書き込み後に自動テスト」などの自動化に使います。<br>
+                Zapier の「〇〇が起きたら□□を実行する」と同じ発想です。</p>
+                <div class="business-impact">
+                    <strong>💡 Business Impact</strong>
+                    「Claude がコードを書いたら自動で lint → test → Slack 通知」のパイプラインを人間の介入なしで動かせます。<br>
+                    Hook は <code>.claude/hooks.json</code> で定義します。危険な操作の前に承認プロンプトを挿入するセキュリティ用途にも使えます。
+                </div>
+            </div>
+
+            <h2>実行モデル系</h2>
+            <p class="section-intro">エージェントがどのように動作・実行されるかを理解するための概念。</p>
+
+            <!-- Sub-agent -->
+            <div class="term-card">
+                <div class="term-title"><span><span class="term-num">9</span>Sub-agent（サブエージェント）</span> <span class="term-analogy">Analogy: "下請け業者"</span></div>
+                <p class="term-desc">親エージェント（Orchestrator）が <code>Task</code> ツールを使って起動する<strong>子エージェント</strong>です。独立したコンテキストを持ち、特定の作業だけを担当します。複数のサブエージェントを同時に起動して<strong>並列実行</strong>することが可能です。<br>
+                元請け業者（Opus）が設計・指示を担当し、複数の下請け業者（Sonnet）が各モジュールを同時に施工するイメージです。</p>
+                <div class="business-impact">
+                    <strong>💡 Business Impact</strong>
+                    直列で3時間かかる作業を、3つのサブエージェントに分割して並列実行すれば1時間で完了します。<br>
+                    独立したコンテキストを持つため、サブエージェント同士が互いの作業履歴に干渉しません。
+                </div>
+            </div>
+
+            <!-- Streaming -->
+            <div class="term-card">
+                <div class="term-title"><span><span class="term-num">12</span>Streaming（ストリーミング）</span> <span class="term-analogy">Analogy: "リアルタイム字幕"</span></div>
+                <p class="term-desc">全文が生成されてから一度に返すのではなく、<strong>生成しながらリアルタイムで送信する方式</strong>です。長い応答でも最初の文字が表示されるまでの時間（TTFT: Time to First Token）が短く、待ち時間が短く感じます。<br>
+                映画の「リアルタイム字幕」と同じです。全セリフが字幕に出るまで待つのではなく、話しながらリアルタイムで字幕が流れます。</p>
+                <div class="business-impact">
+                    <strong>💡 Business Impact</strong>
+                    Non-interactive モード（CI/CD・スクリプトからの呼び出し）では <code>--output-format stream-json</code> を指定すると、生成中の中間状態をリアルタイムにパイプ処理できます。<br>
+                    進捗モニタリングや部分的な結果の早期活用が可能になります。
+                </div>
+            </div>
+
+            <!-- Background Agent -->
+            <div class="term-card">
+                <div class="term-title"><span><span class="term-num">14</span>Background Agent（バックグラウンドエージェント）</span> <span class="term-analogy">Analogy: "夜間バッチ処理"</span></div>
+                <p class="term-desc">ユーザーの目の前ではなく、<strong>クラウド VM 上で非同期に実行されるエージェント</strong>です。ターミナルを閉じても、外出中でも実行継続します。完了時に Slack や Email で通知を受け取れます。<br>
+                「夜間バッチ処理」と同じです。就業後に起動しておけば、翌朝出社時には完了しています。</p>
+                <div class="business-impact">
+                    <strong>💡 Business Impact</strong>
+                    1,000ファイルのマイグレーション・全テストの再生成・大規模ドキュメント更新など、数時間かかるタスクを外出中に完了させられます。<br>
+                    複数の Background Agent を同時起動して、チームのように並走させることも可能です。
+                </div>
+            </div>
+
         </section>
+
+        <footer>
+            最終更新: 2026年6月 | <a href="index.html" style="color:#666; text-decoration:none;">← Claude Code Mastery Hub</a>
+        </footer>
     </div>
 </body>
 

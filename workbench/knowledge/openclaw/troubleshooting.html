@@ -10,6 +10,7 @@
             --text: #ededed;
             --accent: #ff4d4d;
             /* Error Red */
+            --safe: #00ff9d;
             --border: #333;
         }
 
@@ -37,6 +38,18 @@
             font-size: 20px;
             margin-bottom: 60px;
             display: block;
+        }
+
+        h2 {
+            font-size: 22px;
+            color: #aaa;
+            margin-top: 48px;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-size: 13px;
+            border-bottom: 1px solid #2a2a2a;
+            padding-bottom: 8px;
         }
 
         .issue-card {
@@ -67,6 +80,18 @@
             display: inline-block;
         }
 
+        .issue-num {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            background: rgba(255, 77, 77, 0.12);
+            color: var(--accent);
+            border: 1px solid rgba(255, 77, 77, 0.3);
+            margin-right: 4px;
+        }
+
         .cause-solution {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -92,6 +117,12 @@
             color: #ccc;
             font-size: 13px;
             margin-top: 4px;
+            white-space: pre-wrap;
+            line-height: 1.5;
+        }
+
+        .code-comment {
+            color: #5a8a6a;
         }
 
         .back {
@@ -99,6 +130,90 @@
             margin-bottom: 40px;
             color: #666;
             text-decoration: none;
+        }
+
+        .solution-list {
+            list-style: none;
+            padding: 0;
+            margin: 8px 0 0;
+        }
+
+        .solution-list li {
+            padding: 6px 0 6px 20px;
+            position: relative;
+            color: #ccc;
+            font-size: 14px;
+        }
+
+        .solution-list li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--safe);
+            font-weight: bold;
+        }
+
+        .warning-inline {
+            background: rgba(255, 77, 77, 0.08);
+            border: 1px solid rgba(255, 77, 77, 0.25);
+            border-radius: 6px;
+            padding: 10px 14px;
+            margin-top: 10px;
+            color: #ffcccc;
+            font-size: 13px;
+        }
+
+        .tip-inline {
+            background: rgba(0, 255, 157, 0.06);
+            border: 1px solid rgba(0, 255, 157, 0.2);
+            border-radius: 6px;
+            padding: 10px 14px;
+            margin-top: 10px;
+            color: #cce8d8;
+            font-size: 13px;
+        }
+
+        .footer-note {
+            margin-top: 80px;
+            padding-top: 20px;
+            border-top: 1px solid #333;
+            color: #555;
+            font-size: 13px;
+        }
+
+        .toc {
+            background: #222;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 20px 24px;
+            margin-bottom: 48px;
+        }
+
+        .toc-title {
+            color: var(--accent);
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .toc ol {
+            margin: 0;
+            padding-left: 20px;
+            color: #888;
+            font-size: 14px;
+        }
+
+        .toc ol li {
+            margin-bottom: 4px;
+        }
+
+        .toc ol li a {
+            color: #aaa;
+            text-decoration: none;
+        }
+
+        .toc ol li a:hover {
+            color: var(--safe);
         }
     </style>
 </head>
@@ -112,9 +227,28 @@
         <h1>Troubleshooting</h1>
         <span class="subtitle">Diagnosing stuck agents and errors.</span>
 
+        <!-- TOC -->
+        <div class="toc">
+            <div class="toc-title">目次（既知の10問題）</div>
+            <ol>
+                <li><a href="#issue1">Agent is looping indefinitely（無限ループ）</a></li>
+                <li><a href="#issue2">Error: EACCES / Permission Denied（Docker権限）</a></li>
+                <li><a href="#issue3">Agent edits the wrong file（幻覚・スコープ逸脱）</a></li>
+                <li><a href="#issue4">Error: ENOTFOUND（ネットワークエラー）</a></li>
+                <li><a href="#issue5">Agent runs out of context mid-task（コンテキスト枯渇）</a></li>
+                <li><a href="#issue6">Rate limit exceeded: 429 Too Many Requests</a></li>
+                <li><a href="#issue7">File edited outside target scope（スコープ外ファイルの改変）</a></li>
+                <li><a href="#issue8">Model refuses to execute（セーフティフィルター拒否）</a></li>
+                <li><a href="#issue9">Inconsistent results between runs（実行ごとに結果が変わる）</a></li>
+                <li><a href="#issue10">Can't connect to MCP server（MCPサーバー接続失敗）</a></li>
+            </ol>
+        </div>
+
+        <h2>既存の問題（1–4）</h2>
+
         <!-- Issue 1: Infinite Loop -->
-        <div class="issue-card">
-            <div class="issue-title">Agent is looping indefinitely</div>
+        <div class="issue-card" id="issue1">
+            <div class="issue-title"><span class="issue-num">#1</span>Agent is looping indefinitely</div>
             <p>エージェントが同じ手順（Lint修正 → 失敗 → Retry）を永遠に繰り返している。</p>
             <div class="cause-solution">
                 <div>
@@ -125,17 +259,16 @@
                     <div class="col-title">Solution</div>
                     <p>一度停止し、<strong>Hints</strong>を与えて再開してください。</p>
                     <div class="code-snippet">
-                        > Stop
-                        > Hint: "The error is in utils.ts. You need to export the interface."
-                    </div>
-                    <p>または、`--max-steps` を短く設定し、早めに失敗させます。</p>
+&gt; Stop
+&gt; Hint: "The error is in utils.ts. You need to export the interface."</div>
+                    <p>または、<code>--max-steps</code> を短く設定し、早めに失敗させます。</p>
                 </div>
             </div>
         </div>
 
         <!-- Issue 2: Docker Permission -->
-        <div class="issue-card">
-            <div class="issue-title">Error: EACCES / Permission Denied</div>
+        <div class="issue-card" id="issue2">
+            <div class="issue-title"><span class="issue-num">#2</span>Error: EACCES / Permission Denied</div>
             <p>Docker使用時、ファイルを書き込もうとすると権限エラーになる。</p>
             <div class="cause-solution">
                 <div>
@@ -145,16 +278,14 @@
                 <div>
                     <div class="col-title">Solution</div>
                     <p>Docker実行時にUIDを渡します。</p>
-                    <div class="code-snippet">
-                        docker run -u $(id -u):$(id -g) ...
-                    </div>
+                    <div class="code-snippet">docker run -u $(id -u):$(id -g) ...</div>
                 </div>
             </div>
         </div>
 
         <!-- Issue 3: Hallucination -->
-        <div class="issue-card">
-            <div class="issue-title">Agent edits the wrong file</div>
+        <div class="issue-card" id="issue3">
+            <div class="issue-title"><span class="issue-num">#3</span>Agent edits the wrong file</div>
             <p>指示していないファイルを勝手に書き換えたり、存在しないライブラリをimportする。</p>
             <div class="cause-solution">
                 <div>
@@ -164,17 +295,15 @@
                 <div>
                     <div class="col-title">Solution</div>
                     <p>MISSION Specを分割し、小さくします。</p>
-                    <div class="code-snippet">
-                        Before: "Refactor entire app"
-                        After: "Refactor only /components/Button"
-                    </div>
+                    <div class="code-snippet">Before: "Refactor entire app"
+After: "Refactor only /components/Button"</div>
                 </div>
             </div>
         </div>
 
         <!-- Issue 4: Network Error -->
-        <div class="issue-card">
-            <div class="issue-title">Error: ENOTFOUND (Network)</div>
+        <div class="issue-card" id="issue4">
+            <div class="issue-title"><span class="issue-num">#4</span>Error: ENOTFOUND (Network)</div>
             <p>エージェントが外部サイト（npm registryなど）に接続できない。</p>
             <div class="cause-solution">
                 <div>
@@ -184,14 +313,234 @@
                 <div>
                     <div class="col-title">Solution</div>
                     <p>プロキシ設定を環境変数に追加してください。</p>
-                    <div class="code-snippet">
-                        export HTTP_PROXY=http://proxy:8080
-                        export HTTPS_PROXY=http://proxy:8080
-                    </div>
+                    <div class="code-snippet">export HTTP_PROXY=http://proxy:8080
+export HTTPS_PROXY=http://proxy:8080</div>
                 </div>
             </div>
         </div>
 
+        <h2>追加問題（5–10）</h2>
+
+        <!-- Issue 5: Context exhausted -->
+        <div class="issue-card" id="issue5">
+            <div class="issue-title"><span class="issue-num">#5</span>Agent runs out of context mid-task</div>
+            <p>タスクの途中でエージェントが突然停止し、「コンテキストが足りない」または無応答になる。
+                大規模なリファクタリングや複数ファイルの一括変更でよく発生します。</p>
+            <div class="cause-solution">
+                <div>
+                    <div class="col-title">Possible Cause</div>
+                    <ul style="padding-left:16px;color:#ccc;font-size:14px;">
+                        <li>タスクが大きすぎて、LLM のコンテキストウィンドウを超えた</li>
+                        <li>Observe フェーズで不要なファイルを大量に読み込んだ</li>
+                        <li>Scratchpad への書き込みが積み重なりコンテキストを圧迫している</li>
+                    </ul>
+                </div>
+                <div>
+                    <div class="col-title">Solution</div>
+                    <ul class="solution-list">
+                        <li>Mission を「30分以内で終わる」サイズに分割し直す</li>
+                        <li><code>--max-context-tokens 60000</code> で上限を設定し、超えたら強制停止させる</li>
+                        <li>Resources セクションで参照ファイルを5個以内に限定する</li>
+                    </ul>
+                    <div class="code-snippet"><span class="code-comment"># コンテキスト上限を設定して強制停止</span>
+openclaw run MISSION.md --max-context-tokens 60000
+
+<span class="code-comment"># 大きなMissionを分割する例</span>
+# Before: refactor-entire-app.md
+# After:
+#   refactor-01-auth.md
+#   refactor-02-components.md
+#   refactor-03-api.md</div>
+                    <div class="tip-inline">コンテキスト使用量はログの <code>context_usage</code> フィールドで確認できます。70% を超えたら分割を検討してください。</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Issue 6: Rate limit -->
+        <div class="issue-card" id="issue6">
+            <div class="issue-title"><span class="issue-num">#6</span>Rate limit exceeded (429 Too Many Requests)</div>
+            <p>実行途中で <code>429 Too Many Requests</code> エラーが発生し、エージェントが停止する。
+                マルチエージェントの並列実行や、OODA ループが高速で回るタスクでよく発生します。</p>
+            <div class="cause-solution">
+                <div>
+                    <div class="col-title">Possible Cause</div>
+                    <ul style="padding-left:16px;color:#ccc;font-size:14px;">
+                        <li>サブエージェントの並列実行で API 呼び出しが集中した</li>
+                        <li>ループ内で大量の API 呼び出しが短時間に発生した</li>
+                        <li>Anthropic の Tier に対してリクエスト数が多すぎる</li>
+                    </ul>
+                </div>
+                <div>
+                    <div class="col-title">Solution</div>
+                    <ul class="solution-list">
+                        <li><code>--request-delay 2000</code> で API 呼び出し間に 2 秒の遅延を挿入</li>
+                        <li><code>--max-parallel-agents 2</code> で並列エージェント数を制限</li>
+                        <li>Anthropic Console でレートリミットの引き上げを申請</li>
+                    </ul>
+                    <div class="code-snippet"><span class="code-comment"># 2秒遅延 + 並列数を2に制限</span>
+openclaw run MISSION.md \
+  --request-delay 2000 \
+  --max-parallel-agents 2
+
+<span class="code-comment"># レートリミット確認（Anthropic Console）</span>
+# https://console.anthropic.com/ → Usage → Rate Limits</div>
+                    <div class="tip-inline">一時的な 429 エラーは自動リトライされます。繰り返し発生する場合はレートリミット引き上げか Mission の分割を検討してください。</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Issue 7: Scope violation -->
+        <div class="issue-card" id="issue7">
+            <div class="issue-title"><span class="issue-num">#7</span>File edited outside target scope</div>
+            <p>MISSION.md の Constraints で対象外のはずのファイルが書き換えられていた。
+                <code>git diff</code> で確認したら想定外のファイルに変更が入っていたケース。</p>
+            <div class="cause-solution">
+                <div>
+                    <div class="col-title">Possible Cause</div>
+                    <ul style="padding-left:16px;color:#ccc;font-size:14px;">
+                        <li>Constraints セクションに「変更してはいけないファイル」が明記されていなかった</li>
+                        <li>エージェントが「関連するから修正した方がいい」と独自判断した</li>
+                        <li>コンテキストが長くなって Constraints を忘れた</li>
+                    </ul>
+                </div>
+                <div>
+                    <div class="col-title">Solution</div>
+                    <ul class="solution-list">
+                        <li>MISSION.md に「絶対に変更してはいけないファイル」セクションを明示する</li>
+                        <li><code>--protect "src/legacy/**,*.env"</code> で保護パスをコマンドラインでも指定</li>
+                        <li>実行後に <code>git diff --name-only</code> で変更ファイルを確認する習慣をつける</li>
+                    </ul>
+                    <div class="code-snippet"><span class="code-comment"># MISSION.md の Constraints に追加する記述</span>
+## 絶対に変更してはいけないファイル
+- src/legacy/**
+- *.env
+- src/tests/auth.test.ts
+
+<span class="code-comment"># コマンドラインでの保護設定</span>
+openclaw run MISSION.md --protect "src/legacy/**,*.env"
+
+<span class="code-comment"># 変更されたファイルの確認</span>
+git diff --name-only HEAD</div>
+                    <div class="warning-inline">想定外の変更を発見したら即座に <code>git restore &lt;file&gt;</code> で元に戻してください。コミット前の確認を習慣にすることがリスク管理の基本です。</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Issue 8: Safety filter refusal -->
+        <div class="issue-card" id="issue8">
+            <div class="issue-title"><span class="issue-num">#8</span>Model refuses to execute (Safety filter)</div>
+            <p>エージェントが「それはできません」「その操作は安全ではありません」と返答して実行を拒否する。
+                特にデータ削除・本番デプロイ・セキュリティテスト系の指示で発生しやすい。</p>
+            <div class="cause-solution">
+                <div>
+                    <div class="col-title">Possible Cause</div>
+                    <ul style="padding-left:16px;color:#ccc;font-size:14px;">
+                        <li>指示の表現がセーフティフィルターのパターンに一致した</li>
+                        <li>「削除」「破壊」「本番」などのキーワードが文脈なしに使われた</li>
+                        <li>目的・安全性の根拠が MISSION.md に書かれていなかった</li>
+                    </ul>
+                </div>
+                <div>
+                    <div class="col-title">Solution</div>
+                    <ul class="solution-list">
+                        <li>建設的な表現に言い換える（下の対応表を参照）</li>
+                        <li>目的と安全性の根拠を Objective セクションに明記する</li>
+                        <li>「バックアップ済み」「テスト環境のみ」を Constraints に追記する</li>
+                    </ul>
+                    <div class="code-snippet"><span class="code-comment"># 拒否されやすい表現 → 受け入れられやすい表現</span>
+「ファイルを削除して」     → 「アーカイブフォルダに移動して」
+「本番DBを更新して」       → 「マイグレーションスクリプトを生成して」
+「パスワードを変更して」   → 「パスワードリセット機能を実装して」
+「壊れたコードを直して」   → 「テストが PASS するように修正して」
+「脆弱性を突いて」         → 「セキュリティテスト用に入力バリデーションを検証して」</div>
+                    <div class="tip-inline">「なぜその操作が必要か」と「安全であることの根拠」を Objective に1文追加するだけで、拒否率が大幅に下がります。</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Issue 9: Inconsistent results -->
+        <div class="issue-card" id="issue9">
+            <div class="issue-title"><span class="issue-num">#9</span>Inconsistent results between runs</div>
+            <p>同じ MISSION.md を使って再実行すると、毎回異なるファイルが変更される・異なるアプローチが取られる。
+                チーム開発やCI環境での自動実行で再現性が必要な場合に問題になる。</p>
+            <div class="cause-solution">
+                <div>
+                    <div class="col-title">Possible Cause</div>
+                    <ul style="padding-left:16px;color:#ccc;font-size:14px;">
+                        <li>LLM の sampling temperature が高く、確率的なバラツキが大きい</li>
+                        <li>Constraints が曖昧で、複数の解釈が可能になっている</li>
+                        <li>DoD が主観的で、エージェントが毎回異なる基準で「完了」を判断している</li>
+                        <li>外部環境（ファイルの状態・依存パッケージ）が実行ごとに異なる</li>
+                    </ul>
+                </div>
+                <div>
+                    <div class="col-title">Solution</div>
+                    <ul class="solution-list">
+                        <li><code>--temperature 0</code> でランダム性を最小化する</li>
+                        <li>DoD を「テストが PASS すること」「ファイルが存在すること」など客観的基準にする</li>
+                        <li>重要な設計決定を MISSION.md の Resources に含め、エージェントが参照できるようにする</li>
+                        <li>実行前に <code>git stash</code> でクリーンな状態から始める</li>
+                    </ul>
+                    <div class="code-snippet"><span class="code-comment"># temperature 0 で確定性を最大化</span>
+openclaw run MISSION.md --temperature 0
+
+<span class="code-comment"># 再現性を高める DoD の書き方</span>
+# 悪い例: 「コードをきれいにする」
+# 良い例: 「npm run lint がエラー0件で通過する」
+
+<span class="code-comment"># クリーンな状態から実行</span>
+git stash && openclaw run MISSION.md --temperature 0</div>
+                    <div class="tip-inline"><code>--temperature 0</code> でも完全な決定性は保証されません。CI での自動化には DoD の客観化が最も効果的です。</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Issue 10: MCP server -->
+        <div class="issue-card" id="issue10">
+            <div class="issue-title"><span class="issue-num">#10</span>Can't connect to MCP server</div>
+            <p>MCP ツールを使おうとすると <code>Server not found</code> または <code>Connection refused</code> エラーが発生する。
+                GitHub・Slack・データベース連携など、外部 MCP サーバーが必要なタスクで発生する。</p>
+            <div class="cause-solution">
+                <div>
+                    <div class="col-title">Possible Cause</div>
+                    <ul style="padding-left:16px;color:#ccc;font-size:14px;">
+                        <li>MCP サーバーが起動していない / プロセスが終了している</li>
+                        <li><code>.claude/settings.json</code> の <code>command</code> や <code>args</code> が間違っている</li>
+                        <li>サーバーに必要な環境変数（トークン等）が設定されていない</li>
+                        <li>ポートが別プロセスに使われている / ファイアウォールでブロックされている</li>
+                    </ul>
+                </div>
+                <div>
+                    <div class="col-title">Solution</div>
+                    <ul class="solution-list">
+                        <li>サーバーを手動で起動してテストし、エラーを確認する</li>
+                        <li><code>.claude/settings.json</code> の設定を確認・修正する</li>
+                        <li>必要な環境変数が設定されているか確認する</li>
+                    </ul>
+                    <div class="code-snippet"><span class="code-comment"># サーバーを手動起動してテスト</span>
+npx @modelcontextprotocol/server-filesystem /tmp/test
+
+<span class="code-comment"># 設定ファイルの内容確認</span>
+cat .claude/settings.json | jq .mcpServers
+
+<span class="code-comment"># 環境変数の確認</span>
+echo $GITHUB_TOKEN
+echo $SLACK_BOT_TOKEN
+
+<span class="code-comment"># サーバーの疎通テスト（filesystem サーバー例）</span>
+npx @modelcontextprotocol/inspector \
+  npx @modelcontextprotocol/server-filesystem /workspace</div>
+                    <div class="tip-inline">MCP サーバーの設定は <code>.claude/settings.json</code> の <code>mcpServers</code> セクションにあります。<code>command</code> フィールドに実行コマンド、<code>args</code> に引数、<code>env</code> に環境変数を記述します。詳細は <a href="architecture.html" style="color:#00ff9d;">Architecture ページの Tool System</a> を参照。</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-note">
+            最終更新: 2026-06-08 &nbsp;|&nbsp;
+            <a href="index.html" style="color:#555">OpenClaw Hub</a> &nbsp;|&nbsp;
+            <a href="security.html" style="color:#555">Security</a> &nbsp;|&nbsp;
+            <a href="mission-control.html" style="color:#555">Mission Control</a>
+        </div>
     </div>
 </body>
 

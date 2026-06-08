@@ -189,7 +189,135 @@
                 </div>
             </div>
 
+            <!-- Pattern 4 -->
+            <div class="pattern-card">
+                <div class="pattern-title">⚠️ 4. The "Monolithic Mission" Collapse</div>
+                <p>「全部やってください」という1つの巨大タスクを投げて失敗するパターン。コンテキスト超過・タイムアウト・途中での作業上書きが同時に発生する。</p>
+
+                <div class="symptom-box">
+                    <span class="symptom-label">Symptoms (症状)</span>
+                    &gt; Claude: "承知しました。全システムをリファクタリングします..."<br>
+                    &gt; [3時間後] タイムアウト / コンテキスト超過<br>
+                    &gt; 作業の半分しか完了していない、かつ前半の変更が後半で上書きされている
+                </div>
+
+                <div class="solution-block">
+                    <span class="solution-header">✅ The Exorcism Command</span>
+                    <p>タスクを分割させる。「始めるな、まず計画だけを出せ」と命じるのがポイント。</p>
+                    <div class="command-box">
+                        $ claude "STOP. Task is too large.<br>
+                        Break this refactoring into 10 atomic tasks.<br>
+                        Each task must be completable in under 30 minutes.<br>
+                        List them as a numbered checklist without starting any work."
+                    </div>
+                    <p style="color:#bbb; margin-top:14px; font-size:0.95em;">
+                        <strong style="color:var(--accent)">教訓:</strong>
+                        「2時間以内に終わらないタスクは分割する」が鉄則。Claude は長時間作業でドリフトする。
+                        チェックリストを受け取ったら、1項目ずつ別コマンドで発行すること。
+                    </p>
+                </div>
+            </div>
+
+            <!-- Pattern 5 -->
+            <div class="pattern-card">
+                <div class="pattern-title">⚠️ 5. The "Permission Creep" Trap</div>
+                <p>最初に広すぎる権限を与え、思わぬ副作用が起きるパターン。<code>--dangerously-skip-permissions</code> を安易に使うと、ファイルシステム操作の範囲が制御不能になる。</p>
+
+                <div class="symptom-box">
+                    <span class="symptom-label">Symptoms (症状)</span>
+                    &gt; $ claude --dangerously-skip-permissions "全ての未使用ファイルを削除して"<br>
+                    &gt; [結果] テストフィクスチャ、設定ファイル、隠しファイルが削除された<br>
+                    &gt; git restore . で辛うじて復元できたが、.gitignore に含まれていたファイルは消滅
+                </div>
+
+                <div class="solution-block">
+                    <span class="solution-header">✅ 正しいアプローチ: 先に分析のみ</span>
+                    <p>削除・移動・上書きが伴う操作は、必ず「一覧を出させる → 人間が確認 → 個別に実行」の順序を守る。</p>
+                    <div class="command-box">
+                        # Step 1: リストアップのみ（削除はしない）<br>
+                        $ claude --print "未使用ファイルを特定して、削除候補リストを出力せよ。<br>
+                        削除はするな。出力形式: ファイルパス / 最終更新日 / 未使用の根拠"<br>
+                        <br>
+                        # Step 2: リストを確認してから個別に削除を指示<br>
+                        $ claude "以下のファイルを削除してよい: [確認済みリスト]"
+                    </div>
+                    <p style="color:#bbb; margin-top:14px; font-size:0.95em;">
+                        <strong style="color:var(--accent)">教訓:</strong>
+                        Read-Only フェーズ → 人間レビュー → 実行フェーズ、の3段階を崩さない。
+                        <code>--dangerously-skip-permissions</code> は「使わなくて済むなら使わない」が原則。
+                    </p>
+                </div>
+            </div>
+
+            <!-- Pattern 6 -->
+            <div class="pattern-card">
+                <div class="pattern-title">⚠️ 6. The "Missing CLAUDE.md" Syndrome</div>
+                <p>CLAUDE.md なしで作業させ、毎回同じ説明を繰り返すパターン。セッションをまたぐたびにコーディングスタイルが変わり、蓄積が起きない。</p>
+
+                <div class="symptom-box">
+                    <span class="symptom-label">Symptoms (症状)</span>
+                    - 毎セッションで「このプロジェクトは〇〇です」と説明している<br>
+                    - エージェントが毎回違うコーディングスタイルで書く（TypeScript ← → JavaScript など）<br>
+                    - 「前にも言いましたが…」という修正が頻発する<br>
+                    - 新しいセッションで既に決定済みの方針が覆る
+                </div>
+
+                <div class="solution-block">
+                    <span class="solution-header">✅ The Fix: CLAUDE.md を一度作れば永続化する</span>
+                    <p>セッション開始時に一度だけ実行することで、次回以降は自動的に読み込まれる。</p>
+                    <div class="command-box">
+                        # セッション開始時に一度だけ実行<br>
+                        $ claude "このプロジェクトの構造・技術スタック・コーディング規約を分析して、<br>
+                        CLAUDE.md として保存してください。<br>
+                        次回以降のエージェントが最初に読む '憲法' になります。"
+                    </div>
+                    <p style="color:#bbb; margin-top:14px; font-size:0.95em;">
+                        <strong style="color:var(--accent)">教訓:</strong>
+                        CLAUDE.md は「エージェントへの命令書」。プロジェクトルートに置くと Claude が自動的に読む。
+                        コーディング規約・禁止パターン・フォルダ構成の意図を書いておくと効果絶大。
+                    </p>
+                </div>
+            </div>
+
+            <!-- Pattern 7 -->
+            <div class="pattern-card">
+                <div class="pattern-title">⚠️ 7. The "Stale Context" Drift</div>
+                <p>古いコンテキストが新しい指示に干渉するパターン。Context Poisoning（Pattern 3）の亜種だが、こちらは「明示的に却下・削除した情報」が幽霊のように復活する点が違う。</p>
+
+                <div class="symptom-box">
+                    <span class="symptom-label">Symptoms (症状)</span>
+                    &gt; 「3時間前に却下したアプローチを突然また実装し始めた」<br>
+                    &gt; 「削除したファイルへの参照が残ったコードを書いてきた」<br>
+                    &gt; 「フォルダ構成を変更したのに、古いパスでインポートを書いてくる」
+                </div>
+
+                <div class="solution-block">
+                    <span class="solution-header">✅ The Fix: コンテキストを明示的に上書きする</span>
+                    <p><code>/compact</code> または <code>/clear</code> でリセットした後、「現在の正しい状態」だけを再提示する。過去の経緯は渡さない。</p>
+                    <div class="command-box">
+                        /compact  # コンテキストを圧縮（重要部分だけ残す）<br>
+                        # または<br>
+                        /clear    # 完全リセット後に重要事項だけ再提示<br>
+                        <br>
+                        $ claude "作業を再開します。現在の正しい状態:<br>
+                        - 使用技術: [現在の技術スタック]<br>
+                        - 完了済み: [済んだこと]<br>
+                        - 現在のタスク: [今やること]<br>
+                        - 却下済みアプローチ: [再提案禁止の内容]"
+                    </div>
+                    <p style="color:#bbb; margin-top:14px; font-size:0.95em;">
+                        <strong style="color:var(--accent)">教訓:</strong>
+                        Context Poisoning は「疲れ」、Stale Context Drift は「幽霊」。
+                        対処法は同じく /clear + 正解だけの再提示だが、「却下済みアプローチ」を明示的に列挙するのが有効。
+                    </p>
+                </div>
+            </div>
+
         </section>
+
+        <div style="color:#555; font-size:0.85em; margin-top:60px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.07);">
+            最終更新: 2026-06-08 &nbsp;|&nbsp; <a href="index.html" style="color:#555;">← Strategy Hub</a>
+        </div>
     </div>
 </body>
 

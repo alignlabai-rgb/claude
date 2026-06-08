@@ -46,6 +46,12 @@
             padding-bottom: 10px;
         }
 
+        h3 {
+            font-size: 19px;
+            margin-top: 36px;
+            color: #ccc;
+        }
+
         .spec-card {
             background: #222;
             padding: 30px;
@@ -91,6 +97,118 @@
             color: #666;
             text-decoration: none;
         }
+
+        /* Sample cards */
+        .sample-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 24px;
+        }
+
+        .sample-card {
+            background: #222;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 24px;
+        }
+
+        .sample-label {
+            display: inline-block;
+            padding: 3px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            background: rgba(0, 255, 157, 0.12);
+            color: var(--accent);
+            border: 1px solid rgba(0, 255, 157, 0.3);
+            margin-bottom: 12px;
+        }
+
+        .sample-card h4 {
+            font-size: 16px;
+            color: #fff;
+            margin: 0 0 12px;
+        }
+
+        .sample-card .code-box {
+            font-size: 12px;
+        }
+
+        /* Failure pattern table */
+        .fail-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .fail-table th {
+            background: #2a2a2a;
+            color: var(--accent);
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .fail-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #2a2a2a;
+            color: #ccc;
+            vertical-align: top;
+        }
+
+        .fail-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .fail-tag {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+            background: rgba(255, 77, 77, 0.12);
+            color: #ff4d4d;
+            border: 1px solid rgba(255, 77, 77, 0.3);
+            white-space: nowrap;
+        }
+
+        .fix-tag {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+            background: rgba(0, 255, 157, 0.12);
+            color: var(--accent);
+            border: 1px solid rgba(0, 255, 157, 0.3);
+        }
+
+        .info-box {
+            background: rgba(0, 255, 157, 0.06);
+            border: 1px solid rgba(0, 255, 157, 0.25);
+            border-radius: 8px;
+            padding: 18px 20px;
+            margin: 20px 0;
+            color: #cce8d8;
+        }
+
+        .info-box-title {
+            font-weight: bold;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+
+        .footer-note {
+            margin-top: 80px;
+            padding-top: 20px;
+            border-top: 1px solid #333;
+            color: #555;
+            font-size: 13px;
+        }
     </style>
 </head>
 
@@ -109,7 +227,7 @@
                 曖昧な Spec は、曖昧な成果物（または無限ループ）を生みます。</p>
 
             <h2>The Perfect Mission Spec</h2>
-            <p>OpenClaw に仕事を投げるときは、必ず以下のフォーマットで記述した Markdown ファイル (`MISSION.md`) を渡してください。</p>
+            <p>OpenClaw に仕事を投げるときは、必ず以下のフォーマットで記述した Markdown ファイル (<code>MISSION.md</code>) を渡してください。</p>
 
             <div class="spec-card">
                 <div class="spec-title">Template: MISSION.md</div>
@@ -144,12 +262,194 @@
             <h2>Intervention (介入)</h2>
             <p>Mission実行中、Operatorはログ監視画面（Mission Control）で状況を見守ります。</p>
             <ul>
-                <li><strong>Pause & Redirect</strong>: 「方向性が違う」と思ったら即座に一時停止し、チャットで軌道修正を指示します。</li>
+                <li><strong>Pause &amp; Redirect</strong>: 「方向性が違う」と思ったら即座に一時停止し、チャットで軌道修正を指示します。</li>
                 <li><strong>Inject Knowledge</strong>: エージェントが迷っていたら、ヒントや追加資料を途中で差し入れます。</li>
             </ul>
             <p>完全に放置するのではなく、<strong>「困っているときだけ助け船を出す」</strong>のが熟練Operatorの技です。</p>
 
+            <!-- ===== Section: 実戦 Mission サンプル集 ===== -->
+            <h2>実戦 Mission サンプル集</h2>
+            <p>以下の4つのサンプルは、現場でそのまま使えるテンプレートです。
+                Objective・Constraints・Definition of Done の3点セットを必ず揃えることが、成功率を高める鍵です。</p>
+
+            <h3>Sample A: 機能実装 Mission</h3>
+            <div class="spec-card">
+                <div class="spec-title">feature-search.md</div>
+                <div class="code-box"># Mission: 検索機能の実装
+
+## 1. Objective
+ユーザーが商品名でアイテムを全文検索できる機能を実装する。
+
+## 2. Constraints
+- DB は既存の PostgreSQL を使う（新しい DB は追加しない）
+- フロントエンドは既存の React コンポーネントの設計パターンに従う
+- レスポンスタイム: 300ms 以内（ベンチマークテストで証明すること）
+- 絶対に変更してはいけないファイル: src/db/schema.ts
+
+## 3. Definition of Done
+- [ ] POST /api/search エンドポイントが実装されている
+- [ ] フロントエンドの SearchBar コンポーネントが動作する
+- [ ] `npm test` が全 PASS
+- [ ] レスポンスタイムのベンチマーク結果が logs/benchmark.json に保存されている
+
+## 4. Resources
+- 参照ファイル: src/db/schema.ts, src/api/routes.ts, src/components/ItemCard.tsx</div>
+                <span class="annotation">新機能実装の場合は「制約」と「測定可能なDoD」が特に重要。ベンチマーク結果ファイルをDoDに含めることで検証可能にします。</span>
+            </div>
+
+            <h3>Sample B: バグ修正 Mission</h3>
+            <div class="spec-card">
+                <div class="spec-title">bugfix-234.md</div>
+                <div class="code-box"># Mission: ログインループバグの修正
+
+## 1. Objective
+Issue #234: ログイン後に /dashboard にリダイレクトされず、
+ログイン画面に戻るバグを修正する。
+
+## 2. Resources
+- 再現手順: src/docs/bug-234-reproduction.md
+- 関連ファイル: src/auth/callback.ts, src/middleware/auth.ts
+
+## 3. Constraints
+- 認証ロジックのリファクタリングは禁止（スコープ外）
+- Cookie の設定は変更しない
+- 絶対に変更してはいけないファイル: src/auth/session.ts, src/tests/auth.test.ts
+
+## 4. Definition of Done
+- [ ] bug-234-reproduction.md の手順でバグが再現しない
+- [ ] `npm test -- --testPathPattern=auth` が全 PASS
+- [ ] 修正内容のコメントを該当箇所に追記している</div>
+                <span class="annotation">バグ修正では「再現手順ファイル」をResourcesに含め、DoDに「その手順でバグが再現しないこと」を入れるのが鉄則。</span>
+            </div>
+
+            <h3>Sample C: リファクタリング Mission</h3>
+            <div class="spec-card">
+                <div class="spec-title">refactor-auth.md</div>
+                <div class="code-box"># Mission: 認証モジュールの分割
+
+## 1. Objective
+600行ある src/auth.ts を責務単位に分割する。
+
+## 2. Target Structure
+src/auth/
+├── index.ts        (re-export のみ)
+├── login.ts        (ログイン処理)
+├── session.ts      (セッション管理)
+├── permissions.ts  (権限チェック)
+└── utils.ts        (共通ユーティリティ)
+
+## 3. Constraints
+- 外部から見た API は一切変更しない（index.ts で全て re-export）
+- 既存のテストコードは変更しない
+- 絶対に変更してはいけないファイル: src/tests/auth.test.ts
+
+## 4. Definition of Done
+- [ ] `npm run build` が成功する
+- [ ] `npm test` が全 PASS
+- [ ] 元の auth.ts が削除されている
+- [ ] src/auth/ 以下に5ファイルが存在する</div>
+                <span class="annotation">リファクタリングでは「外部から見た API 変更禁止」という Constraints と、テストが PASS することを DoD にすることで安全性を担保します。</span>
+            </div>
+
+            <h3>Sample D: ドキュメント生成 Mission</h3>
+            <div class="spec-card">
+                <div class="spec-title">doc-api.md</div>
+                <div class="code-box"># Mission: API ドキュメントの自動生成
+
+## 1. Objective
+src/api/ 以下のすべてのエンドポイントに JSDoc コメントを追加し、
+OpenAPI 仕様書 (docs/api.yaml) を生成する。
+
+## 2. Constraints
+- コメントを追加するのみ。実装コードは変更しない
+- 生成ツールは既存の `swagger-jsdoc` を使用する（新パッケージ不可）
+- 英語でコメントを書く（既存コードの言語に統一）
+
+## 3. Definition of Done
+- [ ] `npm run docs:generate` が成功する
+- [ ] docs/api.yaml が生成されている
+- [ ] src/api/ 以下の全ファイルに JSDoc コメントが存在する
+- [ ] `npm test` が引き続き全 PASS
+
+## 4. Resources
+- 参照ファイル: src/api/routes.ts, package.json（既存スクリプト確認用）
+- 参照してはいけないファイル: src/legacy/*</div>
+                <span class="annotation">「変更してよいもの／してはいけないもの」を明確に分離するだけで、エージェントのドリフトを大幅に防げます。</span>
+            </div>
+
+            <!-- ===== Section: 失敗パターンと対策 ===== -->
+            <h2>Mission の失敗パターンと対策</h2>
+            <p>Mission が思い通りに動かないとき、ほとんどの原因は「Spec の書き方」にあります。
+                よくある失敗パターンを把握し、事前に手を打ちましょう。</p>
+
+            <table class="fail-table">
+                <thead>
+                    <tr>
+                        <th>パターン</th>
+                        <th>症状</th>
+                        <th>根本原因</th>
+                        <th>対策</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="fail-tag">Constraints が曖昧</span></td>
+                        <td>エージェントが勝手に判断して想定外の変更をする</td>
+                        <td>「しないこと」が明記されていない</td>
+                        <td>NGワード（「絶対に〇〇してはいけない」）と「絶対に変更してはいけないファイル」セクションを追加</td>
+                    </tr>
+                    <tr>
+                        <td><span class="fail-tag">DoD が測定不能</span></td>
+                        <td>「いい感じに」で終わりが来ない / 無限改善ループ</td>
+                        <td>合否を判定できる基準がない</td>
+                        <td>コマンドで確認できる基準のみ（<code>npm test PASS</code>、ファイルの存在確認）を DoD にする</td>
+                    </tr>
+                    <tr>
+                        <td><span class="fail-tag">Resources が多すぎ</span></td>
+                        <td>コンテキスト溢れ / 混乱して誤ったファイルを編集</td>
+                        <td>LLM のコンテキストウィンドウを超える情報量</td>
+                        <td>参照するファイルは5個以内に絞る。巨大ファイルは関連セクションのみ抜粋して渡す</td>
+                    </tr>
+                    <tr>
+                        <td><span class="fail-tag">スコープが大きすぎ</span></td>
+                        <td>途中でタイムアウト / 作業がドリフトして別の問題に取り組む</td>
+                        <td>30分以内に完了できないサイズ</td>
+                        <td>Mission を「30分以内で終わるサイズ」に分割。大きなゴールは Orchestrator Mission でサブタスクに分ける</td>
+                    </tr>
+                    <tr>
+                        <td><span class="fail-tag">Objective が複数ある</span></td>
+                        <td>どちらかの目標が中途半端になる / 両立できず止まる</td>
+                        <td>「これもやって、あれもやって」型の指示</td>
+                        <td>1 Mission = 1 Objective の原則を守る。2つのゴールは2つの Mission に分割する</td>
+                    </tr>
+                    <tr>
+                        <td><span class="fail-tag">技術前提が不明</span></td>
+                        <td>フレームワークやバージョンを誤って推測する</td>
+                        <td>コードベースの文脈情報が不足</td>
+                        <td>Resources に <code>package.json</code> や <code>README.md</code> を含める。使用技術スタックを Objective に明記する</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="info-box">
+                <div class="info-box-title">Mission 品質チェックリスト（実行前に確認）</div>
+                <ul style="margin:0;padding-left:20px;color:#cce8d8;">
+                    <li>Objective は1文で言い切れるか？（2つ以上あれば分割）</li>
+                    <li>Constraints に「絶対に変更してはいけないファイル」が書かれているか？</li>
+                    <li>DoD の各項目はコマンドや存在確認で検証できるか？（「いい感じ」は NG）</li>
+                    <li>Resources のファイルは5個以内か？</li>
+                    <li>30分以内で完了できるサイズか？（不安なら分割）</li>
+                </ul>
+            </div>
+
         </section>
+
+        <div class="footer-note">
+            最終更新: 2026-06-08 &nbsp;|&nbsp;
+            <a href="index.html" style="color:#555">OpenClaw Hub</a> &nbsp;|&nbsp;
+            <a href="architecture.html" style="color:#555">Architecture</a> &nbsp;|&nbsp;
+            <a href="troubleshooting.html" style="color:#555">Troubleshooting</a>
+        </div>
     </div>
 </body>
 

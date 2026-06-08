@@ -100,6 +100,137 @@
             color: #666;
             text-decoration: none;
         }
+
+        /* Tool table */
+        .tool-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .tool-table th {
+            background: #2a2a2a;
+            color: var(--accent);
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .tool-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #2a2a2a;
+            color: #ccc;
+            vertical-align: top;
+        }
+
+        .tool-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .tool-name {
+            font-family: "SF Mono", monospace;
+            color: #a5d6ff;
+            font-size: 13px;
+        }
+
+        .tool-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .tag-safe {
+            background: rgba(0, 255, 157, 0.12);
+            color: var(--accent);
+            border: 1px solid rgba(0, 255, 157, 0.3);
+        }
+
+        .tag-write {
+            background: rgba(255, 200, 77, 0.12);
+            color: #ffc84d;
+            border: 1px solid rgba(255, 200, 77, 0.3);
+        }
+
+        .tag-danger {
+            background: rgba(255, 77, 77, 0.12);
+            color: #ff4d4d;
+            border: 1px solid rgba(255, 77, 77, 0.3);
+        }
+
+        /* Multi-agent */
+        .pattern-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .pattern-card {
+            background: #222;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 18px;
+        }
+
+        .pattern-card-title {
+            color: var(--accent);
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .pattern-card p {
+            color: #999;
+            font-size: 13px;
+            margin: 0;
+        }
+
+        /* Code block */
+        .code-block {
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 18px 20px;
+            font-family: "SF Mono", monospace;
+            font-size: 13px;
+            color: #a5d6ff;
+            white-space: pre-wrap;
+            line-height: 1.6;
+            margin: 16px 0;
+            overflow-x: auto;
+        }
+
+        .code-comment {
+            color: #5a8a6a;
+        }
+
+        .info-box {
+            background: rgba(0, 255, 157, 0.06);
+            border: 1px solid rgba(0, 255, 157, 0.25);
+            border-radius: 8px;
+            padding: 18px 20px;
+            margin: 20px 0;
+            color: #cce8d8;
+        }
+
+        .info-box-title {
+            font-weight: bold;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+
+        .footer-note {
+            margin-top: 80px;
+            padding-top: 20px;
+            border-top: 1px solid #333;
+            color: #555;
+            font-size: 13px;
+        }
     </style>
 </head>
 
@@ -113,7 +244,7 @@
         <span class="subtitle">Understanding the OODA Loop</span>
 
         <section>
-            <p>OpenClaw (Official OpenAI Operator) は、単なる「チャットボット」ではありません。<br>
+            <p>OpenClaw は、単なる「チャットボット」ではありません。<br>
                 それは、目標が達成されるまで無限に自己対話を繰り返す<strong>再帰的ループ・プログラム</strong>です。</p>
 
             <h2>The OODA Loop</h2>
@@ -173,7 +304,217 @@
             </div>
             <p>これにより、Operator（あなた）は後から「彼がなぜその修正をしたのか」を完全に追跡（Audit）できるのです。</p>
 
+            <!-- ===== Tool System ===== -->
+            <h2>Tool System（ツールシステム）</h2>
+            <p>OpenClaw がデフォルトで持つツール群は、エージェントが世界と相互作用する「手足」です。
+                各ツールは副作用の大きさによってリスクが異なるため、<strong>副作用の小さいツールを優先</strong>して使う設計になっています。</p>
+
+            <table class="tool-table">
+                <thead>
+                    <tr>
+                        <th>ツール</th>
+                        <th>説明</th>
+                        <th>副作用</th>
+                        <th>代表的な使用例</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="tool-name">read_file(path)</span></td>
+                        <td>ファイルを読み込む</td>
+                        <td><span class="tool-tag tag-safe">なし</span></td>
+                        <td>コードを理解する・構造を把握する</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tool-name">list_dir(path)</span></td>
+                        <td>ディレクトリ一覧を取得する</td>
+                        <td><span class="tool-tag tag-safe">なし</span></td>
+                        <td>プロジェクト構造を把握する</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tool-name">write_file(path, content)</span></td>
+                        <td>ファイルを書き換える（上書き）</td>
+                        <td><span class="tool-tag tag-write">書き込み</span></td>
+                        <td>実装・修正・ドキュメント生成</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tool-name">bash(command)</span></td>
+                        <td>シェルコマンドを実行する</td>
+                        <td><span class="tool-tag tag-danger">高リスク</span></td>
+                        <td>テスト実行・ビルド・パッケージ操作</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tool-name">browser_navigate(url)</span></td>
+                        <td>ブラウザで URL を開く</td>
+                        <td><span class="tool-tag tag-write">外部通信</span></td>
+                        <td>Web 上の資料を確認する・API ドキュメントを読む</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tool-name">browser_screenshot()</span></td>
+                        <td>現在の画面をキャプチャする</td>
+                        <td><span class="tool-tag tag-safe">なし</span></td>
+                        <td>UI の表示状態を確認する・レイアウトのデバッグ</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tool-name">mcp_call(server, tool, args)</span></td>
+                        <td>MCP サーバーのツールを呼び出す</td>
+                        <td><span class="tool-tag tag-write">外部通信</span></td>
+                        <td>GitHub / Slack / DB など外部 API との連携</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="info-box">
+                <div class="info-box-title">ツール選択の原則: 最小副作用</div>
+                <p style="margin:0;color:#cce8d8;">
+                    エージェントは <strong>read &gt; write &gt; bash</strong> の順で、より副作用の小さいツールを選ぶよう設計されています。
+                    「まず読んで理解し、最小限だけ書き、どうしても必要なときだけシェルを叩く」というアプローチが
+                    予測可能な動作と安全性を両立させます。<br><br>
+                    Mission の Constraints に <code>--read-only</code> を指定すると、分析フェーズで write ツールを完全に封じることができます。
+                </p>
+            </div>
+
+            <h3>カスタムツールの追加</h3>
+            <p>OpenClaw は MCP（Model Context Protocol）経由でツールを拡張できます。
+                <code>.claude/settings.json</code> の <code>mcpServers</code> セクションにサーバーを追加すると、
+                そのサーバーが提供するツールが自動的にエージェントから利用可能になります。</p>
+            <div class="code-block"><span class="code-comment"># .claude/settings.json の例</span>
+{
+  "mcpServers": {
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": { "GITHUB_TOKEN": "${GITHUB_TOKEN}" }
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/workspace"]
+    }
+  }
+}</div>
+
+            <!-- ===== Multi-Agent Coordination ===== -->
+            <h2>Multi-Agent Coordination（マルチエージェント協調）</h2>
+            <p>複雑なプロジェクトでは、単一エージェントに全作業を任せるより、
+                複数の OpenClaw インスタンスが役割分担する設計が効果的です。
+                以下の3パターンが代表的な協調アーキテクチャです。</p>
+
+            <div class="pattern-grid">
+                <div class="pattern-card">
+                    <div class="pattern-card-title">Orchestrator / Worker</div>
+                    <p>1つのメインエージェントが全体計画を立て、複数ワーカーに作業を分配する。ワーカーは独立したサブタスクを並列実行する。</p>
+                </div>
+                <div class="pattern-card">
+                    <div class="pattern-card-title">Blackboard パターン</div>
+                    <p>共有メモリファイル（<code>.agent/shared-state.md</code>）を黒板として、複数エージェントが読み書きして情報を交換する。</p>
+                </div>
+                <div class="pattern-card">
+                    <div class="pattern-card-title">A2A Protocol 連携</div>
+                    <p>他フレームワーク（MAF / LangGraph）のエージェントと A2A プロトコルでハンドオフし、異種エージェントを協調させる。</p>
+                </div>
+            </div>
+
+            <h3>Orchestrator / Worker パターンの実装例</h3>
+            <div class="code-block"><span class="code-comment"># Orchestrator に投入する Mission ファイル</span>
+# Mission: フルスタック機能実装（オーケストレーション）
+
+## 1. Objective
+検索機能を並列開発する。フロントエンドとバックエンドを同時に実装し、
+最後に統合テストで接続を確認する。
+
+## 2. Sub-tasks
+- [Worker A] フロントエンド実装: missions/frontend-search.md
+- [Worker B] バックエンド実装: missions/backend-search.md
+- [Integration] Worker A + B 完了後: missions/integration-test.md
+
+## 3. Coordination
+- Worker A / B は .agent/shared-state.md に API 仕様を記録してから実装開始
+- どちらかが API 仕様を変更する場合は shared-state.md を先に更新する
+
+## 4. Definition of Done
+- [ ] フロントエンドとバックエンドの統合テストが PASS する
+- [ ] shared-state.md に最終 API 仕様が記録されている</div>
+
+            <div class="code-block"><span class="code-comment"># 実行コマンド（Orchestrator モード）</span>
+$ openclaw run orchestration-mission.md --orchestrate \
+  --max-workers 2 \
+  --shared-state .agent/shared-state.md</div>
+
+            <h3>Blackboard パターン（共有状態ファイル）</h3>
+            <div class="code-block"><span class="code-comment"># .agent/shared-state.md の構造例</span>
+# Shared State
+
+## API 仕様（Worker B が記録 → Worker A が参照）
+- POST /api/search
+- Request: { query: string, limit?: number }
+- Response: { items: Item[], total: number }
+
+## 完了フラグ
+- [x] Worker B: バックエンド実装完了
+- [ ] Worker A: フロントエンド実装完了</div>
+
+            <!-- ===== 実行フロー詳細ダイアグラム ===== -->
+            <h2>実行フロー詳細ダイアグラム</h2>
+            <p>Mission 投入から DoD 達成までの完全なフローです。
+                エージェントの内部処理がどのように進むかを俯瞰することで、
+                どのフェーズで何が起きているかを理解できます。</p>
+
+            <div class="diagram">
+[Operator]  →  MISSION.md 投入
+                    ↓
+[Parser]    →  Objective / Constraints / DoD を解析
+              「何を達成するか」「何を禁止されているか」「どうなれば終わりか」を抽出
+                    ↓
+[Planner]   →  タスクをサブステップに分解（内部計画）
+              「まずファイル構造を読む」→「テストを走らせる」→「修正する」の順を決める
+                    ↓
+[Executor]  ←→  OODA Loop × N 回
+              ┌─ Observe: ツール実行（read_file / bash / screenshot）
+              ├─ Orient:  推論・仮説構築（Scratchpad に記録）
+              ├─ Decide:  次の最小アクションを決定
+              └─ Act:     副作用ある操作を実行 → Loop back
+                    ↓
+[Checker]   →  DoD チェックリストを1つずつ検証
+              未完了項目があれば Executor に戻る（最大 --max-steps 回まで）
+                    ↓
+[Reporter]  →  完了レポート生成（何をしたか・なぜしたか）
+                    ↓
+[Operator]  ←  通知: "Mission Complete" / "Mission Failed: 理由"</div>
+
+            <h3>各フェーズの役割</h3>
+            <p><strong>Parser</strong> は MISSION.md を読み込み、構造化された内部表現に変換します。
+                Constraints を正確に解析できないと、後の全フェーズに影響するため、
+                MISSION.md の書き方の品質が直接エージェントの行動精度に影響します。</p>
+
+            <p><strong>Planner</strong> は Objective を達成するための大まかな手順を立てます。
+                この計画は実行中に更新されますが、最初の計画が間違っていると
+                後の OODA ループで修正コストが増大します。</p>
+
+            <p><strong>Checker</strong> は DoD の各項目を実際にコマンドや確認で検証します。
+                DoD が「テストが PASS すること」のように機械的に検証できる形式であれば、
+                Checker は確実に判定できます。「いい感じになること」では判定できません。</p>
+
+            <p><strong>Reporter</strong> は Scratchpad に記録された推論ログを元に、
+                人間が読めるサマリーを生成します。なぜその変更をしたかの追跡が可能になります。</p>
+
+            <div class="info-box">
+                <div class="info-box-title">フローを理解するとデバッグが速くなる</div>
+                <p style="margin:0;color:#cce8d8;">
+                    エージェントが期待通りに動かないとき、「どのフェーズで問題が起きているか」を特定することが重要です。<br>
+                    Parser フェーズの問題なら MISSION.md の書き方を修正。<br>
+                    Executor フェーズの問題なら <code>--max-steps</code> を増やすか Mission を分割。<br>
+                    Checker フェーズの問題なら DoD をより具体的な検証コマンドに書き直す。
+                </p>
+            </div>
+
         </section>
+
+        <div class="footer-note">
+            最終更新: 2026-06-08 &nbsp;|&nbsp;
+            <a href="index.html" style="color:#555">OpenClaw Hub</a> &nbsp;|&nbsp;
+            <a href="mission-control.html" style="color:#555">Mission Control</a> &nbsp;|&nbsp;
+            <a href="security.html" style="color:#555">Security</a>
+        </div>
     </div>
 </body>
 

@@ -111,6 +111,41 @@
             color: #666;
             text-decoration: none;
         }
+
+        .tip-box {
+            background: rgba(16, 185, 129, 0.08);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-top: 20px;
+            color: #a7f3d0;
+            font-size: 0.95em;
+        }
+
+        .tip-box strong {
+            color: var(--accent);
+        }
+
+        .step-label {
+            display: inline-block;
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent);
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        .footer-note {
+            color: #555;
+            font-size: 0.85em;
+            margin-top: 60px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.07);
+        }
     </style>
 </head>
 
@@ -184,7 +219,133 @@
                     必要なライブラリがあれば `npm install` していい。"</div>
             </div>
 
+            <!-- Recipe 4 -->
+            <div class="recipe-card">
+                <div class="recipe-title">Recipe 04: "API First" Generation <span class="tag">API DESIGN</span></div>
+                <p class="explanation">OpenAPI スペックを起点に、型定義・サーバー実装・クライアント SDK・テストをすべて自動生成するパターン。仕様を「単一の真実の源泉」として、実装とテストの乖離をゼロにする。</p>
+
+                <div class="section-title">Step 1: スペック作成</div>
+                <p class="explanation">ビジネス要件を Claude に渡し、OpenAPI 3.1 の YAML を生成させます。</p>
+                <div class="prompt-box">$ claude "以下のビジネス要件を満たす OpenAPI 3.1 スペックを YAML で作成して。
+  - エンドポイント: POST /users, GET /users/{id}, PATCH /users/{id}
+  - 認証: Bearer JWT
+  - レスポンス: JSON、エラーは RFC 7807 準拠
+ファイル名: openapi.yaml"</div>
+
+                <div class="section-title">Step 2: クライアント / サーバー生成</div>
+                <p class="explanation">生成したスペックから、型定義・ルーター・SDK を一括で出力させます。</p>
+                <div class="prompt-box">$ claude "openapi.yaml を読んで、以下を生成して:
+  1. TypeScript の型定義 (types/api.ts)
+  2. FastAPI のルーター実装 (routers/users.py)
+  3. axios を使ったフロントエンド SDK (sdk/users.ts)"</div>
+
+                <div class="section-title">Step 3: テスト生成</div>
+                <p class="explanation">スペックに基づき、正常系・異常系を網羅したテストを自動生成します。</p>
+                <div class="prompt-box">$ claude "openapi.yaml の各エンドポイントに対して pytest テストを生成して。
+  正常系・異常系（400, 401, 404, 422）を網羅すること。"</div>
+
+                <div class="tip-box">
+                    <strong>ポイント:</strong> スペック変更時は Step 1 だけを更新し、Step 2・3 を再実行する。「スペックが変われば実装とテストも自動で追随する」サイクルを作ることが目的。
+                </div>
+            </div>
+
+            <!-- Recipe 5 -->
+            <div class="recipe-card">
+                <div class="recipe-title">Recipe 05: "Database Migration" Safety <span class="tag">DATABASE</span></div>
+                <p class="explanation">本番データに影響するスキーマ変更を安全に行うパターン。まず読み取り専用で影響分析を行い、人間が確認してから実行計画を作成する二段構えが鉄則。</p>
+
+                <div class="section-title">Phase 1: 影響範囲分析（Read-Only）</div>
+                <p class="explanation">migration ファイルを読み取り専用で分析し、リスクと rollback 手順をまとめます。</p>
+                <div class="prompt-box">$ claude --print "migrations/ 以下の新しい migration ファイルを読んで:
+  1. 影響を受けるテーブルと列を列挙
+  2. データ消失リスクがある操作を赤字で特定
+  3. ロールバック手順を3ステップで説明
+  ファイルは修正しないこと。" > migration_analysis.md</div>
+
+                <div class="section-title">Phase 2: ダウンタイムなし移行計画の作成</div>
+                <p class="explanation">分析結果をもとに Blue-Green デプロイで無停止移行を実現する手順書を生成します。各ステップには必ずロールバック可否を明記させます。</p>
+                <div class="prompt-box">$ claude "migration_analysis.md を読んで、
+  Blue-Green デプロイで無停止 migration を実現する手順書を作って。
+  各ステップに 'SAFE TO ROLLBACK: YES/NO' を明記すること。"</div>
+
+                <div class="tip-box">
+                    <strong>原則:</strong> migration は「実行→確認→次ステップ」の小刻みなサイクルで進める。1 回の migration で複数テーブルを変更しない。
+                </div>
+            </div>
+
+            <!-- Recipe 6 -->
+            <div class="recipe-card">
+                <div class="recipe-title">Recipe 06: "Documentation Sync" <span class="tag">DOCS</span></div>
+                <p class="explanation">実装とドキュメントを常に一致させる自動化パターン。コードを正とし、ドキュメントの抜けを自動検出・補完する。</p>
+
+                <div class="section-title">The Prompt (Copy & Paste)</div>
+                <div class="prompt-box">$ claude "以下をすべて実行して:
+  1. src/ 以下の全 TypeScript ファイルを読む
+  2. 公開API（export された関数・クラス）の一覧を抽出
+  3. docs/API_REFERENCE.md と比較して、ドキュメントに抜けている関数を特定
+  4. 抜けている関数の JSDoc コメントを src/ に追記
+  5. docs/API_REFERENCE.md を自動更新"</div>
+
+                <div class="tip-box">
+                    <strong>応用:</strong> CI/CD に組み込むと、PR マージのたびにドキュメントが自動更新される。「ドキュメントが古くなる問題」を仕組みで解決するのが狙い。
+                </div>
+            </div>
+
+            <!-- Recipe 7 -->
+            <div class="recipe-card">
+                <div class="recipe-title">Recipe 07: "Incident Response" Assistant <span class="tag">DEBUGGING</span></div>
+                <p class="explanation">本番障害時の高速トリアージパターン。エラーログをパイプで渡し、上級 SRE ペルソナで根本原因・緩和策・次の調査コマンドを 5 分以内に返させる。</p>
+
+                <div class="section-title">Incident 発生時のコマンド（コピペで即使用）</div>
+                <div class="prompt-box">$ cat /var/log/app/error.log | tail -n 200 | \
+  claude -p "あなたは上級 SRE です。
+  このエラーログを分析して以下を5分以内に回答してください:
+  1. 根本原因 (Root Cause) の仮説 TOP3 とその確率
+  2. 即時の緩和策 (Mitigation) — サービス影響を最小化するための操作
+  3. 調査すべき次の3コマンド
+  現在の時刻: $(date). 影響範囲を最小化することを最優先にしてください。"</div>
+
+                <div class="section-title">ポストモーテム作成への応用</div>
+                <div class="prompt-box">$ claude "incident_log.md を読んで、以下の形式でポストモーテムを作成して:
+  - タイムライン（時系列の出来事）
+  - 根本原因（技術的原因と組織的原因）
+  - 影響範囲（対象ユーザー数・ダウンタイム）
+  - 再発防止策（Action Item と担当者・期限）"</div>
+
+                <div class="tip-box">
+                    <strong>ポイント:</strong> ログの末尾 200 行だけをパイプすることでコンテキストを節約しつつ、最新の異常シグナルを確実に渡せる。ログが多い場合は <code>grep ERROR</code> で絞り込んでからパイプする。
+                </div>
+            </div>
+
+            <!-- Recipe 8 -->
+            <div class="recipe-card">
+                <div class="recipe-title">Recipe 08: "Codebase Onboarding" <span class="tag">KNOWLEDGE</span></div>
+                <p class="explanation">新規参加者・新セッションのための高速キャッチアップパターン。Claude にリポジトリを探索させ、次のエージェントや人間が 30 分で戦力になれる ONBOARDING.md を自動生成する。</p>
+
+                <div class="section-title">ONBOARDING.md 自動生成</div>
+                <div class="prompt-box">$ claude --print "このリポジトリの新しい担当者向けに以下を作成してください:
+  1. 30行以内のアーキテクチャ概要（図なし・テキストのみ）
+  2. 開発環境の立ち上げ手順（コマンドつき）
+  3. 'はじめての修正' として適切な 3 Issues の提案（難易度: easy）
+  4. 地雷（このコードには手を出してはいけない）ファイル・関数の警告一覧
+  ONBOARDING.md として出力。" > ONBOARDING.md</div>
+
+                <div class="section-title">新セッション開始時の高速リロード</div>
+                <p class="explanation">ONBOARDING.md を作成したら、以降のセッションでは冒頭に読み込ませるだけで済みます。</p>
+                <div class="prompt-box">$ claude "ONBOARDING.md と CLAUDE.md を読んで、現在の作業コンテキストを把握してください。
+  把握できたら「準備完了」と一言だけ返してください。"</div>
+
+                <div class="tip-box">
+                    <strong>応用:</strong> ONBOARDING.md は CI で定期自動更新すると鮮度を保てる。<br>
+                    <strong>CLAUDE.md との違い:</strong> CLAUDE.md はエージェントへの「命令書」、ONBOARDING.md は人間とエージェント双方への「地図」として使い分ける。
+                </div>
+            </div>
+
         </section>
+
+        <div class="footer-note">
+            最終更新: 2026-06-08 &nbsp;|&nbsp; <a href="index.html" style="color:#555;">← Strategy Hub</a>
+        </div>
     </div>
 </body>
 

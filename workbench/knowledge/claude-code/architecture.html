@@ -58,6 +58,15 @@
             margin-bottom: 24px;
         }
 
+        ul, ol {
+            color: #ccc;
+            margin-bottom: 20px;
+        }
+
+        li {
+            margin-bottom: 6px;
+        }
+
         .file-tree {
             background: #0f172a;
             padding: 24px;
@@ -75,6 +84,11 @@
             border-radius: 8px;
             border: 1px solid rgba(217, 119, 87, 0.3);
             margin: 30px 0;
+            color: #ccc;
+        }
+
+        .highlight strong {
+            color: var(--accent);
         }
 
         code {
@@ -85,11 +99,133 @@
             color: #fdb;
         }
 
+        .code-block {
+            background: #0f172a;
+            padding: 20px 24px;
+            border-radius: 8px;
+            font-family: monospace;
+            color: #94a3b8;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            border: 1px solid #334155;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+
+        .code-block .comment {
+            color: #64748b;
+        }
+
+        .code-block .key {
+            color: #d97757;
+        }
+
+        .code-block .value {
+            color: #86efac;
+        }
+
         .back {
             display: inline-block;
             margin-bottom: 40px;
             color: #666;
             text-decoration: none;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 24px 0;
+            font-size: 15px;
+        }
+
+        th {
+            background: rgba(217, 119, 87, 0.15);
+            color: var(--accent);
+            padding: 12px 16px;
+            text-align: left;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        td {
+            padding: 12px 16px;
+            border: 1px solid rgba(255,255,255,0.06);
+            color: #ccc;
+        }
+
+        tr:nth-child(even) td {
+            background: rgba(255,255,255,0.02);
+        }
+
+        .info-box {
+            background: rgba(59, 130, 246, 0.08);
+            border: 1px solid rgba(59, 130, 246, 0.25);
+            border-radius: 8px;
+            padding: 20px 24px;
+            margin: 24px 0;
+            color: #93c5fd;
+            font-size: 15px;
+        }
+
+        .info-box strong {
+            color: #fff;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .layer-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            padding: 20px 24px;
+            margin-bottom: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .layer-card::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: var(--accent);
+        }
+
+        .layer-title {
+            font-weight: bold;
+            color: var(--accent);
+            font-family: monospace;
+            font-size: 15px;
+            margin-bottom: 8px;
+        }
+
+        .layer-desc {
+            color: #ccc;
+            font-size: 15px;
+            margin: 0;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-left: 8px;
+            font-weight: normal;
+            vertical-align: middle;
+        }
+
+        .tag-git { background: #166534; color: #86efac; }
+        .tag-local { background: #1e3a5f; color: #93c5fd; }
+        .tag-secret { background: #7c2d12; color: #fca5a5; }
+
+        footer {
+            margin-top: 80px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            color: #555;
+            font-size: 14px;
         }
     </style>
 </head>
@@ -159,7 +295,7 @@
                 現在は「Authモジュール」の実装中。ユーザー登録フローを完了させることが最優先。
             </div>
 
-            <h2>3. Agent-Driven Development Fow</h2>
+            <h2>3. Agent-Driven Development Flow</h2>
             <p>このアーキテクチャを使って開発を進める具体的なフロー。</p>
 
             <h3>Phase 1: Definition</h3>
@@ -170,11 +306,325 @@
                 <code>$ claude "Read .ai/CONTEXT.md and generate the directory structure and empty files for the Auth module."</code>
             </p>
 
-            <h3>Phase 3: Logic & Test</h3>
+            <h3>Phase 3: Logic &amp; Test</h3>
             <p>中身を埋めさせます。<br>
                 <code>$ claude "Implement the Auth service based on best practices. Create tests first."</code>
             </p>
         </section>
+
+        <!-- =============================================
+             追加セクション (2026年6月 拡充)
+             ============================================= -->
+
+        <section>
+            <h2>4. CLAUDE.md の書き方（決定版）</h2>
+            <p>CLAUDE.md はプロジェクトルートに置く「AIへの憲法」です。Claude がプロジェクトを開始する際に<strong>最初に自動的に読み込まれる</strong>ファイルであり、エージェントの行動規範となります。</p>
+            <p>ポイントは「コードの説明」ではなく、<strong>「AI が間違いを犯しやすい判断」を事前に明文化すること</strong>です。</p>
+
+            <h3>推奨テンプレート構造</h3>
+            <div class="code-block"># Project: [プロジェクト名]
+
+## 技術スタック
+- Frontend: React 19, TypeScript 5.4 (strict)
+- Backend: FastAPI 0.111, PostgreSQL 16
+- Test: Pytest, Vitest
+- CI/CD: GitHub Actions
+
+## コーディング規約
+- 型はすべて明示（any 禁止）
+- コメントは「なぜ」だけ書く（「何を」はコードで表現）
+- 1関数1責任。1ファイル 300 行を超えたら分割を検討
+- CSS は Tailwind のみ。インラインスタイル禁止
+
+## 作業前に必ず読むファイル
+- docs/API_SPEC.md（REST API の仕様・認証方式）
+- .env.example（環境変数の一覧と説明）
+- ARCHITECTURE.md（モジュール依存関係）
+
+## やってはいけないこと
+- node_modules/ を直接編集しない
+- master/main ブランチに直接コミットしない
+- 外部 API キーをコードにハードコードしない
+- データベースのマイグレーションを直接 DROP TABLE で戻さない
+- package.json のバージョンを理由なく変えない
+
+## よく使うコマンド
+- `npm run dev` — 開発サーバー起動（ポート 3000）
+- `npm test` — Vitest でテスト実行
+- `npm run lint` — ESLint + Prettier チェック
+- `npm run build` — 本番ビルド
+
+## 現在の作業フォーカス
+[担当者が毎回更新] 現在は認証モジュールのリファクタリング中。
+JWT → セッション Cookie への移行が完了していない。
+auth/services/token.ts を見ると現状が分かる。</div>
+
+            <h3>CLAUDE.md の書き方のコツ</h3>
+            <ul>
+                <li><strong>「禁止事項」を必ず書く</strong>: AIが悪意なくやりがちなミス（`any` 型の多用、直接 commit 等）を明示する。</li>
+                <li><strong>「現在のフォーカス」を毎回更新する</strong>: これがないと Claude は全体を把握しようとして不要なファイルを大量に読む。</li>
+                <li><strong>「よく使うコマンド」を書く</strong>: Claude がコマンドを推測で実行するミスを防げる。</li>
+                <li><strong>「関連ファイルへのポインタ」を書く</strong>: 「この文脈を理解するにはこのファイルを読め」と案内する。</li>
+                <li><strong>200行以内に収める</strong>: 長すぎる CLAUDE.md は最後まで読まれない。</li>
+            </ul>
+
+            <div class="info-box">
+                <strong>CLAUDE.md と CONTEXT.md の使い分け</strong>
+                CLAUDE.md はプロジェクトルートに置き、Claude が自動的に読む（人間向け規約も兼ねる）。<br>
+                CONTEXT.md は <code>.ai/</code> や <code>modules/xxx/</code> に置き、特定スコープの詳細文脈を格納する（AI 専用）。<br>
+                両方あるプロジェクトでは、CLAUDE.md が概要・方針、CONTEXT.md が詳細情報を持つ構造が理想的。
+            </div>
+        </section>
+
+        <section>
+            <h2>5. 設定ファイル体系（3層構造）</h2>
+            <p>Claude Code の設定は<strong>3つの層</strong>で構成されており、内側ほど優先度が高くなります。この構造を理解することで、「チーム共有」と「個人設定」を安全に分離できます。</p>
+
+            <div class="layer-card">
+                <div class="layer-title">~/.claude/CLAUDE.md <span class="tag tag-local">ローカルのみ</span></div>
+                <p class="layer-desc">全プロジェクト共通の個人設定。「自分はこういうコーディングスタイルが好き」「コミットメッセージは日本語で書いてほしい」といった個人の癖・好みを書く。git には入れない。</p>
+            </div>
+
+            <div class="layer-card">
+                <div class="layer-title">.claude/settings.json <span class="tag tag-git">git 管理</span></div>
+                <p class="layer-desc">プロジェクト固有の設定。チームメンバーが共有するべき設定（許可ツール・デフォルトモデル・MCP サーバー等）を書く。git にコミットしてチームで共有する。</p>
+            </div>
+
+            <div class="layer-card">
+                <div class="layer-title">.claude/settings.local.json <span class="tag tag-secret">gitignore 必須</span></div>
+                <p class="layer-desc">ローカル専用の上書き設定。API キー、個人の MCP サーバー設定、デバッグフラグ等。.gitignore に追加してリポジトリに入れない。</p>
+            </div>
+
+            <h3>.claude/settings.json の完全例</h3>
+            <div class="code-block">{
+  "model": "claude-sonnet-4-6",
+  "defaultEffort": "medium",
+
+  "permissions": {
+    "allow": [
+      "Bash(npm:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git diff:*)",
+      "Bash(git status)",
+      "Bash(git log:*)",
+      "Edit",
+      "Write",
+      "Read"
+    ],
+    "deny": [
+      "Bash(rm -rf*)",
+      "Bash(git push --force*)",
+      "Bash(git reset --hard*)",
+      "Bash(DROP TABLE*)"
+    ]
+  },
+
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/path/to/project"]
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+      }
+    }
+  },
+
+  "hooks": {
+    "afterToolUse": [
+      {
+        "match": { "tool": "Write" },
+        "command": "npm run lint --silent || true"
+      }
+    ]
+  }
+}</div>
+
+            <h3>設定の優先順位（高→低）</h3>
+            <p>同じキーが複数の層に存在する場合、以下の順で上書きされます。</p>
+            <ol>
+                <li>コマンドライン引数（<code>--model</code>, <code>--effort</code> 等）</li>
+                <li><code>.claude/settings.local.json</code>（ローカル上書き）</li>
+                <li><code>.claude/settings.json</code>（プロジェクト共有）</li>
+                <li><code>~/.claude/settings.json</code>（ユーザーグローバル）</li>
+            </ol>
+
+            <div class="highlight">
+                <strong>設定ファイルのセキュリティチェックリスト:</strong><br>
+                <code>.claude/settings.local.json</code> が <code>.gitignore</code> に追加されているか確認する<br>
+                <code>settings.json</code> に API キーや認証情報が混入していないか確認する<br>
+                <code>deny</code> リストに破壊的コマンドを登録する（<code>rm -rf</code>, <code>--force</code> 等）<br>
+                CI/CD 環境では <code>--permission-mode auto</code> と組み合わせて使う
+            </div>
+        </section>
+
+        <section>
+            <h2>6. Checkpoint &amp; Shadow Workspace</h2>
+            <p>長時間エージェント実行における「安全網」となる2つの機能です。どちらも<strong>「試してから確認する」</strong>設計思想に基づいています。</p>
+
+            <h3>Checkpoint（チェックポイント）</h3>
+            <p>長時間タスクの実行中に自動的に取得される<strong>中間スナップショット</strong>です。タスクが途中で失敗・エラーになっても、直前のチェックポイントまで巻き戻すことができます。</p>
+            <ul>
+                <li><strong>自動取得のタイミング</strong>: 一定のファイル変更数ごと、または重要なステップ完了時</li>
+                <li><strong>手動トリガー</strong>: エージェントへの指示に「チェックポイントを取ってから次へ」と書くと確実に取得させられる</li>
+                <li><strong>巻き戻し</strong>: <code>claude checkpoint restore --id cp_abc123</code> で任意の時点に戻せる</li>
+                <li><strong>比較</strong>: <code>claude checkpoint diff --id cp_abc123</code> でチェックポイント以降の変更を確認できる</li>
+            </ul>
+            <div class="code-block"># チェックポイントを明示的に指示する書き方
+大規模リファクタリングを以下の手順で実行してください:
+
+Step 1: src/auth/ の移行を完了する。
+★ Step 1 完了後、チェックポイントを取得してください ★
+
+Step 2: src/payment/ の移行を完了する。
+★ Step 2 完了後、チェックポイントを取得してください ★
+
+Step 3: src/dashboard/ の移行を完了する。
+
+各ステップは前のステップが成功した場合のみ進んでください。</div>
+
+            <h3>Shadow Workspace（シャドウワークスペース）</h3>
+            <p>エージェントがユーザーの実ファイルを<strong>変更する前に、コピー上で作業を試す</strong>仕組みです。ユーザーが承認したときのみ実ファイルへの変更が適用されます。</p>
+
+            <table>
+                <tr>
+                    <th>項目</th>
+                    <th>Shadow Workspace</th>
+                    <th>直接編集（デフォルト）</th>
+                </tr>
+                <tr>
+                    <td>変更の即時反映</td>
+                    <td>なし（承認後のみ）</td>
+                    <td>あり（即時）</td>
+                </tr>
+                <tr>
+                    <td>安全性</td>
+                    <td>高（承認前は git に影響なし）</td>
+                    <td>中（git で戻せるが履歴が汚れる）</td>
+                </tr>
+                <tr>
+                    <td>適合ケース</td>
+                    <td>大規模リファクタリング・初めての変更</td>
+                    <td>小規模な修正・テスト追加</td>
+                </tr>
+            </table>
+
+            <div class="code-block"># Shadow Workspace を使った大規模リファクタリングのフロー
+
+# 1. Shadow Workspace モードで起動
+claude --shadow-workspace "全コンポーネントを React 18 → React 19 の新 API に移行"
+
+# 2. エージェントがコピー上で作業（実ファイルは未変更）
+#    claude.ai/code のダッシュボードで変更プレビューを確認
+
+# 3. 変更が問題なければ承認して実ファイルへ適用
+claude shadow apply --job-id shadow_xyz789
+
+# 4. 問題があれば破棄（実ファイルに影響なし）
+claude shadow discard --job-id shadow_xyz789</div>
+
+            <div class="highlight">
+                <strong>Checkpoint vs Shadow Workspace の使い分け:</strong><br>
+                <strong>Checkpoint</strong> → 実行中の「セーフポイント」。失敗時の巻き戻し用。長時間タスクに自動設定。<br>
+                <strong>Shadow Workspace</strong> → 実行前の「プレビュー」。ユーザーが変更内容を確認・承認してから適用する。
+            </div>
+        </section>
+
+        <section>
+            <h2>7. Memory ファイルの活用</h2>
+            <p>Claude Code には3つのレベルの「記憶」があります。適切に使い分けることで、毎回同じ説明を繰り返す無駄をなくせます。</p>
+
+            <table>
+                <tr>
+                    <th>種類</th>
+                    <th>保存場所</th>
+                    <th>自動読み込み</th>
+                    <th>用途</th>
+                </tr>
+                <tr>
+                    <td>プロジェクト記憶</td>
+                    <td>CLAUDE.md（プロジェクトルート）</td>
+                    <td>毎回自動</td>
+                    <td>プロジェクトの規約・技術スタック・禁止事項</td>
+                </tr>
+                <tr>
+                    <td>ユーザー記憶</td>
+                    <td>~/.claude/CLAUDE.md</td>
+                    <td>毎回自動</td>
+                    <td>個人の好み・コーディングスタイル・よく使うパターン</td>
+                </tr>
+                <tr>
+                    <td>手動メモ</td>
+                    <td>~/.claude/memory/</td>
+                    <td>明示的に指定時のみ</td>
+                    <td>プロジェクト横断のメモ・過去の決定事項・参照資料</td>
+                </tr>
+            </table>
+
+            <h3><code>~/.claude/memory/</code> の使い方</h3>
+            <p>永続メモリファイルを置く場所。<code>/memory</code> スラッシュコマンドで管理します。</p>
+
+            <div class="code-block"># メモリファイルの追加
+/memory add "project-a-notes.md"
+
+# メモリファイルの一覧表示
+/memory list
+
+# 特定のメモリファイルを今のセッションで読み込む
+/memory load project-a-notes.md</div>
+
+            <h3>推奨メモリファイル構成</h3>
+            <div class="code-block">~/.claude/memory/
+├── my-preferences.md       # コーディング好み・よく使うパターン
+├── my-shortcuts.md         # よく使うコマンド・エイリアス集
+├── project-a-notes.md      # プロジェクトAの重要決定事項
+├── project-b-notes.md      # プロジェクトBの重要決定事項
+└── lessons-learned.md      # 過去の失敗から学んだこと（エージェントへの戒め）</div>
+
+            <h3>my-preferences.md の書き方例</h3>
+            <div class="code-block"># 私のコーディング好み
+
+## 全般
+- コメントは日本語で書く
+- 変数名・関数名は英語
+- インデントは 2 スペース
+- セミコロンあり
+
+## TypeScript
+- as any は絶対に使わない。unknown + 型ガードで対応する
+- interface より type alias を好む
+- enum より const assertion を好む
+
+## コミットメッセージ
+- プレフィックス必須: feat / fix / docs / refactor / test / chore
+- 日本語で書く
+- 例: "feat: ユーザー認証モジュールを追加"
+
+## 指示への応答スタイル
+- 短く簡潔に答える（長文不要）
+- コードを変更した後は変更点の要約を 3 行以内で報告する
+- 不明点があれば作業前に確認する（推測で進まない）</div>
+
+            <h3>CLAUDE.md との違い（自動読み込み vs 手動）</h3>
+            <p>CLAUDE.md はセッション開始時に<strong>常に自動で読み込まれます</strong>。そのため、すべての会話で必要な情報だけを書くべきです。<br>
+            一方、<code>~/.claude/memory/</code> のファイルは<strong>明示的に指定したときのみ</strong>読み込まれます。「プロジェクトAについて話すときだけ読み込む」という使い方に向いています。</p>
+
+            <div class="info-box">
+                <strong>Memory 管理のベストプラクティス</strong>
+                CLAUDE.md は200行以内に抑える（長すぎると最後まで読まれない）<br>
+                頻繁に参照するが全プロジェクト共通でない情報は <code>memory/</code> に分離する<br>
+                メモリファイルには「最終更新日」を必ず書く（古い情報を信じるミスを防ぐ）<br>
+                重要な決定（「この設計を採用した理由」等）は lessons-learned.md に記録しておく
+            </div>
+        </section>
+
+        <footer>
+            最終更新: 2026年6月 | <a href="index.html" style="color:#666; text-decoration:none;">← Claude Code Mastery Hub</a>
+        </footer>
     </div>
 </body>
 
