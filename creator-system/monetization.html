@@ -994,6 +994,123 @@ note トークンを今週中に更新
   </div>
 </section>
 
+<!-- Phase 3 実装マイルストーン -->
+<section class="section" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-label">Phase 3 実装マイルストーン</div>
+    <h2 class="section-title">未実装チャネルを<br>順番に立ち上げる手順</h2>
+    <p style="color:var(--text-muted);max-width:720px;margin-bottom:2rem;">KDP・Booth・note マガジンが「未実装」のまま。このセクションは <strong>次の Claude セッションがそのまま実行できる</strong> 実装手順書。優先順位は「難易度低×収益効果大」から着手する。</p>
+
+    <!-- 優先順マイルストーン表 -->
+    <div style="display:flex; flex-direction:column; gap:1.25rem; margin-bottom:2.5rem;">
+
+      <!-- M1: note 定期マガジン -->
+      <div style="background:var(--card); border:1px solid rgba(79,255,176,0.3); border-radius:14px; padding:1.5rem;">
+        <div style="display:flex; align-items:center; gap:1rem; margin-bottom:1rem; flex-wrap:wrap;">
+          <div style="background:rgba(79,255,176,0.15); border:1px solid rgba(79,255,176,0.3); color:#4fffb0; border-radius:50%; width:32px; height:32px; display:flex; align-items:center; justify-content:center; font-weight:900; flex-shrink:0;">M1</div>
+          <h3 style="margin:0; font-size:1rem; flex:1;">note 定期マガジン設定 <span style="font-size:0.72rem; background:rgba(79,255,176,0.12); color:#4fffb0; padding:2px 8px; border-radius:5px; margin-left:6px;">即時対応可能 — 15分</span></h3>
+          <span style="font-size:0.82rem; color:var(--text-muted);">収益目標への貢献: +¥8,000/月</span>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+          <div>
+            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:0.75rem;">人手でやること（1回限り）:</p>
+            <ol style="font-size:0.84rem; color:var(--text-muted); padding-left:1.2rem; margin:0; display:flex; flex-direction:column; gap:0.35rem;">
+              <li>note.com → クリエイターメニュー → マガジン作成</li>
+              <li>「AIで稼ぐ 週刊漫画マガジン」等でタイトル設定</li>
+              <li>価格: ¥1,500/月 or ¥500/話（単話販売も並行）</li>
+              <li>マガジンIDを <code>.env</code> の <code>NOTE_MAGAZINE_ID</code> に設定</li>
+            </ol>
+          </div>
+          <div>
+            <div class="code-block" style="font-size:0.78rem;">
+<span class="cm"># OpenClaw に依頼するプロンプト</span>
+<span class="str">"note マガジン自動追加を有効化してください。
+.env の NOTE_MAGAZINE_ID が設定済みです。
+漫画パイプラインの publish-scheduler スキルを
+更新し、PUBLISH 判定後に自動でマガジンにも
+追加するようにしてください"</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- M2: Kindle KDP -->
+      <div style="background:var(--card); border:1px solid rgba(255,158,0,0.3); border-radius:14px; padding:1.5rem;">
+        <div style="display:flex; align-items:center; gap:1rem; margin-bottom:1rem; flex-wrap:wrap;">
+          <div style="background:rgba(255,158,0,0.15); border:1px solid rgba(255,158,0,0.3); color:#ffa03c; border-radius:50%; width:32px; height:32px; display:flex; align-items:center; justify-content:center; font-weight:900; flex-shrink:0;">M2</div>
+          <h3 style="margin:0; font-size:1rem; flex:1;">Kindle KDP 自動出版 <span style="font-size:0.72rem; background:rgba(255,158,0,0.12); color:#ffa03c; padding:2px 8px; border-radius:5px; margin-left:6px;">1〜2日の実装</span></h3>
+          <span style="font-size:0.82rem; color:var(--text-muted);">収益目標への貢献: +¥8,000/月</span>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+          <div>
+            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:0.75rem;">実装ステップ:</p>
+            <ol style="font-size:0.84rem; color:var(--text-muted); padding-left:1.2rem; margin:0; display:flex; flex-direction:column; gap:0.35rem;">
+              <li>漫画コマ画像 → EPUB 変換スクリプト作成（<code>manga_to_epub.py</code>）</li>
+              <li>表紙画像を Imagen 4 で自動生成（<code>cover_generator.py</code>）</li>
+              <li>メタデータ JSON → KDP API でドラフト登録</li>
+              <li>価格設定: ¥299〜499（KDP セレクトで Kindle Unlimited 対応）</li>
+              <li>3〜5 話ごとに 1 冊をまとめる「合本」戦略</li>
+            </ol>
+          </div>
+          <div>
+            <div class="code-block" style="font-size:0.78rem;">
+<span class="cm"># Claude への実装依頼プロンプト</span>
+<span class="str">"以下を実装してください:
+1. manga_to_epub.py: コマ画像リストを
+   受け取り EPUB3 形式に変換
+   （ebooklib を使用）
+2. KDP API でドラフト登録する
+   kdp_publisher.py スキル
+3. OpenClaw の publish-scheduler に
+   '5話蓄積後に KDP 出版' を追加"</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- M3: Booth -->
+      <div style="background:var(--card); border:1px solid rgba(167,139,250,0.3); border-radius:14px; padding:1.5rem;">
+        <div style="display:flex; align-items:center; gap:1rem; margin-bottom:1rem; flex-wrap:wrap;">
+          <div style="background:rgba(167,139,250,0.15); border:1px solid rgba(167,139,250,0.3); color:#c4a0ff; border-radius:50%; width:32px; height:32px; display:flex; align-items:center; justify-content:center; font-weight:900; flex-shrink:0;">M3</div>
+          <h3 style="margin:0; font-size:1rem; flex:1;">Booth デジタル販売 <span style="font-size:0.72rem; background:rgba(167,139,250,0.12); color:#c4a0ff; padding:2px 8px; border-radius:5px; margin-left:6px;">M2 完了後に着手</span></h3>
+          <span style="font-size:0.82rem; color:var(--text-muted);">収益目標への貢献: +¥5,000/月</span>
+        </div>
+        <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:0.75rem;">漫画 PDF・プロンプト集・LoRA モデルを直接販売。KDP より高単価（¥500〜3,000）・手数料 Booth 5%。</p>
+        <ol style="font-size:0.84rem; color:var(--text-muted); padding-left:1.2rem; margin:0; display:flex; flex-direction:column; gap:0.35rem;">
+          <li>Booth ショップ開設（1回限り手動操作 — 15分）</li>
+          <li>商品登録 API を OpenClaw スキルとして実装</li>
+          <li>M2 の EPUB → PDF 変換を流用（形式変換のみ）</li>
+          <li>価格帯: 単話 PDF ¥500 / まとめ ¥1,500 / プロンプト集 ¥2,000</li>
+        </ol>
+      </div>
+
+    </div>
+
+    <!-- 収益目標タイムライン -->
+    <h3 style="font-size:1rem; color:var(--text-muted); margin-bottom:1.25rem;">Phase 3 収益達成タイムライン</h3>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:0.75rem;">
+      <div style="background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.25rem; text-align:center;">
+        <div style="font-size:1.1rem; font-weight:900; color:#4fffb0; margin-bottom:0.4rem;">今週</div>
+        <div style="font-size:0.84rem; color:var(--text-muted);">M1 note マガジン開始<br>→ 即時 +¥2,000/月</div>
+      </div>
+      <div style="background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.25rem; text-align:center;">
+        <div style="font-size:1.1rem; font-weight:900; color:#ffa03c; margin-bottom:0.4rem;">2〜4週後</div>
+        <div style="font-size:0.84rem; color:var(--text-muted);">M2 KDP 初出版<br>→ +¥4,000/月（3ヶ月目以降）</div>
+      </div>
+      <div style="background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.25rem; text-align:center;">
+        <div style="font-size:1.1rem; font-weight:900; color:#c4a0ff; margin-bottom:0.4rem;">1〜2ヶ月後</div>
+        <div style="font-size:0.84rem; color:var(--text-muted);">M3 Booth 開始<br>→ +¥5,000/月</div>
+      </div>
+      <div style="background:rgba(0,220,130,0.08); border:1px solid rgba(0,220,130,0.3); border-radius:12px; padding:1.25rem; text-align:center;">
+        <div style="font-size:1.1rem; font-weight:900; color:#00dc82; margin-bottom:0.4rem;">3ヶ月後</div>
+        <div style="font-size:0.84rem; color:var(--text-muted);">目標 ¥60,000/月<br><strong style="color:#00dc82;">達成見込み</strong></div>
+      </div>
+    </div>
+
+    <div style="background:rgba(0,220,130,0.07); border:1px solid rgba(0,220,130,0.25); border-radius:10px; padding:1rem 1.25rem; margin-top:1.25rem; font-size:0.88rem; color:var(--text-muted);">
+      <strong style="color:#00dc82;">次のアクション（外出先から Claude に依頼可能）:</strong> 「monetization.html の M1 手順に従って note マガジン自動追加を実装してください」と送るだけで、このページを参照したエージェントが必要なコード変更を全て完了する。
+    </div>
+  </div>
+</section>
+
 <footer>
   <div class="footer-inner">
     <div class="footer-logo">AI Creator Hub</div>
@@ -1006,7 +1123,7 @@ note トークンを今週中に更新
       <a href="openclaw.html">OpenClaw連携</a>
     </nav>
     <p>AI Creator Hub — AIでコンテンツをつくり、稼ぐ</p>
-    <p style="font-size:0.8rem;opacity:0.65;">最終更新: 2026-05-30（定期マガジン設定ガイド・API認証メンテナンスセクションを追加）</p>
+    <p style="font-size:0.8rem;opacity:0.65;">最終更新: 2026-06-15（Phase 3 実装マイルストーン追加 — note マガジン / KDP / Booth 手順書）</p>
   </div>
 </footer>
 

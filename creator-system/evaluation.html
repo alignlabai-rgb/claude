@@ -53,7 +53,7 @@
           <li><strong>フィードバック先:</strong> ネタ生成AI・LLMプロンプト最適化</li>
           <li><strong>判定速度:</strong> 1コンテンツあたり 約3〜5秒</li>
           <li><strong>自動改善:</strong> スコア70〜84は改善指示とともに再処理</li>
-          <li><strong>判定エンジン:</strong> Vision採点は Gemini 3.1 Pro（Pro 最上位／3.5 Pro は延期中）、テキスト評価は GPT-5.5・Claude Sonnet 4.6 を併用</li>
+          <li><strong>判定エンジン:</strong> Vision採点は Gemini 2.5 Pro、テキスト評価は GPT-4o / o3・Claude claude-sonnet-4-6 を用途別に使い分け</li>
         </ul>
       </div>
       <div>
@@ -444,7 +444,7 @@
   <div class="section-inner">
     <div class="section-label">CLIP スコア実装</div>
     <h2 class="section-title">キャラクター一致度の<br>定量評価</h2>
-    <p style="color:var(--text-muted);max-width:700px;">漫画パイプラインでは Vision 採点（Gemini 3.1 Pro）に加え、CLIP スコアで「キャラクターが正しく描かれているか」を定量チェックする。CLIP は参照画像と生成画像の視覚的類似度を 0.0〜1.0 で返す。</p>
+    <p style="color:var(--text-muted);max-width:700px;">漫画パイプラインでは Vision 採点（Gemini 2.5 Pro）に加え、CLIP スコアで「キャラクターが正しく描かれているか」を定量チェックする。CLIP は参照画像と生成画像の視覚的類似度を 0.0〜1.0 で返す。</p>
     <div class="two-col" style="margin-top:2rem">
       <div>
         <h3 style="margin-bottom:1rem;font-size:1rem">閾値定義</h3>
@@ -560,6 +560,110 @@ score = compute_clip_similarity(
   </div>
 </section>
 
+<!-- 月次チューニング手順 -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label">月次チューニング手順</div>
+    <h2 class="section-title">スコアリングを<br>実データで自己改善する</h2>
+    <p style="color:var(--text-muted);max-width:720px;margin-bottom:2rem;">WHY セクションで「月次レビューで重みをチューニングする」と定義した。このセクションはその <strong>具体的な手順</strong> を記述する。次の Claude セッションが手順を見てそのまま実行できる粒度を目指す。</p>
+
+    <!-- Step 1: データ収集 -->
+    <div style="display:flex; flex-direction:column; gap:1.25rem; margin-bottom:2rem;">
+
+      <div style="background:var(--card); border:1px solid var(--border); border-radius:14px; padding:1.5rem;">
+        <div style="display:flex; align-items:center; gap:1rem; margin-bottom:1rem;">
+          <div style="background:rgba(108,60,225,0.15); border:1px solid rgba(108,60,225,0.3); color:#a48cf5; border-radius:50%; width:32px; height:32px; display:flex; align-items:center; justify-content:center; font-weight:900; flex-shrink:0;">1</div>
+          <h3 style="margin:0; font-size:1rem;">評価ログの収集（月末 30 分）</h3>
+        </div>
+        <p style="color:var(--text-muted); font-size:0.88rem; margin-bottom:1rem;">月次レビューに必要なデータを OpenClaw が自動集計する。以下の OpenClaw スキルで CSV を生成する。</p>
+        <div class="code-block">
+<span class="cm"># OpenClaw に月次レポートを依頼するプロンプト</span>
+<span class="str">"先月の evaluation ログ（logs/eval_YYYY_MM/）を読み込み、
+以下を集計して monthly_eval_YYYY_MM.csv に出力してください:
+- content_id, decision, total_score, 指標別スコア10列
+- 実際の再生数（YouTube Analytics API）
+- 収益額
+- 投稿後7日間のエンゲージメント率
+PUBLISH された上位10件・下位10件を別シートに抽出すること"</span></div>
+      </div>
+
+      <div style="background:var(--card); border:1px solid var(--border); border-radius:14px; padding:1.5rem;">
+        <div style="display:flex; align-items:center; gap:1rem; margin-bottom:1rem;">
+          <div style="background:rgba(108,60,225,0.15); border:1px solid rgba(108,60,225,0.3); color:#a48cf5; border-radius:50%; width:32px; height:32px; display:flex; align-items:center; justify-content:center; font-weight:900; flex-shrink:0;">2</div>
+          <h3 style="margin:0; font-size:1rem;">相関分析（Claude に依頼）</h3>
+        </div>
+        <p style="color:var(--text-muted); font-size:0.88rem; margin-bottom:1rem;">生成した CSV を Claude に渡して相関分析を依頼する。</p>
+        <div class="code-block">
+<span class="str">"monthly_eval_YYYY_MM.csv を分析してください。
+以下を教えてください:
+1. 実再生数・収益との相関係数が最も高い評価指標はどれか
+2. 現在の重み設定（engagement 20%, visual 15%…）と
+   実相関係数の乖離が最も大きい指標はどれか
+3. 変更すべき指標を1つだけ選び、±5%以内の変更案を提示してください
+4. 変更根拠をADRに記録するための文章（1〜2段落）を下書きしてください"</span></div>
+      </div>
+
+      <div style="background:var(--card); border:1px solid var(--border); border-radius:14px; padding:1.5rem;">
+        <div style="display:flex; align-items:center; gap:1rem; margin-bottom:1rem;">
+          <div style="background:rgba(108,60,225,0.15); border:1px solid rgba(108,60,225,0.3); color:#a48cf5; border-radius:50%; width:32px; height:32px; display:flex; align-items:center; justify-content:center; font-weight:900; flex-shrink:0;">3</div>
+          <h3 style="margin:0; font-size:1rem;">変更判断ルール</h3>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+          <div style="background:rgba(79,255,176,0.06); border:1px solid rgba(79,255,176,0.2); border-radius:10px; padding:1rem;">
+            <div style="font-size:0.8rem; font-weight:700; color:#4fffb0; margin-bottom:0.5rem;">変更する条件</div>
+            <ul style="font-size:0.84rem; color:var(--text-muted); padding-left:1rem; margin:0; display:flex; flex-direction:column; gap:0.35rem;">
+              <li>相関係数と重みの差 ≥ 0.10</li>
+              <li>サンプル数 ≥ 30本</li>
+              <li>2ヶ月連続で同じ傾向</li>
+              <li>変更幅 ±5% 以内</li>
+              <li>同月の変更は1指標のみ</li>
+            </ul>
+          </div>
+          <div style="background:rgba(255,107,107,0.06); border:1px solid rgba(255,107,107,0.2); border-radius:10px; padding:1rem;">
+            <div style="font-size:0.8rem; font-weight:700; color:#ff9090; margin-bottom:0.5rem;">変更しない条件</div>
+            <ul style="font-size:0.84rem; color:var(--text-muted); padding-left:1rem; margin:0; display:flex; flex-direction:column; gap:0.35rem;">
+              <li>サンプル数 &lt; 30本（統計的信頼性不足）</li>
+              <li>1ヶ月のみの傾向（季節性の可能性）</li>
+              <li>前回変更から2ヶ月未満</li>
+              <li>拒否権系スコア（安全性）は変更禁止</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:var(--card); border:1px solid var(--border); border-radius:14px; padding:1.5rem;">
+        <div style="display:flex; align-items:center; gap:1rem; margin-bottom:1rem;">
+          <div style="background:rgba(108,60,225,0.15); border:1px solid rgba(108,60,225,0.3); color:#a48cf5; border-radius:50%; width:32px; height:32px; display:flex; align-items:center; justify-content:center; font-weight:900; flex-shrink:0;">4</div>
+          <h3 style="margin:0; font-size:1rem;">ADR 記録 → 実装（OpenClaw に依頼）</h3>
+        </div>
+        <div class="code-block">
+<span class="cm"># 変更が決まったら Claude に ADR + 実装を依頼</span>
+<span class="str">"以下の変更を実施してください:
+1. foundations/decisions.html に ADR-XXX として追記:
+   - タイトル: 評価スコア重み変更（engagement 20%→22%, content 15%→13%）
+   - 根拠: [分析結果の文章]
+   - 影響範囲: evaluation.html の weighted_score() 関数
+2. creator-system/evaluation.html の重み表と
+   weighted_score() のコードを新しい値に更新してください
+3. 変更をコミット: 'fix: 評価スコア重み月次更新（ADR-XXX）'"</span></div>
+        <p style="font-size:0.83rem; color:var(--text-muted); margin:0.75rem 0 0;">このプロンプト 1 本で「ADR 記録 → コード変更 → コミット」まで非同期で完結する。</p>
+      </div>
+
+    </div>
+
+    <!-- 月次チューニングカレンダー -->
+    <div style="background:rgba(108,60,225,0.08); border:1px solid rgba(108,60,225,0.25); border-radius:12px; padding:1.25rem 1.5rem;">
+      <div style="font-size:0.8rem; font-weight:700; color:#a48cf5; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:0.75rem;">📅 月次チューニングカレンダー</div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:0.75rem; font-size:0.84rem;">
+        <div><span style="color:#4fffb0; font-weight:700;">月末</span><br><span style="color:var(--text-muted);">評価ログ CSV を自動生成（OpenClaw）</span></div>
+        <div><span style="color:#4fffb0; font-weight:700;">月初 1〜2 日目</span><br><span style="color:var(--text-muted);">Claude に相関分析を依頼・変更候補を受け取る</span></div>
+        <div><span style="color:#4fffb0; font-weight:700;">月初 3 日目</span><br><span style="color:var(--text-muted);">変更判断 → ADR 記録 → コード更新</span></div>
+        <div><span style="color:#4fffb0; font-weight:700;">翌月</span><br><span style="color:var(--text-muted);">新重みで運用 → 効果を次回レビューで検証</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <footer>
   <div class="footer-inner">
     <div class="footer-logo">AI Creator Hub</div>
@@ -574,7 +678,7 @@ score = compute_clip_similarity(
       <a href="kpi-dashboard.html">KPI</a>
     </nav>
     <p>AI Creator Hub — AIでコンテンツをつくり、稼ぐ</p>
-    <p style="font-size:0.8rem;opacity:0.65;">最終更新: 2026-05-31（CLIP スコア実装・HITL 判定ロジック・品質フィルタ実装セクションを追加）</p>
+    <p style="font-size:0.8rem;opacity:0.65;">最終更新: 2026-06-15（月次チューニング手順追加・モデル名修正 Gemini 2.5 Pro / GPT-4o）</p>
   </div>
 </footer>
 
