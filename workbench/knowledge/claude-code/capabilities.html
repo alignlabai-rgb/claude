@@ -46,6 +46,13 @@
             padding-bottom: 10px;
         }
 
+        h3 {
+            font-size: 18px;
+            color: var(--accent);
+            margin-top: 0;
+            margin-bottom: 6px;
+        }
+
         .cheat-row {
             display: flex;
             gap: 20px;
@@ -64,6 +71,10 @@
             border: 1px solid #333;
         }
 
+        .cmd.wide {
+            min-width: 420px;
+        }
+
         .desc {
             color: #ccc;
             flex: 1;
@@ -75,6 +86,98 @@
             color: #666;
             text-decoration: none;
         }
+
+        .code-box {
+            background: #0f172a;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: monospace;
+            color: #ccc;
+            border: 1px solid #334155;
+            margin-top: 10px;
+            overflow-x: auto;
+            white-space: pre;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .tag {
+            display: inline-block;
+            background: rgba(217, 119, 87, 0.15);
+            color: var(--accent);
+            border: 1px solid rgba(217, 119, 87, 0.35);
+            border-radius: 4px;
+            padding: 2px 8px;
+            font-size: 12px;
+            font-family: monospace;
+            margin-right: 6px;
+        }
+
+        .tip-box {
+            background: rgba(217, 119, 87, 0.08);
+            border-left: 3px solid var(--accent);
+            padding: 14px 18px;
+            border-radius: 0 6px 6px 0;
+            margin: 20px 0;
+            color: #ccc;
+            font-size: 14px;
+        }
+
+        .info-box {
+            background: rgba(165, 214, 255, 0.06);
+            border-left: 3px solid #a5d6ff;
+            padding: 14px 18px;
+            border-radius: 0 6px 6px 0;
+            margin: 20px 0;
+            color: #ccc;
+            font-size: 14px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th {
+            background: #1a2540;
+            color: #fff;
+            padding: 10px 14px;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        td {
+            padding: 10px 14px;
+            border-bottom: 1px solid #1e2d40;
+            font-size: 14px;
+            color: #ccc;
+            vertical-align: top;
+        }
+
+        td code {
+            font-family: monospace;
+            color: #a5d6ff;
+            background: #111;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .kbd {
+            display: inline-block;
+            background: #1a2540;
+            border: 1px solid #334155;
+            border-radius: 4px;
+            padding: 2px 10px;
+            font-family: monospace;
+            font-size: 13px;
+            color: #a5d6ff;
+        }
     </style>
 </head>
 
@@ -83,13 +186,13 @@
         <a href="index.html" class="back">← Strategy Hub</a>
 
         <h1>Capabilities Cheatsheet</h1>
-        <span class="subtitle">Power User Commands & Shell Integration</span>
+        <span class="subtitle">Power User Commands, Slash Commands, Hooks & Shell Integration</span>
 
         <section>
             <p>CLI版Claude Codeの真価は、OSのシェル（Bash/Zsh/PowerShell）との連携にあります。<br>
                 単体で使うだけでなく、パイプラインの一部として組み込むことで最強の自動化ツールになります。</p>
 
-            <h2>File Operations & Piping</h2>
+            <h2>File Operations &amp; Piping</h2>
 
             <div class="cheat-row">
                 <div class="cmd">$ claude --print "Userモデルの定義を作成して" > User.ts</div>
@@ -134,6 +237,385 @@
             </div>
 
         </section>
+
+        <!-- ============================================================ -->
+        <!-- Slash Commands -->
+        <!-- ============================================================ -->
+        <section>
+            <h2>Slash Commands（スラッシュコマンド）</h2>
+            <p>TUIセッション中にプロンプトの先頭に <code>/</code> を付けて入力する内蔵コマンドです。<br>
+                セッション管理・コスト確認・カスタムコマンド実行など、エージェントをコントロールするための重要な手段です。</p>
+
+            <div class="cheat-row">
+                <div class="cmd">/help</div>
+                <div class="desc">
+                    <strong>コマンド一覧表示</strong><br>
+                    使用可能なすべてのスラッシュコマンドを一覧表示します。初めてのセッションや忘れたときにすぐ確認できます。
+                </div>
+            </div>
+
+            <div class="cheat-row">
+                <div class="cmd">/clear</div>
+                <div class="desc">
+                    <strong>コンテキスト消去（Context Poisoning 対策）</strong><br>
+                    現在の会話コンテキストをすべて削除します。誤った前提がモデルに蓄積した「Context Poisoning」状態を解消するのに有効。長いデバッグセッションの後にリセットするために使います。
+                </div>
+            </div>
+
+            <div class="cheat-row">
+                <div class="cmd">/compact</div>
+                <div class="desc">
+                    <strong>コンテキスト圧縮</strong><br>
+                    コンテキストウィンドウが埋まってきた長いセッションで使用します。会話の履歴を要約・圧縮し、トークンを節約しながら作業を継続できます。<code>/clear</code> と違い、作業の流れを完全にはリセットしません。
+                </div>
+            </div>
+
+            <div class="cheat-row">
+                <div class="cmd">/memory</div>
+                <div class="desc">
+                    <strong>メモリファイルの表示・編集</strong><br>
+                    Claude が参照するメモリファイル（CLAUDE.md等）の内容を表示し、必要に応じて編集できます。プロジェクト固有の前提知識やルールを確認・修正するときに使います。
+                </div>
+            </div>
+
+            <div class="cheat-row">
+                <div class="cmd">/cost</div>
+                <div class="desc">
+                    <strong>セッションのトークン消費コストを表示</strong><br>
+                    現在のセッションでどれだけのトークンを消費しているかをリアルタイムで表示します。コスト管理や、コンテキストが増えすぎていないかの確認に使います。
+                </div>
+            </div>
+
+            <div class="cheat-row">
+                <div class="cmd">/status</div>
+                <div class="desc">
+                    <strong>現在のモデル・設定を表示</strong><br>
+                    使用中のモデル名・設定パラメータ・MCP サーバーの接続状態などを確認できます。設定変更後の確認やトラブルシューティングに便利です。
+                </div>
+            </div>
+
+            <div class="cheat-row">
+                <div class="cmd wide">/project:カスタムコマンド名</div>
+                <div class="desc">
+                    <strong>プロジェクト固有カスタムコマンド</strong><br>
+                    <code>.claude/commands/</code> ディレクトリに置いた Markdown ファイルをコマンドとして実行します。例えば <code>.claude/commands/review.md</code> を置けば <code>/project:review</code> で呼び出せます。チームで共有するコマンドに使います。
+                </div>
+            </div>
+
+            <div class="cheat-row">
+                <div class="cmd wide">/user:カスタムコマンド名</div>
+                <div class="desc">
+                    <strong>ユーザー固有カスタムコマンド</strong><br>
+                    <code>~/.claude/commands/</code> に置いたコマンドを実行します。プロジェクトをまたいで個人が使い回すコマンド（例：自分の好みのコードレビュー形式など）に使います。
+                </div>
+            </div>
+
+            <div class="tip-box">
+                <strong>カスタムコマンドの作り方：</strong>
+                Markdown ファイルを <code>.claude/commands/</code> に置くだけです。ファイル名がコマンド名になります。ファイルの中身はプロンプトとして使われ、<code>$ARGUMENTS</code> プレースホルダーでコマンド実行時の引数を受け取れます。
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- Non-Interactive Pipeline Mode -->
+        <!-- ============================================================ -->
+        <section>
+            <h2>Non-Interactive（パイプライン）モード完全版</h2>
+            <p>インタラクティブなTUIを起動せず、標準入出力のみでClaudeを使うモードです。<br>
+                CI/CDパイプライン・cronジョブ・シェルスクリプトへの組み込みに不可欠です。</p>
+
+            <div class="cheat-row">
+                <div class="cmd">$ claude -p "..."</div>
+                <div class="desc">
+                    <strong>Print モード（短縮形）</strong><br>
+                    <code>--print</code> の短縮形です。TUIを起動せずに1回だけ応答を取得して終了します。スクリプト内での使用はこちらを推奨。
+                </div>
+            </div>
+
+            <div class="cheat-row">
+                <div class="cmd wide">$ claude -p "..." --output-format json</div>
+                <div class="desc">
+                    <strong>JSON 出力（CI/CD 向け）</strong><br>
+                    応答をJSONオブジェクトとして出力します。<code>jq</code> でパースして後続処理に渡せます。CI/CDパイプラインでの構造化データ取得に使います。
+                </div>
+            </div>
+
+            <div class="cheat-row">
+                <div class="cmd wide">$ claude -p "..." --output-format stream-json</div>
+                <div class="desc">
+                    <strong>ストリーミング JSON 出力</strong><br>
+                    応答をストリーミングしながら逐次JSONで出力します。長い応答を受け取りながらリアルタイムで処理したい場合に使います。
+                </div>
+            </div>
+
+            <h3 style="margin-top:30px; color:#ccc;">実用パイプライン例</h3>
+
+            <div class="cheat-row">
+                <div class="cmd wide">$ cat code.py | claude -p "このコードをTypeScriptに変換して"</div>
+                <div class="desc">
+                    <strong>コード変換パイプライン</strong><br>
+                    既存のPythonファイルをstdinに渡してTypeScript変換。変換結果を <code>&gt; output.ts</code> にリダイレクトすれば1コマンドで完結します。
+                </div>
+            </div>
+
+            <div class="cheat-row">
+                <div class="cmd wide">$ git diff | claude -p "このdiffのコードレビューをMarkdownで"</div>
+                <div class="desc">
+                    <strong>git diff コードレビュー</strong><br>
+                    コミット前の差分をそのままClaudeに渡してレビューコメントを生成。PRの説明文生成にも応用できます。
+                </div>
+            </div>
+
+            <div class="cheat-row">
+                <div class="cmd wide">$ ls -la | claude -p "最も重いファイルTop5を特定して"</div>
+                <div class="desc">
+                    <strong>ファイル分析</strong><br>
+                    <code>ls</code> や <code>du</code> の出力をパイプして自然言語で分析させます。コマンドの出力を読み解くのが苦手な人でも直感的に使えます。
+                </div>
+            </div>
+
+            <div class="code-box">$ git log --oneline -20 | claude -p "過去20コミットの変更傾向を要約して、リリースノートのドラフトを作成して"
+
+# JSON出力して jq でパース
+$ claude -p "現在のディレクトリ構造を分析して" --output-format json | jq '.result'
+
+# CI でのテスト失敗原因分析
+$ npm test 2>&1 | claude -p "このテスト失敗ログを分析して原因と修正方針を日本語で"</div>
+
+            <div class="info-box">
+                <strong>注意：</strong> Non-Interactive モードではツール実行（ファイル書き込み・コマンド実行等）のデフォルト動作が変わります。
+                安全のため、パイプラインでのファイル操作は <code>--allowedTools</code> で明示的に許可するか、出力をリダイレクトする手法を使うことを推奨します。
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- Context & Memory -->
+        <!-- ============================================================ -->
+        <section>
+            <h2>Context &amp; Memory</h2>
+            <p>Claude Code のコンテキスト管理は階層的なメモリシステムで構成されています。<br>
+                プロジェクト設定からユーザー設定まで、優先度の高いものが低いものをオーバーライドします。</p>
+
+            <h3 style="color:#fff; font-size:20px; margin-top:30px;">@ 構文でコンテキストにファイルを追加</h3>
+
+            <div class="cheat-row">
+                <div class="cmd">@src/auth/user.ts</div>
+                <div class="desc">
+                    <strong>ファイルをコンテキストに読み込む</strong><br>
+                    プロンプトの中で <code>@ファイルパス</code> と書くと、そのファイルの内容がコンテキストに自動挿入されます。「@src/auth/user.ts を参考に同様の構造で...」のように使います。
+                </div>
+            </div>
+
+            <div class="cheat-row">
+                <div class="cmd">@src/components/</div>
+                <div class="desc">
+                    <strong>ディレクトリ全体を読み込む</strong><br>
+                    フォルダパスを指定するとディレクトリ配下のファイルをまとめて読み込みます。コンポーネント全体の一貫性を確認させる場合などに使います。
+                </div>
+            </div>
+
+            <h3 style="color:#fff; font-size:20px; margin-top:30px;">CLAUDE.md ファイルシステム</h3>
+
+            <table>
+                <tr>
+                    <th>ファイルパス</th>
+                    <th>スコープ</th>
+                    <th>用途</th>
+                </tr>
+                <tr>
+                    <td><code>CLAUDE.md</code>（プロジェクトルート）</td>
+                    <td>プロジェクト全体</td>
+                    <td>毎回自動読み込み。コーディング規約・禁止操作・アーキテクチャ概要などを記載。git管理してチームで共有。</td>
+                </tr>
+                <tr>
+                    <td><code>~/.claude/CLAUDE.md</code></td>
+                    <td>グローバル（ユーザー全体）</td>
+                    <td>個人の好みや汎用ルール。「コードコメントは英語で」「エラー時は必ず原因と解決策を提示」など。</td>
+                </tr>
+                <tr>
+                    <td><code>src/CLAUDE.md</code>（サブディレクトリ）</td>
+                    <td>そのディレクトリ以下</td>
+                    <td>モノレポでサブパッケージごとに異なるルールを設定できます。</td>
+                </tr>
+                <tr>
+                    <td><code>.claude/settings.json</code></td>
+                    <td>プロジェクト</td>
+                    <td>許可ツール・モデル選択・MCPサーバー設定・Hooks定義など。git管理してチームで共有。</td>
+                </tr>
+                <tr>
+                    <td><code>.claude/settings.local.json</code></td>
+                    <td>ローカル（個人）</td>
+                    <td>APIキーなどの機密設定。<strong>.gitignore に必ず追加すること。</strong></td>
+                </tr>
+                <tr>
+                    <td><code>~/.claude/settings.json</code></td>
+                    <td>グローバル（ユーザー）</td>
+                    <td>すべてのプロジェクトに共通するグローバル設定。</td>
+                </tr>
+            </table>
+
+            <div class="tip-box">
+                <strong>CLAUDE.md に書くべき内容の例：</strong><br>
+                ・プロジェクトの技術スタック概要（「Next.js + Prisma + tRPC」）<br>
+                ・コーディング規約（「コンポーネントはデフォルトエクスポートを使わない」）<br>
+                ・やってはいけない操作（「本番DB への直接書き込み禁止」）<br>
+                ・よく参照するファイルのパス一覧<br>
+                ・用語集（プロジェクト固有の用語の定義）
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- Hooks System -->
+        <!-- ============================================================ -->
+        <section>
+            <h2>Hooks System</h2>
+            <p>Hooksは、Claudeがツールを呼び出す前後などのライフサイクルイベントに独自のシェルスクリプトを差し込む仕組みです。<br>
+                監査ログの記録・自動フォーマット・危険な操作のブロックなどを実現できます。</p>
+
+            <h3 style="color:#fff; font-size:20px; margin-top:30px;">Hook イベントの種類</h3>
+
+            <table>
+                <tr>
+                    <th>イベント名</th>
+                    <th>発火タイミング</th>
+                    <th>主な用途</th>
+                </tr>
+                <tr>
+                    <td><code>PreToolUse</code></td>
+                    <td>ツール呼び出し直前</td>
+                    <td>危険な操作のブロック・引数の検証・ログ記録</td>
+                </tr>
+                <tr>
+                    <td><code>PostToolUse</code></td>
+                    <td>ツール呼び出し直後</td>
+                    <td>結果の記録・自動フォーマット（prettier等）の実行</td>
+                </tr>
+                <tr>
+                    <td><code>SessionStart</code></td>
+                    <td>セッション開始時</td>
+                    <td>環境変数の設定・前提条件チェック</td>
+                </tr>
+                <tr>
+                    <td><code>SessionEnd</code></td>
+                    <td>セッション終了時</td>
+                    <td>クリーンアップ・サマリーログの記録</td>
+                </tr>
+                <tr>
+                    <td><code>Stop</code></td>
+                    <td>Claude が応答完了時</td>
+                    <td>応答内容の後処理・通知送信</td>
+                </tr>
+            </table>
+
+            <h3 style="color:#fff; font-size:20px; margin-top:30px;">設定方法</h3>
+            <p><code>.claude/settings.json</code> に <code>hooks</code> キーで記述します。</p>
+
+            <div class="code-box">{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo \"[$(date)] Tool: $TOOL_NAME, Input: $TOOL_INPUT\" >> ~/.claude/tool-log.jsonl"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npx prettier --write \"$TOOL_INPUT_FILE_PATH\" 2>/dev/null || true"
+          }
+        ]
+      }
+    ]
+  }
+}</div>
+
+            <div class="tip-box">
+                <strong>実用 Hook アイデア：</strong><br>
+                ・<code>PreToolUse</code> + <code>Bash</code> matcher: <code>rm -rf</code> や <code>DROP TABLE</code> を含むコマンドを検出して実行をブロック<br>
+                ・<code>PostToolUse</code> + <code>Write</code> matcher: ファイル書き込み後に自動で <code>prettier</code> や <code>eslint --fix</code> を実行<br>
+                ・<code>SessionEnd</code>: セッション終了時にSlackやDiscordへ「作業完了」通知を送る
+            </div>
+
+            <h3 style="color:#fff; font-size:20px; margin-top:30px;">jq を使ったツール呼び出しログの記録例</h3>
+            <div class="code-box">#!/bin/bash
+# ツール呼び出しを JSONL 形式でログに記録するスクリプト
+# .claude/hooks/log-tool-use.sh として保存
+
+LOG_FILE="$HOME/.claude/audit-log.jsonl"
+
+jq -n \
+  --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+  --arg tool "$TOOL_NAME" \
+  --arg input "$TOOL_INPUT" \
+  --arg project "$PWD" \
+  '{timestamp: $ts, tool: $tool, input: $input, project: $project}' \
+  >> "$LOG_FILE"</div>
+
+            <p>このスクリプトを <code>PreToolUse</code> Hook として登録すると、すべてのツール呼び出しが <code>~/.claude/audit-log.jsonl</code> に記録されます。セキュリティ監査やデバッグに役立ちます。</p>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- Keyboard Shortcuts -->
+        <!-- ============================================================ -->
+        <section>
+            <h2>キーボードショートカット（TUI）</h2>
+            <p>インタラクティブなTUIセッション中に使えるキーボードショートカットです。<br>
+                長時間の作業を快適に進めるために覚えておきたいショートカット一覧です。</p>
+
+            <table>
+                <tr>
+                    <th>キー</th>
+                    <th>動作</th>
+                    <th>使いどころ</th>
+                </tr>
+                <tr>
+                    <td><span class="kbd">Ctrl + C</span></td>
+                    <td>エージェント停止</td>
+                    <td>Claude が長い処理を実行中に中断したいとき。暴走を止めるのに使います。</td>
+                </tr>
+                <tr>
+                    <td><span class="kbd">Ctrl + Z</span></td>
+                    <td>セッション一時停止</td>
+                    <td>現在のセッションをバックグラウンドに送ります。<code>fg</code> コマンドで再開できます。</td>
+                </tr>
+                <tr>
+                    <td><span class="kbd">Esc</span></td>
+                    <td>入力キャンセル</td>
+                    <td>書きかけのプロンプトを送信前にキャンセルします。誤入力を送る前に使います。</td>
+                </tr>
+                <tr>
+                    <td><span class="kbd">↑</span> / <span class="kbd">↓</span></td>
+                    <td>履歴ナビゲーション</td>
+                    <td>過去に送ったプロンプトを再利用・編集するときに使います。繰り返しタスクに便利。</td>
+                </tr>
+                <tr>
+                    <td><span class="kbd">Ctrl + L</span></td>
+                    <td>画面クリア（表示のみ）</td>
+                    <td>ターミナルの表示をクリアします。コンテキストは消えません（コンテキスト削除は <code>/clear</code>）。</td>
+                </tr>
+                <tr>
+                    <td><span class="kbd">Tab</span></td>
+                    <td>補完</td>
+                    <td>ファイルパス入力時の補完。<code>@src/</code> と入力して Tab でパスを補完できます。</td>
+                </tr>
+            </table>
+
+            <div class="info-box">
+                <strong>Ctrl+C と /clear の違い：</strong><br>
+                <code>Ctrl+C</code> は「現在実行中の処理を止める」だけで、セッションとコンテキストは維持されます。
+                <code>/clear</code> は「会話履歴（コンテキスト）を消去する」コマンドです。処理を止めたいだけなら <code>Ctrl+C</code>、誤った前提をリセットしたいなら <code>/clear</code> を使います。
+            </div>
+        </section>
+
+        <p style="color:#555; font-size:13px; margin-top:60px; border-top:1px solid #1e2d40; padding-top:20px;">最終更新: 2026年6月</p>
     </div>
 </body>
 

@@ -57,9 +57,9 @@
   <div class="panel panel-accent">
     <div class="breadcrumb"><a href="../../index.html">← Hub Top</a> / <a href="../index.html">Claw Stack</a></div>
     <div class="eyebrow">Claw Stack</div>
-    <h1>OpenClaw <span class="new-badge">5/24 再解禁</span></h1>
-    <p class="lead">4 スタック中で最もフル機能な自律エージェント。Signal 連携 HITL・LoRA フォールバック・API 自動化を備えた Creator System のオーケストレーション層。</p>
-    <p style="margin-top:8px"><small>最終更新: 2026-05-30 | <a href="../../creator-system/openclaw.html">Creator System: OpenClaw 連携設計 →</a></small></p>
+    <h1>OpenClaw <span class="new-badge">v2026.6.5</span></h1>
+    <p class="lead">4 スタック中で最もフル機能な自律エージェント。Signal 連携 HITL・LoRA フォールバック・Skill Workshop・Workboard マルチエージェント・Pi SDK 内部エンジンを備えた Creator System のオーケストレーション層。</p>
+    <p style="margin-top:8px"><small>最終更新: 2026-06-15 | <a href="../../creator-system/openclaw.html">Creator System: OpenClaw 連携設計 →</a></small></p>
   </div>
 
   <!-- OpenClaw とは -->
@@ -208,6 +208,134 @@ quality:
     <p style="margin-top:12px;font-size:.85rem">完全な実装コードは <a href="../../creator-system/openclaw.html">creator-system/openclaw.html</a> のフォールバック発動条件セクションを参照。</p>
   </div>
 
+  <!-- 最新リリース情報 -->
+  <div class="panel panel-orange">
+    <h2>最新リリース情報 — 2026年5〜6月</h2>
+    <p style="font-size:.88rem;color:var(--muted);margin-bottom:16px">カレンダーバージョニング（<code>YYYY.M.PATCH</code>）に移行。6月以降の PATCH はカレンダー日ではなく月内通番。</p>
+
+    <div class="grid3" style="margin-bottom:14px">
+      <!-- v2026.6.5 -->
+      <div class="card card-orange">
+        <span class="tag tag-orange">beta</span><span class="tag tag-green">2026-06-09</span>
+        <h3>v2026.6.5</h3>
+        <ul>
+          <li><strong>MCP ツール結果 coercion</strong> — resource_link・audio・不正形式の画像ブロックをプロバイダー変換前に自動修正。Anthropic 400 エラー＆セッション汚染を根絶</li>
+          <li><strong>QQBot 改善</strong> — reasoning/thinking タグをユーザー送信前にストリップ。内部独り言を非公開に保つ</li>
+          <li><strong>Parallel Web Search バンドル</strong> — プラグインなしで同時マルチ検索を標準サポート</li>
+          <li><strong>チャット安全強化</strong> — Anthropic・Matrix チャネルのセッション復元ロジックを改善</li>
+        </ul>
+      </div>
+
+      <!-- v2026.6.1 -->
+      <div class="card card-accent">
+        <span class="tag tag-teal">stable</span><span class="tag tag-green">2026-06-03</span>
+        <h3>v2026.6.1</h3>
+        <ul>
+          <li><strong>Windows ネイティブノード</strong> — x64 + arm64 署名済みインストーラー。WSL 不要で Windows を完全サポート</li>
+          <li><strong>Skill Workshop 正式導入</strong> — governed な提案→レビュー→適用フロー（後述）</li>
+          <li><strong>Workboard プラグイン</strong> — マルチエージェント向けオーケストレーション層（タスク計画・追跡・横断管理）</li>
+          <li><strong>MiniMax M3 サポート</strong> — 新規 LLM プロバイダーを追加</li>
+          <li><strong>Tokenjuice・Copilot agent runtime を公式プラグイン化</strong> — コアから分離し独立メンテナンス</li>
+        </ul>
+      </div>
+
+      <!-- v2026.5.18 -->
+      <div class="card card-purple">
+        <span class="tag tag-purple">stable</span><span class="tag tag-green">2026-05-18</span>
+        <h3>v2026.5.18</h3>
+        <ul>
+          <li><strong>defineToolPlugin 型付き API</strong> — TypeScript でプラグインを安全に定義できる公式 SDK。tools・skills・channels・音声・リアルタイム音声・メディア生成・web search・hooks を追加可能</li>
+          <li><strong>Control UI ダッシュボード刷新</strong> — エージェント状態・タスク進捗をリアルタイム可視化</li>
+          <li><strong>セキュリティ強化</strong> — 難読化コマンドの実行をブロック</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Skill Workshop -->
+  <div class="panel panel-purple">
+    <h2>Skill Workshop — エージェント自己改善ループ</h2>
+    <p style="font-size:.88rem;color:var(--muted);margin-bottom:14px">v2026.6.1 で導入。エージェントが SKILL.md を直接書き換える代わりに<strong>提案→レビュー→適用</strong>の governed フローを経由する。</p>
+
+    <div class="grid2">
+      <div>
+        <h3 style="font-size:.92rem;margin-bottom:10px">フロー概要</h3>
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body"><h3>提案（Propose）</h3><p>エージェントが繰り返し作業を検出 → <code>SKILL.proposal.md</code> に草案を自動生成。<code>status: draft</code> でバージョン管理される。</p></div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body"><h3>レビュー（Inspect）</h3><p><code>openclaw skills workshop inspect &lt;id&gt;</code> で差分確認。何が追加・変更されるかを人間がチェック。</p></div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body"><h3>適用（Apply）</h3><p><code>openclaw skills workshop apply &lt;id&gt;</code> で SKILL.md に書き込み。proposal-only フィールド（status/proposal date）は自動削除。</p></div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-body"><h3>拒否・隔離</h3><p><code>reject</code> でゴミ箱へ。<code>quarantine</code> でリスク案件を隔離。ロールバックも標準装備。</p></div>
+        </div>
+      </div>
+      <div>
+        <h3 style="font-size:.92rem;margin-bottom:8px">CLI コマンド</h3>
+        <div class="code">openclaw skills workshop list
+openclaw skills workshop inspect &lt;id&gt;
+openclaw skills workshop apply &lt;id&gt;
+openclaw skills workshop reject &lt;id&gt;
+openclaw skills workshop quarantine &lt;id&gt;</div>
+        <div class="note" style="margin-top:12px">
+          <strong>どんな時に使うか：</strong> 漫画パイプラインで毎回同じ「LoRA 選定→CLIP 評価→HITL」の流れを繰り返しているとき、エージェントが自分で「これスキル化すべきでは？」と提案を出す。ユーザーは <code>apply</code> を叩くだけで次回から自動実行される。
+        </div>
+        <h3 style="font-size:.92rem;margin-top:14px;margin-bottom:8px">Workboard マルチエージェント実例</h3>
+        <div class="code"><span class="c"># 複数エージェントをまたぐタスク計画</span>
+<span class="k">openclaw workboard</span> create \
+  --title <span class="s">"Ep.03 フル制作"</span> \
+  --agents <span class="s">"artist,writer,uploader"</span> \
+  --steps <span class="s">"storyboard,render,caption,upload"</span>
+
+<span class="c"># 進捗確認（横断ダッシュボード）</span>
+<span class="k">openclaw workboard</span> status --board ep03</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pi SDK 統合 -->
+  <div class="panel">
+    <h2>Pi SDK 統合 — OpenClaw の内部エンジン</h2>
+    <p style="font-size:.88rem;color:var(--muted);margin-bottom:14px">OpenClaw は Earendil 社の <strong>Pi SDK</strong>（<code>@earendil-works/pi-agent-core</code>）をコアエンジンとして使用。Creator System の漫画/動画ワークフローもこの上に構築されている。</p>
+
+    <div class="grid2">
+      <div>
+        <h3 style="font-size:.92rem;margin-bottom:8px">主要依存パッケージ</h3>
+        <table>
+          <thead><tr><th>パッケージ</th><th>役割</th></tr></thead>
+          <tbody>
+            <tr><td><code>@earendil-works/pi-agent-core</code></td><td>コアエージェントループ・ツール管理</td></tr>
+            <tr><td><code>pi-coding-agent</code></td><td>コーディング特化エージェント</td></tr>
+            <tr><td><code>pi-ai</code></td><td>マルチ LLM プロバイダー抽象層</td></tr>
+            <tr><td><code>pi-tui</code></td><td>ターミナル UI コンポーネント</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <h3 style="font-size:.92rem;margin-bottom:8px">Gateway での createAgentSession() 呼び出し例</h3>
+        <div class="code"><span class="k">import</span> { createAgent } <span class="k">from</span> <span class="s">"@earendil-works/pi-coding-agent"</span>;
+
+<span class="k">const</span> session = <span class="k">await</span> createAgent({
+  provider: <span class="s">"anthropic"</span>,
+  model: <span class="s">"claude-sonnet-4-6"</span>,
+  extensions: [comfyuiPlugin, signalPlugin],
+});
+
+<span class="c">// OpenClaw が WhatsApp/Signal/Discord 等</span>
+<span class="c">// 全チャネルをこの1セッションに接続</span>
+<span class="k">await</span> session.start();</div>
+        <div class="warn" style="margin-top:10px">Pi の RPC モードを使うと、外部プロセスから JSONL で OpenClaw エージェントを制御できる。CI/CD パイプラインとの連携に有効。</div>
+      </div>
+    </div>
+  </div>
+
   <!-- 関連リンク -->
   <div class="panel">
     <h2>関連ページ</h2>
@@ -237,7 +365,7 @@ quality:
         </ul>
       </div>
     </div>
-    <p style="margin-top:14px"><small>最終更新: 2026-05-30（OpenClaw 5/24 再解禁後の内容に刷新）</small></p>
+    <p style="margin-top:14px"><small>最終更新: 2026-06-15（v2026.6.1/6.5 最新リリース・Skill Workshop・Workboard・Pi SDK 統合追記）</small></p>
   </div>
 
 </div>

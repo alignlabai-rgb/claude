@@ -7,12 +7,14 @@
     <title>Docker Essentials | Tech Workbench</title>
     <style>
         :root {
-            --bg-deep: #050505;
-            --bg-panel: #0a0a0a;
+            --bg-deep: #0b1220;
+            --bg-panel: #111a2b;
             --text-main: #e0e0e0;
             --text-muted: #888;
             --accent: #58a6ff;
-            /* Environment Blue */
+            --accent2: #3dd8c5;
+            --danger: #ef4444;
+            --warn: #f59e0b;
             --border: rgba(255, 255, 255, 0.1);
         }
 
@@ -25,7 +27,7 @@
         }
 
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
         }
 
@@ -54,12 +56,19 @@
             color: #fff;
         }
 
+        h3 {
+            font-size: 18px;
+            color: var(--accent2);
+            margin-top: 30px;
+            margin-bottom: 10px;
+        }
+
         p {
             margin-bottom: 20px;
         }
 
         .analogy-box {
-            background: #111;
+            background: var(--bg-panel);
             padding: 30px;
             border-radius: 12px;
             border: 1px solid var(--border);
@@ -77,12 +86,21 @@
         .concept-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 30px;
+            gap: 24px;
+        }
+
+        .concept-item {
+            background: var(--bg-panel);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
         }
 
         .concept-item h3 {
             color: #fff;
+            margin-top: 0;
             margin-bottom: 10px;
+            font-size: 17px;
         }
 
         .code-block {
@@ -90,9 +108,93 @@
             padding: 20px;
             border-radius: 8px;
             font-family: monospace;
-            color: #ccc;
-            border: 1px solid var(--border);
+            font-size: 0.9em;
+            color: #a5f3d0;
+            border: 1px solid #1e3a5f;
             overflow-x: auto;
+            white-space: pre;
+            line-height: 1.6;
+            margin: 16px 0;
+        }
+
+        .cmd-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9em;
+        }
+
+        .cmd-table th {
+            text-align: left;
+            padding: 10px 12px;
+            background: rgba(88, 166, 255, 0.1);
+            color: var(--accent);
+            border-bottom: 2px solid rgba(88, 166, 255, 0.3);
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .cmd-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+
+        .cmd-table td:first-child {
+            font-family: monospace;
+            color: #a5f3d0;
+            white-space: nowrap;
+        }
+
+        .cmd-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .tip-box {
+            background: rgba(61, 216, 197, 0.08);
+            border-left: 4px solid var(--accent2);
+            padding: 16px 20px;
+            border-radius: 0 8px 8px 0;
+            margin: 20px 0;
+        }
+
+        .tip-box .label {
+            font-size: 0.75em;
+            text-transform: uppercase;
+            color: var(--accent2);
+            font-weight: bold;
+            letter-spacing: 0.06em;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .warn-box {
+            background: rgba(239, 68, 68, 0.08);
+            border-left: 4px solid var(--danger);
+            padding: 16px 20px;
+            border-radius: 0 8px 8px 0;
+            margin: 20px 0;
+        }
+
+        .warn-box .label {
+            font-size: 0.75em;
+            text-transform: uppercase;
+            color: var(--danger);
+            font-weight: bold;
+            letter-spacing: 0.06em;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(88, 166, 255, 0.15);
+            color: var(--accent);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75em;
+            vertical-align: middle;
+            margin-left: 8px;
         }
 
         .back-link {
@@ -105,14 +207,34 @@
         .back-link:hover {
             color: #fff;
         }
+
+        .nav-links {
+            margin-bottom: 40px;
+        }
+
+        .nav-links a {
+            color: #666;
+            text-decoration: none;
+            font-size: 0.9em;
+        }
+
+        .small {
+            font-size: 0.84rem;
+            color: #7f92ac;
+        }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <h1>Docker Essentials</h1>
-        <span class="subtitle">The Universal Shipping Container for Code</span>
+        <div class="nav-links">
+            <a href="index.html">← LLM 個別深掘り</a>
+        </div>
 
+        <h1>Docker Essentials</h1>
+        <span class="subtitle">The Universal Shipping Container for Code — AI Agent Sandbox として使いこなす</span>
+
+        <!-- What is Docker -->
         <section>
             <h2>What is Docker?</h2>
             <p>
@@ -138,59 +260,455 @@
             </div>
         </section>
 
+        <!-- Core Concepts -->
         <section>
             <h2>Core Concepts</h2>
             <div class="concept-grid">
                 <div class="concept-item">
-                    <h3>🖼️ Image (設計図)</h3>
+                    <h3>🖼️ Image（設計図）</h3>
                     <p>
-                        そのコンテナに何が入っているかの定義ファイル。<br>
-                        「Ubuntuが入っていて、Python 3.9が入っていて、このコードが入っている」という不変のデータ。
-                        CD-ROMのようなもの。
+                        コンテナに何が入っているかの定義ファイル。<br>
+                        「Ubuntu + Python 3.12 + このコード」という不変のデータ。CD-ROMのようなもの。
                     </p>
                 </div>
                 <div class="concept-item">
-                    <h3>📦 Container (実体)</h3>
+                    <h3>📦 Container（実体）</h3>
                     <p>
                         Imageから生成された、実際に動いているプロセス。<br>
-                        1つのImageから、何個でもContainerを作れる。<br>
-                        使い終わったら捨てれば、跡形もなく消える（Disposable）。
+                        1つのImageから何個でも作れる。使い終わったら捨てて跡形なく消える（Disposable）。
+                    </p>
+                </div>
+                <div class="concept-item">
+                    <h3>📝 Dockerfile（レシピ）</h3>
+                    <p>
+                        Imageの作り方を記述したテキストファイル。<br>
+                        「FROM ubuntu → RUN apt install → COPY ソースコード」という手順書。
+                    </p>
+                </div>
+                <div class="concept-item">
+                    <h3>🗂️ Volume（永続ストレージ）</h3>
+                    <p>
+                        コンテナを削除してもデータが残る永続化領域。<br>
+                        DBのデータやアップロードファイルはVolumeに保存する。
+                    </p>
+                </div>
+                <div class="concept-item">
+                    <h3>🌐 Network（仮想LAN）</h3>
+                    <p>
+                        コンテナ間の通信路。同じnetworkに属するコンテナはコンテナ名でアクセス可能。
+                    </p>
+                </div>
+                <div class="concept-item">
+                    <h3>🎻 Docker Compose（指揮者）</h3>
+                    <p>
+                        複数コンテナを1つのYAMLで定義・管理するツール。App + DB + Redisを同時起動できる。
                     </p>
                 </div>
             </div>
         </section>
 
+        <!-- Dockerfile -->
         <section>
-            <h2>Ideally for OpenClaw</h2>
-            <p>
-                なぜ自律型エージェント(OpenClaw)にDockerが必要なのか？<br>
-                理由は<strong>「安全性(Safety)」</strong>と<strong>「再現性(Reproducibility)」</strong>です。
-            </p>
-            <ul>
-                <li><strong>Sandbox (砂場):</strong> エージェントが暴走して `rm -rf /` (全削除) を実行しても、消えるのはコンテナの中だけ。あなたのPCは無傷です。</li>
-                <li><strong>Consistency:</strong> 「私のPCでは動いたのに、本番サーバーではエラー」という事故を、Dockerなら100%防げます。</li>
-            </ul>
-        </section>
+            <h2>Dockerfile の書き方</h2>
+            <p>Dockerfileは上から順に実行され、各命令が「レイヤー」を積み重ねます。</p>
 
-        <section>
-            <h2>Basic Commands</h2>
-            <p>これだけ覚えておけば十分です。</p>
-            <div class="code-block">
-                # 1. コンテナを起動する (run)
-                # -it: インタラクティブモード
-                # --rm: 終わったら自動削除（ゴミを残さない）
-                $ docker run -it --rm python:3.9
+            <h3>基本構文</h3>
+            <div class="code-block">FROM python:3.12-slim            # ベースイメージ指定
+WORKDIR /app                     # 作業ディレクトリ設定
 
-                # 2. 動いているコンテナを見る
-                $ docker ps
+# 依存関係を先にコピー（キャッシュ効率化）
+COPY requirements.txt .
+RUN pip install -r requirements.txt
 
-                # 3. 全てのコンテナ（停止中含む）を見る
-                $ docker ps -a
+# ソースコードをコピー
+COPY . .
 
-                # 4. コンテナを強制停止する
-                $ docker stop <CONTAINER_ID>
+EXPOSE 8000                      # ポート宣言（情報提供のみ）
+CMD ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0"]</div>
+
+            <h3>Multi-stage Build <span class="badge">BEST PRACTICE</span></h3>
+            <p>ビルド用コンテナと実行用コンテナを分離。本番イメージを<strong>劇的に小さく</strong>できる。</p>
+            <div class="code-block"># Stage 1: Build
+FROM node:20 AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+# Stage 2: Production (node_modulesのdevDepsを含まない)
+FROM node:20-slim
+WORKDIR /app
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+EXPOSE 3000
+CMD ["node", "dist/index.js"]</div>
+
+            <div class="tip-box">
+                <span class="label">Tip — .dockerignore</span>
+                プロジェクトルートに <code>.dockerignore</code> を置いて <code>node_modules/</code>・<code>.git/</code>・<code>*.env</code> を除外すると、イメージが小さくなりビルドも速くなる。
             </div>
         </section>
+
+        <!-- Basic Commands -->
+        <section>
+            <h2>コマンドリファレンス</h2>
+
+            <h3>イメージ操作</h3>
+            <table class="cmd-table">
+                <thead>
+                    <tr>
+                        <th>コマンド</th>
+                        <th>説明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>docker build -t myapp:1.0 .</td><td>Dockerfileからイメージをビルド（タグ付き）</td></tr>
+                    <tr><td>docker images</td><td>ローカルのイメージ一覧</td></tr>
+                    <tr><td>docker pull nginx:alpine</td><td>Docker Hubからイメージ取得</td></tr>
+                    <tr><td>docker push myrepo/myapp:1.0</td><td>レジストリへプッシュ</td></tr>
+                    <tr><td>docker rmi myapp:1.0</td><td>イメージ削除</td></tr>
+                    <tr><td>docker image prune</td><td>未使用イメージを一括削除</td></tr>
+                </tbody>
+            </table>
+
+            <h3>コンテナ操作</h3>
+            <table class="cmd-table">
+                <thead>
+                    <tr>
+                        <th>コマンド</th>
+                        <th>説明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>docker run -it --rm python:3.12</td><td>対話モードで起動・終了後自動削除</td></tr>
+                    <tr><td>docker run -d -p 8080:80 nginx</td><td>バックグラウンド起動・ポートマッピング</td></tr>
+                    <tr><td>docker run -v $(pwd):/app myapp</td><td>ホストディレクトリをマウント</td></tr>
+                    <tr><td>docker run --env-file .env myapp</td><td>環境変数ファイルを読み込み</td></tr>
+                    <tr><td>docker ps</td><td>実行中のコンテナ一覧</td></tr>
+                    <tr><td>docker ps -a</td><td>停止中を含む全コンテナ</td></tr>
+                    <tr><td>docker stop &lt;ID&gt;</td><td>コンテナを正常停止（SIGTERM）</td></tr>
+                    <tr><td>docker kill &lt;ID&gt;</td><td>コンテナを強制停止（SIGKILL）</td></tr>
+                    <tr><td>docker rm &lt;ID&gt;</td><td>停止済みコンテナを削除</td></tr>
+                    <tr><td>docker exec -it &lt;ID&gt; bash</td><td>起動中コンテナにシェル接続</td></tr>
+                    <tr><td>docker logs -f &lt;ID&gt;</td><td>ログをtailフォロー</td></tr>
+                    <tr><td>docker inspect &lt;ID&gt;</td><td>詳細メタデータ（JSON）を表示</td></tr>
+                    <tr><td>docker stats</td><td>CPU/メモリのリアルタイム使用率</td></tr>
+                    <tr><td>docker system prune -a</td><td>未使用の全リソースを一括削除</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Docker Compose -->
+        <section>
+            <h2>Docker Compose — 複数コンテナ管理</h2>
+            <p>Webアプリ + DB + Cacheなど複数サービスを1ファイルで宣言的に管理します。</p>
+
+            <h3>compose.yaml の基本構造</h3>
+            <div class="code-block">services:
+  api:
+    build: .                        # Dockerfile からビルド
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://postgres:pass@db:5432/mydb
+    depends_on:
+      db:
+        condition: service_healthy   # DBのヘルスチェック後に起動
+    volumes:
+      - ./src:/app/src               # ホットリロード用バインドマウント
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: mydb
+    volumes:
+      - pgdata:/var/lib/postgresql/data   # 名前付きVolume（永続化）
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+volumes:
+  pgdata:        # 名前付きVolumeの宣言（docker管理・ホストから隔離）</div>
+
+            <h3>Compose コマンド</h3>
+            <table class="cmd-table">
+                <thead>
+                    <tr>
+                        <th>コマンド</th>
+                        <th>説明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>docker compose up -d</td><td>全サービスをバックグラウンドで起動</td></tr>
+                    <tr><td>docker compose up --build</td><td>イメージを再ビルドして起動</td></tr>
+                    <tr><td>docker compose down</td><td>全サービス停止・コンテナ削除</td></tr>
+                    <tr><td>docker compose down -v</td><td>Volumeも含めて完全削除</td></tr>
+                    <tr><td>docker compose logs -f api</td><td>apiサービスのログをフォロー</td></tr>
+                    <tr><td>docker compose exec api bash</td><td>apiコンテナにシェル接続</td></tr>
+                    <tr><td>docker compose ps</td><td>各サービスのステータス確認</td></tr>
+                    <tr><td>docker compose restart api</td><td>apiサービスのみ再起動</td></tr>
+                    <tr><td>docker compose run --rm api pytest</td><td>一時コンテナでコマンド実行</td></tr>
+                </tbody>
+            </table>
+
+            <div class="tip-box">
+                <span class="label">Tip — 複数環境の管理</span>
+                <code>compose.yaml</code>（共通）+ <code>compose.dev.yaml</code>（開発用オーバーライド）の2ファイル運用が定番。
+                <code>docker compose -f compose.yaml -f compose.dev.yaml up</code> でマージ起動。
+            </div>
+        </section>
+
+        <!-- Volumes -->
+        <section>
+            <h2>Volumes — データ永続化</h2>
+            <p>コンテナを削除してもデータを残すための仕組み。3種類の使い分けを把握する。</p>
+
+            <table class="cmd-table">
+                <thead>
+                    <tr>
+                        <th>種別</th>
+                        <th>記法</th>
+                        <th>用途</th>
+                        <th>管理</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Named Volume</td>
+                        <td><code>pgdata:/var/lib/postgresql/data</code></td>
+                        <td>DBデータ・永続ストレージ</td>
+                        <td>Docker管理（隔離）</td>
+                    </tr>
+                    <tr>
+                        <td>Bind Mount</td>
+                        <td><code>./src:/app/src</code></td>
+                        <td>開発中のホットリロード</td>
+                        <td>ホストOS管理</td>
+                    </tr>
+                    <tr>
+                        <td>tmpfs Mount</td>
+                        <td><code>--tmpfs /tmp</code></td>
+                        <td>一時ファイル・セキュア処理</td>
+                        <td>メモリ（再起動で消える）</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="code-block"># Named Volume の操作
+docker volume ls                   # 一覧
+docker volume inspect pgdata       # 詳細（マウントパス確認）
+docker volume rm pgdata            # 削除
+docker volume prune                # 未使用を一括削除
+
+# バックアップ（Named Volume → tar）
+docker run --rm \
+  -v pgdata:/data \
+  -v $(pwd):/backup \
+  alpine tar czf /backup/pgdata.tar.gz /data</div>
+        </section>
+
+        <!-- Network -->
+        <section>
+            <h2>Network — コンテナ間通信</h2>
+            <p>Docker Compose内のサービスはデフォルトで同一ネットワークに属し、<strong>サービス名でDNS解決</strong>できます。</p>
+
+            <table class="cmd-table">
+                <thead>
+                    <tr>
+                        <th>ネットワーク種別</th>
+                        <th>特徴</th>
+                        <th>用途</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>bridge（デフォルト）</td>
+                        <td>同一ホスト内の仮想LAN。コンテナ名でアクセス可</td>
+                        <td>通常の開発・本番</td>
+                    </tr>
+                    <tr>
+                        <td>host</td>
+                        <td>ホストのネットワークをそのまま使用</td>
+                        <td>高パフォーマンスが必要な場合（Linux限定）</td>
+                    </tr>
+                    <tr>
+                        <td>none</td>
+                        <td>ネットワーク完全遮断</td>
+                        <td>エージェントのセキュアサンドボックス</td>
+                    </tr>
+                    <tr>
+                        <td>overlay</td>
+                        <td>複数ホスト間のコンテナ通信（Swarm）</td>
+                        <td>分散デプロイ</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="code-block"># ネットワーク操作コマンド
+docker network ls
+docker network create mynet
+docker network inspect mynet
+
+# コンテナをネットワークに接続
+docker run --network mynet --name app1 myapp
+docker run --network mynet --name db1 postgres:16
+
+# app1 から db1 へ: ホスト名 "db1" でアクセス可能</div>
+        </section>
+
+        <!-- AI Agent Sandbox -->
+        <section>
+            <h2>AI Agent Sandbox パターン <span class="badge">OPENCLAW</span></h2>
+            <p>
+                自律型エージェント（Claude Code / OpenClaw）に危険なコード実行をさせる場合は、
+                <strong>必ずDockerコンテナで隔離</strong>します。
+            </p>
+
+            <h3>基本的なエージェント実行コンテナ</h3>
+            <div class="code-block">FROM python:3.12-slim
+
+# 最低限のツールのみインストール
+RUN apt-get update && apt-get install -y \
+    git curl jq \
+    && rm -rf /var/lib/apt/lists/*
+
+# セキュリティ: root以外のユーザーで実行
+RUN useradd -m -u 1000 agent
+USER agent
+WORKDIR /workspace
+
+# エージェントが使うPythonパッケージ
+COPY requirements.txt .
+RUN pip install --user -r requirements.txt
+
+# エントリーポイント: エージェントコードを実行
+CMD ["python", "agent_runner.py"]</div>
+
+            <h3>Claude Code をサンドボックス実行する compose.yaml</h3>
+            <div class="code-block">services:
+  claude-sandbox:
+    build:
+      context: .
+      dockerfile: Dockerfile.agent
+    volumes:
+      - ./workspace:/workspace     # 作業対象のコードをマウント
+      - /var/run/docker.sock:/var/run/docker.sock  # Docker-in-Docker不要の場合は外す
+    environment:
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+    network_mode: "none"           # ネットワーク完全遮断（外部通信禁止）
+    mem_limit: 2g                  # メモリ上限
+    cpus: "1.0"                    # CPU上限
+    read_only: false               # 作業用に書き込み許可
+    security_opt:
+      - no-new-privileges:true     # 権限昇格禁止
+    tmpfs:
+      - /tmp:size=500m             # tmpfsで一時ファイル管理</div>
+
+            <div class="warn-box">
+                <span class="label">⚠️ セキュリティ注意</span>
+                エージェントに <code>--dangerously-skip-permissions</code> を渡す場合は特に隔離が重要。
+                <code>network_mode: none</code> を設定してもAPIキーが漏れる可能性があるため、
+                最小権限原則を守り、実行後はコンテナを即削除する。
+            </div>
+
+            <h3>コンテナ内でのエージェント実行パターン</h3>
+            <div class="code-block"># パターン1: 使い捨てコンテナで1タスクだけ実行（推奨）
+docker run --rm \
+  --network none \
+  --memory 2g \
+  --cpus 1.0 \
+  -v $(pwd)/task:/workspace \
+  -e ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY \
+  claude-agent:latest \
+  claude --print "README.md を読んで要約して" > output.txt
+
+# パターン2: 対話型開発（デバッグ用）
+docker run -it --rm \
+  --network bridge \    # 開発時はネットワーク許可
+  -v $(pwd):/workspace \
+  -e ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY \
+  claude-agent:latest bash
+
+# パターン3: Compose で継続実行
+docker compose run --rm agent claude "タスクを実行して"</div>
+        </section>
+
+        <!-- Production Best Practices -->
+        <section>
+            <h2>本番運用のベストプラクティス</h2>
+
+            <h3>✅ イメージサイズを最小化する</h3>
+            <ul>
+                <li><code>-slim</code> や <code>-alpine</code> ベースイメージを使う（ubuntu full は避ける）</li>
+                <li>Multi-stage build でビルドツールを本番イメージに含めない</li>
+                <li><code>.dockerignore</code> で <code>node_modules/</code>・<code>.git/</code>・テストファイルを除外</li>
+                <li>RUN 命令を <code>&&</code> で連結してレイヤー数を減らす</li>
+            </ul>
+
+            <h3>✅ セキュリティを固める</h3>
+            <div class="code-block"># rootユーザーで動かさない
+RUN useradd -m -u 1000 appuser
+USER appuser
+
+# イメージを定期的に更新してパッチを当てる
+FROM python:3.12.4-slim  # タグはfloating(:latest)ではなく固定バージョンで
+
+# 機密情報をイメージに焼き込まない
+# ❌ 悪例: ENV API_KEY=sk-xxxx
+# ✅ 良例: docker run -e API_KEY=$API_KEY または --env-file .env</div>
+
+            <h3>✅ ヘルスチェックを設定する</h3>
+            <div class="code-block">HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
+  CMD curl -f http://localhost:8000/health || exit 1</div>
+
+            <h3>✅ ログ設計</h3>
+            <p>アプリは<strong>stdout/stderr にログを出力</strong>するだけでよい。
+               ファイルに書かない。Dockerが <code>docker logs</code> で収集し、
+               クラウドのロギングサービスが自動集約する。</p>
+
+            <div class="tip-box">
+                <span class="label">Tip — Docker Desktop vs Rancher Desktop</span>
+                macOS / Windows では Docker Desktop（有償）か Rancher Desktop（無償・MIT）が2択。
+                企業利用なら Docker Desktop の有償ライセンスが必要。個人・OSS開発なら Rancher Desktop で十分。
+            </div>
+        </section>
+
+        <!-- OpenClaw Connection -->
+        <section>
+            <h2>OpenClaw との連携</h2>
+            <p>
+                なぜ自律型エージェント（OpenClaw）にDockerが必要なのか？
+                理由は<strong>「安全性（Safety）」</strong>と<strong>「再現性（Reproducibility）」</strong>です。
+            </p>
+            <ul>
+                <li><strong>Sandbox（砂場）:</strong> エージェントが暴走して <code>rm -rf /</code> を実行しても、消えるのはコンテナの中だけ。ホストPCは無傷。</li>
+                <li><strong>Consistency:</strong> 「私のMacでは動いたのに、サーバーではエラー」という事故をDockerなら防げる。</li>
+                <li><strong>Rollback:</strong> イメージをバージョン管理すれば、エージェントの動作環境をいつでも過去に戻せる。</li>
+                <li><strong>Resource Control:</strong> CPUとメモリの上限を設定して、暴走タスクからホストを守る。</li>
+            </ul>
+
+            <p>詳細な連携設計は <a href="../../openclaw/architecture.html">OpenClaw アーキテクチャ</a> を参照。</p>
+        </section>
+
+        <!-- Footer -->
+        <div class="panel" style="background: var(--bg-panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; margin-top: 40px;">
+            <h2 style="font-size: 1rem; color: #fcd34d; border-bottom: 1px solid rgba(244,184,96,0.25); padding-bottom: 6px;">関連リンク</h2>
+            <ul style="margin: 0; padding-left: 20px;">
+                <li><a href="../../openclaw/architecture.html">OpenClaw Architecture</a> — エージェントサンドボックス設計</li>
+                <li><a href="../../workbench/index.html">Tech Workbench</a> — 開発実務ガイド一覧</li>
+                <li><a href="index.html">LLM 個別深掘り</a> — 関連ページ一覧</li>
+            </ul>
+            <p class="small" style="margin-top: 16px; margin-bottom: 0;">最終更新: 2026-06-08</p>
+        </div>
 
         <a href="../../index.html" class="back-link">← Tech Workbench Portal</a>
     </div>

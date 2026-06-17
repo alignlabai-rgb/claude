@@ -247,7 +247,7 @@
             <h1>Qwen</h1>
             <p class="lead">多言語の壁を超え、数理的思考とコーディングにおいて卓越した能力を発揮する碩学。現行の「Qwen
                 3.6-Plus」は、MoEアーキテクチャによる効率化と、Qwen-Coderによるトップクラスの実装力を兼ね備えます。</p>
-            <span class="last-updated">Last Updated: 2026.05.30</span>
+            <span class="last-updated">Last Updated: 2026.06.15</span>
             <br>
             <a class="back" href="../index.html">← Workbenchへ戻る</a>
             <a class="back" href="../../research/qwen-recent-updates.html" style="margin-left:14px;">📈 最新動向トラッカー →</a>
@@ -386,7 +386,31 @@
             </div>
             <p style="margin-top:10px;"><strong>損益分岐の考え方</strong>: 「月にどれだけ叩くか」が閾値。下書き・分類・整形・要約のような<strong>大量反復工程</strong>はローカル Qwen が圧倒的に安い。一方、最終品質が要る一発勝負は API（Plus/Max や他社フラッグシップ）。</p>
             <p><strong>現実解＝ハイブリッド</strong>: 量産の下流（下書き・タグ付け・整形）はローカル Qwen で安く回し、<strong>質の最終判断だけ Claude / GPT-5.5 の API</strong> に通す。これが ALIGN_Lab 的な「自動コンテンツ量産」のコスト最適パターンです。</p>
-            <p style="border-left:3px solid #c4b5fd;padding-left:14px;color:#bcc0da;font-style:italic;">注意: ローカルは「無料」ではない。電気代・GPU の減価・運用/保守の手間も“コスト”。完全自前に振り切るより、まずは「量産工程だけローカル」から始めるのが安全。</p>
+            <p style=”border-left:3px solid #c4b5fd;padding-left:14px;color:#bcc0da;font-style:italic;”>注意: ローカルは「無料」ではない。電気代・GPU の減価・運用/保守の手間も”コスト”。完全自前に振り切るより、まずは「量産工程だけローカル」から始めるのが安全。</p>
+        </section>
+
+        <!-- ===== Ollama クイックスタート ===== -->
+        <section class=”card” style=”border-color:rgba(196,181,253,0.35);”>
+            <h2>Ollama クイックスタート（2026-06 時点）</h2>
+            <p>Qwen 3.6 はすべて Ollama ライブラリで公式提供済み。以下のコマンドでローカル実行可能。</p>
+            <table style=”width:100%; border-collapse:collapse; font-size:0.85rem; margin:10px 0;”>
+                <thead><tr style=”text-align:left; color:#c4b5fd;”>
+                    <th style=”padding:6px 8px;”>モデル</th><th style=”padding:6px 8px;”>コマンド</th><th style=”padding:6px 8px;”>推奨環境</th><th style=”padding:6px 8px;”>備考</th>
+                </tr></thead>
+                <tbody>
+                    <tr><td style=”padding:6px 8px;”><strong>Qwen 3.6 27B</strong><br><span style=”font-size:0.75rem; color:#9ca3af;”>2026-04-22</span></td><td style=”padding:6px 8px;”><code>ollama run qwen3.6:27b</code></td><td style=”padding:6px 8px;”>24GB GPU / M1 Max 以上</td><td style=”padding:6px 8px;”>バランス型。Dense モデルで素直に賢い</td></tr>
+                    <tr><td style=”padding:6px 8px;”><strong>Qwen 3.6 35B-A3B</strong><br><span style=”font-size:0.75rem; color:#9ca3af;”>2026-04-15 MoE</span></td><td style=”padding:6px 8px;”><code>ollama run qwen3.6:35b-a3b-iq4_xs</code></td><td style=”padding:6px 8px;”>RTX 4090（24GB）/ M2 Ultra 以上</td><td style=”padding:6px 8px;”>iq3: 13GB（16GB Mac可）/ iq4: 18GB（24GB Mac）</td></tr>
+                    <tr><td style=”padding:6px 8px;”><strong>Qwen-Coder</strong></td><td style=”padding:6px 8px;”><code>ollama run qwen-coder</code></td><td style=”padding:6px 8px;”>16GB GPU / Mac</td><td style=”padding:6px 8px;”>コード特化。SWE-Bench 高スコア</td></tr>
+                </tbody>
+            </table>
+            <p style=”margin-top:10px; font-size:0.87rem;”><strong>thinking モードのOFF（低レイテンシツール呼び出し）:</strong></p>
+            <pre style=”background:rgba(255,255,255,0.04); border-radius:8px; padding:12px; font-size:0.82rem; overflow-x:auto;”>curl http://localhost:11434/api/chat -d '{
+  “model”: “qwen3.6:35b-a3b”,
+  “think”: false,
+  “messages”: [{“role”:”user”,”content”:”タグ付けしてください: ...”}]
+}'</pre>
+            <p style=”font-size:0.82rem; color:#9ca3af; margin-top:6px;”>💡 <code>”think”: false</code> で thinking ブロックをスキップ → ツール呼び出しの低レイテンシ化。デフォルトは thinking ON（高品質推論）。</p>
+            <p style=”margin-top:10px; font-size:0.87rem;”><strong>GGUF 量子化メモ:</strong> 35B-A3B の GGUF で <code>ssm_conv1d tensor drift</code> 問題が過去に報告。2026-04 以降の imatrix キャリブレーション版では修正済み。Ollama の公式タグは修正版を使用している。</p>
         </section>
     </div>
 </body>

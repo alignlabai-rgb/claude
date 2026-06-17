@@ -102,7 +102,7 @@
       Claw Stack（PicoClaw / NanoClaw / OpenClaw）のバックエンド LLM をクラウド API から
       <strong>ローカルモデルに切り替える</strong>ための、ハブ内ローカル LLM 運用の正本。
       エッジ向け小型 SLM から、RTX 4090 一枚で動く中型オープンウェイト（MoE）まで網羅し、
-      コスト削減・オフライン化・プライバシー確保を同時に達成する。最終更新: 2026-05-30。
+      コスト削減・オフライン化・プライバシー確保を同時に達成する。最終更新: 2026-06-15。
     </p>
   </header>
 
@@ -116,7 +116,7 @@
 
   <!-- 主要SLM一覧 -->
   <div class="panel">
-    <h2>主要 SLM ラインナップ（2026-05-30 時点）</h2>
+    <h2>主要 SLM ラインナップ（2026-06-15 時点）</h2>
     <p style="margin:0 0 4px;">スマホ・Raspberry Pi に載る <strong>エッジ級（1〜4B）</strong>を中心に、参考としてゲーミング GPU 一枚で回る <strong>中型オープンウェイト</strong>も併記する。後者は「ローカルでどこまで賢くできるか」の上限を担う。</p>
     <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:16px; margin-top:8px;">
 
@@ -242,7 +242,7 @@
   <!-- 中型ローカルオープンウェイト -->
   <div class="panel">
     <h2>中型ローカルオープンウェイト（GPU 一枚クラス）</h2>
-    <p style="margin:0 0 4px;">エッジを超えて「ローカルで実用的に賢く」したい時の選択肢。クラウド最上位（Claude Opus 4.8 / GPT-5.5 / Gemini 3.1 Pro）の総合力には届かないが、<strong>大量・反復・機密</strong>の工程をローカルで殴るには十分。サイズが大きいので Raspberry Pi ではなくゲーミング GPU（RTX 4090 等）や自前サーバー想定。</p>
+    <p style="margin:0 0 4px;">エッジを超えて「ローカルで実用的に賢く」したい時の選択肢。クラウド最上位（Claude Fable 5 / GPT-5.5 / Gemini 3.1 Pro）の総合力には届かないが、<strong>大量・反復・機密</strong>の工程をローカルで殴るには十分。サイズが大きいので Raspberry Pi ではなくゲーミング GPU（RTX 4090 等）や自前サーバー想定。</p>
     <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:16px; margin-top:8px;">
 
       <!-- Qwen 3.6 35B-A3B -->
@@ -293,28 +293,28 @@
         <p style="margin-top:8px; font-size:0.82rem;"><a href="glm.html">GLM 深掘り →</a></p>
       </div>
 
-      <!-- Gemma 4 (larger) -->
+      <!-- Gemma 4 12B -->
       <div class="model-card">
         <div class="model-header">
           <div class="model-icon" style="background:rgba(96,208,255,0.15);">◆</div>
           <div>
-            <div class="model-name">Gemma 4 系</div>
+            <div class="model-name">Gemma 4 12B <span style="font-size:0.68rem; background:#22c55e; color:#fff; padding:1px 6px; border-radius:8px; margin-left:4px; font-weight:700;">NEW 2026-06-03</span></div>
             <div class="model-maker">Google DeepMind（オープン/ローカル）</div>
           </div>
         </div>
-        <p>Google のオープン重み系列。E2B/E4B のエッジ版に加え、より大きな密モデルもラインナップ。ネイティブマルチモーダル＋関数呼び出しで、Ollama での取り回しが良いのが強み。Apache 2.0 で商用可。</p>
+        <p>2026-06-03 公開の最新 Gemma。<strong>16GB の Mac / GPU で快適動作</strong>する「ラップトップで賢く動く」密モデル。26B モデルに迫るベンチマークで RAM 消費は半分以下。テキスト・画像・動画・音声のネイティブマルチモーダル対応。QAT 版（6/5 公開）は Q4_0 GGUF 約 6.7GB でさらに軽量かつ高品質。</p>
         <div class="model-stats">
-          <span class="model-stat"><strong>マルチモーダル</strong></span>
+          <span class="model-stat"><strong>11.95B</strong> params</span>
+          <span class="model-stat">Q4 <strong>~7.6GB</strong>（QAT: 6.7GB）</span>
           <span class="model-stat"><strong>128k</strong> ctx</span>
           <span class="model-stat"><strong>Apache 2.0</strong></span>
-          <span class="model-stat"><strong>Ollama</strong></span>
         </div>
         <div style="margin-top:8px;">
-          <span class="tag tag-blue">Google製オープン</span>
-          <span class="tag tag-blue">ネイティブ関数呼び出し</span>
-          <span class="tag tag-green">商用OK</span>
+          <span class="tag tag-blue">ネイティブマルチモーダル</span>
+          <span class="tag tag-green">16GB Mac/GPU で快適</span>
+          <span class="tag tag-green">QAT量子化対応</span>
         </div>
-        <p style="margin-top:8px; font-size:0.82rem;"><a href="gemini.html">Google / Gemini →</a></p>
+        <p style="margin-top:8px; font-size:0.82rem;"><code>ollama run gemma4:12b</code> · <a href="gemma.html">Gemma 詳細 →</a></p>
       </div>
 
       <!-- DeepSeek V4 -->
@@ -341,49 +341,49 @@
         <p style="margin-top:8px; font-size:0.82rem;"><a href="deepseek.html">DeepSeek 深掘り →</a></p>
       </div>
 
-      <!-- Mistral 3 -->
+      <!-- Mistral Small 4 -->
       <div class="model-card">
         <div class="model-header">
           <div class="model-icon" style="background:rgba(255,160,0,0.15);">🌬️</div>
           <div>
-            <div class="model-name">Mistral 3 系</div>
+            <div class="model-name">Mistral Small 4</div>
             <div class="model-maker">Mistral AI（欧州・オープンウェイト）</div>
           </div>
         </div>
-        <p>欧州発・効率重視・オープンウェイト。外部にデータを出したくない秘匿プロジェクトでローカル/プライベートクラウド運用しやすい。商用利用のしやすさと欧州言語対応で Llama より一歩リード。長文脈 256k。</p>
+        <p>欧州発・効率重視・オープンウェイト（2026-03-16）。119B/6B active の MoE で推論・マルチモーダル・コーディングを1モデルに統合。外部にデータを出したくない機密プロジェクトでローカル/プライベートクラウド運用しやすい。256k コンテキスト。修正 MIT ライセンスで商用利用しやすい。</p>
         <div class="model-stats">
-          <span class="model-stat"><strong>Medium 3.5</strong></span>
+          <span class="model-stat"><strong>119B / 6B active</strong> MoE</span>
           <span class="model-stat"><strong>256k</strong> ctx</span>
-          <span class="model-stat"><strong>商用容易</strong></span>
+          <span class="model-stat"><strong>修正MIT</strong></span>
           <span class="model-stat"><strong>Ollama</strong></span>
         </div>
         <div style="margin-top:8px;">
           <span class="tag tag-orange">欧州オープン</span>
           <span class="tag tag-green">機密向き</span>
-          <span class="tag tag-blue">効率重視</span>
+          <span class="tag tag-blue">推論+マルチモーダル統合</span>
         </div>
         <p style="margin-top:8px; font-size:0.82rem;"><a href="mistral.html">Mistral 深掘り →</a></p>
       </div>
 
-      <!-- Llama 3.3 -->
+      <!-- Llama 4 Scout -->
       <div class="model-card">
         <div class="model-header">
           <div class="model-icon" style="background:rgba(255,160,0,0.15);">🦙</div>
           <div>
-            <div class="model-name">Llama 3.3</div>
-            <div class="model-maker">Meta（オープンウェイト）</div>
+            <div class="model-name">Llama 4 Scout</div>
+            <div class="model-maker">Meta（オープンウェイト・2025-04-05）</div>
           </div>
         </div>
-        <p>エコシステム最大の汎用オープンモデル。Ollama / llama.cpp / vLLM のどれでも実績が豊富で、情報・ツール・量子化版が一番揃う「困ったらこれ」の安全牌。ツール使用・関数呼び出しに対応。</p>
+        <p>Llama 4世代の「ローカル向け」MoEモデル。エコシステム最大で Ollama / llama.cpp / vLLM どれでも実績豊富。<strong>10M トークンコンテキスト</strong>（業界最大級）が最大の強み。ネイティブマルチモーダル（テキスト+画像）対応。Maverick（128 experts）は超高性能。</p>
         <div class="model-stats">
-          <span class="model-stat"><strong>128k</strong> ctx</span>
+          <span class="model-stat"><strong>17B active</strong> / 16E MoE</span>
+          <span class="model-stat"><strong>10M</strong> ctx</span>
           <span class="model-stat"><strong>エコシステム最大</strong></span>
-          <span class="model-stat"><strong>実績豊富</strong></span>
           <span class="model-stat"><strong>LLAMA</strong></span>
         </div>
         <div style="margin-top:8px;">
-          <span class="tag tag-orange">汎用バランス</span>
-          <span class="tag tag-green">ツール使用対応</span>
+          <span class="tag tag-orange">10Mコンテキスト</span>
+          <span class="tag tag-green">ネイティブマルチモーダル</span>
           <span class="tag tag-blue">情報量最大</span>
         </div>
       </div>
@@ -535,7 +535,7 @@
 
       <div class="rec-box">
         <h3>🧠 エージェントの頭脳<br><small style="font-weight:400; color:var(--muted);">どこに賢さを置くか</small></h3>
-        <p><strong style="color:#4FFFB0;">賢さが要る最終判断はクラウド</strong>（Claude Opus 4.8 / GPT-5.5）、<strong>量産・反復・機密はローカル</strong>（Qwen 3.6 35B-A3B / GLM-5.1 / エッジ SLM）に振り分けるのが基本。1モデルで全部やらず、工程で頭脳を使い分ける。</p>
+        <p><strong style="color:#4FFFB0;">賢さが要る最終判断はクラウド</strong>（Claude Fable 5 / GPT-5.5）、<strong>量産・反復・機密はローカル</strong>（Qwen 3.6 35B-A3B / GLM-5.1 / エッジ SLM）に振り分けるのが基本。1モデルで全部やらず、工程で頭脳を使い分ける。</p>
       </div>
 
     </div>
@@ -554,20 +554,28 @@ curl -fsSL https://ollama.ai/install.sh | sh
 winget install Ollama.Ollama</pre>
 
         <h3>Step 2: モデルをプル</h3>
-        <pre># Gemma 4 E2B（推奨）
+        <pre># Gemma 4 E2B（エッジ・超軽量）
 ollama pull gemma4:e2b
 
-# Bonsai 8B
-ollama pull bonsai:8b-1bit-q8
+# Gemma 4 12B（16GB Mac/GPU推奨・NEW 2026-06）
+ollama pull gemma4:12b
+# QAT版（6.7GB・高品質）
+ollama pull gemma4:12b-it-qat-q4_0
 
-# Llama 3.1 8B
-ollama pull llama3.1:8b
+# Bonsai 8B（1-bit・超省メモリ）
+ollama pull bonsai:8b-1bit-q8
 
 # Phi-4 Mini
 ollama pull phi4-mini
 
+# Qwen 3.6 27B（バランス型・2026-04）
+ollama pull qwen3.6:27b
+
 # Qwen 3.6 35B-A3B（RTX 4090級・MoE）
-ollama pull qwen3.6:35b-a3b-q4</pre>
+ollama pull qwen3.6:35b-a3b-iq4_xs
+
+# Llama 4 Scout（10Mコンテキスト）
+ollama pull llama4-scout</pre>
       </div>
       <div>
         <h3>Step 3: PicoClaw の config を切り替え</h3>
@@ -601,7 +609,7 @@ picoclaw agent -m "ローカルAIでの動作テスト"</pre>
     <div style="overflow-x:auto;">
       <table class="compare">
         <thead>
-          <tr><th>項目</th><th>Claude Sonnet 4.6 API</th><th>GPT-5.5 API</th><th>Ollama + Gemma4 E2B</th><th>Ollama + Bonsai 8B</th></tr>
+          <tr><th>項目</th><th>Claude Fable 5 API</th><th>GPT-5.5 API</th><th>Ollama + Gemma4 12B</th><th>Ollama + Bonsai 8B</th></tr>
         </thead>
         <tbody>
           <tr><td>コスト構造</td><td>従量（使うほど比例増）</td><td>従量（フロンティア単価）</td><td>電気代のみ（GPU初期投資後）</td><td>電気代のみ</td></tr>
@@ -609,7 +617,7 @@ picoclaw agent -m "ローカルAIでの動作テスト"</pre>
           <tr><td>プライバシー</td><td>△ 外部送信あり</td><td>△ 外部送信あり</td><td>◎ 完全ローカル</td><td>◎ 完全ローカル</td></tr>
           <tr><td>オフライン動作</td><td>✕</td><td>✕</td><td>◎</td><td>◎</td></tr>
           <tr><td>推論品質（複雑タスク）</td><td>⭐⭐⭐⭐⭐</td><td>⭐⭐⭐⭐⭐</td><td>⭐⭐⭐⭐</td><td>⭐⭐⭐</td></tr>
-          <tr class="hl"><td>Claw Stack 推奨シーン</td><td>本番・重要判断</td><td>本番・最高品質</td><td>開発・テスト・PoC</td><td>エッジ・バッチ</td></tr>
+          <tr class="hl"><td>Claw Stack 推奨シーン</td><td>本番・最高品質判断</td><td>本番・最高品質</td><td>開発・テスト・PoC</td><td>エッジ・バッチ</td></tr>
         </tbody>
       </table>
     </div>
@@ -640,7 +648,7 @@ picoclaw agent -m "ローカルAIでの動作テスト"</pre>
     <div class="grid2" style="margin-top:8px;">
       <div class="panel" style="background:rgba(255,255,255,0.02);">
         <h3>API（従量）</h3>
-        <p>トークン量 × 単価で<strong>使うほど比例増</strong>。初期投資ゼロ・即起動・最新モデルにすぐ乗れる。<strong>低頻度・最高品質・試作</strong>向き。Claude Opus 4.8 / GPT-5.5 / Gemini 3.1 Pro のような最上位の賢さは、ローカルでは出せない。</p>
+        <p>トークン量 × 単価で<strong>使うほど比例増</strong>。初期投資ゼロ・即起動・最新モデルにすぐ乗れる。<strong>低頻度・最高品質・試作</strong>向き。Claude Fable 5 / GPT-5.5 / Gemini 3.1 Pro のような最上位の賢さは、ローカルでは出せない。</p>
       </div>
       <div class="panel" style="background:rgba(255,255,255,0.02);">
         <h3>ローカル（OSS モデル）</h3>
@@ -650,6 +658,49 @@ picoclaw agent -m "ローカルAIでの動作テスト"</pre>
     <p style="margin-top:10px;"><strong>損益分岐の考え方</strong>：「月にどれだけ叩くか」が閾値。下書き・分類・整形・要約・タグ付けのような<strong>大量反復工程</strong>はローカルが圧倒的に安い。一方、最終品質が要る一発勝負は API（フロンティア各社）。GPU の減価・電気代・運用の手間も“コスト”なので、ローカルは「無料」ではない点に注意。</p>
     <div class="note-box" style="margin-top:12px;">
       <p>🔀 <strong>現実解＝ハイブリッド：</strong> 量産の下流（下書き・タグ付け・整形・PoC）はローカルで安く回し、<strong>質の最終判断だけ Claude / GPT-5.5 の API</strong> に通す。完全自前に振り切るより、まずは「量産工程だけローカル」から始めるのが安全。これが Claw Stack のルーティング設計の基本形。</p>
+    </div>
+  </div>
+
+  <!-- ツールバージョン -->
+  <div class="panel">
+    <h2>推論ツール最新バージョン（2026-06-15 時点）</h2>
+    <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:14px; margin-top:8px;">
+
+      <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:14px;">
+        <div style="font-size:0.75rem; font-weight:700; color:#66e0c2; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:6px;">Ollama</div>
+        <div style="font-size:1.1rem; font-weight:700; color:#fff; margin-bottom:6px;">最新リリース: 2026-06-12</div>
+        <ul style="font-size:0.82rem; color:#b6c3da; margin:0; padding-left:16px;">
+          <li>Hermes Desktop サポート追加（ネイティブ UI）</li>
+          <li>Gemma 4 QAT 重み対応・Apple Silicon MLX バックエンド改善</li>
+          <li>Windows config パス対応</li>
+          <li>Kimi K2.6・GLM-5.1・MiniMax・DeepSeek・Qwen・Gemma を追加</li>
+          <li>Claude Desktop との統合（<code>ollama launch claude-desktop</code>）</li>
+        </ul>
+      </div>
+
+      <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:14px;">
+        <div style="font-size:0.75rem; font-weight:700; color:#a78bfa; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:6px;">LM Studio</div>
+        <div style="font-size:1.1rem; font-weight:700; color:#fff; margin-bottom:6px;">v0.4.13 安定版 / v0.4.17 Beta</div>
+        <ul style="font-size:0.82rem; color:#b6c3da; margin:0; padding-left:16px;">
+          <li>v0.4.12（5/13）: Qwen 3.6 サポート追加</li>
+          <li>v0.4.13（5/22）: mlx-engine v1.8.1・Gemma 4 / Qwen 3.6 並列予測対応</li>
+          <li>v0.4.14: MTP 投機的デコードを安定版に昇格</li>
+          <li>MCP OAuth サポート・AMD Radeon AI PRO 対応（Beta）</li>
+          <li>"Locally AI"（iPhone/iPad/Mac 向け）を買収・統合</li>
+        </ul>
+      </div>
+
+      <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:14px;">
+        <div style="font-size:0.75rem; font-weight:700; color:#f4b860; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:6px;">Gemma 4 12B QAT（新着）</div>
+        <div style="font-size:1.1rem; font-weight:700; color:#fff; margin-bottom:6px;">2026-06-05 公開</div>
+        <ul style="font-size:0.82rem; color:#b6c3da; margin:0; padding-left:16px;">
+          <li>全 Gemma 4 ファミリーに QAT チェックポイント提供</li>
+          <li>12B Q4_0 GGUF: <strong>約 6.7GB</strong>（通常 PTQ より品質↑）</li>
+          <li>標準 4-bit より精度劣化を抑えつつメモリ節約</li>
+          <li><code>ollama pull gemma4:12b-it-qat-q4_0</code></li>
+        </ul>
+      </div>
+
     </div>
   </div>
 
@@ -668,7 +719,7 @@ picoclaw agent -m "ローカルAIでの動作テスト"</pre>
       <li><a href="../../claw-stack/comparison.html">Claw スタック比較表</a> — PicoClaw / NanoClaw / OpenClaw の選定</li>
       <li><a href="intelligence-matrix.html">Intelligence Matrix</a> — フロンティア / オープン LLM の比較（世代・価格の canon 出典）</li>
     </ul>
-    <p style="font-size:0.8rem; color:var(--muted); margin-top:12px;">最終更新: 2026-05-30 ／ 世代・価格はハブ内 <a href="intelligence-matrix.html">Intelligence Matrix</a> と各ベンダー深掘りページに準拠。量子化・VRAM・推論エンジン・損益分岐は普遍的なローカル運用知識。</p>
+    <p style="font-size:0.8rem; color:var(--muted); margin-top:12px;">最終更新: 2026-06-15（Gemma 4 12B/QAT・Llama 4 Scout・Mistral Small 4・Ollama 6/12・LM Studio v0.4.13 対応・Claude Fable 5 反映）／ 世代・価格はハブ内 <a href="intelligence-matrix.html">Intelligence Matrix</a> と各ベンダー深掘りページに準拠。量子化・VRAM・推論エンジン・損益分岐は普遍的なローカル運用知識。</p>
   </div>
 
 </div>

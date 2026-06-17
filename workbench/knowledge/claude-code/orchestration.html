@@ -79,10 +79,24 @@
             font-size: 28px;
             margin-top: 60px;
             color: #fff;
+            border-left: 4px solid var(--accent);
+            padding-left: 16px;
+        }
+
+        h3 {
+            font-size: 20px;
+            margin-top: 36px;
+            color: #ddd;
+            font-weight: bold;
         }
 
         ul {
             color: #ccc;
+        }
+
+        p {
+            color: #ccc;
+            margin-bottom: 20px;
         }
 
         .new-tag {
@@ -100,6 +114,124 @@
             margin-bottom: 40px;
             color: #666;
             text-decoration: none;
+        }
+
+        code {
+            font-family: monospace;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #fdb;
+        }
+
+        .code-block {
+            background: #0f172a;
+            padding: 20px 24px;
+            border-radius: 8px;
+            font-family: monospace;
+            color: #94a3b8;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            border: 1px solid #334155;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 24px 0;
+            font-size: 15px;
+        }
+
+        th {
+            background: rgba(217, 119, 87, 0.15);
+            color: var(--accent);
+            padding: 12px 16px;
+            text-align: left;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        td {
+            padding: 12px 16px;
+            border: 1px solid rgba(255,255,255,0.06);
+            color: #ccc;
+        }
+
+        tr:nth-child(even) td {
+            background: rgba(255,255,255,0.02);
+        }
+
+        .highlight {
+            background: rgba(217, 119, 87, 0.08);
+            padding: 20px 24px;
+            border-radius: 8px;
+            border: 1px solid rgba(217, 119, 87, 0.25);
+            margin: 24px 0;
+            color: #ccc;
+        }
+
+        .highlight strong {
+            color: var(--accent);
+        }
+
+        .info-box {
+            background: rgba(59, 130, 246, 0.08);
+            border: 1px solid rgba(59, 130, 246, 0.25);
+            border-radius: 8px;
+            padding: 20px 24px;
+            margin: 24px 0;
+            color: #93c5fd;
+            font-size: 15px;
+        }
+
+        .info-box strong {
+            color: #fff;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .permission-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .permission-card {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 16px 20px;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .permission-card .label {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 6px;
+        }
+
+        .permission-card .value {
+            font-family: monospace;
+            color: var(--accent);
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .permission-card .desc {
+            color: #ccc;
+            font-size: 14px;
+            margin-top: 8px;
+        }
+
+        footer {
+            margin-top: 80px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            color: #555;
+            font-size: 14px;
         }
     </style>
 </head>
@@ -120,7 +252,7 @@
             <div class="role-card">
                 <span class="role-badge">Lead Agent</span>
                 <div class="role-title">Claude 3.7 / 4.6 Opus <span class="new-tag">NEW</span></div>
-                <p><strong>能力: Adaptive Thinking & 1M Context</strong><br>
+                <p><strong>能力: Adaptive Thinking &amp; 1M Context</strong><br>
                     もはや彼に「コード」を書かせてはいけません。彼は「思考」します。<br>
                     新搭載された <strong>Adaptive Thinking</strong>
                     により、タスクの難易度に応じて思考時間を動的に調整。複雑なプロジェクトの依存関係を完全に把握し、最適なサブエージェント（Teammates）を召喚・指揮します。</p>
@@ -159,6 +291,345 @@
             <p>「どう書くか」ではなく「どれくらい深く考えるか」を指定する。これが2026年のマネジメントです。</p>
 
         </section>
+
+        <!-- =============================================
+             追加セクション (2026年6月 拡充)
+             ============================================= -->
+
+        <section>
+            <h2>Sub-agents パターン（2026年版）</h2>
+            <p>Claude Code では1つの<strong>親エージェント（Orchestrator）</strong>が複数の<strong>サブエージェント</strong>を同時起動できます。これは単なる「モデルを切り替える」話ではなく、<strong>本物の並列作業</strong>を実現する仕組みです。</p>
+
+            <h3>Task ツールによる起動メカニズム</h3>
+            <p>親エージェントは <code>Task</code> ツールを呼び出すことでサブエージェントを起動します。各サブエージェントは以下の特性を持ちます。</p>
+            <ul>
+                <li><strong>独立したコンテキスト</strong>: 親の会話履歴を引き継がない。サブエージェントは「新鮮な頭」で作業を開始する。</li>
+                <li><strong>独立したツール権限</strong>: 親が持つ権限セットをサブエージェントに継承させるか、制限するかを制御できる。</li>
+                <li><strong>非同期完了</strong>: 親エージェントは全サブエージェントの完了を待ち、結果を集約する。</li>
+                <li><strong>失敗の局所化</strong>: 1つのサブエージェントが失敗しても、他のサブエージェントの実行は継続される。</li>
+            </ul>
+
+            <h3>並列実行の実例</h3>
+            <p>大規模リファクタリングを3つの並列タスクに分割する典型パターン。</p>
+            <div class="code-block">大規模リファクタリングを以下の並列タスクに分割して実行してください:
+
+1. src/components/ のTypeScript型エラーを全修正（Sonnetを使用）
+   - strict モードのエラーをすべて解消
+   - any 型を適切な型に置き換える
+
+2. src/utils/ の単体テストを新規作成（Sonnetを使用）
+   - 現在テストが存在しない関数にVitestで網羅的なテストを追加
+   - カバレッジ目標: 80%以上
+
+3. docs/ のREADMEを最新仕様に更新（Haikuを使用）
+   - package.json の依存関係と照合して古い記述を修正
+   - インストール手順を最新化
+
+各タスクは独立して実行できます。並列で処理してください。</div>
+
+            <h3>コスト比較: Opus 1個 vs Sonnet 3個並列</h3>
+            <p>オーケストレーション設計において最重要の判断がここです。</p>
+            <table>
+                <tr>
+                    <th>構成</th>
+                    <th>スループット</th>
+                    <th>コスト目安</th>
+                    <th>適合タスク</th>
+                </tr>
+                <tr>
+                    <td>Opus 1個（直列）</td>
+                    <td>低（順番に処理）</td>
+                    <td>$0.03〜$0.15</td>
+                    <td>高度な設計・判断が必要なタスク</td>
+                </tr>
+                <tr>
+                    <td>Sonnet 3個（並列）</td>
+                    <td>高（同時に処理）</td>
+                    <td>$0.003〜$0.03</td>
+                    <td>独立した実装・修正・テスト作成</td>
+                </tr>
+                <tr>
+                    <td>Haiku 5個（並列）</td>
+                    <td>最高</td>
+                    <td>$0.0005〜$0.005</td>
+                    <td>ログ解析・フォーマット変換・単純チェック</td>
+                </tr>
+            </table>
+            <div class="highlight">
+                <strong>設計の鉄則:</strong> 「タスクを分割できるか」を最初に問う。分割できる場合は並列 Sonnet が Opus 単体より速くて安い。分割できない（前の結果が次に必要）場合のみ直列を選ぶ。
+            </div>
+        </section>
+
+        <section>
+            <h2>Parallel Agents 実装パターン</h2>
+            <p>実務で繰り返し使えるパターンを体系化しました。並列エージェントの設計は「<strong>どこで結果を集約するか</strong>」を最初に決めることが重要です。</p>
+
+            <h3>パターン1: Fan-out / Fan-in（分散→集約）</h3>
+            <p>最も基本的なパターン。1つの親が複数のサブエージェントに作業を分散させ、全結果を集約して最終アウトプットを生成します。</p>
+            <div class="code-block"># Fan-out / Fan-in パターンの指示例
+
+以下を並列で実行し、最後に結果を統合してください:
+
+[サブエージェント1] auth モジュールのコードレビューを行い、
+ セキュリティ問題の一覧を JSON で返してください。
+
+[サブエージェント2] payment モジュールのコードレビューを行い、
+ セキュリティ問題の一覧を JSON で返してください。
+
+[サブエージェント3] profile モジュールのコードレビューを行い、
+ セキュリティ問題の一覧を JSON で返してください。
+
+全サブエージェントの結果が集まったら、重大度順にソートして
+ SECURITY_REPORT.md として出力してください。</div>
+
+            <h3>パターン2: Pipeline（直列チェーン）</h3>
+            <p>各エージェントの出力が次のエージェントへの入力になる直列パターン。コンパイル → テスト → デプロイなど、順序が重要な作業に使います。</p>
+            <div class="code-block"># Pipeline パターンの指示例
+
+以下を順番に実行してください（前のステップが成功した場合のみ次へ）:
+
+Step 1 [Sonnet]: TypeScript のビルドエラーを全修正。
+ エラーが 0 になったことを確認してから次へ進む。
+
+Step 2 [Sonnet]: 全テストを実行。
+ 失敗しているテストを修正。パス率 100% を確認してから次へ。
+
+Step 3 [Haiku]: CHANGELOG.md を今回の変更内容で更新。
+ git commit メッセージのドラフトを提案。</div>
+
+            <h3>パターン3: Speculative Execution（投機的実行）</h3>
+            <p>複数の「アプローチ案」を並列で実装させ、後から最良のものを選ぶ。設計の正解が不明な時に有効です。</p>
+            <div class="code-block"># Speculative Execution パターンの指示例
+
+認証トークンの保存方法について、以下の3案を並列で実装してください:
+
+[案 A / Sonnet]: HttpOnly Cookie + CSRF トークン方式
+[案 B / Sonnet]: localStorage + リフレッシュトークン方式
+[案 C / Sonnet]: SessionStorage + 短命トークン方式
+
+各案の実装後、セキュリティ・UX・実装コストの観点から
+比較レポートを作成してください。採用案はユーザーが決定します。</div>
+
+            <div class="info-box">
+                <strong>並列エージェント設計のチェックリスト</strong>
+                タスクAとタスクBに「依存関係」はないか？（あれば直列にする）<br>
+                各サブエージェントの作業範囲は「明確に分離」されているか？<br>
+                集約ロジック（結果をどう統合するか）を親エージェントの指示に含めたか？<br>
+                失敗した場合のフォールバック（再試行 or スキップ）を定義したか？
+            </div>
+        </section>
+
+        <section>
+            <h2>Orchestration コスト管理</h2>
+            <p>エージェントを「賢く使う」最大のポイントは<strong>コスト管理</strong>です。モデル選択の誤りは、品質を下げることなくコストを10〜100倍にしてしまいます。</p>
+
+            <h3>モデル選択の判断基準</h3>
+            <table>
+                <tr>
+                    <th>タスク難度</th>
+                    <th>推奨モデル</th>
+                    <th>目安コスト/タスク</th>
+                    <th>具体例</th>
+                </tr>
+                <tr>
+                    <td>複雑な設計・デバッグ</td>
+                    <td>Opus</td>
+                    <td>$0.01〜$0.05</td>
+                    <td>システム設計、難解なバグ特定、アーキテクチャレビュー</td>
+                </tr>
+                <tr>
+                    <td>通常実装・修正</td>
+                    <td>Sonnet</td>
+                    <td>$0.001〜$0.01</td>
+                    <td>機能実装、コードリファクタリング、テスト作成</td>
+                </tr>
+                <tr>
+                    <td>ログ解析・単純変換</td>
+                    <td>Haiku</td>
+                    <td>$0.0001〜$0.001</td>
+                    <td>ファイル名変換、ログフィルタ、型チェック</td>
+                </tr>
+                <tr>
+                    <td>定型フォーマット処理</td>
+                    <td>Haiku（複数並列）</td>
+                    <td>$0.00005〜$0.0005</td>
+                    <td>CSV変換、マークダウン整形、コメント生成</td>
+                </tr>
+            </table>
+
+            <h3><code>--effort</code> パラメータとモデル選択の関係</h3>
+            <p><code>--effort</code> パラメータはモデルの「思考深度」を制御します。モデル選択と組み合わせることでコストを精密に制御できます。</p>
+            <div class="code-block"># 低コスト優先: 実装タスクに Sonnet + low effort
+claude --model claude-sonnet-4-6 --effort low "src/utils/ の関数に JSDoc コメントを追加"
+
+# バランス重視: 標準開発に Sonnet + medium effort（デフォルト）
+claude --model claude-sonnet-4-6 "認証モジュールを実装"
+
+# 品質優先: 設計タスクに Opus + high effort
+claude --model claude-opus-4-6 --effort high "マイクロサービスのAPIゲートウェイ設計を提案"</div>
+
+            <h3><code>claude_config.json</code> でデフォルトモデルを設定</h3>
+            <p>プロジェクトや用途に応じてデフォルトモデルを固定しておくと、コスト超過を防げます。</p>
+            <div class="code-block">{
+  "model": "claude-sonnet-4-6",
+  "defaultEffort": "medium",
+  "subAgentModel": "claude-haiku-4-6",
+  "orchestratorModel": "claude-opus-4-6"
+}</div>
+
+            <div class="highlight">
+                <strong>コスト削減の実践テクニック:</strong><br>
+                1. まず Haiku で「可能か」を確認 → 本番は Sonnet で実行<br>
+                2. 定型タスク（フォーマット変換、コメント追加）は常に Haiku<br>
+                3. Opus は「設計・診断・レビュー」だけに限定する<br>
+                4. 1タスクあたりのコストを定期的に計測し、モデル選択を見直す
+            </div>
+        </section>
+
+        <section>
+            <h2>Human-in-the-Loop（HITL）設計</h2>
+            <p>エージェントに自律性を持たせるほど、<strong>「人間がどこで介入するか」を設計することが重要</strong>になります。HITL（Human-in-the-Loop）は、エージェントの暴走を防ぎながら自動化の恩恵を最大化する設計思想です。</p>
+
+            <h3>Permission Mode の3段階</h3>
+            <div class="permission-row">
+                <div class="permission-card">
+                    <div class="label">最も安全</div>
+                    <div class="value">--permission-mode plan</div>
+                    <div class="desc">全アクション実行前に確認プロンプトを表示。「次にこれをやろうとしています。承認しますか？」とエージェントが都度確認する。初めてのプロジェクトや、重要なコードベースでの初回作業に推奨。</div>
+                </div>
+                <div class="permission-card">
+                    <div class="label">標準</div>
+                    <div class="value">--permission-mode ask</div>
+                    <div class="desc">通常操作は自動承認。ファイル削除・外部API呼び出し・git commit など、副作用の大きい操作だけ確認プロンプトを表示。日常的な開発作業のバランス設定。</div>
+                </div>
+                <div class="permission-card">
+                    <div class="label">CI/CD向け</div>
+                    <div class="value">--permission-mode auto</div>
+                    <div class="desc">確認なしで全操作を自動実行。バックグラウンド実行・夜間バッチ・完全自動化パイプラインに使用。権限を明示的に <code>allow/deny</code> リストで制限することが必須。</div>
+                </div>
+            </div>
+
+            <h3>Hooks で特定ツール使用前に承認を挿入</h3>
+            <p>Permission Mode よりも細粒度の制御が必要な場合は、<strong>Hooks</strong> を使います。特定のツール呼び出しの直前に任意のシェルコマンドを実行できるため、独自の承認ロジックを差し込めます。</p>
+            <div class="code-block"># .claude/hooks.json の例
+{
+  "beforeToolUse": [
+    {
+      "match": { "tool": "Bash", "pattern": ".*rm.*" },
+      "command": "echo '削除操作を検出: ${TOOL_INPUT}' && read -p '続行しますか？ [y/N] ' yn && [[ $yn == y ]]"
+    },
+    {
+      "match": { "tool": "Bash", "pattern": ".*kubectl.*deploy.*" },
+      "command": "echo '本番デプロイを検出。Slack に通知中...' && curl -X POST $SLACK_WEBHOOK -d '{\"text\":\"デプロイが開始されました\"}'"
+    }
+  ],
+  "afterToolUse": [
+    {
+      "match": { "tool": "Write" },
+      "command": "npm run lint --silent || true"
+    }
+  ]
+}</div>
+
+            <h3>本番デプロイ前の人間レビュー設計パターン</h3>
+            <p>完全自動化が危険な領域では、エージェントに「ここで止まれ」を教えておきます。</p>
+            <div class="code-block"># エージェントへの指示に「承認ゲート」を明示する
+以下の手順でリリース準備を行ってください:
+
+Phase 1（自動）: テストを全実行し、パス率100%を確認。
+Phase 2（自動）: CHANGELOG.md を更新し、バージョンを bump。
+Phase 3（自動）: ステージング環境にデプロイし、スモークテストを実行。
+
+★ ここで停止してください ★
+「ステージング確認が完了しました。本番デプロイを承認しますか？」
+と質問し、ユーザーの明示的な OK を待ってから Phase 4 に進む。
+
+Phase 4（ユーザー承認後のみ）: 本番環境にデプロイ。</div>
+            <div class="info-box">
+                <strong>HITL 設計の 4 原則</strong>
+                1. 「元に戻せない操作」の前には必ず人間を介在させる<br>
+                2. 承認待ちポイントを事前に指示文に明記する（エージェントに推測させない）<br>
+                3. `auto` モードでは必ず `deny` リストを設定して安全網を張る<br>
+                4. 承認ログを残す（誰が・いつ・何を承認したか）
+            </div>
+        </section>
+
+        <section>
+            <h2>Background Agents（非同期実行）</h2>
+            <p>Background Agents は、<strong>ユーザーの目の前ではなくクラウド VM 上で非同期に実行される</strong>エージェントです。長時間かかるタスクを「外出中に任せる」ために設計されています。</p>
+
+            <h3>長時間タスクをバックグラウンドで実行</h3>
+            <p>通常の Claude Code セッションはターミナルを開いている間のみ動作します。Background Agents はセッションを切断してもクラウド上で実行継続します。</p>
+            <div class="code-block"># バックグラウンド実行の起動例
+claude --background "全 3,000 ファイルのレガシーコードを TypeScript strict モードに移行してください。
+完了後に Slack に通知してください。"
+
+# 進捗確認（IDを使って後から確認）
+claude status --job-id abc123
+
+# 結果の取得
+claude result --job-id abc123</div>
+
+            <h3>claude.ai/code からモバイルで進捗確認</h3>
+            <p>バックグラウンド実行中のエージェントは <code>claude.ai/code</code> のダッシュボードから進捗を確認できます。スマートフォンからでも以下が確認できます。</p>
+            <ul>
+                <li>現在実行中のステップと進捗率</li>
+                <li>これまでに変更されたファイルの一覧</li>
+                <li>エラーや警告のリアルタイムログ</li>
+                <li>Checkpoint（中間セーブポイント）の状態</li>
+            </ul>
+
+            <h3>Slack 通知との連携（完了時に通知）</h3>
+            <p>長時間タスクは「完了したらすぐ知りたい」ニーズがあります。Hooks の <code>afterSession</code> イベントを使って Slack 通知を自動化できます。</p>
+            <div class="code-block"># .claude/hooks.json に完了通知フックを追加
+{
+  "afterSession": [
+    {
+      "command": "curl -X POST $SLACK_WEBHOOK_URL \\
+        -H 'Content-Type: application/json' \\
+        -d '{\"text\": \"Claude タスク完了: ${SESSION_SUMMARY}\", \"channel\": \"#dev-alerts\"}'"
+    }
+  ],
+  "onError": [
+    {
+      "command": "curl -X POST $SLACK_WEBHOOK_URL \\
+        -H 'Content-Type: application/json' \\
+        -d '{\"text\": \"Claude タスク失敗: ${ERROR_MESSAGE}\", \"channel\": \"#dev-alerts\"}'"
+    }
+  ]
+}</div>
+
+            <h3>複数の非同期タスクを並走させる実践</h3>
+            <p>複数の Background Agent を同時に起動することで、チームのように並走させることができます。</p>
+            <div class="code-block"># 朝出社前に複数タスクをキューに積む例
+
+# Job 1: ドキュメント更新（低優先・Haiku）
+claude --background --model haiku --job-name "doc-update" \
+  "docs/ 以下のすべての README を最新の API 仕様に同期してください"
+
+# Job 2: テスト追加（中優先・Sonnet）
+claude --background --model sonnet --job-name "test-coverage" \
+  "カバレッジが 60% 未満のモジュールにテストを追加。目標 80%"
+
+# Job 3: パフォーマンス調査（高優先・Opus）
+claude --background --model opus --job-name "perf-audit" \
+  "Lighthouse スコアが 60 未満のページを調査し、改善案をレポートしてください"
+
+# 全ジョブの状態一覧
+claude jobs list</div>
+
+            <div class="highlight">
+                <strong>Background Agents を使うべきタスクの条件:</strong><br>
+                実行時間が10分以上かかる見込みのタスク<br>
+                ターミナルを閉じても継続してほしい作業<br>
+                外出中・就寝中に完了させたい作業<br>
+                CI/CD パイプラインで定期実行したい処理
+            </div>
+        </section>
+
+        <footer>
+            最終更新: 2026年6月 | <a href="index.html" style="color:#666; text-decoration:none;">← Claude Code Mastery Hub</a>
+        </footer>
     </div>
 </body>
 

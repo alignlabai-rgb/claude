@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pi Coding Agent 完全ガイド | Tech Workbench</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --panel: #111a2b;
+      --text: #e9edf5;
+      --dim: #7f92ac;
+      --accent: #a78bfa;   /* violet — Pi の最小主義を表す */
+      --accent2: #34d399;
+      --warn: #fcd34d;
+      --danger: #f87171;
+      --border: rgba(255,255,255,0.08);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: "Segoe UI","Noto Sans JP",system-ui,sans-serif; line-height: 1.75; padding: 28px 18px 80px; }
+    .shell { max-width: 1060px; margin: 0 auto; display: grid; gap: 20px; }
+    .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 18px; padding: 26px 28px; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    h1 { font-size: 2rem; color: var(--accent); margin-bottom: 6px; }
+    h2 { font-size: 1.2rem; color: var(--warn); border-bottom: 2px solid rgba(252,211,77,0.2); padding-bottom: 8px; margin-bottom: 16px; }
+    h3 { font-size: 1rem; color: #fff; margin: 20px 0 8px; }
+    h4 { font-size: 0.92rem; color: var(--accent2); margin: 14px 0 6px; }
+    p, li { color: #c5d0e3; font-size: 0.93rem; }
+    ul, ol { padding-left: 20px; display: grid; gap: 6px; margin-top: 8px; }
+    strong { color: var(--text); }
+    code { font-family: "Fira Code","Consolas",monospace; background: rgba(255,255,255,0.06); padding: 1px 6px; border-radius: 4px; font-size: 0.84em; color: #a5f3d0; }
+    pre { background: #000; border: 1px solid #1e3a5f; border-radius: 10px; padding: 18px 20px; overflow-x: auto; font-family: "Fira Code","Consolas",monospace; font-size: 0.84em; color: #a5f3d0; line-height: 1.6; margin: 12px 0; }
+    pre .comment { color: #5a7a9a; }
+    pre .cmd { color: #fcd34d; }
+    pre .str { color: #86efac; }
+
+    /* KPI バナー */
+    .kpi-row { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 16px; }
+    .kpi { background: rgba(167,139,250,0.08); border: 1px solid rgba(167,139,250,0.25); border-radius: 12px; padding: 14px 20px; min-width: 130px; flex: 1; text-align: center; }
+    .kpi .v { font-size: 1.5rem; font-weight: 800; color: var(--accent); }
+    .kpi .l { font-size: 0.75rem; color: var(--dim); margin-top: 2px; }
+
+    /* ハイライトボックス */
+    .tip { background: rgba(52,211,153,0.06); border-left: 4px solid var(--accent2); padding: 14px 18px; border-radius: 0 10px 10px 0; margin: 14px 0; }
+    .tip .label { font-size: 0.72rem; text-transform: uppercase; color: var(--accent2); font-weight: 700; letter-spacing: 0.06em; display: block; margin-bottom: 4px; }
+    .warn-box { background: rgba(252,211,77,0.06); border-left: 4px solid var(--warn); padding: 14px 18px; border-radius: 0 10px 10px 0; margin: 14px 0; }
+    .warn-box .label { font-size: 0.72rem; text-transform: uppercase; color: var(--warn); font-weight: 700; letter-spacing: 0.06em; display: block; margin-bottom: 4px; }
+    .key-box { background: rgba(167,139,250,0.06); border: 1px solid rgba(167,139,250,0.2); border-radius: 10px; padding: 16px 20px; margin: 14px 0; }
+
+    /* 比較テーブル */
+    .cmp { width: 100%; border-collapse: collapse; font-size: 0.87rem; margin-top: 14px; }
+    .cmp th { background: rgba(167,139,250,0.1); color: var(--accent); text-align: left; padding: 10px 13px; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid rgba(167,139,250,0.25); }
+    .cmp td { padding: 10px 13px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    .cmp tr:hover td { background: rgba(255,255,255,0.02); }
+    .cmp td:first-child { font-weight: 700; color: var(--text); white-space: nowrap; }
+    .ok { color: var(--accent2); font-weight: 600; }
+    .no { color: var(--danger); }
+    .mid { color: var(--warn); }
+
+    /* モードカード */
+    .mode-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-top: 14px; }
+    .mode-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 12px; padding: 18px; }
+    .mode-card .num { font-size: 1.5rem; color: var(--accent); font-weight: 800; display: block; }
+    .mode-card h4 { color: #fff; font-size: 0.95rem; margin: 6px 0 8px; }
+    .mode-card p { color: var(--dim); font-size: 0.85rem; }
+    .mode-card code { font-size: 0.78em; }
+
+    /* エージェント比較カード */
+    .agent-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-top: 14px; }
+    .agent-card { border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; }
+    .agent-card .name { font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 6px; }
+    .agent-card .tag { display: inline-block; font-size: 0.7rem; padding: 2px 8px; border-radius: 4px; font-weight: 600; margin-bottom: 8px; }
+    .tag-pi { background: rgba(167,139,250,0.15); color: var(--accent); }
+    .tag-cc { background: rgba(52,211,153,0.12); color: var(--accent2); }
+    .tag-hermes { background: rgba(251,146,60,0.12); color: #fb923c; }
+    .tag-codex { background: rgba(96,165,250,0.12); color: #60a5fa; }
+    .tag-pico { background: rgba(244,114,182,0.12); color: #f472b6; }
+    .agent-card p { font-size: 0.86rem; color: var(--dim); }
+    .agent-card ul { margin-top: 8px; gap: 4px; }
+    .agent-card li { font-size: 0.84rem; }
+
+    /* ナビゲーション */
+    .nav { font-size: 0.85rem; color: var(--dim); }
+    .nav a { color: var(--dim); }
+
+    .small { font-size: 0.8rem; color: var(--dim); }
+    .badge { display: inline-block; background: rgba(167,139,250,0.12); color: var(--accent); font-size: 0.7rem; padding: 2px 8px; border-radius: 4px; font-weight: 600; margin-left: 6px; vertical-align: middle; }
+    .badge-new { background: rgba(52,211,153,0.12); color: var(--accent2); }
+    .badge-warn { background: rgba(252,211,77,0.12); color: var(--warn); }
+
+    /* フロー図 */
+    .flow { display: flex; align-items: center; flex-wrap: wrap; gap: 0; margin: 14px 0; }
+    .flow-box { background: rgba(167,139,250,0.08); border: 1px solid rgba(167,139,250,0.3); border-radius: 8px; padding: 8px 16px; font-size: 0.85rem; color: #fff; text-align: center; }
+    .flow-arrow { color: var(--dim); padding: 0 8px; font-size: 1.1rem; }
+
+    /* プロバイダーテーブル */
+    .provider-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-top: 12px; }
+    .provider-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+    .provider-card .pname { font-weight: 700; color: #fff; font-size: 0.9rem; }
+    .provider-card p { font-size: 0.8rem; color: var(--dim); margin-top: 2px; }
+  </style>
+</head>
+<body>
+  <div class="shell">
+
+    <!-- ヘッダー -->
+    <div class="panel">
+      <p class="nav"><a href="index.html">← LLM 個別深掘り</a> / <a href="../../index.html">Hub Top</a></p>
+      <h1>Pi Coding Agent</h1>
+      <p style="color:var(--dim); font-size:1rem; margin:6px 0 16px;">「必要なものだけを作る」— Mario Zechner の最小主義ターミナルコーディングエージェント。<strong>OpenClaw のエンジンでもある。</strong></p>
+      <div class="kpi-row">
+        <div class="kpi"><div class="v">4</div><div class="l">コアツール数</div></div>
+        <div class="kpi"><div class="v">&lt;1K</div><div class="l">システムプロンプト（tokens）</div></div>
+        <div class="kpi"><div class="v">15+</div><div class="l">対応 LLM プロバイダー</div></div>
+        <div class="kpi"><div class="v">4</div><div class="l">動作モード</div></div>
+        <div class="kpi"><div class="v">MIT</div><div class="l">ライセンス</div></div>
+        <div class="kpi"><div class="v">378K+</div><div class="l">OpenClaw Stars（Pi SDK 採用）</div></div>
+      </div>
+    </div>
+
+    <!-- そもそも Pi とは何か -->
+    <div class="panel">
+      <h2>🔍 Pi Coding Agent とは何か — 30秒で掴む核心</h2>
+
+      <p>Pi は <strong>ターミナル（コマンドライン）で動くAIコーディングエージェント</strong>です。「エージェント」とは、あなたが命令をひとつ出すと、AIが自律的にファイルを読み・書き・コードを実行して、タスクを完了させるソフトウェアのことです。</p>
+
+      <div class="key-box" style="margin-top:14px;">
+        <strong>Pi が他のエージェントと根本的に違う点：</strong>
+        <ul style="margin-top:10px;">
+          <li>コアは <strong>4ツール（read / write / edit / bash）だけ</strong> — あとは全部オプション</li>
+          <li>システムプロンプト（AIへの指示書）が <strong>1K トークン未満</strong>と極限まで短い</li>
+          <li>特定のLLMに縛られない — Claude でも GPT-5 でも Gemini でも Ollama（ローカル）でも動く</li>
+          <li><strong>OpenClaw の内部エンジン</strong>として採用されている（OpenClaw は Pi の SDK ラッパー）</li>
+        </ul>
+      </div>
+
+      <div class="tip" style="margin-top:16px;">
+        <span class="label">PicoClaw との違い（混同注意）</span>
+        <strong>Pi Coding Agent</strong>（このページ）= 開発者向けのターミナルコーディングハーネス（TypeScript製）<br>
+        <strong>PicoClaw</strong>（別物）= Raspberry Pi / IoT デバイス向け超軽量 Go バイナリ（RAM 10MB 以下）<br>
+        名前は似ているが、作者も用途も技術スタックも全く異なります。
+      </div>
+    </div>
+
+    <!-- 作者と背景 -->
+    <div class="panel">
+      <h2>👤 作者 Mario Zechner と設計思想</h2>
+
+      <h3>Mario Zechner とは</h3>
+      <p>Java の大人気 2Dゲームフレームワーク <strong>libGDX</strong>（GitHub 23K+ stars）の作者。Badlogic Games 創業者。2025年末に Pi を個人プロジェクトとして公開し、2026年4月に <strong>Armin Ronacher</strong>（Flask / Jinja2 / Rye 作者）が共同創業したスタートアップ <strong>Earendil</strong> に参加。Pi のリポジトリは <code>badlogic/pi-mono</code> から <code>earendil-works/pi</code> へ移管（MIT ライセンスは維持）。</p>
+
+      <h3>「必要なものだけを作る」哲学</h3>
+      <div class="key-box">
+        <p style="font-size:1rem; font-style:italic; color:#e9edf5; border-left: 3px solid var(--accent); padding-left: 14px;">
+          "Mario's philosophy in all of this was: if I don't need it, it won't be built. And I don't need a lot of things."
+        </p>
+        <p style="margin-top: 10px; font-size: 0.85rem;">— dev.to より（Pi の設計哲学を評した記事）</p>
+      </div>
+
+      <p style="margin-top: 12px;">Zechner は「現在のコーディングエージェントは <em>ふわふわした混沌（'fuck around and find out'）フェーズ</em> にある」と考えています。その不確実性の中で最小主義が勝つ理由：</p>
+      <ul>
+        <li><strong>モデルへのシグナルが明確</strong> — 余計な指示がなければAIは混乱しない</li>
+        <li><strong>デバッグが容易</strong> — 何が起きているか常に追跡できる</li>
+        <li><strong>拡張の自由度が高い</strong> — コアが小さいほど、ユーザーが思い通りにカスタマイズできる</li>
+        <li><strong>エージェント自身が拡張する</strong> — 「機能を内蔵する」のではなく「エージェントが必要な機能を追加できる構造」を提供</li>
+      </ul>
+
+      <div class="tip" style="margin-top: 14px;">
+        <span class="label">Armin Ronacher の視点（Earendil / OpenClaw）</span>
+        Flask 作者の Ronacher は Pi を「OpenClaw の中の最小エージェント」と評し、Pi の SDK を OpenClaw のコアエンジンとして採用。Pi が LLM 対話・ツール実行・ストリーミングを担い、OpenClaw がその上に個人アシスタント層を構築する構造。
+      </div>
+    </div>
+
+    <!-- コアアーキテクチャ -->
+    <div class="panel">
+      <h2>⚙️ コアアーキテクチャ — 4ツールと最小ループ</h2>
+
+      <h3>エージェントループの仕組み</h3>
+      <p>Pi の中核は <strong>約150行のエージェントループ</strong>です。動作は非常にシンプル：</p>
+
+      <div class="flow" style="margin: 16px 0;">
+        <div class="flow-box">あなたの指示</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box">LLM がプランを立てる</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box">ツールを呼ぶ</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box">結果を観察</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box">完了まで繰り返す</div>
+      </div>
+
+      <p>このループ中、Pi は <strong>ライブ TODO チェックリスト</strong> と <strong>リアルタイムのトークンコスト</strong> を表示します。</p>
+
+      <h3>コア4ツールの詳細</h3>
+      <table class="cmp">
+        <thead>
+          <tr><th>ツール</th><th>役割</th><th>具体的な使われ方</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>read</code></td>
+            <td>ファイル・ディレクトリを読む</td>
+            <td>ソースコード確認、README 把握、エラーログ読み込み</td>
+          </tr>
+          <tr>
+            <td><code>write</code></td>
+            <td>ファイル全体を書く（新規作成・上書き）</td>
+            <td>新規ファイル作成、大規模な書き直し</td>
+          </tr>
+          <tr>
+            <td><code>edit</code></td>
+            <td>既存ファイルの一部を差分で変更</td>
+            <td>バグ修正、関数の書き換え（write より効率的）</td>
+          </tr>
+          <tr>
+            <td><code>bash</code></td>
+            <td>シェルコマンドを実行する</td>
+            <td>テスト実行、ビルド、npm install、git 操作</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="tip" style="margin-top: 14px;">
+        <span class="label">なぜこの4つだけで十分か</span>
+        この4ツールで「読む → 考える → 書く → 確認する」のサイクルを完全に回せます。他の全ての操作（ウェブ検索、データベース操作、API 呼び出し）は拡張で追加できます。コアにないのは「意図的」です。
+      </div>
+
+      <h3>AGENTS.md — Pi の「憲法」ファイル</h3>
+      <p>Claude Code における <code>CLAUDE.md</code> に相当するのが Pi の <code>AGENTS.md</code> です。</p>
+      <pre><span class="comment"># AGENTS.md — プロジェクトルールの例</span>
+
+<span class="comment">## このプロジェクトについて</span>
+TypeScript + Next.js 14 (App Router) プロジェクトです。
+テストランナーは Vitest。コーディング規約は ESLint + Prettier。
+
+<span class="comment">## ルール</span>
+- ファイルを削除する前に必ず確認を取ること
+- npm install を実行する前に package.json を提示すること
+- テストが全件パスするまでコミットしないこと
+
+<span class="comment">## 承認が必要な操作（ツールが外部サービスに書き込む場合）</span>
+- 外部 API に書き込むツールは呼び出し前に承認を要求すること</pre>
+
+      <p>AGENTS.md は <strong>階層的に読み込まれます</strong>：</p>
+      <ol>
+        <li><code>~/.pi/agent/</code> — グローバル設定（全プロジェクト共通）</li>
+        <li>親ディレクトリの AGENTS.md（モノレポ等）</li>
+        <li>現在のディレクトリの AGENTS.md（プロジェクト固有）</li>
+      </ol>
+
+      <p style="margin-top:10px;"><code>SYSTEM.md</code> を置くと、デフォルトのシステムプロンプトを<strong>置き換えまたは追記</strong>できます。</p>
+    </div>
+
+    <!-- 4つの動作モード -->
+    <div class="panel">
+      <h2>🔀 4つの動作モード</h2>
+      <p>Pi が他のエージェントと大きく異なる点のひとつが、<strong>4種類の動作モード</strong>を持つことです。ユーザーの使い方に合わせて選べます。</p>
+
+      <div class="mode-grid">
+        <div class="mode-card">
+          <span class="num">1</span>
+          <h4>Interactive TUI</h4>
+          <p>ターミナル上のインタラクティブUI。<strong>差分レンダリング</strong>（変更箇所のみ再描画）で滑らか。リアルタイムで TODO と消費トークンを表示。</p>
+          <code>$ pi</code>
+        </div>
+        <div class="mode-card">
+          <span class="num">2</span>
+          <h4>Print / JSON ストリーム</h4>
+          <p>スクリプトやパイプライン用の非対話モード。<code>--print</code> または <code>--json</code> フラグで出力形式を指定。CI/CD への組み込みに最適。</p>
+          <code>$ pi --print "README を要約して"</code>
+        </div>
+        <div class="mode-card">
+          <span class="num">3</span>
+          <h4>RPC モード</h4>
+          <p>stdin/stdout 経由の JSON プロトコル。Node.js 以外のアプリ（Rust, Python 等）から Pi を制御できる。JSONL（改行区切り）フォーマット。</p>
+          <code>--rpc</code> フラグで起動
+        </div>
+        <div class="mode-card">
+          <span class="num">4</span>
+          <h4>SDK モード</h4>
+          <p>TypeScript アプリに Pi をライブラリとして組み込む。<strong>OpenClaw はこのモードを使っている</strong>。IPC や HTTP なしで同一プロセス内で動作。</p>
+          <code>createAgentSession()</code> で呼び出し
+        </div>
+      </div>
+
+      <div class="warn-box" style="margin-top: 16px;">
+        <span class="label">SDK モードの重要性</span>
+        OpenClaw（GitHub 378K+ stars）は Pi の SDK モードでエージェントセッションをインポートし、LLM 対話・ツール実行・ストリーミング応答の全処理を Pi に委譲しています。Pi は「ライブラリとしての AI エンジン」という新しいカテゴリを開拓しています。
+      </div>
+    </div>
+
+    <!-- TUI 機能詳細 -->
+    <div class="panel">
+      <h2>🖥️ インタラクティブ TUI の機能詳細</h2>
+
+      <h3>ツリー構造セッション</h3>
+      <p>Pi のセッションは JSONL ファイルに <strong>ツリー構造</strong>（各エントリに <code>id</code> と <code>parentId</code>）で保存されます。これにより：</p>
+      <ul>
+        <li>会話の途中から「分岐」して別の方針を試せる（Git のブランチ感覚）</li>
+        <li><code>/tree</code> コマンドで過去のどの時点にも戻れる</li>
+        <li>異なるブランチ間を自由に行き来できる</li>
+        <li>ファイルを新規作成せずにセッション内でブランチを切れる</li>
+      </ul>
+
+      <h3>ミッドセッション モデル切り替え</h3>
+      <p>会話の途中で <strong>別のLLMプロバイダー/モデルに乗り換えられます</strong>。切り替え時、それまでの会話履歴は自動でマイグレーションされます。</p>
+      <table class="cmp">
+        <thead><tr><th>操作</th><th>説明</th></tr></thead>
+        <tbody>
+          <tr><td><code>/model</code></td><td>モデル選択ダイアログを開く</td></tr>
+          <tr><td><code>Ctrl + L</code></td><td>モデル切り替え（ショートカット）</td></tr>
+          <tr><td><code>Ctrl + P</code></td><td>お気に入りモデルを順番に切り替え</td></tr>
+        </tbody>
+      </table>
+
+      <h3>その他の主要コマンド</h3>
+      <table class="cmp">
+        <thead><tr><th>コマンド</th><th>説明</th></tr></thead>
+        <tbody>
+          <tr><td><code>/tree</code></td><td>セッションツリーを表示・分岐点を選択</td></tr>
+          <tr><td><code>/skill:&lt;name&gt;</code></td><td>スキルを手動で読み込む</td></tr>
+          <tr><td><code>/login</code></td><td>Claude Pro / ChatGPT Plus / GitHub Copilot で OAuth 認証</td></tr>
+          <tr><td><code>/cost</code></td><td>現在のセッションのトークンコスト表示</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 拡張システム -->
+    <div class="panel">
+      <h2>🧩 拡張システム — TypeScript で何でも追加できる</h2>
+
+      <p>Pi のコアは最小ですが、<strong>TypeScript 拡張</strong>で際限なく機能を追加できます。これが Pi の真の力です。</p>
+
+      <h3>拡張で追加できるもの</h3>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 12px;">
+        <div class="mode-card">
+          <h4>🛠 カスタムツール</h4>
+          <p>LLM が呼べる新しいツールを追加。データベース操作、API 呼び出し、ウェブスクレイピングなど何でも。</p>
+        </div>
+        <div class="mode-card">
+          <h4>⌨️ コマンド</h4>
+          <p><code>/mycommand</code> 形式のカスタムスラッシュコマンドを追加。よく使う操作を1コマンド化。</p>
+        </div>
+        <div class="mode-card">
+          <h4>🎨 テーマ</h4>
+          <p>TUI の見た目をカスタマイズ。カラースキーム、フォント、レイアウトを変更。</p>
+        </div>
+        <div class="mode-card">
+          <h4>🎯 スキル</h4>
+          <p>特定タスク向けの拡張セット。<code>/skill:python-debug</code> のように呼び出し、または自動ロード。</p>
+        </div>
+        <div class="mode-card">
+          <h4>📦 パッケージ</h4>
+          <p>拡張 + スキル + テーマをまとめて npm / git で共有できる形式。</p>
+        </div>
+        <div class="mode-card">
+          <h4>🔔 イベントハンドラ</h4>
+          <p>セッション開始・終了・ツール呼び出し前後などのライフサイクルに処理を挟む。</p>
+        </div>
+      </div>
+
+      <h3>TypeScript 拡張の書き方（基本）</h3>
+      <pre><span class="comment">// my-extension.ts — カスタムツールの追加例</span>
+import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
+
+<span class="str">export default</span> function(api: ExtensionAPI) {
+  <span class="comment">// カスタムツールを LLM が呼べるように登録</span>
+  api.registerTool({
+    name: <span class="str">"fetch_url"</span>,
+    description: <span class="str">"指定した URL のコンテンツを取得します"</span>,
+    parameters: {
+      type: <span class="str">"object"</span>,
+      properties: {
+        url: { type: <span class="str">"string"</span>, description: <span class="str">"取得する URL"</span> }
+      },
+      required: [<span class="str">"url"</span>]
+    },
+    handler: async ({ url }) => {
+      const res = await fetch(url);
+      return await res.text();
+    }
+  });
+
+  <span class="comment">// カスタムコマンドを追加 (/summarize で呼び出し)</span>
+  api.registerCommand(<span class="str">"summarize"</span>, async () => {
+    await api.sendMessage(<span class="str">"このプロジェクトの現状を3行で要約して"</span>);
+  });
+
+  <span class="comment">// ライフサイクルイベントにフックを追加</span>
+  api.on(<span class="str">"session:start"</span>, () => {
+    console.log(<span class="str">"Pi セッション開始"</span>);
+  });
+}</pre>
+
+      <div class="tip">
+        <span class="label">CLAUDE.md との対応</span>
+        Claude Code の Hooks（settings.json）に相当するのが Pi のイベントハンドラ。CLAUDE.md に相当するのが AGENTS.md。Slash commands に相当するのがカスタムコマンド。考え方は似ているが、Pi は全て TypeScript で書けるため、より柔軟。
+      </div>
+    </div>
+
+    <!-- マルチ LLM サポート -->
+    <div class="panel">
+      <h2>🌐 マルチ LLM サポート — 15+ プロバイダー</h2>
+
+      <p>Pi は <strong>プロバイダー中立設計</strong>。同じエージェントループが Claude でも GPT でも Gemini でもローカル Ollama でも動きます。トランスクリプトはプロバイダー非依存フォーマットで保存されるため、<strong>会話の途中でモデルを切り替えても履歴が引き継がれます</strong>。</p>
+
+      <h3>認証方法（2種類）</h3>
+
+      <h4>方法 1: API キーで BYOK（従量課金）</h4>
+      <pre><span class="comment"># 使いたいプロバイダーの API キーを環境変数にセット</span>
+<span class="cmd">export</span> ANTHROPIC_API_KEY=<span class="str">"sk-ant-..."</span>        <span class="comment"># Anthropic</span>
+<span class="cmd">export</span> OPENAI_API_KEY=<span class="str">"sk-..."</span>              <span class="comment"># OpenAI</span>
+<span class="cmd">export</span> GEMINI_API_KEY=<span class="str">"AIza..."</span>             <span class="comment"># Google</span>
+<span class="cmd">export</span> GROQ_API_KEY=<span class="str">"gsk_..."</span>               <span class="comment"># Groq（無料枠あり）</span>
+
+<span class="comment"># Pi を起動</span>
+<span class="cmd">pi</span></pre>
+
+      <h4>方法 2: 既存サブスクリプションで無料利用（OAuth）</h4>
+      <pre><span class="comment"># CLI 内で /login を入力すると以下を選択できる</span>
+> <span class="cmd">/login</span>
+
+<span class="comment"># 選択肢：</span>
+<span class="comment"># ・Claude Pro / Max（Anthropic）→ 追加 API 料金なし</span>
+<span class="comment"># ・ChatGPT Plus / Pro（OpenAI）→ 追加 API 料金なし</span>
+<span class="comment"># ・GitHub Copilot → 追加 API 料金なし</span></pre>
+
+      <div class="tip">
+        <span class="label">サブスクリプション活用は非常にお得</span>
+        Claude Max（月額 $200）や ChatGPT Pro（月額 $200）に加入済みであれば、Pi の API 料金はゼロ。Claude Code が月額 $100/Max ユーザー制限に引っかかる場面でも、Pi で同等の作業ができます。
+      </div>
+
+      <h3>対応プロバイダー一覧</h3>
+      <div class="provider-grid">
+        <div class="provider-card"><div class="pname">Anthropic</div><p>Claude Opus 4.8 / Sonnet 4.6 / Haiku 4.5<br>$5 / $25 per 1M tokens（Opus）</p></div>
+        <div class="provider-card"><div class="pname">OpenAI</div><p>GPT-5.5 / GPT-4o / o3<br>$5 / $30 per 1M tokens（GPT-5.5）</p></div>
+        <div class="provider-card"><div class="pname">Google</div><p>Gemini 3.1 Pro / Flash / Ultra<br>$2 / $12 per 1M tokens（Pro）</p></div>
+        <div class="provider-card"><div class="pname">Azure OpenAI</div><p>エンタープライズ向け<br>Azure サブスク経由</p></div>
+        <div class="provider-card"><div class="pname">Mistral</div><p>Mistral Large / Codestral<br>コスト効率に優れる</p></div>
+        <div class="provider-card"><div class="pname">Groq</div><p>Llama 3.3 / Mixtral<br>無料枠あり・超高速推論</p></div>
+        <div class="provider-card"><div class="pname">OpenRouter</div><p>100+ モデルへのゲートウェイ<br>DeepSeek V4 Flash: $0.14/$0.28</p></div>
+        <div class="provider-card"><div class="pname">Ollama（ローカル）</div><p>完全オフライン実行<br>API コスト ゼロ</p></div>
+      </div>
+    </div>
+
+    <!-- インストール・はじめかた -->
+    <div class="panel">
+      <h2>🚀 インストールとはじめかた</h2>
+
+      <h3>Step 1: インストール</h3>
+      <pre><span class="comment"># npm 経由でグローバルインストール</span>
+<span class="cmd">npm</span> install -g @earendil-works/pi-coding-agent
+
+<span class="comment"># または npx で即時実行（インストール不要）</span>
+<span class="cmd">npx</span> @earendil-works/pi-coding-agent</pre>
+
+      <h3>Step 2: 認証設定</h3>
+      <pre><span class="comment"># API キー方式（最もシンプル）</span>
+<span class="cmd">export</span> ANTHROPIC_API_KEY=<span class="str">"your-key-here"</span>
+
+<span class="comment"># または既存サブスク OAuth（CLI 内で実行）</span>
+> <span class="cmd">/login</span></pre>
+
+      <h3>Step 3: プロジェクト設定</h3>
+      <pre><span class="comment"># プロジェクトルートに AGENTS.md を作成</span>
+<span class="cmd">cat</span> > AGENTS.md << <span class="str">'EOF'</span>
+# プロジェクト情報
+Node.js + TypeScript のバックエンド API。
+テストは Jest、フォーマッタは Prettier。
+
+# ルール
+- ファイルを削除する場合は事前に確認すること
+- 変更後は必ず `npm test` を実行すること
+EOF</pre>
+
+      <h3>Step 4: 起動して使う</h3>
+      <pre><span class="comment"># インタラクティブモードで起動</span>
+<span class="cmd">pi</span>
+
+<span class="comment"># プロジェクトディレクトリを指定して起動</span>
+<span class="cmd">pi</span> --cwd /path/to/project
+
+<span class="comment"># ワンショット（非対話）で実行</span>
+<span class="cmd">pi</span> --print <span class="str">"src/index.ts のバグを修正して"</span>
+
+<span class="comment"># CI 向け JSON 出力</span>
+<span class="cmd">pi</span> --json <span class="str">"テストを全件実行して結果を報告"</span> | jq .summary</pre>
+
+      <div class="tip">
+        <span class="label">初回実行のおすすめ手順</span>
+        1. まず <code>pi --print "このプロジェクトの構造を説明して"</code> で読み取りのみ実行<br>
+        2. 問題なければ AGENTS.md を整備<br>
+        3. 小さな変更（コメント追加等）から始めて動作を確認<br>
+        4. 信頼できたら本格的なタスクを委任
+      </div>
+    </div>
+
+    <!-- 他エージェントとの詳細比較 -->
+    <div class="panel">
+      <h2>⚖️ 他エージェントとの詳細比較</h2>
+
+      <div class="agent-grid">
+        <!-- Pi vs Claude Code -->
+        <div class="agent-card">
+          <div class="name">Pi <span class="badge tag-pi">このページ</span></div>
+          <span class="tag tag-pi">最小主義・プロバイダー中立</span>
+          <ul>
+            <li>✅ 4ツールのみ（シンプル）</li>
+            <li>✅ 15+ LLM プロバイダー対応</li>
+            <li>✅ TypeScript 拡張で自由にカスタマイズ</li>
+            <li>✅ SDK モードで他アプリに組み込める</li>
+            <li>✅ 既存サブスクで API コストゼロ</li>
+            <li>✅ セッションツリー・ミッドモデル切り替え</li>
+            <li>❌ ベンチマーク非掲載（Terminal-Bench 等）</li>
+            <li>❌ Hooks/ADR 等の高度な運用機能は自分で拡張</li>
+          </ul>
+        </div>
+
+        <div class="agent-card">
+          <div class="name">Claude Code <span class="badge tag-cc">Anthropic</span></div>
+          <span class="tag tag-cc">機能豊富・Anthropic 最適化</span>
+          <ul>
+            <li>✅ 豊富な組み込み機能（Hooks / 並走 / 検索等）</li>
+            <li>✅ SWE-bench 80.8%（業界トップクラス）</li>
+            <li>✅ MCP（Model Context Protocol）ネイティブ対応</li>
+            <li>✅ CLAUDE.md による細かい運用制御</li>
+            <li>✅ IDE 統合（VS Code / JetBrains 拡張）</li>
+            <li>❌ Anthropic モデルのみ（プロバイダー固定）</li>
+            <li>❌ ライセンス料発生（Free / Pro / Max プラン）</li>
+            <li>❌ カスタマイズは Hooks で限定的</li>
+          </ul>
+        </div>
+
+        <div class="agent-card">
+          <div class="name">Hermes Agent <span class="badge tag-hermes">NousResearch</span></div>
+          <span class="tag tag-hermes">個人アシスタント・自動化</span>
+          <ul>
+            <li>✅ メモリ・スキル・自動化が強い</li>
+            <li>✅ 180K+ GitHub stars（急成長）</li>
+            <li>✅ 2026/06 デスクトップアプリリリース</li>
+            <li>✅ コーディング以外の用途も広い</li>
+            <li>❌ コーディング特化ではない</li>
+            <li>❌ Pi のような SDK 組み込みは不得意</li>
+          </ul>
+        </div>
+
+        <div class="agent-card">
+          <div class="name">OpenAI Codex <span class="badge tag-codex">OpenAI</span></div>
+          <span class="tag tag-codex">クラウド・ブラウザUI</span>
+          <ul>
+            <li>✅ Terminal-Bench 2.1 で 83.4%（最高スコア）</li>
+            <li>✅ GPT-5.5 ネイティブ統合</li>
+            <li>✅ ブラウザ UI あり（ターミナル不要）</li>
+            <li>❌ OpenAI サブスク必須</li>
+            <li>❌ クラウド依存（ローカル実行不可）</li>
+            <li>❌ プロバイダー固定</li>
+          </ul>
+        </div>
+
+        <div class="agent-card">
+          <div class="name">PicoClaw <span class="badge tag-pico">別物・混同注意</span></div>
+          <span class="tag tag-pico">エッジ・IoT 向け</span>
+          <ul>
+            <li>✅ RAM 10MB 以下で動作</li>
+            <li>✅ Raspberry Pi / RISC-V 対応</li>
+            <li>✅ Go 製（超高速起動）</li>
+            <li>✅ 完全オフライン実行可能</li>
+            <li>❌ コーディングエージェントではない</li>
+            <li>❌ 開発者ツールとしての機能は限定的</li>
+          </ul>
+        </div>
+
+        <div class="agent-card">
+          <div class="name">OpenClaw <span class="badge tag-cc">Pi SDK を採用</span></div>
+          <span class="tag tag-cc">個人アシスタント層</span>
+          <ul>
+            <li>✅ Pi SDK を内蔵エンジンとして使用</li>
+            <li>✅ 378K+ GitHub stars（最速成長OSSエージェント）</li>
+            <li>✅ メッセージングゲートウェイ統合</li>
+            <li>✅ 個人アシスタント層（Pi の上位レイヤー）</li>
+            <li>Pi との関係: Pi = エンジン、OpenClaw = プロダクト</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>機能マトリックス比較</h3>
+      <table class="cmp" style="margin-top: 16px;">
+        <thead>
+          <tr>
+            <th>機能</th>
+            <th>Pi</th>
+            <th>Claude Code</th>
+            <th>Hermes</th>
+            <th>Codex</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>コアツール数</td>
+            <td class="ok">4（最小）</td>
+            <td>10+（豊富）</td>
+            <td>多数</td>
+            <td>多数</td>
+          </tr>
+          <tr>
+            <td>LLM プロバイダー</td>
+            <td class="ok">15+（中立）</td>
+            <td class="no">Anthropic のみ</td>
+            <td class="mid">複数対応</td>
+            <td class="no">OpenAI のみ</td>
+          </tr>
+          <tr>
+            <td>SDK 組み込み</td>
+            <td class="ok">✅ ネイティブ</td>
+            <td class="no">❌</td>
+            <td class="no">❌</td>
+            <td class="no">❌</td>
+          </tr>
+          <tr>
+            <td>ベンチマーク掲載</td>
+            <td class="no">❌ 非掲載</td>
+            <td class="ok">✅ SWE 80.8%</td>
+            <td class="no">❌</td>
+            <td class="ok">✅ TB 83.4%</td>
+          </tr>
+          <tr>
+            <td>TypeScript 拡張</td>
+            <td class="ok">✅ ネイティブ</td>
+            <td class="mid">Hooks 限定</td>
+            <td class="mid">スキル形式</td>
+            <td class="no">❌</td>
+          </tr>
+          <tr>
+            <td>既存サブスク活用</td>
+            <td class="ok">✅ OAuth 対応</td>
+            <td class="ok">✅ Pro/Max</td>
+            <td class="mid">一部対応</td>
+            <td class="ok">✅ Plus/Pro</td>
+          </tr>
+          <tr>
+            <td>セッション分岐</td>
+            <td class="ok">✅ ツリー構造</td>
+            <td class="no">❌</td>
+            <td class="no">❌</td>
+            <td class="no">❌</td>
+          </tr>
+          <tr>
+            <td>ミッドセッション切り替え</td>
+            <td class="ok">✅ 履歴移行あり</td>
+            <td class="no">❌</td>
+            <td class="no">❌</td>
+            <td class="no">❌</td>
+          </tr>
+          <tr>
+            <td>ライセンス</td>
+            <td class="ok">MIT（完全無料）</td>
+            <td class="mid">一部商用</td>
+            <td class="ok">MIT</td>
+            <td class="no">商用</td>
+          </tr>
+          <tr>
+            <td>公式 IDE 統合</td>
+            <td class="no">❌ ターミナルのみ</td>
+            <td class="ok">✅ VS Code / JB</td>
+            <td class="mid">一部</td>
+            <td class="mid">一部</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- OpenClaw との関係：深掘り -->
+    <div class="panel">
+      <h2>🔗 OpenClaw との関係 — Pi は OpenClaw のエンジン</h2>
+
+      <p>これが Pi を理解する上で最も重要なポイントです。</p>
+
+      <div class="key-box">
+        <strong>構造を一言で言うと：</strong><br><br>
+        <div class="flow" style="flex-wrap: nowrap; overflow-x: auto;">
+          <div class="flow-box" style="background: rgba(167,139,250,0.1); border-color: rgba(167,139,250,0.4);">あなた</div>
+          <div class="flow-arrow">↔</div>
+          <div class="flow-box" style="background: rgba(52,211,153,0.1); border-color: rgba(52,211,153,0.4);">OpenClaw<br><small style="color:var(--dim);">個人アシスタント層<br>メッセージング統合</small></div>
+          <div class="flow-arrow">→ SDK 呼び出し →</div>
+          <div class="flow-box" style="background: rgba(167,139,250,0.1); border-color: rgba(167,139,250,0.4);">Pi Coding Agent<br><small style="color:var(--dim);">LLM 対話エンジン<br>ツール実行</small></div>
+          <div class="flow-arrow">↔</div>
+          <div class="flow-box" style="background: rgba(96,165,250,0.1); border-color: rgba(96,165,250,0.4);">LLM<br><small style="color:var(--dim);">Claude / GPT / Gemini</small></div>
+        </div>
+      </div>
+
+      <p style="margin-top: 14px;">OpenClaw が Pi を採用しているコード（概念図）：</p>
+      <pre><span class="comment">// OpenClaw の内部コード（概念）</span>
+import { createAgentSession } from "@earendil-works/pi-coding-agent";
+
+<span class="str">class</span> OpenClawAgent {
+  <span class="str">async</span> handleMessage(userMessage: string) {
+    <span class="comment">// Pi の SDK で AgentSession を作成</span>
+    const session = await createAgentSession({
+      provider: <span class="str">"anthropic"</span>,
+      model: <span class="str">"claude-opus-4-8"</span>,
+      workdir: this.workspaceDir,
+    });
+
+    <span class="comment">// Pi がLLM対話・ツール実行・ストリーミングを全部担当</span>
+    <span class="str">for</span> await (const event of session.run(userMessage)) {
+      <span class="comment">// OpenClaw はイベントを受け取り、メッセージングUI に表示するだけ</span>
+      await this.messagingGateway.send(event);
+    }
+  }
+}</pre>
+
+      <p>OpenClaw の <strong>378K+ GitHub stars</strong> の裏には Pi のエンジンがあります。Pi 自身のスター数（~15K）は少ないですが、間接的な影響力は巨大です。</p>
+    </div>
+
+    <!-- Earendil との関係 -->
+    <div class="panel">
+      <h2>🏢 Earendil — Pi の新しい家</h2>
+
+      <p><strong>2026年4月</strong>、Mario Zechner が <strong>Earendil</strong> に参加。Earendil はベンチャーバックの公益法人（PBC）で、Armin Ronacher（Flask / Jinja2 / uv / Rye 作者）が共同創業。</p>
+
+      <h3>変更点</h3>
+      <ul>
+        <li>リポジトリ: <code>badlogic/pi-mono</code> → <code>earendil-works/pi</code></li>
+        <li>npm パッケージ: <code>@mariozechner/pi-coding-agent</code> → <code>@earendil-works/pi-coding-agent</code></li>
+        <li>MIT ライセンスは維持（コアは永遠に無料）</li>
+        <li>Zechner が Pi に関する決定権を持つ株主として参加</li>
+      </ul>
+
+      <div class="tip">
+        <span class="label">なぜ Armin Ronacher が Pi に注目したか</span>
+        Ronacher は OpenClaw を開発する中で Pi の SDK が最も優れたエンジン選択肢であると判断。Earendil は OpenClaw を商業的に展開しながら、Pi のオープンソースコアを維持する構造。Flask と Werkzeug の関係に似た「OSS コア + 商業レイヤー」モデル。
+      </div>
+    </div>
+
+    <!-- 誰が使うべきか -->
+    <div class="panel">
+      <h2>🎯 誰が Pi を使うべきか</h2>
+
+      <h3>Pi が最適なユーザー</h3>
+      <ul>
+        <li>✅ <strong>複数の LLM を使い分けたい開発者</strong> — 今日は Claude、明日は GPT-5、という使い方</li>
+        <li>✅ <strong>既に Claude Pro / ChatGPT Plus に加入している人</strong> — 追加 API コストなしで使える</li>
+        <li>✅ <strong>エージェントを自分のアプリに組み込みたいエンジニア</strong> — SDK モードが強力</li>
+        <li>✅ <strong>ターミナル派</strong> — GUI を嫌い、CLI 完結で作業したい人</li>
+        <li>✅ <strong>Open Source 信者</strong> — MIT ライセンスで全コードが見える安心感</li>
+        <li>✅ <strong>ローカル LLM 派</strong> — Ollama と組み合わせてコストゼロで使いたい人</li>
+      </ul>
+
+      <h3>Claude Code の方が向いているケース</h3>
+      <ul>
+        <li>📌 Anthropic モデルしか使わないと決めている</li>
+        <li>📌 MCP サーバーとの統合が必要</li>
+        <li>📌 IDE（VS Code / JetBrains）に統合したい</li>
+        <li>📌 SWE-bench 等のベンチマークで実証された精度が必要</li>
+        <li>📌 Hooks による細かい運用制御（セッション開始/終了時の処理）</li>
+      </ul>
+
+      <h3>どちらも使うという選択肢</h3>
+      <div class="key-box">
+        「Claude Code で深い作業 + Pi で複数モデルを比較・ローカル作業」という使い方が 2026年の現実的なベストプラクティスとされています。両者は競合というより<strong>補完関係</strong>に近いです。
+      </div>
+    </div>
+
+    <!-- まとめ -->
+    <div class="panel">
+      <h2>📋 まとめ — Pi Coding Agent の本質</h2>
+
+      <table class="cmp">
+        <tbody>
+          <tr><td>本質</td><td>「最小主義」のターミナルコーディングエージェント。不要なものを作らない哲学。</td></tr>
+          <tr><td>コア</td><td>4ツール（read/write/edit/bash）、システムプロンプト &lt;1K tokens、~150行のエージェントループ</td></tr>
+          <tr><td>強み</td><td>プロバイダー中立（15+ LLM）、SDK 組み込み、TypeScript 拡張、セッションツリー</td></tr>
+          <tr><td>弱み</td><td>ベンチマーク非掲載、IDE 統合なし、MCP 非対応（拡張で追加可）</td></tr>
+          <tr><td>価格</td><td>MIT 完全無料。コストは LLM API のみ（既存サブスクで ¥0 も可）</td></tr>
+          <tr><td>OpenClaw との関係</td><td>Pi が内部エンジン。OpenClaw 378K+ stars の裏に Pi の SDK</td></tr>
+          <tr><td>作者</td><td>Mario Zechner（libGDX 作者）→ 2026/04 Earendil（Armin Ronacher）に合流</td></tr>
+          <tr><td>リポジトリ</td><td>github.com/earendil-works/pi（MIT）</td></tr>
+          <tr><td>公式サイト</td><td>pi.dev</td></tr>
+          <tr><td>npm</td><td>@earendil-works/pi-coding-agent</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 関連リンク・出典 -->
+    <div class="panel">
+      <h2>🔗 関連リンク・出典</h2>
+      <ul>
+        <li><a href="https://pi.dev/" target="_blank" rel="noopener">pi.dev</a> — 公式サイト</li>
+        <li><a href="https://github.com/earendil-works/pi" target="_blank" rel="noopener">github.com/earendil-works/pi</a> — GitHub リポジトリ（MIT）</li>
+        <li><a href="https://mariozechner.at/posts/2025-11-30-pi-coding-agent/" target="_blank" rel="noopener">What I learned building an opinionated and minimal coding agent</a> — Mario Zechner 本人のブログ</li>
+        <li><a href="https://lucumr.pocoo.org/2026/1/31/pi/" target="_blank" rel="noopener">Pi: The Minimal Agent Within OpenClaw</a> — Armin Ronacher（Earendil）のブログ</li>
+        <li><a href="https://dev.to/wonderlab/one-open-source-project-a-day-no-53-pi-mono-minimalist-high-performance-ai-coding-agent-4d73" target="_blank" rel="noopener">pi-mono: Minimalist AI Coding Agent</a> — DEV Community レビュー</li>
+        <li><a href="https://vibecodinghub.org/tools/pi" target="_blank" rel="noopener">Pi Review 2026</a> — VibeCodingHub 総合レビュー</li>
+        <li><a href="../../claw-stack/comparison.html">Claw Stack 比較表</a> — 当ハブのエージェント比較</li>
+        <li><a href="claude-code/index.html">Claude Code 深掘り</a> — 比較対象の詳細ページ</li>
+        <li><a href="../../workbench/knowledge/agent-memory.html">エージェントメモリ</a> — Mem0 / Supermemory / ClawMem</li>
+        <li><a href="../../workbench/knowledge/a2a-protocol.html">A2A Protocol</a> — エージェント間通信標準</li>
+      </ul>
+      <p class="small" style="margin-top: 16px;">最終更新: 2026-06-15 &nbsp;|&nbsp; mario Zechner ブログ・lucumr.pocoo.org・pi.dev・GitHub・VibeCodingHub・admix.software・agenticengineer.com をもとに作成</p>
+    </div>
+
+  </div>
+</body>
+</html>
