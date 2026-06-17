@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Obsidian 完全ガイド — AI エージェントインフラとしての第2の脳 | Tech Workbench</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --panel: #111a2b;
+      --text: #e9edf5;
+      --dim: #7f92ac;
+      --accent: #a78bfa;   /* Obsidian purple */
+      --accent2: #4FFFB0;  /* green: MCP/エージェント */
+      --accent3: #60d0ff;  /* blue: OpenClaw */
+      --warn: #fcd34d;
+      --danger: #f87171;
+      --border: rgba(255,255,255,0.08);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: "Segoe UI","Noto Sans JP",system-ui,sans-serif; line-height: 1.75; padding: 28px 18px 80px; }
+    .shell { max-width: 1080px; margin: 0 auto; display: grid; gap: 20px; }
+    .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 18px; padding: 26px 28px; }
+    .panel-accent { background: linear-gradient(135deg,rgba(167,139,250,0.07),rgba(96,208,255,0.05)),var(--panel); border-color: rgba(167,139,250,0.25); }
+    .panel-green { background: rgba(79,255,176,0.04); border-color: rgba(79,255,176,0.2); }
+    .panel-blue { background: rgba(96,208,255,0.04); border-color: rgba(96,208,255,0.2); }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    h1 { font-size: 2.1rem; color: var(--accent); margin-bottom: 6px; }
+    h2 { font-size: 1.2rem; color: var(--warn); border-bottom: 2px solid rgba(252,211,77,0.2); padding-bottom: 8px; margin-bottom: 18px; }
+    h3 { font-size: 1rem; color: #fff; margin: 20px 0 8px; }
+    h4 { font-size: 0.92rem; color: var(--accent2); margin: 14px 0 6px; }
+    p, li { color: #c5d0e3; font-size: 0.93rem; }
+    ul, ol { padding-left: 20px; display: grid; gap: 6px; margin-top: 8px; }
+    strong { color: var(--text); }
+    code { font-family: "Fira Code","Consolas",monospace; background: rgba(255,255,255,0.06); padding: 1px 6px; border-radius: 4px; font-size: 0.84em; color: #a5f3d0; }
+    pre { background: #000d1a; border: 1px solid #1e3a5f; border-radius: 10px; padding: 18px 20px; overflow-x: auto; font-family: "Fira Code","Consolas",monospace; font-size: 0.84em; color: #a5f3d0; line-height: 1.6; margin: 12px 0; }
+    pre .c { color: #5a7a9a; }
+    pre .k { color: #fcd34d; }
+    pre .s { color: #86efac; }
+
+    /* KPI */
+    .kpi-row { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 16px; }
+    .kpi { background: rgba(167,139,250,0.08); border: 1px solid rgba(167,139,250,0.25); border-radius: 12px; padding: 14px 20px; min-width: 130px; flex: 1; text-align: center; }
+    .kpi .v { font-size: 1.5rem; font-weight: 800; color: var(--accent); }
+    .kpi .l { font-size: 0.74rem; color: var(--dim); margin-top: 2px; }
+
+    /* ハイライトボックス */
+    .tip { background: rgba(79,255,176,0.05); border-left: 4px solid var(--accent2); padding: 14px 18px; border-radius: 0 10px 10px 0; margin: 14px 0; }
+    .tip .label { font-size: 0.71rem; text-transform: uppercase; color: var(--accent2); font-weight: 700; letter-spacing: 0.07em; display: block; margin-bottom: 4px; }
+    .warn-box { background: rgba(252,211,77,0.05); border-left: 4px solid var(--warn); padding: 14px 18px; border-radius: 0 10px 10px 0; margin: 14px 0; }
+    .key-box { background: rgba(167,139,250,0.06); border: 1px solid rgba(167,139,250,0.2); border-radius: 10px; padding: 16px 20px; margin: 14px 0; }
+    .blue-box { background: rgba(96,208,255,0.05); border-left: 4px solid var(--accent3); padding: 14px 18px; border-radius: 0 10px 10px 0; margin: 14px 0; }
+    .blue-box .label { font-size: 0.71rem; text-transform: uppercase; color: var(--accent3); font-weight: 700; letter-spacing: 0.07em; display: block; margin-bottom: 4px; }
+
+    /* テーブル */
+    .cmp { width: 100%; border-collapse: collapse; font-size: 0.87rem; margin-top: 14px; }
+    .cmp th { background: rgba(167,139,250,0.1); color: var(--accent); text-align: left; padding: 10px 13px; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid rgba(167,139,250,0.25); }
+    .cmp td { padding: 10px 13px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    .cmp tr:hover td { background: rgba(255,255,255,0.02); }
+    .cmp td:first-child { font-weight: 700; color: var(--text); }
+    .ok { color: var(--accent2); font-weight: 600; }
+    .no { color: var(--danger); }
+    .mid { color: var(--warn); }
+
+    /* グリッド */
+    .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 14px; }
+    .grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-top: 14px; }
+
+    /* プラグインカード */
+    .plugin-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; }
+    .plugin-card .icon { font-size: 1.8rem; margin-bottom: 8px; display: block; }
+    .plugin-card .name { font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 4px; }
+    .plugin-card .tag { display: inline-block; font-size: 0.68rem; padding: 2px 8px; border-radius: 4px; font-weight: 600; margin-bottom: 10px; }
+    .tag-core { background: rgba(252,211,77,0.12); color: var(--warn); }
+    .tag-ai { background: rgba(167,139,250,0.15); color: var(--accent); }
+    .tag-auto { background: rgba(79,255,176,0.12); color: var(--accent2); }
+    .tag-mcp { background: rgba(96,208,255,0.12); color: var(--accent3); }
+    .tag-sync { background: rgba(251,146,60,0.12); color: #fb923c; }
+
+    /* ステップ */
+    .step { background: rgba(255,255,255,0.02); border-radius: 12px; padding: 14px 18px 14px 58px; margin: 10px 0; position: relative; border-left: 3px solid var(--accent); }
+    .step .num { position: absolute; left: 14px; top: 14px; width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: #07111d; font-weight: 800; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; }
+    .step h4 { color: #fff; font-size: 0.95rem; margin: 0 0 5px; }
+    .step p { font-size: 0.86rem; color: var(--dim); margin: 0; }
+
+    .nav { font-size: 0.85rem; color: var(--dim); }
+    .nav a { color: var(--dim); }
+    .small { font-size: 0.8rem; color: var(--dim); margin-top: 6px; }
+    .badge { display: inline-block; background: rgba(167,139,250,0.12); color: var(--accent); font-size: 0.7rem; padding: 2px 8px; border-radius: 4px; font-weight: 600; margin-left: 6px; vertical-align: middle; }
+    .badge-new { background: rgba(79,255,176,0.12); color: var(--accent2); }
+    .badge-hot { background: rgba(252,211,77,0.12); color: var(--warn); }
+
+    /* ワークフロー図 */
+    .flow { display: flex; gap: 0; flex-wrap: wrap; margin-top: 14px; align-items: center; }
+    .flow-node { background: rgba(167,139,250,0.1); border: 1px solid rgba(167,139,250,0.3); border-radius: 10px; padding: 10px 16px; font-size: 0.84rem; font-weight: 700; color: var(--accent); text-align: center; min-width: 100px; }
+    .flow-node.green { background: rgba(79,255,176,0.08); border-color: rgba(79,255,176,0.25); color: var(--accent2); }
+    .flow-node.blue { background: rgba(96,208,255,0.08); border-color: rgba(96,208,255,0.25); color: var(--accent3); }
+    .flow-node.orange { background: rgba(251,146,60,0.08); border-color: rgba(251,146,60,0.25); color: #fb923c; }
+    .flow-arrow { color: var(--dim); font-size: 1.4rem; padding: 0 8px; align-self: center; }
+
+    @media (max-width: 640px) {
+      .cmp { font-size: 0.8rem; }
+      .cmp th, .cmp td { padding: 7px 8px; }
+      h1 { font-size: 1.6rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ヘッダー -->
+  <div class="panel panel-accent">
+    <p class="nav"><a href="index.html">← Knowledge Hub</a> / <a href="../../index.html">Hub Top</a></p>
+    <h1>🪨 Obsidian</h1>
+    <p style="color:var(--dim); font-size:1rem; margin:6px 0 16px;">ローカルファースト PKM → <strong>AI エージェントインフラとしての第2の脳</strong>。OpenClaw / Claude Code / Hermes Agent が読み書きする生きた知識ベース。</p>
+    <div class="kpi-row">
+      <div class="kpi"><div class="v">1.5M+</div><div class="l">ユーザー数（2026-02）</div></div>
+      <div class="kpi"><div class="v">4,350+</div><div class="l">コミュニティプラグイン</div></div>
+      <div class="kpi"><div class="v">無料</div><div class="l">コアアプリ（個人・商用）</div></div>
+      <div class="kpi"><div class="v">MCP</div><div class="l">AI エージェント接続</div></div>
+      <div class="kpi"><div class="v">Markdown</div><div class="l">完全ローカル・Plain Text</div></div>
+    </div>
+    <p class="small" style="margin-top:14px;">最終更新: 2026-06-15 ／ 出典: Obsidian 公式・GitHub・MCPVault・obsidian-second-brain 等</p>
+  </div>
+
+  <!-- そもそも Obsidian とは -->
+  <div class="panel">
+    <h2>🔍 Obsidian とは何か — 30秒で掴む核心</h2>
+    <p>Obsidian は <strong>ローカルに保存された Markdown ファイルを Vault（ボルト）として管理する知識管理アプリ</strong>です。2026年現在、単なるメモアプリを超えて、<strong>AI エージェントが記憶・参照・書き込む「生きたインフラ」</strong>として急速に重要性が高まっています。</p>
+
+    <div class="key-box" style="margin-top:16px;">
+      <strong>Obsidian が AI インフラとして選ばれる3つの理由:</strong>
+      <ol style="margin-top:10px;">
+        <li><strong>ローカル Markdown = AI が直接読み書きできる</strong> — ファイルシステム上の .md ファイルなのでエージェントがそのままアクセス可能。API 不要。</li>
+        <li><strong>MCP（Model Context Protocol）に完全対応</strong> — Claude / GPT / Gemini など主要 AI が Vault を「道具」として使える標準規格が整備済み。</li>
+        <li><strong>Graph View + Backlink</strong> — ノート間の双方向リンクが自動生成され、AI がアイデアのつながりを「見える化」して使える知識グラフになる。</li>
+      </ol>
+    </div>
+
+    <h3>Vault の構造</h3>
+    <pre><span class="c"># Vault は単なるフォルダ = AI が直接操作できる</span>
+MyVault/
+  ├── .obsidian/            <span class="c"># 設定・プラグイン（Git 管理推奨）</span>
+  ├── agent-memory/         <span class="c"># AI エージェントが書き込む記憶フォルダ</span>
+  │   ├── HEARTBEAT.md      <span class="c"># 毎朝自動生成される日次ブリーフィング</span>
+  │   ├── 2026-06-15.md     <span class="c"># 日次ログ</span>
+  │   └── themes/           <span class="c"># AI が発見した繰り返しテーマ</span>
+  ├── projects/             <span class="c"># プロジェクトノート</span>
+  ├── daily/                <span class="c"># デイリーノート</span>
+  ├── sources/              <span class="c"># 参照元・リサーチ</span>
+  └── inbox/                <span class="c"># 未整理の新規メモ</span></pre>
+
+    <p>各ファイルの先頭は <strong>YAML フロントマター（Properties）</strong> で構造化できます:</p>
+    <pre><span class="s">---</span>
+<span class="k">title</span><span class="s">: OpenClaw 統合設計</span>
+<span class="k">tags</span><span class="s">: [ai, openclaw, architecture]</span>
+<span class="k">status</span><span class="s">: in-progress</span>
+<span class="k">priority</span><span class="s">: high</span>
+<span class="k">created</span><span class="s">: 2026-06-15</span>
+<span class="k">agent</span><span class="s">: claude-fable-5</span>    <span class="c"># どの AI が作ったか</span>
+<span class="s">---</span>
+本文はここから通常の Markdown...</pre>
+  </div>
+
+  <!-- 料金プラン -->
+  <div class="panel">
+    <h2>💰 料金プラン 2026</h2>
+    <table class="cmp">
+      <thead>
+        <tr><th>プラン</th><th>価格</th><th>内容</th><th>AI 活用への影響</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>コアアプリ</td>
+          <td><span class="ok">無料</span></td>
+          <td>全機能・プラグイン・無制限ノート。個人・商用ともに無料（2026年から商用ライセンス撤廃）</td>
+          <td class="ok">◎ AI 統合に必要な全機能が無料</td>
+        </tr>
+        <tr>
+          <td>Obsidian Sync</td>
+          <td>$4/月（年払い）</td>
+          <td>複数デバイス間の公式同期。E2E 暗号化。バージョン履歴（最大1年）</td>
+          <td class="mid">△ Git 同期で代替可。モバイルでも AI Vault を参照したいなら有用</td>
+        </tr>
+        <tr>
+          <td>Obsidian Publish</td>
+          <td>$8/月（年払い）</td>
+          <td>Vault をウェブサイトとして公開。カスタムドメイン対応</td>
+          <td class="mid">△ AI が生成したコンテンツを自動公開するパイプラインに</td>
+        </tr>
+        <tr>
+          <td>Catalyst</td>
+          <td>$25（一回）</td>
+          <td>早期アクセス・インサイダービルドへのアクセス</td>
+          <td>新機能（Bases 等）をいち早く試せる</td>
+        </tr>
+        <tr>
+          <td>商用ライセンス</td>
+          <td>$50/ユーザー/年</td>
+          <td>法人での商用利用（2026年から個人利用は不要に変更）</td>
+          <td class="mid">企業内 AI ナレッジベースとして運用する場合</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="tip" style="margin-top:14px;">
+      <span class="label">ポイント</span>
+      <strong>AI エージェントインフラとして使うだけなら完全無料</strong>。Git 同期（obsidian-git プラグイン）で複数デバイス・複数エージェント間の Vault 共有が可能。
+    </div>
+  </div>
+
+  <!-- コア機能 -->
+  <div class="panel">
+    <h2>⚙️ コア機能 2026 — AI 活用の基盤</h2>
+
+    <div class="grid2">
+      <div class="plugin-card">
+        <span class="icon">🗃️</span>
+        <div class="name">Bases <span class="badge badge-new">Core Plugin 2026</span></div>
+        <span class="tag tag-core">コアプラグイン</span>
+        <p>Notion 風のデータベースビューをローカル・オフラインで実現。YAML frontmatter（Properties）をテーブル・カード・リスト形式で表示・編集・フィルタ。<strong>クエリ言語不要</strong>でノーコードDB。</p>
+        <p style="margin-top:8px; font-size:0.82rem; color:var(--dim);">AI が Property を書き込むだけで Bases のビューに自動反映 → AI 更新のダッシュボードが自動生成される。</p>
+      </div>
+      <div class="plugin-card">
+        <span class="icon">🕸️</span>
+        <div class="name">Graph View</div>
+        <span class="tag tag-core">コア機能</span>
+        <p>ノート間の <code>[[リンク]]</code> を3Dグラフで可視化。AI が記憶ノードを書き込むほど知識グラフが育つ。<strong>Local Graph</strong> で特定ノートの周辺だけ表示も可能。</p>
+      </div>
+      <div class="plugin-card">
+        <span class="icon">🎨</span>
+        <div class="name">Canvas</div>
+        <span class="tag tag-core">コアプラグイン</span>
+        <p>無限キャンバス上にノート・画像・動画・Webリンクを自由配置。マインドマップ・フロー図・ダッシュボード作成に。<strong>AI が .canvas ファイルを直接編集して図を更新</strong>可能。</p>
+      </div>
+      <div class="plugin-card">
+        <span class="icon">🏷️</span>
+        <div class="name">Properties（フロントマター）</div>
+        <span class="tag tag-core">コア機能</span>
+        <p>YAML メタデータをGUI で管理。date・text・number・checkbox・list・link 型をサポート。Bases・Dataview と連携してDB的クエリが可能。<strong>AI が Properties を自動付与</strong>するワークフローに最適。</p>
+      </div>
+      <div class="plugin-card">
+        <span class="icon">📅</span>
+        <div class="name">Daily Notes / Templates</div>
+        <span class="tag tag-core">コアプラグイン</span>
+        <p>毎日自動作成されるデイリーノート。Templates プラグインで変数・日付挿入。<strong>AI が毎朝デイリーノートに前日の要約・今日のタスクを自動書き込む</strong>のが定番ワークフロー。</p>
+      </div>
+      <div class="plugin-card">
+        <span class="icon">🔍</span>
+        <div class="name">Search &amp; Dataview（コミュニティ）</div>
+        <span class="tag tag-core">主要プラグイン</span>
+        <p>Dataview は Vault 全体に SQL ライクなクエリを実行。<code>dataview</code>コードブロックで動的なテーブル・リストを生成。後継の <strong>Datacore</strong>（同作者・開発中）はUIが大幅改善予定。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI プラグイン -->
+  <div class="panel">
+    <h2>🤖 AI プラグイン TOP 6（2026年推奨）</h2>
+
+    <div class="grid2">
+      <div class="plugin-card">
+        <span class="icon">🔗</span>
+        <div class="name">Smart Connections <span class="badge badge-hot">最人気</span></div>
+        <span class="tag tag-ai">AI セマンティック検索</span>
+        <p>Vault 全ノートのベクトルインデックスをローカル生成（TaylorAI/bge-micro-v2・384次元）。<strong>意味検索（RAG）・関連ノートの自動表示・Claude/GPT との対話</strong>が可能。書いている内容に関連するノートをリアルタイム提示。</p>
+        <ul style="margin-top:8px;">
+          <li>対応モデル: Claude / GPT-4o / ローカル Ollama</li>
+          <li>Smart Chat: Vault を RAG として対話</li>
+          <li>Smart Graph: ベクトル類似度グラフ</li>
+          <li><code>ollama run nomic-embed-text</code> でオフライン動作</li>
+        </ul>
+      </div>
+      <div class="plugin-card">
+        <span class="icon">✍️</span>
+        <div class="name">Text Generator</div>
+        <span class="tag tag-ai">テキスト生成</span>
+        <p>プロンプトテンプレートから AI でテキストを生成。Anthropic / OpenAI / Google / Groq / ローカルモデルに対応。<strong>バッチ生成・テンプレート管理・ホットキー呼び出し</strong>が強み。</p>
+        <ul style="margin-top:8px;">
+          <li>タイトル生成・要約・アウトライン作成</li>
+          <li>選択テキストへのインライン AI 変換</li>
+          <li>コミュニティ共有テンプレート多数</li>
+        </ul>
+      </div>
+      <div class="plugin-card">
+        <span class="icon">💬</span>
+        <div class="name">Copilot for Obsidian</div>
+        <span class="tag tag-ai">チャット</span>
+        <p>ChatGPT スタイルのサイドパネルチャット。<strong>Vault のノートをコンテキストとして参照</strong>しながら対話。GPT-4o / Claude / Gemini 対応。QA・要約・翻訳・ノート作成に。</p>
+      </div>
+      <div class="plugin-card">
+        <span class="icon">🤝</span>
+        <div class="name">Claudian <span class="badge badge-new">2026</span></div>
+        <span class="tag tag-ai">エージェント埋め込み</span>
+        <p><strong>Claude Code / Codex / Pi / OpenCode を Vault に直接埋め込む</strong>プラグイン（YishenTu 作）。Vault がエージェントの作業ディレクトリとなり、ファイル読み書き・検索・bash・マルチステップワークフローが可能。</p>
+        <ul style="margin-top:8px;">
+          <li>GitHub: <code>YishenTu/claudian</code></li>
+          <li>Obsidian UI からエージェントを直接操作</li>
+        </ul>
+      </div>
+      <div class="plugin-card">
+        <span class="icon">🏗️</span>
+        <div class="name">AI-Vault / obsidian-ai-agent <span class="badge badge-new">2026</span></div>
+        <span class="tag tag-ai">自律エージェント</span>
+        <p>Claude Code を Vault の AI コラボレータとして統合（m-rgba / AgriciDaniel 作）。<strong>「self-organizing second brain」</strong> — ソースをドロップすると Claude が読み・リンクし・分類する知識グラフを自動構築。Karpathy の LLM Wiki パターンに基づく。</p>
+        <ul style="margin-top:8px;">
+          <li>GitHub: <code>AgriciDaniel/claude-obsidian</code></li>
+          <li>GitHub: <code>m-rgba/obsidian-ai-agent</code></li>
+        </ul>
+      </div>
+      <div class="plugin-card">
+        <span class="icon">🛠️</span>
+        <div class="name">Templater</div>
+        <span class="tag tag-auto">テンプレート自動化</span>
+        <p>JavaScript コードをテンプレートに埋め込める上位版 Templates。<strong>AI プラグインとの組み合わせで「ノート作成時に AI が自動タグ付け・要約生成」</strong>を実現。obsidian-mcp-tools では Templater プロンプトを MCP 経由で実行可能。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MCP 連携 -->
+  <div class="panel panel-green">
+    <h2>⚡ MCP 連携（最重要）— AI エージェントと Vault を繋ぐ</h2>
+    <p>2026年の最大の変化は <strong>MCP（Model Context Protocol）</strong> が Obsidian 連携の標準になったこと。MCP により Claude / GPT / Gemini などの AI エージェントが Vault を「道具」として直接操作できます。MCP は 2026年3月時点で月間 9700万ダウンロードを超えている。</p>
+
+    <div class="tip" style="margin-top:14px;">
+      <span class="label">MCP × Obsidian でできること</span>
+      ノートの検索・読み取り・新規作成・編集・Templater 実行・セマンティック検索 — すべてを AI が自律的に実行できる。
+    </div>
+
+    <h3>主要 MCP ツール一覧</h3>
+    <table class="cmp">
+      <thead>
+        <tr><th>ツール</th><th>特徴</th><th>必要条件</th><th>対応クライアント</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>MCPVault<br><code>@bitbonsai/mcpvault</code> <span class="badge badge-hot">推奨</span></td>
+          <td>最も軽量。Obsidian 起動不要。Vault フォルダに直接アクセス。クラウド同期なし</td>
+          <td>Node.js のみ</td>
+          <td>Claude Desktop・Claude Code・ChatGPT+・Gemini CLI・Cursor・Windsurf</td>
+        </tr>
+        <tr>
+          <td>obsidian-mcp<br><code>administrativetrick/obsidian-mcp</code></td>
+          <td>Local REST API plugin 経由。Obsidian が起動している必要あり。細かい API 制御が可能</td>
+          <td>Obsidian + Local REST API plugin</td>
+          <td>Claude Desktop・Claude Code</td>
+        </tr>
+        <tr>
+          <td>obsidian-mcp-tools<br><code>jacksteamdev/obsidian-mcp-tools</code></td>
+          <td>セマンティック検索 + Templater プロンプト実行。Smart Connections と連携</td>
+          <td>Obsidian + Smart Connections + Templater</td>
+          <td>Claude Desktop・任意の MCP クライアント</td>
+        </tr>
+        <tr>
+          <td>obsidian-claude-code-mcp<br><code>iansinnott/obsidian-claude-code-mcp</code></td>
+          <td>WebSocket で Claude Code と Vault を自動接続。Vault 自動検出</td>
+          <td>Obsidian + Claude Code</td>
+          <td>Claude Code</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 style="margin-top:22px;">MCPVault セットアップ（推奨・最速）</h3>
+    <pre><span class="c"># Claude Code に Obsidian Vault を MCP で追加</span>
+claude mcp add-json obsidian --scope user '{
+  "type": "stdio",
+  "command": "npx",
+  "args": ["@bitbonsai/mcpvault@latest", "/path/to/your/vault"]
+}'
+
+<span class="c"># 確認</span>
+claude mcp list
+
+<span class="c"># Claude Code から使う（自然言語で）</span>
+claude "プロジェクトXの最新ノートを見せて、優先タスクを抽出して"</pre>
+
+    <h3>Obsidian 側セットアップ（obsidian-mcp 方式）</h3>
+    <pre><span class="c"># 1. Local REST API プラグインをインストール（コミュニティプラグイン）</span>
+<span class="c"># 2. API key をメモ（設定画面に表示される）</span>
+<span class="c"># 3. Claude Desktop の mcp_servers.json に追加</span>
+{
+  "obsidian": {
+    "command": "npx",
+    "args": ["-y", "mcp-obsidian"],
+    "env": {
+      "OBSIDIAN_API_KEY": "your-api-key-here",
+      "OBSIDIAN_HOST": "http://localhost:27123"
+    }
+  }
+}</pre>
+
+    <h3>MCP で使えるツール（MCPVault）</h3>
+    <div class="grid3">
+      <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:10px; padding:14px;">
+        <strong style="color:var(--accent2);">read_note</strong>
+        <p style="font-size:0.83rem; margin-top:4px;">指定パスのノートを読み取り。Frontmatter も含めて返す</p>
+      </div>
+      <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:10px; padding:14px;">
+        <strong style="color:var(--accent2);">search_vault</strong>
+        <p style="font-size:0.83rem; margin-top:4px;">キーワード・タグ・Properties で Vault 全体を検索</p>
+      </div>
+      <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:10px; padding:14px;">
+        <strong style="color:var(--accent2);">create_note</strong>
+        <p style="font-size:0.83rem; margin-top:4px;">新規ノートを作成。Frontmatter も自動付与</p>
+      </div>
+      <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:10px; padding:14px;">
+        <strong style="color:var(--accent2);">update_note</strong>
+        <p style="font-size:0.83rem; margin-top:4px;">既存ノートの内容・Properties を更新</p>
+      </div>
+      <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:10px; padding:14px;">
+        <strong style="color:var(--accent2);">semantic_search</strong>
+        <p style="font-size:0.83rem; margin-top:4px;">ベクトル検索で意味的に近いノートを取得（obsidian-mcp-tools）</p>
+      </div>
+      <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:10px; padding:14px;">
+        <strong style="color:var(--accent2);">run_template</strong>
+        <p style="font-size:0.83rem; margin-top:4px;">Templater テンプレートを MCP 経由で実行（obsidian-mcp-tools）</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- OpenClaw × Obsidian -->
+  <div class="panel panel-blue">
+    <h2>🦞 OpenClaw × Obsidian — 自律エージェントの第2の脳</h2>
+    <p>OpenClaw と Obsidian の組み合わせは、ハブ内で最も重要な AI インフラパターンの一つ。<strong>OpenClaw が Obsidian Vault を読み・書き・整理する「生きた記憶」</strong>を構築します。</p>
+
+    <h3>HEARTBEAT パターン（毎朝の自動ブリーフィング）</h3>
+    <div class="blue-box">
+      <span class="label">実装パターン</span>
+      毎朝 cron が起動 → OpenClaw が agent-memory/ をスキャン → 繰り返しテーマを発見 → HEARTBEAT.md に要約を書き込む → Obsidian のデイリーノートにリンク
+    </div>
+
+    <pre><span class="c"># HEARTBEAT.md の自動生成（OpenClaw cron ジョブ）</span>
+<span class="c"># openclaw/skills/heartbeat.skill.ts</span>
+
+<span class="k">export</span> <span class="k">const</span> heartbeatSkill = {
+  name: <span class="s">'heartbeat'</span>,
+  schedule: <span class="s">'0 7 * * *'</span>,  <span class="c">// 毎朝7時</span>
+  run: <span class="k">async</span> (ctx) => {
+    <span class="c">// 過去7日の agent-memory を読む</span>
+    <span class="k">const</span> memories = <span class="k">await</span> ctx.vault.search({
+      folder: <span class="s">'agent-memory'</span>,
+      since: <span class="s">'7d'</span>
+    });
+    <span class="c">// 繰り返しテーマを LLM で抽出</span>
+    <span class="k">const</span> themes = <span class="k">await</span> ctx.llm.extract(memories, <span class="s">'recurring themes'</span>);
+    <span class="c">// HEARTBEAT.md に書き込む</span>
+    <span class="k">await</span> ctx.vault.write(<span class="s">'agent-memory/HEARTBEAT.md'</span>, {
+      date: <span class="k">new</span> Date().toISOString(),
+      themes,
+      unresolved: <span class="k">await</span> ctx.vault.findUnresolved()
+    });
+  }
+};</pre>
+
+    <h3>agent-memory/ フォルダ設計</h3>
+    <pre>agent-memory/
+  ├── HEARTBEAT.md          <span class="c"># 毎朝の要約（cron 生成）</span>
+  ├── daily/
+  │   └── 2026-06-15.md     <span class="c"># 日次ログ（全会話・決定・アクション）</span>
+  ├── themes/
+  │   ├── openclaw-arch.md  <span class="c"># 繰り返し話題のテーマノート</span>
+  │   └── content-ideas.md
+  ├── meetings/
+  │   └── 2026-06-15-sync.md <span class="c"># ミーティング要約（自動生成）</span>
+  └── research/
+      └── local-llm-2026.md  <span class="c"># AI が調査・集約したリサーチノート</span></pre>
+
+    <h3>OpenClaw → Obsidian 書き込みスキル</h3>
+    <pre><span class="c"># OpenClaw から Obsidian MCP を呼び出す設定</span>
+<span class="c"># openclaw.config.ts</span>
+{
+  tools: [
+    {
+      name: <span class="s">'obsidian-vault'</span>,
+      mcp: <span class="s">'@bitbonsai/mcpvault'</span>,
+      vaultPath: <span class="s">'/Users/username/MyVault'</span>,
+    }
+  ],
+  systemPrompt: `
+    あなたは Obsidian Vault を記憶として使う AI エージェントです。
+    重要な情報はすべて agent-memory/ に書き込んでください。
+    ノートには必ず Properties（date・tags・status）を付与してください。
+  `
+}</pre>
+
+    <h3>OpenClaw × n8n × Obsidian パイプライン実例</h3>
+    <div class="flow" style="gap:8px; flex-wrap:wrap;">
+      <div class="flow-node blue">WhatsApp<br>メモ入力</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node orange">n8n<br>Webhook</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node blue">OpenClaw<br>処理</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node green">Obsidian Vault<br>MCP 書き込み</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="background:rgba(167,139,250,0.1); color:var(--accent);">Graph View<br>自動更新</div>
+    </div>
+    <p class="small" style="margin-top:10px;">外出中に WhatsApp でメモ → n8n が受信 → OpenClaw が分類・タグ付け → Obsidian の適切なフォルダにノート作成 → 関連ノートにバックリンクを自動追加</p>
+  </div>
+
+  <!-- obsidian-second-brain スキル -->
+  <div class="panel">
+    <h2>🧠 obsidian-second-brain スキル — 43コマンドのクロスCLI 統合</h2>
+    <p><strong>obsidian-second-brain</strong>（Eugene Ghelbur 作）は、Vault を「生きた AI ファーストな第2の脳」に変える 43コマンドのスキルセットです。<strong>Claude Code・Codex CLI・Gemini CLI・OpenCode</strong> のすべてから同じ Vault を操作できます。</p>
+
+    <div class="blue-box">
+      <span class="label">GitHub</span>
+      <code>eugeniughelbur/obsidian-second-brain</code> — クロスプラットフォーム対応
+    </div>
+
+    <h3>主要コマンド（43コマンドから抜粋）</h3>
+    <table class="cmp">
+      <thead><tr><th>コマンド</th><th>機能</th><th>使用シーン</th></tr></thead>
+      <tbody>
+        <tr><td><code>/capture</code></td><td>アイデア・リンク・メモを即時キャプチャ → inbox/ に保存</td><td>思いついた時に即記録</td></tr>
+        <tr><td><code>/daily</code></td><td>今日のデイリーノートを開く・前日の未完タスクを引き継ぎ</td><td>毎朝のルーティン</td></tr>
+        <tr><td><code>/research</code></td><td>Web・YouTube・X を検索 → Vault に要約ノートを生成</td><td>調査作業の自動化</td></tr>
+        <tr><td><code>/obsidian-architect</code></td><td>コードベースを分析 → Vault にアーキテクチャ文書を自動生成</td><td>開発ドキュメント自動化</td></tr>
+        <tr><td><code>/synthesize</code></td><td>複数ノートを横断して Vault 根拠付き合成レポートを生成</td><td>リサーチのまとめ</td></tr>
+        <tr><td><code>/link</code></td><td>関連ノートを AI が自動発見 → バックリンクを追加</td><td>知識グラフの拡充</td></tr>
+        <tr><td><code>/review</code></td><td>スケジューラが忘れかけたノートを定期的にレビューに出す</td><td>間隔反復学習</td></tr>
+        <tr><td><code>/google-cal</code></td><td>Google Calendar と連携 → スケジュールをデイリーノートに統合</td><td>カレンダー × PKM</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="margin-top:20px;">自己更新ノート（Self-rewriting Notes）</h3>
+    <p>obsidian-second-brain の最大の特徴は、<strong>ノートが自分自身を更新する</strong>仕組みにあります。AI が新情報を検知すると自動的に既存ノートを書き換え・拡充します。</p>
+    <pre><span class="c"># write-time AI validator hook の例</span>
+<span class="c"># 新規ノート保存時に自動で実行される</span>
+hook: on_save
+actions:
+  - extract_properties      <span class="c"># タグ・ステータスを AI が推定して付与</span>
+  - find_related_notes      <span class="c"># 関連ノートを検索</span>
+  - add_backlinks           <span class="c"># 双方向リンクを自動追加</span>
+  - update_index            <span class="c"># MOC（Map of Content）を更新</span></pre>
+  </div>
+
+  <!-- Git 同期 × AI エージェント -->
+  <div class="panel">
+    <h2>🔄 Git 同期 × AI エージェント — バージョン管理された記憶</h2>
+    <p>Obsidian Vault を Git で管理すると、<strong>複数の AI エージェントが同一 Vault を安全に読み書きできる</strong>コラボレーション基盤になります。</p>
+
+    <h3>obsidian-git プラグイン（推奨）</h3>
+    <pre><span class="c"># obsidian-git の設定（.obsidian/plugins/obsidian-git/data.json）</span>
+{
+  "autoSaveInterval": 10,          <span class="c"># 10分ごとに自動コミット</span>
+  "autoPushInterval": 30,          <span class="c"># 30分ごとに自動プッシュ</span>
+  "commitMessage": "auto: {{date}} {{hostname}}",
+  "pullBeforePush": true,
+  "syncMethod": "merge"
+}</pre>
+
+    <h3>Agentic Git Sync（自律的なコンフリクト解決）</h3>
+    <div class="key-box">
+      <strong>GitHub: <code>leweii/agentic-git-sync</code></strong>
+      <p style="margin-top:8px;">複数の AI エージェントが同じ Vault に書き込む場合、Git コンフリクトが発生しえます。Agentic Git Sync はすべての失敗を AI エージェントに渡し、<strong>16ツールのカタログから回復手段を自動選択・実行</strong>します。人間が何も気づかないうちに解決。</p>
+    </div>
+
+    <h3>Hermes Agent × Obsidian の連携</h3>
+    <pre><span class="c"># Hermes Agent で Obsidian Vault を Git 同期する設定</span>
+<span class="c"># hermes.config.yaml</span>
+tools:
+  - name: obsidian-vault
+    type: git-sync
+    vault_path: /Users/username/MyVault
+    remote: git@github.com:username/vault-private.git
+    branch: main
+    auto_pull: true     <span class="c"># タスク開始前に最新を取得</span>
+    auto_push: true     <span class="c"># タスク完了後に自動プッシュ</span>
+    commit_prefix: "hermes:"
+
+  - name: memory-writer
+    type: mcp
+    server: "@bitbonsai/mcpvault"
+    vault_path: /Users/username/MyVault
+
+schedule:
+  - cron: "0 7 * * *"   <span class="c"># 毎朝7時にデイリーブリーフィング作成</span>
+    task: write_daily_briefing</pre>
+
+    <div class="flow" style="margin-top:16px; gap:8px; flex-wrap:wrap;">
+      <div class="flow-node orange">Hermes Agent<br>（VPS常駐）</div>
+      <div class="flow-arrow">git pull</div>
+      <div class="flow-node green">Obsidian Vault<br>（GitHub）</div>
+      <div class="flow-arrow">git push</div>
+      <div class="flow-node blue">Claude Code<br>（ローカル）</div>
+      <div class="flow-arrow">git pull</div>
+      <div class="flow-node green">同一 Vault</div>
+    </div>
+    <p class="small" style="margin-top:10px;">複数エージェントが GitHub 上の Vault リポジトリを介して安全に状態を共有。履歴・差分・コンフリクト解決も Git で管理。</p>
+  </div>
+
+  <!-- マルチエージェント構成 -->
+  <div class="panel">
+    <h2>🕹️ マルチエージェント構成設計 — 複数 AI が同一 Vault を操作する</h2>
+    <p>2026年の最も進んだ活用パターンは、<strong>複数の専門化した AI エージェントが役割分担しながら同一 Vault を操作する</strong>構成です。</p>
+
+    <h3>役割分担アーキテクチャ例</h3>
+    <table class="cmp">
+      <thead><tr><th>エージェント</th><th>役割</th><th>書き込み先</th><th>参照先</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Claude Code</strong><br>（Orchestrator）</td>
+          <td>全体調整・高品質な判断・アーキテクチャ設計</td>
+          <td>projects/ · decisions/ · HEARTBEAT.md</td>
+          <td>Vault 全体</td>
+        </tr>
+        <tr>
+          <td><strong>Hermes Agent</strong><br>（VPS 常駐・24/7）</td>
+          <td>定期タスク・情報収集・デイリーノート生成</td>
+          <td>agent-memory/daily/ · research/ · inbox/</td>
+          <td>agent-memory/ · projects/</td>
+        </tr>
+        <tr>
+          <td><strong>OpenClaw</strong><br>（量産エンジン）</td>
+          <td>コンテンツ大量生成・タグ付け・分類</td>
+          <td>content/ · sources/ · tags/</td>
+          <td>inbox/ · templates/</td>
+        </tr>
+        <tr>
+          <td><strong>Codex / Pi</strong><br>（コーディング特化）</td>
+          <td>コード生成・技術ドキュメント作成</td>
+          <td>tech-notes/ · code-snippets/</td>
+          <td>projects/ · tech-notes/</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 style="margin-top:20px;">コンフリクト回避のルール設計</h3>
+    <div class="key-box">
+      <ul>
+        <li><strong>フォルダ所有権</strong>: 各エージェントに専用フォルダを割り当て、他フォルダへの書き込みは読み取り専用</li>
+        <li><strong>Agent タグ</strong>: Frontmatter に <code>agent: claude-code</code> を必ず付与 → どのノートを誰が作ったか追跡可能</li>
+        <li><strong>LOCK ファイル</strong>: 編集中は <code>.lock</code> ファイルで排他制御（Agentic Git Sync が自動管理）</li>
+        <li><strong>Git ブランチ戦略</strong>: 各エージェントが専用ブランチで作業 → main への PR 形式でマージ（Claude Code が review）</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ダッシュボード実例 -->
+  <div class="panel">
+    <h2>📊 ダッシュボード実例 — Dataview・Canvas・Bases</h2>
+
+    <h3>Dataview: プロジェクト一覧ダッシュボード</h3>
+    <pre><span class="c">```dataview
+TABLE status, priority, due, agent
+FROM "projects"
+WHERE status != "done"
+SORT priority DESC, due ASC
+```</span>
+
+<span class="c"># AI が新プロジェクトノートを作成するたびに自動で一覧に追加される</span>
+<span class="c"># 必要な Frontmatter:</span>
+---
+status: in-progress
+priority: high
+due: 2026-06-30
+agent: claude-code
+---</pre>
+
+    <h3>Dataview: 今週のタスク（AI が毎朝更新）</h3>
+    <pre><span class="c">```dataview
+TASK
+FROM "agent-memory/daily"
+WHERE !completed AND date >= date(today) - dur(7 days)
+GROUP BY file.day
+```</span></pre>
+
+    <h3>Bases: ノーコードDB ビュー</h3>
+    <pre><span class="c"># .base ファイル（ビュー設定のみ。データは Markdown のまま）</span>
+{
+  "view": "table",
+  "source": "projects/",
+  "filter": { "status": { "neq": "done" } },
+  "columns": ["title", "status", "priority", "due", "agent"],
+  "sort": [{ "property": "priority", "direction": "desc" }]
+}</pre>
+    <p class="small">Bases はクエリ言語なしで Notion 風の DB ビューを実現。AI が Properties を書き込むと即座にビューに反映。</p>
+
+    <h3>Canvas: AI が更新するマインドマップ</h3>
+    <pre><span class="c"># .canvas ファイルは JSON で AI が直接編集可能</span>
+{
+  "nodes": [
+    {
+      "id": "1", "type": "file",
+      "file": "projects/openclaw-obsidian.md",
+      "x": 0, "y": 0, "width": 400, "height": 300
+    },
+    {
+      "id": "2", "type": "text",
+      "text": "## 今週のアクション\n- [ ] MCP 設定確認\n- [ ] HEARTBEAT スクリプト本番化",
+      "x": 450, "y": 0, "width": 300, "height": 200
+    }
+  ],
+  "edges": [
+    { "id": "e1", "fromNode": "1", "toNode": "2" }
+  ]
+}</pre>
+    <p class="small">AI が Canvas ファイルに新ノードを追加 → Obsidian で開くとマインドマップが自動更新されている。</p>
+  </div>
+
+  <!-- セットアップ手順 -->
+  <div class="panel">
+    <h2>🚀 セットアップ手順 — Obsidian × AI エージェントを始める</h2>
+
+    <div class="step"><div class="num">1</div>
+      <h4>Obsidian をインストールし Vault を作成</h4>
+      <p>obsidian.md からダウンロード（無料）。新規 Vault を作成し、フォルダ構成（agent-memory/・projects/・daily/ など）を決める。</p>
+    </div>
+
+    <div class="step"><div class="num">2</div>
+      <h4>コミュニティプラグインを有効化</h4>
+      <p>設定 → コミュニティプラグイン → 安全モード OFF。<strong>Smart Connections・Templater・obsidian-git・Dataview</strong> をインストール。</p>
+    </div>
+
+    <div class="step"><div class="num">3</div>
+      <h4>Git リポジトリとして初期化</h4>
+      <p><code>cd ~/MyVault && git init && git remote add origin git@github.com:username/vault.git</code>。obsidian-git プラグインで自動コミット（10分間隔）を設定。</p>
+    </div>
+
+    <div class="step"><div class="num">4</div>
+      <h4>MCPVault で Claude Code と接続</h4>
+      <pre style="margin:8px 0;">claude mcp add-json obsidian --scope user \
+  '{"type":"stdio","command":"npx","args":["@bitbonsai/mcpvault@latest","/path/to/vault"]}'</pre>
+      <p><code>claude "agent-memory/HEARTBEAT.md を読んで今日の優先タスクを教えて"</code> と試す。</p>
+    </div>
+
+    <div class="step"><div class="num">5</div>
+      <h4>agent-memory/ フォルダを作成・HEARTBEAT.md テンプレートを設置</h4>
+      <p>AI エージェントが記憶を書き込む専用フォルダを作成。初回の HEARTBEAT.md テンプレートを用意し、Claude Code / Hermes Agent にフォルダ構成を説明するシステムプロンプトを設定。</p>
+    </div>
+
+    <div class="step"><div class="num">6</div>
+      <h4>OpenClaw スキルで自律化</h4>
+      <p>OpenClaw の Skill として heartbeat cron・研究ノート自動生成・inbox 整理スキルを登録。<code>openclaw skills workshop apply heartbeat</code> で本番適用。</p>
+    </div>
+
+    <div class="step"><div class="num">7</div>
+      <h4>Bases でダッシュボードを作成</h4>
+      <p>新規 .base ファイルを作成し、projects/ フォルダを対象にテーブルビューを設定。AI が Properties を更新するたびにダッシュボードが自動更新される。</p>
+    </div>
+  </div>
+
+  <!-- 実例・YouTube/コミュニティ事例 -->
+  <div class="panel">
+    <h2>📹 実例・コミュニティ事例 2026</h2>
+
+    <div class="grid2">
+      <div class="plugin-card">
+        <div class="name">claude-obsidian（Karpathy パターン）</div>
+        <span class="tag tag-ai">自己組織化</span>
+        <p>AgriciDaniel 作。ソース（PDF・URL・テキスト）を Vault に投入するだけで Claude が読み・リンクし・分類する知識グラフを自動構築。Andrej Karpathy の「LLM Wiki」パターンを Obsidian で実装。</p>
+        <p class="small">GitHub: <code>AgriciDaniel/claude-obsidian</code></p>
+      </div>
+      <div class="plugin-card">
+        <div class="name">Agentic Git Sync</div>
+        <span class="tag tag-sync">自律 Git</span>
+        <p>leweii 作。Obsidian Vault と GitHub を双方向同期し、コンフリクト・エラーをすべて AI が自律解決（16ツールカタログ）。複数エージェントが同一 Vault を使う場合の必須ツール。</p>
+        <p class="small">GitHub: <code>leweii/agentic-git-sync</code></p>
+      </div>
+      <div class="plugin-card">
+        <div class="name">Hermes + Obsidian の DCX ワークフロー</div>
+        <span class="tag tag-auto">VPS 常駐</span>
+        <p>VPS 上の Hermes Agent が Obsidian Vault を Git 同期。外出中でも 24/7 でリサーチノートを生成・inbox を整理。帰宅したら Obsidian を開くと知識グラフが育っている。</p>
+        <p class="small">参考: dcxtribe.com / hermes-agent.ai</p>
+      </div>
+      <div class="plugin-card">
+        <div class="name">n8n + OpenClaw + Obsidian のフル自動化</div>
+        <span class="tag tag-auto">自動化</span>
+        <p>WhatsApp メモ → n8n Webhook → OpenClaw で分類・タグ付け → Obsidian に保存 → Smart Connections で関連ノートにリンク。歩きながらメモ → 夜には整理済みの Vault が待っている。</p>
+        <p class="small">参考: n8nlab.io / blink.new</p>
+      </div>
+      <div class="plugin-card">
+        <div class="name">obsidian-second-brain（43コマンド）</div>
+        <span class="tag tag-ai">クロスCLI</span>
+        <p>Eugene Ghelbur 作。Claude Code / Codex / Gemini CLI / OpenCode 全てで動く Vault 管理スキルセット。web リサーチ・YouTube 要約・コードベース文書化まで含む。<code>/create-command</code> でユーザーが新コマンドを追加可能。</p>
+        <p class="small">GitHub: <code>eugeniughelbur/obsidian-second-brain</code></p>
+      </div>
+      <div class="plugin-card">
+        <div class="name">Claudian でコーディングと PKM を統合</div>
+        <span class="tag tag-ai">開発 × PKM</span>
+        <p>YishenTu 作。Obsidian から Claude Code を起動し、コードの変更履歴・設計決定・TODO を Vault に直接書き込む。コーディング作業の「外部記憶」として Vault を機能させる。</p>
+        <p class="small">GitHub: <code>YishenTu/claudian</code></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Obsidian × AI のベストプラクティス -->
+  <div class="panel">
+    <h2>✅ AI インフラとしての Vault 設計ベストプラクティス</h2>
+
+    <div class="grid2">
+      <div>
+        <h3>Frontmatter の標準化</h3>
+        <pre><span class="c"># すべての AI 生成ノートに必須</span>
+---
+agent: claude-fable-5     <span class="c"># 作成エージェント</span>
+created: 2026-06-15       <span class="c"># 作成日（ISO8601）</span>
+updated: 2026-06-15       <span class="c"># 最終更新</span>
+tags: [ai, obsidian]      <span class="c"># タグ配列</span>
+status: draft             <span class="c"># draft/review/done</span>
+confidence: high          <span class="c"># AI の確信度</span>
+source_url: https://...   <span class="c"># 出典 URL</span>
+---</pre>
+      </div>
+      <div>
+        <h3>フォルダ構成の原則</h3>
+        <ul>
+          <li><strong>inbox/</strong> — 未整理の新規ノート（AI の唯一の書き込み起点）</li>
+          <li><strong>agent-memory/</strong> — AI が自律的に管理する記憶領域</li>
+          <li><strong>projects/</strong> — 進行中プロジェクト（人間が管理）</li>
+          <li><strong>sources/</strong> — 参照元・リサーチ素材</li>
+          <li><strong>templates/</strong> — Templater テンプレート</li>
+          <li><strong>_archive/</strong> — 完了・削除候補（AI が自動移動）</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="warn-box" style="margin-top:14px;">
+      <strong>⚠️ 注意点</strong>
+      <ul style="margin-top:8px;">
+        <li>AI に Vault 全体への自由な書き込みを許可する前に、<strong>Git バックアップを必ず設定</strong>すること</li>
+        <li>Smart Connections の埋め込みインデックスは大規模 Vault では初回に時間がかかる（数千ノート = 数分）</li>
+        <li>MCPVault は Obsidian 起動不要だが、<strong>起動中は排他制御が必要</strong>（同時アクセスに注意）</li>
+        <li>obsidian-git の自動プッシュは GitHub Actions との組み合わせで <strong>CI/CD 的なノート処理</strong>も可能</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 関連リンク -->
+  <div class="panel">
+    <h2>🔗 関連リンク・出典</h2>
+    <div class="grid2">
+      <div>
+        <h3>公式・ツール</h3>
+        <ul>
+          <li><a href="https://obsidian.md" target="_blank">obsidian.md</a> — 公式サイト（無料ダウンロード）</li>
+          <li><a href="https://obsidian.md/plugins" target="_blank">obsidian.md/plugins</a> — プラグインディレクトリ（4350+）</li>
+          <li><a href="https://mcpvault.org" target="_blank">mcpvault.org</a> — MCPVault（Obsidian MCP 推奨）</li>
+          <li><a href="https://smartconnections.app" target="_blank">smartconnections.app</a> — Smart Connections（セマンティック検索）</li>
+          <li><a href="https://github.com/eugeniughelbur/obsidian-second-brain" target="_blank">obsidian-second-brain</a> — 43コマンドクロスCLIスキル</li>
+        </ul>
+      </div>
+      <div>
+        <h3>GitHub プロジェクト</h3>
+        <ul>
+          <li><a href="https://github.com/jacksteamdev/obsidian-mcp-tools" target="_blank">obsidian-mcp-tools</a> — セマンティック検索 + Templater MCP</li>
+          <li><a href="https://github.com/AgriciDaniel/claude-obsidian" target="_blank">claude-obsidian</a> — 自己組織化 AI 第2の脳</li>
+          <li><a href="https://github.com/YishenTu/claudian" target="_blank">claudian</a> — Claude Code を Vault に埋め込む</li>
+          <li><a href="https://github.com/m-rgba/obsidian-ai-agent" target="_blank">obsidian-ai-agent</a> — AI エージェント統合</li>
+          <li><a href="https://github.com/leweii/agentic-git-sync" target="_blank">agentic-git-sync</a> — 自律的 Git コンフリクト解決</li>
+        </ul>
+      </div>
+    </div>
+    <div class="grid2" style="margin-top:14px;">
+      <div>
+        <h3>ハブ内関連ページ</h3>
+        <ul>
+          <li><a href="pi-coding-agent.html">Pi Coding Agent</a> — OpenClaw の内部エンジン</li>
+          <li><a href="hermes-agent.html">Hermes Agent</a> — VPS 常駐・Obsidian Git 連携</li>
+          <li><a href="slm-guide.html">SLM ガイド</a> — ローカル LLM（Smart Connections との組み合わせ）</li>
+          <li><a href="../../claw-stack/openclaw/index.html">OpenClaw</a> — Obsidian 連携スキル</li>
+          <li><a href="../../claw-stack/comparison.html">Claw スタック比較</a> — エージェント選定</li>
+        </ul>
+      </div>
+      <div>
+        <h3>参考記事・ガイド</h3>
+        <ul>
+          <li><a href="https://www.nxcode.io/resources/news/obsidian-ai-second-brain-complete-guide-2026" target="_blank">Obsidian AI Second Brain 完全ガイド 2026</a></li>
+          <li><a href="https://blink.new/blog/openclaw-second-brain-obsidian" target="_blank">OpenClaw Second Brain — Obsidian 記憶システム構築</a></li>
+          <li><a href="https://medium.com/@ai_transfer_lab/mcpvault-the-claude-skill-that-turns-obsidian-into-a-live-agent-memory-6f3aca3dfc4c" target="_blank">MCPVault — Claude が Obsidian を生きた記憶に変える</a></li>
+          <li><a href="https://repovive.com/roadmaps/claude-code/obsidian-claude-code-your-ai-powered-second-brain/obsidian-mcp-server-claude-code-setup" target="_blank">Obsidian MCP Server + Claude Code セットアップ</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="small" style="margin-top:16px;">最終更新: 2026-06-15（新規作成）／ 出典: MCPVault・obsidian-second-brain・OpenClaw ドキュメント・GitHub 各プロジェクト・コミュニティガイド</p>
+  </div>
+
+</div>
+</body>
+</html>
