@@ -187,13 +187,13 @@
           OpenClaw 志向の量産パイプラインにそのまま噛み合います。
         </p>
       </div>
-      <p class="last-update">最終更新: 2026-06-04（公式リリース履歴タイムライン新設・GLM-4.6〜5.1 追記）</p>
+      <p class="last-update">最終更新: 2026-06-18（GLM-5.2 MIT 公開・AutoGLM-Thinking / Phone-Multilingual 追記）</p>
     </section>
 
     <section class="grid-4">
-      <div class="stat"><div class="value">GLM-5.1</div><div class="label">現行モデル</div></div>
-      <div class="stat"><div class="value">~1,530</div><div class="label">Code Arena Elo（3位水準）</div></div>
-      <div class="stat"><div class="value">128k</div><div class="label">コンテキスト</div></div>
+      <div class="stat"><div class="value">GLM-5.2</div><div class="label">現行モデル（2026-06-16）</div></div>
+      <div class="stat"><div class="value">62.1%</div><div class="label">SWE-Bench Pro（OW 首位）</div></div>
+      <div class="stat"><div class="value">1M</div><div class="label">コンテキスト（131K出力）</div></div>
       <div class="stat"><div class="value">$1.40/$4.40</div><div class="label">API 入力/出力 per 1M</div></div>
     </section>
 
@@ -202,31 +202,29 @@
       <div class="grid-3">
         <div class="card">
           <span class="tag tag-code">Coding / Agent</span>
-          <h3>コーディングとエージェントが主戦場</h3>
+          <h3>GLM-5.2 が OW コーディング首位（2026-06）</h3>
           <p>
-            GLM-5.1 は <strong>"All Tools" モジュール</strong>で、単一プロンプトから
-            Web 検索→データ取得→Python 描画→画像生成のパイプラインを<strong>自律的に組んで実行</strong>する。
-            Function Calling の安定性は GPT 系に匹敵する場面があり、外部システムを動かす
-            <strong>オートメーションの接着剤（Connector）</strong>として機能する。
+            GLM-5.2 は <strong>SWE-Bench Pro 62.1%</strong>（GLM-5.1: 58.4%、GPT-5.5: 58.6% を超え）でオープンウェイト中トップ。
+            1M コンテキスト・IndexShare アーキテクチャで長期コーディングに特化。MIT ライセンス公開済み。
+            API は $1.40 / MTok で GPT-5.5 の約 1/5 のコスト。
           </p>
         </div>
         <div class="card">
-          <span class="tag tag-model">Arena</span>
-          <h3>Code Arena 上位（Elo ~1,530）</h3>
+          <span class="tag tag-model">Highspeed</span>
+          <h3>GLM-5.1 Highspeed — 400 tokens/s（2026-05）</h3>
           <p>
-            Intelligence Matrix canon では <strong>Code Arena Elo 1,530（3位水準）</strong>。
-            フロンティアと拮抗するわけではないが、<strong>コーディング系の実用域では明確に上位</strong>に位置する。
-            「最高知能ではないが、コーディングなら十分使える」という線引きが要点。
+            GLM-5.1 の高速 API バリアントとして <strong>400 tokens/s</strong> を達成。
+            主要 LLM プロバイダー中で最速クラスのスループットと報告。
+            リアルタイム翻訳・即レス系ツール向け用途で差別化。
           </p>
         </div>
         <div class="card">
-          <span class="tag tag-new">Open + Low Cost</span>
-          <h3>オープンウェイト＋低コスト</h3>
+          <span class="tag tag-new">AutoGLM</span>
+          <h3>AutoGLM 進化 — Thinking × Phone</h3>
           <p>
-            API は <strong>入力 $1.40 / 出力 $4.40 per 1M（Efficient tier）</strong>。
-            オープンウェイト系として <strong>GLM-Edge / Air</strong> など端末・PC 上で動く軽量版も持ち、
-            MoE 採用の GLM-4.5 Air は高速トークン生成が強み。
-            <strong>クラウド API でもローカルでも安く回せる</strong>二面性がある。
+            <strong>AutoGLM-Thinking</strong>（深度調査＋実行の同時並行）と
+            <strong>AutoGLM-Phone-Multilingual</strong>（50+ アプリ対応モバイル自動化）が新展開。
+            OpenClaw スキルの AutoGLM Toolkit とも連携し、Web 検索・ブラウザ操作・画像生成を API 単一認証で呼び出せる。
           </p>
         </div>
       </div>
@@ -316,8 +314,34 @@
       <div class="timeline">
 
         <article class="item hot">
+          <div class="date">2026-06-16</div>
+          <h3>GLM-5.2 MIT オープンウェイト公開 — OW コーディング首位 <span class="tag tag-new">NEW</span><span class="tag tag-model">Model</span></h3>
+          <p>
+            <strong>GLM-5.2</strong> の MIT ライセンスオープンウェイトを HuggingFace / ModelScope に公開（Z.ai Coding Plan 先行は 6/13）。
+            753B MoE（40B active）・<strong>1M トークンコンテキスト</strong>（最大出力 131K）。
+            <strong>IndexShare</strong> アーキテクチャにより 1M ctx 時の推論 FLOPs を 2.9× 削減。
+            Thinking effort: Low / High の 2 段階切替。
+            ベンチ: <strong>SWE-Bench Pro 62.1%</strong>（GPT-5.5: 58.6% を超え OW 首位）、Terminal-Bench 2.1: 81.0%。
+            FrontierSWE・PostTrainBench・SWE-Marathon でも OW 首位を主張。
+            API: 入力 <strong>$1.40</strong> / 出力 $4.40 per MTok、キャッシュ入力 $0.26。
+          </p>
+          <p class="small">Source: <a href="https://venturebeat.com/technology/z-ais-open-weights-glm-5-2-beats-gpt-5-5-on-multiple-long-horizon-coding-benchmarks-for-1-6th-the-cost" target="_blank">VentureBeat（2026-06）</a> / <a href="https://simonwillison.net/2026/Jun/17/glm-52/" target="_blank">Simon Willison（2026-06-17）</a></p>
+        </article>
+
+        <article class="item">
+          <div class="date">2026-05（頃）</div>
+          <h3>GLM-5.1 Highspeed API — 400 tokens/s <span class="tag tag-new">API</span></h3>
+          <p>
+            GLM-5.1 の高速推論バリアントとして <strong>glm-5.1-highspeed</strong> を API で追加。
+            400 tokens/s を達成し、主要 LLM プロバイダー中で最速クラスと Pandaily 等が報道。
+            リアルタイム翻訳・即レス系・ストリーミング UI など低レイテンシが要る用途向け。
+          </p>
+          <p class="small">Source: <a href="https://pandaily.com/zhipu-ai-glm-5.1-high-speed-api-400-tokens-s-may2026" target="_blank">Pandaily（2026-05）</a></p>
+        </article>
+
+        <article class="item hot">
           <div class="date">2026-04-07</div>
-          <h3>GLM-5.1 リリース — Long-Horizon Tasks への特化 <span class="tag tag-new">NEW</span><span class="tag tag-model">Model</span></h3>
+          <h3>GLM-5.1 リリース — Long-Horizon Tasks への特化 <span class="tag tag-model">Model</span></h3>
           <p>
             <strong>GLM-5.1</strong> が公開（「Towards Long-Horizon Tasks」）。単一プロンプトから<strong>最大 8 時間</strong>の自律実行が可能なエンジニアリングインテリジェンスを実現。<strong>Claude Opus 4.6 と同等水準</strong>と評価される能力アライメント。GLM-5（744B MoE / 40B active）ベースの強化版。
           </p>

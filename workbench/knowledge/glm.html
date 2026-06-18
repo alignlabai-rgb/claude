@@ -245,9 +245,8 @@
             <div class="meta-tag">INTELLIGENCE / ZHIPU AI</div>
             <span class="eyebrow">The Connector (連結者)</span>
             <h1>GLM</h1>
-            <p class="lead">ツールと世界をつなぐハブ。最新の「GLM-5.1」は、エージェント機能に特化した"All Tools"モジュールを搭載し、ブラウザ操作、コード実行、画像生成をシームレスに統合します。
-            </p>
-            <span class="last-updated">Last Updated: 2026.05.30</span>
+            <p class="lead">ツールと世界をつなぐハブ。最新の「GLM-5.2」（2026-06-16 MIT 公開）は、1M トークンコンテキスト×長期コーディングに特化したオープンウェイト最強クラス。SWE-Bench Pro 62.1% で GPT-5.5 を超え、コスト $1.40/MTok で約 1/6 の料金を実現。</p>
+            <span class="last-updated">Last Updated: 2026.06.18（GLM-5.2・AutoGLM-Thinking 追記）</span>
             <br>
             <a class="back" href="../index.html">← Workbenchへ戻る</a>
         </header>
@@ -258,23 +257,22 @@
                 <div class="spec-grid">
                     <div class="spec-item">
                         <span class="spec-label">Latest Model</span>
-                        <span class="spec-value">GLM-5.1</span>
+                        <span class="spec-value">GLM-5.2（2026-06）</span>
                     </div>
                     <div class="spec-item">
-                        <span class="spec-label">Key Feature</span>
-                        <span class="spec-value">"All Tools" Module</span>
+                        <span class="spec-label">Architecture</span>
+                        <span class="spec-value">753B MoE（40B active）</span>
                     </div>
                     <div class="spec-item">
                         <span class="spec-label">Context</span>
-                        <span class="spec-value">128K - 200K Tokens</span>
+                        <span class="spec-value">1M Tokens（131K output）</span>
                     </div>
                     <div class="spec-item">
-                        <span class="spec-label">Type</span>
-                        <span class="spec-value">Agentic Specialized</span>
+                        <span class="spec-label">SWE-Bench Pro</span>
+                        <span class="spec-value">62.1%（OW 首位）</span>
                     </div>
                 </div>
-                <p>Zhipu AI（智譜AI）のGLMシリーズは、清華大学の研究成果をベースにしたアカデミックな出自を持ちながら、極めて実用的な「ツール使用（Function
-                    Calling）」能力に焦点を当てて進化してきました。</p>
+                <p>Zhipu AI（現 Z.ai / 智谱AI）の GLM シリーズは、清華大学の研究成果をベースにしたアカデミックな出自を持ちながら、極めて実用的な「ツール使用（Function Calling）」能力に焦点を当てて進化してきました。GLM-5.2 は現行のオープンウェイトモデル中、長期コーディングベンチ（SWE-Marathon・PostTrainBench・FrontierSWE）で首位を獲得しています。</p>
             </article>
 
             <article class="card">
@@ -283,8 +281,9 @@
                 <ul>
                     <li><strong>Autonomous Selection</strong>:
                         ユーザーが「昨日の〇〇社の株価を調べてグラフにして」と言うだけで、自動的に「Web検索」→「データ取得」→「Pythonで描画」→「画像生成」というパイプラインを構築・実行します。</li>
-                    <li><strong>GLM-5 系（現行 GLM-5.1）</strong>:
-                        2026年春節に合わせて発表されたGLM-5系は既に出荷され、現行は GLM-5.1。744B パラメータ（40B アクティブ）の MoE で、クリエイティブな執筆や、より長期的なタスク計画において高い性能を発揮する。</li>
+                    <li><strong>GLM-5.2（2026-06-16 MIT 公開・現行フラッグシップ）</strong>: 753B MoE（40B active）、1M コンテキスト（最大出力 131K トークン）。IndexShare アーキテクチャにより 1M コンテキスト時の推論 FLOPs を 2.9 倍削減。SWE-Bench Pro 62.1%・Terminal-Bench 2.1 で 81.0%。MIT ライセンスで HuggingFace / ModelScope に公開済み。API は $1.40 / $4.40（入力/出力 per MTok）。</li>
+                    <li><strong>GLM-5.1 Highspeed API（2026-05 追加）</strong>: 400 tokens/s の高速 API バリアント。主要 LLM プロバイダー中で最速クラスのスループット。リアルタイム性が要る用途向け。</li>
+                    <li><strong>GLM-5（2026-02 リリース）</strong>: 744B MoE（40B active）・Huawei Ascend チップで学習（28.5T トークン）。現行は 5.2 が上位互換。</li>
                 </ul>
             </article>
         </section>
@@ -341,6 +340,64 @@
             <p style="font-size:13px; opacity:0.75;">▶ 更新追跡: <a style="color:#9ab4f0;" href="../../research/glm-recent-updates.html">GLM / Zhipu AI 最新アップデート完全版</a>（Research トラッカー）</p>
         </section>
 
+        <!-- ===== GLM-5.2 詳細 ===== -->
+        <section class="card" style="border-color:rgba(110,148,230,0.4);">
+            <h2>GLM-5.2 — 現行フラッグシップ（2026-06-16 MIT 公開）</h2>
+            <p>Z.ai（旧 Zhipu AI）が 2026年6月13日に Coding Plan 加入者向けに先行リリースし、同月16日に MIT ライセンスのオープンウェイトを公開した現行世代。<strong>オープンウェイトモデルとして初めて GPT-5.5 を長期コーディングベンチで超えた</strong>と VentureBeat 等で報じられた。</p>
+            <div style="display:flex; gap:20px; flex-wrap:wrap; margin-top:12px;">
+                <div style="flex:1; min-width:260px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:16px;">
+                    <div style="font-size:0.78rem; font-weight:700; color:#9ab4f0; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:6px;">アーキテクチャ</div>
+                    <ul style="font-size:0.88rem; color:#cbd5e1; margin:0; padding-left:18px;">
+                        <li>753B MoE（40B active per token）</li>
+                        <li>コンテキスト: <strong>1M トークン</strong>（最大出力 131K）</li>
+                        <li><strong>IndexShare</strong>: 4 sparse attention 層ごとに同一 indexer を共有 → 1M ctx 時の推論 FLOPs を 2.9× 削減</li>
+                        <li>Thinking effort: <strong>Low / High</strong> 2段階切替</li>
+                    </ul>
+                </div>
+                <div style="flex:1; min-width:260px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:16px;">
+                    <div style="font-size:0.78rem; font-weight:700; color:#9ab4f0; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:6px;">ベンチマーク（2026-06）</div>
+                    <ul style="font-size:0.88rem; color:#cbd5e1; margin:0; padding-left:18px;">
+                        <li>SWE-Bench Pro: <strong>62.1%</strong>（GLM-5.1: 58.4%、GPT-5.5: 58.6%）</li>
+                        <li>Terminal-Bench 2.1: <strong>81.0%</strong></li>
+                        <li>FrontierSWE / PostTrainBench / SWE-Marathon: OW 首位</li>
+                        <li>Intelligence Index (Z.ai): <strong>51</strong>（OW 最高）</li>
+                    </ul>
+                </div>
+                <div style="flex:1; min-width:260px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:16px;">
+                    <div style="font-size:0.78rem; font-weight:700; color:#9ab4f0; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:6px;">API 価格 / 入手先</div>
+                    <ul style="font-size:0.88rem; color:#cbd5e1; margin:0; padding-left:18px;">
+                        <li>入力: <strong>$1.40 / MTok</strong>、出力: $4.40 / MTok</li>
+                        <li>キャッシュ入力: <strong>$0.26 / MTok</strong></li>
+                        <li>ライセンス: <strong>MIT</strong></li>
+                        <li>HuggingFace: <code>zai-org/GLM-5.2</code></li>
+                        <li>OpenRouter: <code>z-ai/glm-5.2</code></li>
+                    </ul>
+                </div>
+            </div>
+            <p style="margin-top:14px; font-size:0.85rem; color:#7f92ac;">出典: <a href="https://venturebeat.com/technology/z-ais-open-weights-glm-5-2-beats-gpt-5-5-on-multiple-long-horizon-coding-benchmarks-for-1-6th-the-cost" target="_blank">VentureBeat — Z.ai GLM-5.2 beats GPT-5.5</a> / <a href="https://simonwillison.net/2026/Jun/17/glm-52/" target="_blank">Simon Willison（2026-06-17）</a>（2026-06）</p>
+        </section>
+
+        <!-- ===== AutoGLM 2026 ===== -->
+        <section class="card">
+            <h2>AutoGLM — エージェント機能の進化（2026）</h2>
+            <p>Z.ai のエージェントラインは「思考 × 実行の同時並行」へ進化。ブラウザ・コード実行・モバイル操作を自走する製品として展開中。</p>
+            <div style="display:flex; gap:24px; flex-wrap:wrap; margin-top:8px;">
+                <div style="flex:1; min-width:280px;">
+                    <h3>AutoGLM-Thinking</h3>
+                    <p>業界初の<strong>「深度調査 × 実行」同時並行エージェント</strong>。調査結果をリアルタイムで実行に反映しながら、Webページのブラウズ・データ収集・レポート生成を1タスクで完結。Zhongguancun Forum 2025 で発表・段階的公開中。</p>
+                </div>
+                <div style="flex:1; min-width:280px;">
+                    <h3>AutoGLM-Phone-Multilingual</h3>
+                    <p>多言語対応のモバイル自動化フレームワーク。ADB 経由でスクリーン内容を理解して実際の操作を実行。<strong>50+ 主要アプリ</strong>（中国国内外）でエンドツーエンドのスマホ制御が可能。</p>
+                </div>
+                <div style="flex:1; min-width:280px;">
+                    <h3>AutoGLM Toolkit（API）</h3>
+                    <p>6 機能: Browser Automation・Deep Research・Web Search・Image Generation・Image Search・Web Page Reader。GLM API と同一認証で呼び出し可能。OpenClaw スキルとの統合に直結する。</p>
+                </div>
+            </div>
+            <p style="margin-top:10px; font-size:0.85rem; color:#7f92ac;">出典: <a href="https://www.aibase.com/news/13580" target="_blank">AIBase — AutoGLM 54ステップ対応</a> / <a href="https://www.autoglm.dev/" target="_blank">autoglm.dev 公式</a>（2026-06）</p>
+        </section>
+
         <!-- ===== 実践深掘り: コーディング/エージェントが主戦場 ===== -->
         <section class="card" style="border-color:rgba(110,148,230,0.35);">
             <h2>Deep Dive ①: なぜ「コーディング/エージェント」が主戦場なのか</h2>
@@ -350,10 +407,10 @@
                     <th style="padding:6px 8px;">指標（canon）</th><th style="padding:6px 8px;">数値</th><th style="padding:6px 8px;">意味</th>
                 </tr></thead>
                 <tbody>
-                    <tr><td style="padding:6px 8px;"><strong>Code Arena Elo</strong></td><td style="padding:6px 8px;">約 1,530（オープンウェイト3位）</td><td style="padding:6px 8px;">人間がコードの実用性・読みやすさを ELO 方式で判定。上位に食い込む。</td></tr>
-                    <tr><td style="padding:6px 8px;"><strong>規模</strong></td><td style="padding:6px 8px;">744B MoE（40B active）</td><td style="padding:6px 8px;">GLM-4.5 の 355B から約2倍に拡大した MoE。アクティブは 40B でサイズの割に推論コストを抑えやすい。</td></tr>
-                    <tr><td style="padding:6px 8px;"><strong>性能水準（canon 2026-05-11）</strong></td><td style="padding:6px 8px;">中国系トップ群と収束</td><td style="padding:6px 8px;">GLM-5.1・Kimi K2.6・DeepSeek V4 等がエージェント型タスクでほぼ同等の上限に。</td></tr>
-                    <tr><td style="padding:6px 8px;"><strong>推論コスト（canon）</strong></td><td style="padding:6px 8px;">Claude Opus 系の 1/3 以下</td><td style="padding:6px 8px;">同水準の性能を大幅に安く回せる、というコスト競争力が要点。</td></tr>
+                    <tr><td style="padding:6px 8px;"><strong>SWE-Bench Pro</strong></td><td style="padding:6px 8px;">62.1%（OW 首位）</td><td style="padding:6px 8px;">GPT-5.5（58.6%）・GLM-5.1（58.4%）を超え、オープンウェイト中トップ。</td></tr>
+                    <tr><td style="padding:6px 8px;"><strong>Terminal-Bench 2.1</strong></td><td style="padding:6px 8px;">81.0%</td><td style="padding:6px 8px;">長期ターミナル・コーディングタスクで OW 首位。</td></tr>
+                    <tr><td style="padding:6px 8px;"><strong>規模</strong></td><td style="padding:6px 8px;">753B MoE（40B active）</td><td style="padding:6px 8px;">IndexShare で 1M ctx 時の FLOPs を 2.9× 削減。同性能を安く回せる。</td></tr>
+                    <tr><td style="padding:6px 8px;"><strong>推論コスト</strong></td><td style="padding:6px 8px;">$1.40 / MTok（入力）</td><td style="padding:6px 8px;">GPT-5.5（$7.50）の約 1/5、Claude Fable 5（$10）の 1/7。同水準の OW 性能を大幅安価に。</td></tr>
                 </tbody>
             </table>
             <p style="margin-top:10px;"><strong>含意</strong>: 「最高知能を1回」ではなく「<strong>十分な知能を安く大量に</strong>」が効く工程 — つまりコード生成・ツール連携・自動化の量産下層 — が GLM の主戦場です。</p>
@@ -383,7 +440,7 @@
                 <li><strong>ツール連携で自走する</strong>: "All Tools" により、スキルの中で複数ツールを自分で呼び分けて完遂。人間の逐次指示を減らし、工場を止めずに回す。</li>
                 <li><strong>Connector 的な接着</strong>: 外部システム・API を動かすオートメーションの接着剤。設計・相談・品質判断を担うフロンティア層と、量産・接着を担う GLM 層の<strong>二層構造</strong>で組む。</li>
             </ul>
-            <p style="border-left:3px solid #6e94e6;padding-left:14px;color:#bcc0da;font-style:italic;">役割整理: GLM-5.1 =「自動化エンジン本体・量産と接着の作業馬」。質の最終判断は Claude / GPT-5.5、構成・長尺は Gemini、安く回す土台はローカル Qwen が担う多軸構成の中で、GLM は<strong>"自走する接着レーン"</strong>を受け持つ。</p>
+            <p style="border-left:3px solid #6e94e6;padding-left:14px;color:#bcc0da;font-style:italic;">役割整理: GLM-5.2 =「自動化エンジン本体・量産と接着の作業馬」。質の最終判断は Claude Fable 5 / GPT-5.5、構成・長尺は Gemini、安く回す土台はローカル Qwen が担う多軸構成の中で、GLM は<strong>"自走する接着レーン"</strong>を受け持つ。GLM-5.2 は OW モデル中の長期コーディング首位（SWE-Bench Pro 62.1%）でありながら、Claude Fable 5 の 1/7 のコストで回せる点が本ハブ的な最大の価値。</p>
         </section>
 
         <section class="card">
