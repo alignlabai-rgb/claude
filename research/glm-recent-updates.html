@@ -175,8 +175,8 @@
       </p>
       <div class="summary">
         <p>
-          現行は <strong>GLM-5.1</strong>（GLM-5 ベース・744B パラメータ MoE / 40B アクティブ）。軸は明確で、
-          <strong>① コーディング/エージェントが強い</strong>、<strong>② Code Arena 上位（Elo ~1,530・3位水準）</strong>、
+          現行は <strong>GLM-5.2</strong>（753B パラメータ MoE / 40B アクティブ、1M context）。軸は明確で、
+          <strong>① 長期コーディング/エージェントが強い</strong>、<strong>② SWE-Bench Pro 62.1%</strong>、
           <strong>③ オープンウェイト＋低コスト</strong>、そして本ハブにとって最大の意味である
           <strong>④「自動コンテンツ工場を安く回す作業馬」</strong>という位置づけです。
         </p>
@@ -187,7 +187,7 @@
           OpenClaw 志向の量産パイプラインにそのまま噛み合います。
         </p>
       </div>
-      <p class="last-update">最終更新: 2026-06-18（GLM-5.2 MIT 公開・AutoGLM-Thinking / Phone-Multilingual 追記）</p>
+      <p class="last-update">最終更新: 2026-06-20（GLM-5.2 公式ドキュメント確認・5.1 Coding Plan 情報を統合）</p>
     </section>
 
     <section class="grid-4">
@@ -276,8 +276,8 @@
       <div class="grid-2">
         <div class="subpanel">
           <span class="tag tag-model">Model</span>
-          <h3>GLM-5.1（現行）</h3>
-          <p>GLM-5 系は 2026年春節に合わせて発表・出荷され、現行は GLM-5.1。GLM-5 は 744B パラメータ（40B アクティブ）の MoE で GLM-4.5 の 355B から約2倍に拡大、長期的なタスク計画・クリエイティブ執筆でも性能を発揮する。</p>
+          <h3>GLM-5.1（継続利用可能な前世代）</h3>
+          <p><strong>GLM-5.1</strong> は公式ドキュメント上で <strong>200K コンテキスト・最大 128K 出力</strong>、thinking mode / function call / MCP / context caching / structured output に対応。現行最上位は5.2ですが、Coding Planや既存連携で引き続き有効です。</p>
         </div>
         <div class="subpanel">
           <span class="tag tag-code">All Tools</span>
@@ -346,6 +346,20 @@
             <strong>GLM-5.1</strong> が公開（「Towards Long-Horizon Tasks」）。単一プロンプトから<strong>最大 8 時間</strong>の自律実行が可能なエンジニアリングインテリジェンスを実現。<strong>Claude Opus 4.6 と同等水準</strong>と評価される能力アライメント。GLM-5（744B MoE / 40B active）ベースの強化版。
           </p>
           <p class="small">Source: <a href="https://z.ai/blog/glm-5.1" target="_blank">z.ai/blog/glm-5.1（公式）</a>（2026-04-07）</p>
+        </article>
+
+        <article class="item">
+          <div class="date">2026-06 月次確認</div>
+          <h3>GLM Coding Plan — GLM-5.1 / 5-Turbo / 4.7 / 4.5-Air を正式サポート <span class="tag tag-code">Dev Plan</span></h3>
+          <p>
+            Z.AI の Coding Plan FAQ で、対応モデルが <strong>GLM-5.1、GLM-5-Turbo、GLM-4.7、GLM-4.5-Air</strong> と明記された。
+            Claude Code 互換の環境変数では、Opus / Sonnet / Haiku 相当を既定で <strong>GLM-4.7 / GLM-4.7 / GLM-4.5-Air</strong> に割り当てる構成。
+            GLM-5.1 と GLM-5-Turbo は高難度タスク向けで、通常は GLM-4.7 を使い、複雑な推論・大規模エンジニアリングで 5.1 に切り替える運用が推奨されている。
+          </p>
+          <p>
+            MCP 系では Vision Understanding / Web Search / Web Reader が全プラン対応。月間上限は Lite 100、Pro 1,000、Max 4,000 回で、5時間 resource pool と連動する。
+          </p>
+          <p class="small">Source: <a href="https://docs.z.ai/devpack/faq" target="_blank">Z.AI DevPack FAQ</a>（2026-06 月次確認）</p>
         </article>
 
         <article class="item">
