@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Codex 完全オペレーションマニュアル</title><link rel="stylesheet" href="../operation-assets/styles.css"></head>
+<body class="codex" data-manual="codex">
+<div class="layout">
+<aside class="sidebar">
+  <a class="back-link" href="../index.html">← Knowledge Hub</a>
+  <div class="brand"><div class="brand-mark">CX</div><div><strong>OpenAI Codex</strong><span>Operation Manual</span></div></div>
+  <input class="search" type="search" placeholder="マニュアル内を検索">
+  <nav class="nav"><button class="active" data-view="overview">01 サーフェス選択</button><button data-view="start">02 セッション運転</button><button data-view="permissions">03 権限と安全性</button><button data-view="customize">04 AGENTS・Skills・MCP</button><button data-view="workflows">05 実践ワークフロー</button><button data-view="git">06 Git・Worktree</button><button data-view="recovery">07 復旧・逆引き</button></nav>
+  <div class="progress-box"><div class="progress-meta"><span>習熟チェック</span><span class="progress-value">0%</span></div><div class="progress-track"><div class="progress-fill"></div></div></div>
+</aside>
+<main class="main">
+<header class="hero"><div class="eyebrow">Plan, execute, verify</div><h1>Codex<br>完全オペレーション</h1><p class="lead">Codex CLI、IDE、App、Cloudを使い分け、ローカル作業、並列探索、レビュー、GitHub連携を安全に完了させる実務マニュアル。公式Codex Manualの現行サーフェス、承認、サンドボックス、AGENTS.md、Skills、MCP、Subagentsを基準にしています。</p><div class="hero-meta"><span class="pill">最終確認 2026-06-20</span><span class="pill">CLI / App / IDE / Cloud</span><span class="pill">公式Codex Manual準拠</span></div></header>
+<div class="content">
+<section class="view active" id="overview">
+  <div class="section-head"><div><h2>サーフェス選択</h2><p>作業場所を最初に間違えない</p></div></div>
+  <table><thead><tr><th>サーフェス</th><th>向く仕事</th><th>注意点</th></tr></thead><tbody>
+    <tr><td>CLI</td><td>ローカルリポジトリ、コマンド中心、素早い反復</td><td>現在ディレクトリと権限を必ず確認</td></tr>
+    <tr><td>IDE Extension</td><td>編集中コードの文脈、選択範囲、短い修正</td><td>大規模変更はレビュー面を別に確保</td></tr>
+    <tr><td>Codex App</td><td>複数スレッド、計画、差分レビュー、Worktree</td><td>Local / Worktree / Cloudの対象を確認</td></tr>
+    <tr><td>Cloud</td><td>隔離環境、並列・非同期タスク、PR準備</td><td>環境変数、依存、ネットワーク差を管理</td></tr>
+  </tbody></table>
+  <div class="flow"><div class="flow-step"><b>1. Choose</b>Surface/target</div><div class="flow-step"><b>2. Context</b>AGENTSと差分</div><div class="flow-step"><b>3. Plan</b>難題は計画</div><div class="flow-step"><b>4. Execute</b>権限内で実行</div><div class="flow-step"><b>5. Review</b>検証して公開</div></div>
+  <div class="grid three"><article class="card"><h3>Prompt</h3><p>今回だけの目的、制約、完了条件。</p></article><article class="card"><h3>AGENTS.md</h3><p>リポジトリに持続する規約、コマンド、レビュー基準。</p></article><article class="card"><h3>Skill / Plugin</h3><p>再利用ワークフローと配布単位。繰り返し作業を標準化。</p></article></div>
+  <div class="card"><h3>初期セットアップ</h3><div class="checklist">
+    <label class="check"><input type="checkbox"><span><code>codex --version</code> とログイン状態を確認した</span></label>
+    <label class="check"><input type="checkbox"><span>信頼できるリポジトリでのみ書き込み権限を使う</span></label>
+    <label class="check"><input type="checkbox"><span><code>/init</code> を土台にAGENTS.mdを実態へ合わせた</span></label>
+    <label class="check"><input type="checkbox"><span>テスト、lint、build、レビュー手順をAGENTS.mdへ記録した</span></label>
+  </div></div>
+</section>
+
+<section class="view" id="start">
+  <div class="section-head"><div><h2>セッション運転</h2><p>開始、途中、終了の標準手順</p></div></div>
+  <div class="grid"><article class="card"><span class="label">Start</span><h3>開始前</h3><ol><li><code>git status --short --branch</code></li><li><code>/status</code>でモデル・権限・容量確認</li><li>AGENTS.mdと対象ドキュメントを読む</li><li>目的、非対象、完了条件を宣言</li></ol></article><article class="card"><span class="label">During</span><h3>作業中</h3><ol><li>探索結果を短く共有</li><li>編集前に変更方針を説明</li><li>30秒以上なら進捗更新</li><li>難題はPlan、長期はGoal</li></ol></article><article class="card"><span class="label">Finish</span><h3>終了前</h3><ol><li>テストとリンク確認</li><li><code>/diff</code>またはGit差分</li><li><code>/review</code>で重大リスク確認</li><li>コミット・push状態を報告</li></ol></article><article class="card"><span class="label">Long run</span><h3>長い作業</h3><p><code>/compact</code>で会話を圧縮し、<code>/goal</code>で目的を維持。中断後は<code>/resume</code>、分岐検証は<code>codex fork</code>を使います。</p></article></div>
+  <pre>codex
+/status
+/plan
+/goal set "目的"
+/diff
+/review
+/compact
+/resume</pre>
+  <div class="callout"><strong>依頼の型:</strong> 「調査 → 計画 → 実装 → 検証 → レビュー → 状態報告」を明示すると、途中で説明だけして止まることを防げます。</div>
+</section>
+
+<section class="view" id="permissions">
+  <div class="section-head"><div><h2>権限と安全性</h2><p>SandboxとApprovalを別々に理解する</p></div></div>
+  <div class="grid"><article class="card"><h3>Sandbox</h3><p>技術的にどこまで読める・書ける・通信できるか。<code>read-only</code>、<code>workspace-write</code>、<code>danger-full-access</code>があります。</p></article><article class="card"><h3>Approval policy</h3><p>どの操作で人に確認するか。通常の対話は<code>on-request</code>、安定した非対話処理は制約付きの<code>never</code>を検討します。</p></article></div>
+  <table><thead><tr><th>用途</th><th>推奨</th><th>理由</th></tr></thead><tbody>
+    <tr><td>調査・計画</td><td><code>read-only</code></td><td>変更を発生させない</td></tr>
+    <tr><td>通常開発</td><td><code>workspace-write + on-request</code></td><td>作業領域内は自動、外部は確認</td></tr>
+    <tr><td>CI・自動処理</td><td>限定workspace + <code>never</code></td><td>人待ちを避けつつ境界を維持</td></tr>
+    <tr><td>Full access</td><td>外部隔離環境のみ</td><td>ホスト上での常用は危険</td></tr>
+  </tbody></table>
+  <pre>codex --sandbox workspace-write --ask-for-approval on-request
+codex --sandbox read-only --ask-for-approval on-request</pre>
+  <div class="callout bad"><strong><code>--yolo</code>:</strong> 承認とサンドボックスを迂回します。外部で強固に隔離した環境以外では使いません。</div>
+  <div class="card"><h3>安全チェック</h3><div class="checklist"><label class="check"><input type="checkbox"><span>ネットワークアクセスの必要性を説明できる</span></label><label class="check"><input type="checkbox"><span>削除、移動、強制pushの対象を絶対パスで確認した</span></label><label class="check"><input type="checkbox"><span>認証情報をログ・差分・プロンプトへ含めていない</span></label><label class="check"><input type="checkbox"><span>MCP/Appの副作用付き操作を人が確認する</span></label></div></div>
+</section>
+
+<section class="view" id="customize">
+  <div class="section-head"><div><h2>AGENTS・Skills・MCP</h2><p>繰り返し説明を運用資産へ変える</p></div></div>
+  <div class="grid three"><article class="card"><span class="label">Guidance</span><h3>AGENTS.md</h3><p>近い階層のファイルが優先。コマンド、設計境界、検証、禁止事項を短く具体的に書きます。</p></article><article class="card"><span class="label">Workflow</span><h3>Skills</h3><p><code>SKILL.md</code>に再利用手順を格納。明示呼び出しとdescription一致による自動選択に対応します。</p></article><article class="card"><span class="label">Live data</span><h3>MCP / Apps</h3><p>GitHub、Calendar、Docsなどの生データと操作を接続。副作用・認証・管理ポリシーを分離します。</p></article></div>
+  <pre># AGENTS.md
+## Commands
+- Test: npm test
+- Lint: npm run lint
+- Build: npm run build
+
+## Rules
+- Existing patterns first
+- Never overwrite user changes
+- Run link checker after HTML edits</pre>
+  <pre>---
+name: release-check
+description: Verify a release candidate, changelog, tests, and rollback notes.
+---
+1. Inspect the diff.
+2. Run required checks.
+3. Report blockers before publishing.</pre>
+  <table><thead><tr><th>置き場所</th><th>スコープ</th></tr></thead><tbody><tr><td><code>$REPO_ROOT/.agents/skills</code></td><td>リポジトリ共有</td></tr><tr><td><code>$HOME/.agents/skills</code></td><td>個人共通</td></tr><tr><td><code>~/.codex/config.toml</code></td><td>個人設定・MCP・既定権限</td></tr></tbody></table>
+</section>
+
+<section class="view" id="workflows">
+  <div class="section-head"><div><h2>実践ワークフロー</h2><p>Codexを最後まで動かす</p></div></div>
+  <div class="grid"><article class="card"><h3>機能実装</h3><ol><li>コードベースを探索</li><li>実装計画と影響範囲</li><li>既存パターンで編集</li><li>テスト追加・実行</li><li>差分レビュー</li></ol></article><article class="card"><h3>コードレビュー</h3><ol><li>ベースブランチ確認</li><li><code>/review</code></li><li>重大度順に所見</li><li>テストギャップ確認</li><li>必要な修正だけ適用</li></ol></article><article class="card"><h3>並列探索</h3><p>Subagentsは読み取り中心の探索、テストログ、セキュリティ確認へ使います。同時編集は競合が増えるため役割と所有ファイルを分離します。</p></article><article class="card"><h3>Automation</h3><p>安定した手順だけを自動化。専用Worktree、明確な終了条件、失敗時の通知、アーカイブ運用を用意します。</p></article></div>
+  <pre>このブランチを並列レビューしてください。
+- Agent 1: 実害のあるバグ
+- Agent 2: セキュリティと権限
+- Agent 3: テスト不足
+全員を待ち、重複を統合し、重大度順にファイル参照付きで報告してください。</pre>
+</section>
+
+<section class="view" id="git">
+  <div class="section-head"><div><h2>Git・Worktree</h2><p>ユーザー変更を守りながら公開する</p></div></div>
+  <div class="flow"><div class="flow-step"><b>Status</b>dirty確認</div><div class="flow-step"><b>Fetch</b>リモート確認</div><div class="flow-step"><b>Branch</b>作業を隔離</div><div class="flow-step"><b>Commit</b>意図的にstage</div><div class="flow-step"><b>Push</b>追跡設定</div></div>
+  <pre>git status --short --branch
+git fetch origin --prune
+git diff
+git add path/to/intended-file
+git commit -m "Concise change summary"
+git push -u origin HEAD</pre>
+  <div class="grid"><article class="card"><h3>Worktreeを使う</h3><p>長い変更、複数案、並列作業を本体から隔離できます。無視ファイルは自動で引き継がれないため、必要なら<code>.worktreeinclude</code>やセットアップスクリプトを使います。</p></article><article class="card"><h3>既存変更を守る</h3><p>他人の変更を勝手にrestoreしません。同じファイルなら内容を読んで共存させ、無関係ならstage対象から外します。</p></article></div>
+  <div class="callout warn"><strong>競合時:</strong> まずバックアップ枝を作り、base/ours/theirsの意味を確認します。リベース中の<code>ours</code>は更新先、<code>theirs</code>は再適用中コミットになる点に注意します。</div>
+</section>
+
+<section class="view" id="recovery">
+  <div class="section-head"><div><h2>復旧・逆引き</h2><p>止まった場所から安全に戻る</p></div></div>
+  <div class="quick-grid"><div class="quick"><b>承認待ちで止まる</b><span><code>/status</code>と画面のapprovalを確認。必要性を限定して承認。</span></div><div class="quick"><b>文脈が長すぎる</b><span><code>/compact</code>、または新スレッドへ目的・差分・次手だけ渡す。</span></div><div class="quick"><b>前の作業へ戻る</b><span><code>/resume</code>または<code>codex resume</code>。</span></div><div class="quick"><b>AppとCLIで機能差</b><span>対象サーフェスの公式章とバージョンを確認。</span></div><div class="quick"><b>Worktreeで動かない</b><span>ignoredな依存・環境ファイルとセットアップを確認。</span></div><div class="quick"><b>MCPが見えない</b><span><code>/mcp</code>、設定、認証、再起動、管理ポリシーの順で確認。</span></div><div class="quick"><b>編集内容をレビュー</b><span><code>/diff</code>後に<code>/review</code>。重大所見を先に。</span></div><div class="quick"><b>公開したい</b><span>scope確認、テスト、commit、fetch、push、PRの順。</span></div></div>
+  <div class="sources">公式: <a href="https://developers.openai.com/codex/">OpenAI Codex Docs</a> / <a href="https://developers.openai.com/codex/codex-manual.md">Codex Manual</a>　ハブ内: <a href="../workbench/knowledge/openai-codex.html">Codex深掘り</a></div>
+</section>
+</div></main></div><button class="mobile-toggle" type="button">Menu</button><script src="../operation-assets/script.js"></script></body></html>

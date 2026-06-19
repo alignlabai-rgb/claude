@@ -1,0 +1,106 @@
+<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Obsidian 完全オペレーションマニュアル</title><link rel="stylesheet" href="../operation-assets/styles.css"></head>
+<body class="obsidian" data-manual="obsidian"><div class="layout">
+<aside class="sidebar"><a class="back-link" href="../index.html">← Knowledge Hub</a><div class="brand"><div class="brand-mark">OB</div><div><strong>Obsidian</strong><span>Operation Manual</span></div></div><input class="search" type="search" placeholder="マニュアル内を検索"><nav class="nav"><button class="active" data-view="overview">01 Vault設計</button><button data-view="daily">02 日次・週次運用</button><button data-view="notes">03 ノート標準</button><button data-view="views">04 Properties・Bases</button><button data-view="sync">05 Sync・Git</button><button data-view="agents">06 AI・MCP連携</button><button data-view="recovery">07 復旧・逆引き</button></nav><div class="progress-box"><div class="progress-meta"><span>習熟チェック</span><span class="progress-value">0%</span></div><div class="progress-track"><div class="progress-fill"></div></div></div></aside>
+<main class="main"><header class="hero"><div class="eyebrow">Local first, durable knowledge</div><h1>Obsidian<br>完全オペレーション</h1><p class="lead">Obsidianを「ノートアプリ」ではなく、人とAIが長期運用するローカルファーストの知識基盤として扱うためのマニュアル。Vault、Properties、Bases、Templates、Canvas、Sync、Git、MCPを一つの運用体系にします。</p><div class="hero-meta"><span class="pill">最終確認 2026-06-20</span><span class="pill">Desktop / Mobile / Vault</span><span class="pill">Obsidian公式Help準拠</span></div></header><div class="content">
+<section class="view active" id="overview"><div class="section-head"><div><h2>Vault設計</h2><p>フォルダより先に情報の寿命を決める</p></div></div>
+<div class="grid three"><article class="card"><h3>Capture</h3><p>未整理の入力。Inboxへ集め、永久保存場所にしません。</p></article><article class="card"><h3>Active</h3><p>進行中プロジェクト、会議、調査。期限と担当を持たせます。</p></article><article class="card"><h3>Reference</h3><p>再利用する知識。出典、更新日、関連リンクを必須にします。</p></article></div>
+<pre>Vault/
+├─ 00_Inbox/
+├─ 10_Projects/
+├─ 20_Areas/
+├─ 30_Resources/
+├─ 40_Daily/
+├─ 80_Templates/
+├─ 90_Attachments/
+└─ 99_Archive/</pre>
+<div class="callout"><strong>原則:</strong> フォルダは保管責任、リンクは意味の関係、Propertiesは検索と集計に使います。同じ役割を三重に持たせません。</div>
+<div class="card"><h3>初期チェック</h3><div class="checklist"><label class="check"><input type="checkbox"><span>Vaultの保存場所とバックアップ責任を決めた</span></label><label class="check"><input type="checkbox"><span>InboxとArchiveを作り、未整理と終了物を分離した</span></label><label class="check"><input type="checkbox"><span>添付ファイルの保存先を固定した</span></label><label class="check"><input type="checkbox"><span>Propertiesの名前・型・日付形式を決めた</span></label></div></div></section>
+
+<section class="view" id="daily"><div class="section-head"><div><h2>日次・週次運用</h2><p>書くことより、閉じることを標準化する</p></div></div>
+<div class="flow"><div class="flow-step"><b>Capture</b>Inboxへ入力</div><div class="flow-step"><b>Clarify</b>意味と次行動</div><div class="flow-step"><b>Connect</b>リンクと出典</div><div class="flow-step"><b>Review</b>期限と状態</div><div class="flow-step"><b>Archive</b>終了物を移動</div></div>
+<div class="grid"><article class="card"><span class="label">Daily 10 min</span><h3>毎日</h3><ol><li>Daily Noteを開く</li><li>Inboxを5件以内処理</li><li>今日の3タスクを決める</li><li>会議・判断をProjectへリンク</li><li>終了時に未完了を繰越</li></ol></article><article class="card"><span class="label">Weekly 30 min</span><h3>毎週</h3><ol><li>Active Projectを一覧</li><li>期限切れ・孤立ノート確認</li><li>重複ノートを統合</li><li>学びをReferenceへ昇格</li><li>Sync/Gitの状態確認</li></ol></article></div>
+<pre>## 今日の焦点
+- [ ] 最重要1
+- [ ] 最重要2
+- [ ] 最重要3
+
+## Capture
+
+## Decisions
+- 決定:
+- 理由:
+- 関連: [[Project Name]]
+
+## End of day
+- 完了:
+- 繰越:
+- 明日の最初:</pre></section>
+
+<section class="view" id="notes"><div class="section-head"><div><h2>ノート標準</h2><p>人にもAIにも読める最小構造</p></div></div>
+<pre>---
+type: project
+status: active
+owner: your-name
+created: 2026-06-20
+updated: 2026-06-20
+review: 2026-06-27
+source_url:
+tags: [project]
+---
+
+# Literal title
+
+## Outcome
+完了状態を一文で。
+
+## Current state
+事実と未確定を分ける。
+
+## Next actions
+- [ ] 動詞から始める
+
+## Decisions
+
+## Sources</pre>
+<table><thead><tr><th>要素</th><th>ルール</th><th>理由</th></tr></thead><tbody><tr><td>Title</td><td>検索語として自然な名前</td><td>リンク候補と検索精度</td></tr><tr><td>Properties</td><td>型を固定、表記揺れ禁止</td><td>Bases・Dataview集計</td></tr><tr><td>Source</td><td>URLと取得日</td><td>事実確認と更新</td></tr><tr><td>Decision</td><td>結論・理由・日付</td><td>後から判断を再現</td></tr><tr><td>Tasks</td><td>具体的な次行動</td><td>ノートを実行へ接続</td></tr></tbody></table>
+<div class="callout warn"><strong>避ける:</strong> タグをフォルダ代わりに増殖させる、Propertiesの同義語を作る、画像だけで重要情報を残す、出典なしのAI要約を事実として保存する。</div></section>
+
+<section class="view" id="views"><div class="section-head"><div><h2>Properties・Bases</h2><p>ノートをDBとして運転する</p></div></div>
+<div class="grid"><article class="card"><h3>Properties</h3><p>text、list、number、checkbox、date、datetimeなどの型を揃えます。名前変更はVault全体への影響を確認して実施します。</p></article><article class="card"><h3>Bases</h3><p>MarkdownファイルのPropertiesを表・カード・一覧で操作する公式のDBビュー。元データは通常のローカルファイルです。</p></article><article class="card"><h3>Canvas</h3><p>関係の探索、構想、システム図に使います。正式な決定やタスクはノート側へ戻します。</p></article><article class="card"><h3>Search</h3><p><code>path:</code>、<code>tag:</code>、<code>property:</code>を組み合わせ、保存済み検索を日常レビューへ組み込みます。</p></article></div>
+<h3>推奨ビュー</h3><table><thead><tr><th>View</th><th>Filter</th><th>Sort</th></tr></thead><tbody><tr><td>Active Projects</td><td>type=project, status=active</td><td>review昇順</td></tr><tr><td>Needs Review</td><td>review&lt;today</td><td>updated昇順</td></tr><tr><td>Unprocessed Inbox</td><td>path=00_Inbox</td><td>created昇順</td></tr><tr><td>Source Audit</td><td>source_url is empty</td><td>updated昇順</td></tr></tbody></table>
+<div class="card"><h3>ビュー運用チェック</h3><div class="checklist"><label class="check"><input type="checkbox"><span>Active Projectsが現実の案件数と一致する</span></label><label class="check"><input type="checkbox"><span>期限切れレビューを週次で処理する</span></label><label class="check"><input type="checkbox"><span>ビュー専用の表記揺れがない</span></label></div></div></section>
+
+<section class="view" id="sync"><div class="section-head"><div><h2>Sync・Git</h2><p>同期とバックアップを混同しない</p></div></div>
+<table><thead><tr><th>方式</th><th>強み</th><th>注意</th></tr></thead><tbody><tr><td>Obsidian Sync</td><td>公式、履歴、暗号化、端末間運用</td><td>同期はバックアップ戦略の一部</td></tr><tr><td>Git</td><td>差分、履歴、ブランチ、監査</td><td>モバイルと同時編集の競合</td></tr><tr><td>Cloud folder</td><td>OSと統合、簡単</td><td>オンデマンドファイル、競合コピー</td></tr></tbody></table>
+<pre># .gitignore example
+.obsidian/workspace*.json
+.trash/
+.DS_Store
+Thumbs.db
+
+# before editing on another device
+git status --short --branch
+git pull --rebase
+
+# after a coherent note batch
+git add .
+git commit -m "Update project notes"
+git push</pre>
+<div class="callout bad"><strong>禁止:</strong> 同じVaultを複数の同期サービスで同時管理しないこと。Obsidian Sync、OneDrive、iCloud、Git自動同期を重ねるほど競合原因が不明になります。</div>
+<div class="grid"><article class="card"><h3>競合ファイル</h3><p>両方を残して内容を比較します。更新日時だけで片方を消さず、段落単位で統合してから競合コピーを削除します。</p></article><article class="card"><h3>添付ファイル</h3><p>大容量バイナリはGit履歴を膨らませます。保管先、圧縮、Git LFS、外部ストレージを用途で選びます。</p></article></div></section>
+
+<section class="view" id="agents"><div class="section-head"><div><h2>AI・MCP連携</h2><p>Vaultをエージェントの記憶へ接続する</p></div></div>
+<div class="grid three"><article class="card"><h3>Read</h3><p>検索、リンク追跡、要約。最初は読み取り専用で接続します。</p></article><article class="card"><h3>Propose</h3><p>変更案をInboxまたはReview Queueへ書き、人が確認します。</p></article><article class="card"><h3>Write</h3><p>テンプレート、許可フォルダ、Properties型を制限して自動書き込みします。</p></article></div>
+<pre>agent-memory/
+├─ inbox/          # AI提案、人が確認
+├─ approved/       # 採用済みの事実
+├─ decisions/      # 結論・理由・日付
+├─ sessions/       # 作業要約
+└─ archive/        # 古い記憶</pre>
+<div class="callout"><strong>Human-in-the-loop:</strong> AIは出典付き提案を作り、人が承認後に正式ノートへ統合します。自動要約を直接「正本」にしません。</div>
+<div class="card"><h3>MCP導入チェック</h3><div class="checklist"><label class="check"><input type="checkbox"><span>読み取り専用から開始した</span></label><label class="check"><input type="checkbox"><span>許可するVaultとフォルダを限定した</span></label><label class="check"><input type="checkbox"><span>削除・移動・一括置換は人の承認を必須にした</span></label><label class="check"><input type="checkbox"><span>操作ログとロールバック手段を用意した</span></label></div></div></section>
+
+<section class="view" id="recovery"><div class="section-head"><div><h2>復旧・逆引き</h2><p>よくある詰まりを順番に切り分ける</p></div></div>
+<div class="quick-grid"><div class="quick"><b>Vaultが見えない</b><span>実パス、クラウドのダウンロード状態、権限を確認。</span></div><div class="quick"><b>リンクが重複する</b><span>同名ノートとcase、Unicode、別フォルダを確認。</span></div><div class="quick"><b>Propertiesが揃わない</b><span>型と同義キーをProperties UIで棚卸し。</span></div><div class="quick"><b>Basesに出ない</b><span>source folder、filter、property typeを確認。</span></div><div class="quick"><b>同期競合</b><span>全端末の編集を止め、双方を保存して段落単位で統合。</span></div><div class="quick"><b>プラグインで起動不良</b><span>Restricted mode、安全モード、直近追加から切り分け。</span></div><div class="quick"><b>AIがノートを壊す</b><span>書込停止、Git/Sync履歴で比較、許可範囲を縮小。</span></div><div class="quick"><b>Vaultが重い</b><span>巨大添付、プラグイン、Dataview/Bases queryを測定。</span></div></div>
+<div class="sources">公式: <a href="https://obsidian.md/help/vault">Vault</a> / <a href="https://obsidian.md/help/properties">Properties</a> / <a href="https://obsidian.md/help/bases">Bases</a> / <a href="https://obsidian.md/help/sync">Sync</a>　ハブ内: <a href="../workbench/knowledge/obsidian.html">Obsidian完全ガイド</a></div></section>
+</div></main></div><button class="mobile-toggle" type="button">Menu</button><script src="../operation-assets/script.js"></script></body></html>
