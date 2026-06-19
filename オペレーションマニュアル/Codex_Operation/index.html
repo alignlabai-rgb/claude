@@ -1,114 +1,411 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Codex 完全オペレーションマニュアル</title><link rel="stylesheet" href="../operation-assets/styles.css"></head>
-<body class="codex" data-manual="codex">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Codex Master Operations Manual</title>
+  <meta name="description" content="Codexを単に使う段階から、委任・検証・並列化・復旧を設計できる段階へ進む実践オペレーションマニュアル。">
+  <link rel="stylesheet" href="../operation-assets/styles.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="codex" data-manual="codex-master">
 <div class="layout">
-<aside class="sidebar">
-  <a class="back-link" href="../index.html">← オペレーションマニュアル</a>
-  <div class="brand"><div class="brand-mark">CX</div><div><strong>OpenAI Codex</strong><span>Operation Manual</span></div></div>
-  <input class="search" type="search" placeholder="マニュアル内を検索">
-  <nav class="nav"><button class="active" data-view="overview">01 サーフェス選択</button><button data-view="start">02 セッション運転</button><button data-view="permissions">03 権限と安全性</button><button data-view="customize">04 AGENTS・Skills・MCP</button><button data-view="workflows">05 実践ワークフロー</button><button data-view="git">06 Git・Worktree</button><button data-view="recovery">07 復旧・逆引き</button></nav>
-  <div class="progress-box"><div class="progress-meta"><span>習熟チェック</span><span class="progress-value">0%</span></div><div class="progress-track"><div class="progress-fill"></div></div></div>
-</aside>
-<main class="main">
-<header class="hero"><div class="eyebrow">Plan, execute, verify</div><h1>Codex<br>完全オペレーション</h1><p class="lead">Codex CLI、IDE、App、Cloudを使い分け、ローカル作業、並列探索、レビュー、GitHub連携を安全に完了させる実務マニュアル。公式Codex Manualの現行サーフェス、承認、サンドボックス、AGENTS.md、Skills、MCP、Subagentsを基準にしています。</p><div class="hero-meta"><span class="pill">最終確認 2026-06-20</span><span class="pill">CLI / App / IDE / Cloud</span><span class="pill">公式Codex Manual準拠</span></div></header>
-<div class="content">
-<section class="view active" id="overview">
-  <div class="section-head"><div><h2>サーフェス選択</h2><p>作業場所を最初に間違えない</p></div></div>
-  <table><thead><tr><th>サーフェス</th><th>向く仕事</th><th>注意点</th></tr></thead><tbody>
-    <tr><td>CLI</td><td>ローカルリポジトリ、コマンド中心、素早い反復</td><td>現在ディレクトリと権限を必ず確認</td></tr>
-    <tr><td>IDE Extension</td><td>編集中コードの文脈、選択範囲、短い修正</td><td>大規模変更はレビュー面を別に確保</td></tr>
-    <tr><td>Codex App</td><td>複数スレッド、計画、差分レビュー、Worktree</td><td>Local / Worktree / Cloudの対象を確認</td></tr>
-    <tr><td>Cloud</td><td>隔離環境、並列・非同期タスク、PR準備</td><td>環境変数、依存、ネットワーク差を管理</td></tr>
-  </tbody></table>
-  <div class="flow"><div class="flow-step"><b>1. Choose</b>Surface/target</div><div class="flow-step"><b>2. Context</b>AGENTSと差分</div><div class="flow-step"><b>3. Plan</b>難題は計画</div><div class="flow-step"><b>4. Execute</b>権限内で実行</div><div class="flow-step"><b>5. Review</b>検証して公開</div></div>
-  <div class="grid three"><article class="card"><h3>Prompt</h3><p>今回だけの目的、制約、完了条件。</p></article><article class="card"><h3>AGENTS.md</h3><p>リポジトリに持続する規約、コマンド、レビュー基準。</p></article><article class="card"><h3>Skill / Plugin</h3><p>再利用ワークフローと配布単位。繰り返し作業を標準化。</p></article></div>
-  <div class="card"><h3>初期セットアップ</h3><div class="checklist">
-    <label class="check"><input type="checkbox"><span><code>codex --version</code> とログイン状態を確認した</span></label>
-    <label class="check"><input type="checkbox"><span>信頼できるリポジトリでのみ書き込み権限を使う</span></label>
-    <label class="check"><input type="checkbox"><span><code>/init</code> を土台にAGENTS.mdを実態へ合わせた</span></label>
-    <label class="check"><input type="checkbox"><span>テスト、lint、build、レビュー手順をAGENTS.mdへ記録した</span></label>
-  </div></div>
-</section>
+  <aside class="sidebar">
+    <a class="back-link" href="../index.html">← オペレーションマニュアル</a>
+    <div class="brand"><div class="brand-mark">CX</div><div><strong>OpenAI Codex</strong><span>Master Operations Manual</span></div></div>
+    <input class="search" type="search" placeholder="章・概念・コマンドを検索" aria-label="マニュアル内を検索">
+    <nav class="nav" aria-label="章一覧">
+      <button class="active" data-view="doctrine">00 本質と責任分界</button>
+      <button data-view="surfaces">01 サーフェス選択</button>
+      <button data-view="prompting">02 委任仕様の設計</button>
+      <button data-view="loop">03 実行ループ</button>
+      <button data-view="security">04 権限・Sandbox</button>
+      <button data-view="context">05 コンテキスト設計</button>
+      <button data-view="parallel">06 並列化・Worktree</button>
+      <button data-view="quality">07 検証・レビュー</button>
+      <button data-view="delivery">08 Git・公開</button>
+      <button data-view="automation">09 自動化・拡張</button>
+      <button data-view="recovery">10 診断・復旧</button>
+      <button data-view="mastery">11 Mastery Lab</button>
+    </nav>
+    <div class="progress-box">
+      <div class="progress-meta"><span>Mastery progress</span><span class="progress-value">0%</span></div>
+      <div class="progress-track"><div class="progress-fill"></div></div>
+      <div class="rank-line">現在: <strong id="mastery-rank">Observer</strong></div>
+    </div>
+  </aside>
 
-<section class="view" id="start">
-  <div class="section-head"><div><h2>セッション運転</h2><p>開始、途中、終了の標準手順</p></div></div>
-  <div class="grid"><article class="card"><span class="label">Start</span><h3>開始前</h3><ol><li><code>git status --short --branch</code></li><li><code>/status</code>でモデル・権限・容量確認</li><li>AGENTS.mdと対象ドキュメントを読む</li><li>目的、非対象、完了条件を宣言</li></ol></article><article class="card"><span class="label">During</span><h3>作業中</h3><ol><li>探索結果を短く共有</li><li>編集前に変更方針を説明</li><li>30秒以上なら進捗更新</li><li>難題はPlan、長期はGoal</li></ol></article><article class="card"><span class="label">Finish</span><h3>終了前</h3><ol><li>テストとリンク確認</li><li><code>/diff</code>またはGit差分</li><li><code>/review</code>で重大リスク確認</li><li>コミット・push状態を報告</li></ol></article><article class="card"><span class="label">Long run</span><h3>長い作業</h3><p><code>/compact</code>で会話を圧縮し、<code>/goal</code>で目的を維持。中断後は<code>/resume</code>、分岐検証は<code>codex fork</code>を使います。</p></article></div>
-  <pre>codex
-/status
-/plan
-/goal set "目的"
-/diff
-/review
-/compact
-/resume</pre>
-  <div class="callout"><strong>依頼の型:</strong> 「調査 → 計画 → 実装 → 検証 → レビュー → 状態報告」を明示すると、途中で説明だけして止まることを防げます。</div>
-</section>
+  <main class="main">
+    <header class="hero">
+      <div class="eyebrow">Delegate with intent. Verify with evidence.</div>
+      <h1>Codex Master<br>Operations Manual</h1>
+      <p class="lead">Codexを「コードを出すAI」ではなく、環境を読み、計画し、道具を使い、変更し、証拠を揃える実行主体として運用する。本書の到達点は、タスク・権限・コンテキスト・並列性・検証を設計し、失敗しても安全に回収できるオペレーターです。</p>
+      <div class="hero-meta"><span class="pill">公式 Codex Manual 準拠</span><span class="pill">CLI / IDE / App / Cloud</span><span class="pill">12章 + 診断ラボ</span><span class="pill">最終確認 2026-06-20</span></div>
+    </header>
 
-<section class="view" id="permissions">
-  <div class="section-head"><div><h2>権限と安全性</h2><p>SandboxとApprovalを別々に理解する</p></div></div>
-  <div class="grid"><article class="card"><h3>Sandbox</h3><p>技術的にどこまで読める・書ける・通信できるか。<code>read-only</code>、<code>workspace-write</code>、<code>danger-full-access</code>があります。</p></article><article class="card"><h3>Approval policy</h3><p>どの操作で人に確認するか。通常の対話は<code>on-request</code>、安定した非対話処理は制約付きの<code>never</code>を検討します。</p></article></div>
-  <table><thead><tr><th>用途</th><th>推奨</th><th>理由</th></tr></thead><tbody>
-    <tr><td>調査・計画</td><td><code>read-only</code></td><td>変更を発生させない</td></tr>
-    <tr><td>通常開発</td><td><code>workspace-write + on-request</code></td><td>作業領域内は自動、外部は確認</td></tr>
-    <tr><td>CI・自動処理</td><td>限定workspace + <code>never</code></td><td>人待ちを避けつつ境界を維持</td></tr>
-    <tr><td>Full access</td><td>外部隔離環境のみ</td><td>ホスト上での常用は危険</td></tr>
-  </tbody></table>
-  <pre>codex --sandbox workspace-write --ask-for-approval on-request
-codex --sandbox read-only --ask-for-approval on-request</pre>
-  <div class="callout bad"><strong><code>--yolo</code>:</strong> 承認とサンドボックスを迂回します。外部で強固に隔離した環境以外では使いません。</div>
-  <div class="card"><h3>安全チェック</h3><div class="checklist"><label class="check"><input type="checkbox"><span>ネットワークアクセスの必要性を説明できる</span></label><label class="check"><input type="checkbox"><span>削除、移動、強制pushの対象を絶対パスで確認した</span></label><label class="check"><input type="checkbox"><span>認証情報をログ・差分・プロンプトへ含めていない</span></label><label class="check"><input type="checkbox"><span>MCP/Appの副作用付き操作を人が確認する</span></label></div></div>
-</section>
+    <div class="content">
+      <section class="view active" id="doctrine">
+        <div class="section-head"><div><span class="chapter">CHAPTER 00</span><h2>Codexの本質と責任分界</h2><p>成果物の品質は、モデル性能だけでなく制御系の設計で決まる。</p></div></div>
+        <div class="thesis"><p class="thesis-label">CORE DOCTRINE</p><p>Codexは、与えられた環境の中で<strong>観測 → 判断 → 行動 → 検証</strong>を反復するコーディングエージェントです。人間の仕事は逐一コードを書くことから、目的・境界・評価基準・停止条件を設計することへ移ります。</p></div>
+        <div class="control-loop" aria-label="Codex制御ループ">
+          <div><b>1. Observe</b><span>リポジトリ、指示、差分、失敗、外部情報を読む</span></div>
+          <div><b>2. Orient</b><span>既存設計、制約、リスク、依存関係を解釈する</span></div>
+          <div><b>3. Act</b><span>最小の変更を行い、必要なツールを実行する</span></div>
+          <div><b>4. Verify</b><span>テスト、表示、差分、要件との一致を証明する</span></div>
+          <div><b>5. Report</b><span>変更、証拠、残余リスク、次の判断を返す</span></div>
+        </div>
+        <div class="grid">
+          <article class="card"><span class="label">Codex owns</span><h3>実行責任</h3><ul><li>対象コードと周辺規約を読む</li><li>変更前に影響範囲を把握する</li><li>既存パターンに沿って編集する</li><li>適切な検証を実行する</li><li>不確実性と未実施事項を報告する</li></ul></article>
+          <article class="card"><span class="label">Operator owns</span><h3>委任責任</h3><ul><li>何を達成するかを決める</li><li>許容できるリスクと権限を決める</li><li>ビジネス上の正しさを定義する</li><li>外部への送信・公開を承認する</li><li>最終的な採否を判断する</li></ul></article>
+        </div>
+        <h3 class="subhead">マスターと初心者を分ける5つの差</h3>
+        <table><thead><tr><th>観点</th><th>初心者</th><th>マスター</th></tr></thead><tbody>
+          <tr><td>依頼</td><td>「これを作って」</td><td>目的・文脈・制約・完了条件を渡す</td></tr>
+          <tr><td>権限</td><td>止まるたびに広げる</td><td>必要最小限をタスク前に設計する</td></tr>
+          <tr><td>並列化</td><td>何でも複数エージェントに投げる</td><td>所有ファイルと統合点を分離できる時だけ並列化する</td></tr>
+          <tr><td>検証</td><td>最終回答を信じる</td><td>テスト・画面・差分・ログの証拠を要求する</td></tr>
+          <tr><td>改善</td><td>毎回同じ説明をする</td><td>反復知識をAGENTS.md、Skill、Hookへ昇格する</td></tr>
+        </tbody></table>
+        <div class="callout"><strong>最重要原則:</strong> Codexに自由を与えるほど、先に観測可能性と停止条件を強くする。権限だけを広げて検証を弱くしてはいけません。</div>
+        <div class="card checkpoint"><h3>章のチェックポイント</h3><div class="checklist">
+          <label class="check"><input type="checkbox"><span>Codexの成果を「生成コード」ではなく「検証済みの状態変化」と説明できる</span></label>
+          <label class="check"><input type="checkbox"><span>人間とCodexの責任分界を、実行責任と委任責任に分けて説明できる</span></label>
+        </div></div>
+      </section>
 
-<section class="view" id="customize">
-  <div class="section-head"><div><h2>AGENTS・Skills・MCP</h2><p>繰り返し説明を運用資産へ変える</p></div></div>
-  <div class="grid three"><article class="card"><span class="label">Guidance</span><h3>AGENTS.md</h3><p>近い階層のファイルが優先。コマンド、設計境界、検証、禁止事項を短く具体的に書きます。</p></article><article class="card"><span class="label">Workflow</span><h3>Skills</h3><p><code>SKILL.md</code>に再利用手順を格納。明示呼び出しとdescription一致による自動選択に対応します。</p></article><article class="card"><span class="label">Live data</span><h3>MCP / Apps</h3><p>GitHub、Calendar、Docsなどの生データと操作を接続。副作用・認証・管理ポリシーを分離します。</p></article></div>
-  <pre># AGENTS.md
+      <section class="view" id="surfaces">
+        <div class="section-head"><div><span class="chapter">CHAPTER 01</span><h2>サーフェスを仕事で選ぶ</h2><p>慣れた画面ではなく、実行場所・並列性・レビュー方法で決める。</p></div></div>
+        <table><thead><tr><th>サーフェス</th><th>強み</th><th>選ぶ仕事</th><th>避ける誤用</th></tr></thead><tbody>
+          <tr><td><strong>CLI</strong></td><td>低摩擦、shell連携、正確な作業ディレクトリ</td><td>ローカル実装、調査、修正、反復</td><td>現在地やbranchを確認せず起動</td></tr>
+          <tr><td><strong>IDE</strong></td><td>選択範囲と開いているfileが文脈になる</td><td>局所編集、説明、editor中心の実装</td><td>巨大変更を選択範囲だけで判断</td></tr>
+          <tr><td><strong>Codex App</strong></td><td>複数thread、Worktree、diff review、Goal、Apps</td><td>計画、長時間作業、並列委任、レビュー</td><td>同じfileを複数threadで編集</td></tr>
+          <tr><td><strong>Cloud</strong></td><td>隔離環境、非同期、複数試行、別端末</td><td>独立task、PR準備、重い調査、best-of-N</td><td>未pushのlocal状態が見えると仮定</td></tr>
+          <tr><td><strong>Chat</strong></td><td>repo非依存の思考とconnector作業</td><td>調査、企画、接続済みserviceの操作</td><td>local codeを読める前提で依頼</td></tr>
+        </tbody></table>
+        <div class="decision-tree"><h3>30秒選択ルール</h3><ol>
+          <li><strong>ローカル環境固有か。</strong> YesならCLI / IDE / AppのLocal。</li>
+          <li><strong>並列化または長時間化するか。</strong> YesならAppのWorktreeまたはCloud。</li>
+          <li><strong>実コードを変更しないか。</strong> YesならChatまたはRead-only。</li>
+          <li><strong>人が差分を細かく対話レビューするか。</strong> YesならAppまたはIDE。</li>
+          <li><strong>定型処理か。</strong> YesならCLIの<code>codex exec</code>、Automation、SDKを検討。</li>
+        </ol></div>
+        <div class="grid three">
+          <article class="card"><span class="label">Local thread</span><h3>現在の状態を使う</h3><p>未commit差分や導入済みtoolを直接使う。hostへの影響をSandboxで制限します。</p></article>
+          <article class="card"><span class="label">Worktree</span><h3>同一repo内で隔離</h3><p>別branch・別directoryに分け、長い作業や並列編集の衝突を減らします。</p></article>
+          <article class="card"><span class="label">Cloud thread</span><h3>hostから隔離</h3><p>GitHubからcloneした環境で実行。setupとagent実行のnetwork条件を分けます。</p></article>
+        </div>
+        <div class="card checkpoint"><h3>章のチェックポイント</h3><div class="checklist">
+          <label class="check"><input type="checkbox"><span>Local、Worktree、Cloudの状態差を説明できる</span></label>
+          <label class="check"><input type="checkbox"><span>仕事の性質からサーフェスを選び、選択理由を言語化できる</span></label>
+        </div></div>
+      </section>
+
+      <section class="view" id="prompting">
+        <div class="section-head"><div><span class="chapter">CHAPTER 02</span><h2>委任仕様を設計する</h2><p>長いpromptではなく、判断に必要な情報を欠けなく渡す。</p></div></div>
+        <div class="spec-grid"><div><span>G</span><b>Goal</b><p>どの状態へ変えるか</p></div><div><span>C</span><b>Context</b><p>関連file、再現手順、背景</p></div><div><span>C</span><b>Constraints</b><p>守る設計、非対象、禁止</p></div><div><span>D</span><b>Done</b><p>完了を判定する証拠</p></div></div>
+        <div class="grid">
+          <article class="card"><span class="label">Weak</span><h3>「ログインを直して」</h3><p>症状、対象、期待動作、互換性、検証方法がない。Codexは探索できますが、不要な仮定が増えます。</p></article>
+          <article class="card"><span class="label">Operational</span><h3>再現可能な委任</h3><p>「SafariでOAuth後に<code>/login</code>へ戻る。<code>auth/callback.ts</code>周辺を調査し、既存session方式を維持して修正。Chrome回帰を避け、関連testと再現確認を完了条件にする。」</p></article>
+        </div>
+        <table><thead><tr><th>状態</th><th>使うモード</th><th>指示</th></tr></thead><tbody>
+          <tr><td>小さく明確</td><td>直接実行</td><td>対象と完了条件を渡し、そのまま実装</td></tr>
+          <tr><td>複雑だが目的は明確</td><td><code>/plan</code></td><td>調査・設計・検証計画を確認後に実装</td></tr>
+          <tr><td>目的自体が曖昧</td><td>インタビュー</td><td>重要な選択肢を質問させる</td></tr>
+          <tr><td>長く完了判定が明確</td><td><code>/goal</code></td><td>測定可能な目標と停止条件を持続</td></tr>
+          <tr><td>方針を比較したい</td><td><code>/fork</code> / Cloud attempts</td><td>独立案を評価軸で比較</td></tr>
+          <tr><td>本流を止めず質問</td><td>Side chat</td><td>状態説明や論点確認を別会話で行う</td></tr>
+        </tbody></table>
+        <pre>Goal:
+  設定画面の保存失敗を解消する。
+
+Context:
+  - 再現: 通知をOFFにして保存すると500
+  - 関連: src/settings/, api/preferences.ts
+  - ユーザーの未commit変更があるので保全する
+
+Constraints:
+  - API response形は変えない
+  - 新規依存は追加しない
+  - 関係のない整形をしない
+
+Done when:
+  - 原因を説明できる
+  - 回帰testを追加して通る
+  - 既存test、lint、diff reviewが完了する
+  - 残余riskを報告する</pre>
+        <div class="callout warn"><strong>コンテキスト過多:</strong> 全fileを貼るより、入口・症状・制約を渡してCodex自身に探索させる。長期作業ではcompact後も残す判断をGoalや文書へ外部化します。</div>
+        <div class="card checkpoint"><h3>章のチェックポイント</h3><div class="checklist">
+          <label class="check"><input type="checkbox"><span>依頼をGoal・Context・Constraints・Done whenに分解できる</span></label>
+          <label class="check"><input type="checkbox"><span>直接実行、Plan、Goal、Forkを使い分けられる</span></label>
+        </div></div>
+      </section>
+
+      <section class="view" id="loop">
+        <div class="section-head"><div><span class="chapter">CHAPTER 03</span><h2>実行ループを制御する</h2><p>速く書かせるより、誤った方向へ長く走らせない。</p></div></div>
+        <div class="phase-list">
+          <article><span>01</span><div><h3>Orient</h3><p><code>pwd</code>、<code>git status --short --branch</code>、指示file、対象構造を確認。ユーザー変更と境界を把握します。</p></div></article>
+          <article><span>02</span><div><h3>Investigate</h3><p>検索、呼び出し関係、test、履歴、再現から原因仮説を作る。症状だけを書き換えません。</p></div></article>
+          <article><span>03</span><div><h3>Plan</h3><p>変更点、非変更点、検証、復旧方法を決める。単純作業は過剰に儀式化しません。</p></div></article>
+          <article><span>04</span><div><h3>Execute</h3><p>既存patternに沿った最小変更。前提が崩れたら惰性で続けず再調査します。</p></div></article>
+          <article><span>05</span><div><h3>Verify</h3><p>近いtestから広げ、静的検査、実行、表示、link、diffをriskに応じて確認します。</p></div></article>
+          <article><span>06</span><div><h3>Review & Report</h3><p>重大risk優先で自己review。変更・証拠・未実施・残余riskを報告します。</p></div></article>
+        </div>
+        <div class="grid">
+          <article class="card"><span class="label">Continue</span><h3>継続してよい信号</h3><ul><li>仮説がcodeと再現で支持</li><li>範囲が依頼と一致</li><li>検証方法が存在</li><li>失敗しても戻せる</li></ul></article>
+          <article class="card"><span class="label">Stop</span><h3>停止すべき信号</h3><ul><li>破壊的操作や外部送信</li><li>製品判断が必要</li><li>秘密・個人情報が絡む</li><li>ユーザー変更と分離不能</li><li>同じ失敗を根拠なく反復</li></ul></article>
+        </div>
+        <div class="quick-grid"><div class="quick"><b>方向修正</b><span>「実装を止め、今の仮説と反証を3点ずつ示して」</span></div><div class="quick"><b>範囲縮小</b><span>「UIは触らず、API層の原因特定だけ完了して」</span></div><div class="quick"><b>証拠要求</b><span>「成功を支えるcommand出力と画面状態を示して」</span></div><div class="quick"><b>復旧優先</b><span>「編集を増やさず、現状を保全して復旧案を作って」</span></div></div>
+        <div class="card checkpoint"><h3>章のチェックポイント</h3><div class="checklist">
+          <label class="check"><input type="checkbox"><span>探索、仮説、編集、検証を別phaseとして観察できる</span></label>
+          <label class="check"><input type="checkbox"><span>Codexを止めるべき信号を判断できる</span></label>
+        </div></div>
+      </section>
+
+      <section class="view" id="security">
+        <div class="section-head"><div><span class="chapter">CHAPTER 04</span><h2>権限・Sandbox・外部作用</h2><p>「できる範囲」と「確認する時点」は別の制御です。</p></div></div>
+        <div class="grid">
+          <article class="card"><span class="label">Technical boundary</span><h3>Sandbox mode</h3><p>技術的に読み書き・実行できる境界。代表的に<code>read-only</code>、<code>workspace-write</code>、<code>danger-full-access</code>があります。</p></article>
+          <article class="card"><span class="label">Decision boundary</span><h3>Approval policy</h3><p>境界外操作、network、外部作用を実行する前に、人へ確認する条件を決めます。</p></article>
+        </div>
+        <table><thead><tr><th>仕事</th><th>推奨出発点</th><th>理由</th></tr></thead><tbody>
+          <tr><td>調査・review・設計</td><td>Read-only</td><td>誤操作の面積を最小化</td></tr>
+          <tr><td>通常のlocal実装</td><td>Workspace-write + on-request</td><td>workspace内を自律化し外側だけ確認</td></tr>
+          <tr><td>定型CI・非対話</td><td>限定Workspace + never</td><td>人待ちを避け環境側で制限</td></tr>
+          <tr><td>network必須</td><td>Workspace-write + 宛先制限</td><td>必要性と送信先を分離</td></tr>
+          <tr><td>Full Access</td><td>隔離済み環境のみ</td><td>host全体への影響を通常化しない</td></tr>
+        </tbody></table>
+        <pre># 通常のlocal実装
+codex --sandbox workspace-write --ask-for-approval on-request
+
+# 読み取り専用で調査
+codex --sandbox read-only --ask-for-approval on-request
+
+# workspace-writeでcommand networkを許可
+[sandbox_workspace_write]
+network_access = true</pre>
+        <div class="grid three">
+          <article class="card"><h3>Web search</h3><p>Codexの検索tool。取得内容は不信な入力として扱います。</p></article>
+          <article class="card"><h3>Command network</h3><p><code>npm install</code>や<code>curl</code>の通信。Sandbox設定で別に許可します。</p></article>
+          <article class="card"><h3>Connector action</h3><p>GitHubやCalendar等の読み書き。副作用と明示的意図を確認します。</p></article>
+        </div>
+        <div class="callout bad"><strong>Full Accessの誤解:</strong> 確認が減ることは品質向上ではありません。信頼できないrepo、Web由来命令、秘密情報がある環境では攻撃面を広げます。</div>
+        <div class="card checkpoint"><h3>章のチェックポイント</h3><div class="checklist">
+          <label class="check"><input type="checkbox"><span>SandboxとApproval policyの違いを説明できる</span></label>
+          <label class="check"><input type="checkbox"><span>Web検索、command通信、connector操作を別々に評価できる</span></label>
+        </div></div>
+      </section>
+
+      <section class="view" id="context">
+        <div class="section-head"><div><span class="chapter">CHAPTER 05</span><h2>コンテキストを資産化する</h2><p>その場の説明を、適切な持続層へ昇格させる。</p></div></div>
+        <table><thead><tr><th>層</th><th>置くもの</th><th>置かないもの</th></tr></thead><tbody>
+          <tr><td><strong>Prompt / Thread</strong></td><td>今回だけの目的、対象、制約、判断</td><td>全案件で守る規約</td></tr>
+          <tr><td><strong>AGENTS.md</strong></td><td>repo構造、command、規約、検証、禁止</td><td>複雑な再利用手順</td></tr>
+          <tr><td><strong>config.toml</strong></td><td>model、reasoning、Sandbox、MCP、feature</td><td>自然言語の設計思想だけ</td></tr>
+          <tr><td><strong>Skill</strong></td><td>再利用する専門workflow、資料、script</td><td>常時loadする短い規約</td></tr>
+          <tr><td><strong>Plugin</strong></td><td>配布可能なSkills、MCP、Hooks、Appsの束</td><td>単発の個人memo</td></tr>
+          <tr><td><strong>MCP / App</strong></td><td>外部のlive dataと操作</td><td>静的repo規約</td></tr>
+          <tr><td><strong>Hook</strong></td><td>lifecycle上の機械的検査・強制</td><td>人の判断が必要な方針</td></tr>
+          <tr><td><strong>Automation</strong></td><td>安定した定期・追跡作業</td><td>手順が揺れている仕事</td></tr>
+        </tbody></table>
+        <div class="grid">
+          <article class="card"><h3>AGENTS.mdの最小構成</h3><pre># Repository guidance
+## Layout
+- src/: application
+- tests/: automated checks
+
 ## Commands
 - Test: npm test
 - Lint: npm run lint
 - Build: npm run build
 
 ## Rules
-- Existing patterns first
-- Never overwrite user changes
-- Run link checker after HTML edits</pre>
-  <pre>---
-name: release-check
-description: Verify a release candidate, changelog, tests, and rollback notes.
----
-1. Inspect the diff.
-2. Run required checks.
-3. Report blockers before publishing.</pre>
-  <table><thead><tr><th>置き場所</th><th>スコープ</th></tr></thead><tbody><tr><td><code>$REPO_ROOT/.agents/skills</code></td><td>リポジトリ共有</td></tr><tr><td><code>$HOME/.agents/skills</code></td><td>個人共通</td></tr><tr><td><code>~/.codex/config.toml</code></td><td>個人設定・MCP・既定権限</td></tr></tbody></table>
-</section>
+- Preserve user changes
+- Follow existing patterns
+- Report tests not run</pre></article>
+          <article class="card"><h3>昇格ルール</h3><ol><li>同じ説明を2回したら候補</li><li>短いrepo規約ならAGENTS.md</li><li>複数手順・資料・scriptならSkill</li><li>外部dataならMCP / App</li><li>機械的に止めるならHook</li><li>安定後にAutomation</li></ol></article>
+        </div>
+        <div class="callout"><strong>近い指示が優先:</strong> AGENTS.mdはglobal、repo、subdirectoryに配置でき、対象に近い指示が優先されます。責任境界に沿って分割します。</div>
+        <div class="quick-grid"><div class="quick"><b>正確か</b><span>古いcommandや存在しないpathがない</span></div><div class="quick"><b>具体的か</b><span>「高品質に」でなく検査方法がある</span></div><div class="quick"><b>局所的か</b><span>適用範囲に最も近い場所にある</span></div><div class="quick"><b>観測由来か</b><span>反復した実際の失敗から追加した</span></div></div>
+        <div class="card checkpoint"><h3>章のチェックポイント</h3><div class="checklist">
+          <label class="check"><input type="checkbox"><span>Prompt、AGENTS.md、Skill、MCP、Hookの配置判断ができる</span></label>
+          <label class="check"><input type="checkbox"><span>反復した失敗を再利用可能な指示へ変換できる</span></label>
+        </div></div>
+      </section>
 
-<section class="view" id="workflows">
-  <div class="section-head"><div><h2>実践ワークフロー</h2><p>Codexを最後まで動かす</p></div></div>
-  <div class="grid"><article class="card"><h3>機能実装</h3><ol><li>コードベースを探索</li><li>実装計画と影響範囲</li><li>既存パターンで編集</li><li>テスト追加・実行</li><li>差分レビュー</li></ol></article><article class="card"><h3>コードレビュー</h3><ol><li>ベースブランチ確認</li><li><code>/review</code></li><li>重大度順に所見</li><li>テストギャップ確認</li><li>必要な修正だけ適用</li></ol></article><article class="card"><h3>並列探索</h3><p>Subagentsは読み取り中心の探索、テストログ、セキュリティ確認へ使います。同時編集は競合が増えるため役割と所有ファイルを分離します。</p></article><article class="card"><h3>Automation</h3><p>安定した手順だけを自動化。専用Worktree、明確な終了条件、失敗時の通知、アーカイブ運用を用意します。</p></article></div>
-  <pre>このブランチを並列レビューしてください。
-- Agent 1: 実害のあるバグ
-- Agent 2: セキュリティと権限
-- Agent 3: テスト不足
-全員を待ち、重複を統合し、重大度順にファイル参照付きで報告してください。</pre>
-</section>
+      <section class="view" id="parallel">
+        <div class="section-head"><div><span class="chapter">CHAPTER 06</span><h2>並列化・Subagents・Worktree</h2><p>速さはagent数ではなく、依存関係の切り方で決まる。</p></div></div>
+        <div class="parallel-rule"><strong>並列化できる条件</strong><span>独立した入力</span><span>明確な所有範囲</span><span>比較可能な出力</span><span>一人の統合責任者</span></div>
+        <table><thead><tr><th>方式</th><th>適する仕事</th><th>主な危険</th></tr></thead><tbody>
+          <tr><td>Subagents</td><td>読み取り調査、test log分析、独立観点review</td><td>token増、重複、編集競合</td></tr>
+          <tr><td>複数thread</td><td>別機能、別文書、別候補案</td><td>同じfileや前提の競合</td></tr>
+          <tr><td>Worktree</td><td>長い実装、別branch、並列編集</td><td>ignored依存、環境差、統合忘れ</td></tr>
+          <tr><td>Cloud attempts</td><td>複数解法を比較する独立task</td><td>評価軸がないと選べない</td></tr>
+        </tbody></table>
+        <div class="grid">
+          <article class="card"><span class="label">Good decomposition</span><h3>観点で分ける</h3><ul><li>A: 変更箇所と依存関係</li><li>B: test不足と再現条件</li><li>C: securityと権限</li><li>Main: 重複排除、重大度、統合</li></ul></article>
+          <article class="card"><span class="label">Bad decomposition</span><h3>同じ所有物を分ける</h3><ul><li>同じcomponentを複数agentが編集</li><li>共通型を別々に変更</li><li>統合者がいない</li><li>成功条件を各agentに任せる</li></ul></article>
+        </div>
+        <pre>この変更を3つの独立観点で調査してください。
+- Architecture: 影響範囲と既存pattern。読み取りのみ。
+- Tests: 再現条件と不足test。読み取りのみ。
+- Security: 入力境界と権限risk。読み取りのみ。
 
-<section class="view" id="git">
-  <div class="section-head"><div><h2>Git・Worktree</h2><p>ユーザー変更を守りながら公開する</p></div></div>
-  <div class="flow"><div class="flow-step"><b>Status</b>dirty確認</div><div class="flow-step"><b>Fetch</b>リモート確認</div><div class="flow-step"><b>Branch</b>作業を隔離</div><div class="flow-step"><b>Commit</b>意図的にstage</div><div class="flow-step"><b>Push</b>追跡設定</div></div>
-  <pre>git status --short --branch
+各担当は根拠file、重大度、推奨対応を返すこと。
+完了後、main担当が重複を統合し、実装計画を1つ作ること。
+編集は計画承認後にmain担当だけが行う。</pre>
+        <div class="flow"><div class="flow-step"><b>1. Inspect</b>dirty treeと基準branch</div><div class="flow-step"><b>2. Isolate</b>目的別worktree</div><div class="flow-step"><b>3. Prepare</b>依存・環境を再現</div><div class="flow-step"><b>4. Execute</b>所有範囲内で編集</div><div class="flow-step"><b>5. Integrate</b>diff・test・merge</div></div>
+        <div class="callout warn"><strong>並列化しない判断:</strong> 設計が未収束、編集対象が密結合、検証環境が一つなら、直列の方が総時間も品質も良くなります。</div>
+        <div class="card checkpoint"><h3>章のチェックポイント</h3><div class="checklist">
+          <label class="check"><input type="checkbox"><span>読み取り並列と編集並列のrisk差を説明できる</span></label>
+          <label class="check"><input type="checkbox"><span>所有範囲・出力形式・統合責任者を明示して委任できる</span></label>
+        </div></div>
+      </section>
+
+      <section class="view" id="quality">
+        <div class="section-head"><div><span class="chapter">CHAPTER 07</span><h2>検証・レビュー・証拠</h2><p>「testが通った」は品質証明の一部でしかない。</p></div></div>
+        <div class="evidence-stack"><div><b>Requirement</b><span>依頼された振る舞い</span></div><div><b>Focused test</b><span>変更箇所の失敗と成功</span></div><div><b>Regression</b><span>周辺を壊していない</span></div><div><b>Static checks</b><span>型、lint、format、build</span></div><div><b>Runtime / Visual</b><span>実環境、画面、log</span></div><div><b>Diff review</b><span>不要変更、秘密、互換性</span></div></div>
+        <div class="grid">
+          <article class="card"><h3>検証順序</h3><ol><li>再現または失敗test</li><li>最も近い対象test</li><li>型・lint・format</li><li>関連test群</li><li>build / integration</li><li>表示・操作・link</li><li>最終diff review</li></ol></article>
+          <article class="card"><h3>riskで広げる</h3><ul><li>共有module: 利用側</li><li>認証・決済: 境界値と失敗経路</li><li>DB: migrationとrollback</li><li>UI: desktop/mobileと操作</li><li>文書: link、索引、検索</li><li>依存更新: lockfile、license、build</li></ul></article>
+        </div>
+        <table><thead><tr><th><code>/review</code>対象</th><th>狙い</th></tr></thead><tbody>
+          <tr><td>Base branchとの差</td><td>PR全体の回帰・契約・設計risk</td></tr>
+          <tr><td>未commit変更</td><td>commit前の取りこぼし、不要変更</td></tr>
+          <tr><td>特定commit</td><td>独立した変更単位の妥当性</td></tr>
+          <tr><td>Custom instruction</td><td>accessibility、性能、security等の重点監査</td></tr>
+        </tbody></table>
+        <pre>この差分をコードレビューしてください。
+優先順位は、正しさ、データ損失、security、互換性、test不足です。
+style上の好みは、実害がない限り指摘しないでください。
+各所見に重大度、再現条件、file参照、最小修正案を付けてください。
+所見がなければ、残るtest gapだけを報告してください。</pre>
+        <div class="report-contract"><h3>完了報告の契約</h3><div><b>Changed</b><span>何を、なぜ</span></div><div><b>Verified</b><span>検査と結果</span></div><div><b>Not verified</b><span>未実施検査</span></div><div><b>Residual risk</b><span>残る不確実性</span></div></div>
+        <div class="card checkpoint"><h3>章のチェックポイント</h3><div class="checklist">
+          <label class="check"><input type="checkbox"><span>変更riskに合わせて検証範囲を広げられる</span></label>
+          <label class="check"><input type="checkbox"><span>完了報告を証拠と残余riskで評価できる</span></label>
+        </div></div>
+      </section>
+
+      <section class="view" id="delivery">
+        <div class="section-head"><div><span class="chapter">CHAPTER 08</span><h2>Git・競合・公開</h2><p>編集の成功と、安全に共有できる状態は別です。</p></div></div>
+        <div class="flow"><div class="flow-step"><b>1. Status</b>branch・dirty・他者変更</div><div class="flow-step"><b>2. Sync</b>fetch・upstream差</div><div class="flow-step"><b>3. Scope</b>意図したfileだけstage</div><div class="flow-step"><b>4. Verify</b>staged diff・checks</div><div class="flow-step"><b>5. Publish</b>commit・push・PR</div></div>
+        <pre>git status --short --branch
 git fetch origin --prune
 git diff
+git diff --cached
 git add path/to/intended-file
-git commit -m "Concise change summary"
+git commit -m "Explain the completed change"
 git push -u origin HEAD</pre>
-  <div class="grid"><article class="card"><h3>Worktreeを使う</h3><p>長い変更、複数案、並列作業を本体から隔離できます。無視ファイルは自動で引き継がれないため、必要なら<code>.worktreeinclude</code>やセットアップスクリプトを使います。</p></article><article class="card"><h3>既存変更を守る</h3><p>他人の変更を勝手にrestoreしません。同じファイルなら内容を読んで共存させ、無関係ならstage対象から外します。</p></article></div>
-  <div class="callout warn"><strong>競合時:</strong> まずバックアップ枝を作り、base/ours/theirsの意味を確認します。リベース中の<code>ours</code>は更新先、<code>theirs</code>は再適用中コミットになる点に注意します。</div>
-</section>
+        <div class="grid">
+          <article class="card"><span class="label">Dirty tree</span><h3>ユーザー変更を保全</h3><p>無関係な差分は戻さない。同じfileなら内容を理解して共存させ、不可能な時だけ判断を求めます。</p></article>
+          <article class="card"><span class="label">Remote conflict</span><h3>事実を3層に分ける</h3><p>local HEAD、origin HEAD、working treeを別々に確認。履歴意図に合う統合方法を決めます。</p></article>
+        </div>
+        <ol class="protocol"><li><b>保全</b><span>未commit差分とbranchを記録。</span></li><li><b>分類</b><span>行の衝突と意味の衝突を分ける。</span></li><li><b>意図確認</b><span>ours / theirsを内容と履歴で判断。</span></li><li><b>統合</b><span>有効な変更を再構成。</span></li><li><b>検証</b><span>marker、test、diff、履歴を確認。</span></li><li><b>共有</b><span>push前にremote差を再確認。</span></li></ol>
+        <div class="callout bad"><strong>禁止:</strong> 状況確認なしの<code>reset --hard</code>、ユーザー差分への<code>checkout --</code>、無差別な<code>git add .</code>、意味を理解しないours/theirs一括採用。</div>
+        <div class="card checkpoint"><h3>章のチェックポイント</h3><div class="checklist">
+          <label class="check"><input type="checkbox"><span>local HEAD、remote HEAD、working treeを分けて説明できる</span></label>
+          <label class="check"><input type="checkbox"><span>他者変更を保全しながら競合を意味的に統合できる</span></label>
+        </div></div>
+      </section>
 
-<section class="view" id="recovery">
-  <div class="section-head"><div><h2>復旧・逆引き</h2><p>止まった場所から安全に戻る</p></div></div>
-  <div class="quick-grid"><div class="quick"><b>承認待ちで止まる</b><span><code>/status</code>と画面のapprovalを確認。必要性を限定して承認。</span></div><div class="quick"><b>文脈が長すぎる</b><span><code>/compact</code>、または新スレッドへ目的・差分・次手だけ渡す。</span></div><div class="quick"><b>前の作業へ戻る</b><span><code>/resume</code>または<code>codex resume</code>。</span></div><div class="quick"><b>AppとCLIで機能差</b><span>対象サーフェスの公式章とバージョンを確認。</span></div><div class="quick"><b>Worktreeで動かない</b><span>ignoredな依存・環境ファイルとセットアップを確認。</span></div><div class="quick"><b>MCPが見えない</b><span><code>/mcp</code>、設定、認証、再起動、管理ポリシーの順で確認。</span></div><div class="quick"><b>編集内容をレビュー</b><span><code>/diff</code>後に<code>/review</code>。重大所見を先に。</span></div><div class="quick"><b>公開したい</b><span>scope確認、テスト、commit、fetch、push、PRの順。</span></div></div>
-  <div class="sources">公式: <a href="https://developers.openai.com/codex/">OpenAI Codex Docs</a> / <a href="https://developers.openai.com/codex/codex-manual.md">Codex Manual</a>　ハブ内: <a href="../../workbench/knowledge/openai-codex.html">Codex深掘り</a></div>
-</section>
-</div></main></div><button class="mobile-toggle" type="button">Menu</button><script src="../operation-assets/script.js"></script></body></html>
+      <section class="view" id="automation">
+        <div class="section-head"><div><span class="chapter">CHAPTER 09</span><h2>自動化・拡張・プログラム接続</h2><p>会話で安定した仕事だけを、自動実行へ昇格する。</p></div></div>
+        <table><thead><tr><th>手段</th><th>用途</th><th>選択基準</th></tr></thead><tbody>
+          <tr><td><code>codex exec</code></td><td>非対話の単発・shell連携</td><td>入力と完了条件が固定</td></tr>
+          <tr><td>Automation</td><td>定期check、追跡、反復</td><td>失敗時の通知と再実行が定義済み</td></tr>
+          <tr><td>Skill</td><td>人が起動する再利用workflow</td><td>複数案件で手順・資料を共有</td></tr>
+          <tr><td>Hook</td><td>tool実行前後の検査・強制</td><td>規則が決定的で機械判定可能</td></tr>
+          <tr><td>GitHub Action</td><td>CI / PR内でCodex実行</td><td>repo eventと権限をGitHub管理</td></tr>
+          <tr><td>SDK / App Server</td><td>独自app、control UI、統合</td><td>会話外からthreadやeventを制御</td></tr>
+          <tr><td>MCP Server</td><td>Codexへ外部toolを提供</td><td>標準化されたtool/resource接続</td></tr>
+        </tbody></table>
+        <div class="grid"><article class="card"><h3>自動化前の4条件</h3><ol><li>入力形式が安定</li><li>成功・失敗を機械判定</li><li>権限が必要最小限</li><li>通知・再実行・停止がある</li></ol></article><article class="card"><h3>自動化しない仕事</h3><ul><li>製品判断が毎回変わる</li><li>秘密・個人情報の送信判断</li><li>破壊対象が曖昧</li><li>成功が主観だけ</li><li>手順が頻繁に変わる</li></ul></article></div>
+        <pre># 非対話実行
+codex exec "Run repository checks, fix only deterministic lint errors, and report remaining failures"
+
+# 機械可読event
+codex exec --json "Review the current diff and return prioritized findings"
+
+# Cloudへ複数試行
+codex cloud exec --env ENV_ID --attempts 3 "Propose and verify a fix"</pre>
+        <div class="maturity-ladder"><div><span>1</span><b>Prompt</b><small>手動で成功</small></div><div><span>2</span><b>AGENTS</b><small>前提を固定</small></div><div><span>3</span><b>Skill</b><small>手順を再利用</small></div><div><span>4</span><b>Hook</b><small>規則を強制</small></div><div><span>5</span><b>Automation</b><small>安定後に無人化</small></div></div>
+        <div class="card checkpoint"><h3>章のチェックポイント</h3><div class="checklist">
+          <label class="check"><input type="checkbox"><span>Skill、Hook、Automation、MCPの役割を分けられる</span></label>
+          <label class="check"><input type="checkbox"><span>自動化前に成功判定・権限・失敗処理を設計できる</span></label>
+        </div></div>
+      </section>
+
+      <section class="view" id="recovery">
+        <div class="section-head"><div><span class="chapter">CHAPTER 10</span><h2>診断・復旧ランブック</h2><p>症状ではなく、状態・権限・文脈・環境・統合の層で診断する。</p></div></div>
+        <div class="diagnostic-map"><div><b>1. State</b><span>thread、goal、branch、dirty、cwd</span></div><div><b>2. Context</b><span>AGENTS、file、compact、指示競合</span></div><div><b>3. Permission</b><span>Sandbox、approval、network</span></div><div><b>4. Environment</b><span>依存、env、service、worktree</span></div><div><b>5. Integration</b><span>MCP、plugin、auth、policy</span></div></div>
+        <div class="runbook-list">
+          <details open><summary>承認待ちのまま進まない</summary><p><code>/status</code>と<code>/permissions</code>で権限を確認。何のために境界外操作が必要か限定し、一時承認で済むか判断。</p></details>
+          <details><summary>同じ修正と失敗を繰り返す</summary><p>実装を止め、失敗log、仮説、反証、変更履歴を要約。新しい証拠のない再試行を禁止し、最小再現へ縮小。</p></details>
+          <details><summary>長い会話で前提を忘れた</summary><p>Goal、決定log、diff、次の検証を外部化。<code>/compact</code>後に重要制約を再提示し、必要ならhandoff。</p></details>
+          <details><summary>Worktreeだけ動かない</summary><p>ignored依存、未追跡設定、env、port、DB、submoduleを比較。Git管理外の状態は自動複製されません。</p></details>
+          <details><summary>MCP / Appが見えない</summary><p>提供元、plugin install/enable、connector認証、MCP設定、workspace policy、再起動・新threadの順に確認。</p></details>
+          <details><summary>CLIとAppで挙動が違う</summary><p>version、cwd、profile、config layer、feature flag、認証、local/cloudを比較。</p></details>
+          <details><summary>pushがrejectされた</summary><p>working treeを保全し、fetch後にlocal・remote・merge-baseを確認。意味的に競合解消。</p></details>
+          <details><summary>変更が大きくなりすぎた</summary><p>必要差分と偶発変更を分類。無関係な整形・生成物・依存更新を切り離す。</p></details>
+        </div>
+        <pre>Objective:
+Current state:
+Decisions made:
+Files changed:
+Checks passed:
+Checks failing / not run:
+User changes to preserve:
+Known risks:
+Exact next action:
+Stop conditions:</pre>
+        <div class="card checkpoint"><h3>章のチェックポイント</h3><div class="checklist">
+          <label class="check"><input type="checkbox"><span>State・Context・Permission・Environment・Integrationで切り分けられる</span></label>
+          <label class="check"><input type="checkbox"><span>別threadや担当へ状態を失わずhandoffできる</span></label>
+        </div></div>
+      </section>
+
+      <section class="view" id="mastery">
+        <div class="section-head"><div><span class="chapter">CHAPTER 11</span><h2>Mastery Lab</h2><p>委任設計と運用判断を実際に試す。</p></div></div>
+        <div class="lab-grid">
+          <article class="lab-panel"><span class="label">LAB 01</span><h3>Prompt Diagnostic</h3><p>依頼文の構造を検査します。</p><textarea id="prompt-lab" rows="9" placeholder="Codexへ渡す依頼文を入力"></textarea><button class="action-button" id="analyze-prompt" type="button">委任仕様を診断</button><div class="lab-result" id="prompt-result" aria-live="polite">Goal / Context / Constraints / Done / Evidenceを検査します。</div></article>
+          <article class="lab-panel"><span class="label">LAB 02</span><h3>Delegation Selector</h3><p>仕事の性質から実行場所と持続層を判定します。</p>
+            <label>作業タイプ<select id="task-type"><option value="implementation">ローカル実装</option><option value="research">調査・設計</option><option value="parallel">独立taskの並列実行</option><option value="routine">定型反復</option></select></label>
+            <label>変更risk<select id="task-risk"><option value="normal">通常</option><option value="high">高い</option><option value="readonly">変更なし</option></select></label>
+            <label>外部live data<select id="task-data"><option value="no">不要</option><option value="yes">必要</option></select></label>
+            <label>反復頻度<select id="task-repeat"><option value="once">今回だけ</option><option value="often">繰り返す</option><option value="scheduled">定期実行</option></select></label>
+            <button class="action-button" id="select-delegation" type="button">運用構成を判定</button><div class="lab-result" id="delegation-result" aria-live="polite">条件を選び、判定してください。</div>
+          </article>
+        </div>
+        <h3 class="subhead">判断テスト</h3>
+        <div class="quiz" data-answer="b"><p><b>Q1.</b> 3つのthreadが同じ設定fileを変更し始めました。最初に行うことは？</p><button data-choice="a">最後に競合解消</button><button data-choice="b">編集を止め、所有範囲と統合責任者を再設定</button><button data-choice="c">全員へFull Access</button><div class="quiz-feedback"></div></div>
+        <div class="quiz" data-answer="c"><p><b>Q2.</b> 同じtest失敗を3回繰り返しています。最善の介入は？</p><button data-choice="a">reasoningだけ上げる</button><button data-choice="b">さらに待つ</button><button data-choice="c">止めて仮説・反証・新しい証拠を要求</button><div class="quiz-feedback"></div></div>
+        <div class="quiz" data-answer="a"><p><b>Q3.</b> 毎週同じ監査を行うが、判定ruleがまだ変わります。どこから始める？</p><button data-choice="a">Skillまたは明示Promptで手順を安定</button><button data-choice="b">即座に無人Automation</button><button data-choice="c">AGENTS.mdへ全logを貼る</button><div class="quiz-feedback"></div></div>
+        <h3 class="subhead">実案件シミュレーション</h3>
+        <div class="case-grid">
+          <article><span>CASE A</span><h3>古い巨大repoの不具合</h3><p>Read-onlyで構造・再現・履歴を調査。Planで仮説と検証を承認し、失敗test後に最小修正。</p></article>
+          <article><span>CASE B</span><h3>競合中の複数端末</h3><p>全端末を止め、dirty treeを保全。remote基準で価値ある変更を意味的に統合し、単一端末からpush。</p></article>
+          <article><span>CASE C</span><h3>明朝までの大規模移行</h3><p>Goalへ測定可能な条件を設定。Worktree隔離、読み取り調査を並列化、段階commitと定期検証。</p></article>
+          <article><span>CASE D</span><h3>毎日更新する情報hub</h3><p>公式sourceと更新箇所をSkill化し、link検査をHookへ。安定後にAutomation化し、公開は明示承認。</p></article>
+        </div>
+        <div class="master-check"><h3>Master認定条件</h3><p>全章check、2つのLab、3問の判断testを完了するとMasterになります。本書内の運用習熟checkであり、製品資格ではありません。</p><div class="master-meter"><div id="master-meter-fill"></div></div><strong id="master-status">学習を開始してください</strong></div>
+        <div class="sources">
+          公式: <a href="https://developers.openai.com/codex/codex-manual.md">Codex Manual</a> /
+          <a href="https://developers.openai.com/codex/learn/best-practices">Best practices</a> /
+          <a href="https://developers.openai.com/codex/prompting">Prompting</a> /
+          <a href="https://developers.openai.com/codex/agent-approvals-security">Approvals &amp; security</a> /
+          <a href="https://developers.openai.com/codex/guides/agents-md">AGENTS.md</a> /
+          <a href="https://developers.openai.com/codex/skills">Skills</a> /
+          <a href="https://developers.openai.com/codex/mcp">MCP</a> /
+          <a href="https://developers.openai.com/codex/subagents">Subagents</a> /
+          <a href="https://developers.openai.com/codex/app/worktrees">Worktrees</a>
+          <br>ハブ内: <a href="../../workbench/knowledge/openai-codex.html">OpenAI Codex 深掘り</a> / <a href="../GitGitHub_Operation/index.html">Git &amp; GitHub Operation</a>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+<button class="mobile-toggle" type="button" aria-label="章一覧を開く">Menu</button>
+<script src="../operation-assets/script.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
