@@ -1,0 +1,97 @@
+<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Git & GitHub 完全オペレーションマニュアル</title><link rel="stylesheet" href="../operation-assets/styles.css"></head>
+<body class="git" data-manual="git-github"><div class="layout">
+<aside class="sidebar"><a class="back-link" href="../index.html">← オペレーションマニュアル</a><div class="brand"><div class="brand-mark">GH</div><div><strong>Git & GitHub</strong><span>Operation Manual</span></div></div><input class="search" type="search" placeholder="マニュアル内を検索"><nav class="nav"><button class="active" data-view="model">01 状態モデル</button><button data-view="daily">02 日常フロー</button><button data-view="branches">03 Branch・PR</button><button data-view="sync">04 Pull・複数端末</button><button data-view="conflicts">05 競合解消</button><button data-view="recovery">06 復旧・履歴</button><button data-view="github">07 GitHub運用</button><button data-view="quickref">08 逆引き</button></nav><div class="progress-box"><div class="progress-meta"><span>習熟チェック</span><span class="progress-value">0%</span></div><div class="progress-track"><div class="progress-fill"></div></div></div></aside>
+<main class="main"><header class="hero"><div class="eyebrow">Know the state before the command</div><h1>Git & GitHub<br>完全オペレーション</h1><p class="lead">Gitの状態を理解し、複数端末・複数AIインスタンスでも変更を失わず、競合を統合してGitHubへ届けるための実務マニュアル。危険な暗記コマンドではなく、観測、退避、統合、検証の順番を標準化します。</p><div class="hero-meta"><span class="pill">最終確認 2026-06-20</span><span class="pill">Git CLI / GitHub / gh</span><span class="pill">複数端末・AI並走対応</span></div></header><div class="content">
+<section class="view active" id="model"><div class="section-head"><div><h2>状態モデル</h2><p>Gitは場所ではなく差分の状態を管理する</p></div></div>
+<div class="flow"><div class="flow-step"><b>Working tree</b>編集中</div><div class="flow-step"><b>Index</b>次コミット候補</div><div class="flow-step"><b>Local commit</b>手元の履歴</div><div class="flow-step"><b>Remote ref</b>最後に取得した相手</div><div class="flow-step"><b>Remote</b>GitHub上の実体</div></div>
+<div class="grid three"><article class="card"><h3>HEAD</h3><p>現在チェックアウトしているコミット。通常は現在ブランチの先端を指します。</p></article><article class="card"><h3>origin/main</h3><p>最後のfetchで観測したリモートmain。fetchするまで実リモート更新は反映されません。</p></article><article class="card"><h3>Upstream</h3><p>現在ブランチがpull/push比較に使う追跡先。<code>git branch -vv</code>で確認します。</p></article></div>
+<pre>git status --short --branch
+git remote -v
+git branch -vv
+git log --oneline --decorate --graph --all -12</pre>
+<div class="card"><h3>基礎チェック</h3><div class="checklist"><label class="check"><input type="checkbox"><span>working tree、index、commitの違いを説明できる</span></label><label class="check"><input type="checkbox"><span>fetchとpullの違いを説明できる</span></label><label class="check"><input type="checkbox"><span>HEAD、main、origin/mainの位置を確認できる</span></label><label class="check"><input type="checkbox"><span>コマンド前にstatusとlogを見る習慣がある</span></label></div></div></section>
+
+<section class="view" id="daily"><div class="section-head"><div><h2>日常フロー</h2><p>開始と終了の儀式を固定する</p></div></div>
+<div class="grid"><article class="card"><span class="label">Start</span><h3>作業開始</h3><pre>git status --short --branch
+git fetch origin --prune
+git log --oneline --left-right HEAD...origin/main</pre><p>dirtyなら誰の変更かを確認し、勝手に捨てません。</p></article><article class="card"><span class="label">Commit</span><h3>変更を確定</h3><pre>git diff --stat
+git diff
+git add path/to/file
+git diff --cached
+git commit -m "Describe intent"</pre></article><article class="card"><span class="label">Publish</span><h3>公開</h3><pre>git fetch origin
+git status --short --branch
+git push -u origin HEAD</pre><p>push前に相手が進んでいないことを再確認します。</p></article><article class="card"><span class="label">Close</span><h3>終了</h3><p>ブランチ、commit、push先、テスト結果、残ったdirty変更を報告します。「保存した」と「GitHubへ公開した」を分けます。</p></article></div>
+<div class="callout"><strong>コミット単位:</strong> 変更量ではなく、一つの意図で分けます。機能、テスト、無関係な整形を一つに混ぜません。</div></section>
+
+<section class="view" id="branches"><div class="section-head"><div><h2>Branch・Pull Request</h2><p>変更を隔離し、レビュー可能にする</p></div></div>
+<pre>git switch main
+git pull --ff-only
+git switch -c feature/short-description
+
+# work, test, commit
+git push -u origin feature/short-description
+gh pr create --draft --fill</pre>
+<table><thead><tr><th>選択</th><th>使う場面</th><th>注意</th></tr></thead><tbody><tr><td>Direct main</td><td>個人運用、低リスク、即時反映</td><td>fetch・検証・バックアップを厳格に</td></tr><tr><td>Feature branch</td><td>通常の機能・文書変更</td><td>main追随とPRレビュー</td></tr><tr><td>Worktree</td><td>並列AI、長期作業、複数案</td><td>依存・ignored fileを個別準備</td></tr><tr><td>Fork</td><td>外部リポジトリ</td><td>upstreamとoriginを混同しない</td></tr></tbody></table>
+<div class="grid"><article class="card"><h3>良いPR</h3><ul><li>何を、なぜ変えたか</li><li>ユーザーへの影響</li><li>検証コマンドと結果</li><li>リスクとロールバック</li><li>レビューしてほしい点</li></ul></article><article class="card"><h3>Merge方式</h3><ul><li>Squash: PRを1コミットに整理</li><li>Merge commit: 分岐履歴を保持</li><li>Rebase merge: 線形履歴</li></ul><p>チーム規約を先に決めます。</p></article></div></section>
+
+<section class="view" id="sync"><div class="section-head"><div><h2>Pull・複数端末</h2><p>先に観測し、後から統合する</p></div></div>
+<h3>安全な端末切替</h3><div class="flow"><div class="flow-step"><b>Old device</b>status確認</div><div class="flow-step"><b>Commit</b>意味ある保存</div><div class="flow-step"><b>Push</b>GitHubへ公開</div><div class="flow-step"><b>New device</b>fetch</div><div class="flow-step"><b>Update</b>ff-only/rebase</div></div>
+<pre># old device
+git status --short --branch
+git add path/to/files
+git commit -m "Checkpoint before switching device"
+git push
+
+# new device
+git status --short --branch
+git fetch origin --prune
+git pull --ff-only</pre>
+<div class="grid"><article class="card"><h3><code>pull --ff-only</code></h3><p>分岐がなければ更新し、分岐があれば止まります。予期しないmerge commitを作らない安全な既定です。</p></article><article class="card"><h3><code>pull --rebase</code></h3><p>手元コミットを最新リモート上へ再適用します。履歴は整いますが、競合時のours/theirsの意味に注意します。</p></article></div>
+<div class="callout warn"><strong>未コミット変更がある:</strong> まず内容を確認し、コミット、stash、バックアップ枝のどれかで保護します。自動stash任せにせず、戻し方を決めます。</div>
+<pre>git switch -c backup/local-YYYYMMDD
+git add -A
+git commit -m "Backup local changes before sync"
+git switch main
+git fetch origin</pre></section>
+
+<section class="view" id="conflicts"><div class="section-head"><div><h2>競合解消</h2><p>片側選択ではなく、意図を統合する</p></div></div>
+<div class="flow"><div class="flow-step"><b>1. Stop</b>追加編集停止</div><div class="flow-step"><b>2. Backup</b>枝・commit確保</div><div class="flow-step"><b>3. Inspect</b>base/両側比較</div><div class="flow-step"><b>4. Merge</b>内容を統合</div><div class="flow-step"><b>5. Verify</b>testして続行</div></div>
+<pre>git status
+git diff --name-only --diff-filter=U
+git diff --cc
+rg -n "^(<<<<<<<|=======|>>>>>>>)" .
+
+# resolve files, then
+git add path/to/resolved-file
+git rebase --continue   # rebase中
+# or
+git commit              # merge中</pre>
+<div class="grid"><article class="card"><h3>Merge中</h3><p><code>ours</code>は現在ブランチ、<code>theirs</code>は取り込む相手です。</p></article><article class="card"><h3>Rebase中</h3><p><code>ours</code>はrebase先、<code>theirs</code>は再適用中コミット。直感と逆に見えるため、内容で判断します。</p></article></div>
+<div class="callout bad"><strong>禁止:</strong> 新しい日付だから正しい、行数が多いから採用、という判断。公式情報・仕様・ユーザー意図を確認し、両側の価値を統合します。</div>
+<div class="card"><h3>競合解消チェック</h3><div class="checklist"><label class="check"><input type="checkbox"><span>バックアップ枝またはコミットがある</span></label><label class="check"><input type="checkbox"><span>競合全ファイルの両側を読んだ</span></label><label class="check"><input type="checkbox"><span>競合マーカーがゼロ</span></label><label class="check"><input type="checkbox"><span>テスト・リンク・JSONなどを検証した</span></label><label class="check"><input type="checkbox"><span>リモートを再fetchしてからpushする</span></label></div></div></section>
+
+<section class="view" id="recovery"><div class="section-head"><div><h2>復旧・履歴</h2><p>破壊コマンドより復元可能な手段を優先</p></div></div>
+<table><thead><tr><th>目的</th><th>安全な第一選択</th><th>注意</th></tr></thead><tbody><tr><td>未stage変更を確認</td><td><code>git diff</code></td><td>restore前に必ず読む</td></tr><tr><td>stageを外す</td><td><code>git restore --staged file</code></td><td>working treeは残る</td></tr><tr><td>公開済みcommitを戻す</td><td><code>git revert SHA</code></td><td>履歴を壊さない</td></tr><tr><td>消えたcommitを探す</td><td><code>git reflog</code></td><td>期限前に枝を作る</td></tr><tr><td>特定ファイルを過去から復元</td><td><code>git restore --source SHA -- file</code></td><td>現在変更を退避</td></tr></tbody></table>
+<pre>git reflog --date=iso
+git branch recovery/my-work SHA
+git show SHA
+git cherry-pick SHA</pre>
+<div class="callout bad"><strong><code>reset --hard</code>:</strong> 明示的に捨てる対象を確認し、バックアップを作った場合だけ使用します。AIへ曖昧に「元に戻して」と依頼しません。</div>
+<div class="grid"><article class="card"><h3>誤ってmainで作業</h3><pre>git switch -c feature/rescue-work
+git switch main</pre><p>変更を新枝へ保持してからmainへ戻ります。</p></article><article class="card"><h3>push rejected</h3><pre>git fetch origin
+git log --left-right HEAD...origin/main</pre><p>分岐内容を確認し、rebaseまたはmergeを選びます。</p></article></div></section>
+
+<section class="view" id="github"><div class="section-head"><div><h2>GitHub運用</h2><p>認証、Issue、PR、Review、Actions</p></div></div>
+<pre>gh auth status
+gh repo view
+gh issue list
+gh pr status
+gh pr checks
+gh run list</pre>
+<div class="grid"><article class="card"><h3>Authentication</h3><p>HTTPS credential、SSH key、GitHub CLIを混在させず、どの経路で認証しているか把握します。秘密鍵やPATをリポジトリへ保存しません。</p></article><article class="card"><h3>Issue</h3><p>問題、背景、完了条件、非対象を記録。実装前の合意単位として使います。</p></article><article class="card"><h3>PR Review</h3><p>変更概要より、バグ、セキュリティ、回帰、テスト不足を先に確認。指摘はファイルと理由を明示します。</p></article><article class="card"><h3>Actions</h3><p>失敗job、最初の原因、再現性を確認。ログ全体を貼らず、必要な行だけ共有します。</p></article></div>
+<div class="callout"><strong>Protected branch:</strong> mainへ直接pushできない場合は、ルールを迂回せず、ブランチ・PR・必須check・reviewを通します。</div></section>
+
+<section class="view" id="quickref"><div class="section-head"><div><h2>逆引き</h2><p>状況から最初のコマンドを選ぶ</p></div></div>
+<div class="quick-grid"><div class="quick"><b>今どこにいる?</b><span><code>git status -sb</code> / <code>git branch -vv</code></span></div><div class="quick"><b>リモート更新を確認</b><span><code>git fetch origin --prune</code></span></div><div class="quick"><b>両者の差</b><span><code>git log --left-right HEAD...origin/main</code></span></div><div class="quick"><b>未保存差分</b><span><code>git diff</code> / <code>git diff --cached</code></span></div><div class="quick"><b>競合ファイル</b><span><code>git diff --name-only --diff-filter=U</code></span></div><div class="quick"><b>消えた履歴</b><span><code>git reflog</code></span></div><div class="quick"><b>安全に取り消す</b><span>公開済みは<code>git revert</code></span></div><div class="quick"><b>PR状況</b><span><code>gh pr status</code> / <code>gh pr checks</code></span></div></div>
+<div class="sources">公式: <a href="https://git-scm.com/docs/git">Git documentation</a> / <a href="https://docs.github.com/en/get-started/using-git/about-git">GitHub Docs</a> / <a href="https://cli.github.com/manual/">GitHub CLI manual</a>　ハブ内: <a href="../../workbench/knowledge/git-basics.html">Git & GitHub完全ガイド</a> / <a href="../../foundations/multi-instance-protocol.html">並走プロトコル</a></div></section>
+</div></main></div><button class="mobile-toggle" type="button">Menu</button><script src="../operation-assets/script.js"></script></body></html>

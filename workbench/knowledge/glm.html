@@ -246,7 +246,7 @@
             <span class="eyebrow">The Connector (連結者)</span>
             <h1>GLM</h1>
             <p class="lead">ツールと世界をつなぐハブ。最新の「GLM-5.2」（2026-06-16 MIT 公開）は、1M トークンコンテキスト×長期コーディングに特化したオープンウェイト最強クラス。SWE-Bench Pro 62.1% で GPT-5.5 を超え、コスト $1.40/MTok で約 1/6 の料金を実現。</p>
-            <span class="last-updated">Last Updated: 2026.06.18（GLM-5.2・AutoGLM-Thinking 追記）</span>
+            <span class="last-updated">Last Updated: 2026.06.20（GLM-5.2公式確認・GLM-5.1運用情報を統合）</span>
             <br>
             <a class="back" href="../index.html">← Workbenchへ戻る</a>
         </header>
@@ -283,6 +283,7 @@
                         ユーザーが「昨日の〇〇社の株価を調べてグラフにして」と言うだけで、自動的に「Web検索」→「データ取得」→「Pythonで描画」→「画像生成」というパイプラインを構築・実行します。</li>
                     <li><strong>GLM-5.2（2026-06-16 MIT 公開・現行フラッグシップ）</strong>: 753B MoE（40B active）、1M コンテキスト（最大出力 131K トークン）。IndexShare アーキテクチャにより 1M コンテキスト時の推論 FLOPs を 2.9 倍削減。SWE-Bench Pro 62.1%・Terminal-Bench 2.1 で 81.0%。MIT ライセンスで HuggingFace / ModelScope に公開済み。API は $1.40 / $4.40（入力/出力 per MTok）。</li>
                     <li><strong>GLM-5.1 Highspeed API（2026-05 追加）</strong>: 400 tokens/s の高速 API バリアント。主要 LLM プロバイダー中で最速クラスのスループット。リアルタイム性が要る用途向け。</li>
+                    <li><strong>GLM-5.1</strong>: 200K context / 128K max output。長時間の自律実行、thinking mode、function calling、MCP、context caching、structured output に対応。Coding Plan でも継続利用可能。</li>
                     <li><strong>GLM-5（2026-02 リリース）</strong>: 744B MoE（40B active）・Huawei Ascend チップで学習（28.5T トークン）。現行は 5.2 が上位互換。</li>
                 </ul>
             </article>
@@ -331,7 +332,7 @@
                 を本ハブの制作・OpenClaw 志向の中でどう位置づけるか。答えは明快で、<strong>「自動コンテンツ工場を安く回す作業馬（workhorse）」</strong>です。</p>
             <ul>
                 <li><strong>安く・止めずに回す</strong>:
-                    オープンウェイト＋低コスト（API 参考価格 入力 $1.40 / 出力 $4.40 per 1M）のため、量産パイプラインで大量リクエストを単価で殴れます。最高品質を1回より「十分な品質を大量に」が効く工程の下層を担います。</li>
+                    低コストAPIと Coding Plan のモデル選択肢（GLM-5.1 / 5-Turbo / 4.7 / 4.5-Air）があるため、量産パイプラインで大量リクエストを単価で殴れます。最高品質を1回より「十分な品質を大量に」が効く工程の下層を担います。</li>
                 <li><strong>"All Tools" で自走する</strong>:
                     「調べて→整形して→描画して」を1プロンプトで完結できるため、定型の制作タスク（素材収集・整形・下書き生成）を人間の逐次指示なしに回せます。</li>
                 <li><strong>役割分担の下層</strong>:
@@ -411,6 +412,7 @@
                     <tr><td style="padding:6px 8px;"><strong>Terminal-Bench 2.1</strong></td><td style="padding:6px 8px;">81.0%</td><td style="padding:6px 8px;">長期ターミナル・コーディングタスクで OW 首位。</td></tr>
                     <tr><td style="padding:6px 8px;"><strong>規模</strong></td><td style="padding:6px 8px;">753B MoE（40B active）</td><td style="padding:6px 8px;">IndexShare で 1M ctx 時の FLOPs を 2.9× 削減。同性能を安く回せる。</td></tr>
                     <tr><td style="padding:6px 8px;"><strong>推論コスト</strong></td><td style="padding:6px 8px;">$1.40 / MTok（入力）</td><td style="padding:6px 8px;">GPT-5.5（$7.50）の約 1/5、Claude Fable 5（$10）の 1/7。同水準の OW 性能を大幅安価に。</td></tr>
+                    <tr><td style="padding:6px 8px;"><strong>Coding Plan</strong></td><td style="padding:6px 8px;">5.2 / 5.1 / 5-Turbo 等</td><td style="padding:6px 8px;">用途・速度・互換性に応じて世代を選択可能。</td></tr>
                 </tbody>
             </table>
             <p style="margin-top:10px;"><strong>含意</strong>: 「最高知能を1回」ではなく「<strong>十分な知能を安く大量に</strong>」が効く工程 — つまりコード生成・ツール連携・自動化の量産下層 — が GLM の主戦場です。</p>

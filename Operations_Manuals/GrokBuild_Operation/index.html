@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Grok Build 完全オペレーションマニュアル</title>
+  <link rel="stylesheet" href="../operation-assets/styles.css">
+</head>
+<body class="grok" data-manual="grok-build">
+<div class="layout">
+  <aside class="sidebar">
+    <a class="back-link" href="../index.html">← オペレーションマニュアル</a>
+    <div class="brand"><div class="brand-mark">GB</div><div><strong>Grok Build</strong><span>Operation Manual</span></div></div>
+    <input class="search" type="search" placeholder="マニュアル内を検索">
+    <nav class="nav">
+      <button class="active" data-view="overview">01 概要と導入</button>
+      <button data-view="daily">02 日常オペレーション</button>
+      <button data-view="prompting">03 指示とコンテキスト</button>
+      <button data-view="workflows">04 実践ワークフロー</button>
+      <button data-view="api">05 API・ツール連携</button>
+      <button data-view="recovery">06 復旧と安全運用</button>
+      <button data-view="quickref">07 逆引き</button>
+    </nav>
+    <div class="progress-box"><div class="progress-meta"><span>習熟チェック</span><span class="progress-value">0%</span></div><div class="progress-track"><div class="progress-fill"></div></div></div>
+  </aside>
+  <main class="main">
+    <header class="hero">
+      <div class="eyebrow">Build fast, verify harder</div>
+      <h1>Grok Build<br>完全オペレーション</h1>
+      <p class="lead">Grok Buildを「速いコード生成」で終わらせず、調査、実装、検証、レビュー、引き渡しまで一つの運転手順にするための実務マニュアル。Grok Build 0.1の256KコンテキストとxAI API互換運用を前提にしています。</p>
+      <div class="hero-meta"><span class="pill">最終確認 2026-06-20</span><span class="pill">対象: Build / xAI API</span><span class="pill">基準: 公式Docs・Changelog</span></div>
+    </header>
+    <div class="content">
+      <section class="view active" id="overview">
+        <div class="section-head"><div><h2>概要と導入</h2><p>最初に役割と運転境界を決める</p></div></div>
+        <div class="grid three">
+          <article class="card"><span class="label">Best at</span><h3>高速な実装ループ</h3><p>小さく仕様を切り、生成、実行、修正を短い周期で回す。待ち時間を減らして試作数を増やす用途に向きます。</p></article>
+          <article class="card"><span class="label">Not enough</span><h3>検証は別工程</h3><p>速度と正しさは別です。テスト、型検査、セキュリティ、差分レビューを完了条件に含めます。</p></article>
+          <article class="card"><span class="label">Context</span><h3>256Kを設計して使う</h3><p>大量投入より、対象ファイル、仕様、失敗ログ、完了条件に絞るほうが再現性が上がります。</p></article>
+        </div>
+        <div class="flow"><div class="flow-step"><b>1. Scope</b>変更範囲を限定</div><div class="flow-step"><b>2. Inspect</b>コードと仕様を読む</div><div class="flow-step"><b>3. Build</b>小さく実装</div><div class="flow-step"><b>4. Verify</b>テストと差分</div><div class="flow-step"><b>5. Ship</b>説明して引き渡す</div></div>
+        <div class="card"><h3>導入チェック</h3><div class="checklist">
+          <label class="check"><input type="checkbox"><span>xAIアカウントとAPIキーの保管場所を決めた</span></label>
+          <label class="check"><input type="checkbox"><span>対象リポジトリをGit管理し、開始前コミットを作った</span></label>
+          <label class="check"><input type="checkbox"><span>テスト、lint、buildの実行コマンドを確認した</span></label>
+          <label class="check"><input type="checkbox"><span>秘密情報をプロンプトやログへ貼らないルールを決めた</span></label>
+        </div></div>
+        <div class="callout warn"><strong>運用原則:</strong> Grok Buildの速度は、タスクを小さくし、検証コマンドを先に渡したときに最大化します。曖昧な大仕事を一発で任せる運用にはしません。</div>
+      </section>
+
+      <section class="view" id="daily">
+        <div class="section-head"><div><h2>日常オペレーション</h2><p>毎回同じ開始・終了手順を通す</p></div></div>
+        <div class="grid">
+          <article class="card"><span class="label">Start</span><h3>セッション開始</h3><ol><li><code>git status</code>で未保存変更を確認</li><li>対象機能と非対象を一文で定義</li><li>関連ファイルを先に読ませる</li><li>完了条件と検証コマンドを提示</li></ol></article>
+          <article class="card"><span class="label">Finish</span><h3>セッション終了</h3><ol><li>テスト・lint・buildを実行</li><li><code>git diff</code>をレビュー</li><li>残課題と未確認事項を列挙</li><li>意味のある単位でコミット</li></ol></article>
+        </div>
+        <h3>標準プロンプト</h3>
+        <pre>目的: [達成したい状態]
+対象: [変更してよいファイル/機能]
+非対象: [触らない領域]
+制約: [言語、依存、互換性、性能]
+完了条件:
+- [ユーザーから見える結果]
+- [テスト/lint/buildコマンド]
+- 差分を自己レビューし、リスクを報告
+
+最初に実装せず、関連コードと既存パターンを確認してください。</pre>
+        <table><thead><tr><th>局面</th><th>人が決めること</th><th>Grok Buildへ任せること</th></tr></thead><tbody>
+          <tr><td>企画</td><td>価値、優先順位、禁止事項</td><td>選択肢、技術調査、試作案</td></tr>
+          <tr><td>実装</td><td>受入条件、設計境界</td><td>コード変更、テスト追加、反復修正</td></tr>
+          <tr><td>レビュー</td><td>許容リスク、公開判断</td><td>差分要約、潜在バグ、回帰確認</td></tr>
+        </tbody></table>
+      </section>
+
+      <section class="view" id="prompting">
+        <div class="section-head"><div><h2>指示とコンテキスト</h2><p>速さを壊さない情報設計</p></div></div>
+        <div class="grid three">
+          <article class="card"><h3>ファイルで渡す</h3><p>長い仕様を会話へ貼り続けず、README、設計書、テスト、サンプルへ固定します。</p></article>
+          <article class="card"><h3>失敗ログを短く渡す</h3><p>コマンド、終了コード、最初の原因行、期待結果をセットにします。</p></article>
+          <article class="card"><h3>1ターン1判断</h3><p>設計変更と大量実装を混ぜず、確認ポイントごとに区切ります。</p></article>
+        </div>
+        <div class="callout"><strong>良い依頼:</strong> 「この失敗テストを通す最小変更を行い、既存APIを変えず、同じ回帰テストを追加してください」。</div>
+        <div class="callout bad"><strong>避ける依頼:</strong> 「全部いい感じに刷新して」。範囲、判断基準、終了条件がなく、速度が手戻りへ変わります。</div>
+        <div class="card"><h3>コンテキスト棚卸し</h3><div class="checklist">
+          <label class="check"><input type="checkbox"><span>対象コードの入口と呼び出し元を含めた</span></label>
+          <label class="check"><input type="checkbox"><span>既存テストと類似実装を含めた</span></label>
+          <label class="check"><input type="checkbox"><span>秘密情報、個人情報、不要な巨大ログを除外した</span></label>
+          <label class="check"><input type="checkbox"><span>「何を変えないか」を明記した</span></label>
+        </div></div>
+      </section>
+
+      <section class="view" id="workflows">
+        <div class="section-head"><div><h2>実践ワークフロー</h2><p>用途別の再現可能な手順</p></div></div>
+        <div class="grid">
+          <article class="card"><span class="label">Feature</span><h3>機能追加</h3><ol><li>既存の類似機能を特定</li><li>最小のデータフローを図示</li><li>失敗するテストを先に追加</li><li>実装してテストを通す</li><li>公開APIとUI回帰を確認</li></ol></article>
+          <article class="card"><span class="label">Bug</span><h3>障害修正</h3><ol><li>再現コマンドを固定</li><li>原因候補を最大3つに絞る</li><li>観測ログを追加</li><li>最小修正</li><li>再現テストを残す</li></ol></article>
+          <article class="card"><span class="label">Refactor</span><h3>リファクタリング</h3><ol><li>振る舞いテストを確保</li><li>構造変更を小分け</li><li>各段階でテスト</li><li>性能・bundle差を比較</li></ol></article>
+          <article class="card"><span class="label">Review</span><h3>PRレビュー</h3><ol><li>仕様との不一致</li><li>境界値とエラー処理</li><li>認証・権限・秘密情報</li><li>テスト欠落</li><li>運用・移行リスク</li></ol></article>
+        </div>
+        <pre>この差分をレビューしてください。要約ではなく、
+1. 実害のあるバグ
+2. セキュリティ/権限リスク
+3. 回帰テスト不足
+4. ロールバック困難性
+の順で、ファイルと理由を示してください。</pre>
+      </section>
+
+      <section class="view" id="api">
+        <div class="section-head"><div><h2>API・ツール連携</h2><p>xAI APIで反復処理へ組み込む</p></div></div>
+        <div class="grid">
+          <article class="card"><h3>APIキー</h3><p>環境変数またはシークレットストアで管理します。リポジトリ、HTML、ログ、スクリーンショットへ含めません。</p><pre>$env:XAI_API_KEY="..."</pre></article>
+          <article class="card"><h3>モデル指定</h3><p>モデルIDとコンテキスト上限は公式Modelsページで確認し、コード中の既定値は一箇所へ集約します。</p><pre>model = "grok-build-0-1"
+base_url = "https://api.x.ai/v1"</pre></article>
+        </div>
+        <h3>自動化の境界</h3>
+        <table><thead><tr><th>処理</th><th>自動化</th><th>人の承認</th></tr></thead><tbody>
+          <tr><td>コード生成・静的解析</td><td>可</td><td>最終差分</td></tr>
+          <tr><td>テスト環境デプロイ</td><td>条件付き</td><td>環境・コスト</td></tr>
+          <tr><td>本番変更・削除・課金</td><td>原則不可</td><td>必須</td></tr>
+          <tr><td>秘密情報・顧客データ</td><td>最小化</td><td>データ責任者</td></tr>
+        </tbody></table>
+      </section>
+
+      <section class="view" id="recovery">
+        <div class="section-head"><div><h2>復旧と安全運用</h2><p>速い失敗を安全に戻す</p></div></div>
+        <div class="grid">
+          <article class="card"><h3>変更が広がった</h3><p><code>git diff --stat</code>で範囲を確認し、生成を止めます。必要ファイルだけ残し、未関係の変更はバックアップ後に除外します。</p></article>
+          <article class="card"><h3>テストが不安定</h3><p>同じコマンドを複数回実行し、時刻・ネットワーク・共有状態への依存を切り分けます。</p></article>
+          <article class="card"><h3>コンテキストが崩れた</h3><p>新しいセッションで目的、現在差分、失敗ログ、次の一手だけを再提示します。</p></article>
+          <article class="card"><h3>秘密情報を貼った</h3><p>即時にキーを失効・再発行し、ログと履歴の保存範囲を確認します。削除だけでは無効化になりません。</p></article>
+        </div>
+        <pre>git status --short
+git diff --stat
+git diff
+git log --oneline -5</pre>
+        <div class="callout bad"><strong>禁止:</strong> 状況を確認せずに <code>git reset --hard</code>、強制push、再帰削除を実行させないこと。まずバックアップ枝またはstashを作ります。</div>
+      </section>
+
+      <section class="view" id="quickref">
+        <div class="section-head"><div><h2>逆引き</h2><p>困ったときの最短入口</p></div></div>
+        <div class="quick-grid">
+          <div class="quick"><b>最速で試作したい</b><span>画面1枚、API1本、受入条件3つに限定する。</span></div>
+          <div class="quick"><b>既存コードを壊したくない</b><span>類似実装と回帰テストを先に読ませる。</span></div>
+          <div class="quick"><b>回答が散らかる</b><span>実装前に計画と変更ファイル一覧だけ出させる。</span></div>
+          <div class="quick"><b>同じ失敗を繰り返す</b><span>失敗コマンドと原因をREADMEまたは運用ログへ固定する。</span></div>
+          <div class="quick"><b>本番へ出したい</b><span>テスト、差分、migration、rollbackの4点を人が確認する。</span></div>
+          <div class="quick"><b>最新仕様を確認したい</b><span>xAI ModelsとBuild Changelogを確認する。</span></div>
+        </div>
+        <div class="sources">公式: <a href="https://docs.x.ai/developers/models">xAI Models</a> / <a href="https://x.ai/build/changelog">Grok Build Changelog</a>　ハブ内: <a href="../../workbench/knowledge/grok-build.html">Grok Build深掘り</a> / <a href="../../research/grok-recent-updates.html">Grok Updates</a></div>
+      </section>
+    </div>
+  </main>
+</div>
+<button class="mobile-toggle" type="button">Menu</button>
+<script src="../operation-assets/script.js"></script>
+</body></html>

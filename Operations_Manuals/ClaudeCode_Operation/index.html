@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Code — 完全オペレーションガイド</title>
+    <meta name="description" content="Claude Codeの操作方法を基礎から実践まで体系的に学べるインタラクティブガイド。CLIベースのAIエージェントを最大限に活用するための完全マニュアル。">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <a class="shelf-link" href="../index.html">← 書架</a>
+    <div class="read-progress" id="read-progress"></div>
+
+    <div class="ambient-bg">
+        <div class="ambient-orb orb-a"></div>
+        <div class="ambient-orb orb-b"></div>
+        <div class="ambient-orb orb-c"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="site-header">
+        <div class="header-inner">
+            <div class="brand-area">
+                <div class="brand-logo">CC</div>
+                <div class="brand-text">
+                    <h1>Claude <span>Code</span></h1>
+                    <div class="brand-sub">Operation Guide</div>
+                </div>
+            </div>
+            <nav class="nav-tabs" id="nav-tabs">
+                <button class="nav-tab active" data-view="roadmap">🗺️ ロードマップ</button>
+                <button class="nav-tab" data-view="concepts">📐 基礎知識</button>
+                <button class="nav-tab" data-view="commands">⚡ コマンド辞典</button>
+                <button class="nav-tab" data-view="workflows">🔗 ワークフロー</button>
+                <button class="nav-tab" data-view="tips">💎 マスターの道</button>
+                <button class="nav-tab" data-view="quickref">🔍 逆引き</button>
+            </nav>
+        </div>
+    </header>
+
+    <div class="page-container">
+        <!-- Hero -->
+        <section class="hero-section">
+            <h2>ターミナルから動かす、<br>AIエージェント。</h2>
+            <p class="hero-subtitle">
+                Claude Codeは、ターミナル上で動作するCLIベースのAIコーディングエージェントです。<br>
+                コードを読み、書き、実行し、あなたのプロジェクトを自律的に前進させます。
+            </p>
+            <div class="hero-terminal">
+                <div class="terminal-bar">
+                    <div class="terminal-dot red"></div>
+                    <div class="terminal-dot yellow"></div>
+                    <div class="terminal-dot green"></div>
+                    <span class="terminal-title">claude — ~/my-project</span>
+                </div>
+                <div class="terminal-body">
+                    <div class="terminal-line"><span class="prompt-symbol">$ </span><span class="cmd-text">claude</span></div>
+                    <div class="terminal-line"><span class="output-text">╭──────────────────────────────────╮</span></div>
+                    <div class="terminal-line"><span class="output-text">│  </span><span class="success-text">Claude Code</span><span class="output-text"> v1.0 — Ready.       │</span></div>
+                    <div class="terminal-line"><span class="output-text">╰──────────────────────────────────╯</span></div>
+                    <div class="terminal-line"><span class="prompt-symbol">❯ </span><span class="cmd-text" id="typing-target"></span><span class="typing-cursor" id="typing-cursor">█</span></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== VIEW 1: ROADMAP ==================== -->
+        <div class="view-panel active" id="view-roadmap">
+            <h2 class="section-title"><span class="icon">🗺️</span> マスターへのロードマップ</h2>
+            <p class="section-desc">Claude Code習得の全体像。各フェーズのマイルストーンをチェックして、自分の現在地を確認しましょう。</p>
+
+            <div class="roadmap-container">
+                <div class="roadmap-track">
+                    <!-- Phase 1: Beginner -->
+                    <div class="roadmap-phase fade-up">
+                        <div class="phase-marker phase-1">1</div>
+                        <div class="phase-header">
+                            <div class="phase-title">
+                                Phase 1: 基礎を固める
+                                <span class="phase-tag tag-beginner">Beginner</span>
+                            </div>
+                        </div>
+                        <p class="phase-desc">まずはClaude Codeの起動から対話、基本操作を身につけましょう。ここが全ての土台になります。</p>
+                        <div class="milestone-grid">
+                            <div class="milestone-item glass-card">
+                                <div class="milestone-check" data-milestone="m1">✓</div>
+                                <div class="milestone-info">
+                                    <h4>インストール & 起動</h4>
+                                    <p>npm i -g @anthropic-ai/claude-code でインストール、claude で起動</p>
+                                </div>
+                            </div>
+                            <div class="milestone-item glass-card">
+                                <div class="milestone-check" data-milestone="m2">✓</div>
+                                <div class="milestone-info">
+                                    <h4>最初の対話</h4>
+                                    <p>自然言語で指示を出し、ファイルの読み書きを体験する</p>
+                                </div>
+                            </div>
+                            <div class="milestone-item glass-card">
+                                <div class="milestone-check" data-milestone="m3">✓</div>
+                                <div class="milestone-info">
+                                    <h4>Permission Modelの理解</h4>
+                                    <p>Allow/Denyの仕組みを理解し、安全な操作を覚える</p>
+                                </div>
+                            </div>
+                            <div class="milestone-item glass-card">
+                                <div class="milestone-check" data-milestone="m4">✓</div>
+                                <div class="milestone-info">
+                                    <h4>CLAUDE.md の作成</h4>
+                                    <p>/init で自動生成、プロジェクト固有のルールを定義</p>
+                                </div>
+                            </div>
+                            <div class="milestone-item glass-card">
+                                <div class="milestone-check" data-milestone="m5">✓</div>
+                                <div class="milestone-info">
+                                    <h4>基本コマンドを覚える</h4>
+                                    <p>/clear, /cost, /chat, /review を使いこなす</p>
+                                </div>
+                            </div>
+                            <div class="milestone-item glass-card">
+                                <div class="milestone-check" data-milestone="m6">✓</div>
+                                <div class="milestone-info">
+                                    <h4>エラーを貼り付けてデバッグ</h4>
+                                    <p>スタックトレースを渡して原因特定→修正の一連を体験</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Phase 2: Intermediate -->
+                    <div class="roadmap-phase fade-up">
+                        <div class="phase-marker phase-2">2</div>
+                        <div class="phase-header">
+                            <div class="phase-title">
+                                Phase 2: 実践力を磨く
+                                <span class="phase-tag tag-intermediate">Intermediate</span>
+                            </div>
+                        </div>
+                        <p class="phase-desc">日常の開発タスクをClaude Codeで効率化。指示の出し方を磨き、複雑なタスクを任せられるようになりましょう。</p>
+                        <div class="milestone-grid">
+                            <div class="milestone-item glass-card">
+                                <div class="milestone-check" data-milestone="m7">✓</div>
+                                <div class="milestone-info">
+                                    <h4>リファクタリングを任せる</h4>
+                                    <p>スコープを限定して段階的にコードを改善させる</p>
+                                </div>
+                            </div>
+                            <div class="milestone-item glass-card">
+                                <div class="milestone-check" data-milestone="m8">✓</div>
+                                <div class="milestone-info">
+                                    <h4>テスト駆動開発 (TDD)</h4>
+                                    <p>テストを先に書き、実装をClaude Codeに任せる</p>
+                                </div>
+                            </div>
+                            <div class="milestone-item glass-card">
+                                <div class="milestone-check" data-milestone="m9">✓</div>
+                                <div class="milestone-info">
+                                    <h4>コンテキスト管理を意識する</h4>
+                                    <p>/clear でのリセット、タスクの区切り方を習得</p>
+                                </div>
+                            </div>
+                            <div class="milestone-item glass-card">
+                                <div class="milestone-check" data-milestone="m10">✓</div>
+                                <div class="milestone-info">
+                                    <h4>ドキュメント自動生成</h4>
+                                    <p>README、API docs、アーキテクチャ図を生成させる</p>
+                                </div>
+                            </div>
+                            <div class="milestone-item glass-card">
+                                <div class="milestone-check" data-milestone="m11">✓</div>
+                                <div class="milestone-info">
+                                    <h4>Git操作の自動化</h4>
+                                    <p>コミット、ブランチ、PR作成を自然言語で行う</p>
+                                </div>
+                            </div>
+                            <div class="milestone-item glass-card">
+                                <div class="milestone-check" data-milestone="m12">✓</div>
+                                <div class="milestone-info">
+                                    <h4>画像入力の活用</h4>
+                                    <p>UIモックアップやスクリーンショットからコードを生成</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Phase 3: Advanced -->
+                    <div class="roadmap-phase fade-up">
+                        <div class="phase-marker phase-3">3</div>
+                        <div class="phase-header">
+                            <div class="phase-title">
+                                Phase 3: 自動化の達人
+                                <span class="phase-tag tag-advanced">Advanced</span>
+                            </div>
+                        </div>
+                        <p class="phase-desc">ヘッドレスモードやCI/CD統合で、Claude Codeを開発パイプラインに組み込みましょう。</p>
+                        <div class="milestone-grid">
+                            <div class="milestone-item glass-card">
+                                <div class="milestone-check" data-milestone="m13">✓</div>
+                                <div class="milestone-info">
+                                    <h4>ヘッドレスモード (-p)</h4>
+                                    <p>スクリプトやCI/CDからClaude Codeを非対話的に呼び出す</p>
+                                </div>
+                            </div>
+                            <div class="milestone-item glass-card">
+                                <div class="milestone-check" data-milestone="m14">✓</div>
+                                <div class="milestone-info">
+                                    <h4>パイプ入力の活用</h4>
+                                    <p>cat, git diff などの出力をパイプで渡して処理させる</p>
+                                </div>
+                            </div>
+                            <div class="milestone-item glass-card">
+                                <div class="milestone-check" data-milestone="m15">✓</div>
+                                <div class="milestone-info">
+                                    <h4>GitHub Actions統合</h4>
+                                    <p>PR自動レビュー、セキュリティチェックを自動化</p>
+                                </div>
+                            </div>
+                            <div class="milestone-item glass-card">
+                                <div class="milestone-check" data-milestone="m16">✓</div>
+                                <div class="milestone-info">
+                                    <h4>settings.json のカスタマイズ</h4>
+                                    <p>許可リスト、モデル選択、デフォルト設定を最適化</p>
+                                </div>
+                            </div>
+                            <div class="milestone-item glass-card">
+                                <div class="milestone-check" data-milestone="m17">✓</div>
+                                <div class="milestone-info">
+                                    <h4>マルチファイル・大規模リファクタ</h4>
+                                    <p>プロジェクト横断の変更を安全に実行する戦略</p>
+                                </div>
+                            </div>
+                            <div class="milestone-item glass-card">
+                                <div class="milestone-check" data-milestone="m18">✓</div>
+                                <div class="milestone-info">
+                                    <h4>Extended Thinking の理解</h4>
+                                    <p>複雑なタスクでの思考過程を理解し活用する</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Phase 4: Master -->
+                    <div class="roadmap-phase fade-up">
+                        <div class="phase-marker phase-4">4</div>
+                        <div class="phase-header">
+                            <div class="phase-title">
+                                Phase 4: マスターの領域
+                                <span class="phase-tag tag-master">Master</span>
+                            </div>
+                        </div>
+                        <p class="phase-desc">Claude Codeの全機能を使いこなし、チーム全体の開発効率を変革する存在になりましょう。</p>
+                        <div class="milestone-grid">
+                            <div class="milestone-item glass-card">
+                                <div class="milestone-check" data-milestone="m19">✓</div>
+                                <div class="milestone-info">
+                                    <h4>カスタムスラッシュコマンド</h4>
+                                    <p>プロジェクト固有のコマンドを定義して効率化</p>
+                                </div>
+                            </div>
+                            <div class="milestone-item glass-card">
+                                <div class="milestone-check" data-milestone="m20">✓</div>
+                                <div class="milestone-info">
+                                    <h4>MCP (Model Context Protocol) 統合</h4>
+                                    <p>外部ツールやデータソースをClaude Codeに接続</p>
+                                </div>
+                            </div>
+                            <div class="milestone-item glass-card">
+                                <div class="milestone-check" data-milestone="m21">✓</div>
+                                <div class="milestone-info">
+                                    <h4>チームへの展開</h4>
+                                    <p>CLAUDE.md をチーム共有し、開発プロセスを標準化</p>
+                                </div>
+                            </div>
+                            <div class="milestone-item glass-card">
+                                <div class="milestone-check" data-milestone="m22">✓</div>
+                                <div class="milestone-info">
+                                    <h4>プロンプトエンジニアリング</h4>
+                                    <p>最適な指示の構造化と、反復パターンの確立</p>
+                                </div>
+                            </div>
+                            <div class="milestone-item glass-card">
+                                <div class="milestone-check" data-milestone="m23">✓</div>
+                                <div class="milestone-info">
+                                    <h4>ゼロからの完全自律構築</h4>
+                                    <p>要件だけを伝え、デプロイ可能なアプリを構築させる</p>
+                                </div>
+                            </div>
+                            <div class="milestone-item glass-card">
+                                <div class="milestone-check" data-milestone="m24">✓</div>
+                                <div class="milestone-info">
+                                    <h4>マルチエージェント連携</h4>
+                                    <p>複数のClaude Codeインスタンスを並行で活用</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress bar -->
+                <div class="roadmap-progress-bar glass-card">
+                    <div class="progress-label">
+                        <span>全体の習得度</span>
+                        <span id="progress-pct">0%</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <div class="progress-rank" id="progress-rank-text">Rank: <span>Beginner</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== VIEW 2: CONCEPTS ==================== -->
+        <div class="view-panel" id="view-concepts">
+            <h2 class="section-title"><span class="icon">📐</span> Claude Codeの基礎知識</h2>
+            <p class="section-desc">Claude Codeは「チャット型AI」とは根本的に異なります。ファイルシステムを直接操作し、コマンドを実行し、ウェブを検索する「自律型エージェント」です。</p>
+
+            <div class="concept-flow">
+                <div class="concept-step fade-up">
+                    <div class="step-indicator">⌨️</div>
+                    <div class="step-body glass-card">
+                        <h3>CLI-Firstの思想 <span class="step-label">基本</span></h3>
+                        <p>Claude CodeはターミナルにCLIコマンドとして常駐します。IDEを問わず、SSHセッション越しにリモートサーバー上でも動作します。VSCode拡張のようにGUIに依存しないため、あらゆる開発環境に統合できます。</p>
+                        <div class="code-block">
+                            <span class="prompt-symbol">$ </span>claude<br>
+                            <span class="output-text"># 対話モードで起動。プロジェクトのルートで実行</span><br><br>
+                            <span class="prompt-symbol">$ </span>claude -p "テストを全部直して"<br>
+                            <span class="output-text"># 非対話モード。CI/CDやスクリプトから呼び出せる</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="concept-step fade-up">
+                    <div class="step-indicator">🔄</div>
+                    <div class="step-body glass-card">
+                        <h3>Agentic Loop（自律ループ） <span class="step-label">核心</span></h3>
+                        <p>Claude Codeは「思考 → ツール実行 → 結果を確認 → 次の行動を決定」のループを自律的に回します。単に回答を返すのではなく、ファイルを読み、コードを書き、テストを実行し、エラーを修正するところまでを自分で行います。</p>
+                        <div class="code-block">
+                            <span class="output-text">思考: テストが失敗している → 原因を調査</span><br>
+                            <span class="output-text">ツール: ファイルを読む → エラー箇所を特定</span><br>
+                            <span class="output-text">行動: コードを修正 → テストを再実行</span><br>
+                            <span class="output-text">確認: テストがパス → 完了を報告</span>
+                        </div>
+                        <div class="info-box">
+                            <strong>💡 重要:</strong> Claude Codeはあなたの承認なしに勝手にコードを壊すことはありません。ファイル書き込みやコマンド実行の前に必ず許可を求めます。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="concept-step fade-up">
+                    <div class="step-indicator">🛡️</div>
+                    <div class="step-body glass-card">
+                        <h3>Permission Model（許可モデル） <span class="step-label">安全性</span></h3>
+                        <p>ファイルの書き込みやコマンドの実行時、Claude Codeはユーザーに許可を求めます。信頼できる操作は事前にホワイトリストに追加して自動承認することもできます。</p>
+                        <div class="code-block">
+                            <span class="output-text">Claude wants to run: npm install express</span><br>
+                            <span class="output-text">[Allow] [Deny] [Allow All npm commands]</span>
+                        </div>
+                        <div class="info-box warning">
+                            <strong>⚠️ 注意:</strong> <code>rm -rf</code> や本番DBへの接続など、破壊的な操作は慎重に判断しましょう。Git管理下で作業するのが安全です。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="concept-step fade-up">
+                    <div class="step-indicator">📦</div>
+                    <div class="step-body glass-card">
+                        <h3>コンテキストウィンドウ <span class="step-label">理解</span></h3>
+                        <p>Claude Codeは巨大なコンテキストウィンドウ（200K tokens）を持ちますが、プロジェクト全体を一度に読み込むわけではありません。必要なファイルを都度読み込み、効率的に情報を管理します。</p>
+                        <p>長い会話ではコンテキストが圧縮されることがあるため、<strong>タスクごとに <code>/clear</code> で会話をリセット</strong>するのが効果的です。「1タスク1セッション」を意識しましょう。</p>
+                    </div>
+                </div>
+
+                <div class="concept-step fade-up">
+                    <div class="step-indicator">📝</div>
+                    <div class="step-body glass-card">
+                        <h3>CLAUDE.md — プロジェクトのルールブック <span class="step-label">カスタマイズ</span></h3>
+                        <p>プロジェクトのルートに <code>CLAUDE.md</code> を配置することで、Claude Codeにプロジェクト固有のルール、コーディング規約、アーキテクチャの説明などを永続的に記憶させられます。</p>
+                        <div class="code-block">
+                            <span class="output-text"># CLAUDE.md の例</span><br><br>
+                            <span style="color: var(--accent-primary)">## コーディング規約</span><br>
+                            - TypeScriptで書くこと<br>
+                            - 関数にはJSDocコメントを付けること<br>
+                            - テストファイルは __tests__/ に配置<br><br>
+                            <span style="color: var(--accent-primary)">## ビルド & テスト</span><br>
+                            - npm run build でビルド<br>
+                            - npm test でテスト実行<br><br>
+                            <span style="color: var(--accent-primary)">## アーキテクチャ</span><br>
+                            - Clean Architecture を採用<br>
+                            - src/domain/, src/application/, src/infrastructure/
+                        </div>
+                    </div>
+                </div>
+
+                <div class="concept-step fade-up">
+                    <div class="step-indicator">🧠</div>
+                    <div class="step-body glass-card">
+                        <h3>Extended Thinking（拡張思考） <span class="step-label">深い理解</span></h3>
+                        <p>複雑なタスクでは、Claude Codeは「Extended Thinking」モードで深い推論を行います。コードの依存関係を分析したり、最適なリファクタリング戦略を考えたりする際に自動的に発動します。</p>
+                        <p>ユーザーが意識する必要はありませんが、<strong>複雑な指示を出すときほどClaude Codeの回答品質が上がる</strong>のはこの仕組みのおかげです。</p>
+                    </div>
+                </div>
+
+                <div class="concept-step fade-up">
+                    <div class="step-indicator">🔌</div>
+                    <div class="step-body glass-card">
+                        <h3>MCP (Model Context Protocol) <span class="step-label">拡張</span></h3>
+                        <p>MCPは、Claude Codeに外部ツールやデータソースを接続するためのプロトコルです。データベースの直接参照、Slack通知、Jiraチケット操作など、標準では持たない能力を追加できます。</p>
+                        <div class="code-block">
+                            <span class="output-text"># MCP サーバー設定の例 (~/.claude/settings.json)</span><br>
+                            {<br>
+                            &nbsp;&nbsp;"mcpServers": {<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;"postgres": {<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"command": "npx",<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"args": ["@anthropic-ai/mcp-server-postgres"]<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+                            &nbsp;&nbsp;}<br>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="concept-step fade-up">
+                    <div class="step-indicator">🔀</div>
+                    <div class="step-body glass-card">
+                        <h3>マルチセッション戦略 <span class="step-label">実践</span></h3>
+                        <p>複数のターミナルでClaude Codeを同時に起動し、異なるタスクを並行して進めることが可能です。「UIを作りながら、別ウィンドウでAPIテストを書く」といった並列作業が実現できます。</p>
+                        <div class="info-box">
+                            <strong>💡 Tips:</strong> 同じファイルを複数のセッションで同時に編集するとコンフリクトが起きます。セッションごとに作業ディレクトリやブランチを分けるのがベストです。
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== VIEW 3: COMMANDS ==================== -->
+        <div class="view-panel" id="view-commands">
+            <h2 class="section-title"><span class="icon">⚡</span> コマンド＆ツール辞典</h2>
+            <p class="section-desc">Claude Codeで使える全コマンド、CLIフラグ、設定ファイルの完全リファレンス。</p>
+
+            <div class="filter-bar">
+                <button class="filter-btn active" data-filter="all">すべて</button>
+                <button class="filter-btn" data-filter="slash">スラッシュコマンド</button>
+                <button class="filter-btn" data-filter="tool">内部ツール</button>
+                <button class="filter-btn" data-filter="flag">CLIフラグ</button>
+                <button class="filter-btn" data-filter="config">設定ファイル</button>
+            </div>
+
+            <div class="commands-grid" id="commands-grid">
+                <!-- Slash Commands -->
+                <div class="command-card glass-card" data-category="slash">
+                    <div class="cmd-header">
+                        <div class="cmd-icon">🏁</div>
+                        <div><div class="cmd-name-tag">/init</div><div class="cmd-category">初期設定</div></div>
+                    </div>
+                    <p>プロジェクトを分析し、<code>CLAUDE.md</code>を自動生成。ビルド方法やテストコマンド、ディレクトリ構成を自動で読み取ります。</p>
+                    <div class="cmd-example"><span class="prompt-symbol">❯ </span>/init</div>
+                </div>
+
+                <div class="command-card glass-card" data-category="slash">
+                    <div class="cmd-header">
+                        <div class="cmd-icon">🧹</div>
+                        <div><div class="cmd-name-tag">/clear</div><div class="cmd-category">コンテキスト管理</div></div>
+                    </div>
+                    <p>会話履歴をクリアしてコンテキストウィンドウをリセット。タスク切替時やパフォーマンス低下時に有効。</p>
+                    <div class="cmd-example"><span class="prompt-symbol">❯ </span>/clear</div>
+                </div>
+
+                <div class="command-card glass-card" data-category="slash">
+                    <div class="cmd-header">
+                        <div class="cmd-icon">🔍</div>
+                        <div><div class="cmd-name-tag">/review</div><div class="cmd-category">コードレビュー</div></div>
+                    </div>
+                    <p>Gitの差分を読み取り、変更されたコードに対してプロのコードレビューを実行。バグ、設計懸念、改善案を指摘。</p>
+                    <div class="cmd-example"><span class="prompt-symbol">❯ </span>/review</div>
+                </div>
+
+                <div class="command-card glass-card" data-category="slash">
+                    <div class="cmd-header">
+                        <div class="cmd-icon">💬</div>
+                        <div><div class="cmd-name-tag">/chat</div><div class="cmd-category">会話モード</div></div>
+                    </div>
+                    <p>ファイル編集やコマンド実行を伴わない質疑応答モード。コードの仕組みを質問したり、設計方針を相談するときに。</p>
+                    <div class="cmd-example"><span class="prompt-symbol">❯ </span>/chat この認証ロジックの仕組みを説明して</div>
+                </div>
+
+                <div class="command-card glass-card" data-category="slash">
+                    <div class="cmd-header">
+                        <div class="cmd-icon">📊</div>
+                        <div><div class="cmd-name-tag">/cost</div><div class="cmd-category">利用状況</div></div>
+                    </div>
+                    <p>セッション中のトークン消費量とAPI利用コストを表示。コスト管理やセッション長の判断に。</p>
+                    <div class="cmd-example"><span class="prompt-symbol">❯ </span>/cost</div>
+                </div>
+
+                <div class="command-card glass-card" data-category="slash">
+                    <div class="cmd-header">
+                        <div class="cmd-icon">🐛</div>
+                        <div><div class="cmd-name-tag">/bug</div><div class="cmd-category">バグレポート</div></div>
+                    </div>
+                    <p>Claude Codeの不具合をAnthropicチームに直接報告。ログと会話コンテキストが自動添付されます。</p>
+                    <div class="cmd-example"><span class="prompt-symbol">❯ </span>/bug</div>
+                </div>
+
+                <div class="command-card glass-card" data-category="slash">
+                    <div class="cmd-header">
+                        <div class="cmd-icon">🧠</div>
+                        <div><div class="cmd-name-tag">/memory</div><div class="cmd-category">記憶管理</div></div>
+                    </div>
+                    <p>CLAUDE.md に新しいルールや情報を追記する専用コマンド。会話中に発見した知見を永続化できます。</p>
+                    <div class="cmd-example"><span class="prompt-symbol">❯ </span>/memory "APIレスポンスは必ずcamelCaseで返す"</div>
+                </div>
+
+                <div class="command-card glass-card" data-category="slash">
+                    <div class="cmd-header">
+                        <div class="cmd-icon">🔧</div>
+                        <div><div class="cmd-name-tag">/config</div><div class="cmd-category">設定変更</div></div>
+                    </div>
+                    <p>Claude Codeの設定をインタラクティブに変更。テーマ、モデル選択、通知などを対話形式で設定。</p>
+                    <div class="cmd-example"><span class="prompt-symbol">❯ </span>/config</div>
+                </div>
+
+                <!-- Tool capabilities -->
+                <div class="command-card glass-card" data-category="tool">
+                    <div class="cmd-header">
+                        <div class="cmd-icon">📂</div>
+                        <div><div class="cmd-name-tag">ファイル操作</div><div class="cmd-category">内部ツール</div></div>
+                    </div>
+                    <p>ファイルの読み書き、ディレクトリ探索、grep検索を自律的に実行。大規模コードベースでも効率的に目的のコードを発見。</p>
+                    <div class="cmd-example">「src/ 以下で未使用のimportを探して削除して」</div>
+                </div>
+
+                <div class="command-card glass-card" data-category="tool">
+                    <div class="cmd-header">
+                        <div class="cmd-icon">🖥️</div>
+                        <div><div class="cmd-name-tag">コマンド実行</div><div class="cmd-category">内部ツール</div></div>
+                    </div>
+                    <p>シェルコマンドを実行し結果を確認。ビルド、テスト、lint、デプロイなど開発ワークフロー全般を代行。</p>
+                    <div class="cmd-example">「テストを走らせて、失敗しているものを全部直して」</div>
+                </div>
+
+                <div class="command-card glass-card" data-category="tool">
+                    <div class="cmd-header">
+                        <div class="cmd-icon">🌐</div>
+                        <div><div class="cmd-name-tag">ウェブ検索</div><div class="cmd-category">内部ツール</div></div>
+                    </div>
+                    <p>最新のドキュメント、APIリファレンス、エラー解決策をインターネットから検索。学習データにない最新情報もカバー。</p>
+                    <div class="cmd-example">「Next.js 15のApp Routerのキャッシュ戦略について調べて」</div>
+                </div>
+
+                <div class="command-card glass-card" data-category="tool">
+                    <div class="cmd-header">
+                        <div class="cmd-icon">🔀</div>
+                        <div><div class="cmd-name-tag">Git操作</div><div class="cmd-category">内部ツール</div></div>
+                    </div>
+                    <p>コミット、ブランチ、差分確認、PR作成をすべてCLI経由で実行。コミットメッセージも文脈から自動生成。</p>
+                    <div class="cmd-example">「変更を適切なコミットメッセージでコミットして」</div>
+                </div>
+
+                <div class="command-card glass-card" data-category="tool">
+                    <div class="cmd-header">
+                        <div class="cmd-icon">🖼️</div>
+                        <div><div class="cmd-name-tag">画像認識</div><div class="cmd-category">内部ツール</div></div>
+                    </div>
+                    <p>スクリーンショットやUIモックアップを入力として受け取り、見た目に忠実なコードを生成。Figmaエクスポートにも対応。</p>
+                    <div class="cmd-example">画像をドラッグ&ドロップ → 「この通りにReactで実装して」</div>
+                </div>
+
+                <!-- CLI Flags -->
+                <div class="command-card glass-card" data-category="flag">
+                    <div class="cmd-header">
+                        <div class="cmd-icon">🚀</div>
+                        <div><div class="cmd-name-tag">-p, --print</div><div class="cmd-category">ヘッドレス実行</div></div>
+                    </div>
+                    <p>非対話モードで実行。スクリプトやCI/CDパイプラインから呼び出す際に使用。結果は標準出力に出力されます。</p>
+                    <div class="cmd-example"><span class="prompt-symbol">$ </span>claude -p "セキュリティ脆弱性をチェックして"</div>
+                </div>
+
+                <div class="command-card glass-card" data-category="flag">
+                    <div class="cmd-header">
+                        <div class="cmd-icon">🎯</div>
+                        <div><div class="cmd-name-tag">--model</div><div class="cmd-category">モデル選択</div></div>
+                    </div>
+                    <p>使用するモデルを明示的に指定。タスクの複雑さに応じてモデルを切り替えることでコストを最適化できます。</p>
+                    <div class="cmd-example"><span class="prompt-symbol">$ </span>claude --model claude-sonnet-4-20250514</div>
+                </div>
+
+                <div class="command-card glass-card" data-category="flag">
+                    <div class="cmd-header">
+                        <div class="cmd-icon">🔒</div>
+                        <div><div class="cmd-name-tag">--allowedTools</div><div class="cmd-category">権限制限</div></div>
+                    </div>
+                    <p>使用可能なツールを制限。CI環境では最小限の権限に絞ることでセキュリティを確保。</p>
+                    <div class="cmd-example"><span class="prompt-symbol">$ </span>claude -p --allowedTools "Read,Write" "レビュー"</div>
+                </div>
+
+                <div class="command-card glass-card" data-category="flag">
+                    <div class="cmd-header">
+                        <div class="cmd-icon">📄</div>
+                        <div><div class="cmd-name-tag">--output-format</div><div class="cmd-category">出力制御</div></div>
+                    </div>
+                    <p>出力形式を指定（text, json, stream-json）。プログラムからの解析や、他のツールとのパイプライン連携に有用。</p>
+                    <div class="cmd-example"><span class="prompt-symbol">$ </span>claude -p --output-format json "分析して"</div>
+                </div>
+
+                <div class="command-card glass-card" data-category="flag">
+                    <div class="cmd-header">
+                        <div class="cmd-icon">📎</div>
+                        <div><div class="cmd-name-tag">--add-dir</div><div class="cmd-category">追加ディレクトリ</div></div>
+                    </div>
+                    <p>カレントディレクトリ以外のディレクトリも作業対象に追加。モノレポや関連プロジェクトの参照時に便利。</p>
+                    <div class="cmd-example"><span class="prompt-symbol">$ </span>claude --add-dir ../shared-lib</div>
+                </div>
+
+                <div class="command-card glass-card" data-category="flag">
+                    <div class="cmd-header">
+                        <div class="cmd-icon">🔄</div>
+                        <div><div class="cmd-name-tag">--resume</div><div class="cmd-category">セッション復元</div></div>
+                    </div>
+                    <p>前回のセッションを復元して続行。途中で中断した作業を再開する際に使用。</p>
+                    <div class="cmd-example"><span class="prompt-symbol">$ </span>claude --resume</div>
+                </div>
+
+                <!-- Config Files -->
+                <div class="command-card glass-card" data-category="config">
+                    <div class="cmd-header">
+                        <div class="cmd-icon">📝</div>
+                        <div><div class="cmd-name-tag">CLAUDE.md</div><div class="cmd-category">プロジェクト設定</div></div>
+                    </div>
+                    <p>プロジェクトルートに配置。コーディング規約、ビルド手順、アーキテクチャの説明を記述。セッション開始時に自動で読み込まれます。</p>
+                    <div class="cmd-example">~/project/CLAUDE.md</div>
+                </div>
+
+                <div class="command-card glass-card" data-category="config">
+                    <div class="cmd-header">
+                        <div class="cmd-icon">⚙️</div>
+                        <div><div class="cmd-name-tag">~/.claude/settings.json</div><div class="cmd-category">グローバル設定</div></div>
+                    </div>
+                    <p>全プロジェクト共通の設定。許可するコマンドのホワイトリスト、MCPサーバー設定、デフォルトのモデル選択など。</p>
+                    <div class="cmd-example">{"permissions": {"allow": ["npm *", "git *"]}}</div>
+                </div>
+
+                <div class="command-card glass-card" data-category="config">
+                    <div class="cmd-header">
+                        <div class="cmd-icon">📁</div>
+                        <div><div class="cmd-name-tag">.claude/settings.json</div><div class="cmd-category">プロジェクト設定</div></div>
+                    </div>
+                    <p>プロジェクト固有の設定ファイル。チームで共有することで、全メンバーが同じ設定で作業できます。</p>
+                    <div class="cmd-example">~/project/.claude/settings.json</div>
+                </div>
+
+                <div class="command-card glass-card" data-category="config">
+                    <div class="cmd-header">
+                        <div class="cmd-icon">📌</div>
+                        <div><div class="cmd-name-tag">.claude/commands/</div><div class="cmd-category">カスタムコマンド</div></div>
+                    </div>
+                    <p>プロジェクト固有のカスタムスラッシュコマンドを定義するディレクトリ。Markdownファイルでプロンプトテンプレートを作成できます。</p>
+                    <div class="cmd-example">.claude/commands/deploy.md → /project:deploy で実行</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== VIEW 4: WORKFLOWS ==================== -->
+        <div class="view-panel" id="view-workflows">
+            <h2 class="section-title"><span class="icon">🔗</span> 実践ワークフロー集</h2>
+            <p class="section-desc">日常的な開発タスクをClaude Codeでどう効率化するか。難易度順に並んだ実践パターン集です。</p>
+
+            <div class="filter-bar workflow-filter">
+                <button class="filter-btn active" data-filter="all">すべて</button>
+                <button class="filter-btn" data-filter="beginner">入門</button>
+                <button class="filter-btn" data-filter="intermediate">中級</button>
+                <button class="filter-btn" data-filter="advanced">上級</button>
+                <button class="filter-btn" data-filter="expert">エキスパート</button>
+            </div>
+
+            <div class="workflow-list" id="workflow-list">
+                <!-- WF1: Project Bootstrap -->
+                <div class="workflow-card glass-card" data-workflow="wf1" data-level="beginner">
+                    <div class="workflow-header">
+                        <div class="workflow-title">🚀 ゼロからプロジェクト構築</div>
+                        <span class="workflow-tag beginner">入門</span>
+                    </div>
+                    <p class="workflow-desc">新規プロジェクトのセットアップから初回コミットまでを一気通貫で行うワークフロー。</p>
+                    <div class="workflow-steps">
+                        <span class="wf-step">claude</span><span class="wf-arrow">→</span>
+                        <span class="wf-step">要件を伝える</span><span class="wf-arrow">→</span>
+                        <span class="wf-step">/init</span><span class="wf-arrow">→</span>
+                        <span class="wf-step">実装 & テスト</span>
+                    </div>
+                    <div class="workflow-detail" id="detail-wf1">
+                        <div class="detail-step"><div class="detail-num">1</div><div class="detail-text">プロジェクトのルートディレクトリで <code>claude</code> を起動</div></div>
+                        <div class="detail-step"><div class="detail-num">2</div><div class="detail-text">「Express + TypeScript + PrismaでREST APIを作って。認証にはJWTを使い…」のように要件を詳細に伝える</div></div>
+                        <div class="detail-step"><div class="detail-num">3</div><div class="detail-text">Claude Codeがファイル生成、依存関係のインストール、テストの作成まで自律的に実行</div></div>
+                        <div class="detail-step"><div class="detail-num">4</div><div class="detail-text"><code>/init</code> で CLAUDE.md を生成し、プロジェクトの規約を固定化</div></div>
+                        <div class="detail-usecase"><strong>💡 実践ポイント</strong>要件は箇条書きで具体的に。技術スタック・ディレクトリ構造・命名規約を最初に指定するほど、後の修正が少なくなります。</div>
+                    </div>
+                </div>
+
+                <!-- WF2: Bug Fix -->
+                <div class="workflow-card glass-card" data-workflow="wf2" data-level="beginner">
+                    <div class="workflow-header">
+                        <div class="workflow-title">🐛 バグの特定と修正</div>
+                        <span class="workflow-tag beginner">入門</span>
+                    </div>
+                    <p class="workflow-desc">エラーログやスタックトレースを渡し、原因の特定から修正、テスト確認まで一連で完了。</p>
+                    <div class="workflow-steps">
+                        <span class="wf-step">エラーを貼り付け</span><span class="wf-arrow">→</span>
+                        <span class="wf-step">原因調査</span><span class="wf-arrow">→</span>
+                        <span class="wf-step">修正 & テスト実行</span>
+                    </div>
+                    <div class="workflow-detail" id="detail-wf2">
+                        <div class="detail-step"><div class="detail-num">1</div><div class="detail-text">ターミナルのエラーメッセージやスタックトレースをそのまま貼り付ける</div></div>
+                        <div class="detail-step"><div class="detail-num">2</div><div class="detail-text">Claude Codeが関連ファイルを読み込み、エラーの根本原因を特定</div></div>
+                        <div class="detail-step"><div class="detail-num">3</div><div class="detail-text">修正コードを書き、テストを実行して修正が正しいことを確認</div></div>
+                        <div class="detail-usecase"><strong>💡 実践ポイント</strong>エラーメッセージをそのまま貼るのが最も効果的。余計な説明を加えるより、生のログを渡す方が精度が高いです。</div>
+                    </div>
+                </div>
+
+                <!-- WF3: Code Understanding -->
+                <div class="workflow-card glass-card" data-workflow="wf3" data-level="beginner">
+                    <div class="workflow-header">
+                        <div class="workflow-title">📖 コードの理解＆オンボーディング</div>
+                        <span class="workflow-tag beginner">入門</span>
+                    </div>
+                    <p class="workflow-desc">初めて触るリポジトリの全体像を素早く把握。新メンバーのオンボーディングにも最適。</p>
+                    <div class="workflow-steps">
+                        <span class="wf-step">/chat</span><span class="wf-arrow">→</span>
+                        <span class="wf-step">構造を質問</span><span class="wf-arrow">→</span>
+                        <span class="wf-step">詳細を掘り下げ</span>
+                    </div>
+                    <div class="workflow-detail" id="detail-wf3">
+                        <div class="detail-step"><div class="detail-num">1</div><div class="detail-text"><code>/chat</code> で読み取り専用モードに。「このプロジェクトの全体的なアーキテクチャを説明して」</div></div>
+                        <div class="detail-step"><div class="detail-num">2</div><div class="detail-text">「認証フローを説明して」「データの流れを追って」など特定の領域を深掘り</div></div>
+                        <div class="detail-step"><div class="detail-num">3</div><div class="detail-text">「この関数は何をしているか、前提条件と副作用を教えて」で個別のコードを理解</div></div>
+                        <div class="detail-usecase"><strong>💡 実践ポイント</strong>他人のリポジトリを初めて読むときに、まず /chat で構造を把握するとスムーズです。コードを変更するリスクがないので安心して質問できます。</div>
+                    </div>
+                </div>
+
+                <!-- WF4: Refactoring -->
+                <div class="workflow-card glass-card" data-workflow="wf4" data-level="intermediate">
+                    <div class="workflow-header">
+                        <div class="workflow-title">♻️ リファクタリング＆最適化</div>
+                        <span class="workflow-tag intermediate">中級</span>
+                    </div>
+                    <p class="workflow-desc">大規模なコードの構造改善。型安全性の向上、デッドコード削除、パフォーマンス最適化を自動実行。</p>
+                    <div class="workflow-steps">
+                        <span class="wf-step">方針を指示</span><span class="wf-arrow">→</span>
+                        <span class="wf-step">コード分析</span><span class="wf-arrow">→</span>
+                        <span class="wf-step">段階的リファクタ</span><span class="wf-arrow">→</span>
+                        <span class="wf-step">テストで確認</span>
+                    </div>
+                    <div class="workflow-detail" id="detail-wf4">
+                        <div class="detail-step"><div class="detail-num">1</div><div class="detail-text">「src/utils/ 以下をTypeScriptに移行して、全関数に適切な型を付けて」のようにスコープと目標を伝える</div></div>
+                        <div class="detail-step"><div class="detail-num">2</div><div class="detail-text">Claude Codeが全ファイルを走査し、変更計画を提示</div></div>
+                        <div class="detail-step"><div class="detail-num">3</div><div class="detail-text">承認後、ファイルを順次書き換え、既存のテストが壊れていないことを確認</div></div>
+                        <div class="detail-usecase"><strong>💡 実践ポイント</strong>一度に全部変えず「まず src/utils/ だけ」のようにスコープを限定するのがコツ。大きなリファクタは複数回に分けて行いましょう。</div>
+                    </div>
+                </div>
+
+                <!-- WF5: TDD -->
+                <div class="workflow-card glass-card" data-workflow="wf5" data-level="intermediate">
+                    <div class="workflow-header">
+                        <div class="workflow-title">🧪 テスト駆動開発 (TDD)</div>
+                        <span class="workflow-tag intermediate">中級</span>
+                    </div>
+                    <p class="workflow-desc">テストを先に書き、実装はClaude Codeに任せるTDDワークフロー。品質を担保しながら高速に開発。</p>
+                    <div class="workflow-steps">
+                        <span class="wf-step">テスト仕様</span><span class="wf-arrow">→</span>
+                        <span class="wf-step">テスト生成</span><span class="wf-arrow">→</span>
+                        <span class="wf-step">実装コード生成</span><span class="wf-arrow">→</span>
+                        <span class="wf-step">全テストパス</span>
+                    </div>
+                    <div class="workflow-detail" id="detail-wf5">
+                        <div class="detail-step"><div class="detail-num">1</div><div class="detail-text">「ユーザー登録APIのテストを書いて。正常系、バリデーションエラー、重複エラーの3パターン」</div></div>
+                        <div class="detail-step"><div class="detail-num">2</div><div class="detail-text">テストが生成され、当然全て失敗する</div></div>
+                        <div class="detail-step"><div class="detail-num">3</div><div class="detail-text">「このテストが通る実装を書いて」で実装コードを生成、自動でテストを実行して確認</div></div>
+                        <div class="detail-usecase"><strong>💡 実践ポイント</strong>テストを先に書くことで「AIが何を作るべきか」の定義が明確になり、品質が格段に向上します。</div>
+                    </div>
+                </div>
+
+                <!-- WF6: Docs -->
+                <div class="workflow-card glass-card" data-workflow="wf6" data-level="intermediate">
+                    <div class="workflow-header">
+                        <div class="workflow-title">📚 ドキュメント自動生成</div>
+                        <span class="workflow-tag intermediate">中級</span>
+                    </div>
+                    <p class="workflow-desc">README、API仕様書、アーキテクチャ図を実際のコードから自動生成。常に最新の状態を維持。</p>
+                    <div class="workflow-steps">
+                        <span class="wf-step">対象を指定</span><span class="wf-arrow">→</span>
+                        <span class="wf-step">コード解析</span><span class="wf-arrow">→</span>
+                        <span class="wf-step">ドキュメント出力</span>
+                    </div>
+                    <div class="workflow-detail" id="detail-wf6">
+                        <div class="detail-step"><div class="detail-num">1</div><div class="detail-text">「このプロジェクトのREADME.mdを書いて。セットアップ手順、使い方、API一覧を含めて」</div></div>
+                        <div class="detail-step"><div class="detail-num">2</div><div class="detail-text">「認証フローをMermaid記法のシーケンス図で docs/ に出力して」</div></div>
+                        <div class="detail-step"><div class="detail-num">3</div><div class="detail-text">「全エンドポイントのOpenAPI仕様書を生成して」</div></div>
+                        <div class="detail-usecase"><strong>💡 実践ポイント</strong>ドキュメントが陳腐化する問題を解決。コード変更のたびに「ドキュメントも更新して」と追加するだけ。</div>
+                    </div>
+                </div>
+
+                <!-- WF7: Git Workflow -->
+                <div class="workflow-card glass-card" data-workflow="wf7" data-level="advanced">
+                    <div class="workflow-header">
+                        <div class="workflow-title">🚢 Git ワークフロー自動化</div>
+                        <span class="workflow-tag advanced">上級</span>
+                    </div>
+                    <p class="workflow-desc">ブランチ作成からPR作成、レビュー対応まで、Git操作を自然言語で完結。</p>
+                    <div class="workflow-steps">
+                        <span class="wf-step">feature/xxx 作成</span><span class="wf-arrow">→</span>
+                        <span class="wf-step">実装</span><span class="wf-arrow">→</span>
+                        <span class="wf-step">コミット</span><span class="wf-arrow">→</span>
+                        <span class="wf-step">gh pr create</span>
+                    </div>
+                    <div class="workflow-detail" id="detail-wf7">
+                        <div class="detail-step"><div class="detail-num">1</div><div class="detail-text">「feature/user-auth ブランチを作って、JWT認証を実装して」</div></div>
+                        <div class="detail-step"><div class="detail-num">2</div><div class="detail-text">実装完了後「変更を適切な粒度でコミットして」で意味のあるコミットに分割</div></div>
+                        <div class="detail-step"><div class="detail-num">3</div><div class="detail-text">「PRを作成して。タイトルと説明を適切に」でGitHub CLI経由でPR自動作成</div></div>
+                        <div class="detail-usecase"><strong>💡 実践ポイント</strong><code>gh</code>（GitHub CLI）がインストール済みなら、PR作成、レビューコメント対応まで全てClaude Code内で完結します。</div>
+                    </div>
+                </div>
+
+                <!-- WF8: Headless Mode -->
+                <div class="workflow-card glass-card" data-workflow="wf8" data-level="advanced">
+                    <div class="workflow-header">
+                        <div class="workflow-title">⚡ ヘッドレスモード（自動化パイプライン）</div>
+                        <span class="workflow-tag advanced">上級</span>
+                    </div>
+                    <p class="workflow-desc">CI/CDパイプラインやスクリプトからClaude Codeを非対話的に呼び出し、完全自動化を実現。</p>
+                    <div class="workflow-steps">
+                        <span class="wf-step">claude -p "指示"</span><span class="wf-arrow">→</span>
+                        <span class="wf-step">自律実行</span><span class="wf-arrow">→</span>
+                        <span class="wf-step">結果出力</span>
+                    </div>
+                    <div class="workflow-detail" id="detail-wf8">
+                        <div class="detail-step"><div class="detail-num">1</div><div class="detail-text"><code>claude -p "このリポジトリのセキュリティ脆弱性を分析して"</code> で非対話実行</div></div>
+                        <div class="detail-step"><div class="detail-num">2</div><div class="detail-text">パイプ入力: <code>cat error.log | claude -p "原因と修正方法を教えて"</code></div></div>
+                        <div class="detail-step"><div class="detail-num">3</div><div class="detail-text">GitHub ActionsやCron Jobと組み合わせて定期的な自動化を構築</div></div>
+                        <div class="detail-usecase"><strong>💡 実践ポイント</strong><code>--allowedTools</code> で許可ツールを制限。CI環境では最小限の権限に絞りましょう。</div>
+                    </div>
+                </div>
+
+                <!-- WF9: Migration -->
+                <div class="workflow-card glass-card" data-workflow="wf9" data-level="advanced">
+                    <div class="workflow-header">
+                        <div class="workflow-title">🔄 大規模マイグレーション</div>
+                        <span class="workflow-tag advanced">上級</span>
+                    </div>
+                    <p class="workflow-desc">フレームワーク移行、言語変換、APIバージョンアップなど大規模な移行作業を段階的に実行。</p>
+                    <div class="workflow-steps">
+                        <span class="wf-step">計画策定</span><span class="wf-arrow">→</span>
+                        <span class="wf-step">依存関係分析</span><span class="wf-arrow">→</span>
+                        <span class="wf-step">段階的移行</span><span class="wf-arrow">→</span>
+                        <span class="wf-step">回帰テスト</span>
+                    </div>
+                    <div class="workflow-detail" id="detail-wf9">
+                        <div class="detail-step"><div class="detail-num">1</div><div class="detail-text">「React Router v5 → v6に移行する計画を立てて。影響範囲を洗い出して」</div></div>
+                        <div class="detail-step"><div class="detail-num">2</div><div class="detail-text">Claude Codeが全ルートを走査し、変更が必要なファイルをリスト化</div></div>
+                        <div class="detail-step"><div class="detail-num">3</div><div class="detail-text">「まずこの5ファイルだけ移行して、テストが通ることを確認して」と段階的に実行</div></div>
+                        <div class="detail-usecase"><strong>💡 実践ポイント</strong>一気に全部変えるのではなく「影響の小さいところから」段階的に移行。各段階でテストを通すのが鉄則です。</div>
+                    </div>
+                </div>
+
+                <!-- WF10: Security Audit -->
+                <div class="workflow-card glass-card" data-workflow="wf10" data-level="advanced">
+                    <div class="workflow-header">
+                        <div class="workflow-title">🔐 セキュリティ監査</div>
+                        <span class="workflow-tag advanced">上級</span>
+                    </div>
+                    <p class="workflow-desc">コードベース全体のセキュリティ脆弱性をスキャンし、修正まで自動実行。</p>
+                    <div class="workflow-steps">
+                        <span class="wf-step">脆弱性スキャン</span><span class="wf-arrow">→</span>
+                        <span class="wf-step">リスク分類</span><span class="wf-arrow">→</span>
+                        <span class="wf-step">修正パッチ生成</span>
+                    </div>
+                    <div class="workflow-detail" id="detail-wf10">
+                        <div class="detail-step"><div class="detail-num">1</div><div class="detail-text">「このプロジェクトのセキュリティ脆弱性を分析して。SQLインジェクション、XSS、認証バイパスを重点的に」</div></div>
+                        <div class="detail-step"><div class="detail-num">2</div><div class="detail-text">発見された脆弱性を重大度順にリスト化し、修正方針を提案</div></div>
+                        <div class="detail-step"><div class="detail-num">3</div><div class="detail-text">「クリティカルなものから順に修正して」で自動パッチ適用</div></div>
+                        <div class="detail-usecase"><strong>💡 実践ポイント</strong>定期的なセキュリティ監査をヘッドレスモードでCI/CDに組み込むと、継続的にセキュリティを担保できます。</div>
+                    </div>
+                </div>
+
+                <!-- WF11: Multi-agent -->
+                <div class="workflow-card glass-card" data-workflow="wf11" data-level="expert">
+                    <div class="workflow-header">
+                        <div class="workflow-title">🤖 マルチエージェント並列開発</div>
+                        <span class="workflow-tag expert">エキスパート</span>
+                    </div>
+                    <p class="workflow-desc">複数のClaude Codeインスタンスを並行起動し、異なるタスクを同時進行させる超並列開発。</p>
+                    <div class="workflow-steps">
+                        <span class="wf-step">タスク分解</span><span class="wf-arrow">→</span>
+                        <span class="wf-step">並列実行 ×N</span><span class="wf-arrow">→</span>
+                        <span class="wf-step">統合 & テスト</span>
+                    </div>
+                    <div class="workflow-detail" id="detail-wf11">
+                        <div class="detail-step"><div class="detail-num">1</div><div class="detail-text">ターミナルA: 「API層を実装して」/ ターミナルB: 「フロントエンドUIを作って」/ ターミナルC: 「E2Eテストを書いて」</div></div>
+                        <div class="detail-step"><div class="detail-num">2</div><div class="detail-text">各エージェントが独立して作業。ファイルの衝突を避けるためブランチを分ける</div></div>
+                        <div class="detail-step"><div class="detail-num">3</div><div class="detail-text">全ブランチをマージし、統合テストを実行</div></div>
+                        <div class="detail-usecase"><strong>💡 実践ポイント</strong>各セッションの作業ディレクトリが重ならないよう、事前にタスク分割と責務の明確化が重要です。</div>
+                    </div>
+                </div>
+
+                <!-- WF12: Full Auto -->
+                <div class="workflow-card glass-card" data-workflow="wf12" data-level="expert">
+                    <div class="workflow-header">
+                        <div class="workflow-title">🌟 要件→デプロイ完全自動化</div>
+                        <span class="workflow-tag expert">エキスパート</span>
+                    </div>
+                    <p class="workflow-desc">要件定義だけを伝え、設計・実装・テスト・ドキュメント・デプロイまでを完全に自律実行させる究極のワークフロー。</p>
+                    <div class="workflow-steps">
+                        <span class="wf-step">要件を伝える</span><span class="wf-arrow">→</span>
+                        <span class="wf-step">設計→実装→テスト</span><span class="wf-arrow">→</span>
+                        <span class="wf-step">レビュー & 承認</span><span class="wf-arrow">→</span>
+                        <span class="wf-step">デプロイ</span>
+                    </div>
+                    <div class="workflow-detail" id="detail-wf12">
+                        <div class="detail-step"><div class="detail-num">1</div><div class="detail-text">詳細な要件仕様（技術スタック、DB設計、エンドポイント一覧、UI仕様）を箇条書きで伝える</div></div>
+                        <div class="detail-step"><div class="detail-num">2</div><div class="detail-text">Claude Codeが設計→スキャフォールディング→実装→テスト作成→テスト実行→バグ修正のループを自律的に回す</div></div>
+                        <div class="detail-step"><div class="detail-num">3</div><div class="detail-text">完成したら「Vercelにデプロイして」「Dockerイメージをビルドしてpushして」で公開まで</div></div>
+                        <div class="detail-usecase"><strong>💡 実践ポイント</strong>要件の精度がそのまま成果物の品質に直結します。「曖昧さゼロ」を目指して要件を言語化することが、このワークフローの成否を分けます。</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== VIEW 5: MASTER'S PATH ==================== -->
+        <div class="view-panel" id="view-tips">
+            <h2 class="section-title"><span class="icon">💎</span> マスターの道 — Tips & ベストプラクティス</h2>
+            <p class="section-desc">Claude Codeを最大限に活用するための知恵。初心者が陥りがちなアンチパターンと、マスターが実践するグッドパターンを対比で紹介。</p>
+
+            <div class="tips-container">
+                <!-- Tip 1: Prompt Quality -->
+                <div class="tip-card glass-card fade-up">
+                    <div class="tip-icon">🎯</div>
+                    <div class="tip-body">
+                        <h3>指示は「具体的に」が鉄則</h3>
+                        <p>曖昧な指示ほど、意図とズレた結果が返ります。技術スタック、ディレクトリ、命名規約まで明記しましょう。</p>
+                        <div class="antipattern">
+                            <h4>❌ アンチパターン</h4>
+                            <p>「ログイン機能を作って」— 技術スタックも仕様も不明。AIが推測する部分が多すぎる。</p>
+                        </div>
+                        <div class="goodpattern">
+                            <h4>✅ グッドパターン</h4>
+                            <p><code>src/auth/</code> に <code>JWT</code> ベースのログイン機能を作って。Express + TypeScript。<code>bcrypt</code> でパスワードをハッシュ化、トークン有効期限は24時間。テストも <code>Jest</code> で書いて。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tip 2: Context Management -->
+                <div class="tip-card glass-card fade-up">
+                    <div class="tip-icon">🔄</div>
+                    <div class="tip-body">
+                        <h3>1タスク1セッションを徹底する</h3>
+                        <p>長い会話はコンテキストが汚染され、AIが古い情報に基づいて判断するリスクが増します。</p>
+                        <div class="antipattern">
+                            <h4>❌ アンチパターン</h4>
+                            <p>1つのセッションで「認証→ダッシュボード→メール通知→バグ修正」と連続して依頼。後半になるほど精度が落ちる。</p>
+                        </div>
+                        <div class="goodpattern">
+                            <h4>✅ グッドパターン</h4>
+                            <p>タスクが完了したら <code>/clear</code> でリセット。新しいタスクは新しいコンテキストで始める。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tip 3: CLAUDE.md -->
+                <div class="tip-card glass-card fade-up">
+                    <div class="tip-icon">📋</div>
+                    <div class="tip-body">
+                        <h3>CLAUDE.md を「育てる」</h3>
+                        <p>CLAUDE.md は一度書いたら終わりではなく、プロジェクトの成長に合わせて更新し続ける生きたドキュメントです。</p>
+                        <div class="tip-code">
+                            <span class="comment"># 最初は最小限でOK</span><br>
+                            <span class="highlight">## ビルド</span><br>
+                            npm run build<br><br>
+                            <span class="comment"># チームの知見が増えるたびに追記</span><br>
+                            <span class="highlight">## 新ルール (2025-06追加)</span><br>
+                            - APIレスポンスは必ず camelCase<br>
+                            - エラーは AppError クラスを使う<br>
+                            - 環境変数は .env.example に記載<br><br>
+                            <span class="highlight">## やってはいけないこと</span><br>
+                            - any型の使用禁止<br>
+                            - console.log をコミットしない
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tip 4: Scope Control -->
+                <div class="tip-card glass-card fade-up">
+                    <div class="tip-icon">📐</div>
+                    <div class="tip-body">
+                        <h3>スコープを意識的に限定する</h3>
+                        <p>「全部直して」より「この3ファイルだけ直して」の方が圧倒的に精度が高くなります。</p>
+                        <div class="antipattern">
+                            <h4>❌ アンチパターン</h4>
+                            <p>「プロジェクト全体をリファクタリングして」— スコープが大きすぎて、意図しない変更が発生する。</p>
+                        </div>
+                        <div class="goodpattern">
+                            <h4>✅ グッドパターン</h4>
+                            <p>「<code>src/utils/date.ts</code> の関数を dayjs から date-fns に移行して。テストが通ることを確認して」— 明確なスコープ。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tip 5: Comparison Table -->
+                <div class="tip-card glass-card fade-up">
+                    <div class="tip-icon">⚖️</div>
+                    <div class="tip-body">
+                        <h3>Claude Code vs 他のAIツール — 使い分けガイド</h3>
+                        <p>それぞれのツールには明確な役割があります。状況に応じて使い分けるのが最も効果的。</p>
+                        <table class="comparison-table">
+                            <thead>
+                                <tr><th>特徴</th><th>Claude Code</th><th>ChatGPT / Claude Web</th><th>GitHub Copilot</th><th>Cursor</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>動作形態</td><td>CLI エージェント</td><td>ウェブチャット</td><td>IDE 拡張</td><td>IDE (fork)</td></tr>
+                                <tr><td>ファイル操作</td><td><strong style="color:var(--accent-emerald)">直接実行</strong></td><td>不可</td><td>限定的</td><td>直接実行</td></tr>
+                                <tr><td>コマンド実行</td><td><strong style="color:var(--accent-emerald)">直接実行</strong></td><td>不可</td><td>不可</td><td>限定的</td></tr>
+                                <tr><td>適用範囲</td><td>プロジェクト全体</td><td>スニペット単位</td><td>カーソル周辺</td><td>ファイル単位</td></tr>
+                                <tr><td>最適な用途</td><td>タスク丸投げ</td><td>質問・相談</td><td>行単位の補完</td><td>IDE内コーディング</td></tr>
+                                <tr><td>CI/CD統合</td><td><strong style="color:var(--accent-emerald)">ネイティブ対応</strong></td><td>不可</td><td>不可</td><td>不可</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tip 6: Verification -->
+                <div class="tip-card glass-card fade-up">
+                    <div class="tip-icon">✅</div>
+                    <div class="tip-body">
+                        <h3>必ず「検証」を組み込む</h3>
+                        <p>AIが生成したコードは必ず検証しましょう。「テストを走らせて」「ビルドが通ることを確認して」を習慣にすることで品質を担保できます。</p>
+                        <div class="antipattern">
+                            <h4>❌ アンチパターン</h4>
+                            <p>生成されたコードをそのままコミット。テストもレビューもなし。</p>
+                        </div>
+                        <div class="goodpattern">
+                            <h4>✅ グッドパターン</h4>
+                            <p>「実装したら npm test を実行して、全テストがパスすることを確認して。lint も走らせて」— 検証込みの指示。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tip 7: Image Input -->
+                <div class="tip-card glass-card fade-up">
+                    <div class="tip-icon">🧩</div>
+                    <div class="tip-body">
+                        <h3>画像を渡してUIを作る</h3>
+                        <p>デザインのスクリーンショットやモックアップ画像を渡すことで、見た目に忠実なUIコードを生成。言葉で説明するより遥かに正確。</p>
+                        <div class="tip-code">
+                            <span class="prompt-symbol">❯ </span><span class="highlight">このスクリーンショットと同じ見た目の</span><br>
+                            &nbsp;&nbsp;<span class="highlight">ダッシュボードをReactで実装して。</span><br>
+                            &nbsp;&nbsp;<span class="comment">(画像ファイルをドラッグ＆ドロップ)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tip 8: Safety -->
+                <div class="tip-card glass-card fade-up">
+                    <div class="tip-icon">🔐</div>
+                    <div class="tip-body">
+                        <h3>安全性を意識する</h3>
+                        <p>Claude Codeは強力ですが、全てを盲目的に承認しないこと。特に以下に注意。</p>
+                        <div class="tip-code">
+                            <span class="comment">⚠️ 気をつけるべき操作:</span><br>
+                            - <span class="highlight">rm -rf</span> などの破壊的コマンド<br>
+                            - 外部APIキーを含むファイルの操作<br>
+                            - 本番環境のデータベースへの接続<br>
+                            - <span class="highlight">npm install</span> での未知のパッケージ追加<br><br>
+                            <span class="comment">✅ 推奨: Git管理下で作業し、いつでもrevertできるように</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tip 9: Custom Commands -->
+                <div class="tip-card glass-card fade-up">
+                    <div class="tip-icon">⚡</div>
+                    <div class="tip-body">
+                        <h3>カスタムコマンドで反復作業を効率化</h3>
+                        <p><code>.claude/commands/</code> にMarkdownファイルを作成することで、チーム共有の定型作業を1コマンドで実行できます。</p>
+                        <div class="tip-code">
+                            <span class="comment"># .claude/commands/deploy.md</span><br><br>
+                            <span class="highlight">テストを実行して全パスを確認し、</span><br>
+                            <span class="highlight">ビルドを行い、Vercelにデプロイしてください。</span><br>
+                            <span class="highlight">デプロイ後のURLを報告してください。</span><br><br>
+                            <span class="comment"># 使用方法:</span><br>
+                            <span class="prompt-symbol">❯ </span>/project:deploy
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== VIEW 6: QUICK REFERENCE ==================== -->
+        <div class="view-panel" id="view-quickref">
+            <h2 class="section-title"><span class="icon">🔍</span> 逆引き辞典</h2>
+            <p class="section-desc">「◯◯がしたい」→ 最適な操作方法。困ったらここを見ましょう。</p>
+
+            <h3 class="quickref-section-title">🏁 はじめの一歩</h3>
+            <div class="quickref-grid">
+                <div class="quickref-card glass-card">
+                    <h4>🔧 インストールしたい</h4>
+                    <div class="quickref-answer">npm i -g @anthropic-ai/claude-code</div>
+                    <div class="quickref-note">Node.js 18+ が必要</div>
+                </div>
+                <div class="quickref-card glass-card">
+                    <h4>🚀 起動したい</h4>
+                    <div class="quickref-answer">claude</div>
+                    <div class="quickref-note">プロジェクトのルートディレクトリで実行</div>
+                </div>
+                <div class="quickref-card glass-card">
+                    <h4>📝 プロジェクト設定を作りたい</h4>
+                    <div class="quickref-answer">/init</div>
+                    <div class="quickref-note">CLAUDE.md を自動生成</div>
+                </div>
+            </div>
+
+            <h3 class="quickref-section-title">🔧 日常操作</h3>
+            <div class="quickref-grid">
+                <div class="quickref-card glass-card">
+                    <h4>🔍 コードの仕組みを理解したい</h4>
+                    <div class="quickref-answer">/chat モードで質問する</div>
+                    <div class="quickref-note">ファイルを変更しない安全なモード</div>
+                </div>
+                <div class="quickref-card glass-card">
+                    <h4>🐛 バグが出た、助けて</h4>
+                    <div class="quickref-answer">エラーログをそのまま貼り付ける</div>
+                    <div class="quickref-note">余計な説明不要。生ログが最も情報量が多い</div>
+                </div>
+                <div class="quickref-card glass-card">
+                    <h4>⚡ 会話が重くなってきた</h4>
+                    <div class="quickref-answer">/clear で会話をリセット</div>
+                    <div class="quickref-note">タスクの区切りでリセットするのが最適</div>
+                </div>
+                <div class="quickref-card glass-card">
+                    <h4>📊 利用料金を確認したい</h4>
+                    <div class="quickref-answer">/cost</div>
+                    <div class="quickref-note">セッション中のトークン消費量を表示</div>
+                </div>
+                <div class="quickref-card glass-card">
+                    <h4>📝 ルールを毎回伝えるのが面倒</h4>
+                    <div class="quickref-answer">CLAUDE.md に書く</div>
+                    <div class="quickref-note">/init で自動生成、手動で追記も可能</div>
+                </div>
+                <div class="quickref-card glass-card">
+                    <h4>🔀 PRを作りたい</h4>
+                    <div class="quickref-answer">「PRを作成して」と伝える</div>
+                    <div class="quickref-note">gh CLI がインストール済みなら自動作成</div>
+                </div>
+            </div>
+
+            <h3 class="quickref-section-title">🚀 上級操作</h3>
+            <div class="quickref-grid">
+                <div class="quickref-card glass-card">
+                    <h4>🤖 CI/CDに組み込みたい</h4>
+                    <div class="quickref-answer">claude -p "指示" でヘッドレス実行</div>
+                    <div class="quickref-note">-p フラグで非対話モード。パイプ入力にも対応</div>
+                </div>
+                <div class="quickref-card glass-card">
+                    <h4>🖼️ デザインからコードを作りたい</h4>
+                    <div class="quickref-answer">スクリーンショットをドラッグ&ドロップ</div>
+                    <div class="quickref-note">画像を入力として受け取り、忠実にコード化</div>
+                </div>
+                <div class="quickref-card glass-card">
+                    <h4>📚 既存コードにテストを追加したい</h4>
+                    <div class="quickref-answer">「〇〇のテストを書いて」</div>
+                    <div class="quickref-note">既存コードを読み取り、適切なテストケースを生成</div>
+                </div>
+                <div class="quickref-card glass-card">
+                    <h4>🌐 最新のAPI仕様を知りたい</h4>
+                    <div class="quickref-answer">「〇〇の最新APIドキュメントを調べて」</div>
+                    <div class="quickref-note">Web検索機能で最新情報を取得</div>
+                </div>
+                <div class="quickref-card glass-card">
+                    <h4>⚙️ 許可のダイアログが煩わしい</h4>
+                    <div class="quickref-answer">settings.json で許可リストを設定</div>
+                    <div class="quickref-note">信頼するコマンドを事前にホワイトリスト登録</div>
+                </div>
+                <div class="quickref-card glass-card">
+                    <h4>🔄 前回のセッションを再開したい</h4>
+                    <div class="quickref-answer">claude --resume</div>
+                    <div class="quickref-note">前回のコンテキストを復元して続行</div>
+                </div>
+                <div class="quickref-card glass-card">
+                    <h4>📂 別ディレクトリも参照させたい</h4>
+                    <div class="quickref-answer">claude --add-dir ../other-project</div>
+                    <div class="quickref-note">モノレポや共有ライブラリの参照に便利</div>
+                </div>
+                <div class="quickref-card glass-card">
+                    <h4>🔌 外部ツールを接続したい</h4>
+                    <div class="quickref-answer">MCP サーバーを設定する</div>
+                    <div class="quickref-note">settings.json の mcpServers で定義</div>
+                </div>
+                <div class="quickref-card glass-card">
+                    <h4>⚡ 反復タスクを1コマンドで実行したい</h4>
+                    <div class="quickref-answer">.claude/commands/ にカスタムコマンドを定義</div>
+                    <div class="quickref-note">Markdownでプロンプトテンプレートを作成</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="site-footer">
+            <div class="footer-brand">claude code — operation guide</div>
+            <p style="font-size: 0.78rem; color: var(--text-muted);">Built for developers who think in terminals.</p>
+            <div class="footer-links">
+                <a href="https://docs.anthropic.com/en/docs/claude-code" target="_blank" rel="noopener">公式ドキュメント</a>
+                <a href="https://github.com/anthropics/claude-code" target="_blank" rel="noopener">GitHub</a>
+            </div>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
