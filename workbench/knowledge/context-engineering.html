@@ -108,6 +108,27 @@
     th { text-align: left; padding: 10px 12px; color: #f4b860; border-bottom: 2px solid rgba(244,184,96,0.25); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; }
     td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #c5d0e3; vertical-align: top; }
     td strong { color: #edf2fb; }
+
+    /* Graph / Agentic RAG */
+    .graph-box { background: rgba(99,179,237,0.06); border: 1px solid rgba(99,179,237,0.2); border-radius: 12px; padding: 16px 18px; margin: 14px 0; }
+    .graph-box h4 { margin: 0 0 8px; color: #63b3ed; font-size: 0.95rem; }
+    .graph-box p { margin: 0 0 6px; font-size: 0.88rem; color: #b0bcd4; }
+    .pattern-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin: 14px 0; }
+    .pattern-card { background: rgba(251,191,36,0.05); border: 1px solid rgba(251,191,36,0.18); border-radius: 10px; padding: 14px 16px; }
+    .pattern-card h4 { margin: 0 0 6px; color: #fbbf24; font-size: 0.92rem; }
+    .pattern-card p { margin: 0; font-size: 0.85rem; color: #b0bcd4; }
+
+    /* Comparison table highlight */
+    .tbl-good { color: #4FFFB0; font-weight: 700; }
+    .tbl-warn { color: #f4b860; font-weight: 600; }
+    .tbl-bad  { color: #f87171; }
+
+    /* Recommendation matrix */
+    .rec-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin: 14px 0; }
+    .rec-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 14px 16px; }
+    .rec-card .rc-usecase { font-size: 0.78rem; font-weight: 700; color: #7f92ac; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+    .rec-card .rc-pick { font-size: 1rem; font-weight: 800; color: #3dd8c5; margin-bottom: 4px; }
+    .rec-card .rc-reason { font-size: 0.83rem; color: #b0bcd4; }
   </style>
 </head>
 <body>
@@ -124,9 +145,9 @@
       <div class="kpi"><div class="val">2025年6月</div><div class="lbl">概念の命名・普及</div></div>
       <div class="kpi"><div class="val">Gartner 認定</div><div class="lbl">2025年6月 公式見解</div></div>
       <div class="kpi"><div class="val">7 レイヤー</div><div class="lbl">コンテキスト構造モデル</div></div>
-      <div class="kpi"><div class="val">12 実例</div><div class="lbl">クリエイター6 + エンジニア6</div></div>
+      <div class="kpi"><div class="val">18 実例</div><div class="lbl">クリエイター9 + エンジニア9</div></div>
     </div>
-    <p style="font-size:0.82rem; color:#7f92ac; margin:0;">最終更新: 2026-06-20 ／ シリーズ: <a href="prompt-engineering.html">Prompt</a> → <strong>Context（当ページ）</strong> → <a href="harness-engineering.html">Harness</a> → <a href="loop-engineering.html">Loop</a></p>
+    <p style="font-size:0.82rem; color:#7f92ac; margin:0;">最終更新: 2026-06-21 ／ シリーズ: <a href="prompt-engineering.html">Prompt</a> → <strong>Context（当ページ）</strong> → <a href="harness-engineering.html">Harness</a> → <a href="loop-engineering.html">Loop</a></p>
   </div>
 
   <!-- ========== WHAT IS IT ========== -->
@@ -226,7 +247,7 @@
     <div class="timeline">
       <div class="tl-item">
         <div class="tl-year">2022</div>
-        <div class="tl-title">朴素な詰め込み時代 & Lost in the Middle 問題発見</div>
+        <div class="tl-title">朴素な詰め込み時代 &amp; Lost in the Middle 問題発見</div>
         <div class="tl-desc">「とにかくコンテキストに詰め込む」アプローチが主流。Stanford の研究（Liu et al., 2023）でモデルが長文コンテキストの中央部の情報を無視する「Lost in the Middle」現象が発見され、量より配置の重要性が浮上。</div>
       </div>
       <div class="tl-item">
@@ -236,7 +257,7 @@
       </div>
       <div class="tl-item">
         <div class="tl-year">2024</div>
-        <div class="tl-title">Long Context vs RAG の論争 & Memory Systems 台頭</div>
+        <div class="tl-title">Long Context vs RAG の論争 &amp; Memory Systems 台頭</div>
         <div class="tl-desc">Gemini 1.5 が 1M トークンコンテキストを実現し「全部入れればいい」派が登場。一方でノイズ増加・コスト問題が顕在化し、RAG は依然有効と結論。Mem0・Letta 等の永続記憶サービスが登場、クロスセッション記憶の商用実装が普及。</div>
       </div>
       <div class="tl-item">
@@ -293,7 +314,7 @@
 
   <!-- ========== CREATOR EXAMPLES ========== -->
   <div class="panel">
-    <h2>実例 12 選</h2>
+    <h2>実例 18 選</h2>
 
     <div class="section-divider">
       <span class="dl dl-creator">クリエイター向け実例</span>
@@ -425,6 +446,115 @@
           <span class="metric-chip">詳細: <a href="../../creator-system/manga-pipeline.html">manga-pipeline.html</a></span>
         </div>
       </div>
+
+      <!-- NEW CREATOR EXAMPLES 13-15 -->
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">13</span>
+          <span class="badge badge-creator">クリエイター</span>
+          <span class="example-title">YouTube 動画スクリプト ── 前回動画の内容を記憶してシリーズ一貫性を維持</span>
+        </div>
+        <div class="example-body">
+          <p>連続シリーズ動画のスクリプト生成では、前回・前々回の動画情報をコンテキスト層⑥（Memory）として注入することで、視聴者への重複説明を避けつつシリーズとしての連続性を保てます：</p>
+          <pre>
+[System Instructions層]
+あなたは YouTube チャンネル「AI実践塾」のスクリプトライター。
+口語調・15分尺・初心者向け。
+
+[Static Knowledge層]
+チャンネルスタイルガイド: （略）
+固定オープニング: 「どうも、実践塾のタケシです！」
+
+[Memory層（前回エピソード要約）]
+- EP.12: RAG の基礎を解説。ベクトルDB として Chroma を紹介済み。
+- EP.13: HyDE の概念を解説。「仮説文書」という用語で定着。
+- 視聴者アンケート: 「実装例をもっと見たい」という要望多数。
+
+[Task State層]
+今回: EP.14「Reranking で精度を上げる」
+前回言及: 「次回はさらに精度を上げる技術を紹介」と予告済み。</pre>
+          <p>この設計により「前回お話しした仮説文書の概念と組み合わせると…」といった自然な文脈参照が自動的に生成されます。シリーズが 20 本を超えても各エピソードの要約を Memory 層に保持することでトークンを節約しながら一貫性を担保できます。</p>
+          <span class="metric-chip">効果: スクリプト修正回数 約 60% 削減（シリーズ間の矛盾・重複が激減）</span>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">14</span>
+          <span class="badge badge-creator">クリエイター</span>
+          <span class="example-title">ゲーム世界観設定書をコンテキスト化 ── キャラクター台詞の整合性チェック</span>
+        </div>
+        <div class="example-body">
+          <p>大規模なゲーム・小説・漫画プロジェクトでは、世界観設定書（ロアブック）を Static Knowledge 層（②）としてコンテキストに持つことで、個々の台詞・描写の整合性を自動チェックできます：</p>
+          <pre>
+# 設定書の Context Caching（変更頻度が低いため適用）
+settings_doc = open("worldbuilding/lore-bible.txt").read()
+# → キャラクター一覧・種族設定・魔法体系・地理・歴史年表 (約 80,000 字)
+
+response = client.messages.create(
+    model="claude-fable-5",
+    system=[
+        {
+            "type": "text",
+            "text": settings_doc,
+            "cache_control": {"type": "ephemeral"}  # キャッシュ適用
+        },
+        {
+            "type": "text",
+            "text": "以下の台詞がロアブックと矛盾していないか確認し、問題箇所を指摘してください。"
+        }
+    ],
+    messages=[{
+        "role": "user",
+        "content": "「エルフのアリアは炎魔法で敵を一掃した」── この台詞を確認してください。"
+    }]
+)
+# → 「エルフ族は設定書 P.23 で"水・風魔法のみ使用可"と定義されています。炎魔法は矛盾します。」</pre>
+          <p>設定書が 100,000 字を超えてもキャッシュにより初回以降のAPI コストは 90% 削減。複数ライターが並走するプロジェクトでも設定の統一性を機械的に担保できます。</p>
+          <span class="metric-chip">適用: ゲームシナリオ・TRPGリプレイ・連載漫画の設定管理</span>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">15</span>
+          <span class="badge badge-creator">クリエイター</span>
+          <span class="example-title">SNS 過去投稿のコンテキスト化 ── ブランドボイスとスタイルの自動継承</span>
+        </div>
+        <div class="example-body">
+          <p>X（Twitter）・Instagram・Threads の過去投稿データを RAG コンテキストとして活用することで、アカウント固有の「ブランドボイス」を学習・継承した新規投稿を自動生成できます：</p>
+          <pre>
+# 過去投稿をベクトルDB に格納（初回のみ）
+from llama_index.core import VectorStoreIndex, Document
+
+past_posts = load_csv("past_tweets.csv")  # 過去1000件の投稿
+docs = [Document(text=p["text"], metadata={"likes": p["likes"], "date": p["date"]})
+        for p in past_posts]
+index = VectorStoreIndex.from_documents(docs)
+
+# 新規投稿生成時: 類似トーンの過去投稿を参照
+def generate_post(topic: str) -> str:
+    # 同トピック or 高エンゲージメント投稿を取得
+    similar = index.as_retriever(similarity_top_k=5).retrieve(topic)
+    style_examples = "\n---\n".join([s.text for s in similar])
+
+    return llm.complete(f"""
+以下は過去の高反応投稿例です。同じトーン・文体で新規投稿を作成してください。
+
+【参考投稿】
+{style_examples}
+
+【今回のトピック】
+{topic}
+""")
+
+# → 「語尾に『ですよね？』を使う」「3点リーダーを多用する」等の
+#    個人スタイルが自然に継承される</pre>
+          <p>さらに「いいね数上位20%の投稿のみ参照」とフィルタリングすることで、エンゲージメントが高かったスタイルを選択的に模倣します。</p>
+          <span class="metric-chip">効果: 投稿スタイルの一貫性スコア（人間評価）が 素生成比 +40%</span>
+        </div>
+      </div>
+
     </div>
 
     <!-- ENGINEER EXAMPLES -->
@@ -577,7 +707,581 @@ response = client.messages.create(
         </div>
       </div>
 
+      <!-- NEW ENGINEER EXAMPLES 16-18 -->
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">16</span>
+          <span class="badge badge-engineer">エンジニア</span>
+          <span class="example-title">Multi-tenant RAG ── テナントごとのコンテキスト分離設計</span>
+        </div>
+        <div class="example-body">
+          <p>SaaS 製品で複数顧客（テナント）が同一 RAG インフラを共用する場合、テナント間のコンテキスト汚染を防ぐ設計が不可欠です。主な分離戦略は 3 つ：</p>
+          <pre>
+# 戦略A: メタデータフィルタリング（推奨: コスト最小）
+results = vector_db.search(
+    query_embedding,
+    filter={"tenant_id": current_tenant_id},  # テナントIDでフィルタ
+    top_k=5
+)
+
+# 戦略B: Namespace 分離（中規模テナント向け）
+# Pinecone / Qdrant の namespace / collection を テナントごとに作成
+index = pinecone.Index("knowledge-base")
+results = index.query(
+    vector=query_embedding,
+    namespace=f"tenant_{tenant_id}",  # テナント専用 namespace
+    top_k=5
+)
+
+# 戦略C: 完全分離インスタンス（エンタープライズ向け）
+# テナントごとに独立したベクトルDB インスタンスをプロビジョニング
+# コスト高だが最も強固なデータ分離を保証</pre>
+          <table style="margin-top:12px;">
+            <thead><tr><th>戦略</th><th>分離強度</th><th>コスト</th><th>管理複雑度</th><th>推奨テナント規模</th></tr></thead>
+            <tbody>
+              <tr><td>メタデータフィルタ</td><td class="tbl-warn">中</td><td class="tbl-good">低</td><td class="tbl-good">低</td><td>〜100 テナント</td></tr>
+              <tr><td>Namespace 分離</td><td class="tbl-good">高</td><td class="tbl-warn">中</td><td class="tbl-warn">中</td><td>〜1,000 テナント</td></tr>
+              <tr><td>完全分離</td><td class="tbl-good">最高</td><td class="tbl-bad">高</td><td class="tbl-bad">高</td><td>大企業・規制業種</td></tr>
+            </tbody>
+          </table>
+          <p style="margin-top:8px;">セキュリティ要件が厳しい医療・金融領域では完全分離が必須。スタートアップフェーズではメタデータフィルタリングから始め、テナント数・規制要件に応じて移行するのが現実的です。</p>
+          <span class="metric-chip">注意: メタデータフィルタ実装では必ずサーバー側でテナントIDを付与（クライアント信頼禁止）</span>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">17</span>
+          <span class="badge badge-engineer">エンジニア</span>
+          <span class="example-title">Long-context vs RAG ── コスト比較と判断フレームワーク</span>
+        </div>
+        <div class="example-body">
+          <p>「全ドキュメントをコンテキストに入れる（Long-context）」か「RAG で必要部分だけ取得する」か ── 2026 年時点の判断基準を整理します：</p>
+          <table>
+            <thead><tr><th>判断軸</th><th>Long-context が有利</th><th>RAG が有利</th></tr></thead>
+            <tbody>
+              <tr><td><strong>文書数・量</strong></td><td>1〜5 文書・合計 &lt;200K tokens</td><td>100+ 文書 or 合計 &gt;500K tokens</td></tr>
+              <tr><td><strong>クエリ特性</strong></td><td>文書全体の理解・要約・比較</td><td>特定情報の pinpoint 検索</td></tr>
+              <tr><td><strong>コスト</strong></td><td>低頻度 or キャッシュ可能な場合</td><td>高頻度クエリ（RAG の方が安い）</td></tr>
+              <tr><td><strong>更新頻度</strong></td><td>静的文書（変化しない）</td><td>頻繁に更新されるナレッジベース</td></tr>
+              <tr><td><strong>精度要件</strong></td><td>高い文脈理解が必要</td><td>Recall 重視・最新情報が必要</td></tr>
+            </tbody>
+          </table>
+          <pre style="margin-top:12px;">
+# コスト試算（Claude Fable-5 ベース, 2026年6月）
+# シナリオ: 1,000 クエリ/日、文書 100 ページ（約 150,000 tokens）
+
+# Long-context アプローチ（キャッシュなし）
+daily_cost_lc = 1000 * 150000 * (3.0 / 1_000_000)  # $450/日
+
+# Long-context + Context Caching
+daily_cost_cached = (
+    1000 * 150000 * (0.3 / 1_000_000)   # キャッシュヒット分 90% off
+    + 1 * 150000 * (3.0 / 1_000_000)    # キャッシュ書き込み 1回/日
+)  # $45.3/日 ← 10× 削減
+
+# RAG アプローチ（top-k=5, 平均 2,000 tokens/クエリ）
+daily_cost_rag = 1000 * 2000 * (3.0 / 1_000_000)   # $6/日 ← 75× 削減
+
+# 結論: 高頻度クエリ × 大規模文書 → RAG が圧倒的に安い
+#       低頻度 × 中規模文書 → Context Caching + Long-context が手軽</pre>
+          <span class="metric-chip">判断ルール: 文書 &gt;500K tokens OR クエリ &gt;100/日 → RAG を選択</span>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">18</span>
+          <span class="badge badge-engineer">エンジニア</span>
+          <span class="example-title">Context Window 使用率モニタリング ── 動的圧縮による自律管理</span>
+        </div>
+        <div class="example-body">
+          <p>長期稼働するエージェントやチャットボットでは、コンテキストウィンドウの使用率が徐々に増加し、上限に達すると突然エラーになります。使用率をリアルタイムにモニタリングし、閾値を超えたら自動圧縮する設計が本番環境では必須です：</p>
+          <pre>
+import anthropic
+from dataclasses import dataclass
+
+@dataclass
+class ContextManager:
+    model: str = "claude-fable-5"
+    max_tokens: int = 200_000   # モデルの最大 context window
+    compress_threshold: float = 0.75   # 75% を超えたら圧縮
+    target_after_compress: float = 0.40  # 圧縮後の目標使用率
+
+    def count_tokens(self, messages: list) -> int:
+        """現在の messages のトークン数を推定"""
+        client = anthropic.Anthropic()
+        result = client.messages.count_tokens(
+            model=self.model,
+            messages=messages
+        )
+        return result.input_tokens
+
+    def usage_ratio(self, messages: list) -> float:
+        return self.count_tokens(messages) / self.max_tokens
+
+    def maybe_compress(self, messages: list, system: str) -> list:
+        ratio = self.usage_ratio(messages)
+
+        # Prometheus / Datadog にメトリクス送信
+        metrics.gauge("context.usage_ratio", ratio)
+
+        if ratio < self.compress_threshold:
+            return messages  # 圧縮不要
+
+        # 閾値超過: 古い会話履歴を要約して圧縮
+        target_tokens = int(self.max_tokens * self.target_after_compress)
+        keep_recent = messages[-6:]   # 直近 3 往復は必ず保持
+
+        summary_prompt = f"""
+以下の会話履歴を、重要な情報・決定事項・未解決タスクを保持しつつ
+{target_tokens} tokens 以内に圧縮してください。
+
+{messages[:-6]}
+"""
+        summary = llm_summarize(summary_prompt)
+
+        compressed = [
+            {"role": "system", "content": f"[圧縮された会話履歴]\n{summary}"}
+        ] + keep_recent
+
+        metrics.increment("context.compression_triggered")
+        return compressed
+
+# 使用例
+cm = ContextManager()
+messages = conversation_history
+
+while True:
+    messages = cm.maybe_compress(messages, system_prompt)
+    response = client.messages.create(
+        model=cm.model, system=system_prompt, messages=messages
+    )
+    messages.append({"role": "assistant", "content": response.content[0].text})</pre>
+          <p>このパターンを導入することで、エージェントが数時間・数日稼働してもコンテキストエラーが発生せず、かつ重要情報は失われません。</p>
+          <span class="metric-chip">推奨アラート: usage_ratio &gt; 0.85 で PagerDuty / Slack 通知</span>
+        </div>
+      </div>
+
     </div>
+  </div>
+
+  <!-- ========== GRAPH RAG ========== -->
+  <div class="panel">
+    <h2>GraphRAG / 知識グラフ RAG</h2>
+    <p>Microsoft が 2024 年に発表した GraphRAG は、テキストをただベクトル化する Naive RAG の限界を超え、<strong>エンティティ間の関係性をグラフ構造として保持</strong>することで複雑な多段推論クエリに対応します。</p>
+
+    <div class="graph-box">
+      <h4>Naive RAG vs GraphRAG</h4>
+      <table>
+        <thead><tr><th>観点</th><th>Naive RAG</th><th>GraphRAG</th></tr></thead>
+        <tbody>
+          <tr><td><strong>データ構造</strong></td><td>テキストチャンク + ベクトル</td><td>エンティティ・関係・コミュニティのグラフ</td></tr>
+          <tr><td><strong>得意なクエリ</strong></td><td>単一事実の検索</td><td>多段推論・エンティティ関係・全体把握</td></tr>
+          <tr><td><strong>例クエリ</strong></td><td>「Aの定義は？」</td><td>「AとBとCの関係を説明して」</td></tr>
+          <tr><td><strong>グローバル理解</strong></td><td>弱い（チャンク単位）</td><td>強い（Community Summary でデータセット全体を把握）</td></tr>
+          <tr><td><strong>構築コスト</strong></td><td>低い</td><td>高い（グラフ構築に LLM 呼び出しが必要）</td></tr>
+          <tr><td><strong>クエリコスト</strong></td><td>低い</td><td>グローバル検索は高い（Local 検索は同等）</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Community Detection + Summarization アプローチ</h3>
+    <p>GraphRAG の中核は「コミュニティ検出 → 階層的要約」のパイプラインです：</p>
+    <ol style="color:#c5d0e3;">
+      <li><strong>エンティティ抽出</strong>: LLM でテキストからエンティティ（人物・組織・概念）と関係（has / uses / conflicts_with 等）を抽出</li>
+      <li><strong>グラフ構築</strong>: 抽出した関係を有向グラフとして格納（Neo4j / NetworkX）</li>
+      <li><strong>コミュニティ検出</strong>: Leiden Algorithm でグラフをクラスタリング（密に繋がったノード群 = コミュニティ）</li>
+      <li><strong>階層的要約</strong>: 各コミュニティの要約を LLM で生成 → これが「Global Search」のコンテキストになる</li>
+      <li><strong>クエリ時</strong>: Local Search（特定エンティティ周辺のグラフ探索）か Global Search（コミュニティ要約を横断）かを自動選択</li>
+    </ol>
+
+    <h3>実装例（Microsoft GraphRAG + LightRAG）</h3>
+    <div class="example-body">
+      <pre>
+# Microsoft GraphRAG（公式パッケージ）
+pip install graphrag
+
+# インデックス構築（LLM でグラフを自動生成）
+python -m graphrag.index \
+  --root ./my_project \
+  --config ./settings.yml
+# → エンティティ・関係・コミュニティ要約が生成される
+
+# クエリ実行
+python -m graphrag.query \
+  --root ./my_project \
+  --method global \  # または local
+  --query "登場人物間の権力関係を教えてください"
+
+# ---
+
+# LightRAG（よりシンプルな代替）
+from lightrag import LightRAG, QueryParam
+from lightrag.llm.openai import gpt_4o_mini_complete, openai_embed
+
+rag = LightRAG(
+    working_dir="./lightrag_cache",
+    llm_model_func=gpt_4o_mini_complete,
+    embedding_func=openai_embed
+)
+
+with open("novel.txt") as f:
+    rag.insert(f.read())  # グラフ自動構築
+
+# Hybrid モード: Local + Global を組み合わせ
+result = rag.query(
+    "主人公と敵対組織の関係を説明してください",
+    param=QueryParam(mode="hybrid")
+)</pre>
+    </div>
+
+    <h3>使いどきの判断基準</h3>
+    <div class="pattern-grid">
+      <div class="pattern-card">
+        <h4>GraphRAG を選ぶ場合</h4>
+        <p>複数エンティティにまたがる多段推論（「A が B に与えた影響と C との関係」）／ 大量文書のテーマ・構造の全体把握 ／ 関係性の可視化・探索が目的</p>
+      </div>
+      <div class="pattern-card">
+        <h4>Naive RAG で十分な場合</h4>
+        <p>単一事実の検索（「〇〇の定義は？」「〇〇はいつ発表？」）／ 構築コストを抑えたい ／ リアルタイム更新が必要なナレッジベース</p>
+      </div>
+    </div>
+
+    <div class="section-divider">
+      <span class="dl dl-creator">クリエイター適用例</span>
+      <div class="dline"></div>
+    </div>
+    <p style="color:#c5d0e3; font-size:0.9rem;"><strong>キャラクター関係図の知識グラフ化と物語整合性チェック</strong><br>
+    漫画・ゲームシナリオのキャラクター設定（登場人物・所属組織・関係性・過去イベント）を GraphRAG でグラフ化することで、「AとBは第3章で和解したが、第7章でなぜまた対立しているのか」という多段推論クエリが可能になります。Community Summary によりアーク全体の構造も把握でき、新しいライターがオンボーディングする際の参照資料としても機能します。</p>
+
+    <div class="section-divider">
+      <span class="dl dl-engineer">エンジニア適用例</span>
+      <div class="dline"></div>
+    </div>
+    <p style="color:#c5d0e3; font-size:0.9rem;"><strong>コードベースの依存関係グラフを RAG で参照</strong><br>
+    大規模モノレポ（数万ファイル）では、モジュール間の import / call / extend 関係をグラフとして構築し GraphRAG で検索することで、「このAPIを変更すると影響を受けるモジュールをすべて列挙して」という多段影響調査が可能になります。従来の grep ベースの調査に比べ、間接依存（A → B → C → D というチェーン）まで自動的に追跡できます。</p>
+  </div>
+
+  <!-- ========== AGENTIC RAG ========== -->
+  <div class="panel">
+    <h2>Agentic RAG</h2>
+    <p>従来の RAG は「クエリが来たら固定手順で検索する」受動的なパイプラインでした。<strong>Agentic RAG</strong> ではエージェントが自律的に「何を・いつ・どのように検索するか」を決定し、必要なら複数回の検索を繰り返します。</p>
+
+    <div class="quote-card" style="border-color:#34d399; background:rgba(52,211,153,0.06);">
+      <blockquote style="color:#a7f3d0;">「Traditional RAG retrieves once and generates. Agentic RAG thinks about what it doesn't know, retrieves to fill that gap, then decides if it needs to retrieve again.」</blockquote>
+      <cite>── LlamaIndex Blog、2024年</cite>
+    </div>
+
+    <h3>主要パターン</h3>
+    <div class="pattern-grid">
+      <div class="pattern-card">
+        <h4>Query Routing（クエリルーティング）</h4>
+        <p>クエリの種類に応じて参照先を自動選択。「製品仕様 → 仕様書 DB」「最新情報 → Web 検索」「コード → コードベース検索」を LLM が判断して振り分ける。</p>
+      </div>
+      <div class="pattern-card">
+        <h4>Query Expansion（クエリ拡張）</h4>
+        <p>1 つのクエリを複数の視点から言い換えて並列検索し、結果をマージ。HyDE の発展形。「2次元検索」「サブクエリ分解」とも呼ばれる。</p>
+      </div>
+      <div class="pattern-card">
+        <h4>Iterative Retrieval（反復検索）</h4>
+        <p>検索結果を見て「情報が不十分」と判断したら再検索する。ReAct ループ内で Retrieve → Reason → Retrieve を繰り返す。複雑な多段質問に有効。</p>
+      </div>
+      <div class="pattern-card">
+        <h4>Self-RAG（自己評価 RAG）</h4>
+        <p>検索した情報が本当に質問に関連しているかをモデル自身が評価（Relevance Token）し、不十分なら再検索。精度は高いが実装コストが高い。</p>
+      </div>
+    </div>
+
+    <h3>実装例（Query Routing + Iterative Retrieval）</h3>
+    <div class="example-body">
+      <pre>
+from anthropic import Anthropic
+import json
+
+client = Anthropic()
+
+TOOLS = [
+    {
+        "name": "search_docs",
+        "description": "製品ドキュメント・仕様書をセマンティック検索する",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "query": {"type": "string", "description": "検索クエリ"},
+                "top_k": {"type": "integer", "default": 5}
+            },
+            "required": ["query"]
+        }
+    },
+    {
+        "name": "search_web",
+        "description": "最新情報・ニュースをWeb検索する（公式ドキュメントにない情報）",
+        "input_schema": {
+            "type": "object",
+            "properties": {"query": {"type": "string"}},
+            "required": ["query"]
+        }
+    },
+    {
+        "name": "search_codebase",
+        "description": "コードベースをセマンティック検索する",
+        "input_schema": {
+            "type": "object",
+            "properties": {"query": {"type": "string"}},
+            "required": ["query"]
+        }
+    }
+]
+
+def agentic_rag(user_query: str) -> str:
+    """
+    エージェントが自律的にツールを選択・反復実行して回答を構築。
+    Claude がどのツールをいつ使うかを自分で決定する。
+    """
+    messages = [{"role": "user", "content": user_query}]
+
+    while True:
+        response = client.messages.create(
+            model="claude-fable-5",
+            max_tokens=4096,
+            tools=TOOLS,
+            system="""あなたはリサーチアシスタントです。
+質問に答えるために必要なツールを自律的に選択・実行してください。
+情報が不十分な場合は追加検索を行い、十分な情報が揃ったら最終回答を出力します。""",
+            messages=messages
+        )
+
+        # tool_use がなければ最終回答
+        if response.stop_reason == "end_turn":
+            return response.content[0].text
+
+        # ツール呼び出しを実行
+        tool_results = []
+        for block in response.content:
+            if block.type == "tool_use":
+                result = execute_tool(block.name, block.input)
+                tool_results.append({
+                    "type": "tool_result",
+                    "tool_use_id": block.id,
+                    "content": result
+                })
+
+        # 結果を messages に追加して次のターンへ
+        messages.append({"role": "assistant", "content": response.content})
+        messages.append({"role": "user", "content": tool_results})</pre>
+    </div>
+
+    <h3>Claude Code での Agentic Retrieval</h3>
+    <p>Claude Code 自体が Agentic RAG の実装例です：</p>
+    <ul style="color:#c5d0e3;">
+      <li><code>@codebase</code>: プロジェクト全体を Semantic Search で検索（どのファイルを見るかをモデルが自律判断）</li>
+      <li><code>@docs</code>: 公式ドキュメントをリアルタイム検索（React / Next.js / Anthropic API 等を自動参照）</li>
+      <li><strong>Glob / Grep ツール</strong>: 必要に応じてファイル構造探索・パターン検索を繰り返し実行</li>
+      <li><strong>反復読み取り</strong>: 最初の Read 結果から関連ファイルを発見 → 追加 Read を自律的に連鎖</li>
+    </ul>
+    <p>ユーザーが明示的に指定しなくても、Claude Code は「この質問に答えるには何を読むべきか」を自律判断して検索戦略を立てます。これが Agentic RAG の本質です。</p>
+  </div>
+
+  <!-- ========== EMBEDDING COMPARISON ========== -->
+  <div class="panel">
+    <h2>埋め込みモデル（Embedding）比較表</h2>
+    <p>RAG システムの検索精度はベクトル化に使う埋め込みモデルの性能に大きく左右されます。2026年6月時点の主要モデルを比較します。</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>モデル</th>
+          <th>次元数</th>
+          <th>コスト</th>
+          <th>多言語</th>
+          <th>日本語品質</th>
+          <th>MTEB スコア</th>
+          <th>ホスティング</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>OpenAI text-embedding-3-large</strong></td>
+          <td>3,072</td>
+          <td class="tbl-warn">$0.13 / MTok</td>
+          <td class="tbl-good">良好</td>
+          <td class="tbl-warn">中（英語優位）</td>
+          <td>64.6</td>
+          <td>API のみ</td>
+        </tr>
+        <tr>
+          <td><strong>Cohere embed-v3 (multilingual)</strong></td>
+          <td>1,024</td>
+          <td class="tbl-warn">$0.10 / MTok</td>
+          <td class="tbl-good">100+ 言語</td>
+          <td class="tbl-good">高</td>
+          <td>64.0</td>
+          <td>API のみ</td>
+        </tr>
+        <tr>
+          <td><strong>BGE-M3</strong></td>
+          <td>1,024</td>
+          <td class="tbl-good">無料（OSS）</td>
+          <td class="tbl-good">100+ 言語</td>
+          <td class="tbl-good">高</td>
+          <td>63.7</td>
+          <td>ローカル / self-host</td>
+        </tr>
+        <tr>
+          <td><strong>Nomic Embed v1.5</strong></td>
+          <td>768（可変）</td>
+          <td class="tbl-good">無料（OSS）</td>
+          <td class="tbl-warn">英語中心</td>
+          <td class="tbl-bad">低</td>
+          <td>62.0</td>
+          <td>ローカル / API</td>
+        </tr>
+        <tr>
+          <td><strong>E5-mistral-7b-instruct</strong></td>
+          <td>4,096</td>
+          <td class="tbl-good">無料（OSS）</td>
+          <td class="tbl-warn">英語優位</td>
+          <td class="tbl-warn">中</td>
+          <td>66.6</td>
+          <td>ローカル（GPU 推奨）</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>選択ガイド</h3>
+    <div class="rec-grid">
+      <div class="rec-card">
+        <div class="rc-usecase">日本語 RAG / 日英混在コンテンツ</div>
+        <div class="rc-pick">BGE-M3 または Cohere embed-v3</div>
+        <div class="rc-reason">日本語品質が高く、BGE-M3 は OSS で self-host 可能。Cohere はAPI コストは発生するが管理が楽。</div>
+      </div>
+      <div class="rec-card">
+        <div class="rc-usecase">英語オンリー / 高精度優先</div>
+        <div class="rc-pick">E5-mistral-7b-instruct</div>
+        <div class="rc-reason">MTEB スコアが最高クラス。GPU 環境があれば圧倒的なコスパ。API が不要でデータがローカルに留まる。</div>
+      </div>
+      <div class="rec-card">
+        <div class="rc-usecase">プロトタイプ / 最速セットアップ</div>
+        <div class="rc-pick">OpenAI text-embedding-3-large</div>
+        <div class="rc-reason">API キー 1 枚で即利用可能。LangChain / LlamaIndex との統合実績が最も豊富。</div>
+      </div>
+      <div class="rec-card">
+        <div class="rc-usecase">コスト最小・ローカル完結</div>
+        <div class="rc-pick">Nomic Embed v1.5</div>
+        <div class="rc-reason">MRL（Matryoshka Representation Learning）対応で次元数を動的縮小可能。英語コンテンツなら十分な精度。</div>
+      </div>
+    </div>
+
+    <h3>Local vs API のトレードオフ</h3>
+    <table>
+      <thead><tr><th>観点</th><th>API（OpenAI / Cohere）</th><th>ローカル（BGE-M3 / E5）</th></tr></thead>
+      <tbody>
+        <tr><td><strong>セットアップ</strong></td><td class="tbl-good">API キーのみ</td><td class="tbl-warn">モデルダウンロード・推論環境構築</td></tr>
+        <tr><td><strong>ランニングコスト</strong></td><td class="tbl-warn">従量課金（大量処理で高額化）</td><td class="tbl-good">ほぼ0（サーバー電気代のみ）</td></tr>
+        <tr><td><strong>データプライバシー</strong></td><td class="tbl-bad">外部送信が発生</td><td class="tbl-good">完全ローカル処理</td></tr>
+        <tr><td><strong>レイテンシ</strong></td><td class="tbl-warn">ネットワーク依存</td><td class="tbl-good">ローカルは低遅延（GPU 環境）</td></tr>
+        <tr><td><strong>スケーリング</strong></td><td class="tbl-good">自動スケール</td><td class="tbl-warn">サーバー増設が必要</td></tr>
+      </tbody>
+    </table>
+    <p style="font-size:0.85rem; color:#7f92ac; margin-top:8px;">医療・法務・金融など機密データを扱う場合はローカルモデルが必須。それ以外はプロジェクト規模と予算で判断する。</p>
+  </div>
+
+  <!-- ========== VECTOR DB COMPARISON ========== -->
+  <div class="panel">
+    <h2>ベクトルDB 比較</h2>
+    <p>RAG の検索基盤となるベクトルデータベースの選定は、スケール・コスト・運用負荷に大きく影響します。2026年6月時点の主要5製品を比較します。</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>製品</th>
+          <th>ホスティング</th>
+          <th>スケール</th>
+          <th>コスト</th>
+          <th>日本語対応</th>
+          <th>主な特徴</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Pinecone</strong></td>
+          <td>マネージドSaaS</td>
+          <td class="tbl-good">〜10億 vectors</td>
+          <td class="tbl-warn">従量課金（やや高め）</td>
+          <td class="tbl-good">問題なし</td>
+          <td>最も手軽。Serverless プランは小規模無料。Namespace による論理分離が得意。</td>
+        </tr>
+        <tr>
+          <td><strong>Weaviate</strong></td>
+          <td>OSS / マネージド</td>
+          <td class="tbl-good">〜10億 vectors</td>
+          <td class="tbl-good">OSS 無料 / Cloud 従量</td>
+          <td class="tbl-good">問題なし</td>
+          <td>GraphQL API・Hybrid Search（ベクトル + BM25）・マルチモーダル対応が強み。</td>
+        </tr>
+        <tr>
+          <td><strong>Qdrant</strong></td>
+          <td>OSS / マネージド</td>
+          <td class="tbl-good">〜10億 vectors</td>
+          <td class="tbl-good">OSS 無料 / Cloud 格安</td>
+          <td class="tbl-good">問題なし</td>
+          <td>Rust 製で高速。フィルタリング性能が業界最高水準。Self-host が容易（Docker 1コマンド）。</td>
+        </tr>
+        <tr>
+          <td><strong>pgvector</strong></td>
+          <td>PostgreSQL 拡張</td>
+          <td class="tbl-warn">〜数千万 vectors</td>
+          <td class="tbl-good">既存 PG コスト内</td>
+          <td class="tbl-good">問題なし</td>
+          <td>既存 PostgreSQL に追加するだけ。SQL で vector 検索可能。既に PG を使っているなら最速の選択肢。</td>
+        </tr>
+        <tr>
+          <td><strong>Chroma</strong></td>
+          <td>OSS（ローカル/サーバー）</td>
+          <td class="tbl-warn">〜数百万 vectors</td>
+          <td class="tbl-good">完全無料</td>
+          <td class="tbl-good">問題なし</td>
+          <td>開発・プロトタイプ向け最速セットアップ。<code>pip install chromadb</code> で即利用。本番はスケール限界に注意。</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>ユースケース別 推奨マトリクス</h3>
+    <div class="rec-grid">
+      <div class="rec-card">
+        <div class="rc-usecase">プロトタイプ / ハッカソン</div>
+        <div class="rc-pick">Chroma</div>
+        <div class="rc-reason">pip 1 行で動く。LangChain / LlamaIndex のデフォルト。本番移行時はデータ移行が必要。</div>
+      </div>
+      <div class="rec-card">
+        <div class="rc-usecase">既存 PostgreSQL 環境</div>
+        <div class="rc-pick">pgvector</div>
+        <div class="rc-reason">追加インフラ不要。RDS / Supabase でも利用可能。数千万件規模なら十分。</div>
+      </div>
+      <div class="rec-card">
+        <div class="rc-usecase">Self-host 本番 / 高速フィルタ</div>
+        <div class="rc-pick">Qdrant</div>
+        <div class="rc-reason">フィルタリング性能最高。Docker で楽に self-host。Multi-tenant RAG のメタデータフィルタに最適。</div>
+      </div>
+      <div class="rec-card">
+        <div class="rc-usecase">マネージドSaaS / 億規模</div>
+        <div class="rc-pick">Pinecone</div>
+        <div class="rc-reason">インフラ管理ゼロ。Serverless は使った分だけ課金。エンタープライズ SLA が必要なら最有力候補。</div>
+      </div>
+      <div class="rec-card">
+        <div class="rc-usecase">Hybrid Search（ベクトル + キーワード）</div>
+        <div class="rc-pick">Weaviate</div>
+        <div class="rc-reason">BM25 + Vector の Hybrid Search が組み込み済み。日本語 tokenizer（kuromoji）プラグインあり。</div>
+      </div>
+      <div class="rec-card">
+        <div class="rc-usecase">コスト最優先・完全ローカル</div>
+        <div class="rc-pick">Qdrant（self-host）または pgvector</div>
+        <div class="rc-reason">外部SaaSゼロコスト。機密データのローカル処理と組み合わせると最も低コストな本番構成。</div>
+      </div>
+    </div>
+
+    <p style="font-size:0.85rem; color:#7f92ac; margin-top:12px;"><strong>移行コストに注意</strong>: ベクトルDBの乗り換えはデータの再ベクトル化（全文書の再インデックス）が必要になる場合があります。プロトタイプ段階から本番想定の製品を選ぶか、データレイヤーを抽象化しておく設計が重要です。</p>
   </div>
 
   <!-- ========== ANTI-PATTERNS ========== -->
