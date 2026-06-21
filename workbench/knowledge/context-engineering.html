@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Context Engineering | Workbench Knowledge</title>
+  <style>
+    body { font-family: "Segoe UI", "Noto Sans JP", system-ui, sans-serif; margin: 0; background: #0b1220; color: #edf2fb; line-height: 1.75; padding: 28px 18px 60px; }
+    .shell { max-width: 1100px; margin: 0 auto; display: grid; gap: 22px; }
+    .panel { background: #111a2b; border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 26px 28px; }
+    a { color: #75d7c0; }
+    h1 { margin: 0 0 10px; font-size: 1.9rem; }
+    h2 { margin: 0 0 14px; font-size: 1.25rem; color: #edf2fb; }
+    h3 { margin: 14px 0 8px; font-size: 1.05rem; color: #d0daf0; }
+    p, li { color: #c5d0e3; }
+
+    /* KPI strip */
+    .kpi-row { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0; }
+    .kpi { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 12px 16px; text-align: center; min-width: 130px; }
+    .kpi .val { font-size: 1.3rem; font-weight: 800; color: #3dd8c5; }
+    .kpi .lbl { font-size: 0.72rem; color: #7f92ac; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 4px; }
+
+    /* Badges */
+    .badge { display: inline-block; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 5px; margin-right: 6px; vertical-align: middle; }
+    .badge-creator { background: rgba(167,139,250,0.18); color: #a78bfa; border: 1px solid rgba(167,139,250,0.3); }
+    .badge-engineer { background: rgba(61,216,197,0.15); color: #3dd8c5; border: 1px solid rgba(61,216,197,0.3); }
+    .badge-new { background: rgba(79,255,176,0.15); color: #4FFFB0; border: 1px solid rgba(79,255,176,0.3); }
+    .badge-warn { background: rgba(244,184,96,0.15); color: #f4b860; }
+
+    /* Timeline */
+    .timeline { position: relative; padding-left: 28px; }
+    .timeline::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: rgba(61,216,197,0.25); }
+    .tl-item { position: relative; margin-bottom: 20px; }
+    .tl-item::before { content: ''; position: absolute; left: -24px; top: 6px; width: 10px; height: 10px; border-radius: 50%; background: #3dd8c5; box-shadow: 0 0 8px rgba(61,216,197,0.5); }
+    .tl-year { font-size: 0.78rem; font-weight: 700; color: #3dd8c5; letter-spacing: 0.06em; text-transform: uppercase; }
+    .tl-title { font-weight: 700; color: #edf2fb; margin: 2px 0; }
+    .tl-desc { color: #c5d0e3; font-size: 0.9rem; }
+
+    /* 7 Layers */
+    .layer-stack { display: grid; gap: 6px; margin: 14px 0; }
+    .layer { display: grid; grid-template-columns: 28px 1fr; gap: 12px; align-items: start; padding: 12px 14px; border-radius: 10px; border-left: 3px solid; }
+    .layer-num { font-size: 0.78rem; font-weight: 800; color: #7f92ac; padding-top: 2px; }
+    .layer-title { font-weight: 700; font-size: 0.95rem; margin-bottom: 2px; }
+    .layer-desc { font-size: 0.85rem; color: #c5d0e3; }
+    .l1 { background: rgba(167,139,250,0.08); border-color: #a78bfa; }
+    .l2 { background: rgba(99,179,237,0.08); border-color: #63b3ed; }
+    .l3 { background: rgba(61,216,197,0.08); border-color: #3dd8c5; }
+    .l4 { background: rgba(244,184,96,0.08); border-color: #f4b860; }
+    .l5 { background: rgba(248,113,113,0.08); border-color: #f87171; }
+    .l6 { background: rgba(52,211,153,0.08); border-color: #34d399; }
+    .l7 { background: rgba(251,191,36,0.08); border-color: #fbbf24; }
+    .l1 .layer-title { color: #a78bfa; }
+    .l2 .layer-title { color: #63b3ed; }
+    .l3 .layer-title { color: #3dd8c5; }
+    .l4 .layer-title { color: #f4b860; }
+    .l5 .layer-title { color: #f87171; }
+    .l6 .layer-title { color: #34d399; }
+    .l7 .layer-title { color: #fbbf24; }
+
+    /* Technique cards */
+    .technique-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin: 14px 0; }
+    .technique-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 16px; }
+    .technique-card h4 { margin: 0 0 6px; color: #3dd8c5; font-size: 0.95rem; }
+    .technique-card p { margin: 0; font-size: 0.88rem; color: #b0bcd4; }
+    .technique-card code { background: rgba(255,255,255,0.06); padding: 1px 5px; border-radius: 4px; font-size: 0.82rem; color: #f4b860; }
+
+    /* Examples */
+    .example-list { display: grid; gap: 16px; margin: 14px 0; }
+    .example { background: rgba(255,255,255,0.025); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 18px 20px; }
+    .example-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+    .example-num { font-size: 0.78rem; font-weight: 800; color: #7f92ac; min-width: 24px; }
+    .example-title { font-weight: 700; color: #edf2fb; font-size: 1rem; }
+    .example-body { color: #c5d0e3; font-size: 0.9rem; }
+    .example-body code { background: rgba(255,255,255,0.07); padding: 2px 6px; border-radius: 4px; font-family: "Fira Code", "Consolas", monospace; font-size: 0.82rem; color: #f4b860; }
+    .example-body pre { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 12px 14px; overflow-x: auto; font-size: 0.82rem; color: #c5d0e3; font-family: "Fira Code", "Consolas", monospace; line-height: 1.6; margin: 8px 0; }
+    .metric-chip { display: inline-block; background: rgba(61,216,197,0.12); color: #3dd8c5; font-size: 0.78rem; font-weight: 700; padding: 2px 8px; border-radius: 5px; margin-top: 6px; }
+
+    /* Anti-patterns */
+    .anti-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; margin: 14px 0; }
+    .anti-card { background: rgba(248,113,113,0.05); border: 1px solid rgba(248,113,113,0.25); border-radius: 12px; padding: 16px; }
+    .anti-card h4 { margin: 0 0 6px; color: #f87171; font-size: 0.95rem; }
+    .anti-card p { margin: 0; font-size: 0.87rem; color: #b0bcd4; }
+    .anti-fix { margin-top: 8px; font-size: 0.83rem; color: #4FFFB0; }
+
+    /* Quote */
+    .quote-card { background: rgba(167,139,250,0.07); border-left: 4px solid #a78bfa; border-radius: 0 12px 12px 0; padding: 16px 20px; margin: 14px 0; }
+    .quote-card blockquote { margin: 0 0 8px; color: #d4c8f8; font-style: italic; font-size: 1.02rem; }
+    .quote-card cite { color: #7f92ac; font-size: 0.82rem; }
+
+    /* Divider with label */
+    .section-divider { display: flex; align-items: center; gap: 12px; margin: 20px 0 16px; }
+    .section-divider .dl { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; padding: 4px 12px; border-radius: 6px; }
+    .section-divider .dline { flex: 1; height: 1px; background: rgba(255,255,255,0.08); }
+    .dl-creator { background: rgba(167,139,250,0.18); color: #a78bfa; }
+    .dl-engineer { background: rgba(61,216,197,0.15); color: #3dd8c5; }
+
+    /* Series nav */
+    .series-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 14px; }
+    .series-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 16px; text-decoration: none; display: block; transition: border-color 0.2s; }
+    .series-card:hover { border-color: rgba(61,216,197,0.4); }
+    .series-card .sc-label { font-size: 0.72rem; color: #7f92ac; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+    .series-card .sc-title { font-weight: 700; color: #edf2fb; font-size: 0.95rem; }
+    .series-card .sc-desc { font-size: 0.82rem; color: #7f92ac; margin-top: 4px; }
+    .series-card.current { border-color: rgba(61,216,197,0.5); background: rgba(61,216,197,0.06); }
+    .series-card.current .sc-title { color: #3dd8c5; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin: 12px 0; }
+    th { text-align: left; padding: 10px 12px; color: #f4b860; border-bottom: 2px solid rgba(244,184,96,0.25); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #c5d0e3; vertical-align: top; }
+    td strong { color: #edf2fb; }
+  </style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ========== HEADER ========== -->
+  <div class="panel">
+    <p style="margin:0 0 12px;"><a href="../index.html">← Workbench</a> / <a href="index.html">Knowledge</a> / <a href="../../index.html">Hub Top</a></p>
+    <div class="badge badge-new">エンジニアリングスキル シリーズ ②</div>
+    <h1 style="margin-top:10px;">Context Engineering</h1>
+    <p style="font-size:1.05rem; color:#c5d0e3; margin:0 0 16px;">「<strong>何を見せるか</strong>」が競争優位を決める ── プロンプトの書き方より、モデルに届ける情報の設計こそが 2025-2026 年の主戦場。</p>
+    <div class="kpi-row">
+      <div class="kpi"><div class="val">Tobi Lütke</div><div class="lbl">提唱者（Shopify CEO）</div></div>
+      <div class="kpi"><div class="val">2025年6月</div><div class="lbl">概念の命名・普及</div></div>
+      <div class="kpi"><div class="val">Gartner 認定</div><div class="lbl">2025年6月 公式見解</div></div>
+      <div class="kpi"><div class="val">7 レイヤー</div><div class="lbl">コンテキスト構造モデル</div></div>
+      <div class="kpi"><div class="val">12 実例</div><div class="lbl">クリエイター6 + エンジニア6</div></div>
+    </div>
+    <p style="font-size:0.82rem; color:#7f92ac; margin:0;">最終更新: 2026-06-20 ／ シリーズ: <a href="prompt-engineering.html">Prompt</a> → <strong>Context（当ページ）</strong> → <a href="harness-engineering.html">Harness</a> → <a href="loop-engineering.html">Loop</a></p>
+  </div>
+
+  <!-- ========== WHAT IS IT ========== -->
+  <div class="panel">
+    <h2>コンテキストエンジニアリングとは何か</h2>
+
+    <div class="quote-card">
+      <blockquote>「The art of filling the context window with just the right information at the right time.」</blockquote>
+      <cite>── Tobi Lütke（Shopify CEO）、2025年6月</cite>
+    </div>
+
+    <div class="quote-card" style="border-color:#63b3ed; background:rgba(99,179,237,0.07);">
+      <blockquote style="color:#bdd5f0;">「The context window is the most valuable real estate in AI. What you put in it – and what you leave out – determines everything.」</blockquote>
+      <cite>── Andrej Karpathy（元 Tesla AI / OpenAI 共同創業者）、2025年</cite>
+    </div>
+
+    <p><strong>プロンプトエンジニアリングとの決定的な違い</strong>は「粒度」と「主語」にあります。</p>
+
+    <table>
+      <thead><tr><th>観点</th><th>Prompt Engineering</th><th>Context Engineering</th></tr></thead>
+      <tbody>
+        <tr><td><strong>問い</strong></td><td>どう頼むか（How to ask）</td><td>何を見せるか（What to provide）</td></tr>
+        <tr><td><strong>主な技術</strong></td><td>Few-shot, CoT, XML tags, Role</td><td>RAG, Memory, Compression, Caching</td></tr>
+        <tr><td><strong>関与者</strong></td><td>主にプロンプト作成者</td><td>システム設計者・データエンジニア</td></tr>
+        <tr><td><strong>上位/下位</strong></td><td>コンテキストの一部（System Prompt）</td><td>プロンプトを包含する上位概念</td></tr>
+        <tr><td><strong>競争優位の源</strong></td><td>低い（コモディティ化）</td><td>高い（設計の巧拙が直接成果に直結）</td></tr>
+      </tbody>
+    </table>
+
+    <p style="margin-top:12px;">Gartner は 2025年6月の公式レポートで「<em>Context engineering is in, prompt engineering is out</em>」と明言。プロンプトの書き方は素養として全職種に浸透した結果、次の差別化軸はコンテキスト設計に移行しています。</p>
+  </div>
+
+  <!-- ========== 7 LAYERS ========== -->
+  <div class="panel">
+    <h2>コンテキストの 7 層モデル</h2>
+    <p>モデルのコンテキストウィンドウに入れる情報を 7 つのレイヤーで整理します。品質の高いエージェントやアプリは、この 7 層を意図的に設計・管理しています。</p>
+
+    <div class="layer-stack">
+      <div class="layer l1">
+        <div class="layer-num">① </div>
+        <div>
+          <div class="layer-title">System Instructions（システム指示）</div>
+          <div class="layer-desc">役割・人格・制約・禁止事項・出力フォーマット。常に存在し、最も権威のある層。CLAUDE.md や Cursor Rules がここに相当。</div>
+        </div>
+      </div>
+      <div class="layer l2">
+        <div class="layer-num">② </div>
+        <div>
+          <div class="layer-title">Static Knowledge（静的知識）</div>
+          <div class="layer-desc">仕様書・マニュアル・製品ドキュメント・FAQ。クエリに関係なく常に注入する参照資料。Context Caching との相性が良い。</div>
+        </div>
+      </div>
+      <div class="layer l3">
+        <div class="layer-num">③ </div>
+        <div>
+          <div class="layer-title">Retrieved Context（検索取得コンテキスト）</div>
+          <div class="layer-desc">RAG によりクエリに応じて動的取得される情報。Semantic Chunking・HyDE・Reranking でリレバンスを最大化。</div>
+        </div>
+      </div>
+      <div class="layer l4">
+        <div class="layer-num">④ </div>
+        <div>
+          <div class="layer-title">Conversation History（会話履歴）</div>
+          <div class="layer-desc">直近の会話ターン。要約・スライディングウィンドウ・選択的圧縮でトークンを節約しながら文脈を維持。</div>
+        </div>
+      </div>
+      <div class="layer l5">
+        <div class="layer-num">⑤ </div>
+        <div>
+          <div class="layer-title">Tool Outputs（ツール実行結果）</div>
+          <div class="layer-desc">コード実行・Web 検索・API 呼び出し・ファイル操作の結果。エージェントループの「観測」フェーズで生成される動的情報。</div>
+        </div>
+      </div>
+      <div class="layer l6">
+        <div class="layer-num">⑥ </div>
+        <div>
+          <div class="layer-title">Memory（記憶）</div>
+          <div class="layer-desc">短期（セッション内）・長期（クロスセッション）・エピソード（特定イベント）記憶。Mem0・Letta・ClawMem 等で実装。</div>
+        </div>
+      </div>
+      <div class="layer l7">
+        <div class="layer-num">⑦ </div>
+        <div>
+          <div class="layer-title">Task State（タスク状態）</div>
+          <div class="layer-desc">現在のタスク進捗・変数・中間結果・未解決の判断。エージェントが「どこまでやったか」を把握するための実行文脈。</div>
+        </div>
+      </div>
+    </div>
+
+    <p style="font-size:0.88rem; color:#7f92ac; margin-top:8px;">コンテキストエンジニアリングの実践とは、この 7 層をリソース（トークン・コスト・レイテンシ）の制約の中で最適に配置する設計行為です。</p>
+  </div>
+
+  <!-- ========== EVOLUTION TIMELINE ========== -->
+  <div class="panel">
+    <h2>進化タイムライン（2022 → 2026）</h2>
+
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-year">2022</div>
+        <div class="tl-title">朴素な詰め込み時代 & Lost in the Middle 問題発見</div>
+        <div class="tl-desc">「とにかくコンテキストに詰め込む」アプローチが主流。Stanford の研究（Liu et al., 2023）でモデルが長文コンテキストの中央部の情報を無視する「Lost in the Middle」現象が発見され、量より配置の重要性が浮上。</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">2023</div>
+        <div class="tl-title">RAG（Retrieval-Augmented Generation）の台頭</div>
+        <div class="tl-desc">LlamaIndex・LangChain が RAG フレームワークとして普及。クエリに応じて外部知識を動的取得する設計が一般化。Semantic Chunking・Hierarchical RAG・HyDE（Hypothetical Document Embeddings）等の手法が登場。</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">2024</div>
+        <div class="tl-title">Long Context vs RAG の論争 & Memory Systems 台頭</div>
+        <div class="tl-desc">Gemini 1.5 が 1M トークンコンテキストを実現し「全部入れればいい」派が登場。一方でノイズ増加・コスト問題が顕在化し、RAG は依然有効と結論。Mem0・Letta 等の永続記憶サービスが登場、クロスセッション記憶の商用実装が普及。</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">2025年6月</div>
+        <div class="tl-title">「Context Engineering」命名 ── Tobi Lütke → Karpathy → Gartner</div>
+        <div class="tl-desc">Shopify CEO Tobi Lütke が X（旧 Twitter）で「コンテキストエンジニアリング」を定義。Andrej Karpathy が amplify し、Gartner が同月「プロンプトエンジニアリングの時代は終わり、コンテキストエンジニアリングが競争優位の源泉」と公式見解。業界の共通言語として確立。</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">2026</div>
+        <div class="tl-title">超長文コンテキスト × Memory-Augmented Agents の実用期</div>
+        <div class="tl-desc">GLM-5.2（1M ctx / IndexShare で 2.9× FLOPs 削減）、Kimi K2（256K ctx）など長文対応モデルが出揃う。Claude Code・OpenClaw・Hermes Agent 等の本番エージェントが Memory Layer を標準実装。コンテキストエンジニアリングはシステム設計の核心スキルに。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== CORE TECHNIQUES ========== -->
+  <div class="panel">
+    <h2>コア技術 8 選</h2>
+    <div class="technique-grid">
+      <div class="technique-card">
+        <h4>① RAG（検索拡張生成）</h4>
+        <p>クエリに応じてベクトルDBや検索エンジンから関連情報を取得し、コンテキストに注入。LlamaIndex・LangChain・pgvector 等で実装。精度は <code>Recall@k</code> で計測。</p>
+      </div>
+      <div class="technique-card">
+        <h4>② HyDE（仮説文書埋め込み）</h4>
+        <p>クエリから「理想的な答え」を LLM に仮生成させ、その埋め込みで検索。実クエリ埋め込みより検索精度が大幅向上（特に専門ドメイン）。</p>
+      </div>
+      <div class="technique-card">
+        <h4>③ Semantic Chunking</h4>
+        <p>固定文字数ではなく意味のまとまりで文書を分割。文の埋め込み類似度が急変する点を境界として検出する手法。LlamaIndex に実装済み。</p>
+      </div>
+      <div class="technique-card">
+        <h4>④ Context Compression / 要約</h4>
+        <p>長い会話履歴を逐次要約して圧縮。LangChain の <code>ConversationSummaryMemory</code> が代表例。重要情報を保持しながらトークン消費を抑制。</p>
+      </div>
+      <div class="technique-card">
+        <h4>⑤ Context Caching（Anthropic）</h4>
+        <p>変化しない静的コンテキスト（仕様書・マニュアル）をサーバー側でキャッシュ。API コストを最大 90% 削減。<code>cache_control: {"type": "ephemeral"}</code> で有効化。</p>
+      </div>
+      <div class="technique-card">
+        <h4>⑥ Memory Systems</h4>
+        <p>Mem0（ユーザー記憶 SaaS）・Letta（OSS エージェントメモリ）・ClawMem（OpenClaw 向け）・Cloudflare KV など。クロスセッションでユーザー情報・好みを保持。</p>
+      </div>
+      <div class="technique-card">
+        <h4>⑦ Hierarchical Retrieval</h4>
+        <p>文書全体の要約を先に検索し、命中した文書内の詳細チャンクを取得する 2 段階アプローチ。精度と網羅性を両立。大規模ドキュメント群に有効。</p>
+      </div>
+      <div class="technique-card">
+        <h4>⑧ Reranking</h4>
+        <p>ベクトル検索で上位 k 件を取得後、Cross-Encoder（Cohere Rerank・BGE-Reranker）でスコアリングし直す 2 段階精度向上。Recall と Precision を同時改善。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== CREATOR EXAMPLES ========== -->
+  <div class="panel">
+    <h2>実例 12 選</h2>
+
+    <div class="section-divider">
+      <span class="dl dl-creator">クリエイター向け実例</span>
+      <div class="dline"></div>
+    </div>
+    <p style="font-size:0.88rem; color:#7f92ac; margin:0 0 14px;">コンテンツ制作・AI 運用の現場でコンテキスト設計がどう機能しているか。</p>
+
+    <div class="example-list">
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">01</span>
+          <span class="badge badge-creator">クリエイター</span>
+          <span class="example-title">NotebookLM ── 複数ソースを「Notebook」としてコンテキスト化</span>
+        </div>
+        <div class="example-body">
+          <p>Google NotebookLM は PDF・YouTube 動画・音声・Web サイトを「ソース」として Notebook（= コンテキスト）に登録し、モデルはそのソース内の情報のみで回答します。これはコンテキストエンジニアリングの教科書的実装：</p>
+          <ul>
+            <li><strong>静的知識層（②）</strong>: 登録したソースが常時コンテキストに入る</li>
+            <li><strong>検索取得層（③）</strong>: 質問に関連するソース部分を優先表示</li>
+            <li><strong>活用例</strong>: 参考文献 10 冊を登録 → 引用付きで記事下書きを生成、2 時間の作業が 20 分に短縮</li>
+          </ul>
+          <span class="metric-chip">効果: 調査&amp;執筆時間 約 85% 削減（事例報告）</span>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">02</span>
+          <span class="badge badge-creator">クリエイター</span>
+          <span class="example-title">Obsidian × MCPVault ── Vault 全体をエージェントのコンテキストに</span>
+        </div>
+        <div class="example-body">
+          <p>Obsidian の Vault（数千のノート）を MCP サーバーとして公開することで、Claude Code・OpenClaw・Hermes Agent など複数のエージェントが同じ知識ベースを参照・書き込みできます。</p>
+          <pre>
+# mcpServers 設定（.claude/settings.json）
+{
+  "mcpServers": {
+    "obsidian": {
+      "command": "npx",
+      "args": ["-y", "mcp-obsidian", "/path/to/vault"]
+    }
+  }
+}</pre>
+          <p>エージェントは <code>read_note</code>・<code>search_notes</code>・<code>create_note</code> ツールで Vault を操作。毎日の AI News 記事を自動的に Vault に保存し、次のエージェントがそれを参照して週次まとめを生成、というコンテキスト連鎖が実現します。</p>
+          <span class="metric-chip">詳細: <a href="obsidian.html">obsidian.html</a> 参照</span>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">03</span>
+          <span class="badge badge-creator">クリエイター</span>
+          <span class="example-title">このハブの CLAUDE.md ── 新 AI インスタンス向けコンテキスト設計</span>
+        </div>
+        <div class="example-body">
+          <p>本ハブ最上位の <code>CLAUDE.md</code> は「コンテキストエンジニアリングの実物」です。新しい Claude セッションが開始するたびに自動注入される静的知識層（②）として設計されています：</p>
+          <ul>
+            <li><strong>Purpose セクション</strong>: エージェントの役割・目的（System Instructions 相当）</li>
+            <li><strong>Folder Rules</strong>: どのファイルがどこにあるかの地図（Static Knowledge）</li>
+            <li><strong>Priorities</strong>: 判断基準の優先順位（制約層）</li>
+            <li><strong>参照ドキュメントリスト</strong>: 深く読むべきページへのポインタ（RAG 代替）</li>
+          </ul>
+          <p>「新しい Claude に読ませて、なるべく少ない追加説明で作業を始めさせる」── これ自体がコンテキストエンジニアリングの実践です。</p>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">04</span>
+          <span class="badge badge-creator">クリエイター</span>
+          <span class="example-title">Cursor IDE ── @ symbol でコードベースをコンテキストに動的注入</span>
+        </div>
+        <div class="example-body">
+          <p>Cursor はコンテキストエンジニアリングの UI を直接ユーザーに提供しています：</p>
+          <ul>
+            <li><code>@file</code>: 特定ファイルをコンテキストに追加</li>
+            <li><code>@folder</code>: フォルダ全体を追加</li>
+            <li><code>@codebase</code>: プロジェクト全体を Semantic Search 経由で RAG 参照</li>
+            <li><code>@docs</code>: 公式ドキュメントを直接参照（Next.js, React 等）</li>
+            <li><code>@web</code>: リアルタイム Web 検索結果を注入</li>
+          </ul>
+          <p>Cursor Rules v2（<code>.cursor/rules/*.mdc</code>）はプロジェクト固有の System Instructions として機能。コードスタイル・命名規約・禁止パターンをファイル種別ごとに定義できます。</p>
+          <span class="metric-chip">Rules v2: ファイル glob 単位で適用ルールを切り替え可能</span>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">05</span>
+          <span class="badge badge-creator">クリエイター</span>
+          <span class="example-title">AI News ルーティン ── テンプレート＋前日記事でコンテキストを設計</span>
+        </div>
+        <div class="example-body">
+          <p>このハブの日次 AI News 生成（<code>_routines/news-template.html</code>）は、以下のコンテキスト層を明示的に設計しています：</p>
+          <pre>
+[System Instructions層]
+あなたは AI ニュース記者。日本語で 600〜800 字の解説記事を書く。
+出典は必ず明記し、推測を事実として書かない。
+
+[Static Knowledge層]
+対象: Claude/ChatGPT/Gemini/Grok/Qwen/GLM の6社のみ扱う。
+スタイル: hub の style-guide.html に従う。
+
+[Retrieved Context層]
+本日のニュース候補（Web 検索結果 5 件）: ...
+
+[Task State層]
+前回記事: 2026-06-19.html（重複トピックは避ける）</pre>
+          <p>このコンテキスト設計により、毎日一貫した品質・スタイルの記事が生成されます。</p>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">06</span>
+          <span class="badge badge-creator">クリエイター</span>
+          <span class="example-title">Midjourney v7 / Flux ── スタイル参照画像のコンテキスト注入</span>
+        </div>
+        <div class="example-body">
+          <p>画像生成 AI でのコンテキストエンジニアリングは「何を見せるか」が文字通りの意味で重要：</p>
+          <ul>
+            <li><strong>Midjourney v7 <code>--sref</code></strong>: スタイル参照画像を URL で指定。テキストプロンプトに「スタイルの記憶」を注入</li>
+            <li><strong><code>--cref</code></strong>: キャラクター一貫性参照。同一キャラクターをコンテキストとして維持</li>
+            <li><strong>Flux + IP-Adapter</strong>: 参照画像の特徴（色・スタイル・構図）をコンテキストとしてモデルに与える</li>
+            <li><strong>LoRA 参照画像</strong>: 漫画キャラクターの参照画像セット = コンテキストとして LoRA を訓練</li>
+          </ul>
+          <p>「言葉で説明するより見せる」── 視覚的コンテキストは文章の数千語に相当する情報量を持ちます。</p>
+          <span class="metric-chip">詳細: <a href="../../creator-system/manga-pipeline.html">manga-pipeline.html</a></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENGINEER EXAMPLES -->
+    <div class="section-divider" style="margin-top:28px;">
+      <span class="dl dl-engineer">エンジニア向け実例</span>
+      <div class="dline"></div>
+    </div>
+    <p style="font-size:0.88rem; color:#7f92ac; margin:0 0 14px;">システム構築・技術実装の視点からコンテキスト設計の実際を見る。</p>
+
+    <div class="example-list">
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">07</span>
+          <span class="badge badge-engineer">エンジニア</span>
+          <span class="example-title">Shopify ── GitHub + Slack + Docs を統合した週次レポート自動生成</span>
+        </div>
+        <div class="example-body">
+          <p>Tobi Lütke がコンテキストエンジニアリングを命名した際に挙げた代表例。エージェントが以下を自律収集してコンテキストを構築：</p>
+          <ul>
+            <li>GitHub: マージされた PR の diff・コミットメッセージ・レビューコメント</li>
+            <li>Slack: 過去 1 週間の #engineering チャンネルの要点</li>
+            <li>Jira/Linear: クローズされた Issue・ブロッカー</li>
+            <li>Confluence: 変更された設計ドキュメント</li>
+          </ul>
+          <p>これらを 7 層のうち③〜⑤に動的配置し、「週次エンジニアリング進捗レポート」を人手ゼロで生成。チームメンバーが 1-2 時間かけていた作業がゼロになりました。</p>
+          <span class="metric-chip">人手作業: 週 1-2時間 → 0分</span>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">08</span>
+          <span class="badge badge-engineer">エンジニア</span>
+          <span class="example-title">HyDE（仮説文書埋め込み）── RAG 精度向上の実装パターン</span>
+        </div>
+        <div class="example-body">
+          <p>Gao et al. (2022, "Precise Zero-Shot Dense Retrieval without Relevance Labels") が提案した手法の実装：</p>
+          <pre>
+# Step 1: クエリから「理想的な答え」を生成
+hypothetical_doc = llm.generate(
+    f"以下の質問に対する理想的な回答を書いてください: {query}"
+)
+
+# Step 2: 仮説文書の埋め込みで検索
+query_embedding = embed(hypothetical_doc)  # 実クエリではなく仮説文書
+
+# Step 3: ベクトルDB検索
+results = vector_db.search(query_embedding, top_k=5)
+
+# Step 4: 実際の検索結果をコンテキストに注入
+context = "\n\n".join([r.text for r in results])</pre>
+          <p>検索精度: 素のベクトル検索比で <strong>NDCG@10 が平均 +15〜25%</strong> 向上（ドメインによって差異あり）。</p>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">09</span>
+          <span class="badge badge-engineer">エンジニア</span>
+          <span class="example-title">Mem0 ── クロスセッション記憶のコンテキスト注入</span>
+        </div>
+        <div class="example-body">
+          <p>Mem0（mem0.ai）は「AIのための永続記憶レイヤー」として、ユーザーごとの記憶を自動抽出・保存・取得します：</p>
+          <pre>
+from mem0 import Memory
+m = Memory()
+
+# 会話から記憶を自動抽出・保存
+m.add("ユーザーは Python を好み、TypeScript が苦手と言った", user_id="user_123")
+
+# 次回セッションで関連記憶を取得してコンテキスト注入
+memories = m.search("どの言語を使うか", user_id="user_123")
+# → [{"memory": "Python を好む", "score": 0.92}, ...]
+
+# 層⑥（Memory）として system prompt に追加
+system_prompt += f"\nユーザーについて覚えていること: {memories}"</pre>
+          <p>これにより「初めて会ったのに前回の会話を覚えている」エクスペリエンスが実現。チャーン率改善・ユーザー満足度向上に直結。</p>
+          <span class="metric-chip">GitHub Stars: 25K+ (2026年6月)</span>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">10</span>
+          <span class="badge badge-engineer">エンジニア</span>
+          <span class="example-title">Hermes Agent v0.15 ── セッション検索 4500× 高速化の内部実装</span>
+        </div>
+        <div class="example-body">
+          <p>Hermes Agent v0.15 のリファクタで実現した 4500× 高速化は、コンテキスト管理の最適化によるものです：</p>
+          <ul>
+            <li><strong>旧設計</strong>: 全会話履歴を毎回フルスキャン（O(n) 線形検索）</li>
+            <li><strong>新設計</strong>: セッション ID をキーとしたインメモリインデックス構築（O(1) ルックアップ）</li>
+            <li><strong>効果</strong>: 会話履歴が増えても検索時間が一定 → 長期エージェント運用が現実的に</li>
+          </ul>
+          <p>コンテキスト層⑦（Task State）の管理効率化が、エージェント全体のレスポンスタイムを大幅改善した典型例。</p>
+          <span class="metric-chip">詳細: <a href="hermes-agent.html">hermes-agent.html</a></span>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">11</span>
+          <span class="badge badge-engineer">エンジニア</span>
+          <span class="example-title">Anthropic Context Caching ── 静的コンテキストのコスト 90% 削減</span>
+        </div>
+        <div class="example-body">
+          <p>Anthropic API の Context Caching は、変化しないコンテキスト（Static Knowledge 層②）を API サーバー側でキャッシュし、再送コストを削減します：</p>
+          <pre>
+import anthropic
+client = anthropic.Anthropic()
+
+# 大規模マニュアル（50,000トークン）をキャッシュ
+with open("product_manual.txt") as f:
+    manual = f.read()
+
+response = client.messages.create(
+    model="claude-fable-5",
+    max_tokens=1024,
+    system=[
+        {
+            "type": "text",
+            "text": manual,
+            "cache_control": {"type": "ephemeral"}  # ← これだけ
+        }
+    ],
+    messages=[{"role": "user", "content": "返品ポリシーは？"}]
+)
+# キャッシュヒット時: 入力コスト -90%、レイテンシ -60%</pre>
+          <span class="metric-chip">適用シーン: 同一ドキュメントを何度も参照するチャットbot・コードアシスト</span>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">12</span>
+          <span class="badge badge-engineer">エンジニア</span>
+          <span class="example-title">GLM-5.2 IndexShare ── 1M トークンコンテキストの FLOPs 2.9× 削減アーキテクチャ</span>
+        </div>
+        <div class="example-body">
+          <p>GLM-5.2 の IndexShare は、長大なコンテキストを効率的に扱うためのアーキテクチャ革新です。モデルが長文コンテキストを処理する際のコンピュート課題を解決：</p>
+          <ul>
+            <li><strong>課題</strong>: 1M トークンを Standard Attention で処理 → FLOPs が O(n²) で爆発</li>
+            <li><strong>IndexShare</strong>: KV キャッシュをレイヤー間で選択的に共有・圧縮 → 2.9× FLOPs 削減</li>
+            <li><strong>結果</strong>: 1M ctx 処理が現実的なレイテンシ・コストで提供可能に</li>
+            <li><strong>API</strong>: $1.40/$4.40 per MTok（入力/出力）、MIT ライセンスで公開</li>
+          </ul>
+          <p>コンテキストエンジニアリングはモデル側のアーキテクチャも進化させています。</p>
+          <span class="metric-chip">詳細: <a href="glm.html">glm.html</a> / <a href="../../research/glm-recent-updates.html">GLM トラッカー</a></span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========== ANTI-PATTERNS ========== -->
+  <div class="panel">
+    <h2>アンチパターン 6 選</h2>
+    <p style="color:#c5d0e3; margin:0 0 14px;">コンテキスト設計の失敗パターン。これを避けるだけで品質が大幅に改善します。</p>
+    <div class="anti-grid">
+      <div class="anti-card">
+        <h4>① Lost in the Middle</h4>
+        <p>長文コンテキストの中央部の情報をモデルが軽視する現象。重要情報を先頭か末尾に配置することが重要。</p>
+        <div class="anti-fix">✅ Fix: 最重要情報は冒頭 or 末尾に。中央に置かない。</div>
+      </div>
+      <div class="anti-card">
+        <h4>② Token Stuffing</h4>
+        <p>「とにかく情報を詰め込む」アプローチ。関係ない情報がノイズとなりモデルの集中を分散させる。コスト爆発も起きる。</p>
+        <div class="anti-fix">✅ Fix: 取得情報は Reranking でフィルタリング後に注入。</div>
+      </div>
+      <div class="anti-card">
+        <h4>③ Stale Context</h4>
+        <p>更新されていない古い情報がコンテキストに残り、モデルが誤った前提で回答する。製品仕様・API 仕様の変更が特に危険。</p>
+        <div class="anti-fix">✅ Fix: 静的知識に更新日を明記し、定期棚卸しを運用化。</div>
+      </div>
+      <div class="anti-card">
+        <h4>④ Context Pollution</h4>
+        <p>無関係なツール出力・エラーメッセージ・冗長な会話履歴が蓄積し、有効情報の比率が下がる。エージェントの長期実行で発生しやすい。</p>
+        <div class="anti-fix">✅ Fix: ツール出力は要約してから層⑤に追加。</div>
+      </div>
+      <div class="anti-card">
+        <h4>⑤ Single-Source Bias</h4>
+        <p>1 つのデータソースのみに依存した RAG 設計。そのソースに誤りや偏りがあるとモデル全体が偏る。</p>
+        <div class="anti-fix">✅ Fix: 複数ソースから取得し、矛盾があれば明示的に提示。</div>
+      </div>
+      <div class="anti-card">
+        <h4>⑥ Memory Leakage</h4>
+        <p>会話履歴や記憶が際限なく増加し続け、コンテキストウィンドウを圧迫。長期チャットボットで数ヶ月後に急速に劣化。</p>
+        <div class="anti-fix">✅ Fix: N ターンごとに要約圧縮。重要度スコアで古い記憶を間引く。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== METRICS ========== -->
+  <div class="panel">
+    <h2>コンテキスト品質の計測指標</h2>
+    <table>
+      <thead>
+        <tr><th>指標</th><th>意味</th><th>計測方法</th><th>目安</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Context Recall</strong></td><td>正しい答えに必要な情報がコンテキストにあるか</td><td>RAGAS フレームワーク</td><td>0.85 以上を目標</td></tr>
+        <tr><td><strong>Context Precision</strong></td><td>コンテキスト内に無関係な情報がないか</td><td>RAGAS フレームワーク</td><td>0.80 以上を目標</td></tr>
+        <tr><td><strong>Faithfulness</strong></td><td>回答がコンテキストに忠実か（幻覚率の逆）</td><td>LLM-as-judge</td><td>0.90 以上を目標</td></tr>
+        <tr><td><strong>Token Efficiency</strong></td><td>有効情報トークン / 全体トークン</td><td>手動サンプリング or 自動分類</td><td>0.60 以上を目標</td></tr>
+        <tr><td><strong>Cache Hit Rate</strong></td><td>Context Caching のヒット率</td><td>Anthropic API メトリクス</td><td>静的コンテンツなら 80% 以上</td></tr>
+      </tbody>
+    </table>
+    <p style="font-size:0.85rem; color:#7f92ac; margin-top:12px;"><strong>RAGAS</strong>（Retrieval-Augmented Generation Assessment Suite）は RAG パイプラインを自動評価するオープンソースフレームワーク。<code>pip install ragas</code> で導入可能。</p>
+  </div>
+
+  <!-- ========== SERIES NAVIGATION ========== -->
+  <div class="panel">
+    <h2>エンジニアリングスキル シリーズ</h2>
+    <p style="color:#c5d0e3; margin:0 0 14px;">4 つの規律は独立しているが連続している。Prompt で伝え、Context で見せ、Harness で支え、Loop で回す。</p>
+    <div class="series-grid">
+      <a href="prompt-engineering.html" class="series-card">
+        <div class="sc-label">シリーズ ①</div>
+        <div class="sc-title">Prompt Engineering</div>
+        <div class="sc-desc">どう頼むか ── CoT から Extended Thinking まで進化史と 2026 年の実践</div>
+      </a>
+      <a href="context-engineering.html" class="series-card current">
+        <div class="sc-label">シリーズ ② ← 当ページ</div>
+        <div class="sc-title">Context Engineering</div>
+        <div class="sc-desc">何を見せるか ── 7 層モデル・RAG・Memory・Caching の設計技術</div>
+      </a>
+      <a href="harness-engineering.html" class="series-card">
+        <div class="sc-label">シリーズ ③</div>
+        <div class="sc-title">Harness Engineering</div>
+        <div class="sc-desc">どう組むか ── Tool/Memory/Validation/Orchestration の環境設計</div>
+      </a>
+      <a href="loop-engineering.html" class="series-card">
+        <div class="sc-label">シリーズ ④</div>
+        <div class="sc-title">Loop Engineering</div>
+        <div class="sc-desc">どう回すか ── 自律エージェントが反復・自己修正する設計の最前線</div>
+      </a>
+    </div>
+    <p style="margin-top:16px; font-size:0.85rem;"><a href="index.html">← Workbench Knowledge 一覧</a> ／ <a href="../../index.html">Hub Top</a></p>
+  </div>
+
+</div>
+</body>
+</html>

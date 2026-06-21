@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Harness Engineering | Workbench Knowledge</title>
+  <style>
+    body { font-family: "Segoe UI", "Noto Sans JP", system-ui, sans-serif; margin: 0; background: #0b1220; color: #edf2fb; line-height: 1.75; padding: 28px 18px 60px; }
+    .shell { max-width: 1100px; margin: 0 auto; display: grid; gap: 22px; }
+    .panel { background: #111a2b; border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 26px 28px; }
+    a { color: #75d7c0; }
+    h1 { margin: 0 0 10px; font-size: 1.9rem; }
+    h2 { margin: 0 0 14px; font-size: 1.25rem; color: #edf2fb; }
+    h3 { margin: 14px 0 8px; font-size: 1.05rem; color: #d0daf0; }
+    p, li { color: #c5d0e3; }
+
+    /* KPI */
+    .kpi-row { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0; }
+    .kpi { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 12px 16px; text-align: center; min-width: 130px; }
+    .kpi .val { font-size: 1.3rem; font-weight: 800; color: #3dd8c5; }
+    .kpi .lbl { font-size: 0.72rem; color: #7f92ac; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 4px; }
+
+    /* Badges */
+    .badge { display: inline-block; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 5px; margin-right: 6px; vertical-align: middle; }
+    .badge-creator { background: rgba(167,139,250,0.18); color: #a78bfa; border: 1px solid rgba(167,139,250,0.3); }
+    .badge-engineer { background: rgba(61,216,197,0.15); color: #3dd8c5; border: 1px solid rgba(61,216,197,0.3); }
+    .badge-new { background: rgba(79,255,176,0.15); color: #4FFFB0; border: 1px solid rgba(79,255,176,0.3); }
+
+    /* Quote */
+    .quote-card { background: rgba(61,216,197,0.06); border-left: 4px solid #3dd8c5; border-radius: 0 12px 12px 0; padding: 16px 20px; margin: 14px 0; }
+    .quote-card blockquote { margin: 0 0 8px; color: #9de8df; font-style: italic; font-size: 1.02rem; }
+    .quote-card cite { color: #7f92ac; font-size: 0.82rem; }
+
+    /* Layers */
+    .layer-stack { display: grid; gap: 6px; margin: 14px 0; }
+    .layer { display: grid; grid-template-columns: 32px 1fr; gap: 12px; align-items: start; padding: 14px 16px; border-radius: 10px; border-left: 3px solid; }
+    .layer-num { font-size: 0.78rem; font-weight: 800; color: #7f92ac; padding-top: 2px; }
+    .layer-title { font-weight: 700; font-size: 0.95rem; margin-bottom: 3px; }
+    .layer-desc { font-size: 0.85rem; color: #c5d0e3; }
+    .layer-tools { font-size: 0.8rem; color: #7f92ac; margin-top: 4px; }
+    .l1 { background: rgba(61,216,197,0.06); border-color: #3dd8c5; }
+    .l2 { background: rgba(167,139,250,0.06); border-color: #a78bfa; }
+    .l3 { background: rgba(244,184,96,0.06); border-color: #f4b860; }
+    .l4 { background: rgba(248,113,113,0.06); border-color: #f87171; }
+    .l5 { background: rgba(52,211,153,0.06); border-color: #34d399; }
+    .l1 .layer-title { color: #3dd8c5; }
+    .l2 .layer-title { color: #a78bfa; }
+    .l3 .layer-title { color: #f4b860; }
+    .l4 .layer-title { color: #f87171; }
+    .l5 .layer-title { color: #34d399; }
+
+    /* Timeline */
+    .timeline { position: relative; padding-left: 28px; }
+    .timeline::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: rgba(61,216,197,0.25); }
+    .tl-item { position: relative; margin-bottom: 20px; }
+    .tl-item::before { content: ''; position: absolute; left: -24px; top: 6px; width: 10px; height: 10px; border-radius: 50%; background: #3dd8c5; box-shadow: 0 0 8px rgba(61,216,197,0.5); }
+    .tl-year { font-size: 0.78rem; font-weight: 700; color: #3dd8c5; letter-spacing: 0.06em; text-transform: uppercase; }
+    .tl-title { font-weight: 700; color: #edf2fb; margin: 2px 0; }
+    .tl-desc { color: #c5d0e3; font-size: 0.9rem; }
+
+    /* Framework comparison */
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin: 12px 0; }
+    th { text-align: left; padding: 10px 12px; color: #f4b860; border-bottom: 2px solid rgba(244,184,96,0.25); font-size: 0.79rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #c5d0e3; vertical-align: top; }
+    td strong { color: #edf2fb; }
+    .tag-good { background: rgba(79,255,176,0.12); color: #4FFFB0; border-radius: 4px; padding: 1px 6px; font-size: 0.77rem; }
+    .tag-mid  { background: rgba(244,184,96,0.12); color: #f4b860; border-radius: 4px; padding: 1px 6px; font-size: 0.77rem; }
+    .tag-bad  { background: rgba(248,113,113,0.12); color: #f87171; border-radius: 4px; padding: 1px 6px; font-size: 0.77rem; }
+
+    /* Examples */
+    .section-divider { display: flex; align-items: center; gap: 12px; margin: 20px 0 16px; }
+    .section-divider .dl { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; padding: 4px 12px; border-radius: 6px; }
+    .section-divider .dline { flex: 1; height: 1px; background: rgba(255,255,255,0.08); }
+    .dl-creator { background: rgba(167,139,250,0.18); color: #a78bfa; }
+    .dl-engineer { background: rgba(61,216,197,0.15); color: #3dd8c5; }
+
+    .example-list { display: grid; gap: 16px; margin: 14px 0; }
+    .example { background: rgba(255,255,255,0.025); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 18px 20px; }
+    .example-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+    .example-num { font-size: 0.78rem; font-weight: 800; color: #7f92ac; min-width: 24px; }
+    .example-title { font-weight: 700; color: #edf2fb; font-size: 1rem; }
+    .example-body { color: #c5d0e3; font-size: 0.9rem; }
+    .example-body pre { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 12px 14px; overflow-x: auto; font-size: 0.82rem; color: #c5d0e3; font-family: "Fira Code","Consolas",monospace; line-height: 1.6; margin: 8px 0; }
+    .example-body code { background: rgba(255,255,255,0.07); padding: 2px 6px; border-radius: 4px; font-size: 0.82rem; color: #f4b860; }
+    .metric-chip { display: inline-block; background: rgba(61,216,197,0.12); color: #3dd8c5; font-size: 0.78rem; font-weight: 700; padding: 2px 8px; border-radius: 5px; margin-top: 6px; }
+
+    /* Checklist */
+    .checklist-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; margin: 14px 0; }
+    .check-section { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 16px; }
+    .check-section h4 { margin: 0 0 10px; color: #f4b860; font-size: 0.9rem; }
+    .check-section ul { margin: 0; padding-left: 16px; }
+    .check-section li { font-size: 0.85rem; color: #c5d0e3; margin-bottom: 4px; }
+
+    /* Anti-patterns */
+    .anti-list { display: grid; gap: 10px; margin: 14px 0; }
+    .anti-card { background: rgba(248,113,113,0.05); border: 1px solid rgba(248,113,113,0.25); border-radius: 12px; padding: 16px 18px; }
+    .anti-card h4 { margin: 0 0 6px; color: #f87171; font-size: 0.95rem; }
+    .anti-card p { margin: 0; font-size: 0.87rem; color: #b0bcd4; }
+    .anti-fix { margin-top: 8px; font-size: 0.83rem; color: #4FFFB0; }
+
+    /* Series nav */
+    .series-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 14px; }
+    .series-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 16px; text-decoration: none; display: block; transition: border-color 0.2s; }
+    .series-card:hover { border-color: rgba(61,216,197,0.4); }
+    .series-card .sc-label { font-size: 0.72rem; color: #7f92ac; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+    .series-card .sc-title { font-weight: 700; color: #edf2fb; font-size: 0.95rem; }
+    .series-card .sc-desc { font-size: 0.82rem; color: #7f92ac; margin-top: 4px; }
+    .series-card.current { border-color: rgba(61,216,197,0.5); background: rgba(61,216,197,0.06); }
+    .series-card.current .sc-title { color: #3dd8c5; }
+  </style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ========== HEADER ========== -->
+  <div class="panel">
+    <p style="margin:0 0 12px;"><a href="../index.html">← Workbench</a> / <a href="index.html">Knowledge</a> / <a href="../../index.html">Hub Top</a></p>
+    <div class="badge badge-new">エンジニアリングスキル シリーズ ③</div>
+    <h1 style="margin-top:10px;">Harness Engineering</h1>
+    <p style="font-size:1.05rem; color:#c5d0e3; margin:0 0 16px;">「<strong>どう組むか</strong>」の技術 ── モデル以外のすべて（ツール・メモリ・検証・オーケストレーション）を設計する。<strong>ハーネスの改善はモデル交換より効果が大きい</strong>。</p>
+    <div class="kpi-row">
+      <div class="kpi"><div class="val">Mitchell Hashimoto</div><div class="lbl">提唱者（HashiCorp 創業者）</div></div>
+      <div class="kpi"><div class="val">2026年2月</div><div class="lbl">概念の明示的定義</div></div>
+      <div class="kpi"><div class="val">5 レイヤー</div><div class="lbl">ハーネス構造モデル</div></div>
+      <div class="kpi"><div class="val">8 フレームワーク</div><div class="lbl">主要ハーネス比較</div></div>
+      <div class="kpi"><div class="val">12 実例</div><div class="lbl">クリエイター6 + エンジニア6</div></div>
+    </div>
+    <p style="font-size:0.82rem; color:#7f92ac; margin:0;">最終更新: 2026-06-20 ／ シリーズ: <a href="prompt-engineering.html">Prompt</a> → <a href="context-engineering.html">Context</a> → <strong>Harness（当ページ）</strong> → <a href="loop-engineering.html">Loop</a></p>
+  </div>
+
+  <!-- ========== WHAT IS IT ========== -->
+  <div class="panel">
+    <h2>ハーネスエンジニアリングとは何か</h2>
+
+    <div class="quote-card">
+      <blockquote>「The harness is everything that wraps an LLM except the model itself — tool execution, memory, state management, error handling, retry logic, validation gates. Most agent failures aren't model failures: they're harness failures.」</blockquote>
+      <cite>── Mitchell Hashimoto（HashiCorp / Terraform 創業者）、2026年2月</cite>
+    </div>
+
+    <p>プロンプトエンジニアリングが「指示の書き方」、コンテキストエンジニアリングが「何を見せるか」であれば、ハーネスエンジニアリングは <strong>モデルの外側にある環境全体の設計</strong> です。</p>
+
+    <p>最も重要な発見：</p>
+    <ul>
+      <li><strong>「モデルを変えるより、ハーネスを改善する方が効果が大きいことがある」</strong> ── 同じモデルでも、ハーネス設計次第で成果が劇的に変わる</li>
+      <li>エージェントの失敗の大半は「モデルが賢くない」ではなく「ツールが壊れた」「エラー処理がない」「状態管理が不適切」といった<strong>ハーネスの問題</strong></li>
+      <li>本番環境でのエージェント信頼性は、モデルの能力よりもハーネスの堅牢性に依存する</li>
+    </ul>
+  </div>
+
+  <!-- ========== 5 LAYERS ========== -->
+  <div class="panel">
+    <h2>ハーネスの 5 レイヤー構造</h2>
+    <p>本番エージェントのハーネスは以下の 5 レイヤーから構成されます。</p>
+
+    <div class="layer-stack">
+      <div class="layer l1">
+        <div class="layer-num">① </div>
+        <div>
+          <div class="layer-title">Tool Layer（ツール層）</div>
+          <div class="layer-desc">エージェントが実際に使えるツールの定義・実行・サンドボックス化。ツールの I/O スキーマ、権限管理、タイムアウト、実行環境の分離が含まれる。</div>
+          <div class="layer-tools">実装例: MCP ツール定義・OpenClaw defineToolPlugin・LangChain Tool・function calling スキーマ</div>
+        </div>
+      </div>
+      <div class="layer l2">
+        <div class="layer-num">② </div>
+        <div>
+          <div class="layer-title">Memory Layer（メモリ層）</div>
+          <div class="layer-desc">短期記憶（セッション内）・長期記憶（クロスセッション）・エピソード記憶・セマンティック記憶の管理。ベクトルDB・KV ストア・グラフDB を組み合わせる。</div>
+          <div class="layer-tools">実装例: Mem0・Letta・Zep・Pinecone・ClawMem・pgvector・Cloudflare KV</div>
+        </div>
+      </div>
+      <div class="layer l3">
+        <div class="layer-num">③ </div>
+        <div>
+          <div class="layer-title">State Layer（状態層）</div>
+          <div class="layer-desc">タスク進捗・チェックポイント・セッション継続性・エラーリカバリーの管理。エージェントが中断後に再開できるかどうかを決める。</div>
+          <div class="layer-tools">実装例: Redis・SQLite チェックポイント・Claude Code の project 継続機能・OpenClaw Workboard</div>
+        </div>
+      </div>
+      <div class="layer l4">
+        <div class="layer-num">④ </div>
+        <div>
+          <div class="layer-title">Validation Layer（検証層）</div>
+          <div class="layer-desc">型チェック・テスト実行・LLM-as-judge・人間レビューゲート。エージェント出力の品質を保証する。ループエンジニアリングのフィードバックゲートと直結。</div>
+          <div class="layer-tools">実装例: Zod/Pydantic バリデーション・pytest/Jest・RAGAS・Claude Code permissions</div>
+        </div>
+      </div>
+      <div class="layer l5">
+        <div class="layer-num">⑤ </div>
+        <div>
+          <div class="layer-title">Orchestration Layer（オーケストレーション層）</div>
+          <div class="layer-desc">複数エージェントの協調・並列/直列実行の制御・フォールバック・リトライロジック・コスト管理。マルチエージェントシステムの司令塔。</div>
+          <div class="layer-tools">実装例: LangGraph・CrewAI・AutoGen・Hermes Kanban・OpenClaw マルチエージェント</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== EVOLUTION TIMELINE ========== -->
+  <div class="panel">
+    <h2>進化タイムライン（2022 → 2026）</h2>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-year">2022年</div>
+        <div class="tl-title">LangChain 登場 ── 最初の LLM ハーネスフレームワーク</div>
+        <div class="tl-desc">Harrison Chase が LangChain を OSS 公開。Chain・Agent・Tool の概念を確立。「LLM に周辺機能をつなぐ」という発想を初めて体系化。GitHub 100K+ スター、月間 3,400 万ダウンロードを達成。</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">2023年</div>
+        <div class="tl-title">AutoGPT / BabyAGI ── 自律ハーネスの実験期</div>
+        <div class="tl-desc">AutoGPT が「人間の介入なしに自律タスク実行」を実証。BabyAGI がタスク管理ループを実装。ただし本番利用は難しく、「ハーネスの堅牢性なき自律化は破綻する」という教訓を業界に与えた。</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">2024年前半</div>
+        <div class="tl-title">CrewAI・AutoGen ── チームエージェントハーネスの台頭</div>
+        <div class="tl-desc">CrewAI が「役割を持つエージェントのチーム」という概念を商用化。Microsoft AutoGen がエンタープライズ向けマルチエージェントを提供。Fortune 500 の 60% が CrewAI を採用（同社発表）。</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">2024年後半</div>
+        <div class="tl-title">MCP（Model Context Protocol）── ツール定義の標準化</div>
+        <div class="tl-desc">Anthropic が MCP を発表。ツール定義の標準 JSON スキーマを提供し、モデルをまたいだツール再利用を可能に。150+ のサービスが MCP サーバーを実装。ハーネスのインターフェースが標準化される転換点。</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">2025年</div>
+        <div class="tl-title">Claude Code / DSPy ── 本番グレードハーネスの普及</div>
+        <div class="tl-desc">Claude Code が hooks・permissions・CLAUDE.md を統合した本番ハーネスを提供。DSPy が「プロンプトをパラメータとして最適化する」ハーネスを確立。エージェントハーネスが IDE・CLIツールとして日常化。</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">2026年2月</div>
+        <div class="tl-title">「Harness Engineering」命名 ── Mitchell Hashimoto による体系化</div>
+        <div class="tl-desc">Terraform 創業者の Mitchell Hashimoto が「ハーネスエンジニアリング」を独立した設計規律として定義。「ほとんどのエージェント失敗はハーネスの問題」という命題が広く共有される。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== FRAMEWORK COMPARISON ========== -->
+  <div class="panel">
+    <h2>主要ハーネスフレームワーク比較（2026年6月）</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>フレームワーク</th>
+          <th>強み</th>
+          <th>弱み</th>
+          <th>適合ユースケース</th>
+          <th>規模感</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>LangChain</strong></td>
+          <td><span class="tag-good">最多統合数</span> 数百のコネクタ</td>
+          <td><span class="tag-bad">複雑・重い</span> 抽象レイヤー過多</td>
+          <td>プロトタイピング・PoC</td>
+          <td>100K+ Stars / 34M月DL</td>
+        </tr>
+        <tr>
+          <td><strong>LangGraph</strong></td>
+          <td><span class="tag-good">ステートフル</span> グラフ型ワークフロー</td>
+          <td><span class="tag-mid">学習コスト高</span></td>
+          <td>複雑な多段階エージェント</td>
+          <td>LangChain エコシステム</td>
+        </tr>
+        <tr>
+          <td><strong>CrewAI</strong></td>
+          <td><span class="tag-good">役割ベース</span> チーム設計が直感的</td>
+          <td><span class="tag-mid">カスタマイズ限界</span></td>
+          <td>マルチエージェント協調</td>
+          <td>Fortune 500 の 60% 採用</td>
+        </tr>
+        <tr>
+          <td><strong>AutoGen (Microsoft)</strong></td>
+          <td><span class="tag-good">エンタープライズ</span> Azure 統合</td>
+          <td><span class="tag-mid">Microsoft スタック依存</span></td>
+          <td>企業内エージェント</td>
+          <td>Microsoft 公式サポート</td>
+        </tr>
+        <tr>
+          <td><strong>DSPy (Stanford)</strong></td>
+          <td><span class="tag-good">自動最適化</span> プロンプトをパラメータ化</td>
+          <td><span class="tag-bad">評価指標の定義が必要</span></td>
+          <td>精度重視・ベンチマーク向け</td>
+          <td>20K+ Stars</td>
+        </tr>
+        <tr>
+          <td><strong>Claude Code</strong></td>
+          <td><span class="tag-good">本番実績</span> hooks/permissions 完備</td>
+          <td><span class="tag-mid">Claude 専用（MCP で拡張可）</span></td>
+          <td>コーディングエージェント</td>
+          <td>Anthropic 公式</td>
+        </tr>
+        <tr>
+          <td><strong>OpenClaw</strong></td>
+          <td><span class="tag-good">15+ LLM</span> Skill Workshop・Workboard</td>
+          <td><span class="tag-mid">ドキュメント整備中</span></td>
+          <td>カスタムエージェント構築</td>
+          <td>このハブの主軸スタック</td>
+        </tr>
+        <tr>
+          <td><strong>Grok Build</strong></td>
+          <td><span class="tag-good">8並列</span> ローカルファースト</td>
+          <td><span class="tag-mid">Grok モデル中心</span></td>
+          <td>高速コーディングエージェント</td>
+          <td>xAI 公式</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ========== EXAMPLES ========== -->
+  <div class="panel">
+    <h2>実例 12 選</h2>
+
+    <div class="section-divider">
+      <span class="dl dl-creator">クリエイター向け実例</span>
+      <div class="dline"></div>
+    </div>
+    <p style="font-size:0.88rem; color:#7f92ac; margin:0 0 14px;">コンテンツ制作・AI 運用の現場でハーネス設計がどう機能するか。</p>
+
+    <div class="example-list">
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">01</span>
+          <span class="badge badge-creator">クリエイター</span>
+          <span class="example-title">Claude Code の CLAUDE.md ── ハーネス設定ファイルとしての実装</span>
+        </div>
+        <div class="example-body">
+          <p>Claude Code において CLAUDE.md はハーネスの<strong>設定ファイル</strong>として機能します（System Instructions であると同時に、ハーネス動作を制御する）：</p>
+          <pre>
+# CLAUDE.md の役割マッピング
+[ツール層①]  → 使ってよいツール・禁止ツールの宣言
+[メモリ層②]  → プロジェクト固有知識の永続化
+[状態層③]   → 作業継続のための前提情報
+[検証層④]   → Editing Policy・Definition of Done
+[調整層⑤]   → 並走セッションのプロトコル</pre>
+          <p>「新しい Claude インスタンスがこのファイルを読むだけで正しく動く」── これがハーネス設計の完成形です。</p>
+          <span class="metric-chip">詳細: <a href="../../CLAUDE.md">CLAUDE.md</a> / <a href="claude-code.html">claude-code.html</a></span>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">02</span>
+          <span class="badge badge-creator">クリエイター</span>
+          <span class="example-title">OpenClaw Skill Workshop ── ノーコードでカスタムスキルを追加するハーネス</span>
+        </div>
+        <div class="example-body">
+          <p>OpenClaw v2026.6.1 で導入された Skill Workshop は、ハーネスのツール層（①）をノーコードで拡張するインターフェースです：</p>
+          <ul>
+            <li><strong>defineToolPlugin API</strong>: JavaScript/TypeScript でカスタムツールを定義</li>
+            <li><strong>Skill Workshop UI</strong>: ブラウザ上でツールをドラッグ&amp;ドロップ組み合わせ</li>
+            <li><strong>Workboard</strong>: タスクキューをビジュアル管理（オーケストレーション層⑤）</li>
+            <li><strong>クリエイター活用</strong>: 「記事 URL を入れたら自動でスクレイピング → 要約 → Obsidian Vault に保存」というカスタムスキルを GUI で作成</li>
+          </ul>
+          <span class="metric-chip">詳細: <a href="../../claw-stack/openclaw/index.html">openclaw/index.html</a></span>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">03</span>
+          <span class="badge badge-creator">クリエイター</span>
+          <span class="example-title">NotebookLM ── クリエイター向けに最適化されたシンプルハーネス</span>
+        </div>
+        <div class="example-body">
+          <p>Google NotebookLM は「クリエイターが使いやすい最小ハーネス」の好例です：</p>
+          <ul>
+            <li><strong>ツール層（①）</strong>: ソース追加・ノート保存・オーディオ生成の 3 ツールのみ</li>
+            <li><strong>メモリ層（②）</strong>: Notebook = 永続的なプロジェクト知識ベース</li>
+            <li><strong>検証層（④）</strong>: 回答には必ず出典引用（ハルシネーション抑制ゲート）</li>
+            <li><strong>欠落している層</strong>: State・Orchestration → シンプルゆえに使いやすい</li>
+          </ul>
+          <p>「5 層全部が必要ではない」── ユースケースに合わせて必要なレイヤーだけを実装するのがハーネス設計の要諦。</p>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">04</span>
+          <span class="badge badge-creator">クリエイター</span>
+          <span class="example-title">Cursor IDE ── コーディングクリエイター向けハーネスの完成形</span>
+        </div>
+        <div class="example-body">
+          <p>Cursor v3.7（2026年6月）は 5 レイヤー全てを実装した成熟ハーネスです：</p>
+          <ul>
+            <li><strong>ツール層（①）</strong>: ファイル編集・ターミナル実行・Web 検索・@symbol 参照</li>
+            <li><strong>メモリ層（②）</strong>: プロジェクト全体の Embedding インデックス（@codebase）</li>
+            <li><strong>状態層（③）</strong>: 会話履歴・作業ファイルの追跡</li>
+            <li><strong>検証層（④）</strong>: BugBot（解決率 76%）・型チェック連携</li>
+            <li><strong>調整層（⑤）</strong>: Cloud Agents（バックグラウンド並列実行）</li>
+          </ul>
+          <span class="metric-chip">詳細: <a href="cursor.html">cursor.html</a></span>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">05</span>
+          <span class="badge badge-creator">クリエイター</span>
+          <span class="example-title">Obsidian MCPVault ── PKM をハーネスのメモリ層として使う</span>
+        </div>
+        <div class="example-body">
+          <p>Obsidian Vault を MCP サーバーとして公開することで、すべてのエージェントハーネスのメモリ層（②）として機能させます：</p>
+          <pre>
+# エージェントハーネスの設定
+{
+  "mcpServers": {
+    "obsidian": {
+      "command": "npx",
+      "args": ["-y", "mcp-obsidian", "~/Documents/Vault"]
+    }
+  }
+}
+
+# 利用できるツール（ツール層①に追加される）
+# - read_note(path)       ← ノート読み込み
+# - search_notes(query)   ← セマンティック検索
+# - create_note(path, content) ← ノート作成
+# - update_note(path, content) ← ノート更新</pre>
+          <p>ハーネスのメモリ層にローカルファーストの PKM を使うことで、クラウドサービスへの依存なしにクロスセッション記憶を実現。</p>
+          <span class="metric-chip">詳細: <a href="obsidian.html">obsidian.html</a></span>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">06</span>
+          <span class="badge badge-creator">クリエイター</span>
+          <span class="example-title">Kimi Work ── ローカルデスクトップ × 300 エージェントのスケールハーネス</span>
+        </div>
+        <div class="example-body">
+          <p>Moonshot AI の Kimi Work（2026年6月内部テスト）は巨大スケールのハーネス実装：</p>
+          <ul>
+            <li><strong>ツール層（①）</strong>: ブラウザ操作（WebBridge 拡張）・ローカルファイル・PDF・Python 実行</li>
+            <li><strong>オーケストレーション層（⑤）</strong>: 最大 300 並列サブエージェント管理</li>
+            <li><strong>データフィード統合</strong>: A 株・香港株・米国株のリアルタイムデータをツール層に統合</li>
+            <li><strong>安全設計</strong>: Python はバックグラウンド実行（ユーザー環境への直接影響を分離）</li>
+          </ul>
+          <span class="metric-chip">詳細: <a href="kimi.html">kimi.html</a></span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ENGINEER EXAMPLES -->
+    <div class="section-divider" style="margin-top:28px;">
+      <span class="dl dl-engineer">エンジニア向け実例</span>
+      <div class="dline"></div>
+    </div>
+    <p style="font-size:0.88rem; color:#7f92ac; margin:0 0 14px;">システム構築・インフラの視点からハーネス設計の実際を見る。</p>
+
+    <div class="example-list">
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">07</span>
+          <span class="badge badge-engineer">エンジニア</span>
+          <span class="example-title">MCP（Model Context Protocol）── ツール定義の業界標準化</span>
+        </div>
+        <div class="example-body">
+          <p>Anthropic が主導する MCP はハーネスのツール層（①）を標準化するプロトコルです：</p>
+          <pre>
+// MCP ツール定義（JSON Schema）
+{
+  "name": "search_web",
+  "description": "Web を検索して結果を返す",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "query": { "type": "string", "description": "検索クエリ" },
+      "num_results": { "type": "integer", "default": 5 }
+    },
+    "required": ["query"]
+  }
+}
+
+// → Claude・Gemini・OpenAI など複数モデルで同じ定義を再利用</pre>
+          <p>MCP により「ツール定義は一度書けばどのモデルでも使える」が実現。ハーネスのポータビリティが飛躍的に向上。150+ のサービスが MCP サーバーを実装済み。</p>
+          <span class="metric-chip">詳細: <a href="a2a-protocol.html">a2a-protocol.html</a> 参照</span>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">08</span>
+          <span class="badge badge-engineer">エンジニア</span>
+          <span class="example-title">Claude Code Hooks ── ハーネスの検証層・自動化をコードで制御</span>
+        </div>
+        <div class="example-body">
+          <p>Claude Code の hooks システムはハーネスの検証層（④）とオーケストレーション層（⑤）をコードで定義します：</p>
+          <pre>
+// .claude/settings.json
+{
+  "hooks": {
+    "PreToolUse": [{
+      "matcher": "Bash",
+      "hooks": [{
+        "type": "command",
+        "command": "bash /path/to/security-check.sh"
+        // 危険なコマンドを自動ブロック
+      }]
+    }],
+    "PostToolUse": [{
+      "matcher": "Write",
+      "hooks": [{
+        "type": "command",
+        "command": "npx prettier --write $TOOL_OUTPUT_FILE"
+        // ファイル書き込み後に自動フォーマット
+      }]
+    }],
+    "Stop": [{
+      "hooks": [{
+        "type": "command",
+        "command": "git add -A && git commit -m 'auto checkpoint'"
+        // 停止時に自動コミット
+      }]
+    }]
+  }
+}</pre>
+          <p>「何かをするたびに自動的に別のアクションを実行する」── これがハーネスの検証・自動化層の実装です。</p>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">09</span>
+          <span class="badge badge-engineer">エンジニア</span>
+          <span class="example-title">CrewAI ── 役割ベースマルチエージェントのオーケストレーション実装</span>
+        </div>
+        <div class="example-body">
+          <p>CrewAI のオーケストレーション層（⑤）の実装パターン：</p>
+          <pre>
+from crewai import Agent, Task, Crew
+
+# エージェント定義（役割・ゴール・バックストーリー）
+researcher = Agent(
+    role="AI リサーチャー",
+    goal="最新の AI トレンドを調査する",
+    backstory="5年の AI 研究経験を持つ専門家",
+    tools=[web_search, arxiv_search]
+)
+writer = Agent(
+    role="テックライター",
+    goal="研究結果を読みやすい記事にする",
+    tools=[draft_tool, edit_tool]
+)
+
+# タスク定義（依存関係を明示）
+research_task = Task(description="AI の最新動向を調査", agent=researcher)
+write_task    = Task(description="記事を執筆", agent=writer,
+                     context=[research_task])  # ← 依存関係
+
+# 実行
+crew = Crew(agents=[researcher, writer], tasks=[research_task, write_task])
+result = crew.kickoff()</pre>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">10</span>
+          <span class="badge badge-engineer">エンジニア</span>
+          <span class="example-title">Hermes Agent v0.16 ── ネイティブデスクトップ × 状態管理の実装</span>
+        </div>
+        <div class="example-body">
+          <p>Hermes Agent v0.16 のハーネス構成：</p>
+          <ul>
+            <li><strong>ツール層（①）</strong>: Web 検索・ファイル操作・API コール・ブラウザ制御</li>
+            <li><strong>メモリ層（②）</strong>: セッション検索インデックス（v0.15 で 4500× 高速化）</li>
+            <li><strong>状態層（③）</strong>: ネイティブデスクトップ（Mac/Linux/Win）でのセッション永続化（v0.16）</li>
+            <li><strong>調整層（⑤）</strong>: Kanban v1 によるマルチエージェントタスク管理</li>
+            <li><strong>Grok SuperGrok OAuth（v0.14）</strong>: 認証をハーネスに組み込む実装例</li>
+          </ul>
+          <span class="metric-chip">詳細: <a href="hermes-agent.html">hermes-agent.html</a></span>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">11</span>
+          <span class="badge badge-engineer">エンジニア</span>
+          <span class="example-title">DSPy ── プロンプトをハーネスがパラメータとして最適化する逆転発想</span>
+        </div>
+        <div class="example-body">
+          <p>Stanford の DSPy（Declarative Self-improving Python）は「プロンプトをハーネスが自動設計する」逆転の発想：</p>
+          <ul>
+            <li><strong>従来</strong>: 人間がプロンプトを手動設計 → ハーネスが実行</li>
+            <li><strong>DSPy</strong>: 人間が評価指標を定義 → ハーネスがプロンプトを自動最適化</li>
+            <li><strong>実装</strong>: 評価ループ（生成→評価→Few-shot 選択→再生成）をハーネスが自律実行</li>
+            <li><strong>効果</strong>: 手動プロンプトエンジニアリングと同等以上の精度を自動達成</li>
+          </ul>
+          <p>「ハーネスがプロンプトエンジニアリングを代替する」── 4 つの規律が互いに影響し合う象徴的な例。</p>
+          <span class="metric-chip">GitHub: 20K+ Stars / Stanford NLP Group</span>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">12</span>
+          <span class="badge badge-engineer">エンジニア</span>
+          <span class="example-title">A2A Protocol ── エージェント間通信を標準化するハーネス間インターフェース</span>
+        </div>
+        <div class="example-body">
+          <p>Google 主導の A2A（Agent-to-Agent）Protocol は、異なるハーネスで動くエージェントが通信する標準を提供：</p>
+          <pre>
+// A2A タスク送信（Agent A → Agent B）
+const task = {
+  "id": "task-001",
+  "message": {
+    "role": "user",
+    "parts": [{ "type": "text", "text": "競合分析レポートを作成してください" }]
+  }
+};
+
+// Agent B（異なるハーネス・異なるモデル）が受け取って実行
+// 結果を Agent A に返送
+const result = await agentB.sendTask(task);</pre>
+          <p>LangChain 製エージェントと CrewAI 製エージェント、OpenClaw 製エージェントが同じプロトコルで通信できます。150 社が採用（2026年6月）。</p>
+          <span class="metric-chip">詳細: <a href="a2a-protocol.html">a2a-protocol.html</a></span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========== PRODUCTION CHECKLIST ========== -->
+  <div class="panel">
+    <h2>本番ハーネス設計チェックリスト 20 項目</h2>
+    <div class="checklist-grid">
+      <div class="check-section">
+        <h4>① ツール層</h4>
+        <ul>
+          <li>全ツールに入出力スキーマを定義している</li>
+          <li>ツールのタイムアウトを設定している</li>
+          <li>ツール実行を分離された環境（サンドボックス）で行っている</li>
+          <li>危険操作（削除・外部送信）に確認ゲートがある</li>
+        </ul>
+      </div>
+      <div class="check-section">
+        <h4>② メモリ層</h4>
+        <ul>
+          <li>重要な状態が永続化されている（セッション跨ぎ対応）</li>
+          <li>ベクトルDB のインデックスが最新に保たれている</li>
+          <li>記憶の更新・削除ポリシーが定義されている</li>
+          <li>個人情報・機密情報の除外ルールがある</li>
+        </ul>
+      </div>
+      <div class="check-section">
+        <h4>③ 状態層</h4>
+        <ul>
+          <li>タスク進捗がチェックポイントに保存されている</li>
+          <li>中断からの再開が可能（冪等性がある）</li>
+          <li>エラー発生時のロールバック手順がある</li>
+        </ul>
+      </div>
+      <div class="check-section">
+        <h4>④ 検証層</h4>
+        <ul>
+          <li>出力の型バリデーションがある</li>
+          <li>最低 1 つの外部評価ゲートがある</li>
+          <li>人間レビューが必要なステップが明確</li>
+          <li>コスト上限アラートが設定されている</li>
+        </ul>
+      </div>
+      <div class="check-section">
+        <h4>⑤ オーケストレーション層</h4>
+        <ul>
+          <li>最大反復回数・実行時間の上限がある</li>
+          <li>エージェント失敗時のフォールバックがある</li>
+          <li>並列実行の競合（race condition）対策がある</li>
+          <li>コスト・トークン使用量をログ記録している</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== ANTI-PATTERNS ========== -->
+  <div class="panel">
+    <h2>アンチパターン 5 選</h2>
+    <div class="anti-list">
+      <div class="anti-card">
+        <h4>① ハーネスなし直接呼び出し（Bare API）</h4>
+        <p>LLM API を直接呼ぶだけで、ツール・メモリ・検証を実装しない。プロトタイプには可だが、本番運用では失敗が積み重なる。</p>
+        <div class="anti-fix">✅ Fix: 最低限ツール層と検証層（型バリデーション + エラー処理）を実装してから本番投入。</div>
+      </div>
+      <div class="anti-card">
+        <h4>② 過剰な抽象化（Framework Over-Engineering）</h4>
+        <p>LangChain の全機能を使おうとして、シンプルなユースケースに過剰な複雑さを持ち込む。デバッグが困難になり、チームの学習コストが爆発する。</p>
+        <div class="anti-fix">✅ Fix: まず必要な 2-3 レイヤーだけを実装。フレームワークは必要になってから選定。</div>
+      </div>
+      <div class="anti-card">
+        <h4>③ 状態の漏洩（State Leakage）</h4>
+        <p>複数のエージェントが同じ状態を無制御に読み書きし、互いの作業が干渉する。並列エージェントのアンチパターン。</p>
+        <div class="anti-fix">✅ Fix: エージェントごとに名前空間分離された状態ストアを持たせる。書き込みには必ずロックを。</div>
+      </div>
+      <div class="anti-card">
+        <h4>④ 検証レイヤー欠如（Validation Gap）</h4>
+        <p>エージェントの出力をそのまま使い、型チェック・サニタイズ・評価ゲートがない。本番でデータ破損・セキュリティ問題が発生。</p>
+        <div class="anti-fix">✅ Fix: すべてのツール出力・エージェント出力を Zod/Pydantic でバリデート。</div>
+      </div>
+      <div class="anti-card">
+        <h4>⑤ モデル依存設計（Vendor Lock-in Harness）</h4>
+        <p>特定モデルの固有機能に依存したツール定義をして、モデル交換ができない状態になる。モデルの API 変更で全体が壊れる。</p>
+        <div class="anti-fix">✅ Fix: MCP / 共通インターフェースでツールを定義。モデル固有機能はアダプタ層で吸収。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== SERIES NAVIGATION ========== -->
+  <div class="panel">
+    <h2>エンジニアリングスキル シリーズ</h2>
+    <p style="color:#c5d0e3; margin:0 0 14px;">Prompt で伝え、Context で見せ、Harness で支え、Loop で回す ── 4 つの規律は連続している。</p>
+    <div class="series-grid">
+      <a href="prompt-engineering.html" class="series-card">
+        <div class="sc-label">シリーズ ①</div>
+        <div class="sc-title">Prompt Engineering</div>
+        <div class="sc-desc">どう頼むか ── CoT から Extended Thinking まで進化史と 2026 年の実践</div>
+      </a>
+      <a href="context-engineering.html" class="series-card">
+        <div class="sc-label">シリーズ ②</div>
+        <div class="sc-title">Context Engineering</div>
+        <div class="sc-desc">何を見せるか ── 7 層モデル・RAG・Memory・Caching の設計技術</div>
+      </a>
+      <a href="harness-engineering.html" class="series-card current">
+        <div class="sc-label">シリーズ ③ ← 当ページ</div>
+        <div class="sc-title">Harness Engineering</div>
+        <div class="sc-desc">どう組むか ── Tool/Memory/Validation/Orchestration の環境設計</div>
+      </a>
+      <a href="loop-engineering.html" class="series-card">
+        <div class="sc-label">シリーズ ④</div>
+        <div class="sc-title">Loop Engineering</div>
+        <div class="sc-desc">どう回すか ── 自律エージェントが反復・自己修正する設計の最前線</div>
+      </a>
+    </div>
+    <p style="margin-top:16px; font-size:0.85rem;"><a href="index.html">← Workbench Knowledge 一覧</a> ／ <a href="../../index.html">Hub Top</a></p>
+  </div>
+
+</div>
+</body>
+</html>

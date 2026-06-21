@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prompt Engineering | Workbench Knowledge</title>
+  <style>
+    body { font-family: "Segoe UI", "Noto Sans JP", system-ui, sans-serif; margin: 0; background: #0b1220; color: #edf2fb; line-height: 1.75; padding: 28px 18px 60px; }
+    .shell { max-width: 1100px; margin: 0 auto; display: grid; gap: 22px; }
+    .panel { background: #111a2b; border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 26px 28px; }
+    a { color: #75d7c0; }
+    h1 { margin: 0 0 10px; font-size: 1.9rem; }
+    h2 { margin: 0 0 14px; font-size: 1.25rem; color: #edf2fb; }
+    h3 { margin: 14px 0 8px; font-size: 1.05rem; color: #d0daf0; }
+    p, li { color: #c5d0e3; }
+
+    /* KPI */
+    .kpi-row { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0; }
+    .kpi { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 12px 16px; text-align: center; min-width: 130px; }
+    .kpi .val { font-size: 1.3rem; font-weight: 800; color: #3dd8c5; }
+    .kpi .lbl { font-size: 0.72rem; color: #7f92ac; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 4px; }
+
+    /* Badges */
+    .badge { display: inline-block; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 5px; margin-right: 6px; vertical-align: middle; }
+    .badge-creator { background: rgba(167,139,250,0.18); color: #a78bfa; border: 1px solid rgba(167,139,250,0.3); }
+    .badge-engineer { background: rgba(61,216,197,0.15); color: #3dd8c5; border: 1px solid rgba(61,216,197,0.3); }
+    .badge-new { background: rgba(79,255,176,0.15); color: #4FFFB0; border: 1px solid rgba(79,255,176,0.3); }
+
+    /* Timeline */
+    .timeline { position: relative; padding-left: 28px; }
+    .timeline::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: rgba(167,139,250,0.3); }
+    .tl-item { position: relative; margin-bottom: 22px; }
+    .tl-item::before { content: ''; position: absolute; left: -24px; top: 6px; width: 10px; height: 10px; border-radius: 50%; background: #a78bfa; box-shadow: 0 0 8px rgba(167,139,250,0.5); }
+    .tl-year { font-size: 0.78rem; font-weight: 700; color: #a78bfa; letter-spacing: 0.06em; text-transform: uppercase; }
+    .tl-title { font-weight: 700; color: #edf2fb; margin: 2px 0; }
+    .tl-desc { color: #c5d0e3; font-size: 0.9rem; }
+    .tl-paper { display: inline-block; background: rgba(99,179,237,0.12); color: #63b3ed; border-radius: 4px; padding: 1px 7px; font-size: 0.78rem; margin-top: 4px; }
+
+    /* Technique cards */
+    .technique-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin: 14px 0; }
+    .technique-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 16px; }
+    .technique-card h4 { margin: 0 0 8px; color: #a78bfa; font-size: 0.95rem; }
+    .technique-card p { margin: 0 0 8px; font-size: 0.88rem; color: #b0bcd4; }
+    .technique-card pre { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; padding: 10px; overflow-x: auto; font-size: 0.8rem; color: #c5d0e3; font-family: "Fira Code","Consolas",monospace; line-height: 1.5; margin: 6px 0 0; }
+    .technique-card code { background: rgba(255,255,255,0.07); padding: 1px 5px; border-radius: 4px; font-size: 0.82rem; color: #f4b860; }
+
+    /* Examples */
+    .section-divider { display: flex; align-items: center; gap: 12px; margin: 20px 0 16px; }
+    .section-divider .dl { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; padding: 4px 12px; border-radius: 6px; }
+    .section-divider .dline { flex: 1; height: 1px; background: rgba(255,255,255,0.08); }
+    .dl-creator { background: rgba(167,139,250,0.18); color: #a78bfa; }
+    .dl-engineer { background: rgba(61,216,197,0.15); color: #3dd8c5; }
+
+    .example-list { display: grid; gap: 16px; margin: 14px 0; }
+    .example { background: rgba(255,255,255,0.025); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 18px 20px; }
+    .example-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+    .example-num { font-size: 0.78rem; font-weight: 800; color: #7f92ac; min-width: 24px; }
+    .example-title { font-weight: 700; color: #edf2fb; font-size: 1rem; }
+    .example-body { color: #c5d0e3; font-size: 0.9rem; }
+    .example-body pre { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 12px 14px; overflow-x: auto; font-size: 0.82rem; color: #c5d0e3; font-family: "Fira Code","Consolas",monospace; line-height: 1.6; margin: 8px 0; }
+    .example-body code { background: rgba(255,255,255,0.07); padding: 2px 6px; border-radius: 4px; font-size: 0.82rem; color: #f4b860; }
+    .metric-chip { display: inline-block; background: rgba(167,139,250,0.12); color: #a78bfa; font-size: 0.78rem; font-weight: 700; padding: 2px 8px; border-radius: 5px; margin-top: 6px; }
+
+    /* Comparison table */
+    table { width: 100%; border-collapse: collapse; font-size: 0.87rem; margin: 12px 0; }
+    th { text-align: left; padding: 10px 12px; color: #f4b860; border-bottom: 2px solid rgba(244,184,96,0.25); font-size: 0.79rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #c5d0e3; vertical-align: top; }
+    td strong { color: #edf2fb; }
+
+    /* Anti-patterns */
+    .anti-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; margin: 14px 0; }
+    .anti-card { background: rgba(248,113,113,0.05); border: 1px solid rgba(248,113,113,0.25); border-radius: 12px; padding: 16px; }
+    .anti-card h4 { margin: 0 0 6px; color: #f87171; font-size: 0.95rem; }
+    .anti-card p { margin: 0; font-size: 0.87rem; color: #b0bcd4; }
+    .anti-fix { margin-top: 8px; font-size: 0.83rem; color: #4FFFB0; }
+
+    /* Series nav */
+    .series-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 14px; }
+    .series-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 16px; text-decoration: none; display: block; transition: border-color 0.2s; }
+    .series-card:hover { border-color: rgba(167,139,250,0.4); }
+    .series-card .sc-label { font-size: 0.72rem; color: #7f92ac; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+    .series-card .sc-title { font-weight: 700; color: #edf2fb; font-size: 0.95rem; }
+    .series-card .sc-desc { font-size: 0.82rem; color: #7f92ac; margin-top: 4px; }
+    .series-card.current { border-color: rgba(167,139,250,0.5); background: rgba(167,139,250,0.06); }
+    .series-card.current .sc-title { color: #a78bfa; }
+
+    .info-box { background: rgba(167,139,250,0.07); border: 1px solid rgba(167,139,250,0.2); border-radius: 12px; padding: 14px 16px; margin: 14px 0; }
+    .info-box p { margin: 0; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ========== HEADER ========== -->
+  <div class="panel">
+    <p style="margin:0 0 12px;"><a href="../index.html">← Workbench</a> / <a href="index.html">Knowledge</a> / <a href="../../index.html">Hub Top</a></p>
+    <div class="badge badge-new">エンジニアリングスキル シリーズ ①</div>
+    <h1 style="margin-top:10px;">Prompt Engineering</h1>
+    <p style="font-size:1.05rem; color:#c5d0e3; margin:0 0 16px;">「<strong>どう頼むか</strong>」の技術 ── Zero-shot から Extended Thinking まで 2020〜2026 年の進化史と、クリエイター・エンジニア双方に役立つ現在の実践。</p>
+    <div class="kpi-row">
+      <div class="kpi"><div class="val">6 フェーズ</div><div class="lbl">2020〜2026 進化</div></div>
+      <div class="kpi"><div class="val">10+ 論文</div><div class="lbl">学術的系譜</div></div>
+      <div class="kpi"><div class="val">2026年</div><div class="lbl">「素養」として全職種へ内包</div></div>
+      <div class="kpi"><div class="val">12 実例</div><div class="lbl">クリエイター6 + エンジニア6</div></div>
+    </div>
+    <p style="font-size:0.82rem; color:#7f92ac; margin:0;">最終更新: 2026-06-20 ／ シリーズ: <strong>Prompt（当ページ）</strong> → <a href="context-engineering.html">Context</a> → <a href="harness-engineering.html">Harness</a> → <a href="loop-engineering.html">Loop</a></p>
+  </div>
+
+  <!-- ========== POSITION IN 2026 ========== -->
+  <div class="panel">
+    <h2>2026年のプロンプトエンジニアリング ── 「素養」化とその先</h2>
+
+    <div class="info-box">
+      <p>「プロンプトエンジニアリングという職種は消えた」（Fast Company, 2025年5月）── これは「不要になった」のではなく、<strong>すべての AI 活用職に内包された</strong>ことを意味します。医師・弁護士・デザイナー・エンジニア・クリエイターが全員使うスキルは、専門職ではなくリテラシーになります。</p>
+    </div>
+
+    <table>
+      <thead><tr><th>時期</th><th>位置づけ</th><th>誰が担う</th></tr></thead>
+      <tbody>
+        <tr><td>2020-22</td><td>専門スキル（希少）</td><td>AI 研究者・先進的エンジニア</td></tr>
+        <tr><td>2023-24</td><td>差別化スキル</td><td>AI エンジニア・プロンプトエンジニア職</td></tr>
+        <tr><td>2025</td><td>コモディティ化の始まり</td><td>すべての IT 職・クリエイター</td></tr>
+        <tr><td>2026</td><td><strong>素養（リテラシー）</strong></td><td>AI を使うすべての人</td></tr>
+      </tbody>
+    </table>
+
+    <p style="margin-top:12px;">では 2026 年に「プロンプト力」はどこが差別化になるか：</p>
+    <ul>
+      <li><strong>モダリティ特化</strong>: 動画生成・音楽生成など特定メディアのプロンプト設計</li>
+      <li><strong>エージェント向けシステムプロンプト設計</strong>: 長期自律実行に耐えるプロンプト</li>
+      <li><strong>Extended Thinking との共存</strong>: 推論モデルに「考えさせながら」制御する技法</li>
+      <li><strong>コンテキストエンジニアリングとの統合</strong>: プロンプトはコンテキスト設計の一部として設計する</li>
+    </ul>
+  </div>
+
+  <!-- ========== EVOLUTION TIMELINE ========== -->
+  <div class="panel">
+    <h2>進化タイムライン（2020 → 2026）── 6 フェーズ</h2>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-year">Phase 1 ── 2020-2021</div>
+        <div class="tl-title">Zero-shot / Few-shot / Role Prompting の発見</div>
+        <div class="tl-desc">GPT-3 登場で「例を見せると賢くなる」Few-shot 学習が発見される。「あなたはエキスパートの〇〇です」という Role Prompting が広まる。プロンプトの書き方次第でモデルの能力が大幅に変わることが判明し、「プロンプトエンジニアリング」という言葉が生まれる。</div>
+        <span class="tl-paper">GPT-3: Brown et al., NeurIPS 2020</span>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">Phase 2 ── 2022</div>
+        <div class="tl-title">Chain-of-Thought ── 「考えてから答える」の発見</div>
+        <div class="tl-desc">Wei et al.（Google Brain）が「途中の思考過程を書かせると数学・推論タスクの精度が劇的に向上する」ことを示す。「答えを直接聞く」→「考え方を示してから答えさせる」への転換点。大規模モデルでのみ効果があることも発見（emergent ability）。</div>
+        <span class="tl-paper">Chain-of-Thought: Wei et al., NeurIPS 2022</span>
+        <span class="tl-paper">Self-Consistency: Wang et al., 2022</span>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">Phase 3 ── 2023前半</div>
+        <div class="tl-title">Tree of Thought / ReAct / Least-to-Most ── 推論の高度化</div>
+        <div class="tl-desc">CoT を「木」に拡張した ToT が複数の思考経路を探索。ReAct が「考える → ツールを使う → 観察する」サイクルを実現（エージェントループの原型）。Least-to-Most が複雑な問題を分解して段階的に解くアプローチを提案。</div>
+        <span class="tl-paper">Tree of Thoughts: Yao et al., 2023</span>
+        <span class="tl-paper">ReAct: Yao et al., 2022</span>
+        <span class="tl-paper">Least-to-Most: Zhou et al., 2022</span>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">Phase 4 ── 2023後半〜2024</div>
+        <div class="tl-title">System Prompt 設計論 / XML 構造化 / Constitutional AI</div>
+        <div class="tl-desc">Anthropic が XML タグ（<code>&lt;thinking&gt;</code>・<code>&lt;output&gt;</code>）の有効性を公開。System Prompt の設計が重要な技術として認識される。Constitutional AI でプロンプトにより行動原則を定義する手法が登場。Multimodal prompting（画像を見て答える）が一般化。</div>
+        <span class="tl-paper">Constitutional AI: Anthropic 2022/2024</span>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">Phase 5 ── 2025</div>
+        <div class="tl-title">Extended Thinking / Reasoning Models / Prompt Caching</div>
+        <div class="tl-desc">Claude 3.7 Sonnet が Extended Thinking（長期推論）を商用リリース。OpenAI o3 が推論を内部化。「考えさせる」プロンプトから「どれだけ考えさせるか（Budget Tokens）」の制御へ。Anthropic の Prompt Caching で静的プロンプトのコストを最大 90% 削減。「プロンプトエンジニアリングの死」論争が起きる。</div>
+        <span class="tl-paper">Extended Thinking: Anthropic 2025</span>
+        <span class="tl-paper">Budget Tokens / Thinking Budget 制御</span>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">Phase 6 ── 2026</div>
+        <div class="tl-title">Tool-call / Multimodal / Agentic Prompting ── 新領域</div>
+        <div class="tl-desc">動画・音声・コード実行を統合したマルチモーダルプロンプトが成熟。エージェントが自律的に Tool を選択する「Tool-call Prompting」の設計が重要スキルに。Veo 3・Sora・Imagen 4 などの生成 AI がプロンプト設計の新フロンティアに。「プロンプトは上位概念のコンテキストエンジニアリングの一部」として再定義。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== CORE TECHNIQUES ========== -->
+  <div class="panel">
+    <h2>コアテクニック 10 選</h2>
+    <div class="technique-grid">
+
+      <div class="technique-card">
+        <h4>① Zero-shot / Few-shot</h4>
+        <p>最も基本。Few-shot は例を数件見せて望ましい出力形式・スタイルを示す。2026 年でも最高 ROI の技法の一つ。</p>
+        <pre>
+# Few-shot 例
+Q: 東京の天気は？
+A: 東京は晴れ、気温28度です。
+
+Q: 大阪の天気は？
+A:</pre>
+      </div>
+
+      <div class="technique-card">
+        <h4>② Chain-of-Thought（CoT）</h4>
+        <p>「ステップバイステップで考えてください」という指示で推論精度が大幅向上。<code>Let's think step by step</code> が最も有名な魔法の一文。</p>
+        <pre>
+問題: 〇〇を解いてください。
+考え方を1ステップずつ示した上で
+最終的な答えを出してください。</pre>
+      </div>
+
+      <div class="technique-card">
+        <h4>③ XML 構造化タグ（Anthropic 推奨）</h4>
+        <p>Claude は XML タグで構造を明示されると解析精度が向上。特に長いプロンプトや複数セクションがある場合に効果的。</p>
+        <pre>
+&lt;context&gt;
+  ここに背景情報を記述
+&lt;/context&gt;
+
+&lt;task&gt;
+  具体的なタスク内容
+&lt;/task&gt;
+
+&lt;output_format&gt;JSON で回答してください&lt;/output_format&gt;</pre>
+      </div>
+
+      <div class="technique-card">
+        <h4>④ Extended Thinking（Think タグ）</h4>
+        <p>Claude の Extended Thinking を明示的に使う。<code>thinking budget</code> でトークン数を制御。複雑な推論・コーディング・分析タスクで大幅改善。</p>
+        <pre>
+# API 使用例（Python）
+response = client.messages.create(
+    model="claude-fable-5",
+    thinking={
+        "type": "enabled",
+        "budget_tokens": 10000
+    },
+    messages=[{"role": "user",
+               "content": task}]
+)</pre>
+      </div>
+
+      <div class="technique-card">
+        <h4>⑤ Role Prompting（役割付与）</h4>
+        <p>モデルに専門的な役割を与えることで回答の深度・スタイルが変わる。「あなたは 10 年経験のシニアエンジニアです」など。</p>
+        <pre>
+あなたは 2026 年の AI 業界に精通した
+テックアナリストです。以下の質問に
+業界レポート形式で回答してください。</pre>
+      </div>
+
+      <div class="technique-card">
+        <h4>⑥ Self-Consistency（自己整合性）</h4>
+        <p>同じ問題を複数の CoT パスで解かせ、多数決で答えを決定。単一の解答より精度が高い。コストは高いが重要判断に有効。</p>
+        <pre>
+# 5回独立に考えさせて多数決
+responses = [
+    llm.generate(problem) for _ in range(5)
+]
+answer = majority_vote(responses)</pre>
+      </div>
+
+      <div class="technique-card">
+        <h4>⑦ Structured Output（構造化出力）</h4>
+        <p>JSON・Markdown・特定フォーマットでの出力を強制。後続処理との連携が容易になる。<code>response_format</code> API や JSON Mode で実装。</p>
+        <pre>
+以下の JSON 形式で回答してください:
+{
+  "title": "記事タイトル",
+  "summary": "200字以内の要約",
+  "tags": ["タグ1", "タグ2"],
+  "confidence": 0.0-1.0
+}</pre>
+      </div>
+
+      <div class="technique-card">
+        <h4>⑧ Meta-Prompting</h4>
+        <p>「最良のプロンプトを書いてください」とモデル自身に依頼する。プロンプト改善ループの自動化。DSPy はこれをフレームワーク化。</p>
+        <pre>
+以下のタスクに最適なプロンプトを
+設計してください。制約条件:
+- 出力は 500 字以内
+- JSON 形式で回答
+- 専門用語を避ける
+
+タスク: [タスクの説明]</pre>
+      </div>
+
+      <div class="technique-card">
+        <h4>⑨ Tool-call Prompting</h4>
+        <p>エージェントが利用できるツールを適切に定義し、どのツールをいつ使うかを自律決定させる。ツール説明の品質が精度を左右する。</p>
+        <pre>
+# ツール定義（MCP JSON Schema）
+{
+  "name": "search_web",
+  "description":
+    "最新情報を検索。知識カットオフ後の
+     情報が必要な場合のみ使用すること",
+  "inputSchema": {...}
+}</pre>
+      </div>
+
+      <div class="technique-card">
+        <h4>⑩ Negative Prompting（ネガティブ指示）</h4>
+        <p>「〇〇しないでください」という禁止指示。画像生成では特に重要（<code>--no</code> オプション）。LLM でも「短くまとめないで」「箇条書きにしないで」など。</p>
+        <pre>
+# Midjourney v7 例
+a serene mountain lake at sunset
+--no people, cars, power lines, text
+--style raw --ar 16:9</pre>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========== EXAMPLES ========== -->
+  <div class="panel">
+    <h2>実例 12 選</h2>
+
+    <div class="section-divider">
+      <span class="dl dl-creator">クリエイター向け実例</span>
+      <div class="dline"></div>
+    </div>
+    <p style="font-size:0.88rem; color:#7f92ac; margin:0 0 14px;">画像・動画・音楽・テキスト生成の現場でプロンプト設計がどう機能するか。</p>
+
+    <div class="example-list">
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">01</span>
+          <span class="badge badge-creator">クリエイター</span>
+          <span class="example-title">Midjourney v7 ── --sref / --cref でスタイル・キャラクターを固定</span>
+        </div>
+        <div class="example-body">
+          <p>Midjourney v7（2026年）のプロンプト設計は視覚的コンテキストの注入が核心：</p>
+          <pre>
+# スタイル参照（--sref）── 参照画像のスタイルを継承
+a young woman in a café, reading
+--sref https://example.com/my-style.jpg
+--sw 100 --ar 4:5
+
+# キャラクター参照（--cref）── キャラクターの外見を一貫させる
+my character [name] walking in a park
+--cref https://example.com/character.jpg
+--cw 80
+
+# 動画・漫画シリーズでの活用
+# 同じ --cref URL を全カット共通で使うことで
+# キャラクターの外見が全話を通して統一される</pre>
+          <p><strong>クリエイター活用</strong>: 漫画の各話でキャラクターのビジュアルがバラバラになる問題を解消。<code>--cref</code> で参照画像を設定することで一貫したキャラ立ち絵が可能に。</p>
+          <span class="metric-chip">詳細: <a href="../../creator-system/manga-pipeline.html">manga-pipeline.html</a></span>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">02</span>
+          <span class="badge badge-creator">クリエイター</span>
+          <span class="example-title">Veo 3 ── Google の動画生成モデルへのプロンプト設計</span>
+        </div>
+        <div class="example-body">
+          <p>Veo 3（2026年）は動画プロンプトの設計が映像品質を決定します：</p>
+          <pre>
+# 推奨構造（Veo 3 公式ガイドライン）
+[カメラムーブ], [シーン設定],
+[主体の動作・外見], [照明・雰囲気],
+[スタイル指定], [時間・ペース]
+
+# 実例
+Slow dolly push-in, golden hour sunset
+over Tokyo skyline. A woman in a red
+kimono walks across a wooden bridge,
+cherry blossoms falling around her.
+Cinematic, shallow depth of field,
+4K, realistic. Duration: 8 seconds.</pre>
+          <p><strong>重要なプロンプト要素</strong>: ① カメラ動き（dolly/pan/zoom/static）② 照明（golden hour/blue hour/overcast）③ スタイル（cinematic/anime/documentary）④ 主体の動き（動詞を具体的に）</p>
+          <span class="metric-chip">詳細: <a href="../../creator-system/video-pipeline.html">video-pipeline.html</a> / <a href="veo.html">veo.html</a></span>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">03</span>
+          <span class="badge badge-creator">クリエイター</span>
+          <span class="example-title">Imagen 4 Ultra ── 漫画・イラストに特化したプロンプト設計</span>
+        </div>
+        <div class="example-body">
+          <p>Imagen 4 Ultra（2026年）は高品質なイラスト・漫画に対応しています：</p>
+          <pre>
+# 漫画スタイル指定
+manga panel, black and white ink drawing,
+detailed line art, [キャラクター描写],
+in the style of [参照作品 or スタイル],
+dramatic angle, speedlines in background,
+JJBA-style muscle detail, high contrast.
+
+# クリエイター向けヒント
+- "manga panel" をつけると枠線・スクリーントーン感が出る
+- "ink drawing" で線の強弱が生まれる
+- 参照画像は --cref より Imagen の image2image 機能が安定
+- Negative prompt: realistic photo, 3D render, CGI</pre>
+          <span class="metric-chip">詳細: <a href="imagen.html">imagen.html</a> / <a href="../../creator-system/manga-pipeline.html">manga-pipeline.html</a></span>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">04</span>
+          <span class="badge badge-creator">クリエイター</span>
+          <span class="example-title">AI News ルーティン ── 日次記事を一定品質で量産するプロンプト設計</span>
+        </div>
+        <div class="example-body">
+          <p>このハブの日次 AI News の生成プロンプトは以下の設計原則に従っています：</p>
+          <pre>
+&lt;role&gt;
+あなたは AI 業界専門のテックジャーナリストです。
+対象読者: 日本のエンジニア・クリエイター。
+&lt;/role&gt;
+
+&lt;constraints&gt;
+- 600〜800字（厳守）
+- 事実のみ記述、推測は「〜とみられる」と明示
+- 出典は記事末尾に必ず明記
+- 対象: Claude/ChatGPT/Gemini/Grok/Qwen/GLM の6社のみ
+&lt;/constraints&gt;
+
+&lt;input&gt;
+今日の最重要ニュース: [ニュースの内容]
+出典URL: [URL]
+&lt;/input&gt;
+
+&lt;output_format&gt;
+# [タイトル]（30字以内）
+[本文 600〜800字]
+**出典:** [媒体名 / URL]
+&lt;/output_format&gt;</pre>
+          <p>XML タグ（役割/制約/入力/出力形式）を明確に分離することで、毎回安定した品質が得られます。</p>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">05</span>
+          <span class="badge badge-creator">クリエイター</span>
+          <span class="example-title">NotebookLM Podcast ── 会話形式の音声コンテンツを生成するプロンプト</span>
+        </div>
+        <div class="example-body">
+          <p>Google NotebookLM の Audio Overview（ポッドキャスト生成）は独特のプロンプト設計が必要：</p>
+          <ul>
+            <li><strong>ソース品質が全て</strong>: ソース（PDF・記事）の品質がそのまま音声品質に直結</li>
+            <li><strong>カスタマイズ指示</strong>: 「5分以内で」「初心者向けに」「深く掘り下げて」などを追加指示として渡す</li>
+            <li><strong>対話スタイルの誘導</strong>: 「2人のホストが議論するポッドキャスト形式で、具体例を多く使って」</li>
+            <li><strong>限界</strong>: 2026年時点でも日本語音声の品質は英語より低い</li>
+          </ul>
+          <p><strong>クリエイター活用</strong>: ハブの記事（PDF 変換）を NotebookLM に入れて「30分の解説ポッドキャスト」を自動生成 → YouTube チャンネルとして展開。</p>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">06</span>
+          <span class="badge badge-creator">クリエイター</span>
+          <span class="example-title">Flux + Stable Diffusion ── ネガティブプロンプトとスタイルの精密制御</span>
+        </div>
+        <div class="example-body">
+          <p>Flux.1 Dev（2026年）でのポジティブ・ネガティブプロンプトの設計：</p>
+          <pre>
+# ポジティブプロンプト（詳細で具体的に）
+ultra-detailed portrait of a young woman,
+soft studio lighting, shallow depth of field,
+Canon 5D, 85mm lens, bokeh background,
+intricate hair details, professional photography,
+8K, high resolution, photorealistic.
+
+# ネガティブプロンプト（除外したい要素を列挙）
+ugly, deformed, noisy, blurry, distorted,
+disfigured, bad anatomy, extra limbs,
+missing fingers, low quality, jpeg artifacts,
+watermark, text, signature, oversaturated.
+
+# IP-Adapter（スタイル参照）
+# 参照画像のスタイルを 0.4〜0.6 の重みで注入
+# 高すぎると参照画像のコピーになる</pre>
+          <span class="metric-chip">詳細: <a href="../../creator-system/video-pipeline.html">video-pipeline.html</a></span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ENGINEER EXAMPLES -->
+    <div class="section-divider" style="margin-top:28px;">
+      <span class="dl dl-engineer">エンジニア向け実例</span>
+      <div class="dline"></div>
+    </div>
+    <p style="font-size:0.88rem; color:#7f92ac; margin:0 0 14px;">システム開発・エージェント設計の視点からプロンプト設計の実際を見る。</p>
+
+    <div class="example-list">
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">07</span>
+          <span class="badge badge-engineer">エンジニア</span>
+          <span class="example-title">Cursor Rules v2 ── プロジェクト単位のシステムプロンプト設計</span>
+        </div>
+        <div class="example-body">
+          <p>Cursor IDE の Rules v2（<code>.cursor/rules/*.mdc</code>）はファイルパターンに応じてシステムプロンプトを切り替えます：</p>
+          <pre>
+# .cursor/rules/react-components.mdc
+---
+globs: ["src/components/**/*.tsx"]
+---
+## React コンポーネント作成ルール
+
+- 関数コンポーネントのみ使用（クラスコンポーネント禁止）
+- Props は必ず TypeScript で型定義
+- useEffect の依存配列を省略しない
+- コンポーネント名は PascalCase
+- ファイル末尾に export default を書く
+
+## 命名規則
+- Props 型: `ComponentNameProps`
+- カスタムフック: `use` プレフィックス必須</pre>
+          <p>ファイルの種類に応じて異なるルール（システムプロンプト）が自動適用されるため、コード品質が一貫します。</p>
+          <span class="metric-chip">詳細: <a href="cursor.html">cursor.html</a></span>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">08</span>
+          <span class="badge badge-engineer">エンジニア</span>
+          <span class="example-title">エージェント向けシステムプロンプト設計 ── 長期自律実行に耐える構造</span>
+        </div>
+        <div class="example-body">
+          <p>短期チャットと長期エージェントではシステムプロンプトの設計原則が異なります：</p>
+          <pre>
+&lt;identity&gt;
+あなたは [ハブ名] の更新エージェントです。
+技術知識ハブを最新状態に保つことが責務です。
+&lt;/identity&gt;
+
+&lt;operating_principles&gt;
+1. リンク切れを作らない
+2. 既存ページを消す前に整理を試みる
+3. 変更が大きい場合はユーザーに確認を求める
+4. 並走セッションの作業を消さない
+&lt;/operating_principles&gt;
+
+&lt;tool_usage&gt;
+- Read: ファイルを編集する前に必ず読む
+- Edit: 部分変更に使用（Write は完全書き換え時のみ）
+- Bash: git push 前に必ず git status で確認
+&lt;/tool_usage&gt;
+
+&lt;boundaries&gt;
+禁止: force push / 機密情報のコミット / ALIGN_Lab 内容の書き込み
+&lt;/boundaries&gt;</pre>
+          <p>エージェント向けプロンプトでは「何をするか」より「何をしてはいけないか」と「判断が難しい場合のエスカレーション条件」の定義が重要。</p>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">09</span>
+          <span class="badge badge-engineer">エンジニア</span>
+          <span class="example-title">LLM-as-judge ── 評価プロンプトの設計パターン</span>
+        </div>
+        <div class="example-body">
+          <p>LLM を評価者として使う「LLM-as-judge」の評価プロンプト設計：</p>
+          <pre>
+# 評価プロンプト（MT-Bench スタイル）
+あなたは公平な評価者です。以下の回答を
+[基準] に照らして 1〜10 で評価してください。
+
+&lt;criteria&gt;
+- 正確性（事実の誤りがないか）: 40%
+- 完全性（質問に全て答えているか）: 30%
+- 簡潔性（余計な情報がないか）: 20%
+- 文体（適切なトーンか）: 10%
+&lt;/criteria&gt;
+
+&lt;question&gt;[元の質問]&lt;/question&gt;
+&lt;answer&gt;[評価対象の回答]&lt;/answer&gt;
+
+まず各基準を評価し、最後に総合スコアを
+{"score": X, "reason": "..."} の JSON で返してください。</pre>
+          <p>評価基準を数値の重みで明示することで、評価の一貫性が向上。「まず考えてから評価する」CoT を入れると精度が上がる。</p>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">10</span>
+          <span class="badge badge-engineer">エンジニア</span>
+          <span class="example-title">o3 / Reasoning Model 向けプロンプト ── 「考えさせる」と「制御する」のバランス</span>
+        </div>
+        <div class="example-body">
+          <p>OpenAI o3・Claude Extended Thinking のような推論モデルではプロンプト設計が変わります：</p>
+          <table style="margin:8px 0;">
+            <thead><tr><th>通常モデル</th><th>推論モデル（o3/ET）</th></tr></thead>
+            <tbody>
+              <tr><td>「ステップバイステップで考えて」</td><td>不要（内部で自動実行）</td></tr>
+              <tr><td>「簡潔に答えて」が効果的</td><td>「詳しく説明して」が有効</td></tr>
+              <tr><td>Few-shot が大きく効く</td><td>Few-shot の効果が低下する場合も</td></tr>
+              <tr><td>System prompt で細かく制御</td><td>問題定義だけ明確にすればよい</td></tr>
+            </tbody>
+          </table>
+          <pre>
+# 推論モデル向け（o3 / Claude ET）推奨スタイル
+あなたは専門家です。以下の問題を解いてください。
+
+問題: [具体的な問題定義のみ記述]
+制約: [ハードな制約のみ明示]
+期待する出力形式: [必要な場合のみ]
+
+# CoT の指示は不要。余計な制約を与えすぎない。</pre>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">11</span>
+          <span class="badge badge-engineer">エンジニア</span>
+          <span class="example-title">Constitutional AI ── プロンプトで行動原則を定義する</span>
+        </div>
+        <div class="example-body">
+          <p>Anthropic の Constitutional AI（CAI）はシステムプロンプトでモデルの行動原則を定義する手法です：</p>
+          <pre>
+# CAI スタイルの原則プロンプト
+あなたは以下の原則に従って動作します:
+
+1. 有益性: ユーザーの真のニーズに応える
+2. 無害性: 有害なコンテンツを生成しない
+3. 誠実性: 不確かなことは不確かと伝える
+
+回答する前に、あなたの回答が上記の
+原則に反していないかを確認してください。
+反している場合は回答を修正してください。</pre>
+          <p>CAI の本質は「評価ループ（③）をプロンプトの中に埋め込む」こと。生成 → 自己評価 → 修正を一つのプロンプトで実現します。</p>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">12</span>
+          <span class="badge badge-engineer">エンジニア</span>
+          <span class="example-title">Anthropic Prompt Caching ── プロンプトコストを最大 90% 削減</span>
+        </div>
+        <div class="example-body">
+          <p>Prompt Caching はプロンプトエンジニアリングとコスト最適化を統合した技法：</p>
+          <pre>
+# 変化しない部分をキャッシュ対象に
+system_prompt = [
+    {
+        "type": "text",
+        "text": large_document,  # 10万トークンのドキュメント
+        "cache_control": {"type": "ephemeral"}
+        # ↑ キャッシュのブレークポイントを設定
+    }
+]
+
+# キャッシュヒット時
+# - 入力トークンコスト: -90%
+# - レイテンシ: -60%
+# - キャッシュ書き込み: +25%（初回のみ）
+# 同じドキュメントを 10 回以上参照するなら確実に元が取れる</pre>
+          <p>プロンプトの「静的部分」と「動的部分」を意識的に分離するプロンプト設計が、コスト効率を大きく左右します。</p>
+          <span class="metric-chip">詳細: <a href="claude-code.html">claude-code.html</a> / Anthropic API ドキュメント</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========== ANTI-PATTERNS ========== -->
+  <div class="panel">
+    <h2>アンチパターン 6 選</h2>
+    <div class="anti-grid">
+      <div class="anti-card">
+        <h4>① プロンプトの過剰長文化</h4>
+        <p>「長ければ精度が上がる」は誤り。Lost in the Middle 問題が発生し、重要な指示が無視される。特に中盤に埋もれた制約は見落とされやすい。</p>
+        <div class="anti-fix">✅ Fix: 重要な指示は先頭か末尾に。中盤は「事実・文脈」に限定。</div>
+      </div>
+      <div class="anti-card">
+        <h4>② 曖昧な否定指示</h4>
+        <p>「悪いものを書かないで」「長くしないで」では何を避けるべきかが不明確。モデルによって解釈が異なる。</p>
+        <div class="anti-fix">✅ Fix: 否定より肯定で書く。「500字以内で」「事実のみ」など定量・具体的に。</div>
+      </div>
+      <div class="anti-card">
+        <h4>③ CoT を全てのタスクに適用</h4>
+        <p>単純な分類・抽出タスクに CoT を入れると冗長な推論が付いてコストが増えるだけ。効果があるのは推論が本当に必要なタスクのみ。</p>
+        <div class="anti-fix">✅ Fix: 精度向上が必要なタスクだけに CoT を適用。単純タスクは Zero-shot で十分。</div>
+      </div>
+      <div class="anti-card">
+        <h4>④ 推論モデルへの過剰な指示</h4>
+        <p>o3・Extended Thinking モデルに「ステップバイステップで考えて」「詳しく説明して」を追加すると、内部推論と競合して品質が下がることがある。</p>
+        <div class="anti-fix">✅ Fix: 推論モデルには問題定義と制約のみ与える。思考プロセスの指示は不要。</div>
+      </div>
+      <div class="anti-card">
+        <h4>⑤ プロンプトの秘匿による属人化</h4>
+        <p>効果的なプロンプトをチームで共有せず個人が保有する。担当者が離れると再現不能になり、品質が不安定化する。</p>
+        <div class="anti-fix">✅ Fix: プロンプトをコードと同様にバージョン管理（Git）。テンプレート化して共有。</div>
+      </div>
+      <div class="anti-card">
+        <h4>⑥ 評価なしの本番投入</h4>
+        <p>プロンプトを変更するたびに体感でのみ評価し、定量指標を持たない。改善したのか悪化したのかが不明。</p>
+        <div class="anti-fix">✅ Fix: LLM-as-judge または人間評価でスコアを記録。変更前後のスコアを比較。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== SERIES NAVIGATION ========== -->
+  <div class="panel">
+    <h2>エンジニアリングスキル シリーズ</h2>
+    <p style="color:#c5d0e3; margin:0 0 14px;">Prompt で伝え、Context で見せ、Harness で支え、Loop で回す ── 4 つの規律は連続している。</p>
+    <div class="series-grid">
+      <a href="prompt-engineering.html" class="series-card current">
+        <div class="sc-label">シリーズ ① ← 当ページ</div>
+        <div class="sc-title">Prompt Engineering</div>
+        <div class="sc-desc">どう頼むか ── CoT から Extended Thinking まで進化史と 2026 年の実践</div>
+      </a>
+      <a href="context-engineering.html" class="series-card">
+        <div class="sc-label">シリーズ ②</div>
+        <div class="sc-title">Context Engineering</div>
+        <div class="sc-desc">何を見せるか ── 7 層モデル・RAG・Memory・Caching の設計技術</div>
+      </a>
+      <a href="harness-engineering.html" class="series-card">
+        <div class="sc-label">シリーズ ③</div>
+        <div class="sc-title">Harness Engineering</div>
+        <div class="sc-desc">どう組むか ── Tool/Memory/Validation/Orchestration の環境設計</div>
+      </a>
+      <a href="loop-engineering.html" class="series-card">
+        <div class="sc-label">シリーズ ④</div>
+        <div class="sc-title">Loop Engineering</div>
+        <div class="sc-desc">どう回すか ── 自律エージェントが反復・自己修正する設計の最前線</div>
+      </a>
+    </div>
+    <p style="margin-top:16px; font-size:0.85rem;"><a href="index.html">← Workbench Knowledge 一覧</a> ／ <a href="../../index.html">Hub Top</a></p>
+  </div>
+
+</div>
+</body>
+</html>

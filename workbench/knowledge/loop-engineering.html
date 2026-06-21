@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loop Engineering | Workbench Knowledge</title>
+  <style>
+    body { font-family: "Segoe UI", "Noto Sans JP", system-ui, sans-serif; margin: 0; background: #0b1220; color: #edf2fb; line-height: 1.75; padding: 28px 18px 60px; }
+    .shell { max-width: 1100px; margin: 0 auto; display: grid; gap: 22px; }
+    .panel { background: #111a2b; border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 26px 28px; }
+    a { color: #75d7c0; }
+    h1 { margin: 0 0 10px; font-size: 1.9rem; }
+    h2 { margin: 0 0 14px; font-size: 1.25rem; color: #edf2fb; }
+    h3 { margin: 14px 0 8px; font-size: 1.05rem; color: #d0daf0; }
+    p, li { color: #c5d0e3; }
+
+    /* KPI */
+    .kpi-row { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0; }
+    .kpi { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 12px 16px; text-align: center; min-width: 130px; }
+    .kpi .val { font-size: 1.3rem; font-weight: 800; color: #3dd8c5; }
+    .kpi .lbl { font-size: 0.72rem; color: #7f92ac; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 4px; }
+
+    /* Badges */
+    .badge { display: inline-block; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 5px; margin-right: 6px; vertical-align: middle; }
+    .badge-creator { background: rgba(167,139,250,0.18); color: #a78bfa; border: 1px solid rgba(167,139,250,0.3); }
+    .badge-engineer { background: rgba(61,216,197,0.15); color: #3dd8c5; border: 1px solid rgba(61,216,197,0.3); }
+    .badge-new { background: rgba(79,255,176,0.15); color: #4FFFB0; border: 1px solid rgba(79,255,176,0.3); }
+
+    /* Quote */
+    .quote-card { background: rgba(251,191,36,0.07); border-left: 4px solid #fbbf24; border-radius: 0 12px 12px 0; padding: 16px 20px; margin: 14px 0; }
+    .quote-card blockquote { margin: 0 0 8px; color: #fde68a; font-style: italic; font-size: 1.02rem; }
+    .quote-card cite { color: #7f92ac; font-size: 0.82rem; }
+
+    /* Loop lifecycle */
+    .loop-cycle { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin: 18px 0; }
+    .loop-phase { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 14px 18px; text-align: center; flex: 1; min-width: 120px; }
+    .loop-phase .phase-icon { font-size: 1.6rem; margin-bottom: 4px; }
+    .loop-phase .phase-name { font-weight: 700; font-size: 0.95rem; }
+    .loop-phase .phase-desc { font-size: 0.78rem; color: #7f92ac; margin-top: 4px; }
+    .loop-arrow { font-size: 1.4rem; color: #3dd8c5; flex-shrink: 0; }
+    .loop-phase.plan { border-color: rgba(167,139,250,0.4); }
+    .loop-phase.act  { border-color: rgba(61,216,197,0.4); }
+    .loop-phase.obs  { border-color: rgba(244,184,96,0.4); }
+    .loop-phase.ref  { border-color: rgba(248,113,113,0.4); }
+    .loop-phase.plan .phase-name { color: #a78bfa; }
+    .loop-phase.act  .phase-name { color: #3dd8c5; }
+    .loop-phase.obs  .phase-name { color: #f4b860; }
+    .loop-phase.ref  .phase-name { color: #f87171; }
+
+    /* Pattern cards */
+    .pattern-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; margin: 14px 0; }
+    .pattern-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 18px; }
+    .pattern-card h4 { margin: 0 0 8px; color: #3dd8c5; font-size: 0.95rem; }
+    .pattern-card p { margin: 0 0 8px; font-size: 0.88rem; color: #b0bcd4; }
+    .pattern-card code { background: rgba(255,255,255,0.06); padding: 1px 5px; border-radius: 4px; font-size: 0.82rem; color: #f4b860; }
+    .pattern-card pre { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 10px 12px; overflow-x: auto; font-size: 0.8rem; color: #c5d0e3; font-family: "Fira Code","Consolas",monospace; line-height: 1.5; margin: 8px 0 0; }
+
+    /* Timeline */
+    .timeline { position: relative; padding-left: 28px; }
+    .timeline::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: rgba(61,216,197,0.25); }
+    .tl-item { position: relative; margin-bottom: 20px; }
+    .tl-item::before { content: ''; position: absolute; left: -24px; top: 6px; width: 10px; height: 10px; border-radius: 50%; background: #3dd8c5; box-shadow: 0 0 8px rgba(61,216,197,0.5); }
+    .tl-year { font-size: 0.78rem; font-weight: 700; color: #3dd8c5; letter-spacing: 0.06em; text-transform: uppercase; }
+    .tl-title { font-weight: 700; color: #edf2fb; margin: 2px 0; }
+    .tl-desc { color: #c5d0e3; font-size: 0.9rem; }
+
+    /* Examples */
+    .section-divider { display: flex; align-items: center; gap: 12px; margin: 20px 0 16px; }
+    .section-divider .dl { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; padding: 4px 12px; border-radius: 6px; }
+    .section-divider .dline { flex: 1; height: 1px; background: rgba(255,255,255,0.08); }
+    .dl-creator { background: rgba(167,139,250,0.18); color: #a78bfa; }
+    .dl-engineer { background: rgba(61,216,197,0.15); color: #3dd8c5; }
+
+    .example-list { display: grid; gap: 16px; margin: 14px 0; }
+    .example { background: rgba(255,255,255,0.025); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 18px 20px; }
+    .example-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+    .example-num { font-size: 0.78rem; font-weight: 800; color: #7f92ac; min-width: 24px; }
+    .example-title { font-weight: 700; color: #edf2fb; font-size: 1rem; }
+    .example-body { color: #c5d0e3; font-size: 0.9rem; }
+    .example-body pre { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 12px 14px; overflow-x: auto; font-size: 0.82rem; color: #c5d0e3; font-family: "Fira Code","Consolas",monospace; line-height: 1.6; margin: 8px 0; }
+    .example-body code { background: rgba(255,255,255,0.07); padding: 2px 6px; border-radius: 4px; font-size: 0.82rem; color: #f4b860; }
+    .metric-chip { display: inline-block; background: rgba(61,216,197,0.12); color: #3dd8c5; font-size: 0.78rem; font-weight: 700; padding: 2px 8px; border-radius: 5px; margin-top: 6px; }
+
+    /* Gates */
+    .gate-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin: 14px 0; }
+    .gate-card { background: rgba(79,255,176,0.04); border: 1px solid rgba(79,255,176,0.2); border-radius: 12px; padding: 16px; }
+    .gate-card h4 { margin: 0 0 6px; color: #4FFFB0; font-size: 0.92rem; }
+    .gate-card p { margin: 0; font-size: 0.85rem; color: #b0bcd4; }
+
+    /* Anti-patterns */
+    .anti-list { display: grid; gap: 10px; margin: 14px 0; }
+    .anti-card { background: rgba(248,113,113,0.05); border: 1px solid rgba(248,113,113,0.25); border-radius: 12px; padding: 16px 18px; }
+    .anti-card h4 { margin: 0 0 6px; color: #f87171; font-size: 0.95rem; }
+    .anti-card p { margin: 0; font-size: 0.87rem; color: #b0bcd4; }
+    .anti-fix { margin-top: 8px; font-size: 0.83rem; color: #4FFFB0; }
+
+    /* Paper citations */
+    .paper-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin: 14px 0; }
+    .paper-card { background: rgba(99,179,237,0.06); border: 1px solid rgba(99,179,237,0.2); border-radius: 10px; padding: 14px; }
+    .paper-card .paper-title { font-weight: 700; color: #63b3ed; font-size: 0.9rem; margin-bottom: 4px; }
+    .paper-card .paper-meta { font-size: 0.8rem; color: #7f92ac; margin-bottom: 6px; }
+    .paper-card .paper-contrib { font-size: 0.85rem; color: #c5d0e3; }
+
+    /* Series nav */
+    .series-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 14px; }
+    .series-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 16px; text-decoration: none; display: block; transition: border-color 0.2s; }
+    .series-card:hover { border-color: rgba(61,216,197,0.4); }
+    .series-card .sc-label { font-size: 0.72rem; color: #7f92ac; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+    .series-card .sc-title { font-weight: 700; color: #edf2fb; font-size: 0.95rem; }
+    .series-card .sc-desc { font-size: 0.82rem; color: #7f92ac; margin-top: 4px; }
+    .series-card.current { border-color: rgba(251,191,36,0.5); background: rgba(251,191,36,0.05); }
+    .series-card.current .sc-title { color: #fbbf24; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin: 12px 0; }
+    th { text-align: left; padding: 10px 12px; color: #f4b860; border-bottom: 2px solid rgba(244,184,96,0.25); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #c5d0e3; vertical-align: top; }
+    td strong { color: #edf2fb; }
+  </style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ========== HEADER ========== -->
+  <div class="panel">
+    <p style="margin:0 0 12px;"><a href="../index.html">← Workbench</a> / <a href="index.html">Knowledge</a> / <a href="../../index.html">Hub Top</a></p>
+    <div class="badge badge-new">エンジニアリングスキル シリーズ ④ ── 2026年最前線</div>
+    <h1 style="margin-top:10px;">Loop Engineering</h1>
+    <p style="font-size:1.05rem; color:#c5d0e3; margin:0 0 16px;">「<strong>どう回すか</strong>」の設計 ── プロンプトを 1 回送るのではなく、自律的に反復・自己修正するエージェントループを設計する技術。2026年6月の現在の最前線。</p>
+    <div class="kpi-row">
+      <div class="kpi"><div class="val">2026年6月</div><div class="lbl">概念の明示的命名</div></div>
+      <div class="kpi"><div class="val">Plan-Act-Obs-Ref</div><div class="lbl">ループの4フェーズ</div></div>
+      <div class="kpi"><div class="val">5パターン</div><div class="lbl">ループ設計の類型</div></div>
+      <div class="kpi"><div class="val">12 実例</div><div class="lbl">クリエイター6 + エンジニア6</div></div>
+    </div>
+    <p style="font-size:0.82rem; color:#7f92ac; margin:0;">最終更新: 2026-06-20 ／ シリーズ: <a href="prompt-engineering.html">Prompt</a> → <a href="context-engineering.html">Context</a> → <a href="harness-engineering.html">Harness</a> → <strong>Loop（当ページ）</strong></p>
+  </div>
+
+  <!-- ========== WHAT IS IT ========== -->
+  <div class="panel">
+    <h2>ループエンジニアリングとは何か</h2>
+
+    <div class="quote-card">
+      <blockquote>「You don't prompt a coding agent once. You design loops that run autonomously. A loop with nothing to push back is the agent just agreeing with itself.」</blockquote>
+      <cite>── Loop Engineering の核心原則（Boris Cherny / Anthropic, 2026）</cite>
+    </div>
+
+    <p>プロンプトエンジニアリングが「1 回の指示をどう書くか」、コンテキストエンジニアリングが「何を見せるか」だとすれば、ループエンジニアリングは <strong>「エージェントがどう反復するか」</strong> を設計します。</p>
+
+    <p>4 つの規律の進化を振り返ると：</p>
+    <table>
+      <thead><tr><th>規律</th><th>問い</th><th>確立時期</th><th>設計対象</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Prompt Engineering</strong></td><td>どう頼むか</td><td>2020〜</td><td>1 回の指示文</td></tr>
+        <tr><td><strong>Context Engineering</strong></td><td>何を見せるか</td><td>2025年6月〜</td><td>コンテキストウィンドウの中身</td></tr>
+        <tr><td><strong>Harness Engineering</strong></td><td>どう組むか</td><td>2026年2月〜</td><td>ツール・メモリ・検証の環境</td></tr>
+        <tr><td><strong>Loop Engineering</strong></td><td><strong>どう回すか</strong></td><td><strong>2026年6月〜</strong></td><td><strong>自律反復サイクル全体</strong></td></tr>
+      </tbody>
+    </table>
+
+    <p style="margin-top:12px;">「ループ設計のないエージェントは、タスクを受け取り、1 回実行し、終わる ── つまり自動化スクリプトと変わらない。本当の意味でのエージェントは、フィードバックを受け取り、自分で判断し、次の行動を決める」という思想が基盤にあります。</p>
+  </div>
+
+  <!-- ========== LOOP LIFECYCLE ========== -->
+  <div class="panel">
+    <h2>ループの 4 フェーズ</h2>
+    <p>すべてのエージェントループはこの 4 フェーズを基本構造として持ちます。</p>
+
+    <div class="loop-cycle">
+      <div class="loop-phase plan">
+        <div class="phase-icon">🧭</div>
+        <div class="phase-name">Plan</div>
+        <div class="phase-desc">目標を分解<br>サブタスクに切り出す<br>ツール選択</div>
+      </div>
+      <div class="loop-arrow">→</div>
+      <div class="loop-phase act">
+        <div class="phase-icon">⚡</div>
+        <div class="phase-name">Act</div>
+        <div class="phase-desc">コード実行<br>ファイル操作<br>API 呼び出し</div>
+      </div>
+      <div class="loop-arrow">→</div>
+      <div class="loop-phase obs">
+        <div class="phase-icon">👁</div>
+        <div class="phase-name">Observe</div>
+        <div class="phase-desc">実行結果の取得<br>エラー検知<br>テスト結果</div>
+      </div>
+      <div class="loop-arrow">→</div>
+      <div class="loop-phase ref">
+        <div class="phase-icon">💭</div>
+        <div class="phase-name">Reflect</div>
+        <div class="phase-desc">結果の評価<br>方針修正<br>次ループ判断</div>
+      </div>
+      <div class="loop-arrow">↩</div>
+    </div>
+
+    <p>「Reflect → Plan へのフィードバック」がループを閉じます。<strong>フィードバックゲートがないループはエージェントが自己承認を繰り返すだけ</strong>です。終了条件（done-condition）の設計も同様に重要です。</p>
+
+    <h3>軍事・認知科学から来た OODA ループとの対応</h3>
+    <table>
+      <thead><tr><th>OODA（John Boyd, 1970s）</th><th>Agent Loop（2022〜）</th><th>役割</th></tr></thead>
+      <tbody>
+        <tr><td>Observe（観測）</td><td>Observe（ツール出力・環境状態）</td><td>現実を知覚する</td></tr>
+        <tr><td>Orient（方向付け）</td><td>Reflect（評価・判断）</td><td>状況を解釈する</td></tr>
+        <tr><td>Decide（決定）</td><td>Plan（次アクション決定）</td><td>行動を選択する</td></tr>
+        <tr><td>Act（行動）</td><td>Act（ツール実行）</td><td>環境に影響を与える</td></tr>
+      </tbody>
+    </table>
+    <p style="font-size:0.85rem; color:#7f92ac;">AI エージェントループは OODA の直接の派生ではなく並行発展ですが、構造的に一致しています。</p>
+  </div>
+
+  <!-- ========== ACADEMIC LINEAGE ========== -->
+  <div class="panel">
+    <h2>学術的系譜 ── 論文で辿るループの進化</h2>
+
+    <div class="paper-grid">
+      <div class="paper-card">
+        <div class="paper-title">ReAct: Synergizing Reasoning and Acting in Language Models</div>
+        <div class="paper-meta">Yao et al. (Princeton / Google Research), arXiv 2022年10月</div>
+        <div class="paper-contrib">LLM に「思考（Reason）+ 行動（Act）を交互に実行させる」設計を提案。Thought → Action → Observation のサイクルが現在のエージェントループの原型。HotpotQA・ALFWorld で従来手法を上回る精度を実現。</div>
+      </div>
+      <div class="paper-card">
+        <div class="paper-title">Reflexion: Language Agents with Verbal Reinforcement Learning</div>
+        <div class="paper-meta">Shinn et al. (Northeastern / MIT), arXiv 2023年3月</div>
+        <div class="paper-contrib">「言語フィードバックによる自己改善」を実現。タスク失敗後に自然言語で反省文を生成し、次のループに注入することで精度を向上。HumanEval でパス率 91% 達成（GPT-4 ベース）。</div>
+      </div>
+      <div class="paper-card">
+        <div class="paper-title">Self-Refine: Iterative Refinement with Self-Feedback</div>
+        <div class="paper-meta">Madaan et al. (CMU / Yann LeCun Group), arXiv 2023年3月</div>
+        <div class="paper-contrib">同一モデルが生成・評価・改善を繰り返す「自己改善ループ」。追加学習なしに品質向上が可能なことを示す。数学・コード・要約など 7 タスクで平均 +20% の品質向上。</div>
+      </div>
+      <div class="paper-card">
+        <div class="paper-title">Tree of Thoughts: Deliberate Problem Solving with LLMs</div>
+        <div class="paper-meta">Yao et al. (Princeton), arXiv 2023年5月</div>
+        <div class="paper-contrib">Chain-of-Thought を「木」に拡張。複数の思考経路を並列探索し、バックトラックを可能にする。ループの分岐・探索概念の先駆け。Game of 24 で GPT-4 を 4% → 74% に向上。</div>
+      </div>
+      <div class="paper-card">
+        <div class="paper-title">AgentBench: Evaluating LLMs as Agents</div>
+        <div class="paper-meta">Liu et al. (THU / UC Berkeley), arXiv 2023年8月</div>
+        <div class="paper-contrib">エージェントとしての LLM を 8 環境で評価する統一ベンチマーク。ループ実行能力（長期整合性・自己修正・探索）の差がモデル選択で重要になることを示す。</div>
+      </div>
+      <div class="paper-card">
+        <div class="paper-title">SWE-bench: Can LMs Resolve Real-World GitHub Issues?</div>
+        <div class="paper-meta">Jimenez et al. (Princeton), arXiv 2023年10月〜（継続更新）</div>
+        <div class="paper-contrib">実際の GitHub Issue 解決を評価するベンチマーク。エージェントがコード読解 → 修正 → テスト実行のループを何度回せるかが性能に直結。GLM-5.2 が OW 首位（62.1%）を取得。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== EVOLUTION TIMELINE ========== -->
+  <div class="panel">
+    <h2>進化タイムライン（2022 → 2026）</h2>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-year">2022年10月</div>
+        <div class="tl-title">ReAct パターン登場 ── 「考えてから行動する」ループの原型</div>
+        <div class="tl-desc">Yao et al. の論文で Reason+Act の交互実行を提案。LangChain がすぐに実装し普及。エージェントループの事実上の標準パターンに。</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">2023年</div>
+        <div class="tl-title">Reflexion / Self-Refine / ToT ── 自己改善ループの確立</div>
+        <div class="tl-desc">外部フィードバックではなく、モデル自身が評価・改善するループが学術的に確立。「ループに評価ゲートを入れる」設計思想の根拠が揃う。</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">2024年前半</div>
+        <div class="tl-title">Devin 登場 ── 自律コーディングエージェントの商用化</div>
+        <div class="tl-desc">Cognition AI の Devin が「完全自律コーディング」を標榜。SWE-bench で 13.86%（当時最高）を記録。エージェントが数時間のループを自律実行することへの期待が爆発。</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">2024年後半</div>
+        <div class="tl-title">評価ループ（LLM-as-judge）の一般化</div>
+        <div class="tl-desc">MT-Bench・Alpaca Eval など LLM が LLM の出力を評価するループが研究・製品双方で定着。「ループの中に評価者を置く」設計が標準的に。</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">2025年</div>
+        <div class="tl-title">本番エージェントの実用化 ── Claude Code / Cursor / Grok Build</div>
+        <div class="tl-desc">Claude Code が自律ループで本番レベルのコーディングを実現。Cursor BugBot が解決率 76% を記録。ループの長期安定性・コスト管理が実用的課題として浮上。</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">2026年6月</div>
+        <div class="tl-title">「Loop Engineering」明示的命名 ── 設計規律として確立</div>
+        <div class="tl-desc">Peter Steinberger（Aspect）・Boris Cherny（Anthropic）らが「ループエンジニアリング」を一つの設計規律として明示化。ExplainX・Linas Substack 等でガイドが公開され、コミュニティの共通言語に。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 5 PATTERNS ========== -->
+  <div class="panel">
+    <h2>ループ設計の 5 パターン</h2>
+    <p>エージェントループには用途に応じた複数の設計パターンがあります。</p>
+
+    <div class="pattern-grid">
+      <div class="pattern-card">
+        <h4>① 単純反復ループ（Until-Condition）</h4>
+        <p>「条件を満たすまで繰り返す」最もシンプルな形。終了条件の設計が全て。</p>
+        <pre>
+# Claude Code パターン
+until [ "$(npm test)" = "PASS" ]; do
+  # Claude が自律的に修正を試みる
+  sleep 2
+done</pre>
+        <p style="font-size:0.82rem; color:#7f92ac; margin-top:4px;">適用: バッチ処理・フォーマット変換・単純な修正タスク</p>
+      </div>
+
+      <div class="pattern-card">
+        <h4>② TDD ループ（テスト駆動エージェント）</h4>
+        <p>テストを先に書き、テストが通るまで実装を繰り返す。品質担保と終了条件が一体化した優れた設計。</p>
+        <pre>
+# 1. テストを書く（人間 or エージェント）
+# 2. 実装する（エージェント）
+# 3. テスト実行（ハーネス）
+# 4. 失敗 → Reflect → 再実装
+# 5. 全テスト GREEN → 完了</pre>
+        <p style="font-size:0.82rem; color:#7f92ac; margin-top:4px;">適用: 機能実装・バグ修正・リファクタリング</p>
+      </div>
+
+      <div class="pattern-card">
+        <h4>③ 評価ループ（Eval Loop / LLM-as-judge）</h4>
+        <p>生成 → 評価 → 改善を繰り返す。評価者と生成者が同一モデルでも分離したモデルでも機能。</p>
+        <pre>
+for i in range(max_rounds):
+    output = generator.generate(task)
+    score, feedback = judge.evaluate(output)
+    if score >= threshold:
+        break
+    task = enrich_with_feedback(task, feedback)</pre>
+        <p style="font-size:0.82rem; color:#7f92ac; margin-top:4px;">適用: コンテンツ品質向上・翻訳精度向上・レポート生成</p>
+      </div>
+
+      <div class="pattern-card">
+        <h4>④ 並列ループ（Parallel Agent Swarm）</h4>
+        <p>複数のエージェントが独立した作業を並列実行。オーケストレーターが結果を統合。</p>
+        <pre>
+# オーケストレーター
+tasks = decompose(goal)
+results = await asyncio.gather(*[
+    agent.run(task) for task in tasks
+])
+final = synthesize(results)</pre>
+        <p style="font-size:0.82rem; color:#7f92ac; margin-top:4px;">適用: 大規模コンテンツ生成・マルチリサーチ・コードベース全体修正</p>
+      </div>
+
+      <div class="pattern-card">
+        <h4>⑤ 階層ループ（Orchestrator-Worker）</h4>
+        <p>高レベル計画エージェント（オーケストレーター）が低レベル実行エージェント（ワーカー）を管理する 2 層構造。</p>
+        <pre>
+class Orchestrator:
+    def run(self, goal):
+        plan = self.plan(goal)
+        for step in plan:
+            worker = Worker(step.type)
+            result = worker.execute(step)
+            self.update_state(result)
+            if self.goal_met(): break</pre>
+        <p style="font-size:0.82rem; color:#7f92ac; margin-top:4px;">適用: 複雑な長期タスク・Kanban エージェント・マルチモーダルパイプライン</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== EXAMPLES ========== -->
+  <div class="panel">
+    <h2>実例 12 選</h2>
+
+    <div class="section-divider">
+      <span class="dl dl-creator">クリエイター向け実例</span>
+      <div class="dline"></div>
+    </div>
+    <p style="font-size:0.88rem; color:#7f92ac; margin:0 0 14px;">コンテンツ制作・AI 創作の現場でループ設計がどう機能するか。</p>
+
+    <div class="example-list">
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">01</span>
+          <span class="badge badge-creator">クリエイター</span>
+          <span class="example-title">Hermes Agent ── Kanban マルチエージェントでコンテンツ量産</span>
+        </div>
+        <div class="example-body">
+          <p>Hermes Agent v0.13 で導入された Kanban v1 は、階層ループ（⑤）の実装です：</p>
+          <ul>
+            <li><strong>オーケストレーター</strong>: Kanban ボード上のタスクを管理・割り振り</li>
+            <li><strong>ワーカーエージェント（並列）</strong>: 各タスクを独立実行</li>
+            <li><strong>実例 – SEO 記事量産</strong>: キーワード 100 件のリストを投入 → 各キーワードで並列リサーチ → 記事生成 → 品質評価 → 合格したものだけを出力バッファに</li>
+            <li><strong>実例 – ComfyUI 画像生成</strong>: プロンプトリストを読み込み → 並列でバッチ画像生成 → 評価エージェントが低品質を除去 → Obsidian Vault に保存</li>
+          </ul>
+          <span class="metric-chip">詳細: <a href="hermes-agent.html">hermes-agent.html</a></span>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">02</span>
+          <span class="badge badge-creator">クリエイター</span>
+          <span class="example-title">AI News ループ ── 日次コンテンツを評価込みで自動生成</span>
+        </div>
+        <div class="example-body">
+          <p>このハブの日次 AI News 生成は評価ループ（③）を内包しています：</p>
+          <pre>
+# 擬似的なループ設計
+1. Web 検索で今日のニュース候補を収集（Observe）
+2. 重複・低品質を除去（Reflect = 評価ゲート①）
+3. 600〜800字の記事を生成（Act）
+4. 事実確認・出典確認（Reflect = 評価ゲート②）
+5. 合格 → publish、不合格 → Step 3 に戻る
+6. 6社分（Claude/ChatGPT/Gemini/Grok/Qwen/GLM）繰り返し</pre>
+          <p>2 つの評価ゲート（重複除去と事実確認）がループ品質を担保しています。</p>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">03</span>
+          <span class="badge badge-creator">クリエイター</span>
+          <span class="example-title">Kimi Work ── 300 サブエージェント・4000 ステップの自律ループ</span>
+        </div>
+        <div class="example-body">
+          <p>Moonshot AI の Kimi Work（2026年6月、内部テスト中）は最大規模の並列ループ実装の一つです：</p>
+          <ul>
+            <li><strong>並列ループ（④）</strong>: 最大 300 のサブエージェントが独立作業</li>
+            <li><strong>最大 4000 ステップ</strong>: 長期タスクでも文脈を維持して継続実行</li>
+            <li><strong>WebBridge</strong>: ブラウザ拡張でリアルタイム Web 情報をループ内に取り込む</li>
+            <li><strong>クリエイター用途</strong>: リサーチ記事の自動生成（数十ページ規模）・競合分析・市場調査レポート</li>
+            <li><strong>株式フィード連携</strong>: A 株・香港株・米国株のデータをループ内でリアルタイム参照</li>
+          </ul>
+          <span class="metric-chip">詳細: <a href="kimi.html">kimi.html</a></span>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">04</span>
+          <span class="badge badge-creator">クリエイター</span>
+          <span class="example-title">Cursor BugBot ── 自律バグ修正ループで解決率 76%</span>
+        </div>
+        <div class="example-body">
+          <p>Cursor IDE の BugBot は TDD ループ（②）の商用実装です：</p>
+          <ul>
+            <li>PR 作成時に自動起動 → コードを読解 → バグの仮説を立てる（Plan）</li>
+            <li>修正を適用する（Act）</li>
+            <li>テストスイートを実行（Observe）</li>
+            <li>結果を評価・次のループを判断（Reflect）</li>
+            <li>最大 N 回反復 → 解決 or 「人間に引き渡し」判断</li>
+          </ul>
+          <p>自律解決率 76% は「何ラウンド反復させるか」「いつ諦めるか」というループ設計の巧拙に依存します。</p>
+          <span class="metric-chip">解決率: 76%（2026年6月時点） 詳細: <a href="cursor.html">cursor.html</a></span>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">05</span>
+          <span class="badge badge-creator">クリエイター</span>
+          <span class="example-title">Obsidian HEARTBEAT パターン ── Vault を定期的に自律更新するループ</span>
+        </div>
+        <div class="example-body">
+          <p>Obsidian × AI エージェントの「HEARTBEAT パターン」は単純反復ループ（①）の実装です：</p>
+          <pre>
+// heartbeat.ts — 定期実行エージェント
+async function heartbeat() {
+  const pendingNotes = await vault.search("status: draft");
+  for (const note of pendingNotes) {
+    const enriched = await claude.enrich(note.content);
+    await vault.update(note.path, enriched);
+  }
+}
+
+// 毎朝 6:00 に実行
+cron.schedule("0 6 * * *", heartbeat);</pre>
+          <p>「下書きノートを毎朝エージェントが自動補完する」というクリエイターのワークフロー。ループが止まらない設計（cron）とエラー時の安全な停止設計が重要。</p>
+          <span class="metric-chip">詳細: <a href="obsidian.html">obsidian.html</a></span>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">06</span>
+          <span class="badge badge-creator">クリエイター</span>
+          <span class="example-title">AutoGLM-Thinking ── 54+ ステップの深掘りリサーチ＋実行ループ</span>
+        </div>
+        <div class="example-body">
+          <p>Zhipu AI（Z.ai）の AutoGLM-Thinking は「考えながら調べながら実行する」複合ループです：</p>
+          <ul>
+            <li><strong>Deep Research フェーズ</strong>: Web 検索・文献収集を 54+ ステップで自律実行</li>
+            <li><strong>Thinking フェーズ</strong>: 収集した情報を統合・矛盾を検出・仮説を立てる</li>
+            <li><strong>Execution フェーズ</strong>: コード実行・フォーム入力・PC 操作で仮説を検証</li>
+            <li><strong>クリエイター用途</strong>: 競合他社の全製品を調査して比較レポートを自動生成</li>
+          </ul>
+          <p>「リサーチ ↔ 実行」を交互に繰り返すループが、単一の Web 検索では得られない深度の情報を実現。</p>
+          <span class="metric-chip">詳細: <a href="glm.html">glm.html</a></span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ENGINEER EXAMPLES -->
+    <div class="section-divider" style="margin-top:28px;">
+      <span class="dl dl-engineer">エンジニア向け実例</span>
+      <div class="dline"></div>
+    </div>
+    <p style="font-size:0.88rem; color:#7f92ac; margin:0 0 14px;">システム構築・コーディング・インフラの現場でループ設計がどう機能するか。</p>
+
+    <div class="example-list">
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">07</span>
+          <span class="badge badge-engineer">エンジニア</span>
+          <span class="example-title">Claude Code ── until ループで自律的なコード修正を実現</span>
+        </div>
+        <div class="example-body">
+          <p>Claude Code のループエンジニアリングの核心はシェルの until ループとの組み合わせです：</p>
+          <pre>
+# パターン①: テストが通るまで繰り返す
+until npm test 2>&amp;1 | grep -q "All tests passed"; do
+  # Claude が自律的にコードを読んで修正する
+  sleep 2
+done
+
+# パターン②: 型エラーがゼロになるまで繰り返す
+until [ "$(npx tsc --noEmit 2>&amp;1 | wc -l)" = "0" ]; do
+  sleep 1
+done
+
+# パターン③: Lint が clean になるまで繰り返す
+until npx eslint src/ --quiet; do
+  sleep 1
+done</pre>
+          <p>重要なのは <strong>「外部から見える状態変化（テスト結果）がゲート」</strong> になっていること。エージェントの自己評価だけに頼らない設計です。</p>
+          <span class="metric-chip">詳細: <a href="claude-code.html">claude-code.html</a></span>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">08</span>
+          <span class="badge badge-engineer">エンジニア</span>
+          <span class="example-title">Reflexion 実装 ── 言語フィードバックによる自己改善ループ</span>
+        </div>
+        <div class="example-body">
+          <p>Reflexion パターンの最小実装：</p>
+          <pre>
+def reflexion_loop(task, max_trials=5):
+    memory = []  # エピソード記憶
+    for trial in range(max_trials):
+        # 過去の反省を注入してから実行
+        context = "\n".join(memory) if memory else ""
+        result = agent.run(task, context=context)
+
+        # 外部評価（テスト / LLM-judge）
+        success, feedback = evaluate(result, task)
+        if success:
+            return result
+
+        # 失敗した場合、自然言語で反省文を生成
+        reflection = llm.reflect(
+            f"タスク: {task}\n試行結果: {result}\n失敗理由: {feedback}"
+        )
+        memory.append(reflection)  # 次のループに引き継ぐ
+
+    return None  # max_trials 超過</pre>
+          <p>記憶（memory）への反省文の蓄積がループを賢くします。trial を重ねるごとに「何をすべきでないか」の知識が増えます。</p>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">09</span>
+          <span class="badge badge-engineer">エンジニア</span>
+          <span class="example-title">Grok Build ── 8 並列サブエージェントのオーケストレーターループ</span>
+        </div>
+        <div class="example-body">
+          <p>xAI の Grok Build は並列ループ（④）+ 階層ループ（⑤）の組み合わせです：</p>
+          <ul>
+            <li><strong>オーケストレーター</strong>: ユーザーのゴールを受け取り、最大 8 つのサブタスクに分解</li>
+            <li><strong>8 並列ワーカー</strong>: 各ワーカーが独立してコード生成・テスト・デバッグのループを実行</li>
+            <li><strong>ローカルファースト</strong>: ローカル環境で直接実行してリアルな Observe フェーズを実現</li>
+            <li><strong>Live Search 統合</strong>: ループ内で最新ドキュメントを動的取得</li>
+            <li><strong>結果統合</strong>: オーケストレーターが 8 つの結果を統合・競合を解決</li>
+          </ul>
+          <span class="metric-chip">詳細: <a href="grok-build.html">grok-build.html</a></span>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">10</span>
+          <span class="badge badge-engineer">エンジニア</span>
+          <span class="example-title">DSPy ── プロンプト最適化を反復評価ループで自動化</span>
+        </div>
+        <div class="example-body">
+          <p>Stanford の DSPy はプロンプト自体をループで最適化するフレームワーク：</p>
+          <pre>
+import dspy
+
+# 評価メトリクスを定義
+def metric(gold, pred, trace=None):
+    return gold.answer == pred.answer
+
+# コンパイル = 自動プロンプト最適化ループ
+teleprompter = dspy.BootstrapFewShot(metric=metric)
+compiled_program = teleprompter.compile(
+    my_program,
+    trainset=train_examples
+)
+# 内部で: 生成 → 評価 → 良い例を選択 → Few-shot に追加 → 繰り返し</pre>
+          <p>「人間が Few-shot 例を手動で書く」作業を評価ループで自動化。プロンプトエンジニアリングをループで代替する発想。</p>
+          <span class="metric-chip">GitHub: 20K+ stars（2026年6月）</span>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">11</span>
+          <span class="badge badge-engineer">エンジニア</span>
+          <span class="example-title">Scott Logic ── agentic loop で flexbox 実装を 3 時間で完了</span>
+        </div>
+        <div class="example-body">
+          <p>Scott Logic（英国コンサルティング）が 2025年12月に公開した事例。複雑な flexbox レイアウト実装をエージェントループで実行：</p>
+          <ul>
+            <li><strong>従来推定</strong>: 熟練フロントエンド開発者で 1〜2 日</li>
+            <li><strong>ループ実装結果</strong>: 3 時間で完了</li>
+            <li><strong>ループの構成</strong>: コード生成 → ブラウザでのビジュアル確認（Observe）→ ピクセル差分評価（Reflect）→ 修正（Act）→ 繰り返し</li>
+            <li><strong>鍵</strong>: 「目で見て確認する」ビジュアルフィードバックゲートがループ精度を担保</li>
+          </ul>
+          <span class="metric-chip">出典: blog.scottlogic.com, 2025-12-22</span>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">12</span>
+          <span class="badge badge-engineer">エンジニア</span>
+          <span class="example-title">SWE-Bench トップ ── GLM-5.2 が OW 首位（62.1%）を取ったループ設計</span>
+        </div>
+        <div class="example-body">
+          <p>GLM-5.2 が SWE-bench Verified で Open-Weight 首位（62.1%）を取得した設計：</p>
+          <ul>
+            <li><strong>Issue 読解</strong>: GitHub Issue と関連コードを 1M ctx に一括注入</li>
+            <li><strong>修正仮説生成</strong>: 複数の修正案を並列生成</li>
+            <li><strong>テスト実行ループ</strong>: 各修正案に対してテストスイートを実行</li>
+            <li><strong>Terminal-Bench</strong>: ターミナル操作（コマンド実行・ファイル操作）の自律ループも 81.0% で首位</li>
+            <li><strong>鍵</strong>: 1M ctx により「全コードを一度に見ながら」ループを実行できる点</li>
+          </ul>
+          <p>ループの反復回数ではなく「1 回のループで見える情報量」が性能を決めた事例。</p>
+          <span class="metric-chip">詳細: <a href="glm.html">glm.html</a> / <a href="../../research/glm-recent-updates.html">GLM トラッカー</a></span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========== FEEDBACK GATES ========== -->
+  <div class="panel">
+    <h2>信頼できるループを作る 7 つのフィードバックゲート</h2>
+    <p style="color:#c5d0e3; margin:0 0 14px;">「フィードバックのないループはエージェントが自分に同意しているだけ」── ゲートがループを機能させます。</p>
+    <div class="gate-grid">
+      <div class="gate-card">
+        <h4>① テストスイート（最強）</h4>
+        <p>ユニットテスト・統合テストが通るかどうか。バイナリ（合格/不合格）でエージェントの主観を排除。TDD ループの要。</p>
+      </div>
+      <div class="gate-card">
+        <h4>② 型チェッカー</h4>
+        <p>TypeScript の <code>tsc</code>・Python の mypy など。エラーゼロを終了条件にすると収束が安定。</p>
+      </div>
+      <div class="gate-card">
+        <h4>③ Linter / Formatter</h4>
+        <p>ESLint・Prettier・Ruff など。コードスタイルの客観的評価。低コストで即座にフィードバックが得られる。</p>
+      </div>
+      <div class="gate-card">
+        <h4>④ LLM-as-judge</h4>
+        <p>別の LLM（または同一モデル）が出力を評価するゲート。主観的品質（文章の自然さ・論理性）の自動評価に有効。スコアに閾値を設定。</p>
+      </div>
+      <div class="gate-card">
+        <h4>⑤ ビジュアル差分</h4>
+        <p>スクリーンショット比較・ピクセル差分。UI 実装・デザイン生成ループで人間の目を代替。Percy / Chromatic などで自動化可能。</p>
+      </div>
+      <div class="gate-card">
+        <h4>⑥ 人間レビューゲート</h4>
+        <p>特定ステップで人間の承認を必須にする。コスト・安全性に関わる操作や「確信が持てない場合」に配置。Claude Code の permission system が実装例。</p>
+      </div>
+      <div class="gate-card">
+        <h4>⑦ 上限カウンター（Safety）</h4>
+        <p>最大反復回数・最大トークン使用量・最大実行時間のハードリミット。すべてのループに必須。無限ループ防止の最後の砦。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== ANTI-PATTERNS ========== -->
+  <div class="panel">
+    <h2>アンチパターン 5 選</h2>
+    <div class="anti-list">
+      <div class="anti-card">
+        <h4>① 無限ループ（Infinite Loop）</h4>
+        <p>終了条件が未定義、または達成不可能な条件を設定してしまう。最も危険なアンチパターン。APIコスト・時間が無限に消費される。</p>
+        <div class="anti-fix">✅ Fix: max_iterations・max_tokens・timeout を必ず設定。loop 開始前にログで可視化。</div>
+      </div>
+      <div class="anti-card">
+        <h4>② 自己承認ループ（Echo Chamber Loop）</h4>
+        <p>エージェントが自分で生成し、自分で評価し、自分で合格とする。外部フィードバックゲートがないため、品質が改善されない。</p>
+        <div class="anti-fix">✅ Fix: 評価は必ず外部（テスト・別モデル・人間）が行う。自己評価のみに頼らない。</div>
+      </div>
+      <div class="anti-card">
+        <h4>③ コンテキスト肥大化（Context Bloat in Loop）</h4>
+        <p>ループを重ねるたびに会話履歴・ツール出力が蓄積し、コンテキストウィンドウを圧迫。後半のループで初期の判断を「忘れる」。</p>
+        <div class="anti-fix">✅ Fix: N ループごとに状態を要約圧縮。重要な状態のみ Task State（層⑦）として明示的に管理。</div>
+      </div>
+      <div class="anti-card">
+        <h4>④ 過剰ループ（Over-Engineering the Loop）</h4>
+        <p>1 回で十分なタスクに複雑なループを設計する。オーバーヘッドが大きく、シンプルな実装より遅く高コスト。</p>
+        <div class="anti-fix">✅ Fix: まず単純実装で試す。反復が本当に必要かを検証してからループを導入。</div>
+      </div>
+      <div class="anti-card">
+        <h4>⑤ フィードバックラグ（Slow Feedback Gate）</h4>
+        <p>フィードバックゲートの実行に時間がかかりすぎてループが遅い。E2E テスト全件実行をすべてのループで行う等。</p>
+        <div class="anti-fix">✅ Fix: 高速ゲート（型チェック・単体テスト）を先に配置。遅いゲート（E2E）は最終ループのみに。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== SERIES NAVIGATION ========== -->
+  <div class="panel">
+    <h2>エンジニアリングスキル シリーズ</h2>
+    <p style="color:#c5d0e3; margin:0 0 14px;">Prompt で伝え、Context で見せ、Harness で支え、Loop で回す ── 4 つの規律は連続している。</p>
+    <div class="series-grid">
+      <a href="prompt-engineering.html" class="series-card">
+        <div class="sc-label">シリーズ ①</div>
+        <div class="sc-title">Prompt Engineering</div>
+        <div class="sc-desc">どう頼むか ── CoT から Extended Thinking まで進化史と 2026 年の実践</div>
+      </a>
+      <a href="context-engineering.html" class="series-card">
+        <div class="sc-label">シリーズ ②</div>
+        <div class="sc-title">Context Engineering</div>
+        <div class="sc-desc">何を見せるか ── 7 層モデル・RAG・Memory・Caching の設計技術</div>
+      </a>
+      <a href="harness-engineering.html" class="series-card">
+        <div class="sc-label">シリーズ ③</div>
+        <div class="sc-title">Harness Engineering</div>
+        <div class="sc-desc">どう組むか ── Tool/Memory/Validation/Orchestration の環境設計</div>
+      </a>
+      <a href="loop-engineering.html" class="series-card current">
+        <div class="sc-label">シリーズ ④ ← 当ページ</div>
+        <div class="sc-title">Loop Engineering</div>
+        <div class="sc-desc">どう回すか ── 自律エージェントが反復・自己修正する設計の最前線</div>
+      </a>
+    </div>
+    <p style="margin-top:16px; font-size:0.85rem;"><a href="index.html">← Workbench Knowledge 一覧</a> ／ <a href="../../index.html">Hub Top</a></p>
+  </div>
+
+</div>
+</body>
+</html>
