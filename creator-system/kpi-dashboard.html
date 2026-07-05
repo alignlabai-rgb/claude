@@ -42,9 +42,11 @@
     <a href="#daily" style="color: var(--accent);">日次KPI</a>
     <a href="#monthly" style="color: var(--accent);">月次収益KPI</a>
     <a href="#health" style="color: var(--accent);">システムヘルス</a>
+    <a href="#benchmark" style="color: var(--accent);">業界ベンチマーク照合</a>
     <a href="#review" style="color: var(--accent);">レビューサイクル</a>
     <a href="#triggers" style="color: var(--accent);">改善トリガー</a>
     <a href="#loop" style="color: var(--accent);">フィードバックループ</a>
+    <a href="#worked-example" style="color: var(--accent);">ループ実例（1ヶ月）</a>
   </div>
 </section>
 
@@ -223,6 +225,31 @@
         </tbody>
       </table>
     </div>
+
+    <h3 style="margin: 2.5rem 0 1rem; font-size: 1rem; color: var(--text-muted);">サンプル週次ダッシュボード（Phase 3稼働時点の想定例・数値は仮想）</h3>
+    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">
+      現在はPhase 2仕上げ段階のため実データはまだ揃っていない。Phase 3稼働後にこの形式のダッシュボードをOpenClaw経由で自動生成する想定で、レイアウトと読み方を先に固定しておく。数値は<strong style="color: var(--text);">説明用の仮想値</strong>であり実績ではない。
+    </p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>日付</th><th>ネタ生成</th><th>評価通過率</th><th>公開本数</th><th>API費用</th><th>備考</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Day 1（月）</td><td>15本</td><td>58%</td><td>4本</td><td>¥2,100</td><td>週初、平常運転</td></tr>
+          <tr><td>Day 2（火）</td><td>15本</td><td>61%</td><td>5本</td><td>¥2,400</td><td>-</td></tr>
+          <tr><td>Day 3（水）</td><td>14本</td><td>52%</td><td>3本</td><td>¥2,050</td><td>ネタ生成バッチが1回失敗（自動リトライで復旧）</td></tr>
+          <tr><td>Day 4（木）</td><td>15本</td><td>47%</td><td>3本</td><td>¥2,300</td><td style="color:#FF9E00;">通過率が目標65%の80%（52%）を下回り始める</td></tr>
+          <tr><td>Day 5（金）</td><td>15本</td><td>44%</td><td>3本</td><td>¥2,600</td><td style="color:#FF9E00;">2日連続で低下 → 週次レビューで要因分析対象に</td></tr>
+          <tr><td>Day 6（土）</td><td>12本</td><td>50%</td><td>3本</td><td>¥1,800</td><td>週末は生成本数を意図的に絞る運用</td></tr>
+          <tr><td>Day 7（日）</td><td>12本</td><td>53%</td><td>3本</td><td>¥1,750</td><td>-</td></tr>
+          <tr style="font-weight: 700;"><td>週平均</td><td>14.0本</td><td>52.1%</td><td>3.4本</td><td>¥2,143</td><td>目標65%に対し−12.9pt。翌週アクションの起案対象</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 0.75rem;">
+      このサンプルの読み方: 週平均だけでなく<strong style="color: var(--text);">「悪化が始まった日」</strong>を特定することが重要。Day 4〜5で連続低下しているため、週次レビューでは「その2日に何が変わったか」（ネタのジャンル傾向・LLMの出力傾向・外部トレンド変化など）を最初に確認する。単発の落ち込み（Day 3）はバッチ失敗という別要因なので混同しない。
+    </p>
   </div>
 </section>
 
@@ -380,11 +407,79 @@ Kindleロイヤリティ: ¥  25,000〜 35,000
   </div>
 </section>
 
+<!-- Industry Benchmark Alignment -->
+<section class="section" id="benchmark">
+  <div class="section-inner">
+    <div class="section-label">業界ベンチマーク照合</div>
+    <h2 class="section-title">このKPI設計は<br>2026年の業界水準と比べてどうか</h2>
+    <p style="color: var(--text-muted); margin-bottom: 2rem;">
+      自己流の指標だけで運用すると盲点が生まれる。外部の業界調査（2026年時点の報告ベース・出典は各カード内に記載）と本ハブの設計を突き合わせ、抜けている観点がないかを確認する。
+    </p>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+      <div class="card">
+        <div style="font-size: 0.75rem; color: #FF6B6B; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.75rem;">測定ギャップの警告</div>
+        <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.7; margin: 0;">
+          コンテンツマーケティング領域の調査では、AI活用チームの多く（報告ベースで8割超）がAI生成コンテンツ専用のKPIを持たず、「本数」だけを見て「本当にAIが成果を出しているか」を測れていないと指摘されている。本ハブは評価通過率・コスト効率・収益相関を分離して追う設計にしており、この落とし穴を先回りして回避している。
+        </p>
+      </div>
+      <div class="card">
+        <div style="font-size: 0.75rem; color: var(--accent); font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.75rem;">量と質のトレードオフ</div>
+        <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.7; margin: 0;">
+          「薄い内容を大量publishするより、質の高い少数を出す方が成果が出やすい」という報告が複数ある（目安値）。本ハブの評価通過率ゲート（55点未満は破棄）はこの考え方と一致する。<strong style="color: var(--text);">生成本数を目標に含めつつも、公開の主指標は「通過率 × 生成本数」であって生成本数単体ではない</strong>ことを改めて明記する。
+        </p>
+      </div>
+      <div class="card">
+        <div style="font-size: 0.75rem; color: #4FFFB0; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.75rem;">クリエイティブ・フィードバックループの3指標</div>
+        <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.7; margin: 0;">
+          生成AIクリエイティブ運用の外部知見では、ループが機能しているかを①<strong style="color: var(--text);">iteration velocity</strong>（成果シグナルから次の改善が市場に出るまでの時間。目安は72時間以内）②<strong style="color: var(--text);">attribute lift rate</strong>（採用した成功パターンが実際に成績を押し上げているか）③<strong style="color: var(--text);">brief書き換え頻度</strong>（システムが自動化されるほどゼロに近づくべき）の3つで判定するという考え方がある。本ハブの週次・月次サイクルは①に相当し、月次の重み調整ルールは②③に相当する。
+        </p>
+      </div>
+    </div>
+
+    <p style="color: var(--text-muted); margin-bottom: 1rem;">
+      さらに、このKPIダッシュボード自体は独立した仕組みではなく、<a href="../workbench/knowledge/loop-engineering.html" style="color: var(--accent);">workbench/knowledge/loop-engineering.html</a> が定義する「信頼できるループを作る7つのフィードバックゲート」の具体的な実装のひとつである。抽象的なゲート類型と本システムの実装箇所を対応させると、設計の抜け漏れが見えやすくなる。
+    </p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>フィードバックゲート類型</th><th>本システムでの実装</th><th>該当セクション</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>① テストスイート（バイナリ判定）</td><td>バッチ成功率・ジョブ成功率チェック</td><td><a href="#health" style="color: var(--accent);">システムヘルス指標</a></td></tr>
+          <tr><td>② 型チェッカー相当</td><td>ネタJSON・評価出力のスキーマ検証（形式不正は自動破棄）</td><td><a href="#health" style="color: var(--accent);">ネタ生成バッチ成功率</a></td></tr>
+          <tr><td>③ Linter / Formatter相当</td><td>タイトル・タグのSEOフォーマットチェック</td><td>評価システムのSEOスコア（<a href="evaluation.html" style="color: var(--accent);">evaluation.html</a>）</td></tr>
+          <tr><td>④ LLM-as-judge</td><td>10項目スコアリング（エンゲージメント予測・コンテンツ品質等）</td><td>評価通過率（<a href="evaluation.html" style="color: var(--accent);">evaluation.html</a>）</td></tr>
+          <tr><td>⑤ ビジュアル差分</td><td>CLIPスコアによるキャラクター一致度チェック（漫画パイプライン）</td><td><a href="evaluation.html#clip" style="color: var(--accent);">evaluation.html CLIP実装</a></td></tr>
+          <tr><td>⑥ 人間レビューゲート</td><td>評価スコア55〜69点のHITL転送、コンプライアンス疑いの強制人間確認</td><td><a href="#triggers" style="color: var(--accent);">改善トリガー定義</a></td></tr>
+          <tr><td>⑦ 上限カウンター（Safety）</td><td>API費用が日次上限の2倍超で自動停止、バッチ3回連続失敗でアラート</td><td><a href="#triggers" style="color: var(--accent);">改善トリガー定義</a></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="color: var(--text-muted); font-size: 0.82rem; margin-top: 0.75rem;">
+      ※ この対応表は「KPIダッシュボードが単なる集計ではなく、ループを健全に保つためのゲート集合である」ことを明示するために作成した。新しい指標を追加する際は、どのゲート類型に属するかをまず考えると設計がぶれにくい。
+    </p>
+  </div>
+</section>
+
 <!-- Review Cycle -->
 <section class="section" id="review">
   <div class="section-inner">
     <div class="section-label">レビューサイクル</div>
     <h2 class="section-title">週次・月次で<br>何を見て何を判断するか</h2>
+    <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+      レビューは「週次・月次」の2階層に加え、Phase 3稼働後は<strong style="color: var(--text);">日次クイックチェック</strong>を運用の下地として推奨する。日次は判断を行わず異常の早期検知のみに限定し、週次・月次の負荷を上げないことを目的とする。
+    </p>
+    <div style="background: rgba(0,212,255,0.06); border: 1px solid rgba(0,212,255,0.2); border-radius: 14px; padding: 1.25rem; margin-bottom: 2rem;">
+      <div style="font-size: 0.8rem; font-weight: 700; color: var(--accent); margin-bottom: 0.5rem;">日次クイックチェック（毎朝1〜2分・任意運用）</div>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0 0 0.5rem;">OpenClawからのSignal通知を確認するだけの受動チェック。能動的な分析はしない。</p>
+      <ul style="font-size: 0.84rem; color: var(--text-muted); padding-left: 1.2rem; line-height: 1.9; margin: 0;">
+        <li>前日のALERT通知が来ていないか（来ていれば即改善トリガーの該当項目を確認）</li>
+        <li>API費用が日次上限を超えていないか（超過なら当日中に対応、週次を待たない）</li>
+        <li>数値の深掘りはしない — 「異常の有無」だけを見て、深掘りは週次レビューに委ねる</li>
+      </ul>
+    </div>
     <div class="two-col">
       <div>
         <h3 style="margin-bottom: 1.25rem; font-size: 1.05rem; color: var(--accent);">週次レビュー（毎週月曜 15分）</h3>
@@ -445,6 +540,21 @@ Kindleロイヤリティ: ¥  25,000〜 35,000
         </div>
       </div>
     </div>
+
+    <h3 style="margin: 2.5rem 0 1rem; font-size: 1rem; color: var(--text-muted);">週次レビュー記録テンプレート（そのままコピーして使う）</h3>
+    <div class="code-block">
+<span class="cm"># weekly_review_YYYY_WW.md</span>
+<span class="fn">期間</span>: 2026-MM-DD 〜 2026-MM-DD
+<span class="fn">ヘルス</span>: バッチ成功率 __% / ALERT件数 __件 / 未解決 __件
+<span class="fn">生産KPI</span>: 生成 __本 / 通過率 __% (目標比 __%) / 公開 __本 / コスト ¥__
+<span class="fn">悪化開始日</span>: __月__日（通過率が目標80%を割った最初の日）
+<span class="fn">今週の変更</span>: [変更したプロンプト/設定を1つだけ記載]
+<span class="fn">変更理由</span>: [なぜその変更が原因と推定したか]
+<span class="fn">成功判定条件</span>: [来週この数値になれば成功とみなす、の具体値]
+<span class="fn">持ち越し課題</span>: [来週以降に回す項目。放置せず必ず記載]</div>
+    <p style="color: var(--text-muted); font-size: 0.82rem; margin-top: 0.75rem;">
+      「今週の変更」を1つに絞るのは月次チューニング手順（<a href="evaluation.html" style="color: var(--accent);">evaluation.html</a>）と同じ思想。複数同時変更すると、通過率が改善しても<strong style="color: var(--text);">何が効いたか</strong>を来月以降に説明できなくなる。
+    </p>
   </div>
 </section>
 
@@ -498,7 +608,41 @@ Kindleロイヤリティ: ¥  25,000〜 35,000
         <div style="font-size: 0.82rem; color: var(--text-muted);">genai-tools.html の比較表を更新。5本分のテスト生成を実施してコスト・品質を比較。既存ツールと比較して有意差があれば翌月のツール構成を変更。変更の判断をADRに記録。</div>
       </div>
 
+      <div style="background: rgba(0,212,255,0.06); border: 1px solid rgba(0,212,255,0.2); border-radius: 14px; padding: 1.25rem; display: grid; grid-template-columns: 180px 1fr; gap: 1rem; align-items: start;">
+        <div>
+          <div style="font-size: 0.75rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.35rem;">MEDIUM</div>
+          <div style="font-size: 0.85rem; font-weight: 700;">改善の反映が72時間以内に間に合わない（iteration velocity低下）</div>
+        </div>
+        <div style="font-size: 0.82rem; color: var(--text-muted);">業界の目安値では「成果シグナルを検知してから次の改善版が本番に出るまで72時間以内」が健全なループの基準とされる（<a href="#benchmark" style="color: var(--accent);">業界ベンチマーク照合</a>参照）。週次レビューで決めた変更が翌週の生成に反映されていなければ、変更適用の運用フロー自体（誰が・いつ・どのファイルを触るか）を見直す。</div>
+      </div>
+
+      <div style="background: rgba(0,212,255,0.06); border: 1px solid rgba(0,212,255,0.2); border-radius: 14px; padding: 1.25rem; display: grid; grid-template-columns: 180px 1fr; gap: 1rem; align-items: start;">
+        <div>
+          <div style="font-size: 0.75rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.35rem;">MEDIUM</div>
+          <div style="font-size: 0.85rem; font-weight: 700;">評価スコアは高いのに再生数・購入数が伸びない（コンテンツ疲労）</div>
+        </div>
+        <div style="font-size: 0.82rem; color: var(--text-muted);">AI評価スコアと実エンゲージメントの相関が崩れ始めているサイン。同じジャンル・同じフォーマットの繰り返しで視聴者が飽きている可能性が高い。月次チューニング（<a href="evaluation.html" style="color: var(--accent);">evaluation.html</a>）でエンゲージメント予測スコアの重みを見直すか、ネタのジャンルローテーションを強制する。</div>
+      </div>
+
     </div>
+
+    <h3 style="margin: 2.5rem 0 1rem; font-size: 1rem; color: var(--text-muted);">閾値サマリー（早見表）</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>指標</th><th>正常</th><th>注意（週次で確認）</th><th>トリガー閾値</th><th>対応の重さ</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>バッチ連続失敗</td><td>0回</td><td>1〜2回</td><td>3回連続</td><td style="color:#FF6B6B; font-weight:700;">CRITICAL</td></tr>
+          <tr><td>日次API費用</td><td>目標以下</td><td>目標の1〜2倍</td><td>目標の2倍超</td><td style="color:#FF6B6B; font-weight:700;">CRITICAL</td></tr>
+          <tr><td>評価通過率</td><td>目標以上</td><td>目標の80〜100%</td><td>45%未満が2週連続</td><td style="color:#FF9E00; font-weight:700;">HIGH</td></tr>
+          <tr><td>月収</td><td>目標達成</td><td>目標の50〜100%</td><td>目標の50%未満</td><td style="color:#FF9E00; font-weight:700;">HIGH</td></tr>
+          <tr><td>改善反映までの時間</td><td>72時間以内</td><td>72〜168時間</td><td>168時間（1週）超</td><td style="color:var(--accent); font-weight:700;">MEDIUM</td></tr>
+          <tr><td>スコア高×実績低の乖離</td><td>相関あり</td><td>1ヶ月乖離</td><td>2ヶ月連続乖離</td><td style="color:var(--accent); font-weight:700;">MEDIUM</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="color: var(--text-muted); font-size: 0.82rem; margin-top: 0.75rem;">※ 「正常」「注意」帯の具体的な数値幅はPhase 3の実データ蓄積後にADRで確定させる。現時点は設計上の目安値。</p>
   </div>
 </section>
 
@@ -586,6 +730,72 @@ Kindleロイヤリティ: ¥  25,000〜 35,000
   </div>
 </section>
 
+<!-- Worked Example -->
+<section class="section" style="background: var(--bg2);" id="worked-example">
+  <div class="section-inner">
+    <div class="section-label">ループ実例（1ヶ月分・架空シナリオ）</div>
+    <h2 class="section-title">上の図が実際に<br>どう動くかの通し例</h2>
+    <p style="color: var(--text-muted); margin-bottom: 2rem;">
+      抽象的な図だけでは「実際に何をするか」が伝わりにくい。以下は<strong style="color: var(--text);">架空の1ヶ月サイクルを想定した説明用の通し例</strong>であり、実績データではない。Phase 3稼働後、この形式で実データを記録していく想定のテンプレートとして読む。
+    </p>
+
+    <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem;">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+          <div style="background: rgba(255,158,0,0.15); border: 1px solid rgba(255,158,0,0.3); color: #FF9E00; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-weight: 900; flex-shrink: 0;">1</div>
+          <h3 style="margin: 0; font-size: 1rem;">Week 1 — 通常運転からの逸脱を検知</h3>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.8; margin: 0;">
+          週平均: 生成14.0本／通過率52.1%（目標65%比 −12.9pt）／公開3.4本／コスト¥2,143。
+          日次クイックチェックではDay 4〜5でALERTなし（45%閾値には未到達）だが、週次レビューで「目標の80%ライン」を下回っていることに気づく。評価ログを見ると、下がっているのは主にSEOスコアとエンゲージメント予測スコアで、ビジュアル・安全性は正常。<strong style="color: var(--text);">「翌週アクション決定」ルールに従い、変更は1つだけに絞る</strong> — 今回はネタ展開プロンプトの「SEOキーワード密度」の指示を改訂することに決定。成功判定条件は「来週の通過率が58%以上に回復すること」とメモに残す。
+        </p>
+      </div>
+
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem;">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+          <div style="background: rgba(0,212,255,0.15); border: 1px solid rgba(0,212,255,0.3); color: var(--accent); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-weight: 900; flex-shrink: 0;">2</div>
+          <h3 style="margin: 0; font-size: 1rem;">Week 2 — 変更を反映し、効果を観測</h3>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.8; margin: 0;">
+          プロンプト変更を週初に適用（改善反映まで約48時間 — 72時間の目安内に収まる）。週平均通過率は59%まで回復。目標には届かないが「成功判定条件（58%以上）」はクリアしたため、この変更は維持する。同時にコスト効率も改善（¥2,143 → ¥1,980）。ここで2つ目の課題（エンゲージメント予測の弱さ）が残っているが、月次レビューまで「持ち越し課題」として記録し、今週は追加変更をしない。
+        </p>
+      </div>
+
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem;">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+          <div style="background: rgba(79,255,176,0.15); border: 1px solid rgba(79,255,176,0.3); color: #4FFFB0; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-weight: 900; flex-shrink: 0;">3</div>
+          <h3 style="margin: 0; font-size: 1rem;">Week 3 — 収益データが初めて意味を持ち始める</h3>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.8; margin: 0;">
+          通過率63%まで回復し、公開本数も安定。ここで初めて「公開後7日間のエンゲージメント」データが十分な件数（目安30本以上）に達し、月次分析に使えるサンプルサイズになる。上位5本を確認すると、共通点として「タイトルに具体的な数字を含む」パターンが浮かぶ（例: 「3つの理由」「7日間で」等）。ただしサンプルがまだ1ヶ月分のため、この時点では「候補」であって確定した変更対象にはしない（月次チューニング手順の「2ヶ月連続で同じ傾向」ルールに従う）。
+        </p>
+      </div>
+
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem;">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+          <div style="background: rgba(255,107,107,0.15); border: 1px solid rgba(255,107,107,0.3); color: #FF6B6B; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-weight: 900; flex-shrink: 0;">4</div>
+          <h3 style="margin: 0; font-size: 1rem;">Week 4 / 月次レビュー — 収益 → ネタ生成AIへのフィードバックを確定</h3>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.8; margin: 0;">
+          月末に評価ログCSVを集計（<a href="evaluation.html" style="color: var(--accent);">evaluation.html の月次チューニング手順</a>と同じ形式）。通過率は月初38%→月末65%へ改善、コストは月間で約8%削減。「具体的な数字を含むタイトル」パターンは今月時点ではまだ1ヶ月目のため<strong style="color: var(--text);">来月も同じ傾向が出るかを確認してから</strong>ネタ生成プロンプトの成功パターンDBに正式追加する判断とする。一方、SEOキーワード密度の変更（Week 1）は効果が明確なため、変更内容と根拠をADR（<a href="../foundations/decisions.html" style="color: var(--accent);">foundations/decisions.html</a>）に記録して恒久化する。
+        </p>
+      </div>
+
+    </div>
+
+    <div style="margin-top: 1.5rem; background: rgba(108,60,225,0.08); border: 1px solid rgba(108,60,225,0.25); border-radius: 12px; padding: 1.25rem 1.5rem;">
+      <div style="font-size: 0.8rem; font-weight: 700; color: #a48cf5; margin-bottom: 0.5rem;">この通し例からわかること</div>
+      <ul style="font-size: 0.85rem; color: var(--text-muted); padding-left: 1.2rem; line-height: 1.9; margin: 0;">
+        <li>週次ループ（評価→ネタ生成）と月次ループ（収益→ネタ生成）は<strong style="color: var(--text);">別々の速度</strong>で回る — 週次は仮説検証、月次は確定判断</li>
+        <li>「候補」と「確定した変更」を区別する（1回の傾向で飛びつかない）ことが、ループを壊さない鍵</li>
+        <li>1回の変更を1指標に絞ることで、Week 2の効果測定がノイズなく行えている</li>
+        <li>数値そのものより「悪化・回復のタイミングを特定できているか」が本質</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
 <footer>
   <div class="footer-inner">
     <div class="footer-logo">AI Creator Hub</div>
@@ -600,7 +810,7 @@ Kindleロイヤリティ: ¥  25,000〜 35,000
       <a href="kpi-dashboard.html">KPI</a>
     </nav>
     <p>AI Creator Hub — AIでコンテンツをつくり、稼ぐ</p>
-    <p style="font-size:0.8rem;opacity:0.65;">最終更新: 2026-05-30（KPIダッシュボード初版作成 — フェーズ別KPI・ヘルス指標・レビューサイクル・改善トリガー・フィードバックループを定義）</p>
+    <p style="font-size:0.8rem;opacity:0.65;">最終更新: 2026-07-05（大幅拡充 — 業界ベンチマーク照合・7フィードバックゲート対応表・サンプル週次ダッシュボード・日次クイックチェック・閾値早見表・1ヶ月分のループ実例を追加）</p>
   </div>
 </footer>
 

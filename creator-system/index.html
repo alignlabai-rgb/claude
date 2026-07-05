@@ -34,7 +34,7 @@
 <section class="hero">
   <div class="hero-bg"></div>
   <div class="hero-content">
-    <div class="hero-badge"><span class="dot-live"></span>Phase 2 仕上げ → Phase 3 本格実装へ</div>
+    <div class="hero-badge"><span class="dot-live"></span>Phase 3 本格実装 進行中（2026年6月: note展開・評価通過率48%まで改善）</div>
     <h1 class="fade-up">
       ネタ文章を流すだけで<br>
       <span class="gradient-text">AI が作品をつくり、稼ぐ</span>
@@ -375,9 +375,11 @@
           <div class="timeline-date">2026 Q2 — Q3</div>
         </div>
         <div class="timeline-body">
-          <div class="timeline-milestone current">◉ マネタイズ自動化フル稼働へ移行中</div>
-          <div class="timeline-milestone current">◉ 収益フィードバックループ構築</div>
+          <div class="timeline-milestone done">✓ note自動投稿を追加（プラットフォーム展開数 1→2）</div>
+          <div class="timeline-milestone current">◉ マネタイズ自動化フル稼働へ移行中（YouTube・note）</div>
+          <div class="timeline-milestone current">◉ 収益フィードバックループ構築・評価閾値の月次チューニング</div>
           <div class="timeline-milestone pending">○ A/Bテスト自動化</div>
+          <div class="timeline-milestone pending">○ Kindle・Booth 自動投稿の実装</div>
           <div class="timeline-milestone pending">○ 月30本量産体制確立</div>
         </div>
       </div>
@@ -398,6 +400,50 @@
           <div class="timeline-milestone pending">○ 収益 ¥500,000/月 達成</div>
         </div>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== G. 外部環境アップデート（2026年6月） ===== -->
+<section class="section" id="market-update">
+  <div class="section-inner">
+    <div class="section-label">外部環境アップデート</div>
+    <h2 class="section-title">2026年6月、パイプラインの<br>前提が動いた1ヶ月</h2>
+    <p class="section-desc">
+      生成AI領域は毎月のように地図が変わります。Phase 3 の判断に関わる範囲で、5月末以降の変化を棚卸しします
+      （詳細な横断比較は <a href="genai-tools.html">genai-tools.html</a> を参照）。
+    </p>
+
+    <div class="two-col">
+      <div>
+        <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--text-muted);">動画・画像生成まわり</h3>
+        <ul class="checklist">
+          <li><strong>RunwayML が Gen-4.5 へ更新。</strong>本編・キーカット用の高品質枠として継続採用。</li>
+          <li><strong>Kling が 3.0 / 3.5 へ更新。</strong>3.5 はブラウザ完結・1080p/60fps に対応し、量産用フォールバック先としての優位性が拡大（コスト効率が高いとの報告ベース）。</li>
+          <li><strong>Sora はコンシューマー版終了（4/26）が既定路線として定着。</strong>API版は継続のため、本パイプラインは元々 Runway/Kling 主軸のままで影響は限定的。</li>
+          <li>人間評価ベースの動画リーダーボードでは Grok Imagine Video・Veo 3.1・WAN Video 2.6 が上位という報告あり（5月時点・変動しうる）。</li>
+        </ul>
+      </div>
+      <div>
+        <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--text-muted);">LLM・エージェント基盤</h3>
+        <ul class="checklist">
+          <li><strong>Claude Sonnet 5</strong> が6/30にGA、Free/Proの既定モデルに。スクリプト生成・評価テキストの主力候補として検証中。</li>
+          <li><strong>Claude Fable 5</strong> は6/9に追加された最上位モデルだが、6/12の米輸出管理指示で一時アクセス停止 → 6/30に規制解除、7/1にグローバル再開という経緯を辿った（下記リスク章に教訓を反映）。</li>
+          <li><strong>GPT-5.5 Instant</strong> は6/24に会話品質・指示追従の改善アップデート。後継の <strong>GPT-5.6（Sol/Terra/Luna）</strong>は6/26に限定Preview開始したが、API/Codexの信頼パートナー限定でまだ本パイプラインからは利用不可。</li>
+          <li><strong>Gemini 3.5 Flash</strong> がGA（3.5 Pro は7月GA予定と報告）。評価AI（Vision採点）の次期候補として比較検討中。</li>
+        </ul>
+      </div>
+    </div>
+
+    <div style="margin-top: 1.5rem; background: rgba(61,216,197,0.08); border: 1px solid rgba(61,216,197,0.3); border-radius: 16px; padding: 1.5rem;">
+      <h3 style="margin-bottom: 0.75rem; font-size: 1rem; color: #3dd8c5;">新顔: Gemini Omni / Omni Flash・Gemini Spark</h3>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.75rem;">
+        Google I/O 2026 で公開された2つの新機軸が、このパイプラインの設計に間接的に関わってきます。
+      </p>
+      <ul class="checklist">
+        <li><strong>Gemini Omni Flash</strong>: テキスト・画像・動画から動画生成・会話型編集まで行う統合モデル。現状10秒動画までのプレビュー段階（動画出力1秒あたり $0.10 目安 = Veo 3.1 Fast相当と報告）。Runway/Klingに次ぐ第3のフォールバック候補として評価予定（未採用・検証段階）。詳細は <a href="../workbench/knowledge/gemini-omni.html">gemini-omni.html</a>。</li>
+        <li><strong>Gemini Spark</strong>: Google AI Ultra 向けの「24時間稼働する汎用パーソナルAIエージェント」。OpenClaw が目指す「非同期・常時稼働のオーケストレーション」と設計思想が近く、外部の参照実装として動向を追う価値がある（本システムへの直接導入は検討していない）。詳細は <a href="../workbench/knowledge/gemini-spark.html">gemini-spark.html</a>。</li>
+      </ul>
     </div>
   </div>
 </section>
@@ -499,20 +545,20 @@
               <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem;">コンテンツ生成</div>
               <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
                 <span class="tag tag-purple">GPT-5.5 Instant</span>
-                <span class="tag tag-purple">Claude Sonnet 4.6</span>
-                <span class="tag tag-purple">Gemini 3.1 Pro</span>
-                <span class="tag tag-cyan">Stable Diffusion</span>
+                <span class="tag tag-purple">Claude Sonnet 5</span>
+                <span class="tag tag-purple">Gemini 3.5 Flash</span>
+                <span class="tag tag-cyan">Stable Diffusion XL</span>
                 <span class="tag tag-cyan">Midjourney</span>
-                <span class="tag tag-cyan">RunwayML Gen-4</span>
+                <span class="tag tag-cyan">RunwayML Gen-4.5</span>
               </div>
             </div>
             <div>
               <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem;">音声・動画</div>
               <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
                 <span class="tag tag-orange">ElevenLabs v3</span>
-                <span class="tag tag-orange">Sora 2.0</span>
-                <span class="tag tag-orange">Kling AI 2.0</span>
+                <span class="tag tag-orange">Kling 3.0/3.5</span>
                 <span class="tag tag-orange">FFmpeg</span>
+                <span class="tag tag-orange" style="opacity:0.7;">Gemini Omni Flash（検証中）</span>
               </div>
             </div>
             <div>
@@ -562,24 +608,24 @@
         <tbody>
           <tr>
             <td><span class="tag tag-purple">スクリプト</span></td>
-            <td>GPT-5.5 / Claude Sonnet 4.6</td>
+            <td>GPT-5.5 Instant / Claude Sonnet 5</td>
             <td>ネタ→台本・セリフ変換</td>
             <td>日本語品質・コスト・API安定性のバランスが最良</td>
-            <td>Gemini 3.1 Pro（長文向け）</td>
+            <td>Gemini 3.5 Flash（長文・高速処理向け）</td>
           </tr>
           <tr>
             <td><span class="tag tag-cyan">画像生成</span></td>
-            <td>Midjourney v7</td>
+            <td>Midjourney</td>
             <td>シーン・サムネイル画像</td>
             <td>商用利用OK・クオリティ最高水準・スタイル一貫性</td>
-            <td>DALL-E 4, Stable Diffusion XL</td>
+            <td>Imagen（指示忠実度）, Stable Diffusion XL</td>
           </tr>
           <tr>
             <td><span class="tag tag-cyan">動画生成</span></td>
-            <td>RunwayML Gen-4</td>
+            <td>RunwayML Gen-4.5</td>
             <td>静止画→動画クリップ変換</td>
             <td>最長16秒・高品質・APIアクセス可能</td>
-            <td>Kling AI 2.0（高負荷時フォールバック・約40%安）</td>
+            <td>Kling 3.0/3.5（高負荷時フォールバック・コスト効率が高いと報告）</td>
           </tr>
           <tr>
             <td><span class="tag tag-orange">音声合成</span></td>
@@ -590,10 +636,10 @@
           </tr>
           <tr>
             <td><span class="tag tag-orange">BGM</span></td>
-            <td>Suno AI v4</td>
+            <td>Suno</td>
             <td>動画BGM自動生成</td>
-            <td>プロンプトで雰囲気指定可・商用ライセンス対応</td>
-            <td>Udio, MusicFX</td>
+            <td>プロンプトで雰囲気指定可・ジャンル網羅（商用利用は都度規約確認）</td>
+            <td>Udio（完成度重視）</td>
           </tr>
           <tr>
             <td><span class="tag tag-orange">動画編集</span></td>
@@ -606,15 +652,15 @@
             <td><span class="tag tag-green">オーケストレーション</span></td>
             <td>OpenClaw</td>
             <td>全パイプライン統合管理</td>
-            <td>独自開発・要件に完全対応・拡張自由度最高</td>
+            <td>独自開発・要件に完全対応・拡張自由度最高。Gemini Spark 等の「常時稼働エージェント」潮流とも設計思想が近い</td>
             <td>n8n（GUI）, Zapier（ノーコード）</td>
           </tr>
           <tr>
             <td><span class="tag tag-purple">評価AI</span></td>
-            <td>Gemini 3.1 Pro (Vision)</td>
+            <td>Gemini 3.5 Flash (Vision)</td>
             <td>映像・画像品質スコアリング</td>
             <td>マルチモーダル対応・長コンテキスト・コスト効率</td>
-            <td>GPT-4o Vision</td>
+            <td>GPT-5.5 Vision</td>
           </tr>
           <tr>
             <td><span class="tag tag-purple">漫画生成</span></td>
@@ -626,7 +672,53 @@
         </tbody>
       </table>
     </div>
-    <p style="color: var(--text-muted); font-size: 0.82rem;">※ 全ツールはAPIコスト・品質・商用利用ライセンスの3軸で選定。高負荷時の自動フォールバック先を必ず確保。</p>
+    <p style="color: var(--text-muted); font-size: 0.82rem;">※ 全ツールはAPIコスト・品質・商用利用ライセンスの3軸で選定。高負荷時の自動フォールバック先を必ず確保。バージョン・料金・リーダーボード順位は変動するため、確証のない数値は相対表記・報告ベースに留めています（詳細比較は <a href="genai-tools.html" style="color: var(--accent);">genai-tools.html</a>）。</p>
+  </div>
+</section>
+
+<!-- ===== H. 運用プラクティス・関連ナレッジ ===== -->
+<section class="section" id="knowledge-links" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-label">運用プラクティス</div>
+    <h2 class="section-title">ツール選定の先にある、<br>「使いこなし」のナレッジ</h2>
+    <p class="section-desc">
+      ツールを選ぶだけでは量産は回りません。プロンプト設計・自己改善ループの組み方といった運用ノウハウは
+      <code>workbench/knowledge/</code> 側に蓄積しています。このパイプラインの各工程と特に関係が深いページを以下にまとめます。
+    </p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>知りたいこと</th><th>参照ページ</th><th>このパイプラインとの関係</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>ネタ生成・評価スコアリングのプロンプト設計</strong></td>
+            <td><a href="../workbench/knowledge/prompt-engineering.html">prompt-engineering.html</a></td>
+            <td>topic-generator・content-evaluator の展開/採点プロンプトを組む際の基礎パターン</td>
+          </tr>
+          <tr>
+            <td><strong>収益フィードバックループの一般設計原則</strong></td>
+            <td><a href="../workbench/knowledge/loop-engineering.html">loop-engineering.html</a></td>
+            <td>Plan→Act→Observe→Reflect の型。マネタイズ→ネタ生成AIへの環流ループの設計根拠</td>
+          </tr>
+          <tr>
+            <td><strong>ComfyUIノード・LoRA運用の基礎</strong></td>
+            <td><a href="../workbench/knowledge/comfyui.html">comfyui.html</a></td>
+            <td>漫画パイプラインのキャラ一貫生成バックエンド</td>
+          </tr>
+          <tr>
+            <td><strong>Gemini Omniの動画生成統合を詳しく知りたい</strong></td>
+            <td><a href="../workbench/knowledge/gemini-omni.html">gemini-omni.html</a></td>
+            <td>動画生成フォールバックの第3候補として比較検討中（未採用）</td>
+          </tr>
+          <tr>
+            <td><strong>常時稼働型エージェントの設計思想</strong></td>
+            <td><a href="../workbench/knowledge/gemini-spark.html">gemini-spark.html</a></td>
+            <td>OpenClawオーケストレーション層の外部参照実装として動向を追う</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </section>
 
@@ -734,11 +826,11 @@
         <div class="risk-body">
           <div class="risk-section">
             <div class="risk-section-label">リスク内容</div>
-            <div class="risk-section-text">RunwayML・ElevenLabs等のサービスが突然終了、または料金体系が大幅変更されるリスク。</div>
+            <div class="risk-section-text">RunwayML・ElevenLabs等のサービスが突然終了、または料金体系が大幅変更されるリスク。規制起因の停止もありうる（例: Claude Fable 5 / Mythos 5 は2026-06-12に米輸出管理指示で全ユーザーアクセスが一時停止し、6-30の規制解除を経て7-1にグローバル再開した事例が報告されている。本パイプラインは主力モデルとしてFable系に依存していないため影響は受けなかったが、単一モデル依存のリスクを裏付ける実例として記録）。</div>
           </div>
           <div class="risk-section">
             <div class="risk-section-label">対策</div>
-            <div class="risk-section-text">全工程に代替ツールを定義済み。OSS代替（FFmpeg・VOICEVOX・Stable Diffusion）でオフライン稼働できる構成を維持。</div>
+            <div class="risk-section-text">全工程に代替ツールを定義済み。OSS代替（FFmpeg・VOICEVOX・Stable Diffusion）でオフライン稼働できる構成を維持。LLM層もGPT-5.5系・Claude Sonnet系・Gemini系の複数プロバイダーに分散し、特定モデルの停止が全体停止に波及しない設計を継続。</div>
           </div>
         </div>
       </div>
@@ -760,17 +852,17 @@
               <tr><th>ツール</th><th>用途</th><th>概算コスト</th></tr>
             </thead>
             <tbody>
-              <tr><td>GPT-5.5 / Claude Sonnet 4.6</td><td>スクリプト生成</td><td>¥0（サブスク利用）〜¥25</td></tr>
-              <tr><td>Midjourney / DALL-E 4</td><td>シーン画像生成</td><td>¥30〜80</td></tr>
-              <tr><td>RunwayML Gen-4</td><td>動画クリップ生成</td><td>¥50〜150</td></tr>
+              <tr><td>GPT-5.5 Instant / Claude Sonnet 5</td><td>スクリプト生成</td><td>¥0（サブスク利用）〜¥25</td></tr>
+              <tr><td>Midjourney / Imagen</td><td>シーン画像生成</td><td>¥30〜80</td></tr>
+              <tr><td>RunwayML Gen-4.5</td><td>動画クリップ生成</td><td>¥50〜150</td></tr>
               <tr><td>ElevenLabs v3</td><td>ナレーション音声</td><td>¥15〜40</td></tr>
-              <tr><td>Suno AI v4</td><td>BGM生成</td><td>¥5〜15</td></tr>
+              <tr><td>Suno</td><td>BGM生成</td><td>¥5〜15</td></tr>
               <tr><td>評価・投稿API</td><td>Vision AI・YouTube API</td><td>¥5〜10</td></tr>
               <tr style="font-weight: 700;"><td colspan="2">合計（ショート1本）</td><td>¥115〜320</td></tr>
             </tbody>
           </table>
         </div>
-        <p style="color: var(--text-muted); font-size: 0.82rem; margin-top: 0.75rem;">※ RunwayML高負荷時はKling AI 2.0へ自動フォールバック（約40%コスト削減）</p>
+        <p style="color: var(--text-muted); font-size: 0.82rem; margin-top: 0.75rem;">※ RunwayML高負荷時はKling 3.0/3.5へ自動フォールバック（コスト効率が高いと報告ベース）。具体的な削減率は継続測定中で、確証値ではなく目安として扱う。</p>
       </div>
       <div>
         <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--text-muted);">月間収支シミュレーション</h3>
@@ -805,79 +897,79 @@
     <div class="section-label">進捗 KPI</div>
     <h2 class="section-title">目標値と<br>現在の達成状況</h2>
     <p class="section-desc">
-      Phase 2 仕上げ時点（2026年5月）の現在値と、Phase 3 完了時の目標値を比較します。
+      Phase 3 進行中（2026年6月末時点）の現在値と、Phase 3 完了時の目標値を比較します。
     </p>
 
     <div class="kpi-grid">
       <div class="kpi-card">
         <div class="kpi-header">
           <div class="kpi-label">月間公開本数</div>
-          <div class="kpi-values"><span class="kpi-current">8本</span> / <span class="kpi-target">目標 20本</span></div>
+          <div class="kpi-values"><span class="kpi-current">13本</span> / <span class="kpi-target">目標 20本</span></div>
         </div>
         <div class="kpi-bar-track">
-          <div class="kpi-bar-fill" style="width: 40%; background: linear-gradient(90deg, #6C3CE1, #00D4FF);"></div>
+          <div class="kpi-bar-fill" style="width: 65%; background: linear-gradient(90deg, #6C3CE1, #00D4FF);"></div>
         </div>
-        <div class="kpi-note">評価システム統合済み。Phase 3 で量産配信を回し月20本体制へ移行予定。</div>
+        <div class="kpi-note">評価システム統合済み。note展開により公開先が増え、5月比+5本。月20本体制へ引き続き移行中。</div>
       </div>
 
       <div class="kpi-card">
         <div class="kpi-header">
           <div class="kpi-label">評価通過率</div>
-          <div class="kpi-values"><span class="kpi-current">40%</span> / <span class="kpi-target">目標 65%</span></div>
+          <div class="kpi-values"><span class="kpi-current">48%</span> / <span class="kpi-target">目標 65%</span></div>
         </div>
         <div class="kpi-bar-track">
-          <div class="kpi-bar-fill" style="width: 62%; background: linear-gradient(90deg, #FF6B6B, #FF9E00);"></div>
+          <div class="kpi-bar-fill" style="width: 74%; background: linear-gradient(90deg, #FF6B6B, #FF9E00);"></div>
         </div>
-        <div class="kpi-note">スコアリングロジック改善中。閾値調整とフィードバックループで65%を目指す。</div>
+        <div class="kpi-note">スコアリング閾値の月次チューニングで5月の40%から改善。フィードバックループで65%を目指す。</div>
       </div>
 
       <div class="kpi-card">
         <div class="kpi-header">
           <div class="kpi-label">API コスト効率（ROI）</div>
-          <div class="kpi-values"><span class="kpi-current">2.1x</span> / <span class="kpi-target">目標 5x</span></div>
+          <div class="kpi-values"><span class="kpi-current">2.8x</span> / <span class="kpi-target">目標 5x</span></div>
         </div>
         <div class="kpi-bar-track">
-          <div class="kpi-bar-fill" style="width: 42%; background: linear-gradient(90deg, #00DC82, #00D4FF);"></div>
+          <div class="kpi-bar-fill" style="width: 56%; background: linear-gradient(90deg, #00DC82, #00D4FF);"></div>
         </div>
-        <div class="kpi-note">現在は実験的なAPIコストが高め。量産スケール時にROI大幅改善を見込む。</div>
+        <div class="kpi-note">Runway→Klingフォールバック比率の調整でコスト効率が改善中。量産スケール時にさらなる向上を見込む。</div>
       </div>
 
       <div class="kpi-card">
         <div class="kpi-header">
           <div class="kpi-label">パイプライン自動化率</div>
-          <div class="kpi-values"><span class="kpi-current">73%</span> / <span class="kpi-target">目標 95%</span></div>
+          <div class="kpi-values"><span class="kpi-current">82%</span> / <span class="kpi-target">目標 95%</span></div>
         </div>
         <div class="kpi-bar-track">
-          <div class="kpi-bar-fill" style="width: 73%; background: linear-gradient(90deg, #6C3CE1, #FF6B6B);"></div>
+          <div class="kpi-bar-fill" style="width: 86%; background: linear-gradient(90deg, #6C3CE1, #FF6B6B);"></div>
         </div>
-        <div class="kpi-note">マネタイズ投稿と一部の品質チェックが未自動化。Phase 3で残り22%を埋める。</div>
+        <div class="kpi-note">note投稿の自動化が完了し73%→82%へ。残るKindle・Boothの投稿自動化と一部の品質チェックがPhase 3の課題。</div>
       </div>
 
       <div class="kpi-card">
         <div class="kpi-header">
           <div class="kpi-label">月次収益</div>
-          <div class="kpi-values"><span class="kpi-current">¥22,000</span> / <span class="kpi-target">目標 ¥60,000</span></div>
+          <div class="kpi-values"><span class="kpi-current">¥34,000</span> / <span class="kpi-target">目標 ¥60,000</span></div>
         </div>
         <div class="kpi-bar-track">
-          <div class="kpi-bar-fill" style="width: 37%; background: linear-gradient(90deg, #4FFFB0, #00D4FF);"></div>
+          <div class="kpi-bar-fill" style="width: 57%; background: linear-gradient(90deg, #4FFFB0, #00D4FF);"></div>
         </div>
-        <div class="kpi-note">YouTube収益中心。note・Kindle・Booth への展開で目標¥60,000達成を目指す。</div>
+        <div class="kpi-note">YouTube・note収益の合算。5月の¥22,000から+¥12,000。Kindle・Boothの展開で目標¥60,000達成を目指す。</div>
       </div>
 
       <div class="kpi-card">
         <div class="kpi-header">
           <div class="kpi-label">プラットフォーム展開数</div>
-          <div class="kpi-values"><span class="kpi-current">1</span> / <span class="kpi-target">目標 4</span></div>
+          <div class="kpi-values"><span class="kpi-current">2</span> / <span class="kpi-target">目標 4</span></div>
         </div>
         <div class="kpi-bar-track">
-          <div class="kpi-bar-fill" style="width: 25%; background: linear-gradient(90deg, #FF9E00, #FF6B6B);"></div>
+          <div class="kpi-bar-fill" style="width: 50%; background: linear-gradient(90deg, #FF9E00, #FF6B6B);"></div>
         </div>
-        <div class="kpi-note">現在 YouTube のみ。Phase 3 でnote・Kindle・Booth への自動投稿を順次追加。</div>
+        <div class="kpi-note">6月にnote自動投稿を追加（YouTube＋note）。Phase 3後半でKindle・Boothへの自動投稿を順次追加予定。</div>
       </div>
     </div>
 
     <div style="margin-top: 1.5rem; background: rgba(108,60,225,0.08); border: 1px solid rgba(108,60,225,0.25); border-radius: 12px; padding: 1.25rem; font-size: 0.85rem; color: var(--text-muted);">
-      ※ 数値はPhase 2仕上げ時点（2026年5月）の概算値。Phase 3進行に伴いリアルデータへ置き換え予定。
+      ※ 数値はPhase 3進行中（2026年6月末時点）の概算値・報告ベースであり、リアルタイム計測値ではありません。7月以降も月次レビューのたびに更新します。
     </div>
   </div>
 </section>
@@ -894,7 +986,7 @@
       <a href="openclaw.html">OpenClaw連携</a>
     </nav>
     <p>AI Creator Hub — AIでコンテンツをつくり、稼ぐ</p>
-    <p style="font-size:0.8rem;opacity:0.65;">最終更新: 2026-05-30（Phase 2 仕上げ→Phase 3 進行中に現行化。モデル世代は GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.1 Pro 据え置き＝Gemini 3.5 Pro は延期中）</p>
+    <p style="font-size:0.8rem;opacity:0.65;">最終更新: 2026-07-05（月次現行化: モデル世代を Claude Sonnet 5 / GPT-5.5 Instant / Gemini 3.5 Flash に更新し、Fable 5 一時停止・GPT-5.6 限定Preview・Gemini Omni/Sparkなど6月の外部環境変化を新セクションで追記。ツール選定表を RunwayML Gen-4.5・Kling 3.0/3.5 に更新。KPIをPhase 3進行分（note展開・評価通過率48%等）へ前進。workbench/knowledge への運用プラクティス・関連ナレッジ導線を新設）</p>
   </div>
 </footer>
 

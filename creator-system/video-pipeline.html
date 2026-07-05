@@ -60,7 +60,7 @@
           <div class="code-block">
 <span class="cm"># OpenClaw スキル定義 (SKILL.md 抜粋)</span>
 <span class="fn">name</span>: <span class="str">video-pipeline</span>
-<span class="fn">version</span>: <span class="str">"2.1.0"</span>
+<span class="fn">version</span>: <span class="str">"2.2.0"</span>
 <span class="fn">input</span>:
   <span class="fn">topic_text</span>: <span class="fn">string</span>   <span class="cm"># ネタ文章</span>
   <span class="fn">genre</span>: <span class="fn">string</span>       <span class="cm"># shorts|long|podcast</span>
@@ -121,14 +121,16 @@
         <div class="step-num" style="margin: 0;">3</div>
         <div>
           <h3>ビジュアル素材生成</h3>
-          <p>スクリプトの各シーンに対応する画像・映像をAIで生成。スタイルの一貫性を保ちながら、シーンごとに最適な構図・色調を自動選択。</p>
+          <p>スクリプトの各シーンに対応する画像・映像をAIで生成。スタイルの一貫性を保ちながら、シーンごとに最適な構図・色調を自動選択。
+          Sora撤退（2026-04-26）以降、動画生成AIは<strong>Runway Gen-4.5（品質）/ Kling 3.0（コスパ）/ Google Veo 3.1（エコシステム）の3極構造</strong>に収束しており、本パイプラインもこの3系統を並列評価する設計にしている。</p>
           <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
-            <span class="tag tag-cyan">Midjourney API</span>
-            <span class="tag tag-cyan">Imagen 4 Ultra</span>
-            <span class="tag tag-cyan">RunwayML Gen-4</span>
-            <span class="tag tag-orange">Kling AI v2</span>
+            <span class="tag tag-cyan">Nano Banana 2 系（画像）</span>
+            <span class="tag tag-cyan">RunwayML Gen-4.5</span>
+            <span class="tag tag-orange">Kling AI 3.0</span>
             <span class="tag tag-green">Google Veo 3.1</span>
+            <span class="tag tag-purple">Grok Imagine Video 1.5</span>
           </div>
+          <p style="margin-top: 0.6rem; font-size: 0.82rem; color: var(--text-muted);">⚠️ Google Imagen 4 は2026-08-17廃止予定。新規シーンは後継の Nano Banana 2 Lite / Pro（Gemini API 経由）へ切り替え中。詳細は下の「動画生成AIランドスケープ」参照。</p>
         </div>
       </div>
 
@@ -216,44 +218,52 @@ ffmpeg -i <span class="str">video_scenes.mp4</span> \
         </thead>
         <tbody>
           <tr>
-            <td><strong>Google Veo 3.1</strong></td>
-            <td>テキスト/画像→動画・音声同時生成</td>
+            <td><strong>RunwayML Gen-4.5</strong></td>
+            <td>テキスト/画像→動画（プロ向け・複数モデル統合ハブ化）</td>
             <td><span class="tag tag-green">最高</span></td>
             <td><span class="tag tag-orange">高め</span></td>
             <td><span class="tag tag-green">あり</span></td>
             <td>⭐⭐⭐⭐⭐</td>
           </tr>
           <tr>
-            <td><strong>Google Imagen 4</strong></td>
-            <td>テキスト→画像（サムネ・ビジュアル素材）</td>
-            <td><span class="tag tag-green">最高</span></td>
-            <td><span class="tag tag-green">低め</span></td>
-            <td><span class="tag tag-green">あり</span></td>
-            <td>⭐⭐⭐⭐⭐</td>
-          </tr>
-          <tr>
-            <td><strong>RunwayML Gen-4</strong></td>
-            <td>テキスト/画像→動画</td>
-            <td><span class="tag tag-green">最高</span></td>
-            <td><span class="tag tag-orange">高め</span></td>
-            <td><span class="tag tag-green">あり</span></td>
-            <td>⭐⭐⭐⭐⭐</td>
-          </tr>
-          <tr>
-            <td><strong>Kling AI v2</strong></td>
-            <td>テキスト/画像→動画</td>
+            <td><strong>Kling AI 3.0</strong></td>
+            <td>テキスト/画像→動画（マルチショット絵コンテ+ネイティブ音声）</td>
             <td><span class="tag tag-green">高</span></td>
-            <td><span class="tag tag-cyan">中</span></td>
+            <td><span class="tag tag-green">低め（目安 $0.07〜0.10/秒）</span></td>
+            <td><span class="tag tag-green">あり</span></td>
+            <td>⭐⭐⭐⭐⭐</td>
+          </tr>
+          <tr>
+            <td><strong>Google Veo 3.1</strong></td>
+            <td>テキスト/画像→動画・音声同時生成（Lite/Fast/Quality）</td>
+            <td><span class="tag tag-green">最高</span></td>
+            <td><span class="tag tag-orange">中〜高め</span></td>
+            <td><span class="tag tag-green">あり</span></td>
+            <td>⭐⭐⭐⭐⭐</td>
+          </tr>
+          <tr>
+            <td><strong>Gemini Omni Flash</strong></td>
+            <td>テキスト/画像/動画→動画・会話型編集</td>
+            <td><span class="tag tag-cyan">高（プレビュー）</span></td>
+            <td><span class="tag tag-cyan">中（目安 $0.10/秒）</span></td>
+            <td><span class="tag tag-green">あり</span></td>
+            <td>⭐⭐⭐<span style="opacity:.4">⭐⭐</span></td>
+          </tr>
+          <tr>
+            <td><strong>Grok Imagine Video 1.5</strong></td>
+            <td>画像→動画（ネイティブ同期オーディオ）</td>
+            <td><span class="tag tag-green">高</span></td>
+            <td><span class="tag tag-green">低め（目安 $4.20/分）</span></td>
             <td><span class="tag tag-green">あり</span></td>
             <td>⭐⭐⭐⭐</td>
           </tr>
-          <tr>
+          <tr style="opacity:0.6;">
             <td><strong>Sora (OpenAI)</strong></td>
             <td>テキスト→動画</td>
-            <td><span class="tag tag-green">最高</span></td>
-            <td><span class="tag tag-orange">高め</span></td>
-            <td><span class="tag tag-green">あり</span></td>
-            <td>⭐⭐⭐⭐</td>
+            <td>—</td>
+            <td>—</td>
+            <td><span class="tag tag-orange">廃止予定</span></td>
+            <td>非推奨</td>
           </tr>
           <tr>
             <td><strong>Hailuo AI (MiniMax)</strong></td>
@@ -261,7 +271,15 @@ ffmpeg -i <span class="str">video_scenes.mp4</span> \
             <td><span class="tag tag-green">高</span></td>
             <td><span class="tag tag-green">低め</span></td>
             <td><span class="tag tag-green">あり</span></td>
-            <td>⭐⭐⭐⭐</td>
+            <td>⭐⭐⭐<span style="opacity:.4">⭐⭐</span></td>
+          </tr>
+          <tr>
+            <td><strong>Google Imagen 4 Ultra</strong></td>
+            <td>テキスト→画像（サムネ・ビジュアル素材）</td>
+            <td><span class="tag tag-green">最高</span></td>
+            <td><span class="tag tag-green">低め</span></td>
+            <td><span class="tag tag-orange">2026-08-17廃止予定</span></td>
+            <td>移行推奨</td>
           </tr>
           <tr>
             <td><strong>ElevenLabs</strong></td>
@@ -274,6 +292,51 @@ ffmpeg -i <span class="str">video_scenes.mp4</span> \
         </tbody>
       </table>
     </div>
+    <p style="color: var(--text-muted); font-size: 0.82rem; margin-top: 0.75rem;">
+      ※ コスト・速度の具体的な数値は各社の発表・複数の第三者リーダーボード記事をもとにした目安であり、プラン・地域・時期によって変動する。本番導入前に必ず現行の料金ページで確認すること。
+      Sora はコンシューマーアプリを2026-04-26に終了済み、API も2026-09-24廃止予定のため新規採用は非推奨（詳細は次セクション）。
+    </p>
+  </div>
+</section>
+
+<!-- 2026年半ばの動画生成AIランドスケープ -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label">2026年半ばの動画生成AIランドスケープ</div>
+    <h2 class="section-title">Sora撤退後、市場は<br>「3極構造」に収束</h2>
+    <p style="color: var(--text-muted); margin-bottom: 2rem; max-width: 760px;">
+      OpenAI Sora はコンシューマーアプリを2026-04-26に終了（1日1,500万ドルの計算コストに対し累計収益210万ドルという赤字構造が要因と報じられた）、API も2026-09-24廃止が確定している。
+      この撤退を境に、動画生成AI市場は<strong>「品質＝Runway Gen-4.5」「コスト効率＝Kling 3.0」「エコシステム統合＝Google Veo 3.1」の3極構造</strong>に収束した。
+      これは本ページ「設計意図」で触れている<strong>「1本のツールに賭けない」設計原則の妥当性を裏付ける実例</strong>でもある。
+    </p>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon purple">🎬</div>
+        <h3>Runway Gen-4.5 — 品質・制御の最右翼</h3>
+        <p>Video Arenaなど主要リーダーボードで首位クラスを維持。カメラムーブ制御・キャラクター一貫性・参照画像対応に強み。2026年6月末以降、Kling 3.0・Sora 2 Pro・WAN2.2 など他社モデルを自社API上に統合し、<strong>「マルチモデルルーティングのハブ」</strong>としての性格を強めている。加えてGemini Omni FlashやSeed Audio 1.0（音声生成）も追加され、単一ツールで複数モデルを比較・使い分けできる体制に。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon orange">💰</div>
+        <h3>Kling 3.0（Kuaishou）— コスパと量産の最有力候補</h3>
+        <p>目安 $0.07〜0.10/秒とRunway比4〜5割安のコスト優位を武器に、グローバル登録ユーザー1億人超に到達（報道ベース）。マルチショット絵コンテモード・カット横断のネイティブ音声同期を搭載し、量産系のショート動画・EC商品動画向けに適する。2026-07-02には20億ドル規模の資金調達も報じられており、事業拡大が続く。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon green">🔗</div>
+        <h3>Google Veo 3.1 — エコシステム統合の強み</h3>
+        <p>Flow / Workspace / Gemini APIとの統合が深く、既にこのパイプラインの主力。ただし<strong>旧世代のVeo 2.0/3.0は2026-06-30付で廃止済み</strong>のため、Veo系を使う場合は必ずVeo 3.1系のモデルIDを指定する必要がある。2026-06-30にはGemini Omni Flash（テキスト/画像/動画→動画、会話型編集、パブリックプレビュー）も追加公開された。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon purple">⚡</div>
+        <h3>Grok Imagine Video 1.5 — 台風の目となる挑戦者</h3>
+        <p>2026-06-16にGA。前世代比+52 Eloのスコア上昇でImage-to-Video Arena首位を奪還したと報じられ、ネイティブ同期オーディオを標準搭載。価格は目安 $4.20/分とSora比86%安とされ、コスト・速度で無視できない存在になりつつある。xAI一貫のリアルタイム性・スピード志向はこのパイプラインの「並列評価してよいモデル」候補に追加する価値がある。</p>
+      </div>
+    </div>
+    <div style="margin-top: 1.5rem; background: rgba(255,158,0,0.06); border: 1px solid rgba(255,158,0,0.24); border-radius: 12px; padding: 1rem 1.25rem; font-size: 0.85rem; color: var(--text-muted);">
+      ⚠️ <strong>廃止スケジュールまとめ（要対応）</strong>：Veo 2.0 / Veo 3.0 は2026-06-30廃止済み（Veo 3.1へ移行必須）／ Imagen 4・Gemini 3 Image系は2026-08-17廃止予定（Nano Banana 2系へ移行）／ Sora API は2026-09-24廃止予定（新規依存は避ける）。いずれもモデルIDのハードコード箇所を洗い出し、OpenClawワークフロー定義の更新が必要。
+    </div>
+    <p style="color: var(--text-muted); font-size: 0.78rem; margin-top: 1rem;">
+      出典: 本ハブ canon（<a href="../research/chatgpt-recent-updates.html">research/chatgpt-recent-updates.html</a> / <a href="../research/gemini-recent-updates.html">research/gemini-recent-updates.html</a> / <a href="../research/grok-recent-updates.html">research/grok-recent-updates.html</a> / research/ai-news 各日）に基づく整理。数値は複数の第三者記事・ベンダー発表をもとにした目安であり、時期により変動する。
+    </p>
   </div>
 </section>
 
@@ -412,6 +475,67 @@ ffmpeg -i <span class="str">video_scenes.mp4</span> \
   </div>
 </section>
 
+<!-- Troubleshooting -->
+<section class="section" id="troubleshooting">
+  <div class="section-inner">
+    <div class="section-label">トラブルシューティング</div>
+    <h2 class="section-title">よくある失敗パターンと対処法</h2>
+    <p style="color: var(--text-muted); margin-bottom: 2rem; max-width: 700px;">
+      動画生成AIは高品質だが、まだ完全ではない。パイプラインを自動運転させる上で頻発する失敗モードと、現時点で有効とされる対処法を記録する。
+      いずれも「絶対に直る」保証はなく、モデル世代が進むごとに改善される前提の暫定対処。
+    </p>
+    <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem; display: flex; gap: 1.25rem; align-items: flex-start;">
+        <div style="background: rgba(108,60,225,0.15); border-radius: 10px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0;">🧑</div>
+        <div>
+          <div style="font-weight: 700; margin-bottom: 0.35rem;">キャラクターの一貫性が崩れる（シーンごとに顔・服装が変わる）</div>
+          <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.8;">
+            複数ショットで同一キャラクターを描く際に最も頻発する問題。対処法：①Veo系は<strong>Ingredients</strong>機能でImagen/Nano Banana生成のキャラクター画像を事前登録し参照させる、②Runway/Klingでは<strong>参照画像（First Frame / reference_image）</strong>を毎ショット同一のものに固定する、③プロンプトのキャラクター描写文を<strong>テンプレート化して使い回す</strong>（服装・髪色・体型の記述を毎回一言一句揃える）。それでも数十カット規模になると崩れは避けにくく、評価システム側で「顔が変わったカット」を検出し再生成する運用にしている。
+          </div>
+        </div>
+      </div>
+
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem; display: flex; gap: 1.25rem; align-items: flex-start;">
+        <div style="background: rgba(0,212,255,0.15); border-radius: 10px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0;">✋</div>
+        <div>
+          <div style="font-weight: 700; margin-bottom: 0.35rem;">モーションアーティファクト（手・液体・布・複雑な動作の破綻）</div>
+          <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.8;">
+            手指の変形、髪や液体の不自然な挙動は動画生成AI共通の弱点。Kling 3.0は複雑な動作（髪・液体・布）に強いとされ、こうしたカットはKling系へルーティングするのが現実的。
+            それ以外の対処：①1クリップあたりの尺を4〜6秒に短く区切りExtendで繋ぐ（長尺一発生成より破綻しにくい）、②プロンプトで複雑な手の動作を明示的に避ける（例：「軽くジェスチャーする」程度に留める）、③破綻カットは評価システムで自動検出し、同一プロンプトで再生成（temperature/seedを変えて）する運用にしている。
+          </div>
+        </div>
+      </div>
+
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem; display: flex; gap: 1.25rem; align-items: flex-start;">
+        <div style="background: rgba(0,220,130,0.15); border-radius: 10px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0;">🗣</div>
+        <div>
+          <div style="font-weight: 700; margin-bottom: 0.35rem;">口パク・音声のズレ（リップシンク不一致）</div>
+          <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.8;">
+            Veo 3.1は<code>"セリフ" [感情]</code>構文での台詞指定で口パク精度±120ms程度とされる（ベンダー公表値の目安）。Kling 3.0・Grok Imagine Video 1.5もネイティブ音声同期を搭載しており、台詞ありカットはこれらのモデルを優先する。
+            ElevenLabsで別途ナレーションを当てる構成（本パイプラインの主フロー）では、そもそも映像側の口パクを目立たせない画角（後ろ姿・引きの画）を選ぶことでズレを回避する設計判断もしている。
+          </div>
+        </div>
+      </div>
+
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem; display: flex; gap: 1.25rem; align-items: flex-start;">
+        <div style="background: rgba(255,158,0,0.15); border-radius: 10px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0;">🔎</div>
+        <div>
+          <div style="font-weight: 700; margin-bottom: 0.35rem;">解像度不足・仕上げ（アップスケーリング）</div>
+          <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.8;">
+            Veo 3.1 Quality（1080p〜4Kプレビュー）以外の多くのモデルは720p〜1080p出力が中心。ショート動画では実用上問題ないことが多いが、長尺・広告用途では不足する場合がある。
+            外部アップスケーラー（Topaz Video AI等）との連携は<strong>本パイプラインではまだ正式統合しておらず検証段階</strong>——導入する場合はFFmpeg合成の後段に追加ステップとして挟む設計になる見込み。現状は「最初から高解像度ティアのモデルを選ぶ」運用で代替している。
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div style="margin-top: 1.5rem; background: rgba(0,212,255,0.06); border: 1px solid rgba(0,212,255,0.2); border-radius: 12px; padding: 1rem; font-size: 0.82rem; color: var(--text-muted);">
+      💡 いずれの対処法も「モデルが今どれだけ得意か」で最適解が変わる。並列生成＋評価システムでの自動選別（本ページ「設計意図」参照）が、個別の弱点をパッチする以上に効くというのがこのパイプラインの基本思想。
+    </div>
+  </div>
+</section>
+
 <!-- 設計意図 / ツール選定 WHY -->
 <section class="section" id="why">
   <div class="section-inner">
@@ -438,13 +562,15 @@ ffmpeg -i <span class="str">video_scenes.mp4</span> \
       <div style="background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem; display: flex; gap: 1.25rem; align-items: flex-start;">
         <div style="background: rgba(108,60,225,0.15); border-radius: 10px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0;">🎬</div>
         <div>
-          <div style="font-weight: 700; margin-bottom: 0.35rem;">RunwayML Gen-4 / Google Veo 3 を「どちらか1本」にしなかった理由</div>
+          <div style="font-weight: 700; margin-bottom: 0.35rem;">RunwayML Gen-4.5 / Kling 3.0 / Google Veo 3.1 を「どれか1本」にしなかった理由</div>
           <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.8;">
-            両方とも「API 経由で自動制御できる最高品質」という条件を満たす。
-            RunwayML はプロンプト一貫性（複数シーンでスタイルが崩れにくい）に強みがあり、
-            Veo 3 は Google エコシステムとのコスト単価で優位性がある。
+            いずれも「API 経由で自動制御できる高品質」という条件を満たすが、強みの軸が異なる。
+            Runway Gen-4.5 はプロンプト一貫性・カメラ制御（複数シーンでスタイルが崩れにくい）、
+            Kling 3.0 はコスト効率と量産適性（$0.07〜0.10/秒目安）、
+            Veo 3.1 は Google エコシステム統合とネイティブ音声品質に強みがある。
             並列で生成して評価エンジンが高スコアを選ぶ設計にすることで、半年単位のモデル更新にも自動で追従できる。
-            1本に絞ると「そのモデルが劣化した瞬間」に全体品質が下がるリスクを背負う。
+            <strong>この判断の正しさは 2026年4月の Sora 撤退で裏付けられた</strong>——1本に絞っていたクリエイターは、そのモデルがサービス終了した瞬間に制作基盤ごと失うリスクを負う。
+            必要に応じて Grok Imagine Video 1.5 のような新興モデルも同じ評価ループに追加できる設計にしている。
           </div>
         </div>
       </div>
@@ -488,16 +614,19 @@ ffmpeg -i <span class="str">video_scenes.mp4</span> \
     <p style="color: var(--text-muted); margin-bottom: 2rem; max-width: 700px;">
       I/O 2026（2026-05-19）で Google が発表した2製品は、このパイプライン設計に直接影響する。
       既存の OpenClaw YAML 構成を置き換えるか補完するかは用途次第。
+      なお <strong>Gemini CLI はコンシューマー向け提供が2026-06-18に終了し Antigravity CLI（<code>agy</code>コマンド）へ完全移行</strong>済み。有料 Google Cloud API キー認証や Enterprise ライセンス利用者は引き続き利用可能。
     </p>
     <div class="two-col">
       <div>
         <div style="background: var(--card); border: 1px solid rgba(108,60,225,0.4); border-radius: 14px; padding: 1.5rem; margin-bottom: 1rem;">
           <div style="font-weight: 700; margin-bottom: 0.5rem;">Google Flow — フィルムメイキングUI</div>
           <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.8;">
-            Veo 3.1 + Imagen 4 + Gemini を統合した映像制作 GUI。
+            Veo 3.1 + Gemini（画像生成は Nano Banana 2 系へ移行中）を統合した映像制作 GUI。
             <strong style="color: var(--text);">Scenebuilder</strong> でショットをタイムライン編集し、Flow Agent が自然言語指示で多段タスクを自動実行。
+            2026-06-30 には <strong>Gemini Omni Flash</strong>（テキスト/画像/動画→動画・会話型編集、パブリックプレビュー）も Flow から利用可能になった。
             適用シナリオ: 人間がディレクションを担い、数ショットを組み合わせた完成品が必要な場合。
             完全自動バッチ生成（このパイプラインの主用途）には API 経由の Veo 3.1 直接呼び出しが引き続き適合。
+            ※ 旧 Imagen 4 は2026-08-17廃止予定のため、Flow 内の画像素材生成も順次 Nano Banana 2 系へ切り替わる見込み。
           </div>
         </div>
         <div style="background: var(--card); border: 1px solid rgba(0,212,255,0.3); border-radius: 14px; padding: 1.5rem;">
@@ -523,7 +652,7 @@ agent = genai.<span class="fn">ManagedAgent</span>(
 result = agent.<span class="fn">run</span>(
     <span class="str">f"ネタ「{topic}」から60秒ショート動画を制作。
     Veo 3.1 Fast でクリップ生成、
-    Imagen 4 でサムネ3案を同時出力すること"</span>
+    Nano Banana 2 でサムネ3案を同時出力すること"</span>  <span class="cm"># Imagen 4は2026-08-17廃止予定</span>
 )</div>
         <p style="color: var(--text-muted); font-size: 0.82rem; margin-top: 0.75rem;">
           詳細: <a href="../workbench/knowledge/anti-gravity.html">anti-gravity.html</a> / <a href="../workbench/knowledge/veo.html">veo.html</a> / <a href="../workbench/knowledge/flow.html">flow.html</a>
@@ -545,7 +674,7 @@ result = agent.<span class="fn">run</span>(
       <a href="openclaw.html">OpenClaw連携</a>
     </nav>
     <p>AI Creator Hub — AIでコンテンツをつくり、稼ぐ</p>
-    <p style="font-size:0.8rem;opacity:0.65;">最終更新: 2026-05-31（Veo 3.1・Imagen 4 反映、Google Flow / Antigravity 2.0 統合オプション追加）</p>
+    <p style="font-size:0.8rem;opacity:0.65;">最終更新: 2026-07-05（Sora撤退後の3極構造〈Runway Gen-4.5／Kling 3.0／Veo 3.1〉とGrok Imagine Video 1.5・Gemini Omni Flashを反映、廃止スケジュール〈Veo 2.0/3.0・Imagen 4・Sora API〉整理、トラブルシューティング節を新設）</p>
   </div>
 </footer>
 
