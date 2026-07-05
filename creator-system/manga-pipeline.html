@@ -94,6 +94,7 @@
           <li>LoRAモデルでキャラを事前学習</li>
           <li>シード値・プロンプトの徹底管理</li>
           <li>IP-Adapter でリファレンス画像を維持</li>
+          <li>PuLID Adapter で顔特徴のみを高精度に固定（2026年に普及した手法、詳細は後述）</li>
           <li>キャラ設定シートをプロンプトに常時注入</li>
           <li>差分のみ生成して顔パーツを固定</li>
         </ul>
@@ -233,7 +234,7 @@
         <div style="display: flex; flex-direction: column; gap: 0.5rem;">
           <div style="background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 0.875rem; display: flex; gap: 0.875rem; align-items: flex-start;">
             <div class="step-num" style="margin: 0; min-width: 36px; height: 36px; font-size: 0.85rem;">1</div>
-            <div><strong>参照画像収集</strong><br><span style="font-size: 0.82rem; color: var(--text-muted);">キャラクター設定画20〜50枚（正面・斜め・表情バリエーション）を Midjourney または Imagen 4 Ultra で生成。Imagen 4 は Vertex AI API 統合が容易で $0.06/枚（Ultra）・8言語プロンプト対応。</span></div>
+            <div><strong>参照画像収集</strong><br><span style="font-size: 0.82rem; color: var(--text-muted);">キャラクター設定画20〜50枚（正面・斜め・表情バリエーション）を生成。旧来のImagen 4は2026年8月17日に廃止予定のため新規ワークフローでは非推奨（詳細は <a href="../research/gemini-recent-updates.html" style="color: var(--accent);">research/gemini-recent-updates.html</a>）。代わりに用途で使い分ける：量産・高速ラフ出しには<strong>Nano Banana 2 Lite</strong>（<code>gemini-3.1-flash-lite-image</code>、1K画像あたり約$0.034・約4秒生成）、複雑な構図・専門用途の仕上げカットには<strong>Nano Banana Pro</strong>（旧Gemini 3 Pro Image）。スタイル参照の効きを重視する場合はMidjourney v7の<code>--sref</code>／<code>--cref</code>やFlux + IP-Adapterも選択肢（使い分けの考え方は <a href="../workbench/knowledge/context-engineering.html" style="color: var(--accent);">context-engineering.html</a>「Midjourney v7 / Flux ── スタイル参照画像のコンテキスト注入」の項を参照）。価格・提供状況は変わりやすいため契約前に必ず一次情報を確認。</span></div>
           </div>
           <div style="background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 0.875rem; display: flex; gap: 0.875rem; align-items: flex-start;">
             <div class="step-num" style="margin: 0; min-width: 36px; height: 36px; font-size: 0.85rem;">2</div>
@@ -276,8 +277,14 @@
             </div>
             <div style="background: var(--bg3); border-radius: 4px; height: 8px;"><div style="background: #4FFFB0; width: 95%; height: 100%; border-radius: 4px;"></div></div>
           </div>
+          <div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.35rem;">
+              <span>低強度LoRA + PuLID Adapter（顔）+ ControlNet OpenPose（未検証・参考値）</span><span style="color: #4FFFB0;">〜97%以上?</span>
+            </div>
+            <div style="background: var(--bg3); border-radius: 4px; height: 8px;"><div style="background: #4FFFB0; width: 97%; height: 100%; border-radius: 4px;"></div></div>
+          </div>
         </div>
-        <p style="color: var(--text-muted); font-size: 0.82rem; margin-top: 1rem;">※ 一貫性 = 同一キャラクターを人間が見て「同一人物」と判定できる割合。測定はCLIP特徴量コサイン類似度0.85以上を基準として算出（設計目標値）。</p>
+        <p style="color: var(--text-muted); font-size: 0.82rem; margin-top: 1rem;">※ 一貫性 = 同一キャラクターを人間が見て「同一人物」と判定できる割合。測定はCLIP特徴量コサイン類似度0.85以上を基準として算出（設計目標値）。最下段のPuLID Adapter併用は2026年に普及した手法として海外事例で言及されるが、当パイプラインでの実測値ではなく自社ベンチマーク未実施のため参考値として扱うこと。</p>
 
         <div style="background: rgba(255,158,0,0.1); border: 1px solid rgba(255,158,0,0.3); border-radius: 12px; padding: 1rem; margin-top: 1rem;">
           <div style="font-size: 0.8rem; color: #FF9E00; font-weight: 700; margin-bottom: 0.35rem;">複数キャラ同フレームの対策</div>
