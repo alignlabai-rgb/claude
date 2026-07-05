@@ -40,7 +40,10 @@
     <span style="color: var(--text-muted); font-weight: 700; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; margin-right: 0.5rem;">目次 →</span>
     <a href="#role" style="color: var(--accent);">役割</a>
     <a href="#sources" style="color: var(--accent);">ネタソース</a>
+    <a href="#trends2026" style="color: var(--accent);">2026年動向</a>
     <a href="#flow" style="color: var(--accent);">生成フロー</a>
+    <a href="#prompts" style="color: var(--accent);">プロンプトパターン</a>
+    <a href="#worked-example" style="color: var(--accent);">実例フロー</a>
     <a href="#scoring" style="color: var(--accent);">スコアリング</a>
     <a href="#schedule" style="color: var(--accent);">スケジュール</a>
     <a href="#api" style="color: var(--accent);">API設計</a>
@@ -142,6 +145,68 @@
       </div>
 
     </div>
+    <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 1.5rem;">
+      拡張検討: ソース収集をキーワード一致だけでなく反復検索・再ランキングで賢く行う「Agentic RAG」的な設計は
+      <a href="../workbench/knowledge/context-engineering.html" style="color: var(--accent);">workbench/knowledge/context-engineering.html</a>（「Agentic RAG」節）に整理がある。現行のネタ生成AIは単純なAPI呼び出し中心だが、将来的にこの方式へ寄せる余地がある。
+    </p>
+  </div>
+</section>
+
+<!-- 2026 Trends -->
+<section class="section" id="trends2026">
+  <div class="section-inner">
+    <div class="section-label">2026年半ばの外部動向</div>
+    <h2 class="section-title">ネタ生成の手法は<br>「後追い検知」から「先回り予測 + 自走エージェント」へ</h2>
+    <p style="color: var(--text-muted); margin-bottom: 1.5rem; max-width: 780px;">
+      2026年半ば時点で、コンテンツアイデア生成の業界的な潮流は大きく4つに整理できます。以下は公開情報から把握できる範囲の要約であり、
+      具体的な数値・製品名は出典時点のものです。ベンダーの機能は変化が速いため、導入判断時は必ず最新の一次情報を確認してください。
+    </p>
+    <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));">
+
+      <div class="card">
+        <div class="card-icon purple">🔮</div>
+        <h3>先回り型トレンド予測</h3>
+        <p>「検索されるのを待つ」のではなく、ニュース素材からLLMが検索クエリ相当の候補を先に生成し、エンゲージメント強度・発信元の信頼度でスコアリングして急上昇の兆しを先取りする手法が研究・実運用の両面で報告されている（例: Meta系の実運用事例として紹介されたRTTP的アプローチ）。テールトレンドの検知精度が既存手法比で大きく改善したという報告もあるが、社内数値は非公開のため参考値として扱う。</p>
+        <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <span class="tag tag-purple">先行生成型クエリ</span>
+          <span class="tag tag-cyan">要出典確認</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-icon cyan">👂</div>
+        <h3>ソーシャルリスニングの自律化</h3>
+        <p>従来の「集計して人間が読む」ダッシュボード型から、AIエージェントが感情・トピッククラスタを解釈し、しきい値超過時に自律的にアラート・下書き生成まで行う方向にツール群がシフトしていると各種ベンダーが説明している。本ハブの手動投入チャネル（下記ソース節）は、この「アラート起点の即時投入」と親和性が高い。</p>
+        <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <span class="tag tag-cyan">アラート駆動</span>
+          <span class="tag tag-green">構想段階</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-icon orange">🕵️</div>
+        <h3>競合分析の自動化</h3>
+        <p>競合チャンネルの新着動画を継続監視し、伸びている動画の型・フック・タグ戦略・投稿頻度を抽出するエージェント型ツールが2026年に増えている。本システムの「ジャンル分類 & 適合フィルタ」ステップに、競合ギャップ検出を将来的な拡張ポイントとして組み込む余地がある（未実装・検討中）。</p>
+        <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <span class="tag tag-orange">競合ギャップ検出</span>
+          <span class="tag tag-purple">拡張候補（未実装）</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-icon green">🧭</div>
+        <h3>深掘りリサーチ・エージェント連携</h3>
+        <p>「調査 × 実行」を並行させるエージェント型ツールが台頭。<a href="../workbench/knowledge/glm.html" style="color: var(--accent);">AutoGLM-Thinking</a>はWebブラウズ・データ収集・レポート生成を1タスクで完結させる調査×実行の並行型として紹介されており、<a href="../workbench/knowledge/kimi.html" style="color: var(--accent);">Kimi Work</a>はローカルデスクトップでサブエージェント群を使い分けて資料生成まで自走する（詳細は本ハブ workbench/knowledge/ 参照）。ネタ生成AIの「ソース収集」ステップを、こうした深掘りエージェントに一部委譲する構成は検討価値がある拡張案。</p>
+        <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <span class="tag tag-green">調査×実行並行</span>
+          <span class="tag tag-purple">将来拡張候補</span>
+        </div>
+      </div>
+
+    </div>
+    <p style="text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: 1.5rem;">
+      なお「AI生成コンテンツは人間作成コンテンツよりトラフィックが伸びにくい」という調査報告も複数あり、ネタの「量産」だけでなく「人間らしい切り口の担保」がスコアリング上も重要という前提を本システムは置いている（下記スコアリング節参照）。
+    </p>
   </div>
 </section>
 
@@ -233,6 +298,144 @@
   </div>
 </section>
 
+<!-- Prompt Patterns -->
+<section class="section" style="background: var(--bg2);" id="prompts">
+  <div class="section-inner">
+    <div class="section-label">プロンプトパターン集</div>
+    <h2 class="section-title">ネタ展開でよく使う<br>4つのプロンプト型</h2>
+    <p style="color: var(--text-muted); margin-bottom: 1.5rem; max-width: 780px;">
+      ステップ3「LLMによるネタ展開」の内部で実際に使い分けているプロンプトの型。汎用パターンとして整理しているため、具体的なチャンネルポリシーや成功パターン集は変数（<code>{{...}}</code>）で差し込む前提。プロンプトチェイニングの一般設計は
+      <a href="../workbench/knowledge/prompt-engineering.html" style="color: var(--accent);">workbench/knowledge/prompt-engineering.html</a>（「プロンプトチェイニング」節）も参照。
+    </p>
+
+    <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+
+      <div class="card">
+        <h3>① トレンド→ネタ変換パターン</h3>
+        <p style="margin-bottom: 0.75rem;">生のトレンドワードを「なぜ今なのか」「誰が興味を持つか」まで含めて具体化する型。抽象的なキーワードのまま展開すると企画が薄くなるため、必ず「文脈」と「対象読者」を先に埋めさせる。</p>
+        <div class="code-block">
+<span class="cm">system</span>: <span class="str">"""あなたはトレンド分析の専門家です。
+与えられたキーワードについて、(1)なぜ今話題なのか
+(2)誰が/どんな視聴者層が反応しそうか (3)動画/漫画に
+落とし込める具体的な切り口を3つ、の順で出力してください。
+抽象論で終わらせず、必ず固有名詞・具体例を含めること。"""</span>
+
+<span class="cm">user</span>: <span class="str">"""
+キーワード: {{raw_keyword}}
+関連文脈（ソースから抽出した要約）: {{context_summary}}
+チャンネルの過去ヒット傾向: {{success_patterns}}
+"""</span></div>
+      </div>
+
+      <div class="card">
+        <h3>② フック（冒頭3〜5秒）生成パターン</h3>
+        <p style="margin-bottom: 0.75rem;">ショート動画の視聴維持率は冒頭数秒でほぼ決まるとされる。フックだけを独立したプロンプトで複数案生成し、後段で本編と結合する2段構成にすることで、フックの質を本編の作り込みから切り離して磨き込める。</p>
+        <div class="code-block">
+<span class="cm">system</span>: <span class="str">"""あなたはショート動画のフック職人です。
+以下のネタについて、最初の3〜5秒で視聴者の離脱を防ぐ
+フック案を5つ出してください。各案には想定される
+'離脱阻止の理由'（疑問形・意外性・数字提示 等）を
+タグ付けしてください。"""</span>
+
+<span class="cm">user</span>: <span class="str">"""
+ネタ本文: {{expanded_text}}
+避けたい表現（過去に不評だったフック傾向）: {{failed_hook_patterns}}
+"""</span>
+<span class="cm">// 出力例:
+// [{ hook: "実はこの機能、○○社員も知らない",
+//    reason: "内部情報っぽさ・意外性" }, ...]</span></div>
+      </div>
+
+      <div class="card">
+        <h3>③ 競合ギャップ検出パターン（拡張候補・未実装）</h3>
+        <p style="margin-bottom: 0.75rem;">同ジャンルで既出のコンテンツと比較し、「まだ誰も扱っていない角度」を優先する型。競合分析の自動化は業界的に広がりつつある領域だが、本システムでは現時点でソース連携が未実装のため、プロンプト設計のみ先行して用意している。</p>
+        <div class="code-block">
+<span class="cm">system</span>: <span class="str">"""あなたはコンテンツ戦略アナリストです。
+同ジャンルの既出タイトル一覧と比較し、まだ扱われていない
+角度・切り口を提案してください。既出と酷似する提案は却下し、
+理由を添えてください。"""</span>
+
+<span class="cm">user</span>: <span class="str">"""
+新規ネタ候補: {{raw_topic}}
+既出タイトル一覧（直近30日・同ジャンル）: {{competitor_titles}}
+"""</span>
+<span class="cm">// 注: competitor_titles の収集元は未確定（要検討）</span></div>
+      </div>
+
+      <div class="card">
+        <h3>④ 検索意図適合チェックパターン（GEO/AEO意識）</h3>
+        <p style="margin-bottom: 0.75rem;">近年は生成AI検索（AI Overview・チャットボット回答）経由の流入も無視できなくなっており、キーワードSEOだけでなく「AIが要約・引用しやすい構造か」を意識する必要があるという指摘がある。スコアリングの「SEOポテンシャル」指標にこの観点を補助的に組み込む案。</p>
+        <div class="code-block">
+<span class="cm">system</span>: <span class="str">"""このネタの想定タイトル・要約が、検索エンジンの
+AI要約機能や対話型AI検索に引用されやすい構造か
+（明確な問いへの回答形式になっているか）を5段階で
+評価し、改善案を1つ提示してください。"""</span>
+
+<span class="cm">user</span>: <span class="str">"""
+タイトル候補: {{title_candidates}}
+要約: {{expanded_text}}
+"""</span></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Worked Example -->
+<section class="section" id="worked-example">
+  <div class="section-inner">
+    <div class="section-label">実例フロー（架空データ）</div>
+    <h2 class="section-title">トレンド信号 → 候補絞込 → スコア化 → 制作へ引き渡し</h2>
+    <p style="color: var(--text-muted); margin-bottom: 1.5rem; max-width: 780px;">
+      以下は説明用に組み立てた<strong>架空の一例</strong>です（実在の事業ネタではありません）。各ステップの入出力イメージをつかむための最小構成として読んでください。
+    </p>
+
+    <div style="display: flex; flex-direction: column; gap: 1rem;">
+
+      <div class="card" style="display: grid; grid-template-columns: 140px 1fr; gap: 1.25rem; align-items: start;">
+        <div><span class="tag tag-purple">1. 信号</span></div>
+        <div>
+          <p style="margin-bottom: 0.5rem;"><strong>Googleトレンド急上昇</strong>: 「小型AIモデル 省電力」検索量が48時間で急増（RSSでも関連記事2件を検知）。</p>
+          <div style="font-size: 0.82rem; color: var(--text-muted);">→ 生素材として source_mix に追加。embedding重複チェックで過去7日分と非重複を確認。</div>
+        </div>
+      </div>
+
+      <div class="card" style="display: grid; grid-template-columns: 140px 1fr; gap: 1.25rem; align-items: start;">
+        <div><span class="tag tag-cyan">2. 候補絞込</span></div>
+        <div>
+          <p style="margin-bottom: 0.5rem;">ジャンル分類で <code>tech_news / hardware</code> と判定。visual_fit 0.7、urgency medium。チャンネルポリシー（テック解説寄り）に合致し次段へ通過。</p>
+          <div style="font-size: 0.82rem; color: var(--text-muted);">→ この時点で候補は3〜5件程度に絞られている想定（他ソースからの候補と合流）。</div>
+        </div>
+      </div>
+
+      <div class="card" style="display: grid; grid-template-columns: 140px 1fr; gap: 1.25rem; align-items: start;">
+        <div><span class="tag tag-orange">3. ネタ展開</span></div>
+        <div>
+          <p style="margin-bottom: 0.5rem;">プロンプトパターン①②を通し、展開文＋タイトル案3本＋フック案5本を生成。「省電力AIチップが変えるエッジデバイスの未来」を軸に、ショート/長尺それぞれの構成案を出力。</p>
+        </div>
+      </div>
+
+      <div class="card" style="display: grid; grid-template-columns: 140px 1fr; gap: 1.25rem; align-items: start;">
+        <div><span class="tag tag-green">4. スコア化</span></div>
+        <div>
+          <p style="margin-bottom: 0.5rem;">下記スコアリング指標で計算した結果（架空値）: ホット度72 / ビジュアル適合65 / ターゲット適合80 / SEO70 / シリーズ性40 → 加重平均 <strong>スコア69.8</strong>。閾値60を上回り採用。</p>
+        </div>
+      </div>
+
+      <div class="card" style="display: grid; grid-template-columns: 140px 1fr; gap: 1.25rem; align-items: start;">
+        <div><span class="tag tag-purple">5. 引き渡し</span></div>
+        <div>
+          <p style="margin-bottom: 0.5rem;">format: shorts のジョブとして動画パイプラインのジョブキューへ投入。urgency: medium のため通常順で処理。同時に漫画パイプライン向けにも別展開ジョブを投入（同一ネタの2系統展開）。</p>
+        </div>
+      </div>
+
+    </div>
+    <p style="text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: 1.5rem;">
+      上記の数値・タイトルはすべて説明用の仮値。実運用のスコア分布や採用率は評価システム（<a href="evaluation.html" style="color: var(--accent);">evaluation.html</a>）側のログを参照。
+    </p>
+  </div>
+</section>
+
 <!-- Scoring -->
 <section class="section" style="background: var(--bg2);" id="scoring">
   <div class="section-inner">
@@ -273,7 +476,7 @@
           <span class="tag tag-green">重み: 15%</span>
         </div>
         <h3>SEO ポテンシャル</h3>
-        <p>キーワードの月間検索ボリューム（Google Keyword Planner）と競合動画数の比から「勝てそうか」を予測。ブルーオーシャンのロングテールキーワードを優遇。</p>
+        <p>キーワードの月間検索ボリューム（Google Keyword Planner）と競合動画数の比から「勝てそうか」を予測。ブルーオーシャンのロングテールキーワードを優遇。近年はAI検索・チャット型回答（GEO/AEOと呼ばれる領域）経由の流入も無視できないとの指摘があり、上記プロンプトパターン④の観点を補助スコアとして加える案を検討中（未実装）。</p>
       </div>
 
       <div class="card">
@@ -525,7 +728,7 @@
       <a href="openclaw.html">OpenClaw連携</a>
     </nav>
     <p>AI Creator Hub — AIでコンテンツをつくり、稼ぐ</p>
-    <p style="font-size:0.8rem;opacity:0.65;">最終更新: 2026-05-30（ネタ生成AIシステム ページ初版作成）</p>
+    <p style="font-size:0.8rem;opacity:0.65;">最終更新: 2026-07-05（2026年動向・プロンプトパターン集・実例フローを追加し内容を大幅拡充）</p>
   </div>
 </footer>
 

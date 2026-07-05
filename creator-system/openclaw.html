@@ -32,6 +32,11 @@
   <div class="section-label">OpenClaw連携</div>
   <h1>OpenClawが全パイプラインを<br><span style="background: linear-gradient(135deg,#6C3CE1,#FF6B6B); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">一元オーケストレーション</span></h1>
   <p>各AIツールのAPIをOpenClawで統合し、ネタ入力から収益化まで一本のワークフローで制御</p>
+  <p style="max-width: 720px; margin: 1rem auto 0; font-size: 0.85rem; color: var(--text-muted);">
+    OpenClaw本体の最新バージョン（v2026.6.5系）・CLIコマンド・Pi SDK内部構成・Skill Workshop / Workboardの詳細は
+    <a href="../claw-stack/openclaw/index.html">Claw Stack: OpenClawガイド</a> を参照。
+    本ページはそれらをAI Creator Hubの制作パイプラインへどう組み込むか＝<strong>Creator System向け統合設計</strong>（ワークフロー定義・HITL・コスト管理・監視）に特化しています。
+  </p>
 </div>
 
 <!-- Role of OpenClaw -->
@@ -44,6 +49,8 @@
         <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
           OpenClawはワークフロー定義に従い、複数のAIツール・APIを順序立てて呼び出す
           オーケストレーションレイヤーとして機能します。
+          中核にはGatewayプロセスがあり、Signal・WhatsApp・Discord・Matrixなど複数チャネルからの入力を
+          単一のWebSocket/HTTPエンドポイントに集約し、セッション管理・ツール呼び出し・チャネルルーティングを担当します。
           各ツールのAPI差異を吸収し、エラー処理・リトライ・進捗管理を一元化。
         </p>
         <ul class="checklist">
@@ -52,6 +59,8 @@
           <li>各ステップの成功/失敗に応じた分岐処理</li>
           <li>実行ログ・コスト追跡・アラート機能</li>
           <li>ヒューマンインザループ（人間確認ポイント）の挿入</li>
+          <li>Skill Workshop（v2026.6.1〜）でSKILL.mdの提案→レビュー→適用を管理</li>
+          <li>Workboardプラグインで複数エージェント（例: artist / writer / uploader）を横断タスク管理</li>
         </ul>
       </div>
       <div>
@@ -194,6 +203,15 @@ skills/
 <span class="fn">output</span>: <span class="cm"># ... (各Skill固有)</span></div>
       </div>
     </div>
+    <div style="background: rgba(167,139,250,0.08); border: 1px solid rgba(167,139,250,0.3); border-radius: 12px; padding: 1.25rem; margin-top: 1.5rem;">
+      <div style="font-size: 0.85rem; font-weight: 700; color: #A78BFA; margin-bottom: 0.4rem;">Skill Workshop 経由の更新（v2026.6.1〜）</div>
+      <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.75;">
+        SKILL.mdを直接手編集する代わりに、エージェント自身が繰り返し作業を検出して <code>SKILL.proposal.md</code> を自動生成する運用に移行中です。
+        <code>openclaw skills workshop inspect &lt;id&gt;</code> で差分を確認し、<code>apply</code> で本採用。
+        誤った提案は <code>reject</code> / <code>quarantine</code> で隔離できます。
+        コマンド詳細は <a href="../claw-stack/openclaw/index.html">Claw Stackガイド</a> を参照。
+      </div>
+    </div>
   </div>
 </section>
 
@@ -253,6 +271,12 @@ skills/
         <span class="fn">next</span>: <span class="str">"human_review"</span>   <span class="cm"># HITL</span>
       - <span class="fn">condition</span>: <span class="str">"default"</span>
         <span class="fn">next</span>: <span class="str">"discard_retry"</span></div>
+        <div style="background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.3); border-radius: 12px; padding: 1rem; margin-top: 1rem; font-size: 0.82rem; color: var(--text-muted); line-height: 1.7;">
+          <strong style="color: var(--accent);">Workboardでの可視化：</strong>
+          上記YAMLの各<code>id</code>はそのままWorkboardのタスクノードとして表示されます。
+          <code>analyze</code> → <code>gen_video</code> / <code>gen_manga</code>（並列）→ <code>evaluate_all</code> → <code>route</code> という依存関係グラフを
+          横断ダッシュボードで一覧できるため、「どのステップで詰まっているか」を1画面で把握できます（詳細後述）。
+        </div>
       </div>
       <div>
         <h3 style="margin-bottom: 0.75rem; font-size: 1rem; color: var(--text-muted);">単体動画ワークフロー（詳細）</h3>
@@ -288,6 +312,52 @@ skills/
   <span class="fn">video</span>: <span class="str">"{{video_file}}"</span>
   <span class="fn">metadata</span>: <span class="str">"{{evaluation.optimized_metadata}}"</span>
   <span class="fn">schedule</span>: <span class="str">"{{evaluation.optimal_publish_time}}"</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Workboard -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label">Workboard（マルチエージェント管理）</div>
+    <h2 class="section-title">「動画+漫画」1話分の座組を<br>Workboardで横断管理</h2>
+    <div class="two-col">
+      <div>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+          dual-content-creationワークフローは内部的に複数のSkill（≒エージェント）が
+          並列・直列に動きます。Workboardプラグインを使うと、これらを1つの「ボード」として
+          可視化し、どのエージェントがどのステップで止まっているかをSignalを開かずに確認できます。
+          個人運用（1人+AI）でも、複数ジョブが同時に走る量産フェーズでは有効です。
+        </p>
+        <ul class="checklist">
+          <li>ジョブ単位でボードを自動生成（<code>ep03-dual-content</code> のように命名）</li>
+          <li>ステップ＝タスクノード、担当Skill＝エージェントとして表示</li>
+          <li>詰まっているノードを赤色ハイライトでひと目確認</li>
+          <li>HITL待ちのノードはSignal未返信時間をタイマー表示</li>
+        </ul>
+      </div>
+      <div>
+        <div class="code-block">
+<span class="cm"># dual-content-creation を Workboard に登録</span>
+openclaw workboard create \
+  --title <span class="str">"ep03-dual-content"</span> \
+  --workflow <span class="str">"dual_content_workflow.yaml"</span> \
+  --agents <span class="str">"analyzer,video-gen,manga-gen,evaluator,publisher"</span>
+
+<span class="cm"># 横断ステータス確認（Signalを開かずにCLIで一覧）</span>
+openclaw workboard status --board ep03-dual-content
+
+<span class="cm"># 出力イメージ</span>
+<span class="cm"># [analyze]      done   (12s)</span>
+<span class="cm"># [gen_video]    running (67%, cost=$0.84)</span>
+<span class="cm"># [gen_manga]    done   (cost=$0.31)</span>
+<span class="cm"># [evaluate_all] waiting (depends_on: gen_video)</span>
+<span class="cm"># [route]        waiting</span></div>
+        <p style="color: var(--text-muted); font-size: 0.82rem; margin-top: 0.75rem;">
+          ※ Workboardは2026年6月にOpenClaw本体へ導入されたばかりのプラグインで、
+          Creator Systemでの本格運用実績はまだ薄いため、運用ノウハウは今後アップデートします（設計方針の段階）。
+        </p>
       </div>
     </div>
   </div>
@@ -655,6 +725,55 @@ ALIASES = {
         </div>
       </div>
 
+      <div class="card">
+        <div class="card-icon purple">🫀</div>
+        <h3>スタックジョブ検知（ハートビート）</h3>
+        <p>動画レンダリングのような長時間ステップは「エラーではなく単に固まっている」ことがある。各Skillは30秒おきに進捗ハートビートを送信し、2回連続で無応答ならウォッチドッグがジョブを強制終了してリトライキューへ戻す。</p>
+        <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <span class="tag tag-purple">30秒間隔heartbeat</span>
+          <span class="tag tag-orange">無応答2回で強制終了</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-icon orange">🧯</div>
+        <h3>サーキットブレーカー</h3>
+        <p>単一ジョブ内の3回リトライとは別に、直近10分間で同一ツールが5回以上失敗した場合はサーキットを開き、クールダウン期間（例: 10分）はそのツールへの新規呼び出し自体をスキップしてフォールバック先に固定。障害中のツールに無駄なリトライを重ねない。</p>
+        <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <span class="tag tag-orange">10分/5回で開放</span>
+          <span class="tag tag-cyan">クールダウン中は即フォールバック</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-icon cyan">🗑</div>
+        <h3>デッドレターキュー（DLQ）</h3>
+        <p>フォールバック先も全滅、かつHITLもタイムアウトで放置された（＝どこにも救済されなかった）ジョブは、静かに消えるのではなくDLQに積む。週次でDLQをレビューし、パターンが同じなら恒久対応（新ツール追加・閾値見直し）を検討する。</p>
+        <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <span class="tag tag-cyan">週次DLQレビュー</span>
+          <span class="tag tag-green">静かな失敗を防止</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="margin-top: 2rem; background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.75rem;">
+      <h3 style="font-size: 1rem; margin-bottom: 1rem; color: var(--text-muted);">部分失敗（Partial Failure）ポリシー — dual-content-creationの例</h3>
+      <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1rem;">
+        並列実行する<code>gen_video</code>と<code>gen_manga</code>の一方だけが失敗した場合、
+        ジョブ全体を失敗扱いにするか・成功した方だけ部分公開するか・失敗分だけ個別リトライするかは
+        設計時に明示しておく必要があります（暗黙のまま運用すると「一部だけ欠けた成果物」がサイレントに公開されるリスクがある）。
+      </p>
+      <ul class="checklist">
+        <li><code>gen_video</code> 失敗 / <code>gen_manga</code> 成功 → 漫画側は<code>evaluate_all</code>を単独実行して先行公開、動画側は独立ジョブとして再キュー（当日内1回まで）</li>
+        <li>両方失敗 → ジョブ全体を失敗として<code>discard_retry</code>へ。ネタ自体の相性が悪い可能性としてログに記録</li>
+        <li>各Skillは同じ入力に対して再実行しても同じ出力に収束する（べき等）設計を推奨 — リトライやフォールバックを安全に自動化する前提条件</li>
+      </ul>
+      <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 1rem;">
+        ※ v2026.6.5でMCPツール結果のcoercion（resource_link・audio・不正形式の画像ブロックの自動修正）が入り、
+        画像・音声・動画など異種メディアAPIを跨ぐステップで発生しがちな400エラー・セッション汚染が減少した（Claw Stackガイド参照）。
+        本ページのフォールバック設計はその改善を前提に、それでも残る障害への備えとして維持しています。
+      </p>
     </div>
   </div>
 </section>
@@ -779,20 +898,20 @@ ALIASES = {
         <p>OpenClaw環境のセットアップ。LLM呼び出しの基本ワークフロー定義。ネタ入力→スクリプト生成の最小パイプライン実装。</p>
       </div>
 
-      <div class="card" style="border-left: 4px solid #00D4FF;">
+      <div class="card" style="border-left: 4px solid #4FFFB0;">
         <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
-          <span class="tag tag-cyan">Phase 2 — 進行中</span>
+          <span class="tag tag-green">Phase 2 — 完了</span>
           <h3 style="margin: 0;">コンテンツ生成統合</h3>
         </div>
-        <p>画像生成・音声合成・動画編集ツールとの連携実装。並列実行の最適化。評価エンジンとの接続。</p>
+        <p>画像生成・音声合成・動画編集ツールとの連携実装。並列実行の最適化。評価エンジンとの接続。フォールバック・HITL・コスト管理の基本設計もこのフェーズで固めた。</p>
       </div>
 
-      <div class="card" style="border-left: 4px solid #6C3CE1;">
+      <div class="card" style="border-left: 4px solid #00D4FF;">
         <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
-          <span class="tag tag-purple">Phase 3 — 予定</span>
+          <span class="tag tag-cyan">Phase 3 — 進行中（2026 Q2〜Q3）</span>
           <h3 style="margin: 0;">マネタイズ自動化</h3>
         </div>
-        <p>配信プラットフォームAPIとの接続。自動投稿・スケジューリング実装。収益データのフィードバックループ構築。</p>
+        <p>配信プラットフォームAPIとの接続。自動投稿・スケジューリング実装。収益データのフィードバックループ構築。note/KDP/Booth連携の詳細手順は<a href="monetization.html">monetization.html</a>を参照。並行してSkill WorkshopとWorkboardの本パイプラインへの本格導入も進行中。</p>
       </div>
 
       <div class="card" style="border-left: 4px solid #FF6B6B;">
@@ -1081,6 +1200,7 @@ ALIASES = {
       <a href="openclaw.html">OpenClaw連携</a>
     </nav>
     <p>AI Creator Hub — AIでコンテンツをつくり、稼ぐ</p>
+    <p style="font-size:0.8rem;opacity:0.65;">最終更新: 2026-07-05（Skill Workshop・Workboard・Gatewayアーキテクチャを反映しClaw Stackガイドと整合。耐障害設計を深掘り＝部分失敗ポリシー・サーキットブレーカー・スタックジョブ検知・デッドレターキュー追加。ロードマップをPhase 3進行中に現行化）</p>
   </div>
 </footer>
 

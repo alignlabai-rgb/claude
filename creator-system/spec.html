@@ -28,7 +28,7 @@
 <section class="hero" style="min-height: 60vh;">
   <div class="hero-bg"></div>
   <div class="hero-content">
-    <div class="hero-badge"><span class="dot-live"></span>仕様書 v0.4 — 2026-05更新</div>
+    <div class="hero-badge"><span class="dot-live"></span>仕様書 v0.5 — 2026-07更新</div>
     <h1 class="fade-up">
       AI Creator Hub<br>
       <span class="gradient-text">システム仕様書</span>
@@ -52,6 +52,8 @@
     <a href="#modules" style="color: var(--accent);">モジュール構成</a>
     <a href="#datatypes" style="color: var(--accent);">型定義</a>
     <a href="#api" style="color: var(--accent);">APIエンドポイント</a>
+    <a href="#architecture" style="color: var(--accent);">実行アーキテクチャ</a>
+    <a href="#connectors" style="color: var(--accent);">外部ツール連携</a>
     <a href="#envvars" style="color: var(--accent);">環境変数</a>
     <a href="#deploy" style="color: var(--accent);">デプロイ</a>
     <a href="#storage" style="color: var(--accent);">ストレージ設計</a>
@@ -201,6 +203,23 @@
 }</div>
       </div>
     </div>
+
+    <h3 style="margin: 2rem 0 1rem; font-size: 1rem; color: var(--text-muted);">JobCheckpoint <span style="font-weight:400; color: var(--text-muted); font-size: 0.82rem;">（v0.5で追加 — ジョブ状態管理・再開用）</span></h3>
+    <div class="code-block">
+<span class="fn">type</span> <span class="str">JobCheckpoint</span> = {
+  <span class="fn">job_id</span>: <span class="str">string</span>
+  <span class="fn">pipeline</span>: <span class="str">"video" | "manga"</span>
+  <span class="fn">step</span>: <span class="str">string</span>            <span class="cm">// 完了済み最終ステップ名</span>
+  <span class="fn">step_index</span>: <span class="str">number</span>
+  <span class="fn">idempotency_key</span>: <span class="str">string</span> <span class="cm">// 同一ステップの二重実行を防止</span>
+  <span class="fn">state</span>: <span class="str">"pending" | "running" | "succeeded"
+                     | "failed" | "compensating"</span>
+  <span class="fn">retry_count</span>: <span class="str">number</span>
+  <span class="fn">last_error</span>: <span class="str">string | null</span>
+  <span class="fn">checkpoint_data</span>: <span class="str">Record&lt;string, unknown&gt;</span> <span class="cm">// 中間データのGCS参照等</span>
+  <span class="fn">updated_at</span>: <span class="str">string</span>
+}</div>
+    <p style="color: var(--text-muted); font-size: 0.82rem; margin-top: 0.5rem;">Redis にジョブ単位で保持し、ステップ完了ごとに書き込む。プロセス再起動時は最後の <code>step</code> から再開し、<code>idempotency_key</code> で外部API呼び出しの二重発火を防ぐ（詳細は <a href="#architecture" style="color: var(--accent);">実行アーキテクチャ</a>）。</p>
   </div>
 </section>
 
@@ -328,6 +347,125 @@
   </div>
 </section>
 
+<!-- Architecture / Orchestration -->
+<section class="section" id="architecture" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-label">実行アーキテクチャ</div>
+    <h2 class="section-title">オーケストレーション方式と<br>状態管理・耐障害性設計</h2>
+    <p class="section-desc">
+      v0.4までは「メッセージキューで非同期連携する」という粒度の記述に留まっていました。v0.5では、
+      OpenClaw がどのオーケストレーションパターンを採用しているか、ジョブ状態をどう永続化し、
+      失敗時にどう回復するかを明文化します。ここで扱うのは<strong style="color: var(--text);">設計方針</strong>であり、
+      Phase 3進行中のため実装が方針に追いついていない箇所は「実装中」と明記します。
+    </p>
+
+    <div class="two-col">
+      <div>
+        <h4 style="margin-bottom: 1rem; font-size: 0.95rem;">採用パターン: Supervisor–Workers</h4>
+        <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1rem;">
+          2026年時点でよく整理されるマルチエージェント/パイプライン構成は
+          「単一エージェントループ」「Supervisor–Workers」「階層型」「Peer-to-Peer」の4パターンに大別される
+          （報告ベース・業界一般の整理であり本ハブ独自の分類ではない）。
+          本システムは <strong style="color: var(--text);">OpenClaw を中央コントローラとする Supervisor–Workers 型</strong> を採用する。
+          理由は、公開判定（評価スコア・コスト上限）という「必ず一箇所で強制したいゲート」が存在し、
+          Peer-to-Peer型のような分散判断だと閾値の一貫性を保証しづらいため。
+        </p>
+        <ul class="checklist">
+          <li>OpenClaw = Supervisor（分解・委譲・集約・ゲート判定）</li>
+          <li>topic-analyzer / video-pipeline / manga-pipeline / evaluator / monetization-manager = Workers</li>
+          <li>Worker間の直接通信は無し。全て Supervisor 経由（暗黙のPeer-to-Peer結合を防止）</li>
+          <li>Worker はステートレス設計。状態は Redis の JobCheckpoint に一元集約</li>
+        </ul>
+      </div>
+      <div>
+        <h4 style="margin-bottom: 1rem; font-size: 0.95rem;">状態管理・チェックポイント</h4>
+        <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1rem;">
+          動画生成は8〜15分、漫画生成は20〜40分かかる長時間ジョブのため、途中でWorkerプロセスが落ちても
+          最初からやり直さないことがコスト・SLA双方で重要。各ステップ完了時に <a href="#datatypes" style="color: var(--accent);">JobCheckpoint</a>
+          をRedisへ書き込み、再起動時は <code>step_index</code> から再開する。
+        </p>
+        <div class="code-block" style="margin: 0;">
+<span class="cm"># 擬似コード: チェックポイント付きステップ実行</span>
+<span class="kw">def</span> <span class="fn">run_step</span>(job_id, step_fn, step_name):
+    cp = redis.<span class="fn">get_checkpoint</span>(job_id)
+    <span class="kw">if</span> cp.step_index &gt;= step_registry[step_name].index:
+        <span class="kw">return</span> cp.checkpoint_data  <span class="cm"># 完了済みはスキップ（冪等）</span>
+    <span class="kw">try</span>:
+        result = step_fn(idempotency_key=cp.idempotency_key)
+        redis.<span class="fn">save_checkpoint</span>(job_id, step_name, <span class="str">"succeeded"</span>, result)
+    <span class="kw">except</span> RetryableError:
+        redis.<span class="fn">increment_retry</span>(job_id)
+    <span class="kw">except</span> FatalError:
+        redis.<span class="fn">mark_compensating</span>(job_id)  <span class="cm"># Saga的な補償処理へ</span></div>
+      </div>
+    </div>
+
+    <h3 style="margin: 2rem 0 1rem; font-size: 1rem; color: var(--text-muted);">冪等性・リトライ・回路遮断（Circuit Breaker）</h3>
+    <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1rem; max-width: 900px;">
+      2026年半ばの一般的なAIパイプライン運用では、「一時的失敗はリトライ、恒久的失敗はフォールバック、
+      連続失敗は回路遮断で以降の呼び出しを止める」という三層構造が定石とされる（報告ベース）。
+      本システムも同じ三層で外部API呼び出し（RunwayML / Kling / ElevenLabs 等）を保護する。
+    </p>
+    <div class="table-wrap" style="margin-bottom: 1.5rem;">
+      <table>
+        <thead><tr><th>状態</th><th>条件</th><th>挙動</th></tr></thead>
+        <tbody>
+          <tr><td><span class="tag tag-green">CLOSED</span></td><td>直近のエラー率が正常範囲</td><td>通常通り呼び出す</td></tr>
+          <tr><td><span class="tag tag-orange">OPEN</span></td><td>同一サービスで3回連続失敗</td><td>即座にフォールバック先へ切替。一定時間（目安60秒）呼び出し自体を停止</td></tr>
+          <tr><td><span class="tag tag-cyan">HALF_OPEN</span></td><td>OPEN経過後の試験的復帰</td><td>1件だけ試行。成功でCLOSEDへ、失敗で再度OPENへ</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <ul class="checklist">
+      <li>リトライ: exponential backoff + jitter（初回1s→2s→4s、最大5回、ジッターで同時再送を回避）</li>
+      <li>フォールバック: RunwayML→Kling AI、Midjourney→DALL-E 4 など既存の代替ツール表（<a href="#tools" style="color: var(--accent);">ツール選定</a>参照）をそのまま利用</li>
+      <li>Saga的補償: 動画合成の途中で漫画側が失敗しても、既に課金済みの音声・画像生成コストは記録として残し「部分成果物」を tmp/ に保持（完全ロールバックはしない＝二重課金より二重生成の方が安いという判断）</li>
+      <li>エスカレーション: 3ステップ連続失敗、または同一ジョブで合計5回リトライ後は自動リトライを止め、Signal通知で人間判断に切り替える</li>
+    </ul>
+    <div style="margin-top: 1rem; background: rgba(255,158,0,0.08); border: 1px solid rgba(255,158,0,0.25); border-radius: 12px; padding: 1rem; font-size: 0.82rem; color: var(--text-muted);">
+      ⚠️ 実装状況（目安）: JobCheckpoint によるステップ再開とexponential backoffは実装済み。回路遮断（Circuit Breaker）とSaga的補償処理はPhase 3で設計中・一部Workerのみ実装（2026-07時点、報告ベース）。
+    </div>
+  </div>
+</section>
+
+<!-- External Tool Connectors -->
+<section class="section" id="connectors">
+  <div class="section-inner">
+    <div class="section-label">外部ツール連携</div>
+    <h2 class="section-title">MCPクリエイティブコネクタの<br>評価状況</h2>
+    <p class="section-desc">
+      2026年4月28日、Anthropicは Blender・Adobe（Creative Cloud）・Affinity・Ableton Live・Splice・SketchUp・
+      Autodesk Fusion・Resolume Arena/Wire 向けの MCP（Model Context Protocol）ベースのクリエイティブコネクタ9種を
+      公開したと報じられている（報告ベース・9to5Mac等の一次報道より）。本システムの L2/L3 レイヤー（<a href="stack-map.html" style="color: var(--accent);">接続マップ参照</a>）に
+      新しい選択肢として関係するため、現状の採用状況を整理する。
+    </p>
+
+    <div class="table-wrap" style="margin-bottom: 1.5rem;">
+      <table>
+        <thead><tr><th>コネクタ</th><th>接続先</th><th>本システムでの位置づけ</th><th>状態</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Blender MCPコネクタ</td>
+            <td>Blender 4.2+（Claude Desktop経由、bpy API全体を公開）</td>
+            <td>manga-pipeline のキャラクター一貫性生成は現状 SDXL + ComfyUI + LoRA + ControlNet で担っている。3Dモデルベースの姿勢・カメラ制御が必要になった場合の代替/補完候補</td>
+            <td><span class="tag tag-cyan">評価中（未導入）</span></td>
+          </tr>
+          <tr>
+            <td>Adobe Creative Cloud MCPコネクタ</td>
+            <td>Photoshop / Premiere / Express / Firefly / Illustrator / Lightroom / InDesign / Stock 等50以上のツール</td>
+            <td>サムネイル仕上げ・字幕微調整など「AI生成後の人手最終調整」工程での活用候補。ただし報告ベースでは<strong style="color: var(--text);">Adobe Express層での操作が中心で、Photoshop/Premiereの深い自動操作は限定的</strong>とされる</td>
+            <td><span class="tag tag-cyan">評価中（未導入）</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="color: var(--text-muted); font-size: 0.82rem;">
+      ※ 現行パイプラインはComfyUI/LoRAによる完全自動化を優先しており、MCPコネクタは「人間が最終確認・微調整する工程」を挟む場合の補助線として位置づける。
+      本格導入する場合は openclaw.html のツール管理表・環境変数リファレンスに追記すること。
+    </p>
+  </div>
+</section>
+
 <!-- Environment Variables -->
 <section class="section" id="envvars" style="background: var(--bg2);">
   <div class="section-inner">
@@ -342,9 +480,9 @@
           <tr><th>変数名</th><th>説明</th><th>取得先</th><th>必須</th></tr>
         </thead>
         <tbody>
-          <tr><td><code>OPENAI_API_KEY</code></td><td>GPT-5.5 スクリプト生成</td><td>platform.openai.com</td><td><span class="tag tag-orange">必須</span></td></tr>
-          <tr><td><code>ANTHROPIC_API_KEY</code></td><td>Claude Sonnet 4.6 代替生成</td><td>console.anthropic.com</td><td><span class="tag tag-orange">必須</span></td></tr>
-          <tr><td><code>GEMINI_API_KEY</code></td><td>Gemini 3.1 Pro 評価・長文</td><td>aistudio.google.com</td><td><span class="tag tag-orange">必須</span></td></tr>
+          <tr><td><code>OPENAI_API_KEY</code></td><td>GPT-5.5 Instant スクリプト生成（GPT-5.6 Sol/Terra/Lunaは信頼パートナー限定Preview中・報告ベースにつき本番未採用）</td><td>platform.openai.com</td><td><span class="tag tag-orange">必須</span></td></tr>
+          <tr><td><code>ANTHROPIC_API_KEY</code></td><td>Claude Sonnet 5 代替生成（長文・高難度構成はFable 5へ切替可、7/1グローバル再開）</td><td>console.anthropic.com</td><td><span class="tag tag-orange">必須</span></td></tr>
+          <tr><td><code>GEMINI_API_KEY</code></td><td>Gemini 3.5 Flash 評価・長文（3.5 Proは7月GA延期中のため現状Flash運用・報告ベース）</td><td>aistudio.google.com</td><td><span class="tag tag-orange">必須</span></td></tr>
           <tr><td><code>MIDJOURNEY_API_KEY</code></td><td>シーン画像生成</td><td>midjourney.com/account</td><td><span class="tag tag-orange">必須</span></td></tr>
           <tr><td><code>RUNWAYML_API_KEY</code></td><td>動画クリップ生成（メイン）</td><td>app.runwayml.com/settings</td><td><span class="tag tag-orange">必須</span></td></tr>
           <tr><td><code>KLING_API_KEY</code></td><td>動画クリップ生成（フォールバック）</td><td>klingai.com/api</td><td><span class="tag tag-cyan">推奨</span></td></tr>
@@ -717,6 +855,10 @@ gs://ai-creator-hub-prod/
   <div class="section-inner">
     <div class="section-label">エラーコード</div>
     <h2 class="section-title">共通エラー定義と対処</h2>
+    <p class="section-desc">
+      v0.5で <span class="tag tag-orange">409</span> <span class="tag tag-orange">504</span> を追加。
+      いずれも <a href="#architecture" style="color: var(--accent);">実行アーキテクチャ</a>のチェックポイント/回路遮断設計と対になる。
+    </p>
     <div class="table-wrap">
       <table>
         <thead>
@@ -725,10 +867,12 @@ gs://ai-creator-hub-prod/
         <tbody>
           <tr><td><span class="tag tag-orange">400</span></td><td>リクエスト不正</td><td>必須フィールド欠損・型不一致</td><td>ペイロードのバリデーションを確認</td></tr>
           <tr><td><span class="tag tag-orange">401</span></td><td>認証失敗</td><td>JWTトークン無効・期限切れ</td><td>OpenClawから新しいトークンを取得</td></tr>
+          <tr><td><span class="tag tag-orange">409</span></td><td>冪等キー重複</td><td>同一 <code>idempotency_key</code> で二重実行を検知</td><td>先行ジョブの結果をそのまま返却（再実行しない）</td></tr>
           <tr><td><span class="tag tag-orange">422</span></td><td>コンテンツ生成失敗</td><td>AIサービスのエラー・プロンプト問題</td><td>fallbackモデルへ自動切り替え後リトライ</td></tr>
-          <tr><td><span class="tag tag-orange">429</span></td><td>APIレート制限</td><td>外部APIのquota超過</td><td>exponential backoff (最大5回) + フォールバック</td></tr>
+          <tr><td><span class="tag tag-orange">429</span></td><td>APIレート制限</td><td>外部APIのquota超過</td><td>exponential backoff + jitter（最大5回） + フォールバック</td></tr>
           <tr><td><span class="tag tag-orange">451</span></td><td>コンテンツフィルタ除外</td><td>不適切コンテンツ検知</td><td>ネタを修正して再投入。パターンをDBに記録</td></tr>
-          <tr><td><span class="tag tag-orange">503</span></td><td>外部サービス障害</td><td>RunwayML / ElevenLabs等の障害</td><td>代替サービスへ自動フォールバック</td></tr>
+          <tr><td><span class="tag tag-orange">503</span></td><td>外部サービス障害</td><td>RunwayML / ElevenLabs等の障害・回路遮断OPEN状態</td><td>代替サービスへ自動フォールバック</td></tr>
+          <tr><td><span class="tag tag-orange">504</span></td><td>ステップタイムアウト</td><td>単一ステップが想定時間（目安: SLAの2倍）を超過</td><td>JobCheckpointから該当ステップのみ再試行。連続超過でエスカレーション</td></tr>
           <tr><td><span class="tag tag-orange">507</span></td><td>ストレージ不足</td><td>GCSバケット上限 or ローカルディスク満杯</td><td>tmpファイルを即時クリーンアップ + アラート</td></tr>
         </tbody>
       </table>
@@ -746,9 +890,24 @@ gs://ai-creator-hub-prod/
 
       <div style="background: var(--card); border: 1px solid rgba(0,212,255,0.4); border-radius: 14px; padding: 1.25rem 1.5rem;">
         <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem; flex-wrap: wrap;">
-          <span style="font-size: 1rem; font-weight: 800; color: var(--accent);">v0.4</span>
-          <span style="font-size: 0.82rem; color: var(--text-muted);">2026-05-11</span>
+          <span style="font-size: 1rem; font-weight: 800; color: var(--accent);">v0.5</span>
+          <span style="font-size: 0.82rem; color: var(--text-muted);">2026-07-05</span>
           <span class="tag tag-cyan" style="margin-left: auto;">現在</span>
+        </div>
+        <ul style="font-size: 0.85rem; color: var(--text-muted); padding-left: 1rem; display: flex; flex-direction: column; gap: 0.3rem;">
+          <li>「実行アーキテクチャ」セクションを新設: Supervisor–Workers パターン採用の理由、JobCheckpointによる状態管理・再開設計を明文化</li>
+          <li>冪等性・リトライ・回路遮断（Circuit Breaker）の設計方針を追加（実装状況は「実装中」と明記）</li>
+          <li>「外部ツール連携」セクションを新設: Anthropic MCPクリエイティブコネクタ（Blender/Adobe等）の評価状況を整理（未導入）</li>
+          <li>型定義に JobCheckpoint を追加</li>
+          <li>エラーコードに 409（冪等キー重複）・504（ステップタイムアウト）を追加</li>
+          <li>環境変数のモデル表記を現行世代へ更新: GPT-5.5 Instant / Claude Sonnet 5・Fable 5 / Gemini 3.5 Flash（旧: Claude Sonnet 4.6・Gemini 3.1 Pro）</li>
+        </ul>
+      </div>
+
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.25rem 1.5rem;">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem; flex-wrap: wrap;">
+          <span style="font-size: 1rem; font-weight: 800;">v0.4</span>
+          <span style="font-size: 0.82rem; color: var(--text-muted);">2026-05-11</span>
         </div>
         <ul style="font-size: 0.85rem; color: var(--text-muted); padding-left: 1rem; display: flex; flex-direction: column; gap: 0.3rem;">
           <li>環境変数リファレンスを追加（18変数）</li>
@@ -812,7 +971,8 @@ gs://ai-creator-hub-prod/
       <a href="evaluation.html">評価システム</a>
       <a href="openclaw.html">OpenClaw連携</a>
     </nav>
-    <p>AI Creator Hub — システム仕様書 v0.4</p>
+    <p>AI Creator Hub — システム仕様書 v0.5</p>
+    <p style="font-size:0.8rem;opacity:0.65;">最終更新: 2026-07-05（実行アーキテクチャ・外部ツール連携セクションを新設し、モデル表記をClaude Sonnet 5/Gemini 3.5 Flash等の現行世代へ更新）</p>
   </div>
 </footer>
 

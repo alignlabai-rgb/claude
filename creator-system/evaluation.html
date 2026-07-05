@@ -53,7 +53,7 @@
           <li><strong>フィードバック先:</strong> ネタ生成AI・LLMプロンプト最適化</li>
           <li><strong>判定速度:</strong> 1コンテンツあたり 約3〜5秒</li>
           <li><strong>自動改善:</strong> スコア70〜84は改善指示とともに再処理</li>
-          <li><strong>判定エンジン:</strong> Vision採点は Gemini 3.1 Pro、テキスト評価は GPT-5.5・Claude claude-fable-5 / claude-sonnet-4-6 を用途別に使い分け</li>
+          <li><strong>判定エンジン:</strong> Vision採点は Gemini 3.5 Omni、テキスト評価は GPT-5.5 Instant・Claude Sonnet 5 / Fable 5 を用途別に使い分け（2026-07時点の主力モデル。モデル世代交代のたびに評価スコアの絶対値がズレるため、月次チューニングの相関分析では判定エンジンの版も記録する）</li>
         </ul>
       </div>
       <div>
@@ -222,6 +222,25 @@
 
     </div>
     <p style="text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: 1.5rem;">※ 重み合計: 20+15+15+15+10+10+5+3+2 = 95%（残5%は動的ボーナス — 初投稿・季節性・プラットフォームキャンペーン等で加点）</p>
+
+    <div style="margin-top:2.5rem;">
+      <h3 style="font-size:1.05rem;margin-bottom:1rem;">主要指標のルーブリック例（Pass / Improve / Fail 基準）</h3>
+      <p style="color:var(--text-muted);font-size:0.88rem;max-width:760px;margin-bottom:1.5rem;">
+        重みだけでは「なぜそのスコアになったか」が再現できない。LLMを評価者として使う設計（LLM-as-judge）は、同じ入力でも実行のたびにスコアがぶれやすいという弱点があるため、各指標に具体的な合否基準を持たせてプロンプトのルーブリックに埋め込むことでブレを抑える。以下は代表的な4指標の基準例。実データが蓄積したら月次チューニングで文言自体も見直す。
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>指標</th><th>Pass（80点以上の目安）</th><th>Improve（60〜79点の目安）</th><th>Fail（60点未満の目安）</th></tr></thead>
+          <tbody>
+            <tr><td><strong>エンゲージメント予測</strong></td><td>冒頭3秒のフックに具体的な数字・疑問文・意外性のいずれかを含む。類似コンテンツの上位帯と構成が一致</td><td>フックはあるが弱い（一般論・抽象的な煽り文句のみ）。中盤で情報密度が下がる</td><td>フックが説明的で冒頭離脱を誘発する構成。類似コンテンツの下位帯と特徴が一致</td></tr>
+            <tr><td><strong>ビジュアル品質</strong></td><td>解像度基準を満たし、主要被写体に破綻（指・輪郭・文字の崩れ）なし。色調が一貫</td><td>軽微な破綻が1〜2箇所（背景の歪み等）。修正コストが低い</td><td>主要被写体に明確な破綻。色調が場面間で不統一</td></tr>
+            <tr><td><strong>コンテンツ品質</strong></td><td>ストーリー内で矛盾なし。セリフが不自然な機械翻訳調でない。情報の出典を確認できる</td><td>矛盾はないが説明が冗長、または情報の一部が未検証</td><td>設定・時系列に矛盾がある。事実確認できない断定的主張を含む</td></tr>
+            <tr><td><strong>安全性・規約遵守</strong>（拒否権）</td><td>著作権物・実在人物の無断使用なし。年齢制限該当表現なし</td><td>該当なし（拒否権方式のためImprove帯を持たない）</td><td>著作権疑義・規約違反表現を1つでも検知 → スコアに関わらず即除外</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="color:var(--text-muted);font-size:0.8rem;margin-top:1rem;">※ 上記の点数境界は目安であり、実データに基づく検証は行っていない。運用開始後、実際の再生数・収益との相関を見ながら基準文言を調整する想定。</p>
+    </div>
   </div>
 </section>
 
@@ -444,7 +463,7 @@
   <div class="section-inner">
     <div class="section-label">CLIP スコア実装</div>
     <h2 class="section-title">キャラクター一致度の<br>定量評価</h2>
-    <p style="color:var(--text-muted);max-width:700px;">漫画パイプラインでは Vision 採点（Gemini 3.1 Pro）に加え、CLIP スコアで「キャラクターが正しく描かれているか」を定量チェックする。CLIP は参照画像と生成画像の視覚的類似度を 0.0〜1.0 で返す。</p>
+    <p style="color:var(--text-muted);max-width:700px;">漫画パイプラインでは Vision 採点（Gemini 3.5 Omni）に加え、CLIP スコアで「キャラクターが正しく描かれているか」を定量チェックする。CLIP は参照画像と生成画像の視覚的類似度を 0.0〜1.0 で返す。</p>
     <div class="two-col" style="margin-top:2rem">
       <div>
         <h3 style="margin-bottom:1rem;font-size:1rem">閾値定義</h3>
@@ -560,6 +579,75 @@ score = compute_clip_similarity(
   </div>
 </section>
 
+<!-- LLM-as-judge Best Practices -->
+<section class="section" style="background: var(--bg2);" id="llm-judge-notes">
+  <div class="section-inner">
+    <div class="section-label">LLM-as-judge 運用上の注意点</div>
+    <h2 class="section-title">判定AIの「揺れ」を<br>どう抑えるか</h2>
+    <p style="color:var(--text-muted);max-width:760px;margin-bottom:1.5rem;">
+      LLMを評価者として使う設計（LLM-as-judge）には固有のクセがあることが2026年時点で広く報告されている。位置バイアス（先に提示した選択肢を優遇）・冗長性バイアス（長い出力を高評価しがち）・自己選好バイアス（同系統モデルの出力を優遇）などが代表例。本システムでも以下の運用ルールで対処する想定。
+    </p>
+    <ul class="checklist">
+      <li><strong>ルーブリックのバージョン管理:</strong> 判定基準の文言を変更したら version 番号を上げ、ADR（<a href="../foundations/decisions.html" style="color:var(--accent);">foundations/decisions.html</a>）に記録する。バージョンが違うスコアは単純比較せず、月次チューニングの相関分析でも version 別にグルーピングする</li>
+      <li><strong>境界スコア帯は複数judge化を検討:</strong> 55〜84点の帯域（改善・人間レビュー対象）はスコアのブレが判定結果を左右しやすい。余力があれば同一コンテンツをVision採点・テキスト評価LLMの2エンジンで独立採点し、乖離が大きい場合は自動でHITLへ回すルールを検討する（多数決より「意見が割れたこと自体」を人間へのシグナルとして使う設計）</li>
+      <li><strong>閾値・文言は固定しすぎない:</strong> 重みは月次で調整するが、ルーブリックの文言自体が古くなっていないか（新しいプラットフォーム規約・トレンド語彙の反映漏れ）も四半期に1度点検する</li>
+      <li><strong>判定理由のログ化:</strong> スコアだけでなく「なぜそのスコアか」の一言説明も出力させ、improvements フィールドに保存する。理由の記述がテンプレ化・空洞化してきたらプロンプト劣化のサイン</li>
+    </ul>
+
+    <div style="background: rgba(108,60,225,0.08); border: 1px solid rgba(108,60,225,0.3); border-radius: 14px; padding: 1.5rem; margin-top: 1.5rem;">
+      <div style="font-size: 0.8rem; font-weight: 700; color: #a48cf5; margin-bottom: 0.5rem;">参考: 「7つのフィードバックゲート」との対応</div>
+      <p style="color:var(--text-muted);font-size:0.85rem;line-height:1.8;margin:0;">
+        <a href="../workbench/knowledge/loop-engineering.html" style="color:var(--accent);">workbench/knowledge/loop-engineering.html</a> は自律ループを機能させる「7つのフィードバックゲート」を整理している。評価システムはこの汎用フレームの具体実装として読み直せる。スコアリング全体（エンゲージメント・コンテンツ・SEO評価など）は<strong>ゲート④ LLM-as-judge</strong>、CLIPスコアによるキャラクター一致度チェックは<strong>ゲート⑤ ビジュアル差分</strong>、55〜69点帯とコンプライアンス拒否権は<strong>ゲート⑥ 人間レビューゲート</strong>、CLIPリトライ上限（2回）とAPIエラー上限（3回）は<strong>ゲート⑦ 上限カウンター</strong>に相当する。評価ロジックを改修するときはこの対応表を見て「どのゲートを触っているか」を意識すると設計判断がぶれにくい。
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- 検知パターン例 -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label">検知パターン例（設計時点の想定）</div>
+    <h2 class="section-title">評価システムが<br>止めるべき典型ケース</h2>
+    <p style="color:var(--text-muted);max-width:760px;margin-bottom:1.5rem;">
+      <strong style="color:var(--text);">注記:</strong> <a href="kpi-dashboard.html#phase" style="color:var(--accent);">kpi-dashboard.html</a> のフェーズ進捗は現時点で Phase 1（設計完了・実装待ち）のため、以下は実運用ログではなく「この設計であれば検知できるはず」という想定シナリオである。実装・運用開始後は実データに基づいてこのセクションを書き換えること。
+    </p>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon cyan" style="margin-bottom:1rem;">🖐</div>
+        <h3>手指・輪郭の破綻（漫画）</h3>
+        <p style="font-size:0.88rem;">生成画像でキャラクターの指が6本になる、輪郭が二重になる等の典型的な生成AIアーティファクト。ビジュアル品質スコア（Vision採点）とCLIPスコア（参照画像との類似度 &lt;0.60）の両方が低下する見込みで、単独指標より2軸で見た方が検知しやすいと想定している。両方が閾値割れした場合のみ自動リトライ、片方だけならHITLに回すといった使い分けは、実運用データを見ながら調整する。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon orange" style="margin-bottom:1rem;">🧩</div>
+        <h3>設定・時系列の矛盾（動画・漫画共通）</h3>
+        <p style="font-size:0.88rem;">前編で「兄」と説明したキャラクターが後編で「弟」と呼ばれる、時系列が前後する等の一貫性エラー。コンテンツ品質スコアのLLM評価による検知を想定するが、シリーズ物では前編のメタデータを評価プロンプトに含めないと検知できない点に注意が必要（シリーズ継続性スコアとの連携が前提になる）。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon purple" style="margin-bottom:1rem;">©</div>
+        <h3>著作権疑義のあるビジュアル引用</h3>
+        <p style="font-size:0.88rem;">実在キャラクター・ロゴに酷似した生成物。安全性・規約遵守スコアの拒否権ロジックでの検知を狙うが、Vision判定だけでは「酷似」の線引きが曖昧になりやすい。疑わしい場合はスコアで確定させず自動でHITLに回し、最終判断は人間に委ねる設計とする（グレーゾーンをAIだけで判定しない）。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- A/Bテストとの接続 -->
+<section class="section" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-label">A/Bテストとの接続</div>
+    <h2 class="section-title">評価を通過した後も<br>「勝者」は実データで決める</h2>
+    <p style="color:var(--text-muted);max-width:760px;margin-bottom:1.5rem;">
+      評価スコアはあくまで「公開に値するか」の事前フィルタであり、「どのタイトル・サムネイルが最も伸びるか」を決めるものではない。2026年半ば時点でYouTubeの Test and Compare 機能はタイトル・サムネイルを最大3パターンまで同一動画でテストでき、勝敗は再生数ではなく<strong style="color:var(--text);">インプレッションあたりの視聴時間</strong>で判定される（プラットフォーム仕様は変更され得るため実装前に要再確認）。評価システムはこの後段テストへ渡す「候補の事前選定」までを担当する。
+    </p>
+    <ul class="checklist">
+      <li>タイトル・サムネイル案を最大3パターン生成し、それぞれ安全性・規約遵守スコア（拒否権）を個別に通過させる</li>
+      <li>3パターンともエンゲージメント予測スコアが一定水準以上の場合のみA/Bテストキューに投入し、低品質案しか残らない「全滅」を避ける</li>
+      <li>プラットフォーム側のA/Bテスト結果（勝者パターンの特徴）を月次チューニングの相関分析に取り込み、エンゲージメント予測スコアのプロンプト自体を実データで補強する</li>
+      <li>A/Bテスト機能がないプラットフォーム（note・Kindle等）では、評価スコア最上位の1案のみを採用する従来方式を維持する</li>
+    </ul>
+  </div>
+</section>
+
 <!-- 月次チューニング手順 -->
 <section class="section">
   <div class="section-inner">
@@ -647,6 +735,7 @@ PUBLISH された上位10件・下位10件を別シートに抽出すること"<
    weighted_score() のコードを新しい値に更新してください
 3. 変更をコミット: 'fix: 評価スコア重み月次更新（ADR-XXX）'"</span></div>
         <p style="font-size:0.83rem; color:var(--text-muted); margin:0.75rem 0 0;">このプロンプト 1 本で「ADR 記録 → コード変更 → コミット」まで非同期で完結する。</p>
+        <p style="font-size:0.83rem; color:var(--text-muted); margin:0.5rem 0 0;">重み変更だけでなく、指標の判定基準（ルーブリック文言）自体を変更した場合は rubric_version をインクリメントし、同様にADRへ記録する。バージョンが混在する期間のデータは相関分析で分けて扱うこと。詳細は <a href="#llm-judge-notes" style="color:var(--accent);">LLM-as-judge 運用上の注意点</a> セクション参照。</p>
       </div>
 
     </div>
@@ -678,7 +767,7 @@ PUBLISH された上位10件・下位10件を別シートに抽出すること"<
       <a href="kpi-dashboard.html">KPI</a>
     </nav>
     <p>AI Creator Hub — AIでコンテンツをつくり、稼ぐ</p>
-    <p style="font-size:0.8rem;opacity:0.65;">最終更新: 2026-06-15（月次チューニング手順追加・モデル名修正: Gemini 3.1 Pro / GPT-5.5 / claude-fable-5）</p>
+    <p style="font-size:0.8rem;opacity:0.65;">最終更新: 2026-07-05（評価ルーブリックの具体化・LLM-as-judge運用上の注意点とloop-engineeringの7ゲート対応整理・検知パターン例・A/Bテスト連携設計を追加し、モデル名を Gemini 3.5 Omni / GPT-5.5 Instant / Claude Sonnet 5 & Fable 5 に更新）</p>
   </div>
 </footer>
 

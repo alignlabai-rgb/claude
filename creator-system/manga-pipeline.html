@@ -218,6 +218,67 @@
   </div>
 </section>
 
+<!-- 具体例: ワンシーンの一気通貫フロー -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label">具体例</div>
+    <h2 class="section-title">1シーンが6ステップを通過する様子</h2>
+    <p style="color: var(--text-muted); margin-bottom: 1.5rem; max-width: 700px;">
+      抽象的な6ステップだけでは実装のイメージが掴みにくいため、1つのシーンが
+      「ストーリー構造化 → コマ割り → キャラ生成 → セリフ配置」を通過する具体例を追跡します。
+    </p>
+    <div class="two-col">
+      <div>
+        <h4 style="margin-bottom: 0.75rem; font-size: 0.95rem;">① 入力: ネタ生成LLMからの原稿断片</h4>
+        <div class="code-block">
+<span class="cm">// story_text の該当箇所（例示・架空のシーン）</span>
+<span class="str">"ヒロは階段を駆け上がった。教室の扉を開けると、
+そこには誰もいなかった。約束の時間はとっくに過ぎている。
+「……えっ、本当に？」思わず声が漏れた。"</span></div>
+        <h4 style="margin: 1.25rem 0 0.75rem; font-size: 0.95rem;">② コマ割り設計の出力</h4>
+        <div class="code-block">
+{
+  <span class="str">"page"</span>: <span class="num">3</span>, <span class="str">"panel_count"</span>: <span class="num">3</span>,
+  <span class="str">"panels"</span>: [
+    { <span class="str">"size"</span>: <span class="str">"small"</span>, <span class="str">"angle"</span>: <span class="str">"wide"</span>,
+      <span class="str">"desc"</span>: <span class="str">"階段を駆け上がるヒロ（後ろ姿）"</span> },
+    { <span class="str">"size"</span>: <span class="str">"medium"</span>, <span class="str">"angle"</span>: <span class="str">"POV"</span>,
+      <span class="str">"desc"</span>: <span class="str">"開けた扉から見た無人の教室"</span> },
+    { <span class="str">"size"</span>: <span class="str">"large"</span>, <span class="str">"angle"</span>: <span class="str">"close-up"</span>,
+      <span class="str">"emotion"</span>: <span class="str">"surprise"</span>,
+      <span class="str">"dialogue"</span>: <span class="str">"……えっ、本当に？"</span> }
+  ]
+}</div>
+      </div>
+      <div>
+        <h4 style="margin-bottom: 0.75rem; font-size: 0.95rem;">③ キャラ生成プロンプト（3コマ目）</h4>
+        <div class="code-block">
+<span class="cm"># build_prompt() が組み立てるプロンプト例</span>
+prompt = (
+    <span class="str">"anime boy, black short hair, blue eyes, "</span>
+    <span class="str">"school uniform, close-up face, surprised expression, "</span>
+    <span class="str">"wide eyes, parted lips, detailed, consistent style"</span>
+)
+negative = <span class="str">"deformed, inconsistent, bad anatomy, extra fingers"</span>
+lora = <span class="str">"hiro_v3.safetensors"</span>; lora_weight = <span class="num">0.85</span>
+ip_adapter_image = <span class="str">"ref/hiro_face.png"</span>; ip_adapter_scale = <span class="num">0.55</span>
+  <span class="cm"># クローズアップ = IP-Adapter強度をやや高めに（0.5〜0.6目安）</span>
+seed = <span class="num">42</span></div>
+        <h4 style="margin: 1.25rem 0 0.75rem; font-size: 0.95rem;">④ 吹き出し配置の判定</h4>
+        <div class="code-block">
+<span class="cm"># セリフ長・感情から吹き出し形状を自動選択</span>
+{
+  <span class="str">"text"</span>: <span class="str">"……えっ、本当に？"</span>,
+  <span class="str">"bubble_type"</span>: <span class="str">"normal"</span>,  <span class="cm"># 感情surpriseだが叫びではないため通常形状</span>
+  <span class="str">"placement"</span>: <span class="str">"upper-right"</span>,  <span class="cm"># 顔の空白領域を検出して配置</span>
+  <span class="str">"font_size"</span>: <span class="num">18</span>,
+  <span class="str">"tail_direction"</span>: <span class="str">"toward-mouth"</span>
+}</div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- LoRA Training & Consistency Metrics -->
 <section class="section">
   <div class="section-inner">
@@ -410,6 +471,16 @@
           <li>ADetailerで顔の品質を自動修正</li>
           <li>生成失敗時の自動リトライ機能</li>
         </ul>
+        <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; margin-top: 1.25rem;">
+          <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.5rem;">検討中の代替スタック（未採用・評価段階）</div>
+          <div style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.7;">
+            <strong style="color: var(--text);">NovelAI Diffusion V4.5</strong>: 1シーン内で複数キャラを直接指定できる位置グリッド機能を持ち、
+            クロスコンタミネーション対策の一部を代替できる可能性がある。<br>
+            <strong style="color: var(--text);">Flux + IP-Adapter</strong>: SDXL系より高解像度・高品質だが、
+            LoRAエコシステムの成熟度はSDXL系に及ばず、既存キャラLoRA資産の移行コストが課題。<br>
+            いずれも自パイプラインでの本格評価は未実施。ComfyUIからの乗り換えは「LoRA資産の再学習コスト」と天秤にかけて判断する。
+          </div>
+        </div>
       </div>
       <div>
         <div class="code-block">
@@ -698,6 +769,51 @@ CLIP_THRESHOLD = <span class="num">0.70</span>
   </div>
 </section>
 
+<!-- トラブルシューティング: style drift / anatomy error -->
+<section class="section" id="troubleshooting">
+  <div class="section-inner">
+    <div class="section-label">トラブルシューティング</div>
+    <h2 class="section-title">よくある不具合と対処<br>（style drift・anatomy error）</h2>
+    <p style="color: var(--text-muted); margin-bottom: 2rem; max-width: 700px;">
+      LoRA + IP-Adapter + ControlNet の3重構成は強力ですが、各手法が互いに干渉して品質を落とすケースがあります。
+      海外の実運用レポートでも同種の問題が報告されており（下記は一般的な傾向として参照。当パイプラインでの再現検証は未実施）、
+      症状ごとの当たりをつけておくとHITL引き渡し前の自動リトライで解決できる割合が上がります。
+    </p>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon orange">🌊</div>
+        <h3>スタイルドリフト</h3>
+        <p>ページを追うごとに線の太さ・塗り・顔つきが微妙にズレていく現象。長編（8ページ超）で顕著。
+        原因はシードのランダム再選択・LoRA weightの自動調整の蓄積誤差であることが多い。
+        対策: シードをキャラ単位で完全固定し、weightの動的調整は失敗時のみに限定する。ページ単位でCLIP類似度を先頭ページ基準と比較し、0.80未満で警告。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon purple">🖐️</div>
+        <h3>anatomy error（指・関節の破綻）</h3>
+        <p>拡散モデル全般に共通する弱点で、指の本数・関節の曲がり方が崩れやすい。
+        対策: ADetailerの手専用検出モデル（hand_yolo系）で手領域のみinpaint、またはMeshGraphormer系のhand ControlNetで骨格を先に固定してから生成する構成が有効とされる。
+        ネガティブプロンプトへの追加（"extra fingers, fused fingers, malformed hands"等）は補助策であり単独では不十分。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon cyan">⚖️</div>
+        <h3>IP-Adapterの強度がシーン種別と合わない</h3>
+        <p>海外の実装事例では、対話・クローズアップは IP-Adapter強度 0.5〜0.6、アクション・激しいポーズは 0.3 程度まで下げるとバランスが取れると報告されている（要検証・環境依存）。
+        強度を上げすぎるとポーズ再現性が落ち、下げすぎるとキャラの顔が崩れる。ジャンルプリセットごとにデフォルト強度を分けて管理するのが現実的。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon green">🧩</div>
+        <h3>LoRAがControlNetの指示を上書きする</h3>
+        <p>スタイル特化LoRA（特に学習データに含まれないポーズ）は、ControlNetの骨格指定を無視して独自のポーズに寄せてしまうことがある。
+        対策: ControlNet weightをLoRA weightより高めに設定する／該当ポーズを追加学習データに含めてLoRAを再学習する／それでも崩れる場合はLoRA weightを一段階落として再生成する。</p>
+      </div>
+    </div>
+    <div style="margin-top: 1.5rem; background: rgba(255,158,0,0.08); border: 1px solid rgba(255,158,0,0.25); border-radius: 12px; padding: 1rem; font-size: 0.82rem; color: var(--text-muted);">
+      ⚠️ 上記の強度パラメータ（0.5〜0.6 / 0.3等）は海外コミュニティの実装レポートに基づく目安であり、モデルバージョンやComfyUIワークフロー構成によって最適値は変わる。
+      本番導入前に必ず自パイプラインでA/Bテストし、数値を実測してから設定に反映すること。
+    </div>
+  </div>
+</section>
+
 <footer>
   <div class="footer-inner">
     <div class="footer-logo">AI Creator Hub</div>
@@ -710,7 +826,7 @@ CLIP_THRESHOLD = <span class="num">0.70</span>
       <a href="openclaw.html">OpenClaw連携</a>
     </nav>
     <p>AI Creator Hub — AIでコンテンツをつくり、稼ぐ</p>
-    <p style="font-size:0.8rem;opacity:0.65;">最終更新: 2026-05-31（LoRA参照画像生成に Imagen 4 Ultra を追加）</p>
+    <p style="font-size:0.8rem;opacity:0.65;">最終更新: 2026-07-05（Imagen 4廃止に伴いNano Banana 2 Lite/Proへ参照画像生成の記述を更新、PuLID Adapter・style drift/anatomy errorのトラブルシューティング・具体例フロー・代替スタック検討を追加）</p>
   </div>
 </footer>
 

@@ -38,7 +38,10 @@
 <section class="section">
   <div class="section-inner">
     <div class="section-label">パイプライン全体像</div>
-    <h2 class="section-title">5 ステップの自動フロー</h2>
+    <h2 class="section-title">6 ステップの自動フロー</h2>
+    <p style="color:var(--text-muted);max-width:740px;margin:0 0 .5rem">
+      「ネタ生成」と「生成」の間に<strong style="color:var(--text)">構造化・脚本</strong>という共通前処理を挟み、動画/漫画の2系統へ分岐させるのが実際のパイプライン構造です（詳細な工程×スタック対応は <a href="stack-map.html" style="color:#3dd8c5">stack-map.html</a> の5工程表を参照）。
+    </p>
 
     <style>
       .flow-diagram{display:flex;flex-direction:column;gap:0;max-width:860px;margin:2rem auto}
@@ -47,10 +50,16 @@
       .flow-step-label{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
       .flow-num{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.2rem;flex-shrink:0}
       .flow-num.teal{background:rgba(61,216,197,.15);border:2px solid rgba(61,216,197,.5);color:#3dd8c5}
+      .flow-num.cyan{background:rgba(0,212,255,.15);border:2px solid rgba(0,212,255,.5);color:#4fd6ff}
       .flow-num.purple{background:rgba(167,139,250,.15);border:2px solid rgba(167,139,250,.5);color:#c4a0ff}
       .flow-num.orange{background:rgba(247,183,51,.15);border:2px solid rgba(247,183,51,.5);color:#f7b733}
       .flow-num.green{background:rgba(79,255,176,.15);border:2px solid rgba(79,255,176,.5);color:#4fffb0}
       .flow-num.red{background:rgba(255,107,107,.15);border:2px solid rgba(255,107,107,.5);color:#ff9090}
+      .flow-branch{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:.75rem 0}
+      .flow-branch-card{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:12px 14px}
+      .flow-branch-card .fb-title{font-weight:700;font-size:.85rem;margin-bottom:4px}
+      .flow-branch-card .fb-desc{font-size:.82rem;color:var(--text-muted)}
+      @media(max-width:600px){.flow-branch{grid-template-columns:1fr}}
       .flow-step-name{font-size:.8rem;font-weight:700;color:var(--text-muted);text-align:center;text-transform:uppercase;letter-spacing:.05em}
       .flow-content h3{margin:0 0 8px;font-size:1.05rem}
       .flow-content p{font-size:.88rem;color:var(--text-muted);margin:0 0 10px}
@@ -80,23 +89,51 @@
           </div>
         </div>
       </div>
-      <div class="flow-arrow">↓ コンテンツ種別で分岐 ↓</div>
+      <div class="flow-arrow">↓</div>
 
-      <!-- Step 2: 生成 -->
+      <!-- Step 2: 構造化・脚本 -->
       <div class="flow-block">
         <div class="flow-step-label">
-          <div class="flow-num purple">2</div>
+          <div class="flow-num cyan">2</div>
+          <div class="flow-step-name">構造化・脚本</div>
+        </div>
+        <div class="flow-content">
+          <h3>シーン・セリフ・カメラ/コマ割りへの構造化（共通前処理）</h3>
+          <p>ネタ生成の出力を、動画・漫画どちらのパイプラインからも読める共通フォーマット（シーン分割・セリフ・カメラ/コマ指定）に変換する工程。同じ構造化結果を2系統に流用することで API コストと処理時間を削減する設計。長尺コンテンツは Claude Opus 4.8、コスト優先時は Sonnet 4.6 / Flash 系に自動切替。</p>
+          <div class="flow-tools">
+            <span class="flow-tool">Claude Sonnet 4.6 / Opus 4.8</span>
+            <span class="flow-tool">Gemini 3.1 Pro</span>
+            <span class="flow-tool">stack-map.html（②の行）</span>
+          </div>
+        </div>
+      </div>
+      <div class="flow-arrow">↓ コンテンツ種別で分岐 ↓</div>
+
+      <!-- Step 3: 生成 -->
+      <div class="flow-block">
+        <div class="flow-step-label">
+          <div class="flow-num purple">3</div>
           <div class="flow-step-name">生成</div>
         </div>
         <div class="flow-content">
-          <h3>動画 / 漫画コマの自動生成</h3>
-          <p>動画は ElevenLabs (TTS) → RunwayML / Veo 3 (映像) → FFmpeg (合成) の 7 ステップ。漫画は ComfyUI (LoRA + ControlNet + IP-Adapter) でコマを生成し ADetailer で顔を修正する。どちらも Python API 経由で OpenClaw が自動実行。</p>
+          <h3>動画 / 漫画コマの自動生成（並列分岐）</h3>
+          <div class="flow-branch">
+            <div class="flow-branch-card">
+              <div class="fb-title">🎬 動画パイプライン</div>
+              <div class="fb-desc">ElevenLabs (TTS) → Veo 3.1 / RunwayML Gen-4 (映像) → Suno (BGM) → FFmpeg (合成) の7ステップ。</div>
+            </div>
+            <div class="flow-branch-card">
+              <div class="fb-title">📖 漫画パイプライン</div>
+              <div class="fb-desc">ComfyUI（LoRA + ControlNet + IP-Adapter）でコマを生成 → ADetailer で顔を修正。参照画は Imagen 4 Ultra。</div>
+            </div>
+          </div>
+          <p>どちらも Python API 経由で OpenClaw が自動実行し、完了後は同じ評価キューへ合流する。</p>
           <div class="flow-tools">
             <span class="flow-tool">video-pipeline.html</span>
             <span class="flow-tool">manga-pipeline.html</span>
             <span class="flow-tool">ComfyUI</span>
             <span class="flow-tool">ElevenLabs</span>
-            <span class="flow-tool">RunwayML / Veo 3</span>
+            <span class="flow-tool">Veo 3.1 / RunwayML Gen-4</span>
           </div>
           <div class="hitl-note">
             <strong>HITL ポイント ①:</strong> LoRA フォールバック全段失敗時 → Signal で確認要求
@@ -105,10 +142,10 @@
       </div>
       <div class="flow-arrow">↓</div>
 
-      <!-- Step 3: 評価 -->
+      <!-- Step 4: 評価 -->
       <div class="flow-block">
         <div class="flow-step-label">
-          <div class="flow-num orange">3</div>
+          <div class="flow-num orange">4</div>
           <div class="flow-step-name">評価</div>
         </div>
         <div class="flow-content">
@@ -127,10 +164,10 @@
       </div>
       <div class="flow-arrow">↓ 合格コンテンツのみ通過 ↓</div>
 
-      <!-- Step 4: 配信 -->
+      <!-- Step 5: 配信 -->
       <div class="flow-block">
         <div class="flow-step-label">
-          <div class="flow-num green">4</div>
+          <div class="flow-num green">5</div>
           <div class="flow-step-name">配信</div>
         </div>
         <div class="flow-content">
@@ -146,18 +183,19 @@
       </div>
       <div class="flow-arrow">↓</div>
 
-      <!-- Step 5: 収益化 -->
+      <!-- Step 6: 収益化フィードバック -->
       <div class="flow-block">
         <div class="flow-step-label">
-          <div class="flow-num red">5</div>
-          <div class="flow-step-name">収益化</div>
+          <div class="flow-num red">6</div>
+          <div class="flow-step-name">収益化フィードバック</div>
         </div>
         <div class="flow-content">
-          <h3>収益トラッキング &amp; 最適化</h3>
-          <p>各プラットフォームの収益データを KPI ダッシュボードに集約。高パフォーマンスのコンテンツパターンをネタ生成 AI へフィードバックし、収益性の高い題材を優先的に生成するよう調整する。</p>
+          <h3>収益トラッキング &amp; ネタ生成への環流</h3>
+          <p>各プラットフォームの収益データを KPI ダッシュボードに集約。高パフォーマンスのコンテンツパターンをネタ生成 AI へフィードバックし、収益性の高い題材を優先的に生成するよう調整する。このループが閉じることで、パイプライン全体が「回すほど精度が上がる」自己改善系になる。</p>
           <div class="flow-tools">
             <span class="flow-tool">kpi-dashboard.html</span>
             <span class="flow-tool">monetization.html</span>
+            <span class="flow-tool">topic-generator.html（環流先）</span>
           </div>
         </div>
       </div>
@@ -173,7 +211,7 @@
     <h2 class="section-title">OpenClaw が全体を繋ぐ</h2>
     <div class="two-col">
       <div>
-        <p style="color:var(--text-muted)">OpenClaw は上記 5 ステップの「繋ぎ役」。各ステップは独立した Python モジュールとして実装されており、OpenClaw が JSON ワークフローとして順次起動する。</p>
+        <p style="color:var(--text-muted)">OpenClaw は上記 6 ステップの「繋ぎ役」。各ステップは独立した Python モジュールとして実装されており、OpenClaw が JSON ワークフローとして順次起動する。</p>
         <ul style="color:var(--text-muted)">
           <li>ステップ間のデータ受け渡し（ファイルパス / メタデータ）を管理</li>
           <li>API エラー時の自動リトライ（指数バックオフ）</li>
@@ -191,9 +229,16 @@
     <span class="fn">module</span>: <span class="str">topic_generator</span>
     <span class="fn">output</span>: <span class="str">topics.json</span>
 
-  - <span class="fn">step</span>: manga_generation
-    <span class="fn">module</span>: <span class="str">comfyui_batch</span>
+  - <span class="fn">step</span>: structuring
+    <span class="fn">module</span>: <span class="str">script_structurer</span>
     <span class="fn">input</span>: <span class="str">topics.json</span>
+    <span class="fn">output</span>: <span class="str">script.json</span>
+
+  - <span class="fn">step</span>: content_generation
+    <span class="fn">parallel</span>:
+      - <span class="fn">module</span>: <span class="str">video_pipeline</span>
+      - <span class="fn">module</span>: <span class="str">comfyui_batch</span>
+    <span class="fn">input</span>: <span class="str">script.json</span>
     <span class="fn">hitl</span>: lora_fallback_threshold
 
   - <span class="fn">step</span>: evaluation
@@ -239,14 +284,52 @@
         <tr><td><strong>OpenClaw のセットアップ</strong></td><td><a href="../claw-stack/openclaw/">claw-stack/openclaw/</a></td><td>設定 YAML・Signal Bot 接続手順</td></tr>
         <tr><td><strong>生成 AI ツール比較</strong></td><td><a href="genai-tools.html">genai-tools.html</a></td><td>画像/動画/テキスト各カテゴリのツール選定</td></tr>
         <tr><td><strong>どのモデルがどの工程を担うか</strong></td><td><a href="stack-map.html">stack-map.html</a></td><td>5工程×スタック対応表・4レイヤー・ナレッジ深掘りへの直結</td></tr>
+        <tr><td><strong>API仕様・型定義・環境変数を見たい</strong></td><td><a href="spec.html">spec.html</a></td><td>モジュール別 Input/Output・APIエンドポイント・デプロイ/認証・エラーコード</td></tr>
       </tbody>
     </table>
+    <p style="color:var(--text-muted);font-size:.82rem;margin-top:1rem">
+      迷ったら: 「順番」を知りたいなら本ページの上のフロー図、「どのモデルが何を担うか」は
+      <a href="stack-map.html" style="color:#3dd8c5">stack-map.html</a>、「どれが優れているか」の選定軸は
+      <a href="genai-tools.html" style="color:#3dd8c5">genai-tools.html</a>、実装の一次情報源は
+      <a href="spec.html" style="color:#3dd8c5">spec.html</a> — の使い分け。
+    </p>
+  </div>
+</section>
+
+<!-- 現在地スナップショット -->
+<section class="section" style="background:var(--section-alt)">
+  <div class="section-inner">
+    <div class="section-label">現在地スナップショット</div>
+    <h2 class="section-title">今どのフェーズで、何が動いているか</h2>
+    <p style="color:var(--text-muted);max-width:740px">
+      Phase 2（プロトタイプ）は仕上げ済み、現在は Phase 3（本格実装）でマネタイズ自動化と収益フィードバックループの構築が進行中。数値は 2026年5月時点の概算値で、Phase 3 進行に伴い実データへ順次置き換え中。詳細は
+      <a href="index.html#kpi" style="color:#3dd8c5">index.html の KPI セクション</a> と
+      <a href="kpi-dashboard.html" style="color:#3dd8c5">kpi-dashboard.html</a> を参照。
+    </p>
+    <div style="display:flex;flex-wrap:wrap;gap:1rem;margin-top:1.5rem">
+      <div style="flex:1;min-width:200px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem 1.25rem">
+        <div style="font-size:.78rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">月間公開本数</div>
+        <div style="font-size:1.4rem;font-weight:800;margin-top:.25rem">8本 <span style="font-size:.8rem;font-weight:400;color:var(--text-muted)">/ 目標20本</span></div>
+      </div>
+      <div style="flex:1;min-width:200px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem 1.25rem">
+        <div style="font-size:.78rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">評価通過率</div>
+        <div style="font-size:1.4rem;font-weight:800;margin-top:.25rem">40% <span style="font-size:.8rem;font-weight:400;color:var(--text-muted)">/ 目標65%</span></div>
+      </div>
+      <div style="flex:1;min-width:200px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem 1.25rem">
+        <div style="font-size:.78rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">プラットフォーム展開数</div>
+        <div style="font-size:1.4rem;font-weight:800;margin-top:.25rem">1 <span style="font-size:.8rem;font-weight:400;color:var(--text-muted)">/ 目標4</span></div>
+      </div>
+      <div style="flex:1;min-width:200px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem 1.25rem">
+        <div style="font-size:.78rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">月次収益</div>
+        <div style="font-size:1.4rem;font-weight:800;margin-top:.25rem">¥22,000 <span style="font-size:.8rem;font-weight:400;color:var(--text-muted)">/ 目標¥60,000</span></div>
+      </div>
+    </div>
   </div>
 </section>
 
 <!-- 最終更新 -->
 <footer style="max-width:1200px;margin:3rem auto 0;padding:0 1.5rem;font-size:.82rem;color:var(--text-muted)">
-  最終更新: 2026-05-30 |
+  最終更新: 2026-07-05（5→6ステップ化：構造化・脚本を独立工程として明示し動画/漫画の並列分岐を可視化、モジュール早見表にspec.htmlを追加、現在地スナップショットを新設） |
   <a href="index.html">Creator System TOP</a> /
   <a href="../index.html">Hub Top</a> /
   <a href="../foundations/decisions.html">ADR</a>

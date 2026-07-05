@@ -227,6 +227,225 @@
   </div>
 </section>
 
+<!-- MCPコネクター時代の接続方式 -->
+<section class="section" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-label">接続方式のアップデート（2026年中頃）</div>
+    <h2 class="section-title">「API直叩き」から<br>MCPコネクター経由へ</h2>
+    <div class="two-col">
+      <div>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+          2026年4月28日、Anthropic は Blender・Adobe Creative Cloud・Ableton を含む<strong style="color:var(--text);">クリエイティブ系 MCP コネクター9本</strong>を一斉公開しました。
+          Blender コネクターは Blender 開発チーム自身がメンテナンスする MCP サーバーとして提供され、Claude 以外の LLM からも呼び出せるオープンな設計になっています。
+          Adobe コネクターは 50 以上のツールにアクセスでき、画像/動画のアニメーション化や生成・改変を自然言語で扱えます。
+          <br><br>
+          これは L2/L3 レイヤーの接続方法における選択肢の追加であり、既存の REST API 直叩き構成（本ハブの現行構成）を置き換える必須要件ではありません。
+          「認証・ツール呼び出しの形式を MCP に標準化できる場面が増えた」という事実として記録します。
+        </p>
+        <ul class="checklist">
+          <li>ComfyUI/LoRA中心の漫画生成は現状維持（MCP移行の優先度は低い）</li>
+          <li>ポスプロ微調整（色調整・テロップ位置修正等）は Adobe コネクター経由の HITL 修正が候補</li>
+          <li>3Dアセットや複雑な画角指定が要る回では Blender コネクターが選択肢に</li>
+          <li>BGM/SEの精密編集は Suno（生成）+ Ableton コネクター（編集・確認）の二段構成も検討可</li>
+        </ul>
+      </div>
+      <div>
+        <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem;">
+          <h3 style="margin-bottom: 1rem; font-size: 0.95rem; color: var(--text-muted);">直叩きAPI vs MCPコネクター</h3>
+          <div class="code-block" style="margin:0;">
+<span class="cm"># 従来: REST APIを個別に直叩き</span>
+POST https://api.runwayml.com/v1/generate
+<span class="fn">Authorization</span>: Bearer RUNWAYML_API_KEY
+<span class="cm"># → サービスごとに認証・スキーマ・エラー処理を個別実装</span>
+
+<span class="cm"># MCP経由: ツール呼び出しを標準化</span>
+<span class="fn">mcp_client</span>.<span class="fn">call_tool</span>(
+  <span class="fn">server</span>=<span class="str">"adobe-creative-cloud"</span>,
+  <span class="fn">tool</span>=<span class="str">"animate_image"</span>,
+  <span class="fn">args</span>={<span class="str">"asset_id"</span>: <span class="str">"scene_04.psd"</span>}
+)
+<span class="cm"># → 認証・ディスカバリはMCPサーバー側が担い、</span>
+<span class="cm">#   呼び出し側は「どのツールを叩くか」だけに集中できる</span></div>
+        </div>
+        <div style="margin-top:1rem; background: rgba(255,158,0,0.06); border: 1px solid rgba(255,158,0,0.25); border-radius: 12px; padding: 1rem; font-size: 0.8rem; color: var(--text-muted);">
+          ⚠️ ここで挙げたクリエイティブ用途への当てはめ（Blender/Ableton連携案等）は本ハブ側の仮説的な拡張案であり、実運用で検証済みの構成ではありません。導入前に各コネクターの権限スコープ・料金体系を必ず確認してください。
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 工程間データフロー: 具体例 -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label">工程間データフローの具体例</div>
+    <h2 class="section-title">構造化データが<br>各工程でどう変形するか</h2>
+    <p style="color: var(--text-muted); margin-bottom: 1.5rem; max-width:740px;">
+      「②構造化・脚本」で生成される <code>topic_data.structured</code> が、動画パイプラインと漫画パイプラインでそれぞれどんな中間データ形式に変換されるかを具体例で示します。
+      型は <a href="spec.html#datatypes" style="color:#3dd8c5;">仕様書の型定義</a>（TopicMeta / ContentArtifact）と整合させています。
+    </p>
+    <div class="two-col">
+      <div>
+        <h3 style="margin-bottom: 0.75rem; font-size: 1rem; color: var(--text-muted);">動画: 脚本 → 絵コンテ → 生成リクエスト</h3>
+        <div class="code-block">
+<span class="cm">// Step1: 構造化された脚本（L1出力）</span>
+{
+  <span class="fn">"scenes"</span>: [
+    { <span class="fn">"id"</span>: <span class="num">1</span>, <span class="fn">"desc"</span>: <span class="str">"雨の商店街、主人公が傘を忘れる"</span>,
+      <span class="fn">"narration"</span>: <span class="str">"人生、忘れ物との闘い。"</span>,
+      <span class="fn">"duration_sec"</span>: <span class="num">4</span> }
+  ]
+}
+
+<span class="cm">// Step2: 絵コンテ化（カメラ・尺を確定）</span>
+{
+  <span class="fn">"scene_id"</span>: <span class="num">1</span>,
+  <span class="fn">"camera"</span>: <span class="str">"slow_pan_right"</span>,
+  <span class="fn">"style_preset"</span>: <span class="str">"news_modern"</span>,
+  <span class="fn">"ref_image"</span>: <span class="str">"gs://.../scene1_ref.png"</span>
+}
+
+<span class="cm">// Step3: 生成モデルへのリクエスト（L2）</span>
+POST /v1/video/generate  <span class="cm">// Veo系API想定</span>
+{
+  <span class="fn">"prompt"</span>: <span class="str">"雨の商店街、傘を忘れる主人公、slow pan right"</span>,
+  <span class="fn">"reference_image"</span>: <span class="str">"gs://.../scene1_ref.png"</span>,
+  <span class="fn">"duration_sec"</span>: <span class="num">4</span>,
+  <span class="fn">"aspect_ratio"</span>: <span class="str">"9:16"</span>
+}</div>
+      </div>
+      <div>
+        <h3 style="margin-bottom: 0.75rem; font-size: 1rem; color: var(--text-muted);">漫画: 脚本 → コマ割り → 生成リクエスト</h3>
+        <div class="code-block">
+<span class="cm">// Step1: 構造化された脚本（動画と共通のtopic_data由来）</span>
+{
+  <span class="fn">"beats"</span>: [
+    { <span class="fn">"id"</span>: <span class="num">1</span>, <span class="fn">"desc"</span>: <span class="str">"雨の商店街、主人公が傘を忘れる"</span>,
+      <span class="fn">"dialogue"</span>: <span class="str">"…あ、傘。"</span> }
+  ]
+}
+
+<span class="cm">// Step2: コマ割り設計（ページ/コマ/構図/セリフ位置）</span>
+{
+  <span class="fn">"page"</span>: <span class="num">1</span>, <span class="fn">"panel"</span>: <span class="num">2</span>,
+  <span class="fn">"composition"</span>: <span class="str">"low_angle_wide"</span>,
+  <span class="fn">"char_ref"</span>: <span class="str">"lora://characters/heroine_v3"</span>,
+  <span class="fn">"dialogue_bbox"</span>: [<span class="num">120</span>,<span class="num">40</span>,<span class="num">260</span>,<span class="num">90</span>]
+}
+
+<span class="cm">// Step3: ComfyUI ワークフローAPIへのリクエスト（L2/L3）</span>
+POST /prompt  <span class="cm">// ComfyUI標準API</span>
+{
+  <span class="fn">"workflow"</span>: <span class="str">"manga_panel_v2.json"</span>,
+  <span class="fn">"inputs"</span>: {
+    <span class="fn">"lora"</span>: <span class="str">"heroine_v3.safetensors"</span>,
+    <span class="fn">"controlnet_pose"</span>: <span class="str">"low_angle_wide.png"</span>,
+    <span class="fn">"prompt"</span>: <span class="str">"雨の商店街、傘を探す仕草"</span>
+  }
+}</div>
+      </div>
+    </div>
+    <div style="margin-top: 1.25rem; background: rgba(0,212,255,0.06); border: 1px solid rgba(0,212,255,0.2); border-radius: 12px; padding: 1rem; font-size: 0.82rem; color: var(--text-muted);">
+      💡 Step3のAPI形状は各ベンダーの実仕様に厳密対応するものではなく、「何を渡す必要があるか」の設計イメージです。実装時は各サービスの最新APIドキュメントを一次情報として確認してください。
+    </div>
+  </div>
+</section>
+
+<!-- オーケストレーション層の比較 -->
+<section class="section" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-label">オーケストレーション層の選択肢</div>
+    <h2 class="section-title">OpenClaw と汎用ツール群の<br>位置づけの違い</h2>
+    <p style="color: var(--text-muted); margin-bottom: 1rem; max-width:740px;">
+      本ハブの L4 はOpenClaw/PicoClawを正本としていますが、汎用オーケストレーションツール（n8n・Zapier・Make）も2026年に入りAIネイティブ機能を大きく強化しています。
+      比較軸として記録し、将来「OpenClawで足りない部分を汎用ツールで補うか」を判断する材料にします。
+    </p>
+    <div style="overflow-x:auto;">
+    <table class="map-table">
+      <thead>
+        <tr><th>ツール</th><th>AIネイティブ度</th><th>ホスティング</th><th>得意領域</th><th>このハブでの位置づけ</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>OpenClaw / PicoClaw</strong></td>
+          <td>Skill単位でLLM呼び出し・HITL・コスト管理を一体設計</td>
+          <td>セルフホスト（自前運用）</td>
+          <td>Signal連携・独自ワークフロー・本ハブ固有の型定義との統合</td>
+          <td><strong style="color:var(--text);">正本（L4の主力）</strong></td>
+        </tr>
+        <tr>
+          <td><strong>n8n（2.0系）</strong></td>
+          <td>AI Agent Tool Node・LangChain連携・70+ AIノードとエージェント指向が強い（2026年初頭に強化）</td>
+          <td>セルフホスト可（OSS）</td>
+          <td>汎用LLMパイプライン、ベクタDB連携、大量ノード実行のコスト最適化</td>
+          <td>参考枠。OpenClaw未実装の汎用連携を補う候補</td>
+        </tr>
+        <tr>
+          <td><strong>Zapier / Make</strong></td>
+          <td>Zapier Agents・Make Maia等でエージェント機能を追加中だがAI呼び出しは「連携の一種」の扱いに留まる傾向</td>
+          <td>SaaS（マネージド）</td>
+          <td>数千規模の既製アプリ連携、非エンジニアでも組みやすいUI</td>
+          <td>本ハブでは非採用。配信系SaaSとの簡易連携が要る場合の候補に留める</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+    <div style="margin-top: 1.25rem; background: rgba(255,158,0,0.06); border: 1px solid rgba(255,158,0,0.25); border-radius: 12px; padding: 1rem; font-size: 0.82rem; color: var(--text-muted);">
+      ⚠️ 表中の特性は各社のブログ・比較記事で一般的に報告されている傾向であり、機能の実測値ではありません。実運用で乗り換えを検討する際は必ず一次情報（公式ドキュメント）で再確認してください。
+    </div>
+  </div>
+</section>
+
+<!-- よくある接続トラブルと対処 -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label">トラブルシューティング</div>
+    <h2 class="section-title">工程間連携で<br>よくある失敗パターン</h2>
+    <p style="color: var(--text-muted); margin-bottom: 1rem; max-width:740px;">
+      <a href="spec.html#errors" style="color:#3dd8c5;">仕様書のエラーコード表</a>が単一APIのエラーを扱うのに対し、ここでは「工程Aから工程Bへの連携」で起きがちな症状を扱います。
+    </p>
+    <div style="overflow-x:auto;">
+    <table class="map-table">
+      <thead>
+        <tr><th>症状</th><th>想定原因</th><th>対処の方向性</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>callback_url へのWebhookが401で弾かれる</td>
+          <td>署名検証用シークレットのローテーション漏れ、または時刻ズレ（HMAC/JWTの<code>exp</code>不整合）</td>
+          <td>secret更新を送信側・受信側の両方に反映したか確認。サーバー間のNTP同期を確認</td>
+        </tr>
+        <tr>
+          <td>ジョブが <code>queued</code> のまま進捗しない</td>
+          <td>Redisキューのワーカー枯渇、または <code>MAX_PARALLEL_JOBS</code> 上限に張り付いている</td>
+          <td><code>/api/v1/system/status</code> でqueue_depthを確認。上限緩和かワーカー追加を検討</td>
+        </tr>
+        <tr>
+          <td>動画・漫画で同じネタなのに構造化結果の解釈がズレる</td>
+          <td>共通前処理（②構造化）のスキーマがバージョン更新され、片方のconsumerだけ追従できていない</td>
+          <td><code>topic_data</code> にschemaバージョンを持たせ、両パイプラインの許容範囲を揃える</td>
+        </tr>
+        <tr>
+          <td>MCPコネクター経由の呼び出しが403で失敗</td>
+          <td>OAuthスコープ不足、コネクター側の権限失効・再認可待ち</td>
+          <td>コネクターの認可状態を確認し再認可。必要スコープを最小権限で洗い出す</td>
+        </tr>
+        <tr>
+          <td>フォールバック先に切り替えても同じくタイムアウトする</td>
+          <td>フォールバック候補が1系統しかなく、同時障害・共通基盤障害に弱い</td>
+          <td>フォールバック先を2段以上用意する。最終段はHITL（人間判断）に必ず落とす</td>
+        </tr>
+        <tr>
+          <td>月次コストアラートは来るが、どの工程が原因か分からない</td>
+          <td>コスト集計がSkill単位までで、Skill内のステップ単位のタグ付けがされていない</td>
+          <td>ステップ単位で<code>cost_so_far_usd</code>を積算するようログを構造化する（<a href="spec.html#monitoring">モニタリング仕様</a>参照）</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</section>
+
 <!-- モデル世代交代への追従 -->
 <section class="section" style="background: var(--bg2);">
   <div class="section-inner">
@@ -311,7 +530,7 @@
       <a href="openclaw.html">OpenClaw連携</a>
     </nav>
     <p>AI Creator Hub — AIでコンテンツをつくり、稼ぐ</p>
-    <p style="font-size:0.8rem;opacity:0.65;">最終更新: 2026-06-01（新設：技術スタック×パイプライン接続マップ。ロードマップ Phase 3「接続強化」の実装）</p>
+    <p style="font-size:0.8rem;opacity:0.65;">最終更新: 2026-07-05（MCPコネクター接続方式・工程間データフロー具体例・オーケストレーション層比較・トラブルシューティングを追加し大幅深掘り）</p>
   </div>
 </footer>
 
