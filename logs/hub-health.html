@@ -106,20 +106,21 @@
       <p><a href="index.html">← Logs</a> / <a href="../index.html">Hub Top</a></p>
       <h1>Hub Health Dashboard</h1>
       <p>このハブ全体の<strong>運用健全性</strong>を可視化するページです。ページ数・最終更新からの経過日数・カテゴリカバレッジ・LLM トラッカー鮮度を一目で見えるようにし、「次に何を更新するか」の判断材料を提供します。</p>
-      <p><strong>計測時点:</strong> 2026-06-26 / <strong>計測対象:</strong> 全 .html ファイル（.git・node_modules を除く）。days old は各ファイルの git 最終コミット日からの経過日数。</p>
+      <p><strong>計測時点:</strong> 2026-07-05 / <strong>計測対象:</strong> 全 .html ファイル（.git・node_modules を除く）。days old は各ファイルの <code>git log</code> 最終コミット日からの経過日数（<code>os.path.getmtime</code> はコンテナ再クローンで全ファイルが 0d 扱いになり誤動作するため、今回から git ベースの計測手法に切替。前回 6/26 版の一部カテゴリは実際には再計測されず前々回の数値が残っていたため、今回で正確な値に補正）。</p>
     </div>
 
     <div class="panel">
       <h2>全体サマリー</h2>
       <div class="stat-grid">
-        <div class="kpi"><div class="value">272</div><div class="label">総ページ数</div></div>
-        <div class="kpi"><div class="value">120,416</div><div class="label">総行数</div></div>
+        <div class="kpi"><div class="value">285</div><div class="label">総ページ数</div></div>
+        <div class="kpi"><div class="value">140,693</div><div class="label">総行数</div></div>
         <div class="kpi"><div class="value">11</div><div class="label">主要カテゴリ</div></div>
         <div class="kpi"><div class="value">6</div><div class="label">LLM トラッカー</div></div>
         <div class="kpi"><div class="value">4</div><div class="label">Index カテゴリ</div></div>
         <div class="kpi"><div class="value">6</div><div class="label">Trend 長文</div></div>
-        <div class="kpi"><div class="value">52</div><div class="label">AI News 日次</div></div>
+        <div class="kpi"><div class="value">60</div><div class="label">AI News 日次</div></div>
       </div>
+      <p style="font-size:0.85rem; color:#7f92ac; margin-top:10px;">前回計測（記載上は6/26、実際の recompute は6/17）比: +31ページ / +13,131行 / AI News 日次 +19本（6/18〜7/05 まで連続更新継続）。</p>
     </div>
 
     <div class="panel">
@@ -139,90 +140,90 @@
           <tr>
             <td class="cat">creator-system</td>
             <td>23</td>
-            <td>25,155</td>
-            <td>7.0d</td>
-            <td><span class="health ok">OK</span></td>
-            <td>★ 主軸領域。index/evaluation/monetization/video-pipeline/manga-pipeline を 5/30 更新、genai-tools.html を新設。Claude_Design 書架（10本）も 5/26〜28 で活発。<strong>4/10 ALERT は解消</strong>。</td>
+            <td>25,376</td>
+            <td>32.9d</td>
+            <td><span class="health warn">WARN</span></td>
+            <td>★ 主軸宣言領域。<strong>直近更新は5/30〜6/01（evaluation.html が最新で19.9d、spec.html など大半が34.3d）</strong>。7月に入って進捗反映なし。「月1回以上」の目安ラインに接近しており次回更新が必要。</td>
           </tr>
           <tr>
             <td class="cat">research</td>
-            <td>85</td>
-            <td>増加中</td>
-            <td>再計測推奨</td>
+            <td>100</td>
+            <td>26,659</td>
+            <td>26.0d</td>
             <td><span class="health ok">OK</span></td>
-            <td>ai-news 日次52本（5/06〜6/26 連続更新）+ LLM トラッカー6本 + trend長文6本で活発。openclaw-news/ サブ群は別途棚卸し対象。</td>
+            <td>ai-news 日次60本（〜7/05 連続更新、最新は0.4d）+ LLM トラッカー6本（7/1更新）+ trend長文6本で活発。openclaw-news/ サブ22本（5/31時点で棚卸し済）が平均を押し上げるが健全域。</td>
           </tr>
           <tr>
             <td class="cat">workbench</td>
-            <td>98</td>
-            <td>60,032</td>
-            <td>8.0d</td>
+            <td>102</td>
+            <td>67,590</td>
+            <td>28.5d</td>
             <td><span class="health ok">OK</span></td>
-            <td>最大カテゴリ（+984行）。6/08 スタブ13本拡充完了後、6/15 に <strong>pi-coding-agent.html</strong>（806行）を新設（Earendil/Pi SDK・4ツール・15+ LLM・OpenClaw内部エンジン解説）。hermes-agent.html を v0.13〜v0.16 に更新（+170行）。openclaw/index.html バナー更新。</td>
+            <td>最大カテゴリ。6/21 に <strong>エンジニアリングスキル シリーズ4本</strong>（prompt/context/harness/loop-engineering、各1,400〜1,700行）を新設・拡充（最新13.9d）。docker/vscode/git-basics 等の旧スタブは6/20・5/31で解消済み。</td>
           </tr>
           <tr>
             <td class="cat">foundations</td>
             <td>14</td>
-            <td>4,316</td>
-            <td>9.2d</td>
-            <td><span class="health ok">OK</span></td>
-            <td>site-map / decisions を 5/30 更新。glossary・onboarding 等は 5/26 整備済。agent-protocol / operating-principles は 4/16 だが変動の少ない原則ページ。</td>
+            <td>4,390</td>
+            <td>31.5d</td>
+            <td><span class="health warn">WARN</span></td>
+            <td>site-map.html は6/21更新（14.2d）だが、archive-policy・glossary等は5/31以来手つかず（34.3d）。「原則ページは別基準」に該当する分もあるが、平均が30日ラインを超過。</td>
           </tr>
           <tr>
             <td class="cat">demos</td>
             <td>7</td>
-            <td>4,955</td>
-            <td>30.4d</td>
+            <td>4,954</td>
+            <td>34.3d</td>
             <td><span class="health warn">WARN</span></td>
-            <td>イベント終了済みアーカイブ。index.html は 5/25 だが、配下5本は 4/16〜5/06 のまま（アーカイブ性質上、棚卸し優先度は低い）。</td>
+            <td>イベント終了済みアーカイブ。全7本が5/31以来未更新。アーカイブ性質上、棚卸し優先度は引き続き低い。</td>
           </tr>
           <tr>
             <td class="cat">strategy</td>
             <td>6</td>
             <td>1,075</td>
-            <td>9.1d</td>
-            <td><span class="health ok">OK</span></td>
-            <td>priorities / roadmap を 5/30 更新。capability-map は本セッションで現行化（後述）。</td>
+            <td>34.2d</td>
+            <td><span class="health warn">WARN</span></td>
+            <td>roadmap.html が最新（33.7d）で、他は5/31のまま。priorities / capability-map の四半期棚卸しが未実施。</td>
           </tr>
           <tr>
             <td class="cat">logs</td>
             <td>12</td>
-            <td>2,207</td>
-            <td>14.2d</td>
-            <td><span class="health ok">OK</span></td>
-            <td>next-actions / site-changelog / hub-health（このページ）を 5/30 更新。<strong>session-log は 4/6 が最新のまま</strong>（sessions/2026-05-26.html を追加したが、それ以降のセッション記録は未追従）。</td>
+            <td>2,240</td>
+            <td>30.0d</td>
+            <td><span class="health warn">WARN</span></td>
+            <td>hub-health.html（このページ）は本更新で8.7d→0dに回復するが、<strong>2026-04-06-session-log.html が時系列セッションログの最新のまま</strong>（34.3d）。6月の大規模更新群（Engineering Skills Series・Operations_Manuals新設等）がセッションログに未反映。</td>
           </tr>
           <tr>
             <td class="cat">claw-stack</td>
             <td>6</td>
-            <td>3,323</td>
-            <td>15.0d</td>
+            <td>3,336</td>
+            <td>29.5d</td>
             <td><span class="health ok">OK</span></td>
-            <td>6/15 に <strong>openclaw/index.html</strong> を v2026.6.5 に全面更新（+136行）。Skill Workshop・Workboard・Pi SDK 統合・3リリースカードを追加。WARN は解消。</td>
+            <td>comparison.html が最新（19.9d）。旧4ページの「4月初旬のまま」ALERT は5/31〜6/15の更新で<strong>解消済み</strong>。全体平均は30日ライン直下でOK維持。</td>
           </tr>
           <tr>
             <td class="cat">_routines</td>
             <td>6</td>
             <td>1,090</td>
-            <td>23.0d</td>
-            <td><span class="health ok">OK</span></td>
-            <td>日次運用テンプレート群（news-template ほか）。前回計測では1本のみ計上していたが実際は6本。</td>
+            <td>34.2d</td>
+            <td><span class="health warn">WARN</span></td>
+            <td>日次運用テンプレート群。5/31以来更新なし。テンプレート自体は変動が少なくて構わないが、hub-health-check.html など運用手順系は内容の陳腐化確認が望ましい。</td>
           </tr>
           <tr>
             <td class="cat">(root)</td>
             <td>2</td>
-            <td>1,212</td>
-            <td>0.0d</td>
+            <td>1,259</td>
+            <td>24.7d</td>
             <td><span class="health ok">OK</span></td>
-            <td>index.html + search.html。6/08 に「エージェント基盤・プロトコル」カードを新設（A2A / MAF / agent-memory 導線）。copilot-studio-guide / power-platform-guide のサブリンクも追加済み。</td>
+            <td>index.html は6/20更新（15.1d、Operations_Manuals カード追加）。search.html は5/31のまま（34.3d）。</td>
           </tr>
           <tr>
-            <td class="cat">operations</td>
+            <td class="cat">Operations_Manuals</td>
             <td>7</td>
-            <td>2,521</td>
-            <td>0.0d</td>
+            <td>2,724</td>
+            <td>15.1d</td>
             <td><span class="health ok">OK</span></td>
-            <td>共通書架の下に6冊を集約。Codexは12章・Prompt診断・運用セレクター・習熟判定を備えたMaster版へ更新。表紙・Site Map・検索からアクセス可能。</td>
+            <td><strong>新設カテゴリ</strong>（6/20、Antigravity/ClaudeCode/Codex/GitGitHub/GrokBuild/Obsidian の6冊+書架index）。index.html・site-map.html からリンク済み。<strong>CLAUDE.md の Folder Rules 表に未記載</strong>（下記アクション参照）。</td>
           </tr>
         </tbody>
       </table>
@@ -230,7 +231,7 @@
 
     <div class="panel">
       <h2>LLM トラッカー鮮度</h2>
-      <p class="info-card">LLM Updates Hub の<strong>6トラッカー</strong>の最終更新日（5/30 に Grok / Qwen / GLM を新設し 3→6 本へ拡張）。全社並走で同じ粒度を維持する運用方針。</p>
+      <p class="info-card">LLM Updates Hub の<strong>6トラッカー</strong>の最終更新日。全社並走で同じ粒度を維持する運用方針。</p>
       <table>
         <thead>
           <tr>
@@ -246,49 +247,49 @@
           <tr>
             <td class="cat">Claude / Anthropic</td>
             <td><a href="../research/claude-recent-updates.html">claude-recent-updates.html</a></td>
-            <td>~1,400</td>
-            <td>2026-06-26</td>
-            <td>2026-02 〜 06-26（Claude Sonnet 4.6 Thinking / Opus 4.8 / Fable 5・Mythos 5 一時停止）</td>
+            <td>1,707</td>
+            <td>2026-07-01</td>
+            <td>Claude Sonnet 5・Fable 5 再開・Claude Science を追記</td>
             <td><span class="health ok">OK</span></td>
           </tr>
           <tr>
             <td class="cat">ChatGPT / OpenAI</td>
             <td><a href="../research/chatgpt-recent-updates.html">chatgpt-recent-updates.html</a></td>
-            <td>~820</td>
-            <td>2026-06-26</td>
-            <td>2025-10 〜 06-26（GPT-5.5 / Codex 6月更新 / ChatGPT Sites）</td>
+            <td>986</td>
+            <td>2026-07-01</td>
+            <td>GPT-5.6 Sol/Terra/Luna 限定Preview・GPT-4.5正式退役・Codex Remote GA・Ona買収</td>
             <td><span class="health ok">OK</span></td>
           </tr>
           <tr>
             <td class="cat">Gemini / Google</td>
             <td><a href="../research/gemini-recent-updates.html">gemini-recent-updates.html</a></td>
-            <td>~660</td>
-            <td>2026-06-26</td>
-            <td>2025-11 〜 06-26（3.5 Flash / Gemini 2.0 API 停止 / Enterprise 既定化）</td>
+            <td>892</td>
+            <td>2026-07-01</td>
+            <td>Nano Banana 2 Lite・Gemini Omni Flash 開発者向け提供開始</td>
             <td><span class="health ok">OK</span></td>
           </tr>
           <tr>
             <td class="cat">Grok / xAI</td>
             <td><a href="../research/grok-recent-updates.html">grok-recent-updates.html</a></td>
-            <td>~460</td>
-            <td>2026-06-26</td>
-            <td>Grok 4.3 / Grok Build / Imagine Video / Files API × Imagine</td>
+            <td>632</td>
+            <td>2026-07-01</td>
+            <td>Grok Build v0.2.70〜v0.2.73（06-25以降の新規モデル発表なしを一次ソースで確認）</td>
             <td><span class="health ok">OK</span></td>
           </tr>
           <tr>
             <td class="cat">Qwen / Alibaba</td>
             <td><a href="../research/qwen-recent-updates.html">qwen-recent-updates.html</a></td>
-            <td>~455</td>
-            <td>2026-06-26</td>
-            <td>Qwen3.7 Max / Plus（商用プレビュー）＋ Qwen 3.6 open-weight 系</td>
+            <td>575</td>
+            <td>2026-07-01</td>
+            <td>Qwen3.7-Max が Model Studio で GA相当／Qwen-Turbo非推奨・Qwen-Flash推奨</td>
             <td><span class="health ok">OK</span></td>
           </tr>
           <tr>
             <td class="cat">GLM / Zhipu</td>
             <td><a href="../research/glm-recent-updates.html">glm-recent-updates.html</a></td>
-            <td>~390</td>
-            <td>2026-06-26</td>
-            <td>GLM-5.1（200K context）/ Coding Plan / MCP quota</td>
+            <td>547</td>
+            <td>2026-07-01</td>
+            <td>HKEX FY2025決算・Coding Plan 30%値上げ／API価格83%上昇</td>
             <td><span class="health ok">OK</span></td>
           </tr>
         </tbody>
@@ -318,44 +319,51 @@
     </div>
 
     <div class="panel">
+      <h2>GitHub 状態</h2>
+      <div class="alert-card">
+        <strong>🟡 要判断 — Open PR #6 が2ヶ月以上放置</strong>
+        <p><a href="https://github.com/alignlabai-rgb/claude/pull/6">PR #6「claude-recent-updates 4〜5月版に更新 + AI×クリエイティブページ新規作成」</a>（2026-05-03 作成、head: <code>claude/may-updates-creative</code>）が open のまま。base は当時の main（2fb710c）で、claude-recent-updates.html はその後 7/1 まで何度も全面更新されているため、<strong>この PR の diff は事実上すべて陳腐化・コンフリクト確実</strong>。ai-creative.html 新設部分のみ救出価値がある可能性。</p>
+        <p><strong>次アクション:</strong> 内容を再確認のうえ、有用な差分（ai-creative.html）だけ現行 main に手動移植してクローズするか、そのままクローズを推奨。</p>
+      </div>
+      <div class="recommend-card">
+        <strong>🟢 健全 — GitHub Actions（pages-build-deployment）</strong>
+        <p>直近の Pages デプロイは全て success（7/1〜7/4 分を確認）。Actions 起因の障害なし。ワークフローはこの1本のみ（CI/テストパイプラインは未整備）。</p>
+      </div>
+      <div class="recommend-card">
+        <strong>🟢 確認 — main への日次コミットは継続中</strong>
+        <p>6/17〜7/5 の間に origin/main へ41コミット。AI News 日次・LLM トラッカー6本（7/1一斉更新）・Engineering Skills Series新設（6/21）・Operations_Manuals新設（6/20）が主な内容。ブランチはこのセッションの作業ブランチのみで、他に issue の残留なし。</p>
+      </div>
+    </div>
+
+    <div class="panel">
       <h2>要対応リスト</h2>
 
-      <div class="recommend-card">
-        <strong>🟢 解消済 — Creator System の「45日前更新」ALERT は誤り</strong>
-        <p>過去の計測で出ていた「主軸宣言なのに大半が45日前のまま」という ALERT は、5/30 の更新で<strong>解消</strong>。index / evaluation / monetization / video-pipeline / manga-pipeline を 5/30 に更新し、genai-tools.html を新設。Claude_Design 書架（10本）も 5/26〜28 で活発。カテゴリ平均は 7.0d まで低下。</p>
+      <div class="alert-card">
+        <strong>🟡 新規 WARN — creator-system・foundations・strategy・_routines・logs が「30日ライン」を超過</strong>
+        <p>5/30〜6/01 に一斉更新されたこれらのカテゴリが、7/5 時点で軒並み平均30〜35日に到達（当ページ自身も含む）。同じ期間、research（AI News・LLM トラッカー）と workbench（Engineering Skills Series）は活発に更新され続けた結果、<strong>「速報系は毎日回っているが、主軸コンテンツ・原則・戦略・セッション記録は5週間近く止まっている」</strong>という偏りが明確化。</p>
+        <p><strong>次アクション:</strong> creator-system は月次更新の目安に沿って進捗反映（★主軸宣言領域のため優先度高）。foundations/strategy/_routines は内容の陳腐化有無を確認したうえで軽微でも touch。</p>
       </div>
 
       <div class="recommend-card">
-        <strong>🟢 解消済 — Claw Stack「全ファイル45日以上未更新」ALERT は誤り</strong>
-        <p>PicoClaw を 5/30 に修正し、agent-brain-guide.html（エージェント頭脳選定ガイド）を新設。「全ファイルが45日以上未更新」という ALERT は<strong>事実でなくなった</strong>。ただし comparison / index / nanoclaw / openclaw は 4/04〜4/05 のままで、カテゴリ平均（46.3d）は依然高い → 下記 WARN を参照。</p>
+        <strong>🟢 解消済 — Claw Stack の旧ページ問題</strong>
+        <p>comparison / index / nanoclaw / openclaw/index はいずれも 5/31〜6/15 に更新済み。以前の「4月初旬のまま」ALERT は完全に解消し、カテゴリ平均29.5dでOK域。</p>
       </div>
 
       <div class="recommend-card">
-        <strong>🟢 改善実施済 — LLM トラッカーを 6/26 時点まで更新</strong>
-        <p>Claude / ChatGPT / Gemini / Grok / Qwen / GLM の6トラッカーを 2026-06-26 時点へ更新。Claude は Sonnet 4.6 Thinking リリース・Fable 5 / Mythos 5 アクセス停止、OpenAI は Codex / Sites、Gemini は 2.0 API 停止、Grok は Files API × Imagine、Qwen は 3.7 Max / Plus、GLM は 200K context / Coding Plan を反映済み。</p>
-      </div>
-
-      <div class="recommend-card">
-        <strong>🟢 改善実施済 — workbench の LLM 深掘り群を一斉更新</strong>
-        <p>grok / qwen / glm / kimi / deepseek / mistral / gemini / chatgpt / claude-model と slm-guide を 5/30 更新、google-ecosystem.html を新設。LLM 個別深掘りの鮮度が回復。</p>
+        <strong>🟢 解消済 — research/openclaw-news・workbench の docker/vscode/git-basics</strong>
+        <p>openclaw-news サブ22本は5/31に、workbench/knowledge の docker.html・vscode.html・git-basics.html は5/31〜6/20に、それぞれ更新済み。「4月のまま」ALERT は解消。</p>
       </div>
 
       <div class="alert-card">
-        <strong>🟡 WARN（正直な古い項目）— Claw Stack の旧4ページが 4月初旬のまま</strong>
-        <p>新規 agent-brain-guide で改善したが、<a href="../claw-stack/comparison.html">comparison.html</a> / <a href="../claw-stack/index.html">index.html</a> / nanoclaw / <a href="../claw-stack/openclaw/index.html">openclaw/index.html</a> は 4/04〜4/05 から更新されていない。OpenClaw 周りの最新状況反映は<strong>本セッションでは未着手</strong>。</p>
-        <p><strong>次アクション:</strong> claw-stack 旧ページの世代・状況更新（別セッションで対応）。</p>
+        <strong>🟡 継続 WARN — Logs の時系列セッションログが 4/6 で止まったまま</strong>
+        <p><a href="2026-04-06-session-log.html">2026-04-06-session-log.html</a> が最新。<code>sessions/</code> 配下には 5/26・5/30・6/01 の3本のみ追加され、それ以降（Engineering Skills Series新設・LLM トラッカー一斉更新・Operations_Manuals新設など6月の大規模作業）は<strong>未記録のまま累積</strong>。ギャップが拡大している。</p>
+        <p><strong>次アクション:</strong> 6月の主要セッションをまとめて sessions/ に追記するか、記録運用そのものを簡略化するか方針を決める。</p>
       </div>
 
       <div class="alert-card">
-        <strong>🟡 WARN（正直な古い項目）— Logs の session-log が 4/6 のまま</strong>
-        <p><a href="2026-04-06-session-log.html">2026-04-06-session-log.html</a> が時系列セッションログの最新。<a href="sessions/2026-05-26.html">sessions/2026-05-26.html</a> を追加したものの、それ以降（5/28〜5/30 の大規模更新）のセッション記録は未追従。</p>
-        <p><strong>次アクション:</strong> 5/30 セッションのログを sessions/ 配下に追加（ADR で意図は記録済みだが、時系列手順は別途）。</p>
-      </div>
-
-      <div class="alert-card">
-        <strong>🟡 WARN（正直な古い項目）— research/openclaw-news と workbench 旧ガイドが 4月のまま</strong>
-        <p>research/openclaw-news/ サブ22本（4/04）、workbench の docker / vscode / git-basics・openclaw/* サブ群（4/04〜4/16）は今回触っていない。これらが research / workbench のカテゴリ平均を押し上げている。<strong>本セッションでは健全化していない</strong>正直な古い項目として明記。</p>
-        <p><strong>次アクション:</strong> openclaw 系の棚卸し方針を別途決める（アーカイブ化 or 更新）。</p>
+        <strong>🟡 小さな WARN — Operations_Manuals が CLAUDE.md の Folder Rules に未記載</strong>
+        <p>6/20 新設のこのカテゴリは index.html・foundations/site-map.html には正しくリンクされているが、CLAUDE.md（2026-06-26更新版）の Folder Rules 表には行が追加されていない。CLAUDE.md 自身が「新カテゴリ追加時は Folder Rules を更新」と定めているルールに対する小さな未達。</p>
+        <p><strong>次アクション:</strong> CLAUDE.md Folder Rules 表に <code>Operations_Manuals/</code> の1行を追記。</p>
       </div>
     </div>
 
@@ -378,16 +386,29 @@
             <li>ただし「変動の少ない原則ページ」（foundations の一部など）は別基準</li>
           </ul>
         </li>
-        <li><strong>計測手順:</strong> Python で全 .html を walk し、行数・mtime を集計（このページ末尾のスクリプトを参照）</li>
+        <li><strong>計測手順:</strong> Python で全 .html を walk し、行数を集計。days old は <code>git log --format=name-only</code> の最古一致から算出（このページ末尾のスクリプトを参照）</li>
       </ul>
     </div>
 
     <div class="panel">
       <h2>計測スクリプト（再現用）</h2>
+      <p class="small" style="color:#7f92ac; margin-bottom:8px;">⚠️ 2026-07-05 版で <code>os.path.getmtime</code> ベースから <code>git log</code> ベースに切替。リモート実行環境ではコンテナ再クローンのたびに全ファイルの mtime が現在時刻にリセットされ、旧スクリプトは常に days_old=0 を返す不具合があったため。</p>
       <pre style="background: rgba(255,255,255,0.04); padding: 14px; border-radius: 10px; font-size: 0.82rem; color: #c5d0e3; overflow-x: auto;">
-import os, time
+import subprocess, time, os
+from collections import defaultdict
+
+# 全コミットを新しい順に舐め、各ファイルが最初に登場した時刻 = 最終更新時刻
+out = subprocess.run(['git','-c','core.quotepath=false','log','--format=C:%ct','--name-only'],
+                      capture_output=True, text=True).stdout
+current_ts, first_seen = None, {}
+for line in out.split('\n'):
+    if line.startswith('C:'):
+        current_ts = int(line[2:])
+    elif line.strip():
+        first_seen.setdefault(line.strip(), current_ts)
+
 now = time.time()
-cats = {}
+cats = defaultdict(list)
 for root, dirs, files in os.walk('.'):
     if '.git' in root or 'node_modules' in root: continue
     for f in files:
@@ -396,11 +417,13 @@ for root, dirs, files in os.walk('.'):
         cat = path.split('/')[0] if '/' in path else '(root)'
         with open(path, encoding='utf-8', errors='ignore') as fh:
             lines = sum(1 for _ in fh)
-        days_old = (now - os.path.getmtime(path)) / 86400
-        cats.setdefault(cat, []).append((path, lines, days_old))
+        ts = first_seen.get(path)
+        days_old = (now - ts) / 86400 if ts else None
+        cats[cat].append((path, lines, days_old))
+
 for c, files in sorted(cats.items()):
     total = sum(f[1] for f in files)
-    ages = [f[2] for f in files]
+    ages = [f[2] for f in files if f[2] is not None]
     print(f"{c:&lt;20}{len(files):&gt;6}p {total:&gt;7}lines  avg={sum(ages)/len(ages):.1f}d")</pre>
       <p class="small">これを <code>logs/hub-stats.py</code> として置き、四半期ごとに実行 → このページを手動更新する想定。将来的には GitHub Actions で自動化できる。</p>
     </div>
