@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Comfy Cloud & Comfy MCP — クラウドComfyUIとAIエージェント連携 | Tech Workbench</title>
+<style>
+:root {
+    --accent: #3dd8c5;
+    --accent2: #a78bfa;
+    --bg: #0b1220;
+    --surface: #111a2b;
+    --surface2: #16213a;
+    --border: rgba(255,255,255,0.08);
+    --text: #e9edf5;
+    --muted: #8b949e;
+    --radius: 12px;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans JP',sans-serif; line-height:1.65; font-size:16px; }
+a { color:var(--accent); text-decoration:none; }
+a:hover { text-decoration:underline; }
+.page-wrap { max-width:960px; margin:0 auto; padding:32px 20px 80px; }
+nav { background:var(--surface); border-bottom:1px solid var(--border); padding:12px 20px; font-size:0.85rem; }
+nav a { color:var(--muted); margin-right:6px; }
+nav a:hover { color:var(--text); }
+nav span { color:var(--muted); margin-right:6px; }
+.hero { background:linear-gradient(135deg, #0f5c52, #14877a, #6d4fc7); border-radius:var(--radius); padding:48px 40px; margin-bottom:40px; }
+.hero h1 { font-size:2.1rem; font-weight:800; color:#fff; margin-bottom:8px; }
+.hero .sub { color:rgba(255,255,255,0.9); font-size:1.03rem; margin-bottom:24px; max-width:680px; }
+.chips { display:flex; flex-wrap:wrap; gap:8px; }
+.chip { background:rgba(255,255,255,0.18); color:#fff; padding:4px 14px; border-radius:20px; font-size:0.8rem; font-weight:600; }
+.section { margin-bottom:48px; }
+.section > h2 { font-size:1.35rem; font-weight:700; margin-bottom:16px; padding-bottom:8px; border-bottom:2px solid var(--accent); color:var(--accent); }
+.section > h2.purple { border-color:var(--accent2); color:var(--accent2); }
+p { margin-bottom:12px; color:var(--muted); }
+p strong, li strong { color:var(--text); }
+ul, ol { padding-left:1.5em; margin-bottom:12px; }
+li { margin-bottom:5px; color:var(--muted); }
+.grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:20px; margin-bottom:20px; }
+.grid2 { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px; }
+@media(max-width:680px){ .grid2{grid-template-columns:1fr;} }
+.card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:22px; }
+.card h3 { font-size:1.02rem; font-weight:700; margin-bottom:10px; color:var(--accent); }
+.card h3.purple { color:var(--accent2); }
+.table-wrap { overflow-x:auto; margin:16px 0; }
+table { width:100%; border-collapse:collapse; font-size:0.88rem; }
+th { background:var(--surface2); color:var(--accent); padding:10px 14px; text-align:left; border:1px solid var(--border); }
+td { padding:9px 14px; border:1px solid var(--border); vertical-align:top; color:var(--muted); }
+td strong { color:var(--text); }
+tr:nth-child(even) td { background:rgba(255,255,255,0.02); }
+.highlight-box { background:rgba(61,216,197,0.08); border-left:3px solid var(--accent); border-radius:0 8px 8px 0; padding:16px 20px; margin:16px 0; }
+.highlight-box.purple { background:rgba(167,139,250,0.08); border-color:var(--accent2); }
+.highlight-box.yellow { background:rgba(250,204,21,0.08); border-color:#facc15; }
+.highlight-box p { margin:0; color:var(--muted); }
+.badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:0.75rem; font-weight:700; margin-bottom:8px; }
+.badge-teal { background:rgba(61,216,197,0.18); color:var(--accent); }
+.badge-purple { background:rgba(167,139,250,0.18); color:var(--accent2); }
+.badge-yellow { background:rgba(250,204,21,0.15); color:#facc15; }
+.code { background:#070d18; border:1px solid rgba(255,255,255,.07); border-radius:10px; padding:16px 18px; font-family:"Fira Code","Cascadia Code","Consolas",monospace; font-size:0.8rem; line-height:1.7; overflow-x:auto; white-space:pre; color:#c8d3e3; margin:12px 0; }
+.c{color:#5a7a9a}.k{color:var(--accent)}.kw{color:#a78bfa}.s{color:#f7b733}.n{color:#c4a0ff}.fn{color:#7dd3fc}.p{color:#e9edf5}
+.spec-row { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:12px; margin:16px 0; }
+.spec-box { background:rgba(0,0,0,0.25); border-radius:8px; padding:14px; }
+.spec-label { font-size:0.72rem; text-transform:uppercase; color:var(--muted); letter-spacing:0.06em; display:block; margin-bottom:4px; }
+.spec-val { font-size:0.98rem; font-weight:700; color:#fff; }
+.ok { color:#4fffb0; font-weight:700; }
+.no { color:#f85149; }
+.partial { color:#facc15; }
+code { background:rgba(255,255,255,.07); padding:2px 7px; border-radius:5px; font-size:0.85rem; color:#a5f3d0; font-family:"Fira Code",monospace; }
+footer { text-align:center; padding:32px 20px; color:var(--muted); font-size:0.85rem; border-top:1px solid var(--border); margin-top:60px; }
+footer a { color:var(--muted); }
+</style>
+</head>
+<body>
+<nav>
+  <a href="../../index.html">Hub</a> <span>›</span>
+  <a href="../index.html">Tech Workbench</a> <span>›</span>
+  <a href="./index.html">Knowledge Hub</a> <span>›</span>
+  Comfy Cloud &amp; Comfy MCP
+</nav>
+
+<main class="page-wrap">
+
+<div class="hero">
+  <h1>Comfy Cloud &amp; Comfy MCP</h1>
+  <p class="sub">「ComfyUI をローカルGPUなしでクラウド実行」がついに公式化。2026年3月に Comfy Cloud が正式ベータ卒業、6月30日には AI エージェントから自然言語で ComfyUI を操作できる「Comfy MCP」が登場した。Claude Code・Claude Desktop から直接つながる、このハブの制作パイプラインに直結する更新。</p>
+  <div class="chips">
+    <span class="chip">Comfy Cloud 正式版（2026-03）</span>
+    <span class="chip">Blackwell RTX 6000 Pro</span>
+    <span class="chip">Comfy MCP 発表（2026-06-30）</span>
+    <span class="chip">Claude Code / Claude Desktop 対応</span>
+    <span class="chip">$30M 調達・評価額$500M</span>
+  </div>
+</div>
+
+<!-- 1. Comfy Cloud とは -->
+<section class="section">
+  <h2>1. Comfy Cloud とは — 公式ホスティング版 ComfyUI</h2>
+  <p><a href="comfyui.html">workbench/knowledge/comfyui.html</a>（既存の完全ガイド）で扱ってきた ComfyUI は、これまでローカルPCに GPU を用意してインストールするのが前提でした。<strong>Comfy Cloud</strong>（<a href="https://comfy.org/cloud/" target="_blank" rel="noopener">comfy.org/cloud</a> / <a href="https://cloud.comfy.org/" target="_blank" rel="noopener">cloud.comfy.org</a>）は、Comfy Org 自身が提供する<strong>公式の完全ホスティング版</strong>です。セットアップ・GPU調達が一切不要で、ブラウザから既存のワークフロー資産（JSON・カスタムノード）をほぼそのまま実行できます。</p>
+  <p>2026年3月にベータを卒業して正式サービス化。ローカル版ワークフローの<strong>約90%のカスタムノードがそのままクラウド上で動作</strong>すると報告されており、既存の資産（LoRA・ControlNet・IP-Adapter構成など）を大きく作り直す必要はありません。</p>
+
+  <div class="highlight-box">
+    <p>💡 <strong>このハブにとっての意味:</strong> <a href="../../creator-system/manga-pipeline.html">manga-pipeline.html</a> や <a href="../../creator-system/video-pipeline.html">video-pipeline.html</a> が前提としてきた「ComfyUIを動かすローカルGPU環境」が、必須条件ではなくなりつつある。低スペックPCやノートPCからでも同じ生成パイプラインを回せる可能性が出てきた。</p>
+  </div>
+
+  <div class="spec-row">
+    <div class="spec-box"><span class="spec-label">GPU</span><span class="spec-val">NVIDIA Blackwell RTX 6000 Pro</span></div>
+    <div class="spec-box"><span class="spec-label">VRAM</span><span class="spec-val">96GB</span></div>
+    <div class="spec-box"><span class="spec-label">システムRAM</span><span class="spec-val">180GB</span></div>
+    <div class="spec-box"><span class="spec-label">カスタムノード互換</span><span class="spec-val">約90%（報告ベース）</span></div>
+    <div class="spec-box"><span class="spec-label">課金対象</span><span class="spec-val">ワークフロー実行中のみ</span></div>
+    <div class="spec-box"><span class="spec-label">今後の拡張</span><span class="spec-val">Blackwell B200対応予定</span></div>
+  </div>
+
+  <p style="font-size:0.85rem;">課金はワークフローが<strong>実際に実行されている時間のみ</strong>発生し、ノードをつなぐ・設定するといったアイドル時間には課金されません。今後は複数人での同時編集（マルチユーザー編集）・ノードツリーのバージョン管理・共有モデルライブラリといったコラボレーション機能が追加される計画も報じられています（未リリース・要確認）。</p>
+</section>
+
+<!-- 2. 料金プラン -->
+<section class="section">
+  <h2>2. 料金プラン（2026年7月時点・報告ベース）</h2>
+  <p style="font-size:0.85rem;">⚠️ クラウドAIサービスの料金体系は変更が頻繁です。以下は複数の一次情報・比較記事から確認した2026年1月の30%値下げ後の水準で、契約前に必ず <a href="https://comfy.org/cloud/pricing/" target="_blank" rel="noopener">公式Pricingページ</a> で最新値を確認してください。</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>プラン</th><th>クレジット/月</th><th>ワークフロー実行上限</th><th>特徴</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Free</strong></td>
+          <td>400クレジット/月</td>
+          <td>—</td>
+          <td>Googleサインインのみ、クレジットカード登録不要</td>
+        </tr>
+        <tr>
+          <td><strong>Standard</strong></td>
+          <td>目安でGPU時間 約4.4時間/月相当</td>
+          <td>1ワークフローあたり最大30分</td>
+          <td>個人利用の入門プラン</td>
+        </tr>
+        <tr>
+          <td><strong>Creator</strong></td>
+          <td>Standardより多いクレジット</td>
+          <td>最大30分</td>
+          <td>Civitai LoRAアップロード対応</td>
+        </tr>
+        <tr>
+          <td><strong>Pro</strong></td>
+          <td>最上位クレジット</td>
+          <td>1ワークフローあたり最大1時間</td>
+          <td>長時間・大規模ワークフロー向け</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p style="font-size:0.85rem;">GPU従量課金は2026年1月の30%値下げ後で<strong>0.266クレジット/秒（≒15.96クレジット/分、目安）</strong>と報告されています。動画生成・アップスケール・複数モデルを跨ぐ重いワークフローほどクレジット消費が大きくなる点に注意してください。</p>
+</section>
+
+<!-- 3. Comfy MCP -->
+<section class="section">
+  <h2 class="purple">3. Comfy MCP — AIエージェントからComfyUIを直接操作</h2>
+  <p>2026年6月30日、Comfy Org は <strong>Comfy MCP</strong> を発表しました。これは Model Context Protocol（MCP）経由で、Claude Code・Claude Desktop のような AI エージェントから ComfyUI の生成機能を<strong>自然言語で直接呼び出す</strong>仕組みです。ノードグラフを手で組む必要がなく、モデルの手動ダウンロードもローカルGPUも不要になります。</p>
+
+  <div class="highlight-box purple">
+    <p>🔌 <strong>なぜ重要か:</strong> これまで「エージェントに画像/動画生成をさせる」には API を個別に叩くコードを書く必要がありました。Comfy MCP はこれを標準化し、<a href="harness-engineering.html">harness-engineering.html</a> でいう「Tool層」を ComfyUI エコシステムに対して一気に整備した形になります。</p>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <span class="badge badge-teal">実装①</span>
+      <h3>Hosted MCP Server（推奨・最も手軽）</h3>
+      <ul>
+        <li><code>cloud.comfy.org/mcp</code> に接続するだけ</li>
+        <li>Comfy Cloud の GPU上でワークフローを実行</li>
+        <li>プリインストール済みモデル・テンプレートライブラリ全体を検索・利用可能</li>
+        <li>Claude Desktop・Claude Code などチャット駆動のエージェントに最適</li>
+        <li>ローカルGPU・モデルダウンロード一切不要</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="badge badge-purple">実装②</span>
+      <h3>Local MCP Server</h3>
+      <ul>
+        <li>ローカル環境で動作しつつ、<strong>30以上の外部パートナープロバイダ</strong>への統一生成ツールを提供</li>
+        <li>対応例: BFL（FLUX）・Ideogram・Kling・Runway・Veo・Meshy・ElevenLabs など</li>
+        <li>複数社のAPIをComfyUI経由で1つのインターフェースに統合</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="badge badge-teal">実装③</span>
+      <h3>CLI Companion</h3>
+      <ul>
+        <li>ターミナル・スクリプト・CIパイプライン向け</li>
+        <li><code>comfy generate</code>: パートナーAPIへの単発呼び出し</li>
+        <li><code>comfy run</code>: Comfy Cloud 上でワークフロー全体を実行</li>
+        <li>OpenClaw・自動化スクリプトへの組み込みに向く</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 style="margin:20px 0 10px; color:var(--text); font-size:1rem;">Claude Desktop / Claude Code からの接続例</h3>
+  <p>Claude Desktop の場合、カスタムコネクタとして以下のURLを追加し、OAuthでサインインするだけで利用開始できます（Claude Code など他クライアントも同様の MCP 接続手順に準拠）。</p>
+  <div class="code"><span class="c"># Claude Desktop: Settings → Connectors → Add Custom Connector</span>
+<span class="k">URL:</span> https://cloud.comfy.org/mcp
+<span class="k">認証:</span> OAuth サインイン（Comfy Cloud アカウント連携）
+
+<span class="c"># 接続後、エージェントへの指示例（自然言語）</span>
+<span class="s">"このキャラクター画像を参照に、雨の夜の路地に立っているシーンを</span>
+<span class="s"> Kling で10秒の動画にして、ネイティブ音声で環境音も入れて"</span>
+<span class="c"># → エージェントがモデル選定・ノード構成・実行までを裏側で処理</span></div>
+
+  <p style="font-size:0.85rem;">この構成は <a href="../../creator-system/stack-map.html">creator-system/stack-map.html</a> で扱っている「MCPコネクター時代の接続方式」の延長線上にあり、Blender・Adobe系の創作系MCPコネクター（2026年4月28日発表）と同じ潮流に位置づけられます。</p>
+</section>
+
+<!-- 4. 比較表 -->
+<section class="section">
+  <h2>4. クラウド実行の選択肢比較</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>選択肢</th><th>提供元</th><th>特徴</th><th>MCP対応</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Comfy Cloud</strong></td>
+          <td>Comfy Org（公式）</td>
+          <td>公式ホスティング。カスタムノード互換性が高く、Comfy MCPと直結</td>
+          <td class="ok">◎ 公式Hosted MCP Server</td>
+        </tr>
+        <tr>
+          <td><strong>RunComfy</strong></td>
+          <td>サードパーティ</td>
+          <td>セットアップ不要・高速GPU・スケーラブルAPIを謳うサードパーティ勢の代表格</td>
+          <td class="partial">△ 要個別確認</td>
+        </tr>
+        <tr>
+          <td><strong>ComfyICU</strong></td>
+          <td>サードパーティ</td>
+          <td>サーバーレス型のComfyUIクラウド。従量課金モデル</td>
+          <td class="partial">△ 要個別確認</td>
+        </tr>
+        <tr>
+          <td><strong>ComfyAI.run</strong></td>
+          <td>サードパーティ</td>
+          <td>無料枠を含むオンラインComfyUI。試用のハードルが低い</td>
+          <td class="no">未対応（報告ベース）</td>
+        </tr>
+        <tr>
+          <td><strong>ローカルComfyUI</strong></td>
+          <td>自前環境</td>
+          <td>従来型。<a href="comfyui.html">comfyui.html</a> の完全ガイド参照。GPU保有前提だが従量課金なし</td>
+          <td class="partial">△ Local MCP Serverで対応可</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.85rem;">サードパーティ勢のMCP対応状況は変化が速いため、実際に採用を検討する際は各社の公式ドキュメントで最新の対応状況を確認してください。</p>
+</section>
+
+<!-- 5. エコシステムの動き -->
+<section class="section">
+  <h2 class="purple">5. エコシステムの勢い — $30M調達と評価額$500M</h2>
+  <div class="grid2">
+    <div class="card">
+      <span class="badge badge-purple">資金調達</span>
+      <h3 class="purple">Craft Ventures 主導ラウンド</h3>
+      <p>2026年4月24日、Comfy Org は <strong>$30M（約45億円）</strong> を調達し、<strong>評価額$500M</strong> に到達したと報じられています。ノードベースの画像/動画生成ツールという一見ニッチな領域から、クラウド実行・エージェント連携基盤へと急速に事業領域を広げている流れがうかがえます。</p>
+    </div>
+    <div class="card">
+      <span class="badge badge-teal">バージョン更新</span>
+      <h3>ComfyUI 0.27.0（2026-06-30）</h3>
+      <p>int8量子化モデルへの対応が追加され、量子化モデルのパフォーマンスが大幅に改善されたと報告されています。クラウド・ローカル双方でリソース効率が向上する方向性です。</p>
+    </div>
+  </div>
+</section>
+
+<!-- 6. このハブでの活用シーン -->
+<section class="section">
+  <h2>6. creator-system パイプラインへの応用シーン</h2>
+  <ul>
+    <li><strong>GPU非保有環境での漫画コマ生成:</strong> <a href="../../creator-system/manga-pipeline.html">manga-pipeline.html</a> のLoRA+ControlNet+IP-Adapter構成を、ノートPCからComfy Cloud経由で実行できる可能性。ただし1ワークフローの実行時間上限（Standard/Creator: 30分、Pro: 1時間）に注意</li>
+    <li><strong>Claude Code からの直接生成:</strong> Comfy MCP のHosted Serverに接続すれば、Claude Codeのセッション内から「このシーンを生成して」と指示するだけでComfyUIワークフローが実行される。<a href="loop-engineering.html">loop-engineering.html</a> でいう「Act」フェーズがMCP経由でComfyUIに直結する</li>
+    <li><strong>CI/バッチパイプラインでの活用:</strong> <code>comfy run</code> をOpenClawや自動化スクリプトに組み込めば、<a href="../../creator-system/openclaw.html">openclaw.html</a> のワークフロー定義から直接クラウドGPUでの生成をキックできる</li>
+    <li><strong>コスト設計上の論点:</strong> ローカルGPU（初期投資型・固定費）とComfy Cloud（従量課金・変動費）のどちらが量産体制に適するかは、月間生成本数とワークフロー当たりの実行時間次第。<a href="../../creator-system/kpi-dashboard.html">kpi-dashboard.html</a> のコスト指標と突き合わせて判断する余地がある</li>
+  </ul>
+  <div class="highlight-box yellow">
+    <p>⚠️ <strong>未検証事項:</strong> 本ページの内容はWebSearchによる一次情報・複数の比較記事の突き合わせに基づく。実際の90%カスタムノード互換性・具体的なクレジット消費量・Claude Codeとの接続時の細かい挙動は、このハブの制作パイプラインで実地検証していない。導入前に小規模なワークフローで動作確認することを推奨。</p>
+  </div>
+</section>
+
+<!-- 7. 関連ページ -->
+<section class="section">
+  <h2>7. 関連ページ</h2>
+  <ul>
+    <li><a href="comfyui.html">ComfyUI 完全ガイド</a> — ローカル環境でのインストール・ノード基礎・LoRA/ControlNet/IP-Adapter実践</li>
+    <li><a href="harness-engineering.html">Harness Engineering</a> — MCPをはじめとするツール層設計の考え方</li>
+    <li><a href="loop-engineering.html">Loop Engineering</a> — エージェントのPlan-Act-Observe-Reflectループと生成ツール連携</li>
+    <li><a href="../../creator-system/manga-pipeline.html">creator-system/manga-pipeline.html</a> — 漫画コマ生成パイプライン</li>
+    <li><a href="../../creator-system/stack-map.html">creator-system/stack-map.html</a> — MCPコネクター接続方式・オーケストレーション層比較</li>
+    <li><a href="../../creator-system/openclaw.html">creator-system/openclaw.html</a> — OpenClawによる全パイプライン統合</li>
+  </ul>
+</section>
+
+</main>
+
+<footer>
+  <p>関連: <a href="comfyui.html">ComfyUI 完全ガイド</a> &nbsp;|&nbsp; <a href="harness-engineering.html">Harness Engineering</a> &nbsp;|&nbsp; <a href="../../creator-system/manga-pipeline.html">manga-pipeline</a> &nbsp;|&nbsp; <a href="index.html">Knowledge Hub</a></p>
+  <p style="margin-top:8px;">最終更新: 2026-07-05 &nbsp;|&nbsp; <a href="../../index.html">Hub トップ</a> &nbsp;|&nbsp; <a href="index.html">← Knowledge Hub</a></p>
+</footer>
+</body>
+</html>
