@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AIツール機能別見取り図 更新ルーティン | _routines</title>
+  <style>
+    body { font-family: "Segoe UI","Noto Sans JP",system-ui,sans-serif; margin:0; background:#0b1220; color:#edf2fb; line-height:1.7; padding:28px 18px 64px; }
+    .shell { max-width:960px; margin:0 auto; display:flex; flex-direction:column; gap:16px; }
+    .panel { background:#111a2b; border:1px solid rgba(255,255,255,0.08); border-radius:18px; padding:22px 26px; }
+    .panel-accent { border-color:rgba(61,216,197,.3); }
+    .panel-yellow { border-color:rgba(252,211,77,.3); }
+    .panel-red { border-color:rgba(255,90,90,.35); }
+    a { color:#75d7c0; text-decoration:none; }
+    a:hover { text-decoration:underline; }
+    h1 { margin:6px 0; font-size:1.7rem; }
+    h2 { margin:0 0 12px; font-size:1.05rem; color:#fcd34d; border-bottom:2px solid rgba(252,211,77,.2); padding-bottom:6px; }
+    h3 { margin:12px 0 6px; font-size:.95rem; color:#75d7c0; }
+    p,li { color:#c5d0e3; font-size:.9rem; }
+    ul { padding-left:20px; margin:6px 0; }
+    li { margin-bottom:4px; }
+    code { font-family:"Fira Code","Consolas",monospace; background:rgba(255,255,255,.06); padding:1px 7px; border-radius:5px; font-size:.83em; color:#a5f3d0; }
+    .pre { background:#070d18; border:1px solid rgba(255,255,255,.07); border-radius:10px; padding:14px 16px; font-family:"Fira Code","Consolas",monospace; font-size:.8rem; line-height:1.65; overflow-x:auto; white-space:pre; color:#c8d3e3; margin:10px 0; }
+    .badge { display:inline-block; font-size:.72rem; font-weight:700; padding:2px 8px; border-radius:5px; margin-right:6px; }
+    .badge-teal { background:rgba(61,216,197,.18); color:#3dd8c5; }
+    .badge-yellow { background:rgba(252,211,77,.18); color:#fcd34d; }
+    .badge-red { background:rgba(255,90,90,.18); color:#ff8080; }
+    .step { display:flex; gap:14px; padding:12px 0; border-bottom:1px solid rgba(255,255,255,.04); }
+    .step:last-child { border-bottom:none; }
+    .step-num { background:rgba(61,216,197,.12); border:1px solid rgba(61,216,197,.3); color:#3dd8c5; border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:.82rem; flex-shrink:0; }
+    .step-body h3 { margin:0 0 4px; font-size:.9rem; color:#edf2fb; }
+    .step-body p { margin:0; font-size:.86rem; }
+    .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    @media(max-width:640px) { .grid2 { grid-template-columns:1fr; } }
+    .card { background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.07); border-radius:12px; padding:14px 16px; }
+    .note { background:rgba(61,216,197,.06); border-left:3px solid #3dd8c5; border-radius:0 8px 8px 0; padding:10px 14px; margin:10px 0; font-size:.87rem; color:#c5d0e3; }
+    .warn { background:rgba(255,90,90,.07); border-left:4px solid #ff5a5a; border-radius:0 8px 8px 0; padding:12px 16px; margin:10px 0; font-size:.88rem; color:#c5d0e3; }
+    .warn strong { color:#ff8080; }
+    table { width:100%; border-collapse:collapse; font-size:.86rem; }
+    th { text-align:left; padding:8px 11px; background:rgba(61,216,197,.07); color:#3dd8c5; font-size:.78rem; border-bottom:1px solid rgba(255,255,255,.07); }
+    td { padding:8px 11px; border-bottom:1px solid rgba(255,255,255,.04); color:#c5d0e3; vertical-align:top; }
+    td strong { color:#edf2fb; }
+    td a { font-size:.82rem; }
+    small { color:#4a6a7a; font-size:.78rem; }
+    .breadcrumb { font-size:.8rem; color:#4a6a7a; margin-bottom:8px; }
+    .vendor-block { background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.07); border-radius:12px; padding:14px 16px; margin:8px 0; }
+    .vendor-name { font-weight:700; color:#edf2fb; font-size:.92rem; margin-bottom:6px; }
+    .vendor-sources { display:flex; flex-direction:column; gap:4px; }
+    .vendor-sources a { font-size:.83rem; color:#75d7c0; }
+    .src-label { font-size:.72rem; color:#4a6a7a; margin-right:4px; }
+  </style>
+</head>
+<body>
+<div class="shell">
+
+  <div class="panel panel-accent">
+    <div class="breadcrumb"><a href="../index.html">← Hub Top</a> / <a href="index.html">_routines</a> / <a href="../workbench/knowledge/ai-tools-map.html">ai-tools-map.html</a></div>
+    <span class="badge badge-teal">隔週ルーティン</span>
+    <h1>AIツール機能別見取り図 更新</h1>
+    <p style="color:#c5d0e3;margin:8px 0 0;font-size:.95rem;">隔週（2週間に1回）で実施。分野別サブエージェント調査により、新規ツール・料金改定・サービス終了・ブランド変更を <a href="../workbench/knowledge/ai-tools-map.html">workbench/knowledge/ai-tools-map.html</a> に反映する。所要時間: 約 45〜60 分（Claude セッション、サブエージェント並列調査込み）。</p>
+    <p style="margin-top:8px"><small>最終更新: 2026-07-13（新規作成） | 実施頻度: 隔週</small></p>
+  </div>
+
+  <!-- ソースポリシー -->
+  <div class="panel panel-red">
+    <h2>⚠️ ソースポリシー</h2>
+    <div class="warn">
+      <strong>daily-news や二次的なまとめブログは「記載の根拠」にしない。</strong>
+      料金・提供終了・買収/規制などの重大情報は、必ず<strong>各社公式サイト（料金ページ・公式ブログ・ヘルプセンター）</strong>で裏取りしてから反映する。
+    </div>
+    <table>
+      <thead><tr><th>Tier</th><th>ソース</th><th>使い方</th></tr></thead>
+      <tbody>
+        <tr><td><strong style="color:#4FFFB0;">Tier 1<br>一次</strong></td><td>各社公式ドメインの発表ブログ／Pricingページ／ヘルプセンター／公式X・note</td><td>✅ これだけが記載の根拠</td></tr>
+        <tr><td><strong style="color:#fcd34d;">Tier 2<br>起点のみ</strong></td><td>まとめサイト・テックメディア・比較ブログ（eesel.ai 等）・中国語メディア記事</td><td>🔶 「新ツール候補」「値上げの噂」の起点に可。<strong>必ず Tier 1 で裏取り</strong></td></tr>
+        <tr><td><strong style="color:#ff8080;">Tier 3<br>不可</strong></td><td>未確認の噂・古いキャッシュ情報</td><td>❌ 書かない（「要追加確認」と明記して次回へ持ち越す）</td></tr>
+      </tbody>
+    </table>
+    <div class="note">
+      料金・バージョン名は変動が非常に速い分野です。確認できなかった項目は数値を書き換えず、カードの「鮮度」表示だけ更新するか「要追加確認」を残してよい。不正確な数値を書くより空白の方が正しい。
+    </div>
+  </div>
+
+  <!-- 更新対象カテゴリと調査の起点 -->
+  <div class="panel">
+    <h2>更新対象カテゴリと調査の起点</h2>
+    <p style="color:#7f92ac;font-size:.85rem;margin-bottom:12px;">ai-tools-map.html は10カテゴリ・約50ツールを掲載。全ツールを毎回洗い直すのではなく、<strong>カテゴリ単位でサブエージェントに投げて差分を洗い出す</strong>運用にする。</p>
+
+    <div class="vendor-block">
+      <div class="vendor-name">🇨🇳 中国AIツール全域（対話/画像/動画/音声/コーディング/エージェント/生産性）</div>
+      <div class="vendor-sources">
+        <div>Alibaba（通義万相・Qoder CN）／ByteDance（豆包・即夢・扣子・飛書）／Baidu（文小言・文心一格）／Tencent（元宝・混元）／MiniMax（海螺）／Kuaishou（可灵）／Shengshu（Vidu）／Zhipu（AutoGLM）／Kingsoft（WPS）の公式サイト・公式微信/微博</div>
+      </div>
+    </div>
+    <div class="vendor-block">
+      <div class="vendor-name">🌍 グローバル生成メディア（画像/動画/音声/音楽）</div>
+      <div class="vendor-sources">
+        <div>Midjourney／OpenAI（画像・Sora）／Adobe Firefly／Ideogram／Black Forest Labs（Flux）／Stability AI／Runway／Pika／Luma AI／HeyGen／Synthesia／ElevenLabs／Suno／Udio の公式Pricingページ・公式ブログ</div>
+      </div>
+    </div>
+    <div class="vendor-block">
+      <div class="vendor-name">🤖 エージェント基盤・自動化・検索・エンタープライズ垂直AI</div>
+      <div class="vendor-sources">
+        <div>Cognition（Devin）／Replit／Manus／Genspark／Perplexity／Zapier／Dify／n8n／LangChain／CrewAI／Salesforce／ServiceNow／SAP／Notion／Slack の公式サイト・release notes</div>
+      </div>
+    </div>
+    <div class="note">
+      既存の深掘りページ（<a href="../workbench/knowledge/google-ecosystem.html">google-ecosystem</a>／<a href="../workbench/knowledge/microsoft-ecosystem.html">microsoft-ecosystem</a>／<a href="../workbench/knowledge/china-ai-coding.html">china-ai-coding</a>／各LLM個別ページ）でカバーされているツールは、そちらの更新ルーティン（<a href="llm-tracker-update.html">llm-tracker-update</a>）に任せ、本ページでは重複調査しない。
+    </div>
+  </div>
+
+  <!-- 実施手順 -->
+  <div class="panel panel-yellow">
+    <h2>実施手順（Claude セッションで実行）</h2>
+
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h3>現状把握 — ai-tools-map.html の最終更新日と掲載ツールを確認</h3>
+        <p>ページ冒頭の Last Updated と各カードの「鮮度」表示を読み、前回からの経過期間・掲載ツール一覧（約50件）を把握する。</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h3>分野別サブエージェントを並列起動して差分調査</h3>
+        <p>上記3カテゴリ（中国／グローバル生成メディア／エージェント・自動化・エンタープライズ）ごとに1体、計3体のサブエージェント（Agent tool, subagent_type: general-purpose）を<strong>並列</strong>で起動し、WebSearchで以下を確認させる。</p>
+        <div class="pre">1. 掲載済みツールの料金・最新バージョン・提供状況に変更はないか
+   （特に「要注意」バッジが付いているツール = Sora, Udio, Manus は優先確認）
+2. この2週間で登場した新規ツール・大型アップデートはないか
+3. サービス終了・買収・規制・訴訟などの重大ニュースはないか
+4. ブランド名変更はないか（例: 通義霊碼→Qoder CN、文心一言→文小言）
+
+確認できたら Tier1 の公式URLを添えて報告。確認できなければ「変更なし」
+または「要追加確認」と明記すること。</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h3>ai-tools-map.html への反映</h3>
+        <p>該当ツールカードの本文・<code>meta-row</code>（Best for / 料金目安 / 鮮度）を更新する。新規ツールはカテゴリ内に <code>&lt;article class="card" id="tool-xxx"&gt;</code> を追加し、早見表（「こういう時はこれ」）にも該当行を追加する。サービス終了・重大リスクは <code>extra_badge="WARN"</code> 相当の警告文を追加する。</p>
+        <div class="warn">
+          <strong>公式で確認できなかった料金・バージョン数値は書き換えない。</strong>「〜らしい」レベルの情報はカードに反映せず、次回への申し送りとして本ルーティンページの下部にメモしてよい。
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h3>ヘッダーの Last Updated とサイト全体の最終更新表記を更新</h3>
+        <p><code>ai-tools-map.html</code> ヘッダーの <code>last-updated</code> と、フッターの最終更新日を今回の日付に更新する。カテゴリ数・新規掲載ツール数に変化があれば <code>workbench/knowledge/index.html</code>・<code>foundations/site-map.html</code> のページ数表記も合わせて確認する。</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <h3>コミット & プッシュ</h3>
+        <div class="pre">git add workbench/knowledge/ai-tools-map.html
+git commit -m "chore: AIツール機能別見取り図 隔週更新 YYYY-MM-DD
+
+反映内容: [新規ツール/料金改定/終了サービス等の概要]
+ソース: 各社公式サイト・Pricingページ"
+git push</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 完了チェックリスト -->
+  <div class="panel">
+    <h2>完了チェックリスト</h2>
+    <div class="grid2">
+      <div class="card">
+        <h3>ソース品質</h3>
+        <ul>
+          <li>□ 変更点はすべて公式ソースで確認したか</li>
+          <li>□ 「要注意」ツール（Sora/Udio/Manus等）の状況を再確認したか</li>
+          <li>□ 確認できなかった項目は数値を書き換えていないか</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>コンテンツ</h3>
+        <ul>
+          <li>□ 3分野（中国／グローバル生成メディア／エージェント・自動化）を確認したか</li>
+          <li>□ 新規ツールを早見表とカード両方に追加したか</li>
+          <li>□ 既存の深掘りページとの重複を作っていないか</li>
+          <li>□ Last Updated / 鮮度表示を更新したか</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 参照リンク -->
+  <div class="panel">
+    <h2>参照リンク</h2>
+    <ul>
+      <li><a href="../workbench/knowledge/ai-tools-map.html">ai-tools-map.html</a>（更新対象本体）</li>
+      <li><a href="llm-tracker-update.html">llm-tracker-update.html</a>（LLM本体トラッカーの更新ルーティン。役割分担あり）</li>
+      <li><a href="../workbench/knowledge/google-ecosystem.html">google-ecosystem</a> / <a href="../workbench/knowledge/microsoft-ecosystem.html">microsoft-ecosystem</a> / <a href="../workbench/knowledge/china-ai-coding.html">china-ai-coding</a></li>
+      <li><a href="hub-health-check.html">Hub ヘルスチェックルーティン</a></li>
+    </ul>
+    <p style="margin-top:10px"><small>関連ルーティン: <a href="llm-tracker-update.html">llm-tracker-update</a> / <a href="hub-health-check.html">hub-health-check</a> / <a href="session-start.html">session-start</a></small></p>
+  </div>
+
+</div>
+</body>
+</html>
