@@ -1,0 +1,1281 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIツール機能別見取り図 — どんな用途なら今何を使うか | Tech Workbench</title>
+    <meta name="description" content="LLM・コーディング・画像/動画/音声生成・自律エージェント・ノーコード自動化・エンタープライズ垂直AIを、欧米と中国横断で機能別に整理。目的から逆引きできる意思決定ガイド。">
+    <style>
+:root {
+    --bg: #0b1220;
+    --panel: #101418;
+    --muted: #94a3b8;
+    --text: #e2e8f0;
+    --accent: #3dd8c5;
+    --accent-grad: linear-gradient(135deg, #3dd8c5, #6C3CE1);
+    --border: rgba(61, 216, 197, 0.2);
+    --radius: 16px;
+    --font-mono: "SF Mono", "Consolas", monospace;
+}
+* { box-sizing: border-box; }
+body {
+    margin: 0; min-height: 100vh;
+    font-family: "Segoe UI", "SF Pro Display", "Noto Sans JP", system-ui, sans-serif;
+    color: var(--text); background: var(--bg);
+    padding: 32px 20px 64px; line-height: 1.7;
+}
+.shell { max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 32px; }
+header.hero {
+    background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 48px 40px; position: relative; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+}
+header.hero::before { content:""; position:absolute; top:0; left:0; width:100%; height:4px; background: var(--accent-grad); }
+header.hero::after { content:""; position:absolute; right:-100px; bottom:-100px; width:400px; height:400px; background: radial-gradient(circle, rgba(61,216,197,0.12), transparent 70%); pointer-events:none; }
+.meta-tag { display:inline-block; background: rgba(61,216,197,0.15); color:#75f0dd; padding:4px 12px; border-radius:99px; font-size:12px; font-weight:bold; text-transform:uppercase; letter-spacing:1px; margin-bottom:16px; border:1px solid rgba(61,216,197,0.3); }
+.last-updated { font-family: var(--font-mono); font-size:12px; color: var(--muted); opacity:0.75; margin-top:8px; display:block; }
+.eyebrow { font-size:0.9em; margin-bottom:12px; display:block; color: var(--accent); font-weight:800; text-transform:uppercase; letter-spacing:2px; }
+h1 { margin:0 0 16px; font-size:42px; font-weight:800; letter-spacing:-1px; line-height:1.15; background: linear-gradient(to right, #fff, #a5f3e8); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+.lead { margin:0 0 20px; font-size:18px; color: var(--muted); max-width: 820px; font-weight:300; }
+.back { display:inline-flex; align-items:center; gap:6px; color: var(--text); text-decoration:none; font-weight:600; font-size:14px; opacity:0.65; transition:opacity .2s; }
+.back:hover { opacity:1; }
+a { color:#75d7c0; }
+.grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:22px; }
+.card { background: rgba(255,255,255,0.02); border:1px solid var(--border); border-radius: var(--radius); padding:28px; position:relative; overflow:hidden; }
+h2 { margin:0 0 18px; font-size:23px; color:#fff; display:flex; align-items:center; gap:12px; font-weight:700; }
+h2::before { content:""; width:4px; height:22px; background: var(--accent); border-radius:2px; flex-shrink:0; }
+h3 { margin:2px 0 10px; font-size:17px; color:#fff; font-weight:700; display:flex; align-items:center; flex-wrap:wrap; gap:6px; }
+p { margin:0 0 14px; color: var(--muted); font-size:14.5px; }
+ul { margin:0 0 14px; padding-left:20px; color: var(--muted); font-size:14px; }
+li { margin-bottom:7px; }
+li strong { color: var(--text); }
+.badge { display:inline-block; padding:2px 9px; border-radius:5px; font-size:0.68rem; font-weight:800; text-transform:uppercase; letter-spacing:.05em; vertical-align:middle; }
+.badge-cn { background: rgba(255,90,90,0.15); color:#ff8f8f; }
+.badge-us { background: rgba(78,140,255,0.15); color:#8bbeff; }
+.badge-eu { background: rgba(167,139,250,0.15); color:#c4b5fd; }
+.badge-global { background: rgba(148,163,184,0.15); color:#cbd5e1; }
+.badge-warn { background: rgba(255,180,78,0.18); color:#ffd9a0; }
+.badge-new { background: rgba(79,255,176,0.15); color:#4fffb0; }
+.tag-cat { font-size:11px; color: var(--accent); font-weight:700; text-transform:uppercase; letter-spacing:.08em; margin-bottom:6px; display:block; }
+.positioning { color:#e2e8f0; font-size:14.5px; margin-bottom:12px; }
+.meta-row { display:flex; flex-wrap:wrap; gap:6px 14px; font-size:12.5px; color: var(--muted); margin-top:10px; border-top:1px solid rgba(255,255,255,0.06); padding-top:10px; }
+.meta-row span strong { color: var(--text); }
+.existing-links { display:flex; flex-wrap:wrap; gap:8px 10px; margin: 6px 0 4px; }
+.tool-chip { display:inline-block; background: rgba(61,216,197,0.07); border:1px solid rgba(61,216,197,0.22); border-radius:8px; padding:7px 13px; font-size:0.85rem; text-decoration:none; color:#c9f5ec; }
+.tool-chip:hover { background: rgba(61,216,197,0.14); }
+table { width:100%; border-collapse:collapse; font-size:13.7px; margin-top:8px; }
+th, td { text-align:left; padding:11px 13px; border-bottom:1px solid rgba(255,255,255,0.08); vertical-align:top; }
+th { color: var(--accent); font-size:11.5px; text-transform:uppercase; letter-spacing:1px; }
+td.want { color: var(--text); font-weight:600; width:36%; }
+td strong { color:#75f0dd; }
+.highlight-box { background: rgba(61,216,197,0.06); border:1px solid rgba(61,216,197,0.22); border-radius:10px; padding:14px 18px; margin-top:12px; }
+.highlight-box p { font-size:0.87rem; margin:0; color: var(--text); }
+.warn-box { background: rgba(255,90,90,0.07); border:1px solid rgba(255,90,90,0.28); border-radius:10px; padding:14px 18px; margin-top:12px; }
+.warn-box p { font-size:0.87rem; margin:0; color:#ffb0b0; }
+.section-intro { color: var(--muted); font-size:14.5px; margin-bottom:6px; }
+footer.page-footer { border-top:1px solid var(--border); padding-top:24px; color: var(--muted); font-size:14px; }
+footer.page-footer h2 { font-size:19px; }
+footer.page-footer a { color:#75d7c0; }
+.src-list { font-size:12.5px; }
+.src-list li { margin-bottom:6px; }
+.toc { display:flex; flex-wrap:wrap; gap:8px; }
+.toc a { background: rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:8px; padding:6px 12px; font-size:13px; text-decoration:none; color:#c9f5ec; }
+.toc a:hover { background: rgba(61,216,197,0.1); }
+
+    </style>
+</head>
+
+<body>
+    <div class="shell">
+
+        <header class="hero">
+            <div class="meta-tag">KNOWLEDGE / AI TOOLS MAP</div>
+            <span class="eyebrow">どんな用途なら、今何を使うべきか</span>
+            <h1>AIツール機能別見取り図</h1>
+            <p class="lead">LLM・コーディング・画像/動画/音声生成・自律エージェント・ノーコード自動化・エンタープライズ垂直AIまで、
+                欧米と中国の主要プレイヤーを横断して<strong>「目的から逆引きする意思決定ガイド」</strong>として整理します。
+                本ハブに既に個別の深掘りページがあるツールはリンクで参照し、まだ扱っていないツールは新規にプロフィールを掲載しています。</p>
+            <span class="last-updated">Last Updated: 2026-07-13 — 新規掲載 約40ツール（画像/動画/音声生成・自律エージェント・ノーコード自動化・エンタープライズ垂直AI・中国発ツール全般）。更新は隔週routine（<a href="../../_routines/ai-tools-map-update.html" style="color:#8bbeff;">_routines/ai-tools-map-update.html</a>）で実施。</span>
+            <br>
+            <a class="back" href="index.html">← Workbenchへ戻る</a>
+            <a class="back" href="../../foundations/site-map.html" style="margin-left:14px;">サイトマップ →</a>
+        </header>
+
+        <section class="card">
+            <h2>このページの読み方</h2>
+            <p>各ツールカードには地域バッジを付けています。 <span class="badge badge-us">US</span> 米国 / <span class="badge badge-eu">EU</span> 欧州 / <span class="badge badge-cn">CN</span> 中国 / <span class="badge badge-global">GLOBAL</span> 拠点が分散・特定困難。
+            <span class="badge badge-new">新規掲載</span> は今回の更新で新規に追加したツール、<span class="badge badge-warn">要注意</span> はサービス終了・訴訟・規制介入など利用前に必ず確認すべき事情があるものです。
+            料金・バージョンは変動が速い分野のため、鮮度表示と公式サイトへのリンクを必ず併記しています。</p>
+        </section>
+
+        <section class="card">
+            <h2>目次</h2>
+            <div class="toc">
+<a href="#chat">汎用チャット・対話アシスタント</a>
+<a href="#coding">コーディング・開発エージェント</a>
+<a href="#image">画像生成</a>
+<a href="#video">動画生成</a>
+<a href="#audio">音声・音楽生成</a>
+<a href="#agents">自律汎用エージェント</a>
+<a href="#research">リサーチ・検索エージェント</a>
+<a href="#automation">ノーコード自動化・開発フレームワーク</a>
+<a href="#enterprise">エンタープライズ垂直AI・生産性</a>
+<a href="#3d">3D生成（補足）</a>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>「こういう時はこれ」早見表</h2>
+            <p>目的から逆引きする決定表です。迷ったらここから。</p>
+            <table>
+                <thead><tr><th>やりたいこと</th><th>使うツール</th></tr></thead>
+                <tbody>
+                    <tr><td class="want">最高品質の汎用対話・推論をしたい</td><td><strong>Claude / GPT / Gemini / Grok</strong>（ベンダー別に<a href="model-generations.html">model-generations.html</a>で現行世代を確認）</td></tr>
+                    <tr><td class="want">無料で中国語ネイティブの日常アシスタントを使いたい</td><td><strong><a href="#tool-doubao">豆包 Doubao</a></strong>（基本機能永久無料、MAU最大級）</td></tr>
+                    <tr><td class="want">WeChat/Tencentエコシステムで長文書類を解析したい</td><td><strong><a href="#tool-yuanbao">騰訊元宝 Yuanbao</a></strong>（混元⇔DeepSeek-R1切替、1Mトークン）</td></tr>
+                    <tr><td class="want">IDEに統合したコーディング支援が欲しい</td><td><strong>Claude Code / Cursor / GitHub Copilot</strong>（<a href="cursor.html">cursor.html</a> ほか）</td></tr>
+                    <tr><td class="want">コーディングを丸ごと自律エージェントに任せたい</td><td><strong><a href="#tool-devin">Devin</a></strong>（サンドボックスVMで計画〜デプロイまで自律実行）</td></tr>
+                    <tr><td class="want">非エンジニアがプロンプトからアプリを一発生成したい</td><td><strong><a href="#tool-replit-agent">Replit Agent</a></strong>（環境構築不要、スキャフォールドまで自動）</td></tr>
+                    <tr><td class="want">無料・オープンソースでコーディング支援を導入したい</td><td><strong>CodeGeeX</strong>（<a href="china-ai-coding.html">china-ai-coding.html</a>参照、完全無料・自己ホスト可）</td></tr>
+                    <tr><td class="want">芸術性の高いビジュアル・コンセプトアートを作りたい</td><td><strong><a href="#tool-midjourney">Midjourney</a></strong>（独自の質感・美しさに強み）</td></tr>
+                    <tr><td class="want">著作権リスクを避けて商用画像を作りたい</td><td><strong><a href="#tool-firefly">Adobe Firefly</a></strong>（許諾済みデータのみで学習、Creative Cloud統合）</td></tr>
+                    <tr><td class="want">ロゴ・バナーなど文字入り画像を作りたい</td><td><strong><a href="#tool-ideogram">Ideogram</a></strong>（業界最高水準のテキストレンダリング）</td></tr>
+                    <tr><td class="want">画像生成APIを自社サービスに組み込みたい・自己ホストしたい</td><td><strong><a href="#tool-flux">Flux</a> / <a href="#tool-sd">Stable Diffusion</a></strong>（オープンウェイト対応）</td></tr>
+                    <tr><td class="want">中国語SNS映えする画像・EC商品画像を作りたい</td><td><strong><a href="#tool-jimeng-img">即夢 Jimeng</a> / <a href="#tool-wanxiang">通義万相</a></strong></td></tr>
+                    <tr><td class="want">プロ品質の映像制作ワークフローに組み込みたい</td><td><strong><a href="#tool-runway">Runway</a></strong>（Motion Brush・キャラクター一貫性・最大60秒4K）</td></tr>
+                    <tr><td class="want">SNS向けの低コスト短尺動画を量産したい</td><td><strong><a href="#tool-pika">Pika</a> / <a href="#tool-kling">可灵 Kling</a> / <a href="#tool-vidu">Vidu</a></strong></td></tr>
+                    <tr><td class="want">研修・マニュアル動画をAIアバターで量産したい</td><td><strong><a href="#tool-synthesia">Synthesia</a></strong>（エンタープライズ機能充実）／<strong><a href="#tool-heygen">HeyGen</a></strong>（表現力重視）</td></tr>
+                    <tr><td class="want">複数の動画生成モデルを1か所で比較・使い分けたい</td><td><strong><a href="#tool-luma">Luma AI（Dream Machine）</a></strong>（Veo/Kling/Seedance等を統合）</td></tr>
+                    <tr><td class="want">長尺・高品質・4Kの動画を生成したい</td><td><strong>Google Veo 3.1</strong>（<a href="veo.html">veo.html</a>）</td></tr>
+                    <tr><td class="want">OpenAI Soraを使おうとしている</td><td><strong style="color:#ffb0b0;">要注意：2026年4月にサービス終了済み</strong>。Runway/Klingへの切替を推奨</td></tr>
+                    <tr><td class="want">ナレーション・音声クローンを作りたい</td><td><strong><a href="#tool-elevenlabs">ElevenLabs</a></strong>（業界標準、多言語対応）</td></tr>
+                    <tr><td class="want">BGM・オリジナル楽曲をAIで作りたい</td><td><strong><a href="#tool-suno">Suno</a></strong>（完成度で先行）／<strong><a href="#tool-mureka">Mureka</a></strong>（中国語歌詞に強い）</td></tr>
+                    <tr><td class="want">中国語の音声クローン・多言語ナレーションが必要</td><td><strong><a href="#tool-minimax-speech">MiniMax Speech</a></strong></td></tr>
+                    <tr><td class="want">リサーチ・雑務を丸ごとAIエージェントに任せたい</td><td><strong><a href="#tool-manus">Manus</a> / <a href="#tool-genspark">Genspark</a></strong></td></tr>
+                    <tr><td class="want">ノーコードで社内向けAIエージェント（ボット）を作りたい</td><td><strong><a href="#tool-coze">扣子 Coze</a></strong>（中国発）／<strong>Copilot Studio</strong>（<a href="copilot-studio.html">copilot-studio.html</a>、Microsoft系）</td></tr>
+                    <tr><td class="want">引用付きで検索・ファクトチェックしたい</td><td><strong><a href="#tool-perplexity">Perplexity</a></strong>（AIブラウザCometも無料）</td></tr>
+                    <tr><td class="want">数十分かけて深いリサーチレポートを作りたい</td><td><strong>ChatGPT Deep Research / Gemini Deep Research Max / Grok DeepSearch</strong>（<a href="#tool-deepresearch-notes">詳細</a>）</td></tr>
+                    <tr><td class="want">既存の業務アプリ間の定型連携を自動化したい</td><td><strong><a href="#tool-zapier">Zapier</a></strong>（7000以上のアプリ連携）</td></tr>
+                    <tr><td class="want">OSSでRAGアプリ・チャットボットを自前構築したい</td><td><strong><a href="#tool-dify">Dify</a></strong>（コミュニティ版無料・セルフホスト可）</td></tr>
+                    <tr><td class="want">複雑な条件分岐を含む自動化をセルフホストで組みたい</td><td><strong><a href="#tool-n8n">n8n</a></strong>（フルOSS、開発者寄り）</td></tr>
+                    <tr><td class="want">コードでエージェントオーケストレーションを本格構築したい</td><td><strong><a href="#tool-langchain">LangChain / LangGraph</a></strong></td></tr>
+                    <tr><td class="want">役割分担された複数エージェントを協調させたい</td><td><strong><a href="#tool-crewai">CrewAI</a></strong>（役割・目標・背景ベース）</td></tr>
+                    <tr><td class="want">CRM・カスタマーサポートを自律エージェント化したい</td><td><strong><a href="#tool-agentforce">Salesforce Agentforce</a></strong></td></tr>
+                    <tr><td class="want">社内ITサービスデスクを自動化したい</td><td><strong><a href="#tool-servicenow">ServiceNow AI</a></strong></td></tr>
+                    <tr><td class="want">基幹業務（ERP）にエージェントを組み込みたい</td><td><strong><a href="#tool-joule">SAP Joule</a></strong></td></tr>
+                    <tr><td class="want">社内ドキュメント検索・議事録を自動化したい</td><td><strong><a href="#tool-notion-ai">Notion AI</a> / <a href="#tool-slack-ai">Slack AI</a></strong></td></tr>
+                    <tr><td class="want">中国オフィス文書（PPT等）を自動生成したい</td><td><strong><a href="#tool-wps">WPS AI</a></strong></td></tr>
+                    <tr><td class="want">中国企業向けのコラボ+AI基盤を導入したい</td><td><strong><a href="#tool-dingtalk">DingTalk AI</a> / <a href="#tool-feishu">Feishu / Lark AI</a></strong></td></tr>
+                    <tr><td class="want">ゲーム・XR用の3Dアセットを生成したい</td><td><strong>Meshy AI / Tripo AI</strong>（<a href="#3d">3D生成セクション</a>）</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+
+        <section class="card" id="chat">
+            <h2>1. 汎用チャット・対話アシスタント</h2>
+            <p class="section-intro">文章相談・雑務・調べもの全般に使う汎用LLM。主要ベンダーはこのハブで個別に深掘り済みです。ここでは既存ページへの導線に加え、中国発の消費者向けアシスタント（モデルページとは別に、アプリ単体として押さえておくべきもの）を新規に掲載します。</p>
+            <p style="font-size:12.5px;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:8px;">サイト内の詳細ページ</p><div class="existing-links"><a class="tool-chip" href="claude-model.html">Claude</a>
+<a class="tool-chip" href="chatgpt.html">ChatGPT / Codex</a>
+<a class="tool-chip" href="gemini.html">Gemini</a>
+<a class="tool-chip" href="grok.html">Grok</a>
+<a class="tool-chip" href="qwen.html">Qwen</a>
+<a class="tool-chip" href="glm.html">GLM</a>
+<a class="tool-chip" href="deepseek.html">DeepSeek</a>
+<a class="tool-chip" href="kimi.html">Kimi</a>
+<a class="tool-chip" href="llama.html">Llama</a>
+<a class="tool-chip" href="mistral.html">Mistral</a>
+<a class="tool-chip" href="phi.html">Phi</a>
+<a class="tool-chip" href="gemma.html">Gemma 4</a>
+<a class="tool-chip" href="model-generations.html">現行モデル世代SSOT</a>
+<a class="tool-chip" href="intelligence-matrix.html">Intelligence Matrix（横断比較）</a></div>
+        </section>
+
+        <section class="grid">
+
+            <article class="card" id="tool-doubao">
+                <h3>豆包 Doubao <span class="badge badge-cn">CN</span> <span class="badge badge-new">新規掲載</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">ByteDance（字節跳動）</p>
+                <p class="positioning">中国最大級のMAUを持つ汎用オムニモーダルAIアシスタント。無料の基本機能を維持しつつ2026年5月からエージェント型Proプランを追加。</p>
+                <ul>
+<li>テキスト対話・文案作成・翻訳・感情サポート</li>
+<li>画像認識・動画理解・音声/動画チャットのオムニモーダル理解</li>
+<li>豆包Pro：コンピュータ操作・ブラウザ操作・定期タスク実行などエージェント機能</li>
+<li>プログラミング支援</li>
+                </ul>
+                
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> 中国語圏の一般ユーザー向け日常アシスタント、無料でのマルチモーダルAI利用</span>
+                    <span><strong>料金目安:</strong> 基本機能は永久無料。Proプランは月68〜500元（2026年5月導入）</span>
+                    <span><strong>公式:</strong> <a href="https://www.doubao.com/" target="_blank" rel="noopener">https://www.doubao.com/</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+
+            <article class="card" id="tool-yuanbao">
+                <h3>騰訊元宝 Tencent Yuanbao <span class="badge badge-cn">CN</span> <span class="badge badge-new">新規掲載</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">Tencent（騰訊）</p>
+                <p class="positioning">自社モデル「混元（Hunyuan）」とDeepSeek-R1をワンクリック切替できる「デュアルモデル」戦略が特徴。WeChatエコシステムと深く統合。</p>
+                <ul>
+<li>混元T1とDeepSeek-R1のワンクリック切替</li>
+<li>最大1Mトークンの長文コンテキスト処理</li>
+<li>36種類のファイル形式解析・契約書の条項自動抽出・高精度OCR</li>
+<li>騰訊文档・騰訊会議など10以上のTencentアプリと連携</li>
+                </ul>
+                
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> WeChat/Tencentエコシステム内での業務利用、長文書類の解析・要約</span>
+                    <span><strong>料金目安:</strong> 基本無料開放（深い思考機能含む）</span>
+                    <span><strong>公式:</strong> <a href="http://yuanbao.tencent.com/" target="_blank" rel="noopener">http://yuanbao.tencent.com/</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+
+            <article class="card" id="tool-wenxiaoyan">
+                <h3>文小言 Wenxiaoyan（旧・文心一言） <span class="badge badge-cn">CN</span> <span class="badge badge-new">新規掲載</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">Baidu（百度）</p>
+                <p class="positioning">2025年9月に「文心一言」から改名。百度検索と統合した「新検索」体験を前面に出す対話アシスタント。</p>
+                <ul>
+<li>リッチメディア検索・マルチモーダル入力</li>
+<li>文章・画像生成、高精細デジタルヒューマン</li>
+<li>「タスク托管（おまかせ実行）」機能でタスクを自動編成・全工程納品</li>
+<li>記憶機能・サブスクリプション機能</li>
+                </ul>
+                <div class="warn-box"><p>⚠️ 旧名称「文心一言」表記の資料は2025年9月の改名を反映していない可能性があります。</p></div>
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> 検索と対話を横断した情報収集、百度エコシステムでの一般ユーザー利用</span>
+                    <span><strong>料金目安:</strong> 基本無料</span>
+                    <span><strong>公式:</strong> <a href="https://yiyan.baidu.com/" target="_blank" rel="noopener">https://yiyan.baidu.com/</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+
+            <article class="card" id="tool-hunyuan">
+                <h3>騰訊混元 Tencent Hunyuan <span class="badge badge-cn">CN</span> <span class="badge badge-new">新規掲載</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">Tencent（騰訊）</p>
+                <p class="positioning">テキスト・画像・動画・3Dをカバーする騰訊の汎用マルチモーダル基盤モデル群。元宝のバックエンドでもあり単体API提供もされる。</p>
+                <ul>
+<li>高品質文章生成（文学創作・要約・ロールプレイ）</li>
+<li>画像理解・生成、動画生成・処理</li>
+<li>テキスト・2D画像からの3Dモデル生成</li>
+<li>Tencent Cloud経由のAPI従量課金</li>
+                </ul>
+                
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> 企業のAPI組み込み（コンテンツ生成・ナレッジQ&A・業務自動化）、3Dアセット生成</span>
+                    <span><strong>料金目安:</strong> API従量課金が主体（Tencent Cloud）</span>
+                    <span><strong>公式:</strong> <a href="https://hunyuan.tencent.com/" target="_blank" rel="noopener">https://hunyuan.tencent.com/</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+        </section>
+
+
+        <section class="card" id="coding">
+            <h2>2. コーディング・開発エージェント</h2>
+            <p class="section-intro">IDE統合型の補助ツールはこのハブで既に深掘り済みです。ここでは「タスクを丸投げして自律的にやり切らせる」タイプの自律コーディングエージェントを新規に掲載します。</p>
+            <p style="font-size:12.5px;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:8px;">サイト内の詳細ページ</p><div class="existing-links"><a class="tool-chip" href="claude-code.html">Claude Code</a>
+<a class="tool-chip" href="cursor.html">Cursor</a>
+<a class="tool-chip" href="github-copilot.html">GitHub Copilot</a>
+<a class="tool-chip" href="openai-codex.html">OpenAI Codex</a>
+<a class="tool-chip" href="jules.html">Google Jules</a>
+<a class="tool-chip" href="pi-coding-agent.html">Pi Coding Agent</a>
+<a class="tool-chip" href="china-ai-coding.html">中国系AIコーディングツール（Qoder CN/CodeGeeX/Baidu Comate）</a>
+<a class="tool-chip" href="grok-build.html">Grok Build</a></div>
+        </section>
+
+        <section class="grid">
+
+            <article class="card" id="tool-devin">
+                <h3>Devin <span class="badge badge-us">US</span> <span class="badge badge-new">新規掲載</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">Cognition AI</p>
+                <p class="positioning">「自律型AIソフトウェアエンジニア」の先駆者。専用サンドボックスVM（独自IDE・ブラウザ・ターミナル）を持ち、計画→実装→テスト→デプロイ→監視まで人手を介さず完結させる。</p>
+                <ul>
+<li>サンドボックスVMでの自律的なコード計画・実装・テスト・デプロイ</li>
+<li>2026年2月〜並列セッション機能（複数エージェント同時作業）</li>
+<li>GitHub/GitLab/Linear/Slack/Jira等と連携</li>
+<li>Agent Compute Unit（ACU）単位の従量課金</li>
+                </ul>
+                
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> バックグラウンドで大規模な実装・リファクタリング・バグ修正を丸投げしたいチーム</span>
+                    <span><strong>料金目安:</strong> Core: $20/月+$2.25/ACU（2026年4月に大幅値下げ）、Team: $500/月〜</span>
+                    <span><strong>公式:</strong> <a href="https://devin.ai/" target="_blank" rel="noopener">https://devin.ai/</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+
+            <article class="card" id="tool-replit-agent">
+                <h3>Replit Agent <span class="badge badge-us">US</span> <span class="badge badge-new">新規掲載</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">Replit</p>
+                <p class="positioning">ブラウザ完結型の開発環境と一体化し、1プロンプトでフロントエンド〜バックエンド〜デプロイまで丸ごと生成するエージェント。ローカル環境構築が不要。</p>
+                <ul>
+<li>1プロンプトでフロント・バック・DB・API連携をスキャフォールド</li>
+<li>最大200分の自律セッション、サブエージェント生成(Agent 3)</li>
+<li>単体テストの自動作成・実行・修正</li>
+<li>160以上のサードパーティ連携（OpenInt買収）</li>
+                </ul>
+                
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> 非エンジニア・スタートアップが企画からアプリを短時間で形にしたい場合、プロトタイピング</span>
+                    <span><strong>料金目安:</strong> Core $20/月〜、Pro $95/月、簡単な変更は$0.25未満/プロンプト</span>
+                    <span><strong>公式:</strong> <a href="https://replit.com/" target="_blank" rel="noopener">https://replit.com/</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+        </section>
+
+
+        <section class="card" id="image">
+            <h2>3. 画像生成</h2>
+            <p class="section-intro">Googleの画像生成（Imagen）はこのハブで既存カバー済みです。ここではMidjourney・Adobe Firefly・Ideogram等のグローバル勢と、通義万相・即夢・文心一格など中国発の主要プレイヤーを新規に掲載します。</p>
+            <p style="font-size:12.5px;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:8px;">サイト内の詳細ページ</p><div class="existing-links"><a class="tool-chip" href="imagen.html">Google Imagen 4</a>
+<a class="tool-chip" href="comfyui.html">ComfyUI 完全ガイド</a>
+<a class="tool-chip" href="comfyui-cloud.html">Comfy Cloud & Comfy MCP</a>
+<a class="tool-chip" href="../../creator-system/genai-tools.html">生成AIツール比較（動画・画像・音楽）</a></div>
+        </section>
+
+        <section class="grid">
+
+            <article class="card" id="tool-midjourney">
+                <h3>Midjourney <span class="badge badge-us">US</span> <span class="badge badge-new">新規掲載</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">Midjourney, Inc.（非公開・自己資金運営）</p>
+                <p class="positioning">プロンプトへの精密な追従よりも「絵として美しい」独自の芸術性・質感表現を重視。デザイナー・アーティストから支持が厚い。</p>
+                <ul>
+<li>V8.1モデルによる高品質画像生成（旧版比4〜5倍高速）</li>
+<li>Omni Reference（キャラクター一貫性維持）</li>
+<li>HD 2K解像度出力・Raw Mode</li>
+<li>生成/アップロード画像のアニメーション化</li>
+                </ul>
+                
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> コンセプトアート・イラスト・広告ビジュアルなど芸術的クオリティ最優先の場面</span>
+                    <span><strong>料金目安:</strong> 無料枠なし。Basic $10/月〜Mega $120/月</span>
+                    <span><strong>公式:</strong> <a href="https://www.midjourney.com/" target="_blank" rel="noopener">https://www.midjourney.com/</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+
+            <article class="card" id="tool-firefly">
+                <h3>Adobe Firefly <span class="badge badge-us">US</span> <span class="badge badge-new">新規掲載</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">Adobe Inc.</p>
+                <p class="positioning">Adobe Stock等の許諾済みデータのみで学習しており「商用利用に安全」なことが最大の差別化要因。Photoshop/Illustrator/Premiere Proとネイティブ統合。</p>
+                <ul>
+<li>Firefly Image Model 5によるネイティブ4メガピクセル画像生成</li>
+<li>Generative Fill/Expand、画像to画像</li>
+<li>Nano Banana 2/Veo 3.1/Runway Gen-4.5/Kling 2.5等30以上の他社モデルを内包</li>
+<li>Creative Cloud全体とのシームレス統合</li>
+                </ul>
+                
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> 商用利用の著作権リスクを避けたい企業・マーケティング部門</span>
+                    <span><strong>料金目安:</strong> Free〜Premium $199.99/月、API従量課金あり</span>
+                    <span><strong>公式:</strong> <a href="https://firefly.adobe.com/" target="_blank" rel="noopener">https://firefly.adobe.com/</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+
+            <article class="card" id="tool-ideogram">
+                <h3>Ideogram <span class="badge badge-us">US</span> <span class="badge badge-new">新規掲載</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">Ideogram AI（カナダ・トロント）</p>
+                <p class="positioning">画像内へのテキスト（文字・ロゴ・タイポグラフィ）を高精度に描画できることが最大の強み。</p>
+                <ul>
+<li>業界最高水準のテキストレンダリング精度（4.0で90〜95%程度）</li>
+<li>Magic Prompt（短いプロンプトの自動拡張）</li>
+<li>Style References（最大3枚の参照画像でスタイル制御）</li>
+<li>2026年6月にオープンウェイト化（Ideogram 4.0、Apache 2.0）</li>
+                </ul>
+                
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> ロゴ・バナー・SNS投稿画像などテキストを含むデザイン制作</span>
+                    <span><strong>料金目安:</strong> 無料枠あり（1日10プロンプト）。Basic $7/月〜Pro $48/月</span>
+                    <span><strong>公式:</strong> <a href="https://ideogram.ai/" target="_blank" rel="noopener">https://ideogram.ai/</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+
+            <article class="card" id="tool-flux">
+                <h3>Flux <span class="badge badge-eu">EU</span> <span class="badge badge-new">新規掲載</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">Black Forest Labs（ドイツ）</p>
+                <p class="positioning">Stable Diffusion開発者らが創業。オープンウェイト／API両対応で開発者・API事業者からの支持が厚い高品質モデル。</p>
+                <ul>
+<li>FLUX.2系（Max等）とオープンウェイト版（Schnell等）を展開</li>
+<li>メガピクセル単位の従量課金API</li>
+<li>高い画像品質と比較的低コストのバランス</li>
+<li>Adobe Firefly/Runway/fal.ai等への幅広い組み込み</li>
+                </ul>
+                
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> 自社サービスに画像生成APIを組み込みたい開発者、オープンウェイトを自己ホストしたい企業</span>
+                    <span><strong>料金目安:</strong> クレジット制API（1クレジット=$0.01）、Schnellは無償</span>
+                    <span><strong>公式:</strong> <a href="https://bfl.ai/" target="_blank" rel="noopener">https://bfl.ai/</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+
+            <article class="card" id="tool-sd">
+                <h3>Stable Diffusion <span class="badge badge-eu">EU</span> <span class="badge badge-new">新規掲載</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">Stability AI（英国）</p>
+                <p class="positioning">オープンソース・自己ホスト可能なモデルの草分け。コミュニティ主導のエコシステム（LoRA・拡張機能）の豊富さが強み。</p>
+                <ul>
+<li>Stable Diffusion 4（2026年4月、DiTアーキテクチャへ全面移行）</li>
+<li>ネイティブ4096×4096解像度・テキストレンダリング専用モジュール</li>
+<li>年商1億円未満の組織は無償で商用利用可</li>
+<li>DreamStudio（Web UI）/API/自己ホストの3形態</li>
+                </ul>
+                
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> 自己ホスト・ファインチューニングでコストや自由度を最適化したい開発者・企業</span>
+                    <span><strong>料金目安:</strong> 自己ホストは無償（GPU代のみ）。API従量課金あり</span>
+                    <span><strong>公式:</strong> <a href="https://stability.ai/" target="_blank" rel="noopener">https://stability.ai/</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+
+            <article class="card" id="tool-wanxiang">
+                <h3>通義万相 Tongyi Wanxiang <span class="badge badge-cn">CN</span> <span class="badge badge-new">新規掲載</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">Alibaba（阿里巴巴・通義研究室）</p>
+                <p class="positioning">アリババクラウドのアカウント基盤と統合され、企業・API利用のハードルが低いオールインワン視覚生成プラットフォーム。</p>
+                <ul>
+<li>文生図・文生視頻・3D生成を単一ブランドでカバー</li>
+<li>スタイル変換、写真・落書きを元にした生成</li>
+<li>API・低コード連携</li>
+<li>Wanxiang 2.6で映画制作レベルの可制御性を強化</li>
+                </ul>
+                
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> EC・広告クリエイティブの大量生成、アリババエコシステム内での業務利用</span>
+                    <span><strong>料金目安:</strong> Web版無料枠あり、API従量課金（文生図 約0.2元/枚）</span>
+                    <span><strong>公式:</strong> <a href="https://tongyi.aliyun.com/wanxiang/" target="_blank" rel="noopener">https://tongyi.aliyun.com/wanxiang/</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+
+            <article class="card" id="tool-jimeng-img">
+                <h3>即夢 Jimeng（画像） <span class="badge badge-cn">CN</span> <span class="badge badge-new">新規掲載</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">ByteDance（字節跳動）</p>
+                <p class="positioning">抖音/小紅書文化に最適化した「中華風・SNS映え」画像に強く、キャンバス型編集UIでプロ・一般ユーザー双方に訴求。</p>
+                <ul>
+<li>最大4K解像度の文生図、中国語テキストレンダリングに強い</li>
+<li>インテリジェントキャンバスでの多要素合成・部分再描画</li>
+<li>国潮・小紅書系スタイルテンプレート</li>
+<li>デジタルヒューマン生成と連携</li>
+                </ul>
+                
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> SNS投稿用ビジュアル、EC商品画像、個人クリエイターの日常利用</span>
+                    <span><strong>料金目安:</strong> 無料枠あり。会員は月額69〜499元</span>
+                    <span><strong>公式:</strong> <a href="https://jimeng.jianying.com/" target="_blank" rel="noopener">https://jimeng.jianying.com/</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+
+            <article class="card" id="tool-wenxinyige">
+                <h3>文心一格 ERNIE-ViLG / Wenxin Yige <span class="badge badge-cn">CN</span> <span class="badge badge-new">新規掲載</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">Baidu（百度）</p>
+                <p class="positioning">百度の文心（ERNIE）大モデル系列に基づくAIアート・クリエイティブ支援。写実・漫画・油絵など芸術性の高いスタイル表現に強い。</p>
+                <ul>
+<li>テキストからの高精細画像生成、写実・漫画・油絵など多様スタイル</li>
+<li>スタイル重ね掛け</li>
+<li>塗りつぶし編集などの高度編集機能</li>
+<li>1日ごとの無料生成枠あり</li>
+                </ul>
+                
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> イラストレーター・デザイナーの概念図作成、ビジュアル素材制作</span>
+                    <span><strong>料金目安:</strong> 無料＋プレミアム課金（月額約30〜98元）</span>
+                    <span><strong>公式:</strong> <a href="https://yige.baidu.com/" target="_blank" rel="noopener">https://yige.baidu.com/</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+        </section>
+
+
+        <section class="card" id="video">
+            <h2>4. 動画生成</h2>
+            <p class="section-intro">Google Veo/Flowは既存カバー済みです。ここでは映像制作ワークフロー系（Runway等）、AIアバター動画系（HeyGen/Synthesia）、および中国発の主要プレイヤー（可灵・Vidu・Seedance・海螺）を新規に掲載します。OpenAI Soraは2026年に事実上終了したため要注意ツールとして明記しています。</p>
+            <p style="font-size:12.5px;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:8px;">サイト内の詳細ページ</p><div class="existing-links"><a class="tool-chip" href="veo.html">Google Veo</a>
+<a class="tool-chip" href="flow.html">Google Flow</a>
+<a class="tool-chip" href="../../creator-system/genai-tools.html">生成AIツール比較（動画・画像・音楽）</a></div>
+        </section>
+
+        <section class="grid">
+
+            <article class="card" id="tool-sora">
+                <h3>OpenAI Sora <span class="badge badge-us">US</span> <span class="badge badge-warn">要注意</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">OpenAI</p>
+                <p class="positioning">物理法則の再現性・同期音声付き生成に強みを持っていたが、2026年に大きな路線転換があった。</p>
+                <ul>
+<li>（提供終了前）テキスト/画像→動画、音声同期生成、キャラクターカメオ機能</li>
+<li>Sora 2（720p）/Sora 2 Pro（1080p）の2ティア、最大25秒程度</li>
+                </ul>
+                <div class="warn-box"><p>⚠️ Web/アプリ版は2026年4月26日に提供終了済み、APIも2026年9月24日に終了予定（OpenAI公式ヘルプセンターで確認）。運営コストに対し収益が見合わず撤退。社内資料では「事実上終了」と明記すること。</p></div>
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> 現時点では新規利用不可。過去作成コンテンツのエクスポートのみ</span>
+                    <span><strong>料金目安:</strong> 終了前基準：Sora 2 $0.10/秒、Pro $0.30/秒</span>
+                    <span><strong>公式:</strong> <a href="https://openai.com/sora" target="_blank" rel="noopener">https://openai.com/sora</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+
+            <article class="card" id="tool-runway">
+                <h3>Runway（Gen-4系） <span class="badge badge-us">US</span> <span class="badge badge-new">新規掲載</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">Runway AI, Inc.</p>
+                <p class="positioning">映像制作ワークフローへの統合力（モーションブラシ・グリーンスクリーン・リップシンク等）が強み。ベンチマークでも高評価のプロ映像制作向け。</p>
+                <ul>
+<li>Motion Brush 3.0（動きの方向・速度を指定するペイント式制御）</li>
+<li>キャラクター参照画像による一貫性維持</li>
+<li>リップシンク・音声統合、グリーンスクリーン合成</li>
+<li>最大60秒の連続動画生成（4K対応）</li>
+                </ul>
+                
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> 映画・広告等のプロ映像制作、ナラティブ性の高い動画コンテンツ制作</span>
+                    <span><strong>料金目安:</strong> 無料プランあり。Standard $12/月〜Max（9,500クレジット/月）</span>
+                    <span><strong>公式:</strong> <a href="https://runwayml.com/" target="_blank" rel="noopener">https://runwayml.com/</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+
+            <article class="card" id="tool-pika">
+                <h3>Pika <span class="badge badge-us">US</span> <span class="badge badge-new">新規掲載</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">Pika Labs, Inc.</p>
+                <p class="positioning">生成速度とカジュアルな使いやすさが強み。「物理法則を無視した」独特のエフェクト機能群がSNS向けショート動画で人気。</p>
+                <ul>
+<li>Pikaffects（溶ける・爆発する等の非現実的エフェクト）</li>
+<li>Pikadditions/Pikaswaps（実写映像への挿入・置換）</li>
+<li>Pikaframes（開始・終了画像間の補間）</li>
+<li>Pikaformance（音声駆動のリップシンク）</li>
+                </ul>
+                
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> SNS向けショート動画、素早い反復が必要なクリエイティブ実験</span>
+                    <span><strong>料金目安:</strong> 無料枠あり（80クレジット/月）。Standard 約$10/月〜Fancy 約$95/月</span>
+                    <span><strong>公式:</strong> <a href="https://pika.art/" target="_blank" rel="noopener">https://pika.art/</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+
+            <article class="card" id="tool-luma">
+                <h3>Luma AI（Dream Machine） <span class="badge badge-us">US</span> <span class="badge badge-new">新規掲載</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">Luma AI, Inc.</p>
+                <p class="positioning">自社Rayモデルに加え、Veo・Kling・Seedance・GPT Image・ElevenLabs等の他社モデルも1ワークスペースに集約する「マルチモデル・ハブ」的立ち位置。</p>
+                <ul>
+<li>Ray 3系モデル（最新Ray 3.14はネイティブ1080p）</li>
+<li>テキスト/画像→動画、Modify、ループ、延長、リップシンク</li>
+<li>Genie（テキスト/画像→3Dモデル生成）</li>
+<li>スマホでのGaussian Splatting/NeRFキャプチャからの3D化</li>
+                </ul>
+                
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> 複数の動画生成モデルを比較・使い分けたいクリエイター、3Dスキャン〜映像制作を一気通貫で行いたい用途</span>
+                    <span><strong>料金目安:</strong> Plus $30/月、Pro $90/月、Ultra $300/月</span>
+                    <span><strong>公式:</strong> <a href="https://lumalabs.ai/" target="_blank" rel="noopener">https://lumalabs.ai/</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+
+            <article class="card" id="tool-heygen">
+                <h3>HeyGen <span class="badge badge-us">US</span> <span class="badge badge-new">新規掲載</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">HeyGen Inc.</p>
+                <p class="positioning">高度なジェスチャー・感情表現を持つアバター生成と、175言語以上への吹替・リップシンク翻訳の強さで差別化。</p>
+                <ul>
+<li>Avatar IV（ジェスチャー・感情マイクロ表現、最大30分）</li>
+<li>Photo Avatar / Digital Twin（自撮り動画からのカスタムアバター）</li>
+<li>175言語以上への翻訳・リップシンク吹替</li>
+<li>Video Agentによる動画自動生成</li>
+                </ul>
+                
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> 研修動画・製品説明動画・多言語マーケティング動画の量産</span>
+                    <span><strong>料金目安:</strong> Free（月3本、透かしあり）〜Business $149/月+席料$20</span>
+                    <span><strong>公式:</strong> <a href="https://www.heygen.com/" target="_blank" rel="noopener">https://www.heygen.com/</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+
+            <article class="card" id="tool-synthesia">
+                <h3>Synthesia <span class="badge badge-eu">EU</span> <span class="badge badge-new">新規掲載</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">Synthesia Ltd（英国）</p>
+                <p class="positioning">企業研修・eラーニング領域での導入実績が豊富。SSO・SCORM出力等エンタープライズ向けガバナンス機能の充実がHeyGenとの差別化点。</p>
+                <ul>
+<li>240以上のストックAIアバター、160以上の言語対応</li>
+<li>Personal Avatar（Webカメラ/スタジオ録画から自分のアバター作成）</li>
+<li>AI Video Assistant（文書・PPT・URLから台本自動生成）</li>
+<li>SCORM出力、SSO/SAML等エンタープライズ機能</li>
+                </ul>
+                
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> 企業研修・eラーニング教材、製品マニュアル動画</span>
+                    <span><strong>料金目安:</strong> Free（月10分）〜Enterprise個別見積り</span>
+                    <span><strong>公式:</strong> <a href="https://www.synthesia.io/" target="_blank" rel="noopener">https://www.synthesia.io/</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+
+            <article class="card" id="tool-kling">
+                <h3>可灵 Kling <span class="badge badge-cn">CN</span> <span class="badge badge-new">新規掲載</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">Kuaishou（快手）</p>
+                <p class="positioning">中国発動画生成AIの中で国際的にも最も知名度が高い部類。text-to-video・image-to-video・動画編集を単一エンジンで統合。</p>
+                <ul>
+<li>Kling 3.0（2026年2月）でネイティブ音声・4K・15秒生成に対応</li>
+<li>Kling 3.0 Turbo（音声内蔵、リップシンク精度向上）</li>
+<li>7-in-1マルチモーダルエディタ（オブジェクト追加・背景差替・延長）</li>
+<li>カメラワーク制御</li>
+                </ul>
+                
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> 高品質な短編動画・広告動画制作、キャラクター一貫性を要する連続シーン制作</span>
+                    <span><strong>料金目安:</strong> 会員58〜586元/月。API従量課金（720P ¥0.8/秒〜）</span>
+                    <span><strong>公式:</strong> <a href="https://klingai.com/" target="_blank" rel="noopener">https://klingai.com/</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+
+            <article class="card" id="tool-vidu">
+                <h3>Vidu <span class="badge badge-cn">CN</span> <span class="badge badge-new">新規掲載</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">Shengshu Technology（生数科技、清華大学発）</p>
+                <p class="positioning">「マルチエンティティ一貫性」（3〜7枚の参照画像から複数キャラクター・物体の一貫性を維持した動画生成）を世界初と謳う。価格競争力も強み。</p>
+                <ul>
+<li>最大1080p・約10秒の文生視頻、画像生視頻（先頭・末尾フレーム制御）</li>
+<li>マルチエンティティ一貫性、48kHz AI効果音生成</li>
+<li>Vidu Q3：音声・動画をネイティブに同時生成（最大16秒1080p）</li>
+<li>Vidu S1：リアルタイム対話型生成</li>
+                </ul>
+                
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> コストを抑えた動画量産、アニメ調動画、複数キャラクター登場の一貫性重視コンテンツ</span>
+                    <span><strong>料金目安:</strong> Standard 約$10/月で約200本相当</span>
+                    <span><strong>公式:</strong> <a href="https://www.vidu.com/" target="_blank" rel="noopener">https://www.vidu.com/</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+
+            <article class="card" id="tool-seedance">
+                <h3>即夢 Jimeng 動画版 / Seedance <span class="badge badge-cn">CN</span> <span class="badge badge-new">新規掲載</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">ByteDance（字節跳動）</p>
+                <p class="positioning">ByteDance独自の動画生成モデル「Seedance」を即夢・豆包双方に搭載。マルチモーダル参照生成と連続性制御が特徴。</p>
+                <ul>
+<li>Seedance 2.0：テキスト・画像・動画・音声の4モダリティ混合入力</li>
+<li>30秒の単一ショット直接生成（分割合成不要）</li>
+<li>最大50個の参照素材を同時入力可能</li>
+<li>2026年7月上旬にSeedance 2.5へ移行予定</li>
+                </ul>
+                
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> 一貫性の高い連続ショット動画、デジタルヒューマン動画</span>
+                    <span><strong>料金目安:</strong> 即夢アプリの会員体系に準拠（月額69〜499元）</span>
+                    <span><strong>公式:</strong> <a href="https://jimeng.jianying.com/" target="_blank" rel="noopener">https://jimeng.jianying.com/</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+
+            <article class="card" id="tool-hailuo">
+                <h3>海螺 Hailuo <span class="badge badge-cn">CN</span> <span class="badge badge-new">新規掲載</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">MiniMax</p>
+                <p class="positioning">2026年1月に香港IPO（時価総額約40億ドル）を果たしたMiniMaxの消費者向け動画生成ブランド。物理演算のリアルさとコストパフォーマンスに強み。</p>
+                <ul>
+<li>456BパラメータMoEベースの文生視頻・画像生視頻</li>
+<li>被写体参照によるキャラクター一貫性、AnyAngle（多角度制御）</li>
+<li>ガイドフレーム制御・カメラモーション指定・ディレクターモード</li>
+<li>AI音声・音楽ライブラリ内蔵</li>
+                </ul>
+                
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> 物理的にリアルな動作表現が必要な動画、コスト重視のB2B/個人クリエイター向け量産</span>
+                    <span><strong>料金目安:</strong> 無料プランあり。有料$14.99〜199.99/月</span>
+                    <span><strong>公式:</strong> <a href="https://hailuoai.com/" target="_blank" rel="noopener">https://hailuoai.com/</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+        </section>
+
+
+        <section class="card" id="audio">
+            <h2>5. 音声・音楽生成</h2>
+            <p class="section-intro">Google Lyriaは既存カバー済みです。ここでは音声合成・声クローンの標準格ElevenLabs、音楽生成のSuno/Udio、および中国発の音声・音楽AIを新規に掲載します。</p>
+            <p style="font-size:12.5px;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:8px;">サイト内の詳細ページ</p><div class="existing-links"><a class="tool-chip" href="lyria.html">Google Lyria</a>
+<a class="tool-chip" href="../../creator-system/genai-tools.html">生成AIツール比較（動画・画像・音楽）</a></div>
+        </section>
+
+        <section class="grid">
+
+            <article class="card" id="tool-elevenlabs">
+                <h3>ElevenLabs <span class="badge badge-us">US</span> <span class="badge badge-new">新規掲載</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">ElevenLabs Inc.</p>
+                <p class="positioning">音声のリアルさ・表現力とレイテンシの低さで業界標準的地位。TTS/STT/音声エージェント基盤までを一気通貫で提供。</p>
+                <ul>
+<li>Instant / Professional Voice Cloning（音声クローン）</li>
+<li>Eleven v3（音声タグ・複数話者対話、70以上の言語）</li>
+<li>Flash v2.5（レイテンシ約75msのリアルタイムモデル）</li>
+<li>Dubbing Studio（動画吹替）、Scribe v2（音声認識）</li>
+                </ul>
+                
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> ナレーション・オーディオブック制作、音声アシスタント開発、動画の多言語吹替</span>
+                    <span><strong>料金目安:</strong> 無料枠あり（月1万文字）。Starter $5/月〜Scale $330/月</span>
+                    <span><strong>公式:</strong> <a href="https://elevenlabs.io/" target="_blank" rel="noopener">https://elevenlabs.io/</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+
+            <article class="card" id="tool-suno">
+                <h3>Suno <span class="badge badge-us">US</span> <span class="badge badge-new">新規掲載</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">Suno Inc.</p>
+                <p class="positioning">テキストプロンプトから歌詞・ボーカル・楽曲を丸ごと生成できる完成度の高さで、AI音楽生成のデファクトスタンダード的地位を確立。</p>
+                <ul>
+<li>テキストからのフル楽曲生成（v4/v4.5/v5/v5.5）</li>
+<li>カスタム音声クローン、パーソナライズモデル学習</li>
+<li>最長8分超のスタジオ品質トラック生成</li>
+<li>Suno Studio（ブラウザ内DAWで後編集）</li>
+                </ul>
+                
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> 動画・広告・ゲーム用BGM制作、個人のオリジナル楽曲制作</span>
+                    <span><strong>料金目安:</strong> 無料枠あり（1日50クレジット）。Pro 約$8〜10/月、Premier 約$24〜30/月</span>
+                    <span><strong>公式:</strong> <a href="https://suno.com/" target="_blank" rel="noopener">https://suno.com/</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+
+            <article class="card" id="tool-udio">
+                <h3>Udio <span class="badge badge-us">US</span> <span class="badge badge-warn">要注意</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">Uncharted Labs, Inc.</p>
+                <p class="positioning">Sunoの主要competitor。2026年は大手レーベルとの著作権訴訟・ライセンス契約が事業の方向性を左右している。</p>
+                <ul>
+<li>テキストからのフル楽曲生成（歌詞・ボーカル・伴奏）</li>
+<li>ステム分離（ボーカル/楽器ごとの個別調整）</li>
+<li>人間の歌唱表現に近いボーカル生成（ビブラート等）</li>
+                </ul>
+                <div class="warn-box"><p>⚠️ 2024年にUMG/Sony/Warnerから著作権侵害で提訴。2025年にUMG・Warnerとは和解しライセンス契約締結（Sonyのみ係争継続）。ライセンス移行期のため楽曲のダウンロード機能が一時停止中。</p></div>
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> オリジナル楽曲のスケッチ・アイデア出し（現状はライセンス移行期で制約あり）</span>
+                    <span><strong>料金目安:</strong> Free（月100クレジット）、Standard $10/月、Pro $30/月</span>
+                    <span><strong>公式:</strong> <a href="https://www.udio.com/" target="_blank" rel="noopener">https://www.udio.com/</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+
+            <article class="card" id="tool-spark-voice">
+                <h3>讯飞星火 iFlytek Spark（音声機能） <span class="badge badge-cn">CN</span> <span class="badge badge-new">新規掲載</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">iFlytek（科大訊飛）</p>
+                <p class="positioning">音声認識・合成を祖業とする科大訊飛の技術的強みを反映。多言語・方言対応と超低遅延がウリ。</p>
+                <ul>
+<li>リアルタイム音声対話（遅延80ms、V4.0 Max）</li>
+<li>24方言・80以上の言語のリアルタイム認識と相互翻訳</li>
+<li>1文の録音からの高精度音声クローン</li>
+<li>リアルタイム同時通訳字幕生成</li>
+                </ul>
+                
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> デジタルヒューマンのライブ配信・ナレーション、多言語コールセンター・会議通訳</span>
+                    <span><strong>料金目安:</strong> 無料枠＋SDK/API従量課金が一般的</span>
+                    <span><strong>公式:</strong> <a href="https://xinghuo.xfyun.cn/" target="_blank" rel="noopener">https://xinghuo.xfyun.cn/</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+
+            <article class="card" id="tool-minimax-speech">
+                <h3>MiniMax Speech（海螺語音） <span class="badge badge-cn">CN</span> <span class="badge badge-new">新規掲載</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">MiniMax</p>
+                <p class="positioning">「中国版ElevenLabs」的な高精度音声合成・声のクローンに特化。17言語・300以上の音色に対応。</p>
+                <ul>
+<li>エンドツーエンド遅延250ms以下（Speech 2.6）</li>
+<li>10秒の音声サンプルからの声クローン</li>
+<li>Fluent LoRAによる訛り保持型の流暢化音声生成</li>
+<li>300以上のプリセット音色</li>
+                </ul>
+                
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> 自媒体（個人メディア）の吹き替え・ナレーション自動化、多言語音声コンテンツ制作</span>
+                    <span><strong>料金目安:</strong> 音声クローン9.9元。合成は従量課金</span>
+                    <span><strong>公式:</strong> <a href="https://www.minimaxi.com/audio" target="_blank" rel="noopener">https://www.minimaxi.com/audio</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+
+            <article class="card" id="tool-mureka">
+                <h3>天工SkyMusic / Mureka <span class="badge badge-cn">CN</span> <span class="badge badge-new">新規掲載</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">Kunlun Wanwei（昆侖万維）</p>
+                <p class="positioning">「中国版Suno」の最有力候補と評される音楽生成AI。中国語歌詞の発音明瞭さに特化最適化。</p>
+                <ul>
+<li>最大6分間のステレオ楽曲生成、500文字以上の歌詞入力</li>
+<li>10言語対応（中日韓英仏西葡独伊露）</li>
+<li>Mureka O1：思考連鎖（CoT）を組み込んだ音楽推論モデル</li>
+<li>API・著作権取引機能も統合</li>
+                </ul>
+                
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> 商用BGM・楽曲制作、多言語対応が必要な音楽コンテンツ制作</span>
+                    <span><strong>料金目安:</strong> 個人会員 月額88元で最大180曲生成</span>
+                    <span><strong>公式:</strong> <a href="https://www.mureka.ai/" target="_blank" rel="noopener">https://www.mureka.ai/</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+        </section>
+
+
+        <section class="card" id="agents">
+            <h2>6. 自律汎用エージェント</h2>
+            <p class="section-intro">「調べて」「作って」「動かして」を丸ごと任せられる汎用エージェント。OpenClaw/Hermes Agentは既存カバー済みです。ここではManus・Genspark・中国発の扣子/AutoGLMを新規に掲載します。</p>
+            <p style="font-size:12.5px;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:8px;">サイト内の詳細ページ</p><div class="existing-links"><a class="tool-chip" href="openclaw.html">OpenClaw</a>
+<a class="tool-chip" href="hermes-agent.html">Hermes Agent</a>
+<a class="tool-chip" href="base44.html">Base44 Skills</a>
+<a class="tool-chip" href="../../claw-stack/agent-brain-guide.html">agent-brain-guide（頭脳選定ガイド）</a></div>
+        </section>
+
+        <section class="grid">
+
+            <article class="card" id="tool-manus">
+                <h3>Manus <span class="badge badge-cn">CN</span> <span class="badge badge-new">新規掲載</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">Manus AI（旧Monica、シンガポール拠点）</p>
+                <p class="positioning">マルチステップタスクを自律的に計画・実行し成果物まで仕上げる汎用AIエージェント。Webブラウジング・コード実行・データ分析・資料作成まで単一の自然言語指示から遂行。</p>
+                <ul>
+<li>自前のブラウザ・シェル・コードインタプリタ・ファイルシステムを保持し自律実行</li>
+<li>Manus 1.6ファミリー（Lite/標準/Max）で精度・コストを選択</li>
+<li>Wide Research（並列調査）、スライド生成、Webサイトデプロイ</li>
+<li>スケジュールタスク、Gmail/Googleカレンダー/Notion等の外部連携</li>
+                </ul>
+                <div class="warn-box"><p>⚠️ 開発元Butterfly EffectはシンガポールでMeta buyout（約20億ドル）が合意されたが、2026年4月に中国国家発展改革委員会（NDRC）が安全保障上の理由で禁止・巻き戻しを命令。2026年7月時点で独立運営を継続中。</p></div>
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> リサーチ・資料作成・簡易Web制作など幅広い業務を丸投げしたい個人・チーム</span>
+                    <span><strong>料金目安:</strong> 無料枠あり（1日300クレジット）。Pro $20〜200/月</span>
+                    <span><strong>公式:</strong> <a href="https://manus.im/" target="_blank" rel="noopener">https://manus.im/</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+
+            <article class="card" id="tool-genspark">
+                <h3>Genspark <span class="badge badge-us">US</span> <span class="badge badge-new">新規掲載</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">Genspark AI</p>
+                <p class="positioning">単なるAIツールから「AI従業員（AI Employee）」への進化を掲げる。Slack/Teams/WhatsApp等の業務チャットから指示を出し、クラウド上の専用コンピュータでタスクを自律実行する「Genspark Claw」が差別化点。</p>
+                <ul>
+<li>Super Agent：リサーチから実世界アクションまで自律実行</li>
+<li>Genspark Claw：クラウド上の自律実行環境、チャットツール経由の指示受付</li>
+<li>Office連携（PowerPoint/Excel/Word内で直接動作するプラグイン）</li>
+<li>リアルタイム音声モード</li>
+                </ul>
+                
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> 業務チャットツールを起点に定型・非定型タスクをエージェントに任せたい組織</span>
+                    <span><strong>料金目安:</strong> 無料（1日100クレジット）、Plus $19.99〜24.99/月、Team $30/席/月</span>
+                    <span><strong>公式:</strong> <a href="https://genspark.ai/" target="_blank" rel="noopener">https://genspark.ai/</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+
+            <article class="card" id="tool-coze">
+                <h3>扣子 Coze <span class="badge badge-cn">CN</span> <span class="badge badge-new">新規掲載</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">ByteDance（字節跳動）</p>
+                <p class="positioning">ノーコードでAIエージェントを構築できるプラットフォームの中国発デファクト。Coze 2.0で「対話ツール」から「長期タスクを遂行する仕事のパートナー」へ進化。</p>
+                <ul>
+<li>Skills Marketplace（専門知識を自然言語でスキル化・再利用）</li>
+<li>Agent Plan（継続稼働・自律的な戦略修正）</li>
+<li>Coze Coding Platform（クラウド型バイブコーディング）</li>
+<li>60以上のプラグインエコシステム、マルチチャネル展開（Discord/LINE/Slack等）</li>
+                </ul>
+                
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> 社内業務用チャットボット・FAQボットの内製、ノーコードRAGアプリ構築</span>
+                    <span><strong>料金目安:</strong> 無料枠あり。国際版$9/月〜</span>
+                    <span><strong>公式:</strong> <a href="https://www.coze.com/" target="_blank" rel="noopener">https://www.coze.com/</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+
+            <article class="card" id="tool-autoglm">
+                <h3>AutoGLM <span class="badge badge-cn">CN</span> <span class="badge badge-new">新規掲載</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">Zhipu AI（智譜AI）</p>
+                <p class="positioning">「世界初のスマホ操作（Phone Use）AIエージェント」を標榜。GLM-4.5/4.5Vをベースに抖音・小紅書・美団・京東等のアプリをクラウドスマホ上で自律操作。</p>
+                <ul>
+<li>50以上の高頻度アプリを自律操作（クラウドスマホ経由）</li>
+<li>出前注文・航空券予約等、数十ステップの複雑操作を安定遂行</li>
+<li>2026年3月「Claw Plan」で20日間に40万人が有料登録</li>
+                </ul>
+                
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> スマホアプリ操作の自動化（実店舗予約・EC購入代行等、中国国内サービス前提）</span>
+                    <span><strong>料金目安:</strong> サブスク型の存在は示唆されるが金額は要追加確認</span>
+                    <span><strong>公式:</strong> <a href="https://www.zhipuai.cn/" target="_blank" rel="noopener">https://www.zhipuai.cn/</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+        </section>
+
+
+        <section class="card" id="research">
+            <h2>7. リサーチ・検索エージェント</h2>
+            <p class="section-intro">「調べて根拠付きでまとめて」に強いカテゴリ。各社チャットAI本体の深掘りは既存ページを参照しつつ、検索ネイティブのPerplexityと各社Deep Research系機能の位置づけを新規に整理します。</p>
+            <p style="font-size:12.5px;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:8px;">サイト内の詳細ページ</p><div class="existing-links"><a class="tool-chip" href="chatgpt.html">ChatGPT / Codex（本体）</a>
+<a class="tool-chip" href="gemini.html">Gemini（本体）</a>
+<a class="tool-chip" href="grok.html">Grok（本体）</a></div>
+        </section>
+
+        <section class="grid">
+
+            <article class="card" id="tool-perplexity">
+                <h3>Perplexity <span class="badge badge-us">US</span> <span class="badge badge-new">新規掲載</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">Perplexity AI</p>
+                <p class="positioning">検索特化から出発し、引用付き回答・自律実行ブラウザ（Comet）まで拡張した「検索ネイティブ」のリサーチプラットフォーム。</p>
+                <ul>
+<li>引用付きAI検索（無料でも利用可）、Pro Search（高精度検索）</li>
+<li>Comet：自律実行型AIブラウザ（2026年3月に全プラットフォーム無料化）</li>
+<li>Comet Background Assistants：バックグラウンド自律動作（Maxプラン）</li>
+<li>GPT-5、Claude Opus等複数トップモデルの選択利用</li>
+                </ul>
+                
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> 一次情報の検索・ファクトチェック・引用付きレポート作成、ブラウザ上でのリサーチ自動化</span>
+                    <span><strong>料金目安:</strong> 無料（1日約5回のPro Search）、Pro $20/月、Max $200/月</span>
+                    <span><strong>公式:</strong> <a href="https://www.perplexity.ai/" target="_blank" rel="noopener">https://www.perplexity.ai/</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+
+            <article class="card" id="tool-deepresearch-notes">
+                <h3>各社のDeep Research / Agent機能（補足） <span class="badge badge-global">GLOBAL</span> <span class="badge badge-new">新規掲載</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">OpenAI / Google / xAI</p>
+                <p class="positioning">汎用チャットAIに内蔵される「深いリサーチ」機能群。単発の検索応答ではなく数分〜数十分かけて多数のソースを横断調査する点が共通。詳細な各モデル自体の解説は既存ページを参照。</p>
+                <ul>
+<li><strong>ChatGPT Deep Research/Agent mode</strong>：数百ソースを横断調査しレポート生成。Agent modeは視覚的ブラウザ操作も自律実行（→chatgpt.html）</li>
+<li><strong>Gemini Deep Research/Deep Research Max</strong>：Collaborative Planningで計画をレビュー可能、MCP経由で社内データも横断（→gemini.html）</li>
+<li><strong>Grok DeepSearch/DeeperSearch</strong>：Web＋X（旧Twitter）投稿を情報源に含め速報性重視（→grok.html）</li>
+                </ul>
+                
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> 長尺の市場調査・競合調査・学術サーベイ、リアルタイムな世論・議論動向の把握</span>
+                    <span><strong>料金目安:</strong> 各社のチャットAI本体サブスクに内包</span>
+                    <span><strong>公式:</strong> <a href="#" target="_blank" rel="noopener">#</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+        </section>
+
+
+        <section class="card" id="automation">
+            <h2>8. ノーコード自動化・開発フレームワーク</h2>
+            <p class="section-intro">Microsoft Power Platform/Copilot Studio、Google Opal、A2A Protocolは既存カバー済みです。ここでは業務アプリ連携の定番Zapier、OSSのDify/n8n、コードで組む開発者向けフレームワークLangChain/LangGraph・CrewAIを新規に掲載します。</p>
+            <p style="font-size:12.5px;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:8px;">サイト内の詳細ページ</p><div class="existing-links"><a class="tool-chip" href="power-automate-guide.html">Power Automate 完全実践ガイド</a>
+<a class="tool-chip" href="power-platform-ai.html">Power Platform AI</a>
+<a class="tool-chip" href="copilot-studio.html">Copilot Studio</a>
+<a class="tool-chip" href="opal.html">Google Opal</a>
+<a class="tool-chip" href="a2a-protocol.html">A2A Protocol</a>
+<a class="tool-chip" href="microsoft-agent-framework.html">Microsoft Agent Framework</a></div>
+        </section>
+
+        <section class="grid">
+
+            <article class="card" id="tool-zapier">
+                <h3>Zapier（AI機能） <span class="badge badge-us">US</span> <span class="badge badge-new">新規掲載</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">Zapier Inc.</p>
+                <p class="positioning">7000以上のアプリ連携という圧倒的エコシステムを土台に、従来の「トリガー→アクション」型ワークフローにAIエージェント（ツール呼び出し・ループ・Web検索）を組み込んだ。</p>
+                <ul>
+<li>AI Agents：チャット/自動実行の「AIチームメイト」を数分で構築</li>
+<li>AI by Zapierステップ：ツール呼び出し・ループ・Web検索をZap内に直接組み込み</li>
+<li>2026年6月〜モデル階層別の従量課金</li>
+<li>7000以上のアプリ連携</li>
+                </ul>
+                
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> 既存の業務アプリ間の定型連携を自動化しつつ、一部の判断業務にAIエージェントを組み込みたい場合</span>
+                    <span><strong>料金目安:</strong> 無料枠あり、Professional 約$29.99/月〜</span>
+                    <span><strong>公式:</strong> <a href="https://zapier.com/" target="_blank" rel="noopener">https://zapier.com/</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+
+            <article class="card" id="tool-dify">
+                <h3>Dify <span class="badge badge-global">GLOBAL</span> <span class="badge badge-new">新規掲載</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">LangGenius（シンガポール/中国系）</p>
+                <p class="positioning">オープンソースであることが最大の特徴。ビジュアルワークフローでチャットボット・エージェント・RAGアプリを構築でき、開発者と非エンジニア双方をターゲットにする。</p>
+                <ul>
+<li>App Studio：チャットボット/テキスト生成/自律エージェント/チャットフロー/自動化ワークフローの5種類</li>
+<li>OpenAI/Anthropic/Google/Mistral等数百のLLMに対応、Ollamaでローカルモデル対応</li>
+<li>RAGパイプラインの視覚的構築</li>
+<li>OSSコミュニティ版（無料）とクラウド版</li>
+                </ul>
+                
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> 社内向けの独自AIアプリ・チャットボット・RAGシステムを自前でコントロールしながら構築したい開発チーム</span>
+                    <span><strong>料金目安:</strong> コミュニティ版無料、Professional $59/月〜</span>
+                    <span><strong>公式:</strong> <a href="https://dify.ai/" target="_blank" rel="noopener">https://dify.ai/</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+
+            <article class="card" id="tool-n8n">
+                <h3>n8n（AI機能） <span class="badge badge-eu">EU</span> <span class="badge badge-new">新規掲載</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">n8n GmbH（ドイツ）</p>
+                <p class="positioning">Zapierに近いワークフロー自動化ツールだが、フルOSS・セルフホストが可能で、複雑な条件分岐やコードノードを扱える「開発者寄り」の柔軟性が特徴。</p>
+                <ul>
+<li>HTTPリクエストノード等によるカスタムAIエージェント構築</li>
+<li>インラインログ・ビジュアルワークフローで動作を可視化、Evaluations機能</li>
+<li>Claude/Gemini/Pinecone/Qdrant等ベクトルDB連携</li>
+<li>100%無料のセルフホスト（コミュニティ版、無制限実行）</li>
+                </ul>
+                
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> セルフホスト環境で高度な条件分岐・カスタムロジックを含む自動化やAIエージェントを構築したい技術チーム</span>
+                    <span><strong>料金目安:</strong> セルフホスト無料、Starter €24/月〜</span>
+                    <span><strong>公式:</strong> <a href="https://n8n.io/" target="_blank" rel="noopener">https://n8n.io/</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+
+            <article class="card" id="tool-langchain">
+                <h3>LangChain / LangGraph <span class="badge badge-us">US</span> <span class="badge badge-new">新規掲載</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">LangChain Inc.</p>
+                <p class="positioning">LLMアプリ開発フレームワークの事実上の業界標準の一つ。LangGraphは循環グラフ・状態管理でループ/リトライ/条件分岐/Human-in-the-loopを扱う本格的なエージェントオーケストレーションに強い。</p>
+                <ul>
+<li>LangGraph：状態管理によるループ/リトライ/条件分岐/Human-in-the-loop</li>
+<li>Deep Agents：計画・サブエージェント管理・ファイルシステムを標準搭載</li>
+<li>LangSmith：トレース・評価・プロンプトバージョン管理</li>
+<li>OSS（MIT）で無料、ホスト版のLangGraph Platformも提供</li>
+                </ul>
+                
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> 本格的なプロダクション向けエージェントシステムをコードベースで構築したい開発者・エンジニアリング組織</span>
+                    <span><strong>料金目安:</strong> フレームワーク無料。LangSmith Plus $39/ユーザー/月</span>
+                    <span><strong>公式:</strong> <a href="https://www.langchain.com/langgraph" target="_blank" rel="noopener">https://www.langchain.com/langgraph</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+
+            <article class="card" id="tool-crewai">
+                <h3>CrewAI <span class="badge badge-us">US</span> <span class="badge badge-new">新規掲載</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">CrewAI, Inc.</p>
+                <p class="positioning">「役割ベースの協調型マルチエージェント」に特化したPythonフレームワーク。リサーチャー・ライター・アナリスト等、役割・目標・背景を持つ複数エージェントを協働させる設計思想。</p>
+                <ul>
+<li>役割・目標・背景を定義したエージェントの協働タスク実行</li>
+<li>エンタープライズ版：ノーコードのビジュアルクルー構築エディタ、RBAC</li>
+<li>ワークフロートレーシング、エージェントのトレーニング</li>
+<li>Fortune 500の約60%が採用（公表値）</li>
+                </ul>
+                
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> 複数の専門役割を持つAIエージェントチームを協調させたい業務プロセス自動化</span>
+                    <span><strong>料金目安:</strong> OSS無料、Professional $25/月、Enterprise個別見積り</span>
+                    <span><strong>公式:</strong> <a href="https://crewai.com/" target="_blank" rel="noopener">https://crewai.com/</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+        </section>
+
+
+        <section class="card" id="enterprise">
+            <h2>9. エンタープライズ垂直AI・生産性</h2>
+            <p class="section-intro">Microsoft 365 Copilot、Google Workspace AI、Vertex AI/Azure AI Foundryは既存カバー済みです。ここではCRM・ITSM・ERP・ナレッジワーク領域の垂直AIと、中国発の企業向けコラボ+AI（WPS/DingTalk/Feishu）を新規に掲載します。</p>
+            <p style="font-size:12.5px;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:8px;">サイト内の詳細ページ</p><div class="existing-links"><a class="tool-chip" href="m365-copilot.html">Microsoft 365 Copilot</a>
+<a class="tool-chip" href="workspace-ai.html">Google Workspace AI</a>
+<a class="tool-chip" href="vertex-ai.html">Vertex AI</a>
+<a class="tool-chip" href="azure-ai-foundry.html">Azure AI Foundry</a>
+<a class="tool-chip" href="copilot-studio.html">Copilot Studio</a></div>
+        </section>
+
+        <section class="grid">
+
+            <article class="card" id="tool-agentforce">
+                <h3>Salesforce Agentforce <span class="badge badge-us">US</span> <span class="badge badge-new">新規掲載</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">Salesforce</p>
+                <p class="positioning">Salesforceの膨大な顧客データ・業務プロセス資産を土台に、営業・カスタマーサービス・マーケティングの実務プロセスを自律的に代行するエージェントを構築・配備するプラットフォーム。</p>
+                <ul>
+<li>Web/アプリ内メッセージング、SMS、WhatsApp等の多チャネル対応</li>
+<li>Agentforce Voice（音声対応）、Agentforce Contact Center</li>
+<li>Agent Builder/Prompt Builderによるノーコード構築</li>
+<li>Flex Credits（従量課金通貨）による柔軟な課金</li>
+                </ul>
+                
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> Salesforce基盤上でカスタマーサービス・営業プロセスを自律エージェント化したい既存顧客</span>
+                    <span><strong>料金目安:</strong> Enterprise Edition以上に無料枠あり。会話課金は$2/会話〜</span>
+                    <span><strong>公式:</strong> <a href="https://www.salesforce.com/agentforce/" target="_blank" rel="noopener">https://www.salesforce.com/agentforce/</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+
+            <article class="card" id="tool-servicenow">
+                <h3>ServiceNow AI（Now Assist） <span class="badge badge-us">US</span> <span class="badge badge-new">新規掲載</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">ServiceNow</p>
+                <p class="positioning">ITSM・HR・カスタマーサービスなど社内業務プロセスの「エンドツーエンド自動化」に強み。2026年4月にFoundation/Advanced/Primeの3階層へライセンス刷新。</p>
+                <ul>
+<li>Foundation：要約・パターン認識・分類等の基本GenAIスキル</li>
+<li>Advanced：文脈理解型のエージェント型ワークフロー自動化</li>
+<li>Prime：カスタムスキル/エージェント作成、完全自律エージェント</li>
+<li>Now Assist、Context Engine、AI Control Towerが全ティア標準搭載</li>
+                </ul>
+                
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> 社内IT・HRサービスデスクや業務プロセスの自動化・エージェント化を進めたい大企業</span>
+                    <span><strong>料金目安:</strong> 公開価格なし（業界推定 Foundation層$70〜100/ユーザー〜）</span>
+                    <span><strong>公式:</strong> <a href="https://www.servicenow.com/products/ai-agents.html" target="_blank" rel="noopener">https://www.servicenow.com/products/ai-agents.html</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+
+            <article class="card" id="tool-joule">
+                <h3>SAP Joule <span class="badge badge-eu">EU</span> <span class="badge badge-new">新規掲載</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">SAP（ドイツ）</p>
+                <p class="positioning">SAPの業務プロセス知識を組み込んだ「業務プロセス専門エージェント」の集合体。40以上の専門エージェント・2,400以上のJouleスキルを35のSAPソリューションに展開。</p>
+                <ul>
+<li>Joule Agents：業務プロセス専門知識を持つ自律エージェント</li>
+<li>Joule Assistants：複数Agentsを調整し複雑ワークフローを実行</li>
+<li>Joule Studio：カスタムエージェント/スキルのビルダー</li>
+<li>エージェント間連携のオープンプロトコル対応</li>
+                </ul>
+                
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> SAP基幹システム（ERP・サプライチェーン・財務）上での業務プロセス自動化を進めたい既存顧客</span>
+                    <span><strong>料金目安:</strong> AI Units制（例：最小100ユニットで年700ユーロ程度）</span>
+                    <span><strong>公式:</strong> <a href="https://www.sap.com/products/artificial-intelligence/ai-agents.html" target="_blank" rel="noopener">https://www.sap.com/products/artificial-intelligence/ai-agents.html</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+
+            <article class="card" id="tool-notion-ai">
+                <h3>Notion AI <span class="badge badge-us">US</span> <span class="badge badge-new">新規掲載</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">Notion Labs</p>
+                <p class="positioning">ドキュメント・DB・ナレッジベースが一体化したNotionのワークスペースに、検索・要約・マルチステップ実行のAIエージェントを組み込んだ形。</p>
+                <ul>
+<li>Notion Agent：ドキュメント草案作成・DB検索・ページ更新を1プロンプトで実行</li>
+<li>Notion AI Search：社内ページを根拠にした自然言語Q&A</li>
+<li>AI Meeting Notes：会議の文字起こし・要約・アクションアイテム生成</li>
+<li>Enterprise Search：Slack/Google Drive/GitHub等の外部アプリ横断検索</li>
+                </ul>
+                
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> 社内ドキュメント・ナレッジベースを起点とした検索・要約・議事録自動化を求めるチーム</span>
+                    <span><strong>料金目安:</strong> Free、Plus $10/ユーザー/月、Business $20/ユーザー/月</span>
+                    <span><strong>公式:</strong> <a href="https://www.notion.com/" target="_blank" rel="noopener">https://www.notion.com/</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+
+            <article class="card" id="tool-slack-ai">
+                <h3>Slack AI <span class="badge badge-us">US</span> <span class="badge badge-new">新規掲載</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">Slack（Salesforce傘下）</p>
+                <p class="positioning">Slack上の会話・ファイル・プロジェクト情報を理解する「パーソナルAIエージェント」。Agentforceと連携した事前構築済みエージェント「Channel Expert」を提供。</p>
+                <ul>
+<li>チャンネル要約（未読分の自動要約）、引用付き会話検索</li>
+<li>未読スレッドのリキャップ、共有ファイルのAI要約</li>
+<li>2026年3月〜Deep Research、MCP統合、会議インテリジェンス追加</li>
+<li>Channel Expert：Agentforce搭載の事前構築済みエージェント</li>
+                </ul>
+                <div class="warn-box"><p>⚠️ Slack外（Notion、Google Docs等）の情報は見えないという明確な限界があります。</p></div>
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> Slack上に業務知識・意思決定履歴が集中している組織の情報検索・要約自動化</span>
+                    <span><strong>料金目安:</strong> Business+（$15/ユーザー/月）にバンドル</span>
+                    <span><strong>公式:</strong> <a href="https://slack.com/" target="_blank" rel="noopener">https://slack.com/</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+
+            <article class="card" id="tool-wps">
+                <h3>WPS AI <span class="badge badge-cn">CN</span> <span class="badge badge-new">新規掲載</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">Kingsoft（金山辦公）</p>
+                <p class="positioning">中国版Office「WPS」に統合されたAI機能。日本のMicrosoft 365 Copilotに近いポジションだが会員体系が複雑化している点が話題。</p>
+                <ul>
+<li>AI一発生成PPT（トピックから30秒で画像・レイアウト込みの完成資料）</li>
+<li>AI文章生成・添削、AI関数作成（Excel）</li>
+<li>AI読解アシスタント、AIデータアシスタント</li>
+                </ul>
+                
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> 社内資料（PPT/Excel/Word）の作成効率化、非デザイナーによる資料デザイン</span>
+                    <span><strong>料金目安:</strong> AI会員 月額25元、大会員 月額35元</span>
+                    <span><strong>公式:</strong> <a href="https://www.wps.cn/" target="_blank" rel="noopener">https://www.wps.cn/</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+
+            <article class="card" id="tool-dingtalk">
+                <h3>釘釘 DingTalk AI <span class="badge badge-cn">CN</span> <span class="badge badge-new">新規掲載</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">Alibaba（阿里巴巴）</p>
+                <p class="positioning">「世界初のエンタープライズ向けAIネイティブ業務プラットフォーム」を標榜する「悟空（Wukong）」を軸に、目標を伝えるだけでタスク分解〜実行〜報告までを自動化する方向へ進化。</p>
+                <ul>
+<li>DingTalk A1（会議要約・アクションアイテム自動生成・分析レポート）</li>
+<li>ブラウザ拡張によるWebページ要約・全文翻訳</li>
+<li>画像内テキスト抽出・画像内容要約</li>
+<li>「効率アイランド」機能（最重要情報を自動抽出）</li>
+                </ul>
+                
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> 会議の議事録自動化、日常業務のタスク管理・情報整理、中小企業のワークフロー自動化</span>
+                    <span><strong>料金目安:</strong> 企業版 創業版2.68元/日〜。個人AI会員 月額29元</span>
+                    <span><strong>公式:</strong> <a href="https://www.dingtalk.com/" target="_blank" rel="noopener">https://www.dingtalk.com/</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+
+            <article class="card" id="tool-feishu">
+                <h3>飛書 Feishu / Lark AI <span class="badge badge-cn">CN</span> <span class="badge badge-new">新規掲載</span></h3>
+                <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">ByteDance（字節跳動）</p>
+                <p class="positioning">グローバル展開（Lark）も進めるByteDance発の企業向け統合ワークプラットフォーム。外部AIエージェントに操作される側としての設計（Lark CLI OSS化）も特徴的。</p>
+                <ul>
+<li>グループチャットのAI自動要約、ドキュメント作成のAI支援</li>
+<li>妙記（会議録音・自動文字起こし）</li>
+<li>aily智能伙伴（カスタムAIエージェント基盤）</li>
+<li>Lark CLI：Claude Code等の外部エージェントから飛書を操作可能にするOSSツール</li>
+                </ul>
+                
+                <div class="meta-row">
+                    <span><strong>Best for:</strong> 会議の自動文字起こし・要約、社内ナレッジ管理、外部AIエージェントとの業務連携</span>
+                    <span><strong>料金目安:</strong> AI機能は4段階の企業版＋個人向けAI会員プラン</span>
+                    <span><strong>公式:</strong> <a href="https://www.feishu.cn/service/ai" target="_blank" rel="noopener">https://www.feishu.cn/service/ai</a></span>
+                    <span>鮮度: 2026-07-13</span>
+                </div>
+            </article>
+        </section>
+
+
+        <section class="card" id="3d">
+            <h2>10. 3D生成（補足）</h2>
+            <p class="section-intro">ゲーム・XR用アセット制作で需要が伸びている領域。まだ本ハブで個別の深掘りページは持っていないため、代表例のみ簡潔に記載します。</p>
+            
+        </section>
+
+        <section class="grid">
+
+            <article class="card">
+                <h3>3D生成AI <span class="badge badge-global">補足</span></h3>
+                <p class="positioning">3D生成AIは欧米・中国の境界が曖昧なプレイヤーが多い新興領域です。代表例を簡潔に記載します。</p>
+                <ul>
+                    <li><strong>Luma Genie</strong>（米Luma AI）：Dream Machine内でテキスト/画像から3Dモデルを生成。スマホでのGaussian Splatting/NeRFスキャンからの3D化が独自ワークフロー。</li>
+                    <li><strong>Meshy AI</strong>：テキスト/画像→3Dモデル→テクスチャ→リギング→アニメーションまで一気通貫（自動リギング、500以上のアニメーションプリセット）。Free/Pro $20/月/Studio $60/月。</li>
+                    <li><strong>Tripo AI</strong>：平均8秒という高速な3Dモデル生成でゲーム開発者に人気。Alibaba/Baidu Venturesからの出資が報じられており中華圏スタートアップに近い。Free/Pro $19.9/月〜。</li>
+                </ul>
+            </article>
+        </section>
+
+
+        <footer class="page-footer">
+            <h2>更新の仕組み化</h2>
+            <p>このページは<strong>隔週</strong>で自動更新の対象になります。手順は <a href="../../_routines/ai-tools-map-update.html">_routines/ai-tools-map-update.html</a> を参照してください。
+            サブエージェントによる分野別調査 → 新規ツール・料金改定・サービス終了の反映 → 早見表とカードの更新、という流れで行います。</p>
+
+            <h2>関連</h2>
+            <ul>
+                <li><a href="google-ecosystem.html">google-ecosystem.html</a> — Google AI エコシステム総覧</li>
+                <li><a href="microsoft-ecosystem.html">microsoft-ecosystem.html</a> — Microsoft AI エコシステム総覧</li>
+                <li><a href="china-ai-coding.html">china-ai-coding.html</a> — 中国系AIコーディングツール完全ガイド</li>
+                <li><a href="../../creator-system/genai-tools.html">creator-system/genai-tools.html</a> — 生成AIツール比較（動画・画像・音楽、制作パイプライン視点）</li>
+                <li><a href="intelligence-matrix.html">intelligence-matrix.html</a> — モデル横断の能力マトリクス</li>
+                <li><a href="model-generations.html">model-generations.html</a> — 現行モデル世代 SSOT</li>
+                <li><a href="../../strategy/capability-map.html">strategy/capability-map.html</a> — 社内ナレッジの能力マップ（本ハブの構造）</li>
+                <li><a href="../../_routines/ai-tools-map-update.html">_routines/ai-tools-map-update.html</a> — 本ページの更新ルーティン</li>
+            </ul>
+
+            <h2>出典（今回の調査で使用した主要ソース）</h2>
+            <ul class="src-list">
+                <li>OpenAI公式ヘルプセンター（Sora提供終了の確認） / OpenAI公式ブログ（GPT Image 2, Deep Research発表）</li>
+                <li>Adobe公式ブログ（Firefly Image Model 5） / Runway Research（Gen-4.5） / Black Forest Labs / Stability AI 公式</li>
+                <li>各社公式Pricingページ（Midjourney / Ideogram / ElevenLabs / Suno / Udio / HeyGen / Synthesia / Luma AI / Devin / Replit / Manus / Genspark / Perplexity / Zapier / Dify / n8n / LangChain / CrewAI / Salesforce / ServiceNow / SAP / Notion / Slack）</li>
+                <li>TechCrunch（Manus買収を巡る中国NDRCの介入報道） / 各社中国語公式サイト（通義万相・即夢・文心一格・可灵・Vidu・Seedance・海螺・讯飞星火・MiniMax・Mureka・扣子・AutoGLM・WPS・DingTalk・飛書・豆包・元宝・文小言・混元）</li>
+            </ul>
+            <p class="last-update" style="margin-top:18px;">最終更新: 2026-07-13（新規作成）。次回更新目安: 隔週。</p>
+            <p style="font-size:13px;"><a class="back" href="index.html">← Workbench index へ戻る</a></p>
+        </footer>
+
+    </div>
+</body>
+
+</html>
