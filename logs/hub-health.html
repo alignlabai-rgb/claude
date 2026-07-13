@@ -414,4 +414,29 @@ for line in out.split('\n'):
     if line.startswith('C:'):
         current_ts = int(line[2:])
     elif line.strip():
-        first_seen.setdefault
+        first_seen.setdefault(line.strip(), current_ts)
+
+now = time.time()
+cats = defaultdict(list)
+for root, dirs, files in os.walk('.'):
+    if '.git' in root or 'node_modules' in root: continue
+    for f in files:
+        if not f.endswith('.html'): continue
+        path = os.path.join(root, f).replace(os.sep, '/').lstrip('./')
+        cat = path.split('/')[0] if '/' in path else '(root)'
+        with open(path, encoding='utf-8', errors='ignore') as fh:
+            lines = sum(1 for _ in fh)
+        ts = first_seen.get(path)
+        days_old = (now - ts) / 86400 if ts else None
+        cats[cat].append((path, lines, days_old))
+
+for c, files in sorted(cats.items()):
+    total = sum(f[1] for f in files)
+    ages = [f[2] for f in files if f[2] is not None]
+    print(f"{c:&lt;20}{len(files):&gt;6}p {total:&gt;7}lines  avg={sum(ages)/len(ages):.1f}d")</pre>
+      <p class="small">これを <code>logs/hub-stats.py</code> として置き、四半期ごとに実行 → このページを手動更新する想定。将来的には GitHub Actions で自動化できる。</p>
+    </div>
+
+  </div>
+</body>
+</html>
