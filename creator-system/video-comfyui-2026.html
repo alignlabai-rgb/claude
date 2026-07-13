@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>【2026年7月最新】ComfyUIで作るAI動画 実践ガイド — AI Creator Hub</title>
+  <meta name="description" content="2026年7月時点のComfyUI動画生成最新事情。Wan2.6・HunyuanVideo-1.5・LTX-2・SCAIL-2など実在するオープンモデルとVRAM要件、具体的ワークフローを実例つきで紹介">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">AI Creator Hub</div>
+  <ul class="nav-links">
+    <li><a href="index.html">ホーム</a></li>
+    <li><a href="topic-generator.html">ネタ生成</a></li>
+    <li><a href="video-pipeline.html">動画制作</a></li>
+    <li><a href="manga-pipeline.html">漫画制作</a></li>
+    <li><a href="manga-comfyui-2026.html">漫画特集2026</a></li>
+    <li><a href="video-comfyui-2026.html" class="active">動画特集2026</a></li>
+    <li><a href="genai-tools.html">生成ツール比較</a></li>
+    <li><a href="overview.html" style="color:#3dd8c5;">全体フロー</a></li>
+    <li><a href="../research/openclaw-news/index.html" style="color: #4FFFB0;">🦞 OpenClaw情報</a></li>
+  </ul>
+  <div class="nav-hamburger"><span></span><span></span><span></span></div>
+</nav>
+
+<div class="page-hero">
+  <div class="section-label">特集 — 2026年7月更新</div>
+  <h1>ComfyUIで作る<br><span style="background: linear-gradient(135deg,#6C3CE1,#00D4FF); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">AI動画のローカル生成、今できること</span></h1>
+  <p>video-pipeline.html は Runway・Kling・Veo など<strong>クローズドAPI</strong>を軸にした設計。このページはその補完として、<strong>ComfyUI上でローカル/セルフホストで動かせるオープン動画モデル</strong>を、2026年7月12日時点のバージョン・VRAM要件・具体的ワークフローつきで扱う。</p>
+</div>
+
+<!-- 立ち位置 -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label">このページの立ち位置</div>
+    <h2 class="section-title">video-pipeline.htmlとの役割分担</h2>
+    <div class="two-col">
+      <div>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+          <a href="video-pipeline.html" style="color: var(--accent);">video-pipeline.html</a> はAPI課金の商用モデル（Runway Gen-4.5・Kling 3.0・Veo 3.1・Grok Imagine等）を前提にした全自動パイプライン設計。
+          月額APIコストをかけず<strong style="color: var(--text);">自前GPU・レンタルGPUで動かしたい場合</strong>の選択肢を、このページでは具体的に扱う。
+        </p>
+        <ul class="checklist">
+          <li><strong>対象読者:</strong> ComfyUIでローカル動画生成を試したい・コストを抑えたい人</li>
+          <li><strong>スコープ:</strong> オープンウェイトの動画生成モデル（商用APIとの比較は末尾の早見表で補足）</li>
+          <li><strong>情報源:</strong> docs.comfy.org/changelog、blog.comfy.org、各モデル配布元（HuggingFace/GitHub）</li>
+        </ul>
+      </div>
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem;">
+        <h3 style="margin-bottom: 1rem; font-size: 0.95rem; color: var(--text-muted);">ComfyUI 動画関連 最新changelog抜粋</h3>
+        <div class="code-block">
+<span class="cm"># docs.comfy.org/changelog より（2026-06〜07）</span>
+v0.27.1 (07-08): Seedream 5 Pro / Seed Audio 1.0
+v0.27.0 (06-30): Gemini Video Omni ノード追加
+v0.26.2 (06-25): SeeDance 2.0 Mini
+v0.26.1 (06-24): SeeDance 2.0 4K対応
+              Grok Video 1080p対応
+              HappyHorse 1.1 (Alibaba)
+v0.26.0 (06-23): LTX2 Context Windows ノード
+              SCAIL-2 Multireference
+v0.25.1 (06-16): Kling V3-Turbo 対応
+v0.25.0 (06-16): SCAIL-2 本体・Bernini-R (Wan系)
+              10-bit動画 入出力対応</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- オープン動画モデル比較 -->
+<section class="section" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-label">オープンウェイト動画モデル 2026年7月版</div>
+    <h2 class="section-title">ComfyUIでローカル実行できる主要モデル</h2>
+    <table style="width:100%; border-collapse:collapse; font-size:0.85rem;">
+      <thead>
+        <tr style="border-bottom: 2px solid var(--border);">
+          <th style="text-align:left; padding:0.75rem; color:var(--accent);">モデル</th>
+          <th style="text-align:left; padding:0.75rem; color:var(--accent);">開発元</th>
+          <th style="text-align:left; padding:0.75rem; color:var(--accent);">特徴</th>
+          <th style="text-align:left; padding:0.75rem; color:var(--accent);">VRAM目安</th>
+        </tr>
+      </thead>
+      <tbody style="color: var(--text-muted);">
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding:0.75rem; color:var(--text); font-weight:600;">LTX-2</td>
+          <td style="padding:0.75rem;">Lightricks（2026-01-06公開）</td>
+          <td style="padding:0.75rem;">ネイティブ4K・最大50fps。<strong style="color:#4FFFB0;">映像と同期した音声（会話・環境音・音楽）を1パスで同時生成</strong>する点が最大の特徴。ComfyUI本体にビルトイン済み（Manager経由でLTXVideo検索→自動DL）</td>
+          <td style="padding:0.75rem;">12GB（FP8）/ 24GB（bf16）</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding:0.75rem; color:var(--text); font-weight:600;">HunyuanVideo-1.5</td>
+          <td style="padding:0.75rem;">Tencent（2025-11-21公開）</td>
+          <td style="padding:0.75rem;">8.3Bパラメータで最大1080p。独自のSSTAアテンション機構で競合比ほぼ2倍の効率。480p I2Vの8-12ステップ蒸留版はRTX 4090で約75秒生成</td>
+          <td style="padding:0.75rem;">14GB（オフロード時の下限）/ ComfyUI公式実装では24GB推奨（Qwen2.5-VLエンコーダ+byT5+VAE+超解像モデルを同時ロードのため）</td>
+        </tr>
+        <tr>
+          <td style="padding:0.75rem; color:var(--text); font-weight:600;">Wan2.6シリーズ</td>
+          <td style="padding:0.75rem;">Alibaba（2025-12-16公開）</td>
+          <td style="padding:0.75rem;">T2V/I2V/<strong>R2V（参照動画から外見+声を継承）</strong>の4モデル構成。マルチショットのストーリー性・最大15秒動画に対応。次世代Wan 3.0（600億パラメータ・4K・30秒連続生成）は2026年半ば予定</td>
+          <td style="padding:0.75rem;">14B版はFP8量子化で40〜48GB（480p）。GGUF量子化（Q5_K_M/Q6等）で6GBまで圧縮可能（速度とのトレードオフ）</td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="margin-top: 1rem; background: rgba(0,212,255,0.06); border: 1px solid rgba(0,212,255,0.2); border-radius: 12px; padding: 1rem; font-size: 0.82rem; color: var(--text-muted);">
+      💡 「音声つき動画を1パスで作りたい」ならLTX-2一択。「解像度より安定した実写風の質感」ならHunyuanVideo-1.5。「同じキャラの声と見た目を別シーンで再現」したいならWan2.6-R2V、という使い分けが2026年7月時点の目安。
+    </div>
+  </div>
+</section>
+
+<!-- 具体的ワークフロー: LTX-2 -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label">具体的ワークフロー①</div>
+    <h2 class="section-title">LTX-2で音声つき動画を生成する</h2>
+    <div class="two-col">
+      <div>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+          ComfyUI Managerで「LTXVideo」を検索してインストールすると、重みは初回実行時に自動ダウンロードされる。
+          カスタムノードの追加インストールは不要（v0.26.0でLTX2 Context Windowsノードがコア機能として統合済み）。
+        </p>
+        <ul class="checklist">
+          <li><strong>1. インストール:</strong> ComfyUI Manager → "LTXVideo" 検索 → インストール</li>
+          <li><strong>2. モデル選択:</strong> VRAM 12GBならFP8量子化版、24GB以上ならbf16版</li>
+          <li><strong>3. プロンプト:</strong> 映像描写に加えて「せりふ・環境音・BGM」も同じプロンプトに含める（音声も同時生成のため）</li>
+          <li><strong>4. Context Windows:</strong> IC-LoRAガイドで長尺シーンを分割サンプリングし、シーン間の一貫性を維持</li>
+        </ul>
+      </div>
+      <div>
+        <div class="code-block">
+<span class="cm"># LTX-2 基本ワークフロー構成（ComfyUI公式サンプル準拠）</span>
+
+<span class="fn">LTXVLoader</span>(precision=<span class="str">"fp8"</span>)  <span class="cm"># 12GB環境向け</span>
+  → <span class="fn">LTXVConditioning</span>(
+      prompt=<span class="str">"教室のドア。少女が驚いた声で
+        「……えっ、本当に？」と言う。
+        廊下の環境音、緊張感のあるBGM"</span>,
+      fps=<span class="num">50</span>, resolution=<span class="str">"4K"</span>
+    )
+  → <span class="fn">LTX2ContextWindow</span>(
+      window_size=<span class="num">97</span>,   <span class="cm"># フレーム数</span>
+      overlap=<span class="num">16</span>
+    )
+  → <span class="fn">KSampler</span>(steps=<span class="num">30</span>)
+  → <span class="fn">LTXVDecode</span>
+  → <span class="fn">SaveVideoWithAudio</span>  <span class="cm"># 映像+音声を1ファイルに書き出し</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 具体的ワークフロー: SCAIL-2 -->
+<section class="section" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-label">具体的ワークフロー②</div>
+    <h2 class="section-title">SCAIL-2でキャラクターの動作を転写・置換する</h2>
+    <p style="color: var(--text-muted); margin-bottom: 1.5rem; max-width: 750px;">
+      SCAIL-2（zai-org公開、arXiv論文「Unifying Controlled Character Animation with End-to-end In-Context Conditioning」）は、
+      中間ポーズ表現（OpenPose骨格等）を介さず、駆動動画の動きを参照キャラクター画像へ直接転写する。<strong style="color:var(--text);">Animation Mode</strong>（キャラが動きを演じる）と
+      <strong style="color:var(--text);">Replacement Mode</strong>（動画内の人物を参照キャラに置き換える）の2モードがある。
+    </p>
+    <div class="two-col">
+      <div>
+        <h4 style="margin-bottom: 0.75rem; font-size: 0.95rem;">Replacement Mode: 実写動画のキャラを差し替える</h4>
+        <div class="code-block">
+<span class="cm"># ComfyUI標準ノードのみで完結（追加カスタムノード不要）</span>
+
+<span class="fn">LoadVideo</span>(<span class="str">"driving/actor_walk.mp4"</span>)
+  → <span class="fn">SAM3Track</span>()  <span class="cm"># 人物トラッキング</span>
+  → <span class="fn">SCAIL2ColoredMask</span>(
+      replacement_mode=<span class="kw">True</span>  <span class="cm"># グローバルトグルと一致させる</span>
+    )
+  → <span class="fn">WanSCAILToVideo</span>(
+      reference_image=<span class="str">"ref/hiro_face_body.png"</span>,
+      mode=<span class="str">"replacement"</span>
+    )
+  → <span class="fn">SaveVideo</span></div>
+        <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 0.75rem;">複数人物が映る動画では、SCAIL2ColoredMaskの「identity↔color」の対応関係が駆動側・参照側で一致している必要がある（順序がズレると別人の特徴が混入する）。</p>
+      </div>
+      <div>
+        <h4 style="margin-bottom: 0.75rem; font-size: 0.95rem;">manga-pipeline.html「複数キャラクター同フレーム」への応用</h4>
+        <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; font-size: 0.85rem; color: var(--text-muted); line-height: 1.8;">
+          <a href="manga-pipeline.html#multi-character" style="color: var(--accent);">manga-pipeline.htmlの複数キャラクター対応節</a>では
+          ControlNet Openposeでキャラ別の骨格レイヤーを手動合成していたが、
+          SCAIL-2のBinding Slotsは複数キャラの識別情報を保持したまま動作転写できるため、
+          <strong style="color:var(--text);">群像シーンの動画版プレビズ</strong>として使い、そこから代表フレームを抜き出してコマ化する、という漫画×動画の連携ワークフローが2026年7月時点で技術的に成立する。
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VRAM別おすすめ構成 -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label">VRAM別 推奨構成</div>
+    <h2 class="section-title">手持ちGPUに合わせた選択</h2>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon green">💻</div>
+        <h3>6〜8GB（エントリー）</h3>
+        <p>Wan2.2 5B版（ネイティブオフロード対応）またはWan2.2 14B GGUF量子化（Q3_K〜Q5_K_M）。480p、生成に10〜15分程度。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon cyan">🖥️</div>
+        <h3>12GB（ミドル）</h3>
+        <p>LTX-2 FP8量子化版が第一候補。4K・50fps・音声同期という上位機能をこの帯域で使えるのが強み。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon purple">🖥️🖥️</div>
+        <h3>24GB（ハイエンド民生）</h3>
+        <p>HunyuanVideo-1.5フル構成（Qwen2.5-VL+byT5+VAE+超解像モデル同時ロード）、またはLTX-2 bf16版。RTX 4090クラスが目安。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon orange">☁️</div>
+        <h3>40GB以上（クラウドGPU）</h3>
+        <p>Wan2.6 14B系をFP8量子化で480p運用。A100/H100クラスのレンタルGPU（RunPod等）が現実的な選択肢。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 商用クローズドモデルとの比較（簡易） -->
+<section class="section" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-label">商用クローズドモデルとの使い分け</div>
+    <h2 class="section-title">オープン運用 vs API課金</h2>
+    <p style="color: var(--text-muted); margin-bottom: 1.5rem; max-width: 750px;">
+      Runway Gen-4.5・Kling 3.0・Veo 3.1・Grok Imagineなどクローズド商用モデルの詳細は
+      <a href="video-pipeline.html" style="color: var(--accent);">video-pipeline.html</a> と
+      <a href="../research/grok-recent-updates.html" style="color: var(--accent);">research/grok-recent-updates.html</a> 等の月次トラッカーを参照。
+      ここでは判断軸だけ整理する。
+    </p>
+    <table style="width:100%; border-collapse:collapse; font-size:0.85rem;">
+      <thead>
+        <tr style="border-bottom: 2px solid var(--border);">
+          <th style="text-align:left; padding:0.75rem; color:var(--accent);">観点</th>
+          <th style="text-align:left; padding:0.75rem; color:var(--accent);">オープン（ComfyUI自前運用）</th>
+          <th style="text-align:left; padding:0.75rem; color:var(--accent);">クローズドAPI（Runway/Kling/Veo等）</th>
+        </tr>
+      </thead>
+      <tbody style="color: var(--text-muted);">
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding:0.75rem; color:var(--text); font-weight:600;">初期コスト</td>
+          <td style="padding:0.75rem;">GPU購入/レンタル費用が先行</td>
+          <td style="padding:0.75rem;">ゼロ（従量課金のみ）</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding:0.75rem; color:var(--text); font-weight:600;">単発品質の上限</td>
+          <td style="padding:0.75rem;">現状はクローズド最上位に一歩譲ることが多い</td>
+          <td style="padding:0.75rem;">最新最高品質を追従しやすい</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding:0.75rem; color:var(--text); font-weight:600;">量産時のコスト</td>
+          <td style="padding:0.75rem;">GPU代のみ、生成数に応じた変動費が小さい</td>
+          <td style="padding:0.75rem;">生成数に比例して膨らむ</td>
+        </tr>
+        <tr>
+          <td style="padding:0.75rem; color:var(--text); font-weight:600;">キャラ一貫性の作り込み</td>
+          <td style="padding:0.75rem;">SCAIL-2・LoRA等で細かく制御可能</td>
+          <td style="padding:0.75rem;">参照画像入力程度に限定されることが多い</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 実例: Series Entertainment -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label">実例 — 実際の制作スタジオ事例</div>
+    <h2 class="section-title">Series Entertainment社の<br>ComfyUI動画本番運用</h2>
+    <div class="two-col">
+      <div>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+          ゲーム・動画スタジオのSeries Entertainment社（Netflixタイトル複数を出荷）は、
+          Story → ComfyUI（画像・動画生成）→ Assembly という一気通貫パイプラインを構築し、
+          クリエイター1人あたり<strong style="color:var(--text);">週15分の完成動画</strong>をボット統合による自動実行で継続生産している。
+        </p>
+        <ul class="checklist">
+          <li><strong>パイプライン設計:</strong> 512×512の低解像度テストから高解像度バッチ生成まで、同一ワークフローを使い回す4本構成</li>
+          <li><strong>自動化:</strong> バッチ実行 + ボット連携で、同じワークフローを繰り返し実行する仕組み化に注力</li>
+          <li><strong>成果:</strong> 資産10万点以上、制作速度は従来手法（1資産6時間以上）比180倍</li>
+        </ul>
+        <p style="margin-top:1rem; font-size:0.78rem; color:var(--text-muted);">Source: <a href="https://blog.comfy.org/p/case-study-how-series-entertainment" style="color:var(--accent);" target="_blank">ComfyUI Blog — Case Study: How Series Entertainment Rebuilt Game and Video Production with ComfyUI</a>（2026-02-19）</p>
+      </div>
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem;">
+        <h3 style="margin-bottom: 1rem; font-size: 0.95rem; color: var(--text-muted);">video-pipelineへの示唆</h3>
+        <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.9;">
+          video-pipeline.htmlはAPI課金モデルを前提に「動画1本あたりのコスト」を管理する設計だが、
+          Series社の事例は<strong style="color:var(--text);">「ワークフローそのものを資産として保有し、実行コストだけを繰り返し払う」</strong>という別のコスト構造を示している。
+          制作本数が一定量を超える段階では、ComfyUI自前運用への移行を検討する損益分岐点があるという前提で、
+          video-pipeline.htmlの「技術スタック」節に代替シナリオとして記録しておく価値がある。
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ワークフロー入手先 -->
+<section class="section" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-label">ワークフロー入手先</div>
+    <h2 class="section-title">どこで探すか</h2>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon cyan">🏠</div>
+        <h3>comfy.org/workflows（公式）</h3>
+        <p>LTX-2・Wan2.6・HunyuanVideo-1.5それぞれの公式サンプルワークフローが揃う。まずここから。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon orange">📘</div>
+        <h3>docs.comfy.org/tutorials/video</h3>
+        <p>各モデルのComfyUI公式チュートリアル。ノード構成のスクリーンショットつきで、そのままインポートして試せるJSONが配布されている。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon purple">⚠️</div>
+        <h3>OpenArt Workflows（縮小済み）</h3>
+        <p>2026年1月18日にクラウド実行機能が終了し、現在はJSON閲覧・DLのみの静的ハブ。動画系の新規ワークフロー探しは公式ドキュメント優先で。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 深掘り: Corridor Digitalの実際の技術分解 -->
+<section class="section" id="corridor-breakdown">
+  <div class="section-inner">
+    <div class="section-label">深掘り① — 実在スタジオの技術分解</div>
+    <h2 class="section-title">Corridor Digitalは実際どう作ったか<br>（実写→アニメ変換の全工程）</h2>
+    <p style="color: var(--text-muted); margin-bottom: 1.5rem; max-width: 750px;">
+      YouTubeのVFXスタジオ<strong style="color:var(--text);">Corridor Digital（チャンネル名 Corridor Crew）</strong>が公開した
+      「実写をアニメ化する」ワークフローを技術要素ごとに分解する。抽象的な「AIで変換」ではなく、実際に何を・どの順で・何のツールで処理したかを追う。

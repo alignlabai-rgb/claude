@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>【2026年7月最新】ComfyUIで作るAI漫画 実践ガイド — AI Creator Hub</title>
+  <meta name="description" content="2026年7月時点のComfyUI最新バージョン・キャラクター一貫性の最新手法・実在するチェックポイント/LoRA/ワークフローを、実例つきで紹介する特集ページ">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">AI Creator Hub</div>
+  <ul class="nav-links">
+    <li><a href="index.html">ホーム</a></li>
+    <li><a href="topic-generator.html">ネタ生成</a></li>
+    <li><a href="video-pipeline.html">動画制作</a></li>
+    <li><a href="manga-pipeline.html">漫画制作</a></li>
+    <li><a href="manga-comfyui-2026.html" class="active">漫画特集2026</a></li>
+    <li><a href="video-comfyui-2026.html">動画特集2026</a></li>
+    <li><a href="genai-tools.html">生成ツール比較</a></li>
+    <li><a href="overview.html" style="color:#3dd8c5;">全体フロー</a></li>
+    <li><a href="../research/openclaw-news/index.html" style="color: #4FFFB0;">🦞 OpenClaw情報</a></li>
+  </ul>
+  <div class="nav-hamburger"><span></span><span></span><span></span></div>
+</nav>
+
+<div class="page-hero">
+  <div class="section-label">特集 — 2026年7月更新</div>
+  <h1>ComfyUIで作る<br><span style="background: linear-gradient(135deg,#00D4FF,#6C3CE1); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">AI漫画の「今」</span></h1>
+  <p>manga-pipeline.html（設計ドキュメント）の補完として、2026年7月12日時点で実在するツール・バージョン・数値だけを一次情報から拾って再構成した実践ガイド。ノード構成・チェックポイント名・VRAM要件まで具体的に書く。</p>
+</div>
+
+<!-- 更新サマリー -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label">このページの立ち位置</div>
+    <h2 class="section-title">manga-pipeline.htmlとの違い</h2>
+    <div class="two-col">
+      <div>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+          <a href="manga-pipeline.html" style="color: var(--accent);">manga-pipeline.html</a> は「OpenClawスキルとしての設計（入出力定義・障害対応・API連携）」を扱う設計書。
+          このページはその逆で、<strong style="color: var(--text);">「今日、実際に何をインストールして、何を打ち込めば動くか」</strong>だけに絞った実践ガイド。
+          ツール名・バージョン番号・VRAM値はすべて2026年7月時点の一次情報（ComfyUI公式changelog・各モデル配布元）で確認したものを記載する。
+        </p>
+        <ul class="checklist">
+          <li><strong>対象読者:</strong> ComfyUIをローカルまたはクラウドGPUで実際に動かす人</li>
+          <li><strong>更新方針:</strong> モデル世代交代が速いため、月1回を目安に再確認・追記（削除ではなく追記）</li>
+          <li><strong>情報源:</strong> docs.comfy.org/changelog、blog.comfy.org、各モデル配布元（HuggingFace/GitHub/Civitai）</li>
+        </ul>
+      </div>
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem;">
+        <h3 style="margin-bottom: 1rem; font-size: 0.95rem; color: var(--text-muted);">ComfyUI本体 最新バージョン</h3>
+        <div class="code-block">
+<span class="cm"># docs.comfy.org/changelog より</span>
+<span class="fn">latest</span>: <span class="str">v0.27.1</span>  <span class="cm"># 2026-07-08</span>
+<span class="fn">frontend</span>: <span class="str">1.45.20+</span>
+
+<span class="cm"># 直近の主な追加（v0.26.0〜v0.27.1）</span>
+- Krea2 (RAW/Turbo オープンウェイト画像モデル)
+- Boogu-Image (Qwen3-VL-8Bテキストエンコーダ)
+- SCAIL-2 (キャラクター動作転写・置換モデル)
+- Nano Banana 2 Lite ノード対応
+- Seedream 5 Pro / Seed Audio 1.0 パートナーノード
+- int8モデル対応（Turing世代以降のGPUで高速化）</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ComfyUI changelog highlights -->
+<section class="section" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-label">直近1ヶ月の主要アップデート</div>
+    <h2 class="section-title">漫画制作に効く変更点だけ抜粋</h2>
+    <p style="color: var(--text-muted); margin-bottom: 1.5rem; max-width: 700px;">
+      ComfyUIは2〜4週間おきにリリースが続く。全部は追えないので、キャラクター生成・一貫性に関係する項目だけ抜粋。
+    </p>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon purple">🧬</div>
+        <h3>SCAIL-2（v0.25.0〜, 2026-06-16）</h3>
+        <p>Zhipu/Z.ai系（zai-org）が公開したキャラクター動作転写モデル。参照画像1枚 + 駆動動画から、そのキャラのポーズ違い画像・動画を大量生成できる。<code>WanSCAILToVideo</code>・<code>SCAIL2ColoredMask</code>・SAM3トラッキングの組み合わせで、追加のカスタムノード不要（標準モデルDLのみ）。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon cyan">🎨</div>
+        <h3>Krea2（v0.26.0〜, 2026-06-23）</h3>
+        <p>Krea社のオープンウェイト画像モデル。<strong>RAW</strong>（52ステップ・LoRA学習用）と<strong>Turbo</strong>（8ステップ推論用）のペア構成。「RAWで学習しTurboで量産」という運用がキャラクターLoRA制作の新しい定番になりつつある。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon orange">🍌</div>
+        <h3>Nano Banana 2 Lite（v0.27.0, 2026-06-30）</h3>
+        <p>ComfyUIから直接呼べるパートナーノードとして追加。参照画像・ラフ出し用途（1K画像 約$0.034・約4秒）で、ローカル生成の前段プレビューに使える。Imagen 4は2026年8月17日廃止予定のため、今から乗り換えておくのが安全。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon green">⚡</div>
+        <h3>int8モデル対応（v0.27.0, 2026-06-30）</h3>
+        <p>Turing世代（RTX 20xx）以降のGPUでint8量子化モデルが高速化。旧GPUでもVRAM消費を抑えつつfp16に近い速度が出るようになり、低スペック環境でのキャラクターLoRA運用のハードルが下がった。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- キャラクター一貫性: 2026年7月版のベストプラクティス -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label">キャラクター一貫性 2026年7月版</div>
+    <h2 class="section-title">「LoRA + IP-Adapter + ControlNet」に<br>SCAIL-2を足すとどう変わるか</h2>
+    <p style="color: var(--text-muted); margin-bottom: 1.5rem; max-width: 750px;">
+      manga-pipeline.htmlの3重構成（LoRA / IP-Adapter / ControlNet）は今も土台として有効。
+      そこに2026年6月以降実用段階に入った<strong style="color:var(--text);">SCAIL-2</strong>を足すと、
+      「基準ポーズ1枚から大量の一貫ポーズ違いを機械的に生成する」工程が追加できる。
+    </p>
+    <div class="two-col">
+      <div>
+        <h4 style="margin-bottom: 0.75rem; font-size: 0.95rem;">従来: 1コマずつプロンプトでポーズ生成</h4>
+        <div class="code-block">
+<span class="cm"># 旧来フロー（コマごとに再生成）</span>
+<span class="kw">for</span> panel <span class="kw">in</span> panels:
+    generate_panel(
+        character, panel.pose_prompt,
+        lora=<span class="str">"hiro_v3.safetensors"</span>,
+        controlnet_openpose=panel.pose_map
+    )
+    <span class="cm"># → コマごとにCLIP類似度チェックが必要
+    #   崩れたら再生成、を繰り返す</span></div>
+        <h4 style="margin: 1.25rem 0 0.75rem; font-size: 0.95rem;">2026年7月: SCAIL-2で駆動動画からポーズ量産</h4>
+        <div class="code-block">
+<span class="cm"># SCAIL-2 Animation Mode
+# 参照画像1枚 + 駆動動画（自作 or ストック）から
+# 同一キャラの一貫したポーズ違いを連続生成</span>
+<span class="fn">WanSCAILToVideo</span>(
+    reference_image=<span class="str">"ref/hiro_face_body.png"</span>,
+    driving_video=<span class="str">"motion/run_upstairs.mp4"</span>,
+    mode=<span class="str">"animation"</span>
+)
+<span class="cm"># SCAIL2ColoredMask で複数キャラの
+# identity↔colorを固定（複数キャラシーンでも安定）</span></div>
+      </div>
+      <div>
+        <h4 style="margin-bottom: 0.75rem; font-size: 0.95rem;">使い分けの考え方</h4>
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; font-weight: 700; color: var(--accent); margin-bottom: 0.35rem;">静止画1コマだけ欲しい → 従来のLoRA+IP-Adapter+ControlNet</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">単発のコマ生成はセットアップが軽い従来手法の方が速い。SCAIL-2は駆動動画の用意が前提になる分、初期コストがかかる。</div>
+          </div>
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; font-weight: 700; color: #FF9E00; margin-bottom: 0.35rem;">同じキャラで動作違いを大量に欲しい → SCAIL-2</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">「階段を駆け上がる」を6コマに分解したい時など、1本の駆動動画から一貫したポーズ列を切り出せる。連載モノでバトルシーン等の大量ポーズが必要な場面で特に効く。</div>
+          </div>
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.8rem; font-weight: 700; color: #A78BFA; margin-bottom: 0.35rem;">複数キャラの絡みシーン → SCAIL-2 Replacement Mode</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">既存の実写/3Dモーション動画に写っている人物を、自キャラの参照画像で置き換える「Replacement Mode」。群像シーンのクロスコンタミネーション対策として、manga-pipeline.htmlのControlNet Openpose手法の代替・補完になる。</div>
+          </div>
+        </div>
+        <div style="margin-top: 1rem; background: rgba(0,212,255,0.06); border: 1px solid rgba(0,212,255,0.2); border-radius: 12px; padding: 1rem; font-size: 0.82rem; color: var(--text-muted);">
+          ⚠️ SCAIL-2は2026年6月にComfyUI本体へ組み込まれたばかり（v0.25.0）。自パイプラインでの本格採用前には、まず少数シーンでA/Bテストを推奨。
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- チェックポイント選定 -->
+<section class="section" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-label">チェックポイント選定 2026年7月版</div>
+    <h2 class="section-title">アニメ・漫画系ベースモデルの現在地</h2>
+    <table style="width:100%; border-collapse:collapse; font-size:0.85rem;">
+      <thead>
+        <tr style="border-bottom: 2px solid var(--border);">
+          <th style="text-align:left; padding:0.75rem; color:var(--accent);">モデル</th>
+          <th style="text-align:left; padding:0.75rem; color:var(--accent);">系統</th>
+          <th style="text-align:left; padding:0.75rem; color:var(--accent);">特徴</th>
+          <th style="text-align:left; padding:0.75rem; color:var(--accent);">向いている用途</th>
+        </tr>
+      </thead>
+      <tbody style="color: var(--text-muted);">
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding:0.75rem; color:var(--text); font-weight:600;">NoobAI-XL V-Pred 1.0</td>
+          <td style="padding:0.75rem;">Illustrious系ファインチューン</td>
+          <td style="padding:0.75rem;">タグ理解・アナトミー精度がIllustrious系内で最上位クラス。v-prediction設定必須・Eulerサンプラー指定という制約あり</td>
+          <td style="padding:0.75rem;">高精度な線画・作画崩れを最小化したいメイン制作</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding:0.75rem; color:var(--text); font-weight:600;">Illustrious XL 1.1</td>
+          <td style="padding:0.75rem;">Illustrious本流</td>
+          <td style="padding:0.75rem;">既存Illustrious系LoRAエコシステムと完全互換</td>
+          <td style="padding:0.75rem;">既にIllustrious系LoRA資産がある制作の継続</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding:0.75rem; color:var(--text); font-weight:600;">Diving-Illustrious Anime</td>
+          <td style="padding:0.75rem;">Illustrious系ファインチューン</td>
+          <td style="padding:0.75rem;">複雑なネガティブプロンプト不要・out-of-the-boxで綺麗な出力</td>
+          <td style="padding:0.75rem;">プロンプトエンジニアリングに時間をかけたくない量産工程</td>
+        </tr>
+        <tr>
+          <td style="padding:0.75rem; color:var(--text); font-weight:600;">Krea2（RAW / Turbo）</td>
+          <td style="padding:0.75rem;">新系統（DiT）</td>
+          <td style="padding:0.75rem;">高いプロンプト追従性。ただしQwen3-VLテキストエンコーダ+Qwen-Image VAE+Krea-2 DiTを同時ロードするため12GB環境では標準LoRA学習が困難</td>
+          <td style="padding:0.75rem;">24GB以上のVRAMがあり、新しいスタイルを一から作りたい場合</td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 1rem;">※ Illustrious/NoobAI系はSDXL系LoRAエコシステムがそのまま使えるため、manga-pipeline.htmlの既存LoRA資産（hiro_v3.safetensors等）との相性は現状こちらが有利。Krea2への本格移行はLoRA再学習コストと天秤にかけて判断（manga-pipeline.htmlの「検討中の代替スタック」を参照）。</p>
+  </div>
+</section>
+
+<!-- Krea2 LoRA学習の具体手順 -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label">具体的手順</div>
+    <h2 class="section-title">Krea2でキャラクターLoRAを学習する</h2>
+    <p style="color: var(--text-muted); margin-bottom: 1.5rem; max-width: 750px;">
+      manga-pipeline.htmlのLoRA学習手順（Kohya SS / SDXL）に加えて、Krea2ベースでの学習手順を実データで追記する。
+    </p>
+    <div class="two-col">
+      <div>
+        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 0.875rem; display: flex; gap: 0.875rem; align-items: flex-start;">
+            <div class="step-num" style="margin: 0; min-width: 36px; height: 36px; font-size: 0.85rem;">1</div>
+            <div><strong>データ準備</strong><br><span style="font-size: 0.82rem; color: var(--text-muted);">1024×1024の高精細画像を<strong>約20枚</strong>用意（表情・角度バリエーション）。Krea2 RAWで学習し、量産はTurboで行う設計</span></div>
+          </div>
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 0.875rem; display: flex; gap: 0.875rem; align-items: flex-start;">
+            <div class="step-num" style="margin: 0; min-width: 36px; height: 36px; font-size: 0.85rem;">2</div>
+            <div><strong>学習ツール選択</strong><br><span style="font-size: 0.82rem; color: var(--text-muted);"><code>AI Toolkit</code>（手軽・初心者向け）または <code>musubi-tuner</code>（VRAM最適化に強い専門ツール）。Krea2はQwen3-VLエンコーダ等を同時ロードするため12GB環境では標準構成でのLoRA学習が困難 — musubi-tunerのVRAM最適化オプションが実質必須</span></div>
+          </div>
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 0.875rem; display: flex; gap: 0.875rem; align-items: flex-start;">
+            <div class="step-num" style="margin: 0; min-width: 36px; height: 36px; font-size: 0.85rem;">3</div>
+            <div><strong>学習実行</strong><br><span style="font-size: 0.82rem; color: var(--text-muted);"><strong>2,000ステップ</strong>で十分な学習が確認されている（コミュニティ報告ベース）。SDXL系のKohya SS運用（2000〜3000ステップ・学習率1e-4）と近いレンジ</span></div>
+          </div>
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 0.875rem; display: flex; gap: 0.875rem; align-items: flex-start;">
+            <div class="step-num" style="margin: 0; min-width: 36px; height: 36px; font-size: 0.85rem;">4</div>
+            <div><strong>推論はTurboに切替</strong><br><span style="font-size: 0.82rem; color: var(--text-muted);">学習したLoRAをKrea2 Turbo（8ステップ推論）にロードして量産。RAWで学習・Turboで生成、という分業がKrea2の標準ワークフロー</span></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="code-block">
+<span class="cm"># ComfyUI公式サンプル: docs.comfy.org/tutorials/image/krea/krea-2
+# 既存Krea2ワークフローにLoRAノードを追加するだけで良い</span>
+
+<span class="fn">CheckpointLoader</span>(<span class="str">"krea2_turbo.safetensors"</span>)
+  → <span class="fn">LoraLoader</span>(
+      lora_name=<span class="str">"hiro_krea2.safetensors"</span>,
+      strength_model=<span class="num">0.85</span>
+    )
+  → <span class="fn">CLIPTextEncode</span>(prompt)
+  → <span class="fn">KSampler</span>(steps=<span class="num">8</span>, cfg=<span class="num">1.5</span>)  <span class="cm"># Turboは低steps/低cfgが基本</span>
+  → <span class="fn">VAEDecode</span>
+  → <span class="fn">SaveImage</span>
+
+<span class="cm"># 学習側（musubi-tuner CLI例）</span>
+python train_network.py \
+  --pretrained_model_name_or_path krea2_raw.safetensors \
+  --train_data_dir ./hiro_dataset \
+  --resolution 1024,1024 \
+  --max_train_steps 2000 \
+  --output_name hiro_krea2</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 実在するワークフロー・ツール具体例 -->
+<section class="section" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-label">実例</div>
+    <h2 class="section-title">実在するワークフロー・LoRA・ツール</h2>
+    <p style="color: var(--text-muted); margin-bottom: 1.5rem; max-width: 750px;">
+      抽象論ではなく、実際にダウンロードして試せるものを具体名で挙げる。
+    </p>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon purple">📷</div>
+        <h3>Photos to Manga Style</h3>
+        <p>実写写真をComfyUIで漫画風に変換する公開ワークフロー。<code>Zanshou-kin（残照金）SDXL - Hoko Manga Style</code>というCivitai配布のLoRAを使用。Load Imageノードで自分の画像に差し替えて使える設計。</p>
+        <div style="margin-top: 0.75rem;"><span class="tag tag-purple">SDXL系</span> <span class="tag tag-cyan">実写→漫画変換</span></div>
+      </div>
+      <div class="card">
+        <div class="card-icon orange">🖍️</div>
+        <h3>One-Click AI Manga Colorizer</h3>
+        <p>2026年4月公開。白黒漫画原稿を<code>Qwen-Image-Edit-2511</code>でワンクリック着色するComfyUIワークフロー。フォルダ単位のバッチ処理に対応しており、既存の白黒漫画資産の二次展開に使える。</p>
+        <div style="margin-top: 0.75rem;"><span class="tag tag-orange">Qwen-Image-Edit</span> <span class="tag tag-green">バッチ処理</span></div>
+      </div>
+      <div class="card">
+        <div class="card-icon cyan">🧩</div>
+        <h3>Consistent Character Creator 3.0</h3>
+        <p><code>Qwen Image Edit</code>モデルを利用し、顔の骨格・服装・スタイルを角度違いでも保持するキャラクター生成ワークフロー。ストーリーボード・連載作品向けの「基準シート量産」用途に近い。</p>
+        <div style="margin-top: 0.75rem;"><span class="tag tag-purple">Qwen Image Edit</span></div>
+      </div>
+      <div class="card">
+        <div class="card-icon green">🔧</div>
+        <h3>comfyui_panels（GitHub）</h3>
+        <p>ページ内のコマ割りレイアウトをノードで組めるカスタムノード集（<code>bmad4ever/comfyui_panels</code>）。空白ページから分割を重ねて任意の複雑なコマ構成を作る、manga-pipeline.htmlの「コマ割り設計」ステップをComfyUI内で完結させる選択肢。</p>
+        <div style="margin-top: 0.75rem;"><span class="tag tag-green">カスタムノード</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ノーコード商用ツール比較（自前ComfyUIを持たない場合の代替） -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label">代替案</div>
+    <h2 class="section-title">ComfyUI環境を持たない場合の商用ツール</h2>
+    <p style="color: var(--text-muted); margin-bottom: 1.5rem; max-width: 750px;">
+      自前GPU・ComfyUI運用が前提のmanga-pipeline.htmlに対し、ノーコードの商用SaaSも2026年時点で選択肢が増えている。比較検討用に主要どころを挙げる（価格・機能は変動するため契約前に必ず公式で確認）。
+    </p>
+    <table style="width:100%; border-collapse:collapse; font-size:0.85rem;">
+      <thead>
+        <tr style="border-bottom: 2px solid var(--border);">
+          <th style="text-align:left; padding:0.75rem; color:var(--accent);">サービス</th>
+          <th style="text-align:left; padding:0.75rem; color:var(--accent);">強み</th>
+          <th style="text-align:left; padding:0.75rem; color:var(--accent);">価格帯（目安）</th>
+        </tr>
+      </thead>
+      <tbody style="color: var(--text-muted);">
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding:0.75rem; color:var(--text); font-weight:600;">Anifusion</td>
+          <td style="padding:0.75rem;">キャラクター参照システムによる一貫性維持。Amazon KDPでの自費出版に強い</td>
+          <td style="padding:0.75rem;">月額制（要公式確認）</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding:0.75rem; color:var(--text); font-weight:600;">Comistitch</td>
+          <td style="padding:0.75rem;">ストーリー→コマ割り→完成までのフルパイプライン型</td>
+          <td style="padding:0.75rem;">無料枠あり</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding:0.75rem; color:var(--text); font-weight:600;">Dashtoon</td>
+          <td style="padding:0.75rem;">縦読みWebtoon特化 + 配信プラットフォーム内蔵</td>
+          <td style="padding:0.75rem;">無料枠あり</td>
+        </tr>
+        <tr>
+          <td style="padding:0.75rem; color:var(--text); font-weight:600;">ComicsAI Manga AI</td>
+          <td style="padding:0.75rem;">コマ生成・ストーリービート起点の低価格プラン</td>
+          <td style="padding:0.75rem;">Pro $9.90/月〜</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 実例: ComfyUI導入の実際の成果 -->
+<section class="section" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-label">実例 — 実際の制作スタジオ事例</div>
+    <h2 class="section-title">Series Entertainment社の<br>ComfyUI本番導入事例</h2>
+    <div class="two-col">
+      <div>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+          ComfyUI公式ブログが2026年2月に公開したケーススタディ。ゲーム・動画スタジオのSeries Entertainment社が、
+          ComfyUIのノードベースワークフローを本番制作の基盤に据え、Netflixタイトルを含む複数プロジェクトを出荷した実例。
+          漫画制作にも応用できる「キャラクター表情の量産」「一貫性を保った反復生成」の考え方が具体的な数値つきで示されている。
+        </p>
+        <ul class="checklist">
+          <li><strong>生成資産数:</strong> 10万点以上（ゲーム・動画横断）</li>
+          <li><strong>制作速度:</strong> 従来手法比 <strong style="color:#4FFFB0;">180倍高速化</strong>（従来は1資産あたり6時間以上）</li>
+          <li><strong>表情生成:</strong> 6種の感情バリエーション（喜・哀・真剣・皮肉・思考・驚き）を数秒で生成</li>
+          <li><strong>パイプライン数:</strong> 512×512の低解像度テストから高解像度バッチ生成まで、4本の再利用可能パイプライン</li>
+          <li><strong>成果:</strong> Netflixタイトル複数を出荷、クリエイター1人あたり週15分の完成動画を継続生産</li>
+        </ul>
+      </div>
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem;">
+        <h3 style="margin-bottom: 1rem; font-size: 0.95rem; color: var(--text-muted);">manga-pipelineへの示唆</h3>
+        <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.9;">
+          Series社の要点は「生成を単発の作業ではなく<strong style="color:var(--text);">再利用可能な資産</strong>として扱う」こと。
+          具体的には：<br><br>
+          ① <strong style="color:var(--text);">感情×キャラのマトリクスを事前生成</strong>しておき、コマ生成時は都度re-promptせずマトリクスから選ぶ<br>
+          ② <strong style="color:var(--text);">テスト用（低解像度）と本番用（高解像度）で同一ワークフローを流用</strong>し、ツール切替コストをゼロにする<br>
+          ③ <strong style="color:var(--text);">バッチ実行・自動化を前提</strong>にワークフローを設計する（人間の都度操作を前提にしない）<br><br>
+          これはmanga-pipeline.htmlの「ジャンルプリセット」「キャラ設定YAML」の設計思想とも一致する。
+        </div>
+        <p style="margin-top:1rem; font-size:0.78rem; color:var(--text-muted);">Source: <a href="https://blog.comfy.org/p/case-study-how-series-entertainment" style="color:var(--accent);" target="_blank">ComfyUI Blog — Case Study: How Series Entertainment Rebuilt Game and Video Production with ComfyUI</a>（2026-02-19）</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ワークフロー入手先 -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label">ワークフロー入手先</div>
+    <h2 class="section-title">どこで探すか</h2>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon cyan">🏠</div>
+        <h3>comfy.org/workflows（公式）</h3>
+        <p>ComfyUI公式の無料ワークフローテンプレート集。画像・動画・音声生成のすぐ使えるワークフローが揃う。まず最初に見るべき場所。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon orange">📦</div>
+        <h3>Civitai</h3>
+        <p>LoRA・チェックポイント・ワークフローJSONの配布が最も活発。漫画スタイルLoRA（Zanshou-kin等）もここで見つかる。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon purple">⚠️</div>
+        <h3>OpenArt Workflows（縮小済み）</h3>
+        <p>2026年1月18日にクラウド実行機能が終了し、現在はJSONファイルの閲覧・DLのみ可能な静的リソースハブに縮小。新規ワークフロー探しの優先度は下げてよい。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 深掘り: 収益化の実態 -->
+<section class="section" id="monetization-reality">
+  <div class="section-inner">
+    <div class="section-label">深掘り① — 収益化の実態</div>
+    <h2 class="section-title">「実際いくら稼いでいるか」を<br>数字で見る</h2>
+    <p style="color: var(--text-muted); margin-bottom: 1.5rem; max-width: 750px;">
+      ツールの使い方だけでなく「本当に稼げているのか」を直視する。良い数字も厳しい数字も両方載せる。
+    </p>
+    <div class="two-col">
+      <div>
+        <h4 style="margin-bottom: 0.75rem; font-size: 0.95rem; color: var(--accent);">うまくいっているケース（Amazon KDP・自費出版）</h4>
+        <div style="display: flex; flex-directio

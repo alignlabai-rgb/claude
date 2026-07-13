@@ -232,6 +232,10 @@
     <div class="panel">
       <h2>LLM トラッカー鮮度</h2>
       <p class="info-card">LLM Updates Hub の<strong>6トラッカー</strong>の最終更新日。全社並走で同じ粒度を維持する運用方針。</p>
+      <div class="recommend-card">
+        <strong>🟢 追記（2026-07-12）— 下表は2026-07-05計測時点のまま。実際は全6トラッカーとも 2026-07-12 まで更新済み</strong>
+        <p>本ページの計測（2026-07-05）以降、6トラッカー全てが <strong>2026-07-12</strong> まで一次ソースで更新されている（下表の「最終更新」列は当時のスナップショットとして残す）。同日、ゼロベースの再点検を実施し、Claude トラッカーに Government of Alberta 事例（07-06）・Ben Bernanke氏 LTBT就任（07-09）・Inviting hard questions（07-09）・Amazon 5GW計算資源提携（04-20）を、ChatGPT トラッカーに GPT-Live 音声モデル（07-08）・GPT-5.6 の Microsoft 365 Copilot 標準採用（07-09）を追加追記。Gemini／Grok／Qwen／GLM は一次ソースを横断確認したが追加すべき欠落は見つからず、既存記載が現状と一致することを確認した。次回四半期計測でこの表自体も 2026-07 時点の数値に更新することを推奨。</p>
+      </div>
       <table>
         <thead>
           <tr>
@@ -410,29 +414,4 @@ for line in out.split('\n'):
     if line.startswith('C:'):
         current_ts = int(line[2:])
     elif line.strip():
-        first_seen.setdefault(line.strip(), current_ts)
-
-now = time.time()
-cats = defaultdict(list)
-for root, dirs, files in os.walk('.'):
-    if '.git' in root or 'node_modules' in root: continue
-    for f in files:
-        if not f.endswith('.html'): continue
-        path = os.path.join(root, f).replace(os.sep, '/').lstrip('./')
-        cat = path.split('/')[0] if '/' in path else '(root)'
-        with open(path, encoding='utf-8', errors='ignore') as fh:
-            lines = sum(1 for _ in fh)
-        ts = first_seen.get(path)
-        days_old = (now - ts) / 86400 if ts else None
-        cats[cat].append((path, lines, days_old))
-
-for c, files in sorted(cats.items()):
-    total = sum(f[1] for f in files)
-    ages = [f[2] for f in files if f[2] is not None]
-    print(f"{c:&lt;20}{len(files):&gt;6}p {total:&gt;7}lines  avg={sum(ages)/len(ages):.1f}d")</pre>
-      <p class="small">これを <code>logs/hub-stats.py</code> として置き、四半期ごとに実行 → このページを手動更新する想定。将来的には GitHub Actions で自動化できる。</p>
-    </div>
-
-  </div>
-</body>
-</html>
+        first_seen.setdefault
