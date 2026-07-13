@@ -331,3 +331,252 @@ v0.25.0 (06-16): SCAIL-2 本体・Bernini-R (Wan系)
     <p style="color: var(--text-muted); margin-bottom: 1.5rem; max-width: 750px;">
       YouTubeのVFXスタジオ<strong style="color:var(--text);">Corridor Digital（チャンネル名 Corridor Crew）</strong>が公開した
       「実写をアニメ化する」ワークフローを技術要素ごとに分解する。抽象的な「AIで変換」ではなく、実際に何を・どの順で・何のツールで処理したかを追う。
+    </p>
+    <div class="two-col">
+      <div>
+        <h4 style="margin-bottom: 0.75rem; font-size: 0.95rem;">初代プロジェクト（じゃんけんバトル）</h4>
+        <div style="display: flex; flex-direction: column; gap: 0.65rem; margin-bottom: 1.5rem;">
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 0.875rem;">
+            <div style="font-size: 0.8rem; color: var(--accent); font-weight:700; margin-bottom:0.3rem;">① 撮影</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">スマートフォンで衣装を着た自分たち自身をグリーンバック撮影。3Dの背景セットはUnreal Engineで構築し、カメラを配置した2Dスクリーンショットとして使用（フル3Dカメラワークではない）</div>
+          </div>
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 0.875rem;">
+            <div style="font-size: 0.8rem; color: var(--accent); font-weight:700; margin-bottom:0.3rem;">② スタイル学習</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">初代は既存アニメ「ヴァンパイアハンターD 血闘編」のフレームを学習データにしてスタイルモデルを訓練。加えて出演者本人の写真を複数枚学習させ、顔の同一性を確保</div>
+          </div>
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 0.875rem;">
+            <div style="font-size: 0.8rem; color: var(--accent); font-weight:700; margin-bottom:0.3rem;">③ フレーム単位のimg2img変換</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">テキストプロンプトからの生成ではなく、撮影した実写フレームをDiffusionで<strong style="color:var(--text);">1枚ずつ画像変換</strong>する方式（text2imgではなくimg2img）</div>
+          </div>
+          <div style="background: rgba(255,158,0,0.08); border: 1px solid rgba(255,158,0,0.25); border-radius: 10px; padding: 0.875rem;">
+            <div style="font-size: 0.8rem; color: #FF9E00; font-weight:700; margin-bottom:0.3rem;">④ 最大の壁: フレーム間のちらつき</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">AIはフレーム単位で処理するため、コマ間で線・色が微妙に変わり<strong style="color:var(--text);">激しいちらつき</strong>が発生。対策は<strong style="color:var(--text);">DaVinci ResolveのDeflickerエフェクトを複数回重ね掛け</strong>。さらにフレームレートを24〜30fpsから<strong style="color:var(--text);">12fpsまで落とす</strong>ことで、アニメ特有の「コマ打ち」感とちらつき軽減を両立</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <h4 style="margin-bottom: 0.75rem; font-size: 0.95rem;">2作目での進化（重要な方針転換）</h4>
+        <div style="background: rgba(0,220,130,0.08); border: 1px solid rgba(0,220,130,0.25); border-radius: 12px; padding: 1.25rem; margin-bottom: 1.25rem;">
+          <div style="font-size: 0.85rem; color: #4FFFB0; font-weight: 700; margin-bottom: 0.5rem;">既存アニメを学習データにするのをやめた</div>
+          <div style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.8;">
+            初代は既存アニメ「ヴァンパイアハンターD」のフレームを直接学習に使ったため、著作権・スタイル模倣を巡る批判を受けた。
+            2作目では<strong style="color:var(--text);">実在のアーティストを雇い、オリジナルのモデルシート（キャラクター設定画）を描き起こしてもらい</strong>、
+            それを学習データの起点にする方式へ転換。これにより①法的・倫理的リスクの低減、②スタイルの一貫性向上、の両方を達成している。
+          </div>
+        </div>
+        <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem;">
+          <h5 style="font-size: 0.85rem; color: var(--text); margin-bottom: 0.5rem;">残りの工程（AI以外の部分）</h5>
+          <div style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.8;">
+            グリーンバック除去（従来型キーヤー）→ 背景合成 → 光線・グロー・レンズ歪み等のエフェクトオーバーレイ → 編集・音響設計。
+            <strong style="color:var(--text);">最終的なVFXショット数は約120</strong>で、AI生成部分は「素材を作る一工程」に過ぎず、大半は<strong style="color:var(--text);">従来型の合成・編集作業</strong>が占めている。
+          </div>
+        </div>
+        <p style="margin-top:1rem; font-size:0.78rem; color:var(--text-muted);">Source: <a href="https://www.provideocoalition.com/live-action-to-anime-with-corridor-digital/" style="color:var(--accent);" target="_blank">ProVideo Coalition — Live Action to Anime with Corridor Digital</a> / Corridor Digital公式YouTube</p>
+      </div>
+    </div>
+    <div style="margin-top: 1.5rem; background: rgba(0,212,255,0.06); border: 1px solid rgba(0,212,255,0.2); border-radius: 12px; padding: 1rem; font-size: 0.82rem; color: var(--text-muted);">
+      💡 2026年7月時点でこの案件を組み直すなら: 「既存アニメを学習データにする」代わりに、<strong style="color:var(--text);">SCAIL-2のReplacement Mode</strong>（本ページ内「具体的ワークフロー②」参照）でオリジナルキャラの参照画像を直接動画に転写する構成にすれば、Corridor Digitalが2作目で辿り着いた「アーティスト起点のモデルシート」路線を、LoRA学習なしでより短い工程で再現できる可能性がある。
+    </div>
+  </div>
+</section>
+
+<!-- 深掘り: 収益化の実態（動画） -->
+<section class="section" style="background: var(--bg2);" id="monetization-reality">
+  <div class="section-inner">
+    <div class="section-label">深掘り② — 収益化の実態</div>
+    <h2 class="section-title">AI動画で実際に稼いでいる人の数字</h2>
+    <div class="two-col">
+      <div>
+        <h4 style="margin-bottom: 0.75rem; font-size: 0.95rem; color: var(--accent);">実在するチャンネル運営者の例</h4>
+        <ul class="checklist">
+          <li><strong>Nora Morris:</strong> 顔出しなし（faceless）チャンネルを18本同時運営し、年間7桁ドルの収益と報告されている</li>
+          <li><strong>Matt Par（"Make Money Matt"）:</strong> メインチャンネル登録者数は100万人規模に迫り、2026年時点の推定純資産は$150万〜$250万</li>
+        </ul>
+        <h4 style="margin: 1.5rem 0 0.75rem; font-size: 0.95rem; color: var(--accent);">収益構造の具体例（1チャンネルあたり）</h4>
+        <div class="code-block">
+<span class="cm"># 高CPMニッチ（金融系）の月間収益内訳・実例</span>
+月間視聴回数: <span class="num">500,000</span> 回
+RPM（1000再生あたり）: <span class="str">$12</span>
+  → AdSense単体で <span class="num">$6,000</span>/月
+
++ アフィリエイト収益: <span class="num">$2,000</span>/月
++ 単発ブランド案件:   <span class="num">$1,500</span>
+
+<span class="cm"># 合計</span>
+月間収益: <span class="num">$9,500</span>（顔出し・撮影ゼロ）</div>
+      </div>
+      <div>
+        <h4 style="margin-bottom: 0.75rem; font-size: 0.95rem; color: #FF9E00;">段階別の相場観</h4>
+        <div style="display: flex; flex-direction: column; gap: 0.65rem;">
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 0.875rem;">
+            <div style="font-size: 0.82rem; color: var(--text-muted);"><strong style="color:var(--text);">立ち上げ期:</strong> 月$500〜$2,000（好ニッチでも収益化直後はこのレンジ）</div>
+          </div>
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 0.875rem;">
+            <div style="font-size: 0.82rem; color: var(--text-muted);"><strong style="color:var(--text);">登録者10万人超・高CPMニッチ:</strong> AdSenseのみで月$5,000〜$20,000</div>
+          </div>
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 0.875rem;">
+            <div style="font-size: 0.82rem; color: var(--text-muted);"><strong style="color:var(--text);">複数収益源を確立した上位層:</strong> 月$30,000〜$100,000超</div>
+          </div>
+        </div>
+        <div style="margin-top:1rem; background: rgba(255,158,0,0.08); border: 1px solid rgba(255,158,0,0.25); border-radius: 12px; padding: 1rem; font-size: 0.82rem; color: var(--text-muted);">
+          ⚠️ これらは「うまくいった例」の数字。マンガのWEBTOON Canvasと同様、大多数の新規チャンネルはこのレンジに届かないまま停止する生存者バイアスがある数字として扱うこと。
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 深掘り: 実在の受賞作 -->
+<section class="section" id="award-examples">
+  <div class="section-inner">
+    <div class="section-label">深掘り③ — 実在する受賞作</div>
+    <h2 class="section-title">2026年 AI映像コンテストの実際の受賞作</h2>
+    <p style="color: var(--text-muted); margin-bottom: 1.5rem; max-width: 750px;">
+      「技術的に作り込まれたAI映像」の到達点として、AI International Film Festival（2026年6月開催）の実際の受賞結果を記録する。
+    </p>
+    <table style="width:100%; border-collapse:collapse; font-size:0.85rem;">
+      <thead>
+        <tr style="border-bottom: 2px solid var(--border);">
+          <th style="text-align:left; padding:0.75rem; color:var(--accent);">作品</th>
+          <th style="text-align:left; padding:0.75rem; color:var(--accent);">監督</th>
+          <th style="text-align:left; padding:0.75rem; color:var(--accent);">受賞</th>
+        </tr>
+      </thead>
+      <tbody style="color: var(--text-muted);">
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding:0.75rem; color:var(--text); font-weight:600;">Orion</td>
+          <td style="padding:0.75rem;">Stefan Flickinger</td>
+          <td style="padding:0.75rem;">審査員賞Best AI Short・観客賞Best Film（ダークなコメディタッチのヒーロー物）</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding:0.75rem; color:var(--text); font-weight:600;">The Real Real</td>
+          <td style="padding:0.75rem;">Sebastian Strasser / Rohan Tehrani</td>
+          <td style="padding:0.75rem;">Most Fun・Most Surprising・Best Use of AI・Best Comedy・Best Short Director（上映2分弱）</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding:0.75rem; color:var(--text); font-weight:600;">Cotton and Iron</td>
+          <td style="padding:0.75rem;">（中国）</td>
+          <td style="padding:0.75rem;">Best AI Animation Short</td>
+        </tr>
+        <tr>
+          <td style="padding:0.75rem; color:var(--text); font-weight:600;">Amandla / DOE / Lady Potato</td>
+          <td style="padding:0.75rem;">Andrei Sava / Pierre Legault / Anna di Luce</td>
+          <td style="padding:0.75rem;">Best Art Direction・Best Dance／Best Story／Best Experimental</td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 1rem;">※ 各作品の詳細な技術内訳（使用モデル・ワークフロー）は現時点で一次情報が確認できておらず未記載。確認でき次第追記する。</p>
+  </div>
+</section>
+
+<!-- 深掘り: 中国AI動画市場の実例 -->
+<section class="section" style="background: var(--bg2);" id="china-video">
+  <div class="section-inner">
+    <div class="section-label">深掘り④ — 中国AI動画市場の実例</div>
+    <h2 class="section-title">中国では誰がAI動画で稼いでいるか<br>Kling・Seedanceの実際</h2>
+    <p style="color: var(--text-muted); margin-bottom: 1.5rem; max-width: 750px;">
+      AI動画の商用実装が最も速いのも中国市場。プラットフォーム側の売上規模から実際の配布戦略まで、確認できた数字だけを記録する。
+    </p>
+    <div class="two-col">
+      <div>
+        <h4 style="margin-bottom: 0.75rem; font-size: 0.95rem;">Kuaishou「Kling AI」</h4>
+        <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; font-size: 0.85rem; color: var(--text-muted); line-height: 1.9; margin-bottom:1rem;">
+          2025年通期売上は<strong style="color:var(--text);">約104億元（約1,500億円）</strong>、2026年は倍増以上を目標とする。ARRは2025年3月の$1億から2026年3月には<strong style="color:var(--text);">$5億</strong>まで拡大、2026年Q1単体売上は6.5億元超。2026年に入り<strong style="color:var(--text);">190億元（約2,800億円）</strong>規模の資金調達（評価額150億ドル、16.7%株式と引き換えに30億ドル）を実施し、出資元にはBlueFive Capital（アブダビ）・百度・騰訊が名を連ねる。課金モデルは消費者向けサブスクが軸で、4K出力・長尺の安定性を求めるプロ向けには上位プランを用意している。
+        </div>
+        <h4 style="margin-bottom: 0.75rem; font-size: 0.95rem;">ByteDance「Seedance」</h4>
+        <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; font-size: 0.85rem; color: var(--text-muted); line-height: 1.9;">
+          Doubao・Dreamina（醸夢）・即夢（Jimeng）・CapCutに<strong style="color:var(--text);">裏側のインフラとして組み込まれて配布</strong>されており、杭州の漫劇制作会社の中には「Seedanceというブランド名を意識せずに使っている」ケースもあるという、B2B2Cのインフラ戦略が特徴。Seedance 2.0は<strong style="color:var(--text);">月商10億元（約150億円）</strong>を突破し、ByteDanceのクラウド部門・火山引擎は2026年のMaaS（モデルAPI課金）売上目標を100億元から150億元に上方修正した。
+        </div>
+      </div>
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem;">
+        <h3 style="margin-bottom: 1rem; font-size: 0.95rem; color: var(--text-muted);">要点まとめ</h3>
+        <div class="code-block">
+<span class="cm"># Kling AI（Kuaishou）</span>
+<span class="fn">revenue_2025</span>: <span class="str">約104億元</span>
+<span class="fn">arr_2026_03</span>: <span class="str">$5億（前年$1億の5倍）</span>
+<span class="fn">funding_2026</span>: <span class="str">190億元・評価額$150億</span>
+
+<span class="cm"># Seedance（ByteDance）</span>
+<span class="fn">distribution</span>: <span class="str">Doubao/Dreamina/Jimeng/CapCutに内蔵</span>
+<span class="fn">revenue</span>: <span class="str">月商10億元突破（v2.0）</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 深掘り: AI短劇市場の光と影 -->
+<section class="section" id="china-shortdrama">
+  <div class="section-inner">
+    <div class="section-label">深掘り⑤ — AI短劇市場の光と影</div>
+    <h2 class="section-title">「作り込んだ動画」の量産現場<br>中国AI短劇（ショートドラマ）市場</h2>
+    <p style="color: var(--text-muted); margin-bottom: 1.5rem; max-width: 750px;">
+      中国の縦型ショートドラマ（短劇）市場にAI制作が本格流入している。市場拡大のスピードと、その裏側にある過当競争の実態を両方記録する。
+    </p>
+    <table style="width:100%; border-collapse:collapse; font-size:0.85rem; margin-bottom:1.5rem;">
+      <thead>
+        <tr style="border-bottom: 2px solid var(--border);">
+          <th style="text-align:left; padding:0.75rem; color:var(--accent);">指標</th>
+          <th style="text-align:left; padding:0.75rem; color:var(--accent);">数値</th>
+        </tr>
+      </thead>
+      <tbody style="color: var(--text-muted);">
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding:0.75rem; color:var(--text); font-weight:600;">短劇市場全体（2026年H1）</td>
+          <td style="padding:0.75rem;">約540億元（通年予測1,200億元、+20%）</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding:0.75rem; color:var(--text); font-weight:600;">うちAI短劇（2026年H1）</td>
+          <td style="padding:0.75rem;">約110億元（通年予測240〜350億元）</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding:0.75rem; color:var(--text); font-weight:600;">2026年Q1 制作本数</td>
+          <td style="padding:0.75rem;">約12.8万本（うち95%超がAIを活用した制作）</td>
+        </tr>
+        <tr>
+          <td style="padding:0.75rem; color:var(--text); font-weight:600;">1本あたり制作コスト</td>
+          <td style="padding:0.75rem;">従来 約50万元 → AI活用 約3〜5万元（90%超減）</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="two-col">
+      <div>
+        <h4 style="margin-bottom: 0.75rem; font-size: 0.95rem;">儲かっている実例</h4>
+        <ul class="checklist">
+          <li><strong>酱油文化（創業者: 黄浩南）:</strong> 2025年通期売上<strong>約10億元</strong>、純利益<strong>2〜3億元</strong>を公表している数少ない黒字企業</li>
+          <li><strong>中文在線（上場企業）:</strong> 2026年Q1のAI短劇制作本数が前年比<strong>+300%</strong>、2026年末までに年間約3,000本のAI短劇制作体制を目標。AI短劇関連の思惑で、累計損失（10億元超）にもかかわらず株価が年初来<strong>+1,300%</strong>まで急騰した局面があり、投機的な過熱の実例としても記録される</li>
+        </ul>
+      </div>
+      <div>
+        <h4 style="margin-bottom: 0.75rem; font-size: 0.95rem;">厳しい現実</h4>
+        <div style="background: rgba(255,158,0,0.06); border: 1px solid rgba(255,158,0,0.25); border-radius: 12px; padding: 1rem; font-size: 0.85rem; color: var(--text-muted); line-height: 1.9;">
+          市場全体で見ると<strong style="color:var(--text);">短劇制作会社の90%以上は赤字</strong>という指摘がある。1万再生あたりの収益は<strong style="color:var(--text);">30〜100元から5〜25元まで暴落</strong>しており、供給過多による単価崩壊が進行中。2025年に新規参入したAI制作会社のうち<strong style="color:var(--text);">40%以上が既に撤退した</strong>とも報告されている。「AIで作れば儲かる」という段階はすでに終わり、企画力・IP・配信網を持つプレイヤーだけが生き残る局面に移っている。
+        </div>
+      </div>
+    </div>
+    <div style="background: rgba(0,212,255,0.06); border: 1px solid rgba(0,212,255,0.2); border-radius: 12px; padding: 1rem; font-size: 0.82rem; color: var(--text-muted); margin-top:1.5rem;">
+      💡 短劇プラットフォーム（抖音・快手等）も「人工智能生成合成内容標識辦法」（2025年9月1日施行）の対象で、AI生成動画には画面上のラベル表示とメタデータ/電子透かしの付与が義務化されている。海外向けにAI短劇・AI動画を輸出する場合も、この開示要件を前提に制作フローを設計しておくと後々の手戻りが少ない。
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">AI Creator Hub</div>
+    <nav>
+      <a href="index.html">ホーム</a>
+      <a href="video-pipeline.html">動画制作（設計）</a>
+      <a href="video-comfyui-2026.html">動画特集2026（このページ）</a>
+      <a href="manga-comfyui-2026.html">漫画特集2026</a>
+      <a href="genai-tools.html">生成ツール比較</a>
+    </nav>
+    <p>AI Creator Hub — AIでコンテンツをつくり、稼ぐ</p>
+    <p style="font-size:0.8rem;opacity:0.65;">初版: 2026-07-12（ComfyUI v0.27.1 changelog・LTX-2・SCAIL-2・Wan2.6・HunyuanVideo-1.5・Series Entertainment事例等を一次情報から新規作成。今後は追記形式で更新）</p>
+    <p style="font-size:0.8rem;opacity:0.65;">追記: 2026-07-12（ゼロベース深掘り第2弾: Corridor Digitalの実写→アニメ変換の全工程分解〈初代・2作目の方針転換含む〉・YouTube自動化チャンネルの実収益内訳〈月$9,500の実例〉・AI International Film Festival 2026受賞作一覧を追加）</p>
+    <p style="font-size:0.8rem;opacity:0.65;">追記: 2026-07-12（中国市場の実例: Kuaishou「Kling AI」の売上・資金調達、ByteDance「Seedance」のインフラ配布戦略、中国AI短劇市場〈2026年H1で約110億元〉の急成長と90%以上が赤字という実態、酱油文化・中文在線の実例を追加）</p>
+  </div>
+</footer>
+
+<script src="main.js"></script>
+</body>
+</html>
