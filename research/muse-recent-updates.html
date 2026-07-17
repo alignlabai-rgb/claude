@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Muse / Meta 最新アップデート完全版 | Research</title>
+  <style>
+    :root {
+      --bg: #07111d;
+      --panel: #0d1829;
+      --panel-2: #101f34;
+      --panel-3: #09131f;
+      --text: #e8eef9;
+      --muted: #b6c3da;
+      --soft: #7f92ac;
+      --border: rgba(255,255,255,0.08);
+      --accent: #4dabf7;
+      --accent-2: #66e0c2;
+      --accent-3: #f7a87a;
+      --accent-4: #d8b4fe;
+      --shadow: 0 12px 36px rgba(0,0,0,0.28);
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 12% 14%, rgba(77,171,247,0.14), transparent 28%),
+        radial-gradient(circle at 88% 4%, rgba(255,255,255,0.08), transparent 24%),
+        linear-gradient(145deg, #07111d 0%, #0a1422 52%, #060d18 100%);
+      color: var(--text);
+      font-family: "Segoe UI", "Noto Sans JP", system-ui, sans-serif;
+      line-height: 1.72;
+      padding: 28px 18px 80px;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .shell { max-width: 1100px; margin: 0 auto; display: grid; gap: 18px; }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px 26px;
+    }
+    .hero {
+      background: linear-gradient(135deg, rgba(77,171,247,0.08), rgba(255,255,255,0.05)), var(--panel);
+    }
+    .breadcrumb { color: var(--soft); font-size: 0.82rem; margin-bottom: 8px; }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      background: rgba(77,171,247,0.12);
+      color: var(--accent);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    h1, h2, h3, h4 { margin: 0 0 10px; }
+    h1 { font-size: 2rem; }
+    h2 { font-size: 1.18rem; }
+    h3 { font-size: 1rem; }
+    h4 { font-size: 0.92rem; color: var(--text); }
+    p, li { color: var(--muted); font-size: 0.92rem; }
+    ul { margin: 8px 0 0; padding-left: 18px; }
+    li { margin-bottom: 6px; }
+    strong { color: var(--text); }
+    .last-update { color: var(--soft); font-size: 0.8rem; margin-top: 10px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    @media (max-width: 920px) {
+      .grid-4, .grid-3 { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 640px) {
+      .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; }
+    }
+    .card, .stat, .subpanel {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+    }
+    .subpanel.deep { background: var(--panel-3); }
+    .stat .value { font-size: 1.8rem; color: var(--accent); font-weight: 800; line-height: 1; }
+    .stat .label { color: var(--soft); font-size: 0.75rem; margin-top: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .tag {
+      display: inline-block;
+      padding: 3px 8px;
+      margin-right: 6px;
+      margin-bottom: 6px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+    .tag-model { background: rgba(167,139,250,0.18); color: var(--accent-4); }
+    .tag-product { background: rgba(96,208,255,0.16); color: #7dd3fc; }
+    .tag-code { background: rgba(247,168,122,0.16); color: #fdba74; }
+    .tag-api { background: rgba(244,184,96,0.16); color: #fcd34d; }
+    .tag-new { background: rgba(79,255,176,0.16); color: #4FFFB0; }
+    .tag-risk { background: rgba(255,107,107,0.16); color: #fca5a5; }
+    .tag-media { background: rgba(77,171,247,0.16); color: #93c5fd; }
+    .summary {
+      border-left: 4px solid var(--accent);
+      padding-left: 14px;
+      margin-top: 8px;
+    }
+    .timeline {
+      position: relative;
+      display: grid;
+      gap: 14px;
+      padding-left: 28px;
+    }
+    .timeline::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 9px;
+      width: 2px;
+      background: rgba(255,255,255,0.08);
+    }
+    .item {
+      position: relative;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 18px;
+    }
+    .item::before {
+      content: "";
+      position: absolute;
+      left: -24px;
+      top: 18px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--panel);
+      border: 2px solid var(--accent);
+    }
+    .item.hot::before { border-color: #fff; }
+    .date { font-size: 0.76rem; color: var(--soft); font-weight: 700; margin-bottom: 4px; }
+    .note {
+      background: rgba(77,171,247,0.08);
+      border: 1px solid rgba(77,171,247,0.24);
+      border-radius: 12px;
+      padding: 14px 16px;
+    }
+    .sources li { margin-bottom: 8px; }
+    code {
+      font-family: "Fira Code", "Consolas", monospace;
+      background: rgba(255,255,255,0.06);
+      padding: 0.12rem 0.4rem;
+      border-radius: 6px;
+      color: #a5f3d0;
+    }
+    .small { font-size: 0.84rem; color: var(--soft); }
+    .footer-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      font-size: 0.86rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      font-size: 0.88rem;
+      margin: 10px 0;
+    }
+    th {
+      background: var(--panel-3);
+      color: var(--text);
+      padding: 12px 14px;
+      text-align: left;
+      font-weight: 700;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      border-bottom: 1px solid var(--border);
+    }
+    td {
+      padding: 10px 14px;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+    .highlight-row td { color: var(--accent); font-weight: 600; }
+    .bar-container {
+      height: 8px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+    .bar {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.5s ease;
+    }
+    .bar-blue { background: linear-gradient(90deg, #4dabf7, #74c0fc); }
+    .bar-green { background: linear-gradient(90deg, #66e0c2, #96f2d7); }
+    .bar-orange { background: linear-gradient(90deg, #f7a87a, #ffd8a8); }
+    .bar-purple { background: linear-gradient(90deg, #d8b4fe, #e9d5ff); }
+    .bar-red { background: linear-gradient(90deg, #fca5a5, #fecdd3); }
+  </style>
+</head>
+<body>
+  <div class="shell">
+
+    <!-- ===== HERO ===== -->
+    <section class="panel hero">
+      <div class="breadcrumb"><a href="index.html">Research</a> / <a href="../index.html">Hub Top</a></div>
+      <div class="eyebrow">Muse / Meta Update Tracker</div>
+      <h1>Muse / Meta 最新アップデート完全版</h1>
+      <p>
+        Meta Superintelligence Labs（MSL）が開発する<strong>Muse ファミリー</strong>の情報を
+        「能力・ポジショニング」視点で整理したページです。
+        <strong>現行フラッグシップ Muse Spark 1.1</strong>（2026年7月9日リリース）を中心に、
+        何が強みで、どこに効き、Claude / ChatGPT / Gemini とどう違うかまで踏み込んでまとめています。
+      </p>
+      <div class="summary">
+        <p>
+          Muse Spark は「<strong>The Orchestrator（統率者）</strong>」として、
+          <strong>マルチエージェント並列推論（Contemplating Mode）</strong>と
+          <strong>ネイティブ・マルチモーダル統合アーキテクチャ</strong>、そして
+          <strong>Meta エコシステム（Instagram・WhatsApp・Meta AI）との深い連携</strong>を併せ持つ
+          エージェント特化型の知性です。
+        </p>
+        <p>
+          Meta が Llama（オープンソース）路線から<strong>クローズドソース・フロンティアモデル</strong>へ
+          大きく舵を切った象徴的プロダクトであり、2026年7月には
+          <strong>Meta Model API</strong>（有料 API）も正式リリースされました。
+          画像生成の <strong>Muse Image</strong>、開発中の <strong>Muse Video</strong> と合わせ、
+          テキスト → 推論 → メディア生成を一気通貫で行えるファミリーに成長しています。
+        </p>
+      </div>
+      <p class="last-update">最終更新: 2026-07-17</p>
+    </section>
+
+    <!-- ===== KEY STATS ===== -->
+    <section class="panel">
+      <h2>📊 Muse Spark 1.1 — Key Stats</h2>
+      <div class="grid-4" style="margin-top:14px;">
+        <div class="stat">
+          <div class="value">51</div>
+          <div class="label">AI Intelligence Index</div>
+        </div>
+        <div class="stat">
+          <div class="value">1M</div>
+          <div class="label">Context Window (tokens)</div>
+        </div>
+        <div class="stat">
+          <div class="value">88.1</div>
+          <div class="label">MCP Atlas Score</div>
+        </div>
+        <div class="stat">
+          <div class="value">71.3</div>
+          <div class="label">SciCode / Coding</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== ARCHITECTURE ===== -->
+    <section class="panel">
+      <h2>🏗️ アーキテクチャ & コア技術</h2>
+      <p>Muse Spark は単なる大規模言語モデルではなく、<strong>エージェント・オーケストレーション</strong>を前提に設計されたシステムです。</p>
+
+      <div class="grid-3" style="margin-top:14px;">
+        <div class="card">
+          <h3>🧠 Contemplating Mode</h3>
+          <p><strong>マルチエージェント並列推論</strong>パラダイム。最大16の独立推論エージェントを同時起動し、それぞれが異なる視点（事実検証・反論探索・ドメイン特化ロジック等）から問題を並行探索。</p>
+          <ul>
+            <li><strong>Thought Compression</strong>: 強化学習で推論プロセスを圧縮し、少ないトークンで複雑な論理問題を解決</li>
+            <li>従来の長鎖推論（CoT）と比べ、レイテンシを大幅に削減しつつ精度を維持</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>🤖 エージェント・オーケストレーション</h3>
+          <p>リードエージェント＋サブエージェント構造でタスクを階層的に処理。</p>
+          <ul>
+            <li><strong>リードエージェント</strong>: コンテキスト収集 → 計画立案 → サブエージェントへ実行委任</li>
+            <li><strong>サブエージェント</strong>: ツール利用・タスク実行を担当し、必要に応じてリードに報告</li>
+            <li>並列化により長期間タスクのE2Eレイテンシを大幅短縮</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>👁️ ネイティブ・マルチモーダル</h3>
+          <p>テキスト・画像・ツール利用をアーキテクチャレベルで統合。後付けモジュールではなく、一体設計。</p>
+          <ul>
+            <li><strong>Visual Chain-of-Thought</strong>: 画像データに対するステップバイステップ推論</li>
+            <li>テキスト・画像・動画・音声の統合処理</li>
+            <li>Computer Use（PC操作の代行）にも対応</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== MUSE FAMILY ===== -->
+    <section class="panel">
+      <h2>🎨 Muse ファミリー — テキスト以外のモデル群</h2>
+      <div class="grid-2" style="margin-top:14px;">
+        <div class="card">
+          <span class="tag tag-media">画像生成</span>
+          <h3>Muse Image</h3>
+          <p>2026年7月リリース。単なる text-to-image ではなく<strong>「エージェント型」画像生成</strong>モデル。</p>
+          <ul>
+            <li>検索ツール・コードツールを自律呼び出しして精度向上</li>
+            <li>自己リファインと推論ベースの構図プランニング</li>
+            <li>QRコード生成・正確なグラフ描画・図表レンダリング</li>
+            <li>自然言語やスケッチによる画像編集</li>
+            <li>Instagram Stories・WhatsApp・Meta AI アプリに統合</li>
+          </ul>
+          <div class="note" style="margin-top:10px;">
+            <p><strong>⚠ プライバシー問題:</strong> 公開Instagramアカウントの写真を@メンションでAI画像に取り込める機能が批判を浴び、<strong>機能廃止</strong>に至った経緯あり（SAG-AFTRA等が批判）。</p>
+          </div>
+        </div>
+        <div class="card">
+          <span class="tag tag-new">開発中</span>
+          <h3>Muse Video</h3>
+          <p>現在プレビュー段階。Muse Image と同じ事前学習ベースから構築。</p>
+          <ul>
+            <li>高品質ビジュアル忠実性</li>
+            <li><strong>ネイティブ音声サポート</strong>搭載</li>
+            <li>Muse Spark とのツール共有・協調計画が可能</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== API PRICING ===== -->
+    <section class="panel">
+      <h2>💰 Meta Model API — 料金体系</h2>
+      <p>2026年7月、Meta 初の有料 API として<strong>Meta Model API</strong>が正式ローンチ。OpenAI・Anthropic の API 形式と<strong>互換性あり</strong>（移行コスト低減を狙う設計）。</p>
+      <table>
+        <thead>
+          <tr>
+            <th>項目</th>
+            <th>詳細</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>入力トークン</strong></td>
+            <td>$1.25 / 1M tokens</td>
+          </tr>
+          <tr>
+            <td><strong>出力トークン</strong></td>
+            <td>$4.25 / 1M tokens</td>
+          </tr>
+          <tr>
+            <td><strong>コンテキストウィンドウ</strong></td>
+            <td>1,000,000 トークン</td>
+          </tr>
+          <tr>
+            <td><strong>無料クレジット</strong></td>
+            <td>新規開発者アカウントに $20 のスタータークレジット</td>
+          </tr>
+          <tr>
+            <td><strong>API 互換性</strong></td>
+            <td>OpenAI / Anthropic API フォーマットと互換</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ===== BENCHMARK COMPARISON ===== -->
+    <section class="panel">
+      <h2>📈 フロンティアモデル比較（2026年7月時点）</h2>
+      <p>Artificial Analysis Intelligence Index をベースに、主要モデルのスコアとポジショニングを比較します。</p>
+
+      <table style="margin-top:14px;">
+        <thead>
+          <tr>
+            <th>モデル</th>
+            <th>Intelligence Index</th>
+            <th>主な強み</th>
+            <th>最適ユースケース</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>GPT-5.5</strong> (OpenAI)</td>
+            <td>—</td>
+            <td>汎用タスク・ツール利用</td>
+            <td>文章作成、ブレスト、汎用推論</td>
+          </tr>
+          <tr>
+            <td><strong>Gemini 3.5 Pro</strong> (Google)</td>
+            <td>—</td>
+            <td>長文コンテキスト・学術推論</td>
+            <td>大規模文書分析、動画処理</td>
+          </tr>
+          <tr>
+            <td><strong>Claude Opus 4.8</strong> (Anthropic)</td>
+            <td>—</td>
+            <td>コーディング・科学的推論</td>
+            <td>大規模コーディング、技術文書</td>
+          </tr>
+          <tr class="highlight-row">
+            <td><strong>Muse Spark 1.1</strong> (Meta)</td>
+            <td>51</td>
+            <td>エージェント・オーケストレーション</td>
+            <td>パーソナルアシスタント、マルチアプリ計画</td>
+          </tr>
+          <tr>
+            <td><strong>GLM-5.2</strong> (Zhipu)</td>
+            <td>~51</td>
+            <td>中国語特化・マルチモーダル</td>
+            <td>中国市場・多言語処理</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 style="margin-top:18px;">個別ベンチマーク比較</h3>
+      <div class="grid-2" style="margin-top:10px;">
+        <div class="subpanel deep">
+          <h4>MCP Atlas（ツール利用）</h4>
+          <p style="margin-bottom:4px;"><strong>Muse Spark 1.1: 88.1</strong></p>
+          <div class="bar-container"><div class="bar bar-blue" style="width:88%"></div></div>
+          <p style="margin:8px 0 4px;color:var(--soft);font-size:0.82rem;">他のフロンティアモデルを上回る成績。エージェント型ワークフローでの<strong>ツール呼び出し精度</strong>が突出。</p>
+        </div>
+        <div class="subpanel deep">
+          <h4>SciCode / コーディング</h4>
+          <p style="margin-bottom:4px;"><strong>Muse Spark 1.1: 71.3</strong></p>
+          <div class="bar-container"><div class="bar bar-blue" style="width:71%"></div></div>
+          <p style="margin:8px 0 4px;color:var(--soft);font-size:0.82rem;">競争力はあるが、SWE-Bench Pro では Claude Opus 系がリード。<strong>実務コーディング</strong>は Claude に軍配。</p>
+        </div>
+        <div class="subpanel deep">
+          <h4>HealthBench Hard（医療推論）</h4>
+          <p style="margin-bottom:4px;"><strong>Muse Spark 1.1: 42.8</strong></p>
+          <div class="bar-container"><div class="bar bar-green" style="width:43%"></div></div>
+          <p style="margin:8px 0 4px;color:var(--soft);font-size:0.82rem;">ドメイン特化ベンチマークで健闘。医療系推論タスクに強みを示す。</p>
+        </div>
+        <div class="subpanel deep">
+          <h4>ハルシネーション率改善</h4>
+          <p style="margin-bottom:4px;"><strong>73% → 38%</strong>（v1.0 → v1.1）</p>
+          <div class="bar-container"><div class="bar bar-orange" style="width:62%"></div></div>
+          <p style="margin:8px 0 4px;color:var(--soft);font-size:0.82rem;">約半減。Intelligence Index も v1.0 の 52 から 51 に微調整されたが、ハルシネーション面の改善が大きい。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== POSITIONING ===== -->
+    <section class="panel">
+      <h2>🎯 ポジショニング — 各社モデルの「使い分け」ガイド</h2>
+      <p>2026年のAI業界は「<strong>1つの万能モデル</strong>」ではなく「<strong>用途別に最適モデルを使い分ける</strong>」時代に突入。各モデルファミリーの強みを軸にした選択指針：</p>
+
+      <div class="grid-2" style="margin-top:14px;">
+        <div class="card" style="border-left:3px solid #4dabf7;">
+          <h4>🔵 Muse Spark 1.1 — The Orchestrator</h4>
+          <p><strong>最適</strong>: エージェント型自動化、マルチアプリ横断タスク、パーソナルアシスタント</p>
+          <p>Contemplating Mode で並列推論 → ツール呼び出し → 結果統合を高速に処理。Meta エコシステム（Instagram、WhatsApp、Meta AI）との統合が最大の差別化要因。</p>
+        </div>
+        <div class="card" style="border-left:3px solid #c084fc;">
+          <h4>🟣 Claude Opus — The Sage</h4>
+          <p><strong>最適</strong>: 大規模コーディングプロジェクト、科学的推論、技術文書</p>
+          <p>SWE-Bench Pro でリード。コード編集・生成の品質と安全性で業界最高水準。開発者ツールとの統合（Claude Code、GitHub等）が成熟。</p>
+        </div>
+        <div class="card" style="border-left:3px solid #34d399;">
+          <h4>🟢 GPT-5.5 — The Generalist</h4>
+          <p><strong>最適</strong>: 汎用タスク、文章作成、ブレインストーミング、創造的コンテンツ</p>
+          <p>指示追従・創造的ライティングで最高評価。最も多くのサードパーティ統合を持つエコシステム。</p>
+        </div>
+        <div class="card" style="border-left:3px solid #fbbf24;">
+          <h4>🟡 Gemini 3.5 Pro — The Architect</h4>
+          <p><strong>最適</strong>: 大規模文書分析、動画処理、学術研究</p>
+          <p>超長文コンテキストとネイティブ動画処理で他を圧倒。Google Workspace 統合による実務活用が強み。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== API PRICING COMPARISON ===== -->
+    <section class="panel">
+      <h2>💲 API 料金比較（2026年7月時点）</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>モデル</th>
+            <th>入力 ($/1M tokens)</th>
+            <th>出力 ($/1M tokens)</th>
+            <th>コンテキスト</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="highlight-row">
+            <td>Muse Spark 1.1</td>
+            <td>$1.25</td>
+            <td>$4.25</td>
+            <td>1M tokens</td>
+          </tr>
+          <tr>
+            <td>Claude Opus 4</td>
+            <td>$15.00</td>
+            <td>$75.00</td>
+            <td>200K tokens</td>
+          </tr>
+          <tr>
+            <td>Claude Sonnet 4</td>
+            <td>$3.00</td>
+            <td>$15.00</td>
+            <td>200K tokens</td>
+          </tr>
+          <tr>
+            <td>Gemini 2.5 Pro</td>
+            <td>$1.25〜$2.50</td>
+            <td>$10.00〜$15.00</td>
+            <td>1M tokens</td>
+          </tr>
+          <tr>
+            <td>GPT-4o</td>
+            <td>$2.50</td>
+            <td>$10.00</td>
+            <td>128K tokens</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="note" style="margin-top:10px;">
+        <p>Muse Spark 1.1 は<strong>入出力ともに最安価格帯</strong>に設定されており、1Mトークンのコンテキストウィンドウと合わせてコストパフォーマンスが極めて高い。ただし比較対象の Claude Opus は最上位グレードのため、Sonnet 級との比較がより公平。</p>
+      </div>
+    </section>
+
+    <!-- ===== STRATEGIC CONTEXT ===== -->
+    <section class="panel">
+      <h2>🔍 戦略的コンテキスト — Meta のAI戦略転換</h2>
+      <div class="grid-2" style="margin-top:14px;">
+        <div class="subpanel deep">
+          <h4>Llama → Muse: オープンからクローズドへ</h4>
+          <ul>
+            <li>2024〜2025年: Llama 2 → Llama 3 → Llama 4 でオープンソースAIの旗手</li>
+            <li>2026年4月: <strong>Muse Spark 1.0 リリース</strong>で初のクローズドソース・フロンティアモデルに転換</li>
+            <li>背景: フロンティア性能競争でクローズドモデルに勝てないジレンマ、収益化圧力</li>
+            <li>Llama はオープンソースコミュニティ向けに並行して継続</li>
+          </ul>
+        </div>
+        <div class="subpanel deep">
+          <h4>Meta Superintelligence Labs（MSL）</h4>
+          <ul>
+            <li>Alexandr Wang（元 Scale AI CEO）率いるフロンティア研究チーム</li>
+            <li>Muse ファミリーの全モデルを開発・運用</li>
+            <li>「Advanced AI Scaling Framework」でリスク評価を実施</li>
+            <li>Muse Spark 1.1 のリスクプロファイルは多層的緩和策適用後「<strong>中程度以下</strong>」と評価</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== TIMELINE ===== -->
+    <section class="panel">
+      <h2>📅 タイムライン</h2>
+      <div class="timeline" style="margin-top:14px;">
+        <div class="item hot">
+          <div class="date">2026-07-09</div>
+          <span class="tag tag-new">NEW</span> <span class="tag tag-model">Muse Spark 1.1</span> <span class="tag tag-api">API</span>
+          <h3>Muse Spark 1.1 リリース & Meta Model API 正式ローンチ</h3>
+          <ul>
+            <li>エージェントタスク・コーディング・マルチモーダル理解の性能向上</li>
+            <li>1M トークンコンテキストウィンドウ</li>
+            <li>Meta Model API で開発者にAPI提供開始（$1.25 / $4.25 per 1M）</li>
+            <li>OpenAI / Anthropic API フォーマット互換</li>
+            <li>ハルシネーション率 73% → 38% に大幅改善</li>
+            <li>Intelligence Index: 51（前バージョン52から微調整だが質的改善は大きい）</li>
+          </ul>
+        </div>
+        <div class="item hot">
+          <div class="date">2026-07（月内）</div>
+          <span class="tag tag-media">メディア</span> <span class="tag tag-new">NEW</span>
+          <h3>Muse Image リリース & Muse Video プレビュー発表</h3>
+          <ul>
+            <li><strong>Muse Image</strong>: エージェント型画像生成モデル。検索・コードツールと連携して精度向上</li>
+            <li><strong>Muse Video</strong>: プレビュー段階。ネイティブ音声サポート付き動画生成</li>
+            <li>Instagram Stories・WhatsApp・Meta AI アプリへの統合</li>
+            <li>@メンション機能 → プライバシー批判で廃止</li>
+          </ul>
+        </div>
+        <div class="item">
+          <div class="date">2026-04-08</div>
+          <span class="tag tag-model">Muse Spark 1.0</span>
+          <h3>Muse Spark 1.0 初リリース</h3>
+          <ul>
+            <li>Meta 初のクローズドソース・フロンティアモデル</li>
+            <li>ネイティブマルチモーダル推論・ツール利用・Visual Chain-of-Thought</li>
+            <li>Contemplating Mode（マルチエージェント並列推論）を初導入</li>
+            <li>Intelligence Index: 52（当時のトップ層に位置）</li>
+          </ul>
+        </div>
+        <div class="item">
+          <div class="date">2025-04</div>
+          <span class="tag tag-model">Llama 4</span>
+          <h3>Llama 4 リリース — オープンソース路線の最後のフラッグシップ</h3>
+          <ul>
+            <li>Llama 4 Scout / Maverick がリリース</li>
+            <li>フロンティア競争でクローズドモデルに性能差 → MSL 設立と Muse 路線への転換契機に</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== STRENGTHS & WEAKNESSES ===== -->
+    <section class="panel">
+      <h2>✅ 強み & ⚠ 弱み（実務視点）</h2>
+      <div class="grid-2" style="margin-top:14px;">
+        <div class="card" style="border-left:3px solid #4FFFB0;">
+          <h4>✅ 強み</h4>
+          <ul>
+            <li><strong>エージェント能力トップクラス</strong>: MCP Atlas 88.1 でツール利用精度が最高水準</li>
+            <li><strong>コスト効率</strong>: $1.25/$4.25 per 1M は競合と比較して最安価格帯</li>
+            <li><strong>1M コンテキスト</strong>: 大規模な文脈を維持しながらの推論が可能</li>
+            <li><strong>Contemplating Mode</strong>: 並列推論で精度とスピードを両立</li>
+            <li><strong>API 互換性</strong>: 既存の OpenAI/Anthropic 統合からの移行コストが低い</li>
+            <li><strong>Meta エコシステム</strong>: 30億ユーザーの既存プラットフォームとネイティブ統合</li>
+            <li><strong>メディア生成統合</strong>: テキスト推論と画像/動画生成を同一ファミリーで処理</li>
+          </ul>
+        </div>
+        <div class="card" style="border-left:3px solid #fca5a5;">
+          <h4>⚠ 弱み・課題</h4>
+          <ul>
+            <li><strong>コーディング</strong>: SWE-Bench Pro では Claude Opus 系に劣後。純粋なコード編集タスクではやや後塵</li>
+            <li><strong>クローズドソース</strong>: Llama のオープン路線との矛盾でコミュニティの反発リスク</li>
+            <li><strong>プライバシー懸念</strong>: Muse Image の @メンション問題に見られるように、Meta のデータ取扱いへの警戒感が根強い</li>
+            <li><strong>API の成熟度</strong>: 2026年7月に初ローンチのため、エコシステム（ライブラリ・ドキュメント等）はまだ発展途上</li>
+            <li><strong>リスクプロファイル</strong>: 「中程度以下」評価だが、独立第三者評価の蓄積が少ない</li>
+            <li><strong>汎用性</strong>: GPT-5.5 のような万能型にはなりきれていない面がある</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== SUMMARY & RECOMMENDATION ===== -->
+    <section class="panel">
+      <h2>📝 まとめ — Muse Spark をいつ使うべきか</h2>
+      <div class="note">
+        <p><strong>Muse Spark 1.1 は「エージェント型ワークフロー」で最も輝く。</strong></p>
+        <p>
+          複数ツール・複数ステップを跨ぐタスク（例: 情報収集 → 分析 → 可視化 → レポート作成）を
+          自律的に計画・実行させるなら、Muse Spark の Contemplating Mode とオーケストレーション能力は
+          他モデルに対する明確なアドバンテージがある。API 料金も安く、大量処理に向いている。
+        </p>
+        <p>
+          一方、<strong>コーディングなら Claude</strong>、<strong>汎用ライティングなら GPT</strong>、
+          <strong>超長文/動画分析なら Gemini</strong>がそれぞれリード。
+          実務上は「<strong>LLMアグノスティック</strong>」アプローチ（タスクに応じてモデルを使い分ける）が
+          2026年のベストプラクティスになっている。
+        </p>
+      </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <section class="panel">
+      <h2>関連ページ</h2>
+      <div class="footer-links">
+        <a href="claude-recent-updates.html">⚡ Claude 最新</a>
+        <a href="chatgpt-recent-updates.html">⚡ ChatGPT 最新</a>
+        <a href="gemini-recent-updates.html">⚡ Gemini 最新</a>
+        <a href="grok-recent-updates.html">⚡ Grok 最新</a>
+        <a href="qwen-recent-updates.html">⚡ Qwen 最新</a>
+        <a href="glm-recent-updates.html">⚡ GLM 最新</a>
+        <a href="kimi-recent-updates.html">⚡ Kimi 最新</a>
+        <a href="deepseek-recent-updates.html">⚡ DeepSeek 最新</a>
+        <a href="index.html">← Research Index</a>
+      </div>
+    </section>
+
+  </div>
+</body>
+</html>

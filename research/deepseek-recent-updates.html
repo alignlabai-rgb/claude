@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DeepSeek 最新アップデート完全版 | Research</title>
+  <style>
+    :root { --bg:#07101e; --panel:#0d192a; --panel2:#10233b; --text:#eef6ff; --muted:#b6c8df; --soft:#7890ad; --border:rgba(255,255,255,.09); --accent:#60a5fa; --accent2:#7dd3fc; --good:#6ee7b7; --warn:#fbbf24; --radius:18px; }
+    * { box-sizing:border-box; }
+    body { margin:0; padding:28px 18px 72px; background:radial-gradient(circle at 10% 5%,rgba(59,130,246,.2),transparent 28%),linear-gradient(145deg,#06101e,#09101a); color:var(--text); font-family:"Segoe UI","Noto Sans JP",system-ui,sans-serif; line-height:1.72; }
+    a { color:var(--accent2); text-decoration:none; } a:hover { text-decoration:underline; }
+    .shell { max-width:1100px; margin:auto; display:grid; gap:18px; }
+    .panel { background:rgba(13,25,42,.97); border:1px solid var(--border); border-radius:var(--radius); padding:24px 26px; box-shadow:0 14px 38px rgba(0,0,0,.28); }
+    .hero { background:linear-gradient(135deg,rgba(96,165,250,.13),rgba(125,211,252,.04)),var(--panel); }
+    .breadcrumb,.last-update,.small { color:var(--soft); font-size:.82rem; }
+    .eyebrow,.tag { display:inline-block; border-radius:999px; padding:4px 10px; background:rgba(96,165,250,.13); color:var(--accent); font-size:.72rem; font-weight:800; letter-spacing:.04em; }
+    h1,h2,h3,h4 { margin:0 0 10px; } h1 { font-size:2rem; } h2 { font-size:1.2rem; } h3 { font-size:1rem; }
+    p,li { color:var(--muted); font-size:.92rem; } strong { color:var(--text); } ul { padding-left:20px; }
+    .summary,.note { background:rgba(96,165,250,.07); border-left:3px solid var(--accent); padding:12px 16px; border-radius:0 12px 12px 0; }
+    .grid-4 { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; } .grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; } .grid-2 { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
+    .card,.stat { background:var(--panel2); border:1px solid var(--border); border-radius:14px; padding:16px; }
+    .stat { text-align:center; } .stat .value { color:var(--accent); font-size:1.65rem; font-weight:900; } .stat .label { color:var(--soft); font-size:.75rem; }
+    table { width:100%; border-collapse:collapse; margin-top:12px; font-size:.86rem; } th,td { padding:11px 12px; border-bottom:1px solid var(--border); text-align:left; } th { color:var(--text); background:#081321; } td { color:var(--muted); }
+    .timeline { border-left:2px solid rgba(96,165,250,.35); padding-left:22px; } .item { position:relative; margin:0 0 22px; } .item:before { content:""; position:absolute; left:-29px; top:7px; width:11px; height:11px; border-radius:50%; background:var(--accent); } .date { color:var(--accent); font-size:.78rem; font-weight:800; }
+    .sources li { margin-bottom:8px; } .footer-links { display:flex; flex-wrap:wrap; gap:16px; }
+    @media(max-width:850px){.grid-4,.grid-3{grid-template-columns:repeat(2,1fr)}} @media(max-width:620px){.grid-4,.grid-3,.grid-2{grid-template-columns:1fr}.panel{padding:20px}h1{font-size:1.55rem}table{display:block;overflow-x:auto}}
+  </style>
+</head>
+<body>
+<main class="shell">
+  <section class="panel hero">
+    <div class="breadcrumb"><a href="index.html">Research</a> / <a href="../index.html">Hub Top</a></div>
+    <div class="eyebrow">DeepSeek Update Tracker</div>
+    <h1>DeepSeek 最新アップデート完全版</h1>
+    <p>DeepSeekのモデル・API・オープンウェイト戦略を追跡します。現行の<strong>DeepSeek V4 Pro / V4 Flash</strong>を中心に、V3.2、R1からの進化、1Mコンテキスト、Agentic Coding、料金と移行上の注意点を整理します。</p>
+    <div class="summary"><p><strong>結論:</strong> V4は「安価な推論モデル」から「長文・Coding・Agentを統合するオープンウェイト基盤」への転換です。Proは1.6T/49B活性、Flashは284B/13B活性で、両方が1MコンテキストとThinking切替を備えます。</p></div>
+    <p class="last-update">最終更新: 2026-07-17（DeepSeek公式API Docs確認）</p>
+  </section>
+
+  <section class="panel">
+    <h2>📊 DeepSeek V4 — Key Stats</h2>
+    <div class="grid-4">
+      <div class="stat"><div class="value">1.6T / 49B</div><div class="label">V4 Pro 総数 / 活性Params</div></div>
+      <div class="stat"><div class="value">284B / 13B</div><div class="label">V4 Flash 総数 / 活性Params</div></div>
+      <div class="stat"><div class="value">1M</div><div class="label">標準Context Window</div></div>
+      <div class="stat"><div class="value">384K</div><div class="label">最大Output</div></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>🏗️ 構造上の進化</h2>
+    <div class="grid-3">
+      <article class="card"><h3>Token-wise Compression</h3><p>長文情報をトークン単位で圧縮し、1M文脈での計算量とメモリ消費を抑える設計です。</p></article>
+      <article class="card"><h3>DeepSeek Sparse Attention</h3><p>DSAにより必要な情報へ疎にアクセス。従来のMLA/DeepSeekMoEを土台に、超長文効率をさらに強化しています。</p></article>
+      <article class="card"><h3>Agent最適化</h3><p>Agentic Coding、Tool Use、複数ステップ推論向けに専用最適化。Claude Code、OpenClaw、OpenCodeとの統合を公式に案内しています。</p></article>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>⚖️ V4 ProとV4 Flash</h2>
+    <table>
+      <thead><tr><th>項目</th><th>DeepSeek V4 Pro</th><th>DeepSeek V4 Flash</th></tr></thead>
+      <tbody>
+        <tr><td>総 / 活性Params</td><td>1.6T / 49B</td><td>284B / 13B</td></tr>
+        <tr><td>位置づけ</td><td>最上位・複雑な推論とAgentic Coding</td><td>高速・低価格・日常Agent</td></tr>
+        <tr><td>Context / Output</td><td>1M / 最大384K</td><td>1M / 最大384K</td></tr>
+        <tr><td>Thinking</td><td>Thinking / Non-thinking</td><td>Thinking / Non-thinking</td></tr>
+        <tr><td>API model</td><td><code>deepseek-v4-pro</code></td><td><code>deepseek-v4-flash</code></td></tr>
+        <tr><td>互換形式</td><td>OpenAI / Anthropic</td><td>OpenAI / Anthropic</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="panel">
+    <h2>🤖 Agent・Coding・Tool Use</h2>
+    <div class="grid-2">
+      <article class="card"><h3>V4 Pro</h3><ul><li>公式評価でオープンモデルのAgentic Coding SOTA</li><li>Math・STEM・Codingと世界知識を重視</li><li>大規模コードベース、調査、複雑な長期タスク向け</li></ul></article>
+      <article class="card"><h3>V4 Flash</h3><ul><li>単純なAgentタスクではProと同等水準を掲げる</li><li>13B活性で低遅延・低価格</li><li>大量バッチ、日常チャット、軽量Agentの既定候補</li></ul></article>
+    </div>
+    <div class="note"><p><strong>V3.2からの連続性:</strong> V3.2はThinkingをTool Useへ直接統合し、1,800超の環境・85K超の複雑指示を使ったAgent学習を導入しました。V4はこの路線を1M文脈とAgentic Codingへ拡張しています。</p></div>
+  </section>
+
+  <section class="panel">
+    <h2>💰 DeepSeek API料金</h2>
+    <p>1M tokens当たり。キャッシュHit価格が非常に低いのが特徴です。</p>
+    <table>
+      <thead><tr><th>モデル</th><th>Input Cache Hit</th><th>Input Cache Miss</th><th>Output</th><th>Context</th></tr></thead>
+      <tbody>
+        <tr><td><strong>deepseek-v4-flash</strong></td><td>$0.0028</td><td>$0.14</td><td>$0.28</td><td>1M</td></tr>
+        <tr><td><strong>deepseek-v4-pro</strong></td><td>$0.003625</td><td>$0.435</td><td>$0.87</td><td>1M</td></tr>
+      </tbody>
+    </table>
+    <p class="small">料金は変更される可能性があります。利用前に公式Pricingを再確認してください。</p>
+  </section>
+
+  <section class="panel">
+    <h2>🔌 API移行ガイド</h2>
+    <div class="grid-2">
+      <article class="card"><h3>最小変更</h3><ul><li>Base URLは <code>https://api.deepseek.com</code> のまま</li><li>モデル名を <code>deepseek-v4-pro</code> または <code>deepseek-v4-flash</code> へ変更</li><li>Anthropic形式は <code>/anthropic</code> を使用</li></ul></article>
+      <article class="card"><h3>重要な期限</h3><ul><li><code>deepseek-chat</code> と <code>deepseek-reasoner</code> は2026-07-24 15:59 UTCで廃止予定</li><li>移行前は両aliasがV4 FlashのNon-thinking / Thinkingへ対応</li><li>JSON、Tool Calls、FIM、Prefix Completionを両モデルが提供</li></ul></article>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>📅 タイムライン</h2>
+    <div class="timeline">
+      <div class="item"><div class="date">2026-04-24</div><span class="tag">DeepSeek V4 Preview</span><h3>V4 Pro / Flashを公開</h3><p>1M標準コンテキスト、Token-wise Compression、DSA、Agentic Coding、OpenAI/Anthropic互換API、オープンウェイトを発表。</p></div>
+      <div class="item"><div class="date">2025-12-01</div><span class="tag">DeepSeek V3.2</span><h3>Reasoning-first Agentモデル</h3><p>Thinking in Tool-Useを導入。V3.2-Specialeは高度推論の評価用として一時API提供され、モデルウェイトも公開。</p></div>
+      <div class="item"><div class="date">2025-08-21</div><span class="tag">DeepSeek V3.1</span><h3>Think / Non-Think統合</h3><p>128K文脈、Agent Tool Use、Anthropic API形式、Strict Function Callingを強化。</p></div>
+      <div class="item"><div class="date">2025-05-28</div><span class="tag">DeepSeek R1-0528</span><h3>推論・Frontend・Function Calling改善</h3><p>ベンチマーク、ハルシネーション、JSON出力、Function Callingを改善。</p></div>
+      <div class="item"><div class="date">2025-01-20</div><span class="tag">DeepSeek R1</span><h3>オープン推論モデルを公開</h3><p>R1/R1-Zeroと1.5B〜70Bの蒸留モデル群を公開し、低コスト推論モデル競争の起点となりました。</p></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>✅ 強みと ⚠ 注意点</h2>
+    <div class="grid-2">
+      <article class="card"><h3>✅ 強み</h3><ul><li>1M文脈と最大384K出力</li><li>極めて低いAPI価格、とくにCache Hit</li><li>Pro/Flashの用途別二層構成</li><li>ThinkingとTool Useの統合</li><li>オープンウェイトと商用APIを並行提供</li><li>OpenAI/Anthropic形式への対応</li></ul></article>
+      <article class="card"><h3>⚠ 注意点</h3><ul><li>V4はPreview表記で、仕様・価格変更の可能性</li><li>Proの自前運用は1.6T規模で非常に重い</li><li>公式性能主張は第三者評価と分けて読む必要</li><li>旧model aliasは2026-07-24に廃止予定</li><li>長大出力は安価でも総トークン費用と検証負荷が増える</li></ul></article>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>📝 どのモデルを使うか</h2>
+    <div class="note"><p><strong>複雑なCoding・研究・長期AgentにはV4 Pro</strong>、大量処理・日常Agent・コスト優先にはV4 Flashが基本です。DeepSeekの差別化は、フロンティア級の長文/推論機能を、オープンウェイトと低価格APIの両方で提供する点にあります。</p></div>
+  </section>
+
+  <section class="panel sources">
+    <h2>一次情報・出典</h2>
+    <ul>
+      <li><a href="https://api-docs.deepseek.com/news/news260424" target="_blank" rel="noopener">DeepSeek — V4 Preview Release</a></li>
+      <li><a href="https://api-docs.deepseek.com/quick_start/pricing" target="_blank" rel="noopener">DeepSeek — Models &amp; Pricing</a></li>
+      <li><a href="https://api-docs.deepseek.com/news/news251201" target="_blank" rel="noopener">DeepSeek — V3.2 Release</a></li>
+      <li><a href="https://api-docs.deepseek.com/news/news250821" target="_blank" rel="noopener">DeepSeek — V3.1 Release</a></li>
+      <li><a href="https://github.com/deepseek-ai/DeepSeek-V3" target="_blank" rel="noopener">deepseek-ai/DeepSeek-V3 公式GitHub</a></li>
+      <li><a href="https://github.com/deepseek-ai/DeepSeek-R1" target="_blank" rel="noopener">deepseek-ai/DeepSeek-R1 公式GitHub</a></li>
+    </ul>
+    <div class="footer-links"><a href="../workbench/knowledge/deepseek.html">DeepSeek 深掘り</a><a href="kimi-recent-updates.html">Kimi 最新</a><a href="muse-recent-updates.html">Muse 最新</a><a href="index.html">← Research Index</a></div>
+  </section>
+</main>
+</body>
+</html>
