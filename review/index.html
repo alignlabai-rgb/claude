@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#101820">
+  <meta name="color-scheme" content="dark">
+  <title>ALIGN Lab Review Pocket</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="app-header">
+    <div>
+      <p class="eyebrow">ALIGN Lab / mobile review</p>
+      <h1>Review Pocket</h1>
+    </div>
+    <button id="refreshButton" class="icon-button" type="button" aria-label="キューを再読み込み">↻</button>
+  </header>
+
+  <main>
+    <section class="notice" aria-label="重要な注意">
+      <strong>ここは公開URLです。</strong>
+      <span>機密・個人情報は置きません。「見た限りOK」はHUMAN_LOCK・正典化・公開承認を意味しません。</span>
+    </section>
+
+    <section class="summary" aria-label="確認状況">
+      <div><span id="pendingCount">0</span><small>未確認</small></div>
+      <div><span id="okCount">0</span><small>見た限りOK</small></div>
+      <div><span id="holdCount">0</span><small>保留</small></div>
+      <div><span id="retakeCount">0</span><small>要修正</small></div>
+    </section>
+
+    <section class="toolbar" aria-label="絞り込み">
+      <label class="search-label">
+        <span>検索</span>
+        <input id="searchInput" type="search" placeholder="作品・人物・論点">
+      </label>
+      <div id="filterBar" class="filters" role="group" aria-label="状態で絞り込み">
+        <button type="button" data-filter="all" class="active">すべて</button>
+        <button type="button" data-filter="pending">未確認</button>
+        <button type="button" data-filter="ok">OK</button>
+        <button type="button" data-filter="hold">保留</button>
+        <button type="button" data-filter="retake">要修正</button>
+      </div>
+    </section>
+
+    <section id="queue" class="queue" aria-live="polite"></section>
+
+    <section class="export-panel">
+      <h2>確認結果を戻す</h2>
+      <p>選択結果はこの端末だけに保存されます。下のボタンでChatGPTへ貼れる文章を作ります。</p>
+      <div class="export-actions">
+        <button id="copyButton" class="primary" type="button">レビュー結果をコピー</button>
+        <button id="shareButton" type="button">共有</button>
+      </div>
+      <textarea id="exportText" rows="8" readonly aria-label="コピー用レビュー結果"></textarea>
+      <p id="copyStatus" class="status-line" role="status"></p>
+    </section>
+  </main>
+
+  <footer>
+    <span id="updatedAt">queue: -</span>
+    <span>offline cache / local-only decisions</span>
+  </footer>
+
+  <template id="cardTemplate">
+    <article class="review-card">
+      <div class="card-heading">
+        <div>
+          <p class="card-meta"></p>
+          <h2 class="card-title"></h2>
+        </div>
+        <span class="decision-pill"></span>
+      </div>
+      <div class="media-slot"></div>
+      <p class="card-summary"></p>
+      <div class="focus-block">
+        <h3>今回見る点</h3>
+        <ul class="focus-list"></ul>
+      </div>
+      <div class="audit-badges"></div>
+      <fieldset class="reason-fieldset">
+        <legend>違和感タグ（複数可）</legend>
+        <div class="reason-chips"></div>
+      </fieldset>
+      <label class="note-label">
+        <span>ひとこと（任意）</span>
+        <textarea class="note-input" rows="3" placeholder="例：6秒時点の右手だけ不自然"></textarea>
+      </label>
+      <div class="decision-actions">
+        <button type="button" data-decision="ok" class="ok">見た限りOK</button>
+        <button type="button" data-decision="hold" class="hold">保留</button>
+        <button type="button" data-decision="retake" class="retake">要修正</button>
+        <button type="button" data-decision="pending" class="clear">未確認へ戻す</button>
+      </div>
+      <details>
+        <summary>由来・境界</summary>
+        <dl class="provenance"></dl>
+      </details>
+    </article>
+  </template>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
