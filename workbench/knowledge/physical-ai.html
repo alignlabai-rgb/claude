@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Physical AI（具象AI &amp; ロボティクス）完全ガイド | Workbench Knowledge</title>
+  <style>
+    body { font-family: "Segoe UI", "Noto Sans JP", system-ui, sans-serif; margin: 0; background: #070d19; color: #edf2fb; line-height: 1.75; padding: 28px 18px 60px; }
+    .shell { max-width: 1160px; margin: 0 auto; display: grid; gap: 24px; }
+    .panel { background: #0e1726; border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 28px 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+    a { color: #4fffb0; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    h1 { margin: 0 0 10px; font-size: 2.1rem; }
+    h2 { margin: 0 0 16px; font-size: 1.35rem; color: #edf2fb; border-bottom: 1px solid rgba(79,255,176,0.2); padding-bottom: 8px; }
+    h3 { margin: 16px 0 10px; font-size: 1.1rem; color: #60a5fa; }
+    p, li { color: #c5d0e3; font-size: 0.95rem; }
+    ul { margin: 8px 0; padding-left: 22px; }
+
+    /* KPI Grid */
+    .kpi-row { display: flex; flex-wrap: wrap; gap: 12px; margin: 16px 0; }
+    .kpi { background: rgba(79,255,176,0.04); border: 1px solid rgba(79,255,176,0.18); border-radius: 12px; padding: 14px 18px; text-align: center; flex: 1; min-width: 140px; }
+    .kpi .val { font-size: 1.45rem; font-weight: 800; color: #4fffb0; }
+    .kpi .lbl { font-size: 0.74rem; color: #7f92ac; letter-spacing: 0.05em; text-transform: uppercase; margin-top: 4px; }
+
+    /* Badges */
+    .badge { display: inline-block; font-size: 0.74rem; font-weight: 700; padding: 3px 10px; border-radius: 6px; margin-right: 6px; vertical-align: middle; }
+    .badge-feature { background: rgba(79,255,176,0.16); color: #4fffb0; border: 1px solid rgba(79,255,176,0.4); }
+    .badge-tech { background: rgba(96,165,250,0.16); color: #60a5fa; border: 1px solid rgba(96,165,250,0.3); }
+    .badge-hardware { background: rgba(244,184,96,0.16); color: #f4b860; border: 1px solid rgba(244,184,96,0.3); }
+    .badge-year { background: rgba(236,72,153,0.16); color: #f472b6; border: 1px solid rgba(236,72,153,0.3); }
+
+    /* Quote Banner */
+    .hero-banner { background: linear-gradient(135deg, rgba(79,255,176,0.1), rgba(96,165,250,0.08)); border: 1px solid rgba(79,255,176,0.25); border-radius: 16px; padding: 22px 26px; margin: 10px 0 20px; }
+    .hero-banner blockquote { margin: 0 0 10px; font-size: 1.08rem; color: #a7f3d0; font-style: italic; line-height: 1.6; }
+    .hero-banner cite { color: #7f92ac; font-size: 0.85rem; font-style: normal; }
+
+    /* 6-Layer Architecture Stack */
+    .stack-container { display: grid; gap: 10px; margin: 18px 0; }
+    .stack-layer { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .stack-layer:hover { border-color: rgba(79,255,176,0.4); background: rgba(79,255,176,0.02); }
+    .stack-num { font-size: 0.8rem; font-weight: 800; color: #7f92ac; background: rgba(255,255,255,0.06); padding: 4px 10px; border-radius: 6px; min-width: 65px; text-align: center; }
+    .stack-title { font-weight: 700; color: #edf2fb; font-size: 1rem; flex: 1; min-width: 200px; }
+    .stack-desc { color: #b0bcd4; font-size: 0.86rem; flex: 2; min-width: 280px; }
+    .stack-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+
+    /* Cards Grid */
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; margin: 16px 0; }
+    .card { background: rgba(255,255,255,0.025); border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; padding: 20px 22px; }
+    .card h4 { margin: 0 0 8px; color: #4fffb0; font-size: 1.05rem; }
+    .card p { margin: 0 0 10px; font-size: 0.88rem; color: #b0bcd4; }
+    .card code { background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px; font-size: 0.82rem; color: #f4b860; }
+
+    /* Key Players Table */
+    table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.88rem; }
+    th { background: rgba(255,255,255,0.05); color: #4fffb0; text-align: left; padding: 10px 14px; border-bottom: 2px solid rgba(79,255,176,0.2); }
+    td { padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,0.06); color: #c5d0e3; }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+
+    /* Code Snippet */
+    pre { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.09); border-radius: 10px; padding: 16px; overflow-x: auto; font-family: "Fira Code","Consolas",monospace; font-size: 0.83rem; color: #d0daf0; line-height: 1.55; }
+    code { font-family: "Fira Code","Consolas",monospace; }
+
+    /* Timeline */
+    .timeline { position: relative; padding-left: 28px; margin: 18px 0; }
+    .timeline::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: rgba(79,255,176,0.3); }
+    .tl-item { position: relative; margin-bottom: 20px; }
+    .tl-item::before { content: ''; position: absolute; left: -24px; top: 6px; width: 10px; height: 10px; border-radius: 50%; background: #4fffb0; box-shadow: 0 0 8px rgba(79,255,176,0.6); }
+    .tl-year { font-size: 0.78rem; font-weight: 700; color: #4fffb0; letter-spacing: 0.05em; text-transform: uppercase; }
+    .tl-title { font-weight: 700; color: #edf2fb; margin: 2px 0; }
+    .tl-desc { color: #c5d0e3; font-size: 0.88rem; }
+
+    /* Anti-pattern / Challenges */
+    .challenge-grid { display: grid; gap: 14px; margin: 16px 0; }
+    .challenge-card { background: rgba(248,113,113,0.05); border: 1px solid rgba(248,113,113,0.22); border-radius: 12px; padding: 18px 20px; }
+    .challenge-card h4 { margin: 0 0 6px; color: #f87171; font-size: 0.98rem; }
+    .challenge-card p { margin: 0; font-size: 0.88rem; color: #b0bcd4; }
+    .challenge-sol { margin-top: 10px; font-size: 0.85rem; color: #4fffb0; background: rgba(79,255,176,0.06); padding: 8px 12px; border-radius: 6px; }
+
+    .note-box { background: rgba(96,165,250,0.08); border-left: 4px solid #60a5fa; border-radius: 0 10px 10px 0; padding: 14px 18px; margin: 16px 0; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- HERO -->
+  <div class="panel">
+    <p style="font-size: 0.82rem; color: #7f92ac; margin: 0 0 8px;">
+      <a href="index.html">← Workbench Knowledge</a> / <a href="../index.html">Hub Top</a>
+    </p>
+    <span class="badge badge-feature">特別展開・2026最前線</span>
+    <span class="badge badge-year">2026 Q3 量産化元年</span>
+    <span class="badge badge-tech">VLA Models &amp; World Models</span>
+    <h1>Physical AI（具象AI / ロボティクス / 空間知能）完全ガイド</h1>
+    <p style="font-size: 1.05rem; color: #b6c8df; margin: 8px 0 0;">
+      画面の中のテキスト・コード処理（Digital AI）から、<strong>物理世界で物体を認識し、物理法則を理解し、力学的作業を遂行する「Physical AI（Embodied AI）」への歴史的大転換</strong>。ハードウェア、物理シミュレータ、ワールドモデル、汎用ロボットポリシーの全体像を徹底解剖。
+    </p>
+
+    <div class="kpi-row">
+      <div class="kpi"><div class="val">$230B+</div><div class="lbl">2026年 物理AI投資額</div></div>
+      <div class="kpi"><div class="val">1,000,000+</div><div class="lbl">Sim-to-Real 仮想学習並列数</div></div>
+      <div class="kpi"><div class="val">100 Hz</div><div class="lbl">超低遅延 リアルタイム制御</div></div>
+      <div class="kpi"><div class="val">量産元年</div><div class="lbl">2026年 ヒューマノイド現場投入</div></div>
+    </div>
+
+    <div class="hero-banner">
+      <blockquote>
+        "AI の次の巨大な波は『Physical AI』である。物理世界の法則（重力・摩擦・触覚・慣性）を理解し、デジタル空間のシミュレーションと現実のロボット身体をシームレスに繋ぐ知能こそが、産業のすべてを再定義する。"
+      </blockquote>
+      <cite>— Jensen Huang (NVIDIA CEO, 2026)</cite>
+    </div>
+  </div>
+
+  <!-- WHAT IS PHYSICAL AI -->
+  <div class="panel">
+    <h2>1. Physical AI とは何か？ — デジタルAIからのパラダイムシフト</h2>
+    <p>
+      従来の「Digital AI（ChatGPT, Claude 等）」は、テキスト・画像・音声・コードといったデジタルデータの処理を得意としていました。
+      これに対し**「Physical AI（Embodied AI / 具象AI）」**とは、**物理世界（Physical World）に身体（ロボット・アーム・移動体・ドローン）を持ち、視覚・触覚・力覚・空間センサーを通じて物理的環境と物理的に対話するAI**です。
+    </p>
+    <p>
+      2026年、Physical AI は研究室のプロトタイプから**「工場・倉庫・医療・家庭への量産現場投入（Mass Production Year One）」**のフェーズへと突入しました。
+    </p>
+
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-year">Phase 1 (〜2022): 決定論的ティーチングロボティクス</div>
+        <div class="tl-title">産業用ロボットの固定プログラム時代</div>
+        <div class="tl-desc">特定の動作を人間が手動で教え込み、位置決めセンサーで固定ラインを単純反復。柔軟な状況判断や未知の物体への対応は不可能。</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">Phase 2 (2023〜2024): 視覚＋単一タスク機械学習</div>
+        <div class="tl-title">カメラ認識と特定タスクのディープラーニング</div>
+        <div class="tl-desc">CNNや強化学習（RL）を用いたピック＆プレース。しかし、ロボットの形態ごとに個別の学習が必要で汎用性が欠如。</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">Phase 3 (2025): VLA (Vision-Language-Action) モデル登場</div>
+        <div class="tl-title">言葉で指示し、見て動く「汎用ロボット脳」</div>
+        <div class="tl-desc">RT-2 / π0 などの登場。自然言語の「りんごを皿に載せて」という指示を理解し、カメラ画像から動作トルクを直接生成。</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">Phase 4 (2026〜現在): Physical AI ＆ ワールドモデル統合時代</div>
+        <div class="tl-title">空間知能 (Spatial Intelligence) と超並列物理シミュレーション</div>
+        <div class="tl-desc">NVIDIA Cosmos / World Labs (Marble) などの物理基礎モデル（WFM）と、ミリ秒単位の物理フィードバック、異種身体（Cross-Embodiment）間での知識共有が実現。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6-LAYER ARCHITECTURE STACK -->
+  <div class="panel">
+    <h2>2. Physical AI の 6 層フルスタック・アーキテクチャ</h2>
+    <p>Physical AI は単一のモデルではなく、ハードウェアからクラウド物理シミュレータ、エッジ推論基盤までを網羅する 6 段階のテクノロジースタックで構成されます。</p>
+
+    <div class="stack-container">
+      <!-- Layer 6 -->
+      <div class="stack-layer">
+        <div class="stack-num">Layer 6</div>
+        <div class="stack-title">Fleet Operations &amp; Teleoperation Flywheel</div>
+        <div class="stack-desc">VRグローブや遠隔操作による人間データ収集、フリート（ロボット群）の挙動監視・クラウド学習データ自動生成基盤。</div>
+        <div class="stack-tags"><span class="badge badge-tech">Teleop Flywheel</span><span class="badge badge-hardware">VR Glove</span></div>
+      </div>
+
+      <!-- Layer 5 -->
+      <div class="stack-layer">
+        <div class="stack-num">Layer 5</div>
+        <div class="stack-title">Universal Policy &amp; VLA Models (ロボット頭脳)</div>
+        <div class="stack-desc">自然言語とカメラ画像・触覚から関節角・トルク命令を出力する大規模マルチモーダル行動モデル（Vision-Language-Action）。</div>
+        <div class="stack-tags"><span class="badge badge-feature">π0 / π0.7</span><span class="badge badge-tech">RT-3</span><span class="badge badge-tech">Skild AI</span></div>
+      </div>
+
+      <!-- Layer 4 -->
+      <div class="stack-layer">
+        <div class="stack-num">Layer 4</div>
+        <div class="stack-title">World Foundation Models (WFM &amp; 空間知能)</div>
+        <div class="stack-desc">物理世界の「次に何が起きるか（物体が倒れる、滑る、跳ねる）」を3D空間で物理正確に予測・生成する世界基礎モデル。</div>
+        <div class="stack-tags"><span class="badge badge-feature">NVIDIA Cosmos</span><span class="badge badge-tech">World Labs Marble</span></div>
+      </div>
+
+      <!-- Layer 3 -->
+      <div class="stack-layer">
+        <div class="stack-num">Layer 3</div>
+        <div class="stack-title">Real-time Physics Simulation (Sim-to-Real)</div>
+        <div class="stack-desc">数千台の仮想ロボットをクラウド上で数百万倍速で並列駆動し、物理的な強化学習と摩擦・弾性シミュレーションを実行。</div>
+        <div class="stack-tags"><span class="badge badge-hardware">Isaac Sim 5.0</span><span class="badge badge-tech">MuJoCo</span><span class="badge badge-tech">SceniX</span></div>
+      </div>
+
+      <!-- Layer 2 -->
+      <div class="stack-layer">
+        <div class="stack-num">Layer 2</div>
+        <div class="stack-title">Real-time Edge Compute &amp; RTOS (エッジ推論・制御)</div>
+        <div class="stack-desc">ロボットの体内に搭載される100Hz超低遅延AIアクセラレータとリアルタイムOS。転倒防止や緊急安全遮断を担当。</div>
+        <div class="stack-tags"><span class="badge badge-hardware">Jetson Thor</span><span class="badge badge-tech">ROS 2 / Micro-ROS</span></div>
+      </div>
+
+      <!-- Layer 1 -->
+      <div class="stack-layer">
+        <div class="stack-num">Layer 1</div>
+        <div class="stack-title">Physical Hardware &amp; Actuators (メカトロニクス身体)</div>
+        <div class="stack-desc">高トルク密度モータ、波動歯車減速機、多自由度ハンド、LiDAR・RGB-Dカメラ、皮膚感触・触覚アレイセンサ。</div>
+        <div class="stack-tags"><span class="badge badge-hardware">Tesla Optimus V3</span><span class="badge badge-hardware">Figure 03</span><span class="badge badge-hardware">Unitree G1</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KEY BREAKTHROUGHS 2025-2026 -->
+  <div class="panel">
+    <h2>3. 2026年 3 大技術ブレイクスルー</h2>
+
+    <div class="card-grid">
+      <div class="card">
+        <h4>1. Real-to-Sim-to-Real 閉環パイプライン</h4>
+        <p>
+          かつて最大の壁だった「シミュレーションと現実のギャップ（Sim-to-Real Gap）」が、生成AIによる高精細3D空間復元（NeRF / 3D Gaussian Splatting）と物理パラメータ自動チューニング（System Identification）により消滅。
+        </p>
+        <p>仮想空間で数億時間の作業経験を積ませたポリシーが、現実のロボットで一発動作（Zero-shot Sim-to-Real）する時代へ。</p>
+      </div>
+
+      <div class="card">
+        <h4>2. Cross-Embodiment Generalization（異種身体横断学習）</h4>
+        <p>
+          人間型ヒューマノイド、2本アーム型ロボット、4足歩行ロボット、産業用6軸アームなど、異なる形状のロボット間で**共通の「運動・操作・物理感覚の重み」を共有**する学習アルゴリズム（Physical Intelligence の π シリーズなど）が確立。
+        </p>
+        <p>「アームロボットで学んだ物体操作の知識」を「ヒューマノイドの手」へそのまま転移可能に。</p>
+      </div>
+
+      <div class="card">
+        <h4>3. Spatial Intelligence &amp; 触覚 VLA 統合</h4>
+        <p>
+          Fei-Fei Li 教授率いる World Labs や Google DeepMind が提唱する「空間知能」。単に2D画像を見るだけでなく、物体間の3D空間位置、奥行き、重量バランス、表面の滑りやすさをリアルタイムで頭の中に構築。
+        </p>
+        <p>卵のような割れやすいものから重い工具まで、触覚フィードバックと力覚制御（Force-Torque Control）で最適な力加減を自律調整。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- INDUSTRY PLAYERS COMPARISON -->
+  <div class="panel">
+    <h2>4. 主要プレイヤー &amp; 陣営マップ（2026最新）</h2>
+    <p>Physical AI の領域は、「自社でハードからソフトまで垂直統合する陣営」と、「プラットフォームや脳（ソフトウェア）に特化する陣営」の2大潮流に分かれています。</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>会社 / プロジェクト</th>
+          <th>アプローチ / 形態</th>
+          <th>代表モデル・プロダクト</th>
+          <th>2026年の主な動向・成果</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Tesla</strong></td>
+          <td>垂直統合型ヒューマノイド</td>
+          <td>Optimus V3</td>
+          <td>自社ギガファクトリーで数千台を実稼働。電池セル運搬やパーツ組付けを全自動化。2026年末にB2B一般販売を開始。</td>
+        </tr>
+        <tr>
+          <td><strong>Figure AI</strong></td>
+          <td>垂直統合型ヒューマノイド</td>
+          <td>Figure 03 / BotQ 工場</td>
+          <td>BMW製造工場での本格パイプライン実稼働。量産工場「BotQ」をフル稼働させ、週数百台ペースで出荷。</td>
+        </tr>
+        <tr>
+          <td><strong>NVIDIA</strong></td>
+          <td>プラットフォーム &amp; 物理シミュレーション</td>
+          <td>Isaac GR00T / Cosmos / Jetson Thor</td>
+          <td>業界標準インフラ。ABB, KUKA, FANUC などの大手産業ロボットメーカーが GR00T &amp; Cosmos を一斉採用。</td>
+        </tr>
+        <tr>
+          <td><strong>Physical Intelligence (π)</strong></td>
+          <td>汎用ロボットポリシー（脳特化）</td>
+          <td>π0 / π0.5 / π0.7</td>
+          <td>OpenAI や Jeff Bezos 等が出資。異なるベンダーのロボットハードウェアを単一ポリシーで制御する共通OSを展開。</td>
+        </tr>
+        <tr>
+          <td><strong>World Labs</strong></td>
+          <td>空間知能 &amp; 3Dワールドモデル</td>
+          <td>Marble / SceniX 買収</td>
+          <td>Fei-Fei Li 設立。SceniX 買収により、リアルな3D物理世界の即時生成とシミュレーション閉環の基盤を提供。</td>
+        </tr>
+        <tr>
+          <td><strong>Boston Dynamics / Hyundai</strong></td>
+          <td>全電動ヒューマノイド</td>
+          <td>Atlas Electric</td>
+          <td>従来の油圧式から完全電動モデルへと移行。関節可動域360度と人間を超える柔軟性で自動車組立ラインを支援。</td>
+        </tr>
+        <tr>
+          <td><strong>Unitree Robotics (宇樹科技)</strong></td>
+          <td>低価格高品質ハードウェア</td>
+          <td>G1 / H1</td>
+          <td>$16,000台という驚異的低価格でヒューマノイド G1 を大量量産。研究開発および商業施設向けに世界中で急拡大。</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- CODE SNIPPET / CONTROL API EXAMPLE -->
+  <div class="panel">
+    <h2>5. 実践コード概念: ROS 2 + VLA Policy インタフェース</h2>
+    <p>以下は、VLA（Vision-Language-Action）モデルが自然言語コマンドを受け取り、カメラ入力・触覚入力から 100Hz の物理関節制御トルクを出力する Python/ROS 2 ノードの概念実装です。</p>
+
+    <pre><code>import rclpy
+from rclpy.node import Node
+from sensor_msgs.msg import Image, JointState
+from geometry_msgs.msg import WrenchStamped
+import numpy as np
+
+# Physical AI VLA (Vision-Language-Action) Policy Node
+class PhysicalAIPolicyNode(Node):
+    def __init__(self):
+        super().__init__('physical_ai_vla_policy')
+        
+        # 1. センサー入力のサブスクライブ (視覚・関節状態・触覚センサ)
+        self.image_sub = self.create_subscription(Image, '/robot/wrist_camera/rgb', self.image_cb, 10)
+        self.joint_sub = self.create_subscription(JointState, '/robot/joint_states', self.joint_cb, 10)
+        self.force_sub = self.create_subscription(WrenchStamped, '/robot/tactile_force', self.force_cb, 10)
+        
+        # 2. 物理トルクコマンドのパブリッシャー (100Hz 超低遅延制御)
+        self.cmd_pub = self.create_publisher(JointState, '/robot/joint_torque_cmd', 10)
+        
+        # 3. 汎用ポリシーモデル (e.g. Physical Intelligence pi0 / GR00T) のロード
+        self.policy = LoadVLAFoundationModel(model_name="pi-zero-0.7-edge")
+        self.current_goal = "Fold the black towel and place it smoothly on the shelf"
+
+    def control_loop(self):
+        # 最新のモーダルデータを取得
+        obs = {
+            'rgb_image': self.latest_image,
+            'joint_positions': self.latest_joints,
+            'tactile_forces': self.latest_forces,
+            'instruction': self.current_goal
+        }
+        
+        # VLA モデルによる関節角度/力学トルクの推論 (リアルタイムエッジ実行)
+        action_torques = self.policy.infer_action(obs)
+        
+        # 物理的なフェイルセーフチェック (安全トルク閾値超えの安全防止)
+        safe_torques = ApplySafetyFailSafe(action_torques, max_force_limit=15.0)
+        
+        # ロボットのアクチュエータへ出力
+        msg = JointState()
+        msg.effort = safe_torques
+        self.cmd_pub.publish(msg)
+
+def main():
+    rclpy.init()
+    node = PhysicalAIPolicyNode()
+    rclpy.spin(node)
+
+if __name__ == '__main__':
+    main()</code></pre>
+  </div>
+
+  <!-- CHALLENGES & SAFETY -->
+  <div class="panel">
+    <h2>6. Physical AI の課題・アンチパターン・安全設計 (Safety &amp; Alignment)</h2>
+    <p>デジタル領域のAIと異なり、Physical AI は**「現実の人間や環境に物理的なダメージを与えるリスク」**が常に伴います。失敗は画面上のエラーではなく、物理的破損を意味します。</p>
+
+    <div class="challenge-grid">
+      <div class="challenge-card">
+        <h4>Challenge 1: Physical Hallucination &amp; Latency Spike（物理的ハルシネーションと遅延スパイク）</h4>
+        <p>VLAモデルがカメラの反射や影を障害物と誤認したり、大容量モデルの推論遅延（レイテンシ）によってロボットのバランス制御が間に合わず転倒するリスク。</p>
+        <div class="challenge-sol">✅ 回避策: 2層制御構造（Two-tier Control）。高レイテンシのVLA脳（10Hz）と、低レイテンシ・物理安定性を担保するモータダイナミクス制御基盤（1000Hz）を完全に分離する。</div>
+      </div>
+
+      <div class="challenge-card">
+        <h4>Challenge 2: Tactile &amp; Deformable Object Handling（触覚・柔軟物の扱い）</h4>
+        <p>剛体（固いブロック）と異なり、衣服・食品・液体・ケーブルなどの柔軟物は形状が定まらず、通常の視覚のみでは力加減を誤って破裂・破損させる現象。</p>
+        <div class="challenge-sol">✅ 回避策: 高密度触覚アレイ（Tactile Sensor Skin）の導入と、力覚フィードバック付き物理強化学習（Force-guided Reinforcement Learning）の適用。</div>
+      </div>
+
+      <div class="challenge-card">
+        <h4>Challenge 3: E-Stop &amp; Hardware Safety Alignment（ハードウェア物理安全遮断）</h4>
+        <p>AIモデルが未定義の異常挙動を起こした際、作業員や周囲の物品との物理的接触事故を起こすリスク。</p>
+        <div class="challenge-sol">✅ 回避策: ISO 10218 / ISO/TS 15066 準拠の物理ブレーキハードウェア回路の標準搭載。AIポリシーの出力よりも最優先される物理インターロックと人間検知ゾーンの併用。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NAVIGATION & RELATED -->
+  <div class="panel" style="text-align: center;">
+    <h2>Physical AI リファレンス &amp; 関連ガイド</h2>
+    <p style="font-size: 0.9rem; color: #7f92ac;">Tech Workbench 関連知識ページ</p>
+    <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 14px;">
+      <a href="a2a-protocol.html" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); padding: 8px 14px; border-radius: 8px; font-size: 0.85rem;">A2A Protocol (エージェント間通信)</a>
+      <a href="harness-engineering.html" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); padding: 8px 14px; border-radius: 8px; font-size: 0.85rem;">Harness Eng</a>
+      <a href="graph-engineering.html" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); padding: 8px 14px; border-radius: 8px; font-size: 0.85rem;">Graph Eng</a>
+      <a href="intelligence-matrix.html" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); padding: 8px 14px; border-radius: 8px; font-size: 0.85rem;">Intelligence Matrix</a>
+    </div>
+    <p style="margin-top: 18px; font-size: 0.82rem;"><a href="index.html">← Knowledge Index へ戻る</a> | <a href="../index.html">Hub Top</a></p>
+  </div>
+
+</div>
+</body>
+</html>
