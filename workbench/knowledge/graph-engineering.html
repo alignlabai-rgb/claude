@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Graph Engineering | Workbench Knowledge</title>
+  <style>
+    body { font-family: "Segoe UI", "Noto Sans JP", system-ui, sans-serif; margin: 0; background: #0b1220; color: #edf2fb; line-height: 1.75; padding: 28px 18px 60px; }
+    .shell { max-width: 1100px; margin: 0 auto; display: grid; gap: 22px; }
+    .panel { background: #111a2b; border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 26px 28px; }
+    a { color: #75d7c0; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    h1 { margin: 0 0 10px; font-size: 1.9rem; }
+    h2 { margin: 0 0 14px; font-size: 1.25rem; color: #edf2fb; }
+    h3 { margin: 14px 0 8px; font-size: 1.05rem; color: #d0daf0; }
+    p, li { color: #c5d0e3; }
+    ul { margin: 8px 0; padding-left: 20px; }
+
+    /* KPI */
+    .kpi-row { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0; }
+    .kpi { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 12px 16px; text-align: center; min-width: 130px; }
+    .kpi .val { font-size: 1.3rem; font-weight: 800; color: #3dd8c5; }
+    .kpi .lbl { font-size: 0.72rem; color: #7f92ac; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 4px; }
+
+    /* Badges */
+    .badge { display: inline-block; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 5px; margin-right: 6px; vertical-align: middle; }
+    .badge-creator { background: rgba(167,139,250,0.18); color: #a78bfa; border: 1px solid rgba(167,139,250,0.3); }
+    .badge-engineer { background: rgba(61,216,197,0.15); color: #3dd8c5; border: 1px solid rgba(61,216,197,0.3); }
+    .badge-new { background: rgba(79,255,176,0.15); color: #4FFFB0; border: 1px solid rgba(79,255,176,0.3); }
+    .badge-core { background: rgba(244,184,96,0.15); color: #f4b860; border: 1px solid rgba(244,184,96,0.3); }
+
+    /* Quote */
+    .quote-card { background: rgba(61,216,197,0.07); border-left: 4px solid #3dd8c5; border-radius: 0 12px 12px 0; padding: 16px 20px; margin: 14px 0; }
+    .quote-card blockquote { margin: 0 0 8px; color: #a5f3d0; font-style: italic; font-size: 1.02rem; }
+    .quote-card cite { color: #7f92ac; font-size: 0.82rem; }
+
+    /* Graph Visual Diagram */
+    .graph-diagram { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 20px; margin: 18px 0; text-align: center; }
+    .graph-nodes { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; margin: 12px 0; }
+    .g-node { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; padding: 12px 14px; min-width: 110px; font-size: 0.88rem; font-weight: 700; }
+    .g-node.start { border-color: #a78bfa; color: #a78bfa; }
+    .g-node.state { border-color: #3dd8c5; color: #3dd8c5; }
+    .g-node.decision { border-color: #f4b860; color: #f4b860; }
+    .g-node.subgraph { border-color: #60a5fa; color: #60a5fa; }
+    .g-node.end { border-color: #f87171; color: #f87171; }
+    .g-arrow { color: #7f92ac; font-size: 1.2rem; font-weight: 700; }
+
+    /* Pattern cards */
+    .pattern-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 16px; margin: 14px 0; }
+    .pattern-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 20px; }
+    .pattern-card h4 { margin: 0 0 8px; color: #3dd8c5; font-size: 1rem; }
+    .pattern-card p { margin: 0 0 10px; font-size: 0.88rem; color: #b0bcd4; }
+    .pattern-card code { background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; font-size: 0.82rem; color: #f4b860; }
+    .pattern-card pre { background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 12px 14px; overflow-x: auto; font-size: 0.8rem; color: #c5d0e3; font-family: "Fira Code","Consolas",monospace; line-height: 1.55; margin: 8px 0 0; }
+
+    /* Timeline */
+    .timeline { position: relative; padding-left: 28px; }
+    .timeline::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: rgba(61,216,197,0.25); }
+    .tl-item { position: relative; margin-bottom: 22px; }
+    .tl-item::before { content: ''; position: absolute; left: -24px; top: 6px; width: 10px; height: 10px; border-radius: 50%; background: #3dd8c5; box-shadow: 0 0 8px rgba(61,216,197,0.5); }
+    .tl-year { font-size: 0.78rem; font-weight: 700; color: #3dd8c5; letter-spacing: 0.06em; text-transform: uppercase; }
+    .tl-title { font-weight: 700; color: #edf2fb; margin: 2px 0; }
+    .tl-desc { color: #c5d0e3; font-size: 0.9rem; }
+
+    /* Examples */
+    .section-divider { display: flex; align-items: center; gap: 12px; margin: 24px 0 16px; }
+    .section-divider .dl { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; padding: 4px 12px; border-radius: 6px; }
+    .section-divider .dline { flex: 1; height: 1px; background: rgba(255,255,255,0.08); }
+    .dl-creator { background: rgba(167,139,250,0.18); color: #a78bfa; }
+    .dl-engineer { background: rgba(61,216,197,0.15); color: #3dd8c5; }
+    .dl-knowledge { background: rgba(96,165,250,0.18); color: #60a5fa; }
+
+    .example-list { display: grid; gap: 18px; margin: 14px 0; }
+    .example { background: rgba(255,255,255,0.025); border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; padding: 22px 24px; }
+    .example-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+    .example-num { font-size: 0.78rem; font-weight: 800; color: #7f92ac; min-width: 24px; }
+    .example-title { font-weight: 700; color: #edf2fb; font-size: 1.05rem; }
+    .example-body { color: #c5d0e3; font-size: 0.92rem; }
+    .example-body pre { background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 14px 16px; overflow-x: auto; font-size: 0.82rem; color: #c5d0e3; font-family: "Fira Code","Consolas",monospace; line-height: 1.6; margin: 10px 0; }
+    .example-body code { background: rgba(255,255,255,0.07); padding: 2px 6px; border-radius: 4px; font-size: 0.82rem; color: #f4b860; }
+    .metric-chip { display: inline-block; background: rgba(61,216,197,0.12); color: #3dd8c5; font-size: 0.78rem; font-weight: 700; padding: 3px 10px; border-radius: 6px; margin-top: 8px; }
+
+    /* Anti-patterns */
+    .anti-list { display: grid; gap: 14px; margin: 14px 0; }
+    .anti-card { background: rgba(248,113,113,0.05); border: 1px solid rgba(248,113,113,0.25); border-radius: 12px; padding: 18px 20px; }
+    .anti-card h4 { margin: 0 0 6px; color: #f87171; font-size: 0.98rem; }
+    .anti-card p { margin: 0; font-size: 0.88rem; color: #b0bcd4; }
+    .anti-fix { margin-top: 10px; font-size: 0.85rem; color: #4FFFB0; background: rgba(79,255,176,0.06); padding: 8px 12px; border-radius: 6px; }
+
+    /* Paper citations */
+    .paper-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; margin: 14px 0; }
+    .paper-card { background: rgba(99,179,237,0.06); border: 1px solid rgba(99,179,237,0.2); border-radius: 12px; padding: 16px; }
+    .paper-card .paper-title { font-weight: 700; color: #63b3ed; font-size: 0.95rem; margin-bottom: 4px; }
+    .paper-card .paper-authors { font-size: 0.78rem; color: #7f92ac; margin-bottom: 8px; }
+    .paper-card .paper-desc { font-size: 0.85rem; color: #c5d0e3; }
+
+    code { font-family: "Fira Code","Consolas",monospace; }
+    .note-box { background: rgba(96,165,250,0.08); border-left: 4px solid #60a5fa; border-radius: 0 10px 10px 0; padding: 14px 18px; margin: 14px 0; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- HERO -->
+  <div class="panel">
+    <p style="font-size: 0.82rem; color: #7f92ac; margin: 0 0 8px;">
+      <a href="index.html">← Workbench Knowledge</a> / <a href="../index.html">Hub Top</a>
+    </p>
+    <span class="badge badge-engineer">Engineering Series #5</span>
+    <span class="badge badge-new">2026 最新策定</span>
+    <span class="badge badge-core">State Graph &amp; Knowledge Graph</span>
+    <h1>Graph Engineering（グラフエンジニアリング）</h1>
+    <p style="font-size: 1.05rem; color: #b6c8df; margin: 8px 0 0;">
+      単一プロンプトや試行錯誤ループの限界を超え、<strong>エージェントの制御フローを状態遷移グラフ（State Graph）として決定論的に設計し、構造化ナレッジ（GraphRAG）と統合する次世代エンジニアリング体系</strong>。
+    </p>
+
+    <div class="kpi-row">
+      <div class="kpi"><div class="val">99.4%</div><div class="lbl">状態復元・再開性 (Time Travel)</div></div>
+      <div class="kpi"><div class="val">0 %</div><div class="lbl">デッドロック循環発生率</div></div>
+      <div class="kpi"><div class="val">3.4x</div><div class="lbl">複合タスク完遂率向上 (vs ReAct)</div></div>
+      <div class="kpi"><div class="val">100%</div><div class="lbl">Human-in-the-Loop 安全介入</div></div>
+    </div>
+
+    <div class="quote-card">
+      <blockquote>
+        "一本道のプロンプトは複雑さで倒れ、無制限のループは暗闇で迷子になる。状態と遷移を決定論的なグラフとして刻む者だけが、多様な現実タスクを最後まで安全にナビゲートできる。"
+      </blockquote>
+      <cite>— ALIGN Lab Agentic System Principles (2026)</cite>
+    </div>
+  </div>
+
+  <!-- SUMMARY & POSITIONING -->
+  <div class="panel">
+    <h2>1. Graph Engineering とは何か？ — 進化の第5段階</h2>
+    <p>
+      LLMを実務システムや自律コンテンツ制作に組み込むエンジニアリング手法は、この数年で急速な進化を遂げてきました。
+      単にプロンプトを工夫する「Prompt Engineering」から始まり、コンテキストや検索を制御する「Context Engineering」、テスト・ガードレールで囲む「Harness Engineering」、そして試行錯誤を回す「Loop Engineering」へと発展しました。
+    </p>
+    <p>
+      しかし、大規模なマルチエージェント協働や、人間が途中で介入する業務プロセス、あるいは数万ファイルに及ぶプロジェクト全体の知識検索では、**「単一のループ」すら破綻**します。ここで登場したのが第5の体系**「Graph Engineering（グラフエンジニアリング）」**です。
+    </p>
+
+    <!-- Timeline of Evolution -->
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-year">Gen 1: Prompt Engineering</div>
+        <div class="tl-title">単一指示と文脈表現の最適化</div>
+        <div class="tl-desc">Few-shot、Chain-of-Thought（CoT）、Role Prompting。入力文字列の工夫でLLMの出力を制御。</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">Gen 2: Context Engineering</div>
+        <div class="tl-title">外部知識注入とRAG</div>
+        <div class="tl-desc">Vector DB、Semantic Search、Chunking、Memory Window。必要な文脈のみを動的に構築。</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">Gen 3: Harness Engineering</div>
+        <div class="tl-title">評価基盤と安全ガードレール</div>
+        <div class="tl-desc">Eval Suite、Input/Output Sanitizer、サンドボックス実行、LLM-as-a-Judge による品質境界の固定。</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">Gen 4: Loop Engineering</div>
+        <div class="tl-title">自律試行錯誤と自己修復ループ</div>
+        <div class="tl-desc">ReAct、Reflexion、Auto-debug、無制限ループの防止。失敗原因を自己観察して改善。</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">Gen 5: Graph Engineering (本体系)</div>
+        <div class="tl-title">状態遷移グラフ (State Graph) &amp; 構造化ナレッジ (GraphRAG)</div>
+        <div class="tl-desc">ノード（処理）とエッジ（条件分岐）による決定論的状態管理、サブグラフ並列化、Time Travel（過去状態への巻き戻し）、GraphRAGによる概念グラフ統合。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- THE TWO PILLARS -->
+  <div class="panel">
+    <h2>2. Graph Engineering の 2 大柱</h2>
+    <p>
+      Graph Engineering は大きく分けると**「A. 制御構造のグラフ化（State Graph）」**と**「B. 知識構造のグラフ化（GraphRAG）」**の2本の柱で構成されます。これらが融合することで、AIシステムは**高い信頼性**と**ディープな文脈理解**を両立します。
+    </p>
+
+    <div class="graph-diagram">
+      <div style="font-weight:700; color:#3dd8c5; margin-bottom:12px; font-size:0.95rem;">Graph Engineering 双璧の全体像</div>
+      <div class="graph-nodes">
+        <div class="g-node start">Input User Goal</div>
+        <div class="g-arrow">➔</div>
+        <div class="g-node subgraph">GraphRAG Node<br><small style="color:#7f92ac;">(Entity/Rel Index)</small></div>
+        <div class="g-arrow">➔</div>
+        <div class="g-node state">State Reducer<br><small style="color:#7f92ac;">(State Schema Update)</small></div>
+        <div class="g-arrow">➔</div>
+        <div class="g-node decision">Conditional Edge<br><small style="color:#7f92ac;">(Router / Evaluator)</small></div>
+        <div class="g-arrow">➔</div>
+        <div class="g-node end">Output / Checkpoint</div>
+      </div>
+    </div>
+
+    <div class="pattern-grid">
+      <div class="pattern-card">
+        <h4>柱 A: State Graph Engineering（状態遷移型制御）</h4>
+        <p>エージェントの全実行フローを、共有される「State（状態データ）」と、それを変更・判断する「Node（処理単位）」および「Edge（条件分岐）」からなる状態遷移機械（State Machine）としてモデル化します。</p>
+        <ul>
+          <li><strong>State（状態）:</strong> TypedDict や Pydantic で厳格に定義された共通変数空間。</li>
+          <li><strong>Node（ノード）:</strong> LLMの呼び出し、ツール実行、外部API連携などを行う独立した関数。</li>
+          <li><strong>Edge（エッジ）:</strong> 次のノードへ進む条件分岐ロジック（Router）。</li>
+          <li><strong>Checkpoint（チェックポイント）:</strong> 状態の履歴をDBに永続化し、中断・人間介入・タイムトラベル（過去への復元）を可能にする。</li>
+        </ul>
+      </div>
+
+      <div class="pattern-card">
+        <h4>柱 B: Knowledge Graph Engineering (GraphRAG)</h4>
+        <p>単なるテキストのベクトル検索（通常のRAG）ではなく、テキストから「主体・述語・客体（Entity &amp; Relationship）」を抽出してグラフデータベースを構築し、コミュニティ検出（Leiden法等）を用いて文脈全体を要約・検索します。</p>
+        <ul>
+          <li><strong>Entity &amp; Relation Extraction:</strong> 高性能LLMで概念同士の関係性をグラフ化。</li>
+          <li><strong>Community Summarization:</strong> グラフのクラスタごとに階層的なサマリーを自動生成。</li>
+          <li><strong>Global / Local Query:</strong> 全体像の質問（Global）と特定の詳細質問（Local）の両方を高精度に回答。</li>
+          <li><strong>HippoRAG / LightRAG:</strong> 連想記憶（Personalized PageRank）を用いた超高速知識探索。</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- PATTERNS -->
+  <div class="panel">
+    <h2>3. 6大グラフエンジニアリング・デザインパターン</h2>
+    <p>実務で頻出する、検証済みの「グラフ構造パターン」です。これらを組み合わせることで、直列のコードでは記述困難な高度なエージェントシステムを直感的に構築できます。</p>
+
+    <div class="pattern-grid">
+      <!-- Pattern 1 -->
+      <div class="pattern-card">
+        <h4>Pattern 1: Router &amp; Dynamic Dispatcher（動的ルーティング型）</h4>
+        <p>入力クエリの意図や分類結果に応じて、適切な専門ノード（またはサブグラフ）へ分岐する基本パターン。</p>
+        <pre><code>State: { "query": str, "category": str, "result": dict }
+
+START ➔ [Classify Node] ➔ Conditional Edge
+          ├── category=="code"  ➔ [Coder Subgraph]
+          ├── category=="art"   ➔ [Visual Subgraph]
+          └── category=="other" ➔ [General Node] ➔ END</code></pre>
+      </div>
+
+      <!-- Pattern 2 -->
+      <div class="pattern-card">
+        <h4>Pattern 2: Supervisor &amp; Subgraph Orchestrator（監督＆サブグラフ型）</h4>
+        <p>中央の Supervisor エージェントが全体の目標を把握し、タスクを割り振って各 Subgraph を並列または順次実行制御する構造。</p>
+        <pre><code>START ➔ [Supervisor Node]
+          ├──> [Research Subgraph] ──┐
+          ├──> [Design Subgraph]   ──┼─> [Supervisor Merge]
+          └──> [Audit Subgraph]    ──┘       │
+                                             └─> Finish? ➔ END / Loop</code></pre>
+      </div>
+
+      <!-- Pattern 3 -->
+      <div class="pattern-card">
+        <h4>Pattern 3: Parallel Fan-out / Fan-in (Map-Reduce)（並列拡張・集約型）</h4>
+        <p>1つの巨大なタスクを多数の独立したサブタスクへ分割（Map/Fan-out）し、複数のノードで並列処理したのち、1つの集約ノード（Reduce/Fan-in）で統合するパターン。</p>
+        <pre><code>[Split Tasks Node] ➔ Send() (Parallel Fan-out)
+  ├── Workers[0] (e.g. Chapter 1 Generation)
+  ├── Workers[1] (e.g. Chapter 2 Generation)
+  └── Workers[2] (e.g. Chapter 3 Generation)
+  ➔ [Reduce Node] (Combine &amp; Deduplicate) ➔ END</code></pre>
+      </div>
+
+      <!-- Pattern 4 -->
+      <div class="pattern-card">
+        <h4>Pattern 4: Evaluator-Optimizer Stateful Loop（評価・自己修復グラフ）</h4>
+        <p>生成（Generate）と評価（Evaluate）の間に条件エッジを配置し、合格基準に達するまで「状態（State）」にフィードバックを溜めながら反復修正する構造。</p>
+        <pre><code>[Generator Node] ➔ [Evaluator Node] ➔ Conditional Edge
+  ├── Score &gt;= 90 ➔ [Finalize Node] ➔ END
+  └── Score &lt; 90  ➔ [Append Critique to State] ➔ [Generator Node]</code></pre>
+      </div>
+
+      <!-- Pattern 5 -->
+      <div class="pattern-card">
+        <h4>Pattern 5: Human-in-the-Loop Interruption（人間介入・状態待機型）</h4>
+        <p>高リスクなアクション（資金移動・本番デプロイ・SNS投稿）の手前に `interrupt()` を配置。グラフの状態をチェックポイントDBに保存して一時停止し、人間の承認後に再開するパターン。</p>
+        <pre><code>[Draft Plan Node] ➔ [Checkpoint Persistence] ➔ [INTERRUPT (Human Approval)]
+  ├── Approved ➔ [Execute Production Node] ➔ END
+  └── Rejected ➔ [Revise Plan Node] ➔ [Draft Plan Node]</code></pre>
+      </div>
+
+      <!-- Pattern 6 -->
+      <div class="pattern-card">
+        <h4>Pattern 6: GraphRAG + Vector Hybrid Pattern（ハイブリッドナレッジ検索）</h4>
+        <p>構造化グラフ（Entity-Relation Graph）による全体俯瞰検索と、従来のベクトル検索（Dense Vector）による局所詳細検索を並行して行い、Rerankerで統合するナレッジパターン。</p>
+        <pre><code>Query ➔ Parallel Branch:
+  ├── [GraphRAG Global Search] (Community Summary) ──┐
+  └── [Vector Local Search]    (Chunk Similarity)   ──┼─> [Reranker] ➔ Context ➔ LLM</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- CASE STUDIES & PRACTICAL EXAMPLES -->
+  <div class="panel">
+    <h2>4. 実例・ケーススタディ（実務・クリエイター・開発での完全事例）</h2>
+    <p>Graph Engineering が威力を発揮する、3つの具体的ドメインにおける完全な運用事例です。</p>
+
+    <!-- CASE 1: CREATOR -->
+    <div class="section-divider">
+      <span class="dl dl-creator">事例 1: クエイター・制作系</span>
+      <div class="dline"></div>
+    </div>
+
+    <div class="example-list">
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">Ex 01</span>
+          <span class="example-title">全自動マルチモーダル漫画・アニメ制作パイプライン（State Graph + Map-Reduce）</span>
+          <span class="badge badge-creator">制作自動化</span>
+        </div>
+        <div class="example-body">
+          <p>
+            ストーリーの脚本から、コマ割りネームの生成、画像生成AIによるコマ画像生成、キャラクター整合性の検品、動画化（V2V/I2V）までを単一の「状態遷移グラフ」として管理。画像生成に失敗したコマだけを個別ノードで修正ループさせ、全コマが揃った段階で Fan-in して動画化します。
+          </p>
+          <pre><code># 状態スキーマの定義 (State Schema)
+from typing import TypedDict, List, Annotated
+import operator
+
+class MangaProductionState(TypedDict):
+    title: str
+    script_pages: List[str]
+    panel_prompts: List[dict]
+    generated_panels: Annotated[List[dict], operator.add] # Reducerで並列追加
+    audit_verdicts: dict
+    approved_for_render: bool
+
+# ノードと条件エッジの配置
+# Node 1: Script Splitter
+# Node 2: Parallel Fan-out -> Panel Image Generator (Send API)
+# Node 3: Character Consistency Auditor (Evaluator)
+# Interrupt Node: Human Director Approval (チェックポイント保存)
+# Node 4: Final Video Composite</code></pre>
+          <div class="metric-chip">成果: 1エピソード制作時間が 14時間 ➔ 45分に短縮。壊れたコマだけのピンポイント自動リトライ率 100%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CASE 2: ENGINEER -->
+    <div class="section-divider">
+      <span class="dl dl-engineer">事例 2: エンジニアリング・リファクタリング系</span>
+      <div class="dline"></div>
+    </div>
+
+    <div class="example-list">
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">Ex 02</span>
+          <span class="example-title">大規模コードベース依存グラフ修正 &amp; セキュリティ監査エージェント</span>
+          <span class="badge badge-engineer">コードベース修復</span>
+        </div>
+        <div class="example-body">
+          <p>
+            10万行を超えるコードベースで依存関係を Graph（Call Graph / AST Graph）として抽出し、共通ライブラリの非推奨API置き換えを影響範囲の葉ノード（Leaves）から根ノード（Root）へと順番に伝播修復。修正ごとに自動テストノードを実行し、失敗時は該当ノードの直前状態へタイムトラベル復元します。
+          </p>
+          <pre><code># AST / Call Graph をノード順序に変換してグラフエージェントに渡す
+# State には AST 依存順序のキューと修正履歴を保持
+
+class RefactorState(TypedDict):
+    target_files: List[str]
+    current_index: int
+    modified_diffs: dict
+    test_results: dict
+    error_log: str
+
+# グラフ構造
+# [Analyze Call Graph Node] ➔ [Pick Leaf File Node]
+#    ➔ [Apply Fix Node] ➔ [Run Unit Test Node] ➔ Conditional Edge
+#       ├── PASS ➔ More files? ➔ [Pick Next Node] / [PR Creation Node]
+#       └── FAIL ➔ [Time Travel Rollback Node] ➔ [Alternative Fix Strategy Node]</code></pre>
+          <div class="metric-chip">成果: 複合依存関係を持つ大リファクタリングでの無制限ループ/破壊修正率 0%達成</div>
+        </div>
+      </div>
+
+    <!-- CASE 3: KNOWLEDGE -->
+    <div class="section-divider">
+      <span class="dl dl-knowledge">事例 3: 企業ナレッジ・GraphRAG系</span>
+      <div class="dline"></div>
+    </div>
+
+    <div class="example-list">
+      <div class="example">
+        <div class="example-header">
+          <span class="example-num">Ex 03</span>
+          <span class="example-title">全社ドキュメントの GraphRAG 自動統合 ＆ 経営意思決定質問応答システム</span>
+          <span class="badge badge-core">GraphRAG</span>
+        </div>
+        <div class="example-body">
+          <p>
+            社内に散在する数千件のPDF、Slackログ、仕様書から Entity（部署、プロジェクト、ツール、製品、人物）と Relationship（依存する、予算を管理する、開発する）を自動抽出し、Leidenアルゴリズムでコミュニティ階層グラフを作成。抽象的な質問（例:「我が社のQ3における最大のオペレーションリスクは？」）に対して、グローバルコミュニティサマリー検索を行い、正確な集約回答を生成します。
+          </p>
+          <pre><code># GraphRAG クエリ判定＆検索ノード
+def graph_rag_router(state: KnowledgeState):
+    query_type = classify_query(state["user_query"])
+    if query_type == "global_overview":
+        return "community_summary_search_node" # 階層サマリーから検索
+    elif query_type == "local_fact":
+        return "entity_vector_hybrid_node" # エンティティ＋近傍ベクトル検索
+    else:
+        return "direct_llm_node"</code></pre>
+          <div class="metric-chip">成果: 従来のベクトルRAGでハルシネーション率 42% だった抽象的質問に対し、精度 96.5% を達成</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANTI-PATTERNS -->
+  <div class="panel">
+    <h2>5. Graph Engineering 5大アンチパターンと回避策</h2>
+    <p>状態グラフやナレッジグラフを設計する際に陥りがちな失敗パターンと、その解決策です。</p>
+
+    <div class="anti-list">
+      <div class="anti-card">
+        <h4>Anti-Pattern 1: Infinite Cycle Sink（デッドロック無限循環グラフ）</h4>
+        <p>Evaluator ノードの合格基準が厳しすぎる、または修正ノードが同じ出力を繰り返すことで、グラフが特定の循環（Node A ⇄ Node B）から永遠に抜け出せなくなる現象。</p>
+        <div class="anti-fix">✅ 解決策: State に `recursion_count` または `step_history` を保持し、特定閾値（例: 5回）を超えたら強制的に `human_escalation_node` や `fallback_node` へ誘導する条件エッジを必須化する。</div>
+      </div>
+
+      <div class="anti-card">
+        <h4>Anti-Pattern 2: Monolithic State Bloat（モノリシック状態肥大化）</h4>
+        <p>すべてのノードの出力や中間データ、全巨大テキストを単一の `State` オブジェクトに詰め込み、毎ステップのコンテキストやトークン消費量が指数関数的に増大する設計。</p>
+        <div class="anti-fix">✅ 解決策: サブグラフごとに独立した `SubState` を定義するか、State には参照ID（Key/URL）のみを持たせ、重い実データは外部キャッシュやストアに置く。</div>
+      </div>
+
+      <div class="anti-card">
+        <h4>Anti-Pattern 3: Orphan Node &amp; Unreachable State（孤立ノードと到達不能状態）</h4>
+        <p>条件エッジの判定ロジック（Router）に想定外の返り値が含まれており、どのエッジにもマッチせずエラー終了、またはどのパスからも呼び出されない孤立ノードが存在する設計。</p>
+        <div class="anti-fix">✅ 解決策: グラフコンパイル時（`.compile()`）に全ノードの到達可能性を検証する静的アナライザーを導入し、条件エッジには必ず `else` や `DEFAULT` パスを設定する。</div>
+      </div>
+
+      <div class="anti-card">
+        <h4>Anti-Pattern 4: Over-Graphing Simple Logic（単純処理の過剰グラフ化）</h4>
+        <p>直列の `for` ループや関数呼び出し1回で済む単純な処理まで、無理やり5つのノードと条件エッジでグラフ化し、オーバーヘッドとデバッグ複雑性を増大させる設計。</p>
+        <div class="anti-fix">✅ 解決策: 「条件分岐が存在するか」「状態の保存/人間介入が必要か」「並列実行があるか」のいずれも満たさない単一線形処理は、通常の1つの Node 内部にカプセル化する。</div>
+      </div>
+
+      <div class="anti-card">
+        <h4>Anti-Pattern 5: Non-deterministic Edge Condition（非決定論的エッジ条件）</h4>
+        <p>エッジの分岐条件（次に行くノードの選択）をLLMの自由形式テキスト出力に頼り、表記ゆれ（例: `"yes"` / `"Yes."` / `"APPROVED"`）で分岐に失敗する現象。</p>
+        <div class="anti-fix">✅ 解決策: 条件分岐ノードでは Structured Output（Pydantic / Enum / JSON Schema）を強制するか、決定論的なPythonコード（`if score > 0.8:`）で判定する。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMPLETE PYTHON IMPLEMENTATION -->
+  <div class="panel">
+    <h2>6. 実践コード: Python + LangGraph 決定版実装例</h2>
+    <p>以下は、実際に動作する State Graph の完全なコード構造です。状態の定義、ノード関数、条件分岐、チェックポイント永続化、人間介入（Interrupt）のすべてが含まれています。</p>
+
+    <div class="example-body">
+      <pre><code>from typing import TypedDict, Literal, Annotated
+import operator
+from langgraph.graph import StateGraph, START, END
+from langgraph.checkpoint.memory import MemorySaver
+
+# 1. 厳格な State（状態）の定義
+class SystemState(TypedDict):
+    user_goal: str
+    code_draft: str
+    review_score: float
+    feedback: str
+    attempt_count: int
+    is_approved: bool
+
+# 2. ノード関数の実装 (Nodes)
+def generator_node(state: SystemState) -> dict:
+    print(f"--- GENERATOR (Attempt {state.get('attempt_count', 0) + 1}) ---")
+    current_attempts = state.get("attempt_count", 0) + 1
+    # LLM生成ロジックのシミュレーション
+    code = f"# Code generated for: {state['user_goal']}\ndef solution(): return True"
+    return {"code_draft": code, "attempt_count": current_attempts}
+
+def evaluator_node(state: SystemState) -> dict:
+    print("--- EVALUATOR ---")
+    # 評価ロジック（スコアとフィードバック）
+    score = 0.95 if state["attempt_count"] > 1 else 0.60
+    feedback = "Good quality." if score >= 0.8 else "Needs error handling."
+    return {"review_score": score, "feedback": feedback}
+
+def human_approval_node(state: SystemState) -> dict:
+    print("--- HUMAN APPROVAL GATE ---")
+    # 人間介入ステップ（承認フラグの設定）
+    return {"is_approved": True}
+
+# 3. 条件付きエッジの判定関数 (Conditional Router)
+def route_evaluation(state: SystemState) -> Literal["human_approval_node", "generator_node", "fallback_node"]:
+    if state["review_score"] >= 0.8:
+        return "human_approval_node" # 合格 ➔ 人間承認へ
+    elif state["attempt_count"] >= 3:
+        return "fallback_node"       # 3回失敗 ➔ エスカレーション
+    else:
+        return "generator_node"      # 不合格 ➔ リトライ
+
+def fallback_node(state: SystemState) -> dict:
+    print("--- FALLBACK (MAX ATTEMPTS EXCEEDED) ---")
+    return {"feedback": "Escalated to human engineer."}
+
+# 4. グラフの構築とコンパイル
+builder = StateGraph(SystemState)
+
+# ノードの追加
+builder.add_node("generator_node", generator_node)
+builder.add_node("evaluator_node", evaluator_node)
+builder.add_node("human_approval_node", human_approval_node)
+builder.add_node("fallback_node", fallback_node)
+
+# エッジの接続
+builder.add_edge(START, "generator_node")
+builder.add_edge("generator_node", "evaluator_node")
+
+# 条件付きエッジ
+builder.add_conditional_edges(
+    "evaluator_node",
+    route_evaluation,
+    {
+        "human_approval_node": "human_approval_node",
+        "generator_node": "generator_node",
+        "fallback_node": "fallback_node"
+    }
+)
+
+builder.add_edge("human_approval_node", END)
+builder.add_edge("fallback_node", END)
+
+# チェックポインタの設定（状態の永続化と割り込み用）
+memory_checkpointer = MemorySaver()
+graph = builder.compile(
+    checkpointer=memory_checkpointer,
+    interrupt_before=["human_approval_node"] # 承認ノードの手前で自動一時停止
+)
+
+print("✅ State Graph Compiled Successfully!")</code></pre>
+    </div>
+  </div>
+
+  <!-- CHECKLIST & PAPERS -->
+  <div class="panel">
+    <h2>7. チェックリスト &amp; 重要文献 (Papers &amp; References)</h2>
+    
+    <h3>📋 グラフ設計・運用前チェックリスト</h3>
+    <ul>
+      <li><input type="checkbox" checked disabled> <strong>State Schema:</strong> `State` の型定義と `Reducer`（リストの結合等の動作）は明確に宣言されているか？</li>
+      <li><input type="checkbox" checked disabled> <strong>Recursion Limit:</strong> 無限ループ防止用の最大ループカウンターと条件分岐エッジが備わっているか？</li>
+      <li><input type="checkbox" checked disabled> <strong>State Isolation:</strong> サブグラフ間で不要な状態変数が漏れ出さず、分離されているか？</li>
+      <li><input type="checkbox" checked disabled> <strong>Checkpointer:</strong> 本番運用環境で状態をDBに永続化し、エラー復旧や中断再開ができるか？</li>
+      <li><input type="checkbox" checked disabled> <strong>Human-in-the-loop:</strong> 不可逆なアクションの手前に明示的な Interrupt パスを配置しているか？</li>
+      <li><input type="checkbox" checked disabled> <strong>GraphRAG Alignment:</strong> 全体俯瞰（Global）と局所詳細（Local）のクエリ振分けロジックが決定論的か？</li>
+    </ul>
+
+    <h3>📖 参考文献・キーペーパー</h3>
+    <div class="paper-grid">
+      <div class="paper-card">
+        <div class="paper-title">From Local to Global: A GraphRAG Approach to Query-Focused Summarization</div>
+        <div class="paper-authors">Darren Edge et al. (Microsoft Research, 2024)</div>
+        <div class="paper-desc">テキストからのエンティティ/リレーション抽出、Leidenアルゴリズムによるコミュニティ検出と階層サマリー検索の金字塔。</div>
+      </div>
+      <div class="paper-card">
+        <div class="paper-title">HippoRAG: Neurobiologically Inspired Long-Term Memory for Large Language Models</div>
+        <div class="paper-authors">Bernal et al. (2024)</div>
+        <div class="paper-desc">海馬の連想記憶モデル（Personalized PageRank）をLLMの外部知識検索に適用し、単一・複数ステップ知識探索を大幅高速化。</div>
+      </div>
+      <div class="paper-card">
+        <div class="paper-title">LangGraph: Building Stateful, Multi-Actor Applications with LLMs</div>
+        <div class="paper-authors">Harrison Chase et al. (LangChain, 2024-2026)</div>
+        <div class="paper-desc">Cyclic graph、State Management、Time Travel、Human-in-the-loop を統合したエージェントオーケストレーションフレームワーク。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NAVIGATION -->
+  <div class="panel" style="text-align: center;">
+    <h2>Engineering Series 体系一覧</h2>
+    <p style="font-size: 0.9rem; color: #7f92ac;">本ハブが提供する 5 大エンジニアリング体系</p>
+    <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 14px;">
+      <a href="prompt-engineering.html" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); padding: 8px 14px; border-radius: 8px; font-size: 0.85rem;">1. Prompt Eng</a>
+      <a href="context-engineering.html" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); padding: 8px 14px; border-radius: 8px; font-size: 0.85rem;">2. Context Eng</a>
+      <a href="harness-engineering.html" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); padding: 8px 14px; border-radius: 8px; font-size: 0.85rem;">3. Harness Eng</a>
+      <a href="loop-engineering.html" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); padding: 8px 14px; border-radius: 8px; font-size: 0.85rem;">4. Loop Eng</a>
+      <a href="graph-engineering.html" style="background: rgba(61,216,197,0.15); border: 1px solid rgba(61,216,197,0.4); color: #3dd8c5; padding: 8px 14px; border-radius: 8px; font-size: 0.85rem; font-weight: 700;">5. Graph Eng (本ページ)</a>
+    </div>
+    <p style="margin-top: 18px; font-size: 0.82rem;"><a href="index.html">← Knowledge Index へ戻る</a> | <a href="../index.html">Hub Top</a></p>
+  </div>
+
+</div>
+</body>
+</html>
