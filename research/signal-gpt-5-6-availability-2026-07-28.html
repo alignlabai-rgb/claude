@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GPT-5.6 利用可否を4つのsurfaceで読む | Research</title>
+  <style>
+    :root {
+      --bg: #07111d;
+      --panel: #0d1829;
+      --panel-2: #101f34;
+      --text: #e8eef9;
+      --muted: #b6c3da;
+      --soft: #7f92ac;
+      --border: rgba(255,255,255,0.09);
+      --accent: #66e0c2;
+      --amber: #f4b860;
+      --red: #ff8585;
+      --green: #78e6a7;
+      --shadow: 0 12px 36px rgba(0,0,0,0.28);
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 12% 12%, rgba(102,224,194,0.14), transparent 28%),
+        radial-gradient(circle at 88% 2%, rgba(244,184,96,0.11), transparent 24%),
+        linear-gradient(145deg, #07111d 0%, #0a1422 52%, #060d18 100%);
+      color: var(--text);
+      font-family: "Segoe UI", "Noto Sans JP", system-ui, sans-serif;
+      line-height: 1.72;
+      padding: 28px 18px 80px;
+    }
+    a { color: var(--accent); }
+    .shell { max-width: 1120px; margin: 0 auto; display: grid; gap: 18px; }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px 26px;
+    }
+    .hero { background: linear-gradient(135deg, rgba(102,224,194,0.08), rgba(244,184,96,0.08)), var(--panel); }
+    .breadcrumb, .small { color: var(--soft); font-size: .82rem; }
+    .eyebrow {
+      display: inline-flex;
+      margin: 8px 0 12px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      background: rgba(102,224,194,0.12);
+      color: var(--accent);
+      font-size: .72rem;
+      font-weight: 800;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    h1, h2, h3 { margin: 0 0 10px; }
+    h1 { font-size: clamp(1.9rem, 5vw, 3.3rem); line-height: 1.15; }
+    h2 { color: var(--amber); font-size: 1.2rem; }
+    h3 { font-size: 1rem; }
+    p, li, td { color: var(--muted); }
+    strong { color: var(--text); }
+    code {
+      font-family: "Fira Code", "Consolas", monospace;
+      background: rgba(255,255,255,0.06);
+      padding: .12rem .4rem;
+      border-radius: 6px;
+      color: #a5f3d0;
+    }
+    .verdict {
+      margin-top: 16px;
+      padding: 16px 18px;
+      border-left: 4px solid var(--amber);
+      border-radius: 10px;
+      background: rgba(244,184,96,0.08);
+    }
+    .status {
+      display: inline-block;
+      margin-right: 6px;
+      padding: 3px 9px;
+      border: 1px solid currentColor;
+      border-radius: 999px;
+      font-size: .72rem;
+      font-weight: 800;
+    }
+    .ok { color: var(--green); }
+    .warn { color: var(--amber); }
+    .risk { color: var(--red); }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 840px; font-size: .88rem; }
+    th {
+      padding: 11px 10px;
+      border-bottom: 2px solid rgba(244,184,96,0.3);
+      color: var(--amber);
+      text-align: left;
+      vertical-align: bottom;
+    }
+    td { padding: 12px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .card { padding: 17px; border: 1px solid var(--border); border-radius: 13px; background: var(--panel-2); }
+    .copy {
+      padding: 15px 17px;
+      border: 1px dashed rgba(102,224,194,0.45);
+      border-radius: 12px;
+      background: rgba(102,224,194,0.05);
+    }
+    .sources li { margin-bottom: 10px; }
+    @media (max-width: 760px) {
+      .grid { grid-template-columns: 1fr; }
+      .panel { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="panel hero">
+      <div class="breadcrumb"><a href="index.html">Research</a> / <a href="chatgpt-recent-updates.html">ChatGPT tracker</a> / <a href="../index.html">Hub Top</a></div>
+      <div class="eyebrow">Curator Signal Packet · Official-source audit</div>
+      <h1>GPT-5.6の「使える」を<br>4つのsurfaceで読み分ける</h1>
+      <p>GPT-5.6 Sol / Terra / Lunaの一般提供は確認できました。ただし、<strong>GA、標準ChatGPTでの選択、ChatGPT Workの利用、Codexでの利用、API提供は同じ意味ではありません</strong>。このページは2026年7月28日時点の公式情報だけで、利用可否の境界を整理したローカル公開候補です。</p>
+      <div class="verdict">
+        <span class="status warn">要修正候補</span>
+        <strong>「GPT-5.6がGA」だけでは読者が実際に使える場所を判断できません。</strong>
+        <p>既存トラッカーのGA・価格・モデルIDの骨格は公式情報と整合します。一方、「ChatGPTで利用可能」という表現にはsurfaceとplanを必ず添える必要があります。</p>
+      </div>
+      <p class="small">観測: 2026-07-28 JST · source class: OpenAI公式のみ · provider実行なし · 公開反映未承認</p>
+    </section>
+
+    <section class="panel">
+      <h2>先に結論</h2>
+      <div class="grid">
+        <article class="card">
+          <h3><span class="status ok">確認済み</span> モデルファミリー</h3>
+          <p>APIの現行モデルは <code>gpt-5.6-sol</code>、<code>gpt-5.6-terra</code>、<code>gpt-5.6-luna</code>。<code>gpt-5.6</code> aliasはSolへrouteします。</p>
+        </article>
+        <article class="card">
+          <h3><span class="status risk">誤読注意</span> 標準ChatGPT</h3>
+          <p>TerraとLunaは標準ChatGPT会話では選択できません。GPT-5.5 Instantが高速応答のdefaultで、Solは対象planのreasoning optionを担当します。</p>
+        </article>
+        <article class="card">
+          <h3><span class="status warn">surface依存</span> ChatGPT Work</h3>
+          <p>desktop版のWork入口は全planに提供されていますが、web/mobileはFree・Goを除くplanへ展開。さらに、Work内で使えるGPT-5.6 modelはplan別です。</p>
+        </article>
+        <article class="card">
+          <h3><span class="status ok">明示済み</span> Codex / API</h3>
+          <p>CodexではFree・GoにTerra、Plus / Pro / Business / EnterpriseにSol・Terra・Luna。APIでは3モデルすべてが提供されています。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>公式情報から作った利用可否マトリクス</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>surface</th>
+              <th>Free / Go</th>
+              <th>公式に列挙された対象plan</th>
+              <th>モデル境界</th>
+              <th>安全な読み方</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>標準ChatGPT会話</strong></td>
+              <td>GPT-5.6 Solなし。GoのThinkingもSolではない</td>
+              <td>Plus: Medium / High<br>Pro・Business・Enterprise: plan別にExtra High / Proを含む</td>
+              <td>Terra / Lunaは選択不可。InstantはGPT-5.5</td>
+              <td>「ChatGPTにGPT-5.6」と書く場合はSolとreasoning optionを明記</td>
+            </tr>
+            <tr>
+              <td><strong>ChatGPT Work<br>desktop</strong></td>
+              <td>Work入口は提供。ただしFree / Goで使う基盤modelは今回の公式資料から断定しない</td>
+              <td>desktop app自体は全plan・Mac / Windowsで提供</td>
+              <td>Help CenterがWork内のSol / Terra / Lunaを明示するのはPlus / Pro / Business / Enterprise</td>
+              <td>feature availabilityとmodel availabilityを分離</td>
+            </tr>
+            <tr>
+              <td><strong>ChatGPT Work<br>web / mobile</strong></td>
+              <td>Free / Goは対象外</td>
+              <td>Pro / Enterprise / Eduから開始し、Plus / Businessへ展開</td>
+              <td>plan・workspace設定・rollout状態に依存</td>
+              <td>「全plan」はdesktop限定。web / mobileへ一般化しない</td>
+            </tr>
+            <tr>
+              <td><strong>Codex</strong></td>
+              <td>Terra</td>
+              <td>Plus / Pro / Business / Enterprise: Sol / Terra / Luna</td>
+              <td>planによって選択肢が異なる</td>
+              <td>Codexの可用性を標準ChatGPTのmodel pickerへ転用しない</td>
+            </tr>
+            <tr>
+              <td><strong>OpenAI API</strong></td>
+              <td>ChatGPT planとは別契約・別利用面</td>
+              <td>API accessのあるdeveloper</td>
+              <td>Sol / Terra / Luna。alias <code>gpt-5.6</code>はSol</td>
+              <td>ChatGPT planの加入をAPI利用可否の根拠にしない</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="small">注: 公式ページ間で列挙対象が異なる場合、書かれていないplanを推測で補完していません。rolloutとworkspace admin設定も実際の表示へ影響します。</p>
+    </section>
+
+    <section class="panel">
+      <h2>既存トラッカーへ適用できる安全な修正文</h2>
+      <p><a href="chatgpt-recent-updates.html">ChatGPT / OpenAI最新アップデート</a>の「GPT-5.6 GA」「ChatGPT Work」記述を置き換える場合は、次の粒度なら一次情報の天井を越えません。</p>
+      <div class="copy">
+        <p><strong>修正文候補:</strong> GPT-5.6 Sol / Terra / Lunaは2026年7月9日に一般提供へ移行した。APIでは3モデルすべてを利用できる。標準ChatGPT会話では対象planのreasoning optionをSolが担い、Terra / Lunaは選択できない。ChatGPT Workはdesktop版では全planに入口がある一方、web / mobileはFree・Goを除くplanへ展開され、利用できるmodelもplanとworkspace設定に依存する。CodexではFree・GoにTerra、Plus / Pro / Business / EnterpriseにSol・Terra・Lunaが提供される。</p>
+      </div>
+      <p class="small">このwaveでは既存トラッカー本文を変更していません。上記は公開反映前のローカル修正候補です。</p>
+    </section>
+
+    <section class="panel">
+      <h2>再利用できる「availability claim」チェック</h2>
+      <ol>
+        <li><strong>日付:</strong> 発表日、観測日、rollout完了日を混ぜない。</li>
+        <li><strong>surface:</strong> standard Chat / Work / Codex / API、desktop / web / mobileを分ける。</li>
+        <li><strong>plan:</strong> Free、Go、Plus、Pro、Business、Enterprise、Eduを「全ユーザー」で丸めない。</li>
+        <li><strong>対象:</strong> featureの入口と、そこで選べるmodelを分ける。</li>
+        <li><strong>状態語:</strong> preview、rolling out、GA、model picker表示を同義にしない。</li>
+        <li><strong>根拠:</strong> plan可否は公式Help / release notes、API model IDはDeveloper Docsを優先する。</li>
+        <li><strong>不明:</strong> 公式資料が列挙しないplanやsurfaceは推測せず「未確認」とする。</li>
+      </ol>
+    </section>
+
+    <section class="panel">
+      <h2>公式一次情報</h2>
+      <ul class="sources">
+        <li><a href="https://help.openai.com/en/articles/20001354-gpt-56-in-chatgpt">GPT-5.6 in ChatGPT — OpenAI Help Center</a><br><span class="small">標準ChatGPTのplan別option、Work / Codex / APIのmodel可用性、Terra / Lunaの標準Chat非対応。</span></li>
+        <li><a href="https://openai.com/index/chatgpt-for-your-most-ambitious-work/">ChatGPT is now a partner for your most ambitious work — OpenAI</a><br><span class="small">desktopは全plan、web / mobileは段階展開というsurface差。</span></li>
+        <li><a href="https://developers.openai.com/api/docs/models">Models — OpenAI API</a><br><span class="small">現行model ID、価格、context、reasoning effort。</span></li>
+        <li><a href="https://developers.openai.com/api/docs/guides/latest-model">Model guidance — OpenAI API</a><br><span class="small"><code>gpt-5.6</code> aliasとSol / Terra / Lunaの用途。</span></li>
+        <li><a href="https://openai.com/index/gpt-5-6/">GPT-5.6: Frontier intelligence that scales with your ambition — OpenAI</a><br><span class="small">2026-07-09の一般提供発表と3モデルのAPI価格。</span></li>
+      </ul>
+      <p class="small">全リンク最終確認: 2026-07-28 JST。第三者メディア、SNS、daily newsを事実根拠に使用していません。</p>
+    </section>
+
+    <section class="panel">
+      <h2>公開境界と状態</h2>
+      <p><span class="status ok">SECRET-FREE</span><span class="status warn">LOCAL CANDIDATE</span><span class="status risk">NOT PUBLISHED</span></p>
+      <p>個人情報、credential、未公開IP、内部作品情報、契約情報は含みません。OpenAI製品を実行せず、公開ページ・Git remote・課金状態を変更していません。公開反映と既存トラッカーの修正は別承認です。</p>
+    </section>
+  </main>
+</body>
+</html>
