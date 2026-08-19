@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>主要AIモデル公式差分 — 2026-08-19 | Research</title>
+  <meta name="description" content="2026年8月11日以降の主要AIモデル・coding agent・生成videoの差分を公式一次情報だけで確認した更新便。">
+  <style>
+    :root{color-scheme:dark;--bg:#07111c;--panel:#101d2c;--line:#29425c;--ink:#f3f7fb;--muted:#a9b9c9;--mint:#69dfc4;--amber:#efbd69;--blue:#7bb9ff;--red:#ff9292}
+    *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 12% 0,#173d4d 0,transparent 35rem),var(--bg);color:var(--ink);font:15px/1.75 system-ui,-apple-system,"Segoe UI","Noto Sans JP",sans-serif}a{color:var(--mint);text-underline-offset:3px}.shell{width:min(1120px,calc(100% - 32px));margin:auto}header{padding:54px 0 30px;border-bottom:1px solid var(--line)}main{padding:26px 0 70px}.eyebrow{color:var(--mint);font-size:.72rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase}h1{font-size:clamp(2.4rem,7vw,5.4rem);line-height:.98;letter-spacing:-.055em;margin:.55rem 0 1rem}h2{font-size:1.22rem;margin:0 0 .65rem}h3{font-size:1rem;margin:.1rem 0 .45rem}p{color:#d2dce6;margin:.45rem 0}.lead{font-size:1.05rem;max-width:900px}.meta,.small{font-size:.8rem;color:var(--muted)}.legend,.grid,.method{display:grid;gap:12px}.legend{grid-template-columns:repeat(3,1fr);margin-top:22px}.legend>div,.card,.notice,.method>div{border:1px solid var(--line);border-radius:14px;background:rgba(16,29,44,.92);padding:16px}.grid{grid-template-columns:repeat(2,1fr)}.badge{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:3px 8px;font-size:.67rem;font-weight:800;letter-spacing:.04em}.confirmed{color:var(--mint);border-color:#397965}.unchanged{color:var(--blue);border-color:#426d98}.radar{color:var(--amber);border-color:#775f31}.stop{color:var(--red);border-color:#884747}.facts{padding-left:1.2rem;color:#d1dce6}.facts li+li{margin-top:.42rem}.source{border-top:1px solid var(--line);padding-top:10px;margin-top:12px;font-size:.78rem;color:var(--muted)}.source a{margin-right:9px}.notice{margin:18px 0;border-left:4px solid var(--amber)}.method{grid-template-columns:repeat(5,1fr);margin-top:12px}.method b{display:block;color:var(--mint);font-size:.72rem}.method span{display:block;color:var(--muted);font-size:.8rem;margin-top:5px}code{background:#182b40;color:#b8efdb;padding:.08rem .34rem;border-radius:5px}footer{border-top:1px solid var(--line);padding:22px 0 35px;color:var(--muted);font-size:.8rem}@media(max-width:780px){.legend,.grid,.method{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<header><div class="shell">
+  <p class="meta"><a href="index.html">← Research</a> / <a href="llm-tracker.html">LLM Tracker</a> / <a href="../index.html">Hub Top</a></p>
+  <div class="eyebrow">Official-source delta · checked 2026-08-19 JST</div>
+  <h1>8月11日以降の<br>公式差分</h1>
+  <p class="lead">Claude NewsとGrokPulseは候補発見に使い、現行層へはprovider公式docs、release notes、公式repositoryでexact-readできた内容だけを昇格します。今回はmodelだけでなく、coding agent、deprecated endpoint、video familyのsurface差も更新対象です。</p>
+  <div class="legend">
+    <div><span class="badge confirmed">PRIMARY_CONFIRMED</span><h3>現行層へ反映</h3><p class="small">model ID、日付、surfaceまたは公式repositoryまで確認。</p></div>
+    <div><span class="badge unchanged">CHECKED / UNCHANGED</span><h3>変化なしも記録</h3><p class="small">速報があっても公式面が変わらないproviderは現行値を維持。</p></div>
+    <div><span class="badge radar">RADAR_ONLY</span><h3>昇格しない</h3><p class="small">X、ニュース、第三者記事だけのclaimは現在判断へ使わない。</p></div>
+  </div>
+</div></header>
+
+<main class="shell">
+  <section class="grid">
+    <article class="card">
+      <span class="badge confirmed">PRIMARY_CONFIRMED</span>
+      <h2>Google — Gemini 3.7 Flash GA</h2>
+      <ul class="facts">
+        <li>Gemini API changelogは<strong>2026-08-13</strong>に<code>gemini-3.7-flash</code>のGAを記録。</li>
+        <li>coding、web development、agentic workflow向けの現行workhorseとして、3.6 Flashからcurrent layerを更新。</li>
+        <li>Imagen 4の<code>generate</code> / <code>ultra</code> / <code>fast</code>の3 model IDは<strong>8月17日停止</strong>。公式のrecommended replacementは3件とも<code>gemini-3.1-flash-image</code>。歴史記事のImagen 4は削除せず、current実装例からは外す。</li>
+      </ul>
+      <p class="source"><a href="https://ai.google.dev/gemini-api/docs/changelog">Gemini API changelog</a><a href="https://ai.google.dev/gemini-api/docs/models/gemini-3.7-flash">Gemini 3.7 Flash</a><a href="https://ai.google.dev/gemini-api/docs/deprecations">Deprecations</a></p>
+    </article>
+
+    <article class="card">
+      <span class="badge confirmed">PRIMARY_CONFIRMED</span>
+      <h2>xAI — Grok 4.6</h2>
+      <ul class="facts">
+        <li>公式model docsに<code>grok-4.6</code>を掲載。text / image input、text output、500K prompt、function calling、structured output、reasoningを確認。</li>
+        <li>Grok Build、API frontier、Xのrealtime data、Imagineを同じsurfaceとして扱わない。</li>
+        <li>公式model pageとしてsurfaceしていない内部catalog名は、現行flagshipへ自動昇格しない。</li>
+      </ul>
+      <p class="source"><a href="https://docs.x.ai/developers/grok-4-6">xAI — Grok 4.6</a><a href="grok-recent-updates.html">Hub tracker</a></p>
+    </article>
+
+    <article class="card">
+      <span class="badge confirmed">PRIMARY_CONFIRMED</span>
+      <h2>Alibaba — Qwen3.8 open weights</h2>
+      <ul class="facts">
+        <li>公式repositoryは<strong>8月12日</strong>にQwen3.8-2.4T-A95B、<strong>8月14日</strong>にQwen3.8-27Bのweight公開を記録。</li>
+        <li>「Qwen Codeでpreviewを選べる」から、「Max-classを含むdownloadable familyがある」へ状態が変わった。</li>
+        <li>repository licenseと各weightのlicenseは混同せず、利用前にmodel card単位で確認する。</li>
+      </ul>
+      <p class="source"><a href="https://github.com/QwenLM/Qwen3.8">Qwen3.8 official repository</a><a href="https://huggingface.co/collections/Qwen/qwen38">Official Hugging Face collection</a></p>
+    </article>
+
+    <article class="card">
+      <span class="badge confirmed">PRIMARY_CONFIRMED</span>
+      <h2>DeepSeek — V4 API alias更新</h2>
+      <ul class="facts">
+        <li><code>deepseek-v4-pro</code>はDeepSeek-V4-Pro-0813へ、<code>deepseek-v4-flash</code>はV4-Flash-0731へ更新。</li>
+        <li>呼び出しaliasは変わらないため、固定aliasを使う実装では中身の更新を別に記録する。</li>
+        <li>公式ページがaliasのpointing先を示すことと、「V4全体がGA」という表記は同じではない。</li>
+      </ul>
+      <p class="source"><a href="https://api-docs.deepseek.com/news/news260816">DeepSeek official API update</a><a href="deepseek-recent-updates.html">Hub tracker</a></p>
+    </article>
+
+    <article class="card">
+      <span class="badge confirmed">MISSED IN PRIOR CHECK</span>
+      <h2>MiniMax — H3 video family</h2>
+      <ul class="facts">
+        <li>MiniMax H3は<strong>2026-07-31</strong>公開。text、image、video、audioのcontextを扱うgeneral-purpose omni-modal generation model。</li>
+        <li>native stereo audio付きvideoを最大2K・15秒で生成するopen modelとして公式記事に記載。</li>
+        <li>M3はLLM、H3はvideo generation family。Hailuo 2.3 API、MCP、CLI、local weightsを一つの「MiniMax導入済み」へまとめない。</li>
+      </ul>
+      <p class="source"><a href="https://www.minimax.io/blog/minimax-h3">MiniMax H3 official release</a><a href="https://www.minimax.io/blog/minimax-m3">MiniMax M3</a><a href="minimax-recent-updates.html">Hub tracker</a></p>
+    </article>
+
+    <article class="card">
+      <span class="badge confirmed">PRODUCT / TOOL DELTA</span>
+      <h2>OpenAI — Codex CLI 0.148.0</h2>
+      <ul class="facts">
+        <li>8月18日release。TUIのMarkdown export、<code>codex exec fork</code>、session archive/restore、Bedrock Runtime built-in provider、async hooks / MCP tool hooksを追加。</li>
+        <li>GPT-5.6 familyは現行。ChatGPT sign-inのGPT-5.4 / 5.4 miniは8月31日retire、APIとAPI-key Codexは別surface。</li>
+        <li>CLI機能追加はprovider契約、AWS credential、実運用採用を自動承認しない。</li>
+      </ul>
+      <p class="source"><a href="https://learn.chatgpt.com/docs/changelog">ChatGPT &amp; Codex changelog</a><a href="https://learn.chatgpt.com/docs/models">Codex models</a></p>
+    </article>
+
+    <article class="card">
+      <span class="badge confirmed">PRODUCT / TOOL DELTA</span>
+      <h2>Anthropic — Platform / Claude Code</h2>
+      <ul class="facts">
+        <li>8月18日、ConsoleのWorkbenchはPlaygroundへ名称変更。Messages API parameters、templates、SDK request / response表示を追加。</li>
+        <li>8月11日、Enterprise向けCompliance APIがlocal Cowork / Claude Code session transcriptをbetaで取得可能に。</li>
+        <li>Claude Code changelogのcurrent topは2.1.235。2.1.234ではGitLab MR表示、usage-limit後の自動継続、Windows path / credential leak対策などを確認。</li>
+      </ul>
+      <p class="source"><a href="https://platform.claude.com/docs/en/release-notes/overview">Claude Platform release notes</a><a href="https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md">Claude Code changelog</a></p>
+    </article>
+
+    <article class="card">
+      <span class="badge unchanged">CHECKED / NOT PROMOTED</span>
+      <h2>速報に残したもの</h2>
+      <ul class="facts">
+        <li><strong>GLM-5.3:</strong> 8月19日時点で専用のZ.ai公式release pageを確認できず、現行はGLM-5.2を維持。</li>
+        <li><strong>Muse Glimmer:</strong> Meta AI公式blogの現行一覧に確認できず、Muse Spark 1.1を維持。</li>
+        <li><strong>Claude Code Auto Modeが全planで既定:</strong> 公式境界と一致しないためcurrent layerへ昇格しない。</li>
+        <li>IPO、買収、ARR、人事、benchmark順位だけのsignalはmodel / toolの現行表へ入れない。</li>
+      </ul>
+    </article>
+  </section>
+
+  <section class="notice">
+    <span class="badge stop">BOUNDARY</span>
+    <h2>今回の更新が意味しないこと</h2>
+    <p>公式modelの存在は、ALIGN Labでの採用、subscription、API実行、credential入力、公開、作品canon、品質優位を意味しません。local適合は同一fixture、同一harness、cost、elapsed、retry、human intervention、licenseを別途記録します。</p>
+  </section>
+
+  <section>
+    <h2>次の更新で残す最小証拠</h2>
+    <div class="method">
+      <div><b>SOURCE</b><span>公式URLとchecked_at</span></div>
+      <div><b>SURFACE</b><span>chat / API / agent / weights</span></div>
+      <div><b>IDENTITY</b><span>model ID / alias / version</span></div>
+      <div><b>EFFECTIVE</b><span>release / sunset / price date</span></div>
+      <div><b>BOUNDARY</b><span>未確認・非採用・非実行</span></div>
+    </div>
+  </section>
+</main>
+
+<footer><div class="shell">Curator official-source refresh · <a href="official-model-delta-2026-08-11.html">前回8/11 snapshot</a> · <a href="signal-to-organizational-leverage.html">Signal → Leverage</a>。公開・契約・課金・provider実行は行いません。</div></footer>
+</body>
+</html>

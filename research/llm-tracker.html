@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LLM Tracker — 21 Provider Coverage Ledger | Research</title>
+  <meta name="description" content="主要LLM 21 provider、中国系12 providerの現行モデル、公式確認日、提供surface、専用tracker、鮮度gapを一画面で確認するcoverage ledger。">
+  <style>
+    :root{color-scheme:dark;--bg:#07111d;--panel:#101c2c;--line:#29415a;--ink:#eef5fb;--muted:#a4b5c7;--mint:#66dfc4;--amber:#efbd69;--blue:#7bb9ff;--red:#ff9292}
+    *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 12% 0,#173a4d 0,transparent 34rem),var(--bg);color:var(--ink);font:15px/1.7 system-ui,-apple-system,"Segoe UI","Noto Sans JP",sans-serif}a{color:var(--mint);text-underline-offset:3px}.shell{width:min(1220px,calc(100% - 30px));margin:auto}header{padding:52px 0 28px;border-bottom:1px solid var(--line)}main{padding:26px 0 70px}.eyebrow{color:var(--mint);font-size:.72rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase}h1{font-size:clamp(2.5rem,7vw,5.6rem);line-height:.96;letter-spacing:-.055em;margin:.55rem 0 1rem}h2{font-size:1.25rem;margin:0 0 .7rem}p{color:#d0dbe6;margin:.45rem 0}.lead{font-size:1.04rem;max-width:900px}.meta,.small{color:var(--muted);font-size:.82rem}.stats,.rules{display:grid;gap:12px}.stats{grid-template-columns:repeat(4,1fr);margin-top:22px}.stat,.rule,.controls,.ledger-wrap,.notice{border:1px solid var(--line);border-radius:14px;background:rgba(16,28,44,.92)}.stat{padding:15px}.stat b{display:block;color:var(--mint);font-size:1.8rem}.stat span{color:var(--muted);font-size:.78rem}.rules{grid-template-columns:repeat(3,1fr);margin:18px 0}.rule{padding:14px}.badge{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:3px 8px;font-size:.67rem;font-weight:800;white-space:nowrap}.dedicated{color:var(--mint);border-color:#377c67}.catalog{color:var(--blue);border-color:#456e99}.watch{color:var(--amber);border-color:#7b6335}.china{color:#ffb3a8;border-color:#874e47}.controls{display:flex;gap:10px;flex-wrap:wrap;padding:14px;margin:18px 0}.controls input{flex:1;min-width:230px;background:#0a1523;color:var(--ink);border:1px solid var(--line);border-radius:9px;padding:10px 12px}.controls button{border:1px solid var(--line);background:#14243a;color:var(--ink);border-radius:999px;padding:8px 12px;cursor:pointer}.controls button.active{color:#07111d;background:var(--mint);border-color:var(--mint)}.ledger-wrap{overflow:auto}.ledger{width:100%;border-collapse:collapse;min-width:980px}.ledger th,.ledger td{padding:13px 12px;text-align:left;vertical-align:top;border-bottom:1px solid rgba(255,255,255,.07)}.ledger th{position:sticky;top:0;background:#14243a;color:#c7d5e3;font-size:.73rem;letter-spacing:.06em;text-transform:uppercase}.ledger td{color:#cbd7e3}.ledger strong{color:var(--ink)}.ledger code{background:#192b3f;color:#b6efdb;padding:.08rem .3rem;border-radius:5px}.ledger tr[hidden]{display:none}.notice{padding:17px;margin-top:18px;border-left:4px solid var(--amber)}.source{font-size:.77rem}.source a{display:block}.rules b{display:block;margin-bottom:5px}.rules span{color:var(--muted);font-size:.82rem}footer{border-top:1px solid var(--line);padding:22px 0 36px;color:var(--muted);font-size:.8rem}@media(max-width:780px){.stats,.rules{grid-template-columns:1fr 1fr}}@media(max-width:520px){.stats,.rules{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="shell">
+      <p class="meta"><a href="index.html">← Research</a> / <a href="../index.html">Hub Top</a></p>
+      <div class="eyebrow">LLM current layer · verified 2026-08-19 JST</div>
+      <h1>LLM Tracker</h1>
+      <p class="lead">モデル別の長文tracker、日次ニュース、公式catalogを一画面に束ねるcoverage ledgerです。「専用trackerがある」と「世界中の全モデルを確認済み」は同じではありません。現行model、提供surface、公式確認日、履歴記事、未確認gapを分けて表示します。</p>
+      <div class="stats">
+        <div class="stat"><b>21</b><span>provider rows</span></div>
+        <div class="stat"><b>12</b><span>China-origin provider rows</span></div>
+        <div class="stat"><b>10</b><span>dedicated update trackers</span></div>
+        <div class="stat"><b>2026-08-19</b><span>official-source check</span></div>
+      </div>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section class="rules">
+      <div class="rule"><span class="badge dedicated">DEDICATED TRACKER</span><b>履歴まで追う</b><span>provider別の長文更新ページがあり、現行層と速報履歴を接続済み。</span></div>
+      <div class="rule"><span class="badge catalog">CATALOG CHECK</span><b>現行入口だけ確認</b><span>公式catalog / releaseで現行を確認。専用の長文trackerはまだない。</span></div>
+      <div class="rule"><span class="badge watch">FRESHNESS GAP</span><b>断定しない</b><span>公式公開面はあるが、2026年の現行general modelを十分に確定できない。</span></div>
+    </section>
+
+    <section class="controls" aria-label="Tracker filters">
+      <input id="search" type="search" placeholder="provider・model・surfaceを検索" aria-label="provider・model・surfaceを検索">
+      <button class="active" data-filter="all">すべて</button>
+      <button data-filter="china">中国系</button>
+      <button data-filter="global">Global</button>
+      <button data-filter="dedicated">専用tracker</button>
+      <button data-filter="catalog">Catalog</button>
+      <button data-filter="watch">Gap</button>
+    </section>
+
+    <section class="ledger-wrap">
+      <table class="ledger">
+        <thead><tr><th>Provider</th><th>2026-08-19 current layer</th><th>Surface / boundary</th><th>Coverage</th><th>Official source / history</th></tr></thead>
+        <tbody>
+          <tr data-region="global" data-tier="dedicated"><td><strong>OpenAI</strong></td><td>GPT-5.6 family</td><td>CodexのChatGPT sign-inでは旧5.4系が8/31 retire。API-key surfaceは別。CLI currentは0.148.0。</td><td><span class="badge dedicated">DEDICATED</span></td><td class="source"><a href="https://learn.chatgpt.com/docs/models">Codex models</a><a href="https://learn.chatgpt.com/docs/changelog">Official changelog</a><a href="chatgpt-recent-updates.html">ChatGPT tracker</a></td></tr>
+          <tr data-region="global" data-tier="dedicated"><td><strong>Anthropic</strong></td><td>Claude Opus 5 / Sonnet 5</td><td>model familyは継続。PlatformはPlayground化、Compliance API local sessions追加。Claude Codeは2.1.235。</td><td><span class="badge dedicated">DEDICATED</span></td><td class="source"><a href="https://platform.claude.com/docs/en/release-notes/overview">Platform release notes</a><a href="https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md">Claude Code changelog</a><a href="claude-recent-updates.html">Claude tracker</a></td></tr>
+          <tr data-region="global" data-tier="dedicated"><td><strong>Google</strong></td><td>Gemini 3.7 Flash</td><td>8/13 GA。stable / preview、model ID、deprecationを別管理。Imagen 4の旧3 IDは8/17停止。</td><td><span class="badge dedicated">DEDICATED</span></td><td class="source"><a href="https://ai.google.dev/gemini-api/docs/changelog">Gemini changelog</a><a href="https://ai.google.dev/gemini-api/docs/models/gemini-3.7-flash">3.7 Flash</a><a href="gemini-recent-updates.html">Gemini tracker</a></td></tr>
+          <tr data-region="global" data-tier="dedicated"><td><strong>xAI</strong></td><td>Grok 4.6</td><td>公式model docsで500K・text/image input・reasoningを確認。Build / API / X realtime dataは別surface。</td><td><span class="badge dedicated">DEDICATED</span></td><td class="source"><a href="https://docs.x.ai/developers/grok-4-6">Grok 4.6 docs</a><a href="grok-recent-updates.html">Grok tracker</a></td></tr>
+          <tr data-region="global" data-tier="dedicated"><td><strong>Meta MSL</strong></td><td>Muse Spark 1.1</td><td>Meta Model APIはpublic preview。Muse Image / Videoは別model family。</td><td><span class="badge dedicated">DEDICATED</span></td><td class="source"><a href="https://ai.meta.com/blog/introducing-muse-spark-meta-model-api/">Muse Spark 1.1</a><a href="muse-recent-updates.html">Muse tracker</a></td></tr>
+          <tr data-region="global" data-tier="catalog"><td><strong>Meta Llama</strong></td><td>Llama 4 Scout / Maverick</td><td>downloadable models。Museのhosted previewと混同しない。</td><td><span class="badge catalog">CATALOG</span></td><td class="source"><a href="https://ai.meta.com/llama/get-started/">Llama official get started</a><a href="../workbench/knowledge/llama.html">Llama deep dive</a></td></tr>
+          <tr data-region="global" data-tier="catalog"><td><strong>Mistral AI</strong></td><td>Mistral Large 3 / Devstral 2</td><td>general multimodal open modelとcode-agent modelを分離。</td><td><span class="badge catalog">CATALOG</span></td><td class="source"><a href="https://docs.mistral.ai/models/">Mistral models</a><a href="../workbench/knowledge/mistral.html">Historical deep dive</a></td></tr>
+          <tr data-region="global" data-tier="catalog"><td><strong>Cohere</strong></td><td>Command A+</td><td><code>command-a-plus-05-2026</code>。open weights / enterprise deployment / APIを分離。</td><td><span class="badge catalog">CATALOG</span></td><td class="source"><a href="https://docs.cohere.com/v1/docs/models">Cohere model catalog</a></td></tr>
+          <tr data-region="global" data-tier="catalog"><td><strong>Microsoft</strong></td><td>Phi-4 reasoning family</td><td>edge / small model family。Azure catalog availabilityは利用前に再確認。</td><td><span class="badge catalog">CATALOG</span></td><td class="source"><a href="https://azure.microsoft.com/en-us/blog/one-year-of-phi-small-language-models-making-big-leaps-in-ai/">Microsoft Phi overview</a><a href="../workbench/knowledge/phi.html">Phi deep dive</a></td></tr>
+
+          <tr data-region="china" data-tier="dedicated"><td><strong>Alibaba / Qwen</strong><br><span class="badge china">CHINA</span></td><td>Qwen3.8 open family</td><td>2.4T-A95Bは8/12、27Bは8/14にweights公開。service previewとweight別licenseを分離。</td><td><span class="badge dedicated">DEDICATED</span></td><td class="source"><a href="https://github.com/QwenLM/Qwen3.8">Qwen3.8 official repo</a><a href="https://huggingface.co/collections/Qwen/qwen38">Official weight collection</a><a href="qwen-recent-updates.html">Qwen tracker</a></td></tr>
+          <tr data-region="china" data-tier="dedicated"><td><strong>Z.ai / GLM</strong><br><span class="badge china">CHINA</span></td><td>GLM-5.2</td><td>1M context・open weights・local serving。hosted pricingは別確認。</td><td><span class="badge dedicated">DEDICATED</span></td><td class="source"><a href="https://z.ai/blog/glm-5.2">GLM-5.2</a><a href="glm-recent-updates.html">GLM tracker</a></td></tr>
+          <tr data-region="china" data-tier="dedicated"><td><strong>DeepSeek</strong><br><span class="badge china">CHINA</span></td><td>DeepSeek V4 API family</td><td><code>deepseek-v4-pro</code>→V4-Pro-0813、<code>flash</code>→V4-Flash-0731。alias更新とGA表記を分離。</td><td><span class="badge dedicated">DEDICATED</span></td><td class="source"><a href="https://api-docs.deepseek.com/news/news260816">Current API aliases</a><a href="deepseek-recent-updates.html">DeepSeek tracker</a></td></tr>
+          <tr data-region="china" data-tier="dedicated"><td><strong>Moonshot / Kimi</strong><br><span class="badge china">CHINA</span></td><td>Kimi K3</td><td>2.8T total / 104B active、1M、full weights。固有tool-history contractあり。</td><td><span class="badge dedicated">DEDICATED</span></td><td class="source"><a href="https://github.com/MoonshotAI/Kimi-K3">Kimi K3 repo</a><a href="kimi-recent-updates.html">Kimi tracker</a></td></tr>
+          <tr data-region="china" data-tier="dedicated"><td><strong>MiniMax</strong><br><span class="badge china">CHINA</span></td><td>MiniMax M3 / H3</td><td>M3はLLM。H3はopen omni-modal video family（2K・15秒・native stereo）。MCP/API/localを分離。</td><td><span class="badge dedicated">DEDICATED</span></td><td class="source"><a href="https://www.minimax.io/blog/minimax-m3">MiniMax M3</a><a href="https://www.minimax.io/blog/minimax-h3">MiniMax H3</a><a href="minimax-recent-updates.html">MiniMax tracker</a></td></tr>
+          <tr data-region="china" data-tier="catalog"><td><strong>Baidu / ERNIE</strong><br><span class="badge china">CHINA</span></td><td>ERNIE 5.1 product / ERNIE 5.0 API</td><td>5.1 launchはBaidu IR、Qianfan international model listは5.0。surface差を維持。</td><td><span class="badge catalog">CATALOG</span></td><td class="source"><a href="https://ir.baidu.com/static-files/f6ac7a6b-3583-4b6d-b42a-75939e09d99b">Baidu 6-K</a><a href="https://intl.cloud.baidu.com/en/doc/qianfan/s/7m95lyy43-intl-en">Qianfan model list</a></td></tr>
+          <tr data-region="china" data-tier="catalog"><td><strong>ByteDance / Seed</strong><br><span class="badge china">CHINA</span></td><td>Seed 2.0 / Doubao Seed 2.1 Turbo</td><td>research familyとVolcano Engine product catalogを分離。Seedanceはvideo family。</td><td><span class="badge catalog">CATALOG</span></td><td class="source"><a href="https://seed.bytedance.com/en/blog/seed2-0-%25E6%25AD%25A3%25E5%25BC%258F%25E5%258F%2591%25E5%25B8%2583">Seed 2.0</a><a href="https://www.volcengine.com/product/doubao">Doubao product catalog</a></td></tr>
+          <tr data-region="china" data-tier="catalog"><td><strong>Tencent / Hunyuan</strong><br><span class="badge china">CHINA</span></td><td>HY3 Preview</td><td>旧Hunyuan text modelsの推奨migration target。旧platformは9/30停止予定。</td><td><span class="badge catalog">CATALOG</span></td><td class="source"><a href="https://cloud.tencent.com/document/product/1729/131925">Tencent migration notice</a></td></tr>
+          <tr data-region="china" data-tier="catalog"><td><strong>SenseTime</strong><br><span class="badge china">CHINA</span></td><td>SenseNova U1 Pro</td><td>7/18発表のlong-horizon multimodal agent base。U1 Lite open-sourceは別tier。</td><td><span class="badge catalog">CATALOG</span></td><td class="source"><a href="https://www.sensetime.com/cn/news/51170769">SenseNova U1 Pro</a><a href="https://www.sensetime.com/en/news/51170625/">U1 open source</a></td></tr>
+          <tr data-region="china" data-tier="catalog"><td><strong>Baichuan</strong><br><span class="badge china">CHINA</span></td><td>Baichuan M4 / Baichuan4 Turbo・Air</td><td>general platformとmedical M3 open modelを分離。用途を跨いで世代比較しない。</td><td><span class="badge catalog">CATALOG</span></td><td class="source"><a href="https://www.baichuan-ai.com/">Baichuan official</a><a href="https://github.com/baichuan-inc">Official GitHub</a></td></tr>
+          <tr data-region="china" data-tier="watch"><td><strong>StepFun</strong><br><span class="badge china">CHINA</span></td><td>Step3（last verified foundation release）</td><td>2026 product activityはあるが、新しいgeneral foundation releaseを公式researchで確定できず。</td><td><span class="badge watch">GAP</span></td><td class="source"><a href="https://chat.stepfun.com/research">StepFun Research</a></td></tr>
+          <tr data-region="china" data-tier="watch"><td><strong>01.AI / Yi</strong><br><span class="badge china">CHINA</span></td><td>Current 2026 general model未確定</td><td>公式public repoは確認できるが、2026 current familyとして断定できる更新を確認できず。</td><td><span class="badge watch">GAP</span></td><td class="source"><a href="https://github.com/01-ai/Yi">Yi official repository</a></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="notice">
+      <h2>このページが保証する範囲</h2>
+      <p>「21行ある」ことを網羅性KPIにはしません。公式sourceがある現行入口、専用trackerの有無、surface差、鮮度gapを見える化したものです。日次ニュースとGrokPulseは新候補の発見に使い、確定欄へ入れる前にこのledgerの公式sourceへ戻します。価格・契約・credential・provider採用はこのページから実行しません。</p>
+      <p class="small">次回点検候補: 2026-08-26、または公式model release / deprecation / pricing effective date発生時。GLM-5.3 / Muse Glimmerは8/19時点で専用公式releaseを確認できず、速報層から昇格していません。</p>
+    </section>
+  </main>
+  <footer><div class="shell">Curator · Public Knowledge Steward · secret-free public candidate · <a href="official-model-delta-2026-08-19.html">8/19 主要provider公式差分</a> · <a href="official-model-delta-2026-08-11.html">8/11 snapshot</a> · <a href="ai-news/index.html">AI News radar</a></div></footer>
+  <script>
+    const rows=[...document.querySelectorAll('.ledger tbody tr')];
+    const input=document.querySelector('#search');
+    const buttons=[...document.querySelectorAll('[data-filter]')];
+    let filter='all';
+    function apply(){
+      const query=input.value.trim().toLowerCase();
+      rows.forEach(row=>{
+        const matchesText=!query||row.textContent.toLowerCase().includes(query);
+        const matchesFilter=filter==='all'||row.dataset.region===filter||row.dataset.tier===filter;
+        row.hidden=!(matchesText&&matchesFilter);
+      });
+    }
+    input.addEventListener('input',apply);
+    buttons.forEach(button=>button.addEventListener('click',()=>{
+      filter=button.dataset.filter;
+      buttons.forEach(item=>item.classList.toggle('active',item===button));
+      apply();
+    }));
+  </script>
+</body>
+</html>

@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>主要AIモデル公式差分 — 2026-08-11 | Research</title>
+  <style>
+    :root{color-scheme:dark;--bg:#08111d;--panel:#101c2d;--panel2:#13243a;--line:#29415c;--ink:#f3f7fb;--muted:#a8b8ca;--mint:#67ddc5;--amber:#f0bd68;--red:#ff8e8e;--blue:#78b7ff}
+    *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 12% 0,#16384b 0,transparent 34rem),var(--bg);color:var(--ink);font:15px/1.75 system-ui,-apple-system,"Segoe UI","Noto Sans JP",sans-serif}a{color:var(--mint);text-underline-offset:3px}.shell{width:min(1120px,calc(100% - 32px));margin:auto}header{padding:54px 0 30px;border-bottom:1px solid var(--line)}main{padding:26px 0 70px}.eyebrow{color:var(--mint);font-size:.73rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase}h1{font-size:clamp(2.35rem,7vw,5.4rem);line-height:.98;letter-spacing:-.055em;margin:.55rem 0 1rem}h2{font-size:1.2rem;margin:0 0 .7rem}h3{font-size:1rem;margin:.2rem 0 .5rem}p{margin:.45rem 0;color:#d1dbe6}.lead{font-size:1.06rem;max-width:880px}.meta,.small{color:var(--muted);font-size:.82rem}.legend,.deadline-grid,.provider-grid,.method{display:grid;gap:12px}.legend{grid-template-columns:repeat(3,1fr);margin-top:22px}.legend div,.deadline,.provider,.method>div,.notice{border:1px solid var(--line);border-radius:14px;background:rgba(16,28,45,.9);padding:15px}.badge{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:3px 8px;font-size:.68rem;font-weight:800;letter-spacing:.04em}.confirmed{color:var(--mint);border-color:#397964}.catalog{color:var(--blue);border-color:#416b96}.radar{color:var(--amber);border-color:#775e30}.contradicted{color:var(--red);border-color:#874646}.deadline-grid{grid-template-columns:repeat(2,1fr);margin:18px 0}.deadline{border-left:4px solid var(--amber)}.deadline strong{display:block;font-size:1.1rem}.provider-grid{grid-template-columns:repeat(2,1fr)}.provider{position:relative}.provider h2{padding-right:110px}.provider .badge{position:absolute;right:15px;top:15px}.facts{margin:.7rem 0;padding-left:1.2rem;color:#d1dbe6}.facts li+li{margin-top:.45rem}.source{border-top:1px solid var(--line);margin-top:12px;padding-top:10px;font-size:.78rem;color:var(--muted)}.source a{margin-right:10px}.notice{margin:20px 0;background:#171f27;border-color:#67552f}.notice strong{color:var(--amber)}.method{grid-template-columns:repeat(5,1fr);margin-top:12px}.method b{display:block;color:var(--mint);font-size:.74rem;letter-spacing:.08em}.method span{display:block;margin-top:5px;color:#cbd6e2;font-size:.84rem}code{background:#19293c;color:#a9ecd7;padding:.1rem .35rem;border-radius:5px}footer{border-top:1px solid var(--line);padding:22px 0 35px;color:var(--muted);font-size:.8rem}@media(max-width:780px){.legend,.deadline-grid,.provider-grid,.method{grid-template-columns:1fr}.provider h2{padding-right:0}.provider .badge{position:static;margin-bottom:8px}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="shell">
+      <p class="meta"><a href="index.html">← Research</a> / <a href="../index.html">Hub Top</a></p>
+      <div class="eyebrow">Official-source freshness layer · 2026-08-11 JST</div>
+      <h1>主要AIモデル<br>公式差分</h1>
+      <p class="lead">日次ニュースとX由来の速報を置き換えるページではありません。いま実装・移行・評価に使える事実だけを、provider公式のmodel catalog、release note、changelog、公式repositoryへ戻して確認するための薄い現行層です。</p>
+      <p class="meta">確認日: 2026-08-11 / 次回点検候補: 2026-08-18 または重要な公式更新時 / 価格・提供surfaceは利用直前に再確認</p>
+      <div class="legend">
+        <div><span class="badge confirmed">PRIMARY_CONFIRMED</span><p>公式一次情報に明記。日付・model ID・surfaceを分離して記録します。</p></div>
+        <div><span class="badge catalog">CATALOG_CURRENT</span><p>確認時点の公式catalog上の現行値。将来の不在を保証するものではありません。</p></div>
+        <div><span class="badge radar">RADAR_UNVERIFIED</span><p>X・速報・issueなどで観測しただけ。採用、記事の断定、課金判断には使いません。</p></div>
+      </div>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section>
+      <h2>まず期限だけ</h2>
+      <div class="deadline-grid">
+        <article class="deadline"><strong>2026-08-31 — Codex model移行</strong><p>ChatGPT sign-inでCodexを使う場合、<code>gpt-5.4</code> / <code>gpt-5.4-mini</code> は退役予定。workspace default、保存済み設定、managed config、custom agent、scheduleを <code>gpt-5.6-terra</code> / <code>gpt-5.6-luna</code> へ確認します。APIとAPI-key認証のCodexはこの退役の対象外です。</p><p class="source"><a href="https://learn.chatgpt.com/docs/models#deprecated-codex-models">OpenAI — Deprecated Codex models</a></p></article>
+        <article class="deadline"><strong>2026-08-31 — Claude Sonnet 5価格</strong><p><code>claude-sonnet-5</code> の導入価格は入力$2、出力$10 / 1M tokenで8月31日まで。以後は入力$3、出力$15。利用量や契約の判断は別ですが、長時間agentの評価票にはeffective dateを分けて残す必要があります。</p><p class="source"><a href="https://www.anthropic.com/news/claude-sonnet-5">Anthropic — Claude Sonnet 5</a></p></article>
+      </div>
+    </section>
+
+    <section class="notice"><strong>速報の訂正:</strong> 「Claude Code Auto Modeが8月14日に既定化」という速報は、2026-08-11確認時点のAnthropic公式説明と一致しません。公式FAQは組織側の有効化と利用者のopt-inを要求し、<code>claude --enable-auto-mode</code> を案内しています。既定化の公式告知が出るまで <span class="badge contradicted">CONTRADICTED</span> として扱います。 <a href="https://support.claude.com/en/articles/14554000-claude-code-power-user-tips">公式tips</a> / <a href="https://support.claude.com/en/articles/14554922-claude-code-user-faq">公式FAQ</a></section>
+
+    <section class="provider-grid" aria-label="Provider snapshot">
+      <article class="provider">
+        <span class="badge confirmed">PRIMARY_CONFIRMED</span><h2>OpenAI / Codex</h2>
+        <ul class="facts"><li>ChatGPT sign-inのCodexでは、8月31日のmodel retirementが直近の実務deadlineです。</li><li>Codex changelogは2026-08-10のDaybreak更新と、CLI 0.147.0のAgent Plugins、MCP 2026-07-28対応、secret redaction、project trust改善を記録しています。</li><li>model IDだけでなく、認証surface、workspace default、scheduleへの固定値を点検対象にします。</li></ul>
+        <p class="source"><a href="https://learn.chatgpt.com/docs/models#deprecated-codex-models">Model deprecations</a><a href="https://learn.chatgpt.com/docs/changelog#codex-2026-08-10-daybreak">Codex changelog</a></p>
+      </article>
+
+      <article class="provider">
+        <span class="badge confirmed">PRIMARY_CONFIRMED</span><h2>Anthropic / Claude</h2>
+        <ul class="facts"><li>今回の公式current layerで確認できる中心モデルはOpus 5とSonnet 5です。Opus 5は7月24日公開、model IDは<code>claude-opus-5</code>、1M context、128K max output、thinking on by defaultです。</li><li>Sonnet 5はFree / Proのdefault、Claude Code、APIで提供。API model IDは<code>claude-sonnet-5</code>です。</li><li>旧速報にあったFable / Mythos / Opus 4.8は今回確認したAnthropic公式current docsで裏づけられないため、現行familyから除外しました。Auto Modeはopt-inで、組織policyにより無効化できます。</li></ul>
+        <p class="source"><a href="https://platform.claude.com/docs/en/release-notes/overview">Platform release notes</a><a href="https://www.anthropic.com/news/claude-sonnet-5">Sonnet 5</a><a href="https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md">Claude Code changelog</a></p>
+      </article>
+
+      <article class="provider">
+        <span class="badge confirmed">PRIMARY_CONFIRMED</span><h2>Google / Gemini</h2>
+        <ul class="facts"><li><code>gemini-3.6-flash</code> と <code>gemini-3.5-flash-lite</code> は7月21日にGA。いずれも1M context、64K max output、built-in toolsをサポートします。</li><li>3.6 Flashの公式価格は入力$1.50、出力$7.50 / 1M token。3.5 Flash-Liteは入力$0.30、出力$2.50です。</li><li>「7月24日の緊急投入」「3.5 Pro再々延期」という説明は公式release noteの表現ではありません。確認できる事実は7月21日のGAです。</li></ul>
+        <p class="source"><a href="https://ai.google.dev/gemini-api/docs/changelog">Gemini API release notes</a><a href="https://ai.google.dev/gemini-api/docs/models">Model catalog</a><a href="https://ai.google.dev/gemini-api/docs/deprecations">Deprecations</a></p>
+      </article>
+
+      <article class="provider">
+        <span class="badge catalog">CATALOG_CURRENT</span><h2>SpaceXAI / Grok</h2>
+        <ul class="facts"><li>公式model detailの現行frontier modelは<code>grok-4.5</code>。aliasには<code>grok-build-latest</code>が含まれます。</li><li>Grok Buildは7月15日にopen source化され、7月23日に多数agentへfan-outするWorkflowsを公式発表しています。</li><li>Grok 4.6 / 4.7の名称・日程・parameter数は、確認した公式catalogに存在しないためレーダー隔離を継続します。</li></ul>
+        <p class="source"><a href="https://docs.x.ai/developers/models/grok-4.5">Grok 4.5</a><a href="https://x.ai/news/grok-build-open-source">Build open source</a><a href="https://x.ai/news/workflows">Workflows</a></p>
+      </article>
+
+      <article class="provider">
+        <span class="badge confirmed">PRIMARY_CONFIRMED</span><h2>DeepSeek</h2>
+        <ul class="facts"><li>現行API modelは<code>deepseek-v4-pro</code>と<code>deepseek-v4-flash</code>。いずれもthinking / non-thinking、1M contextを案内しています。</li><li><code>deepseek-chat</code> / <code>deepseek-reasoner</code> は7月24日15:59 UTCでretire済みです。「これから移行」ではなく、固定値が残っていないかを確認する段階です。</li><li>価格は頻繁に変わり得るため、trackerは価格値とchecked_atを一体で扱います。</li></ul>
+        <p class="source"><a href="https://api-docs.deepseek.com/quick_start/pricing">Models &amp; Pricing</a><a href="https://api-docs.deepseek.com/news/news260424">V4 Preview release</a></p>
+      </article>
+
+      <article class="provider">
+        <span class="badge confirmed">PRIMARY_CONFIRMED</span><h2>Moonshot AI / Kimi</h2>
+        <ul class="facts"><li>Kimi K3は2.8T total / 104B active、1M context、native multimodalのopen-weight modelです。API model IDは<code>kimi-k3</code>。</li><li>multi-turn / tool useでは<code>reasoning_content</code>と<code>tool_calls</code>を含むassistant message全体を履歴へ戻す固有contractがあります。</li><li>「7月27日公開予定」という表現は失効。現在は公式repositoryでfull weightsとKimi K3 Licenseが公開済みです。</li></ul>
+        <p class="source"><a href="https://github.com/MoonshotAI/Kimi-K3">Kimi K3 official repository</a><a href="https://github.com/MoonshotAI/Kimi-Vendor-Verifier">Vendor Verifier</a></p>
+      </article>
+
+      <article class="provider">
+        <span class="badge confirmed">PRIMARY_CONFIRMED</span><h2>Z.AI / GLM</h2>
+        <ul class="facts"><li>GLM-5.2は長時間task向けの現行flagshipとして公開され、1M context、IndexShare、long-horizon RLを公式記事が説明しています。</li><li>weightsは公式repository / Hugging Faceで提供され、local servingの選択肢も案内されています。</li><li>7月時点の「GLM-4.5が7月28日予定」は完全に失効。現行trackerの先頭はGLM-5.2へ合わせる必要があります。</li></ul>
+        <p class="source"><a href="https://z.ai/blog/glm-5.2">GLM-5.2 release</a><a href="https://github.com/zai-org/GLM-5">Official repository</a><a href="https://docs.z.ai/guides/overview/pricing">Pricing</a></p>
+      </article>
+
+      <article class="provider">
+        <span class="badge confirmed">PRIMARY_CONFIRMED</span><h2>Meta / Muse</h2>
+        <ul class="facts"><li>Muse Spark 1.1は7月9日公開。1M context、multimodal reasoning、multi-agent orchestrationを公式説明しています。</li><li>Meta Model APIはpublic preview。Muse Imageは7月7日に提供開始、Muse Videoはnative audio対応のpreviewです。</li><li>導入判断ではprovider benchmarkを転載するより、同じfixtureとharnessで成功率、介入、時間、tokenを測ります。</li></ul>
+        <p class="source"><a href="https://ai.meta.com/blog/introducing-muse-spark-meta-model-api/">Muse Spark 1.1</a><a href="https://ai.meta.com/blog/introducing-muse-image-muse-video-msl/">Muse Image / Video</a></p>
+      </article>
+
+      <article class="provider">
+        <span class="badge catalog">CATALOG_CURRENT</span><h2>Alibaba / Qwen</h2>
+        <ul class="facts"><li>Qwen Codeの公式repositoryとweekly updateには<code>qwen3.8-max-preview</code> supportが確認できます。</li><li>ただし、X上のparameter数、weights公開日、revenue shareは公式model release / licenseを確認できない限り確定欄へ入れません。</li><li>現在の実務価値はQwen CodeのSkills、worktree session、steering、MCP改善を再利用可能なharness機能として評価することです。</li></ul>
+        <p class="source"><a href="https://qwenlm.github.io/qwen-code-docs/en/blog/updates/weekly-update-2026-07-23/">Qwen Code weekly</a><a href="https://github.com/QwenLM/qwen-code">Qwen Code repository</a></p>
+      </article>
+    </section>
+
+    <section class="notice">
+      <h2>組織へ取り込むときの最小記録</h2>
+      <p>providerの「最新」を並べるだけでは運用知になりません。同じ候補を比較できるよう、次の5点を一緒に残します。</p>
+      <div class="method">
+        <div><b>01 SURFACE</b><span>chat / API / coding agent / local weightsを分離</span></div>
+        <div><b>02 CONTRACT</b><span>model ID、履歴、tool schema、parameter制約</span></div>
+        <div><b>03 EFFECTIVE</b><span>checked_at、提供開始、価格変更、sunset</span></div>
+        <div><b>04 HARNESS</b><span>fixture、success、token、elapsed、retry、介入</span></div>
+        <div><b>05 BOUNDARY</b><span>license、公開、credential、cost、不可逆操作</span></div>
+      </div>
+    </section>
+  </main>
+  <footer><div class="shell">Curator official-source refresh. このページは採用、契約、課金、provider実行、公開承認を行いません。速報は <a href="ai-news/index.html">AI News</a>、履歴詳細は各provider trackerを参照してください。</div></footer>
+</body>
+</html>

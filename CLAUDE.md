@@ -5,7 +5,7 @@
 実験的に運用する前提はありますが、それは「壊してよい」という意味ではありません。
 正しい前提は `安全に更新し、必要なら戻せるようにする` です。
 
-**最終更新:** 2026-06-26
+**最終更新:** 2026-08-19
 
 ---
 
@@ -16,6 +16,7 @@
 - 外出中でも Claude に非同期で更新を依頼できる基盤にする
 - 必要に応じて Codex でも同じ構造を理解できる状態を保つ
 - 複数のセッション（Claude / Codex の並走）が同時稼働しても破綻しないこと
+- 日次速報をレーダー、provider公式sourceを現行事実、local receiptを自組織での適合証拠として分離すること
 
 このハブは<strong>公開リポジトリ</strong>です（外部から見られても問題ない設計）。`ALIGN_Lab` 本体は<strong>非公開の別レポ</strong>で、本ハブには ALIGN_Lab の中身は書きません。AI セッションが方向性を理解する必要がある時は、ローカルの `../ALIGN_Lab/` を直接参照します。詳細は [`foundations/align-lab-context.html`](foundations/align-lab-context.html) と [ADR-010](foundations/decisions.html#010-align-lab-decouple) を参照。
 
@@ -140,6 +141,8 @@
 9. **大きな変更なら ADR を書く**（`foundations/decisions.html`）
 10. **失敗事例があれば anti-patterns に記録**
 11. **新用語が出たら glossary に 1-2 行追加**
+
+LLM/providerの現行値はまず最新日付の `research/official-model-delta-YYYY-MM-DD.html`（現在は `official-model-delta-2026-08-19.html`）と `workbench/knowledge/model-generations.html` を更新します。旧日付のdeltaはhistorical snapshotとして残します。X・日次ニュース・issue由来の情報は、公式sourceを確認するまで `RADAR_UNVERIFIED` とし、価格、期限、model ID、契約、securityの断定へ使いません。
 
 詳細チェックリストは `foundations/definition-of-done.html` を参照。
 
