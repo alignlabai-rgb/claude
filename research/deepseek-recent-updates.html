@@ -32,9 +32,19 @@
     <div class="breadcrumb"><a href="index.html">Research</a> / <a href="../index.html">Hub Top</a></div>
     <div class="eyebrow">DeepSeek Update Tracker</div>
     <h1>DeepSeek 最新アップデート完全版</h1>
-    <p>DeepSeekのモデル・API・オープンウェイト戦略を追跡します。現行の<strong>DeepSeek V4 Pro / V4 Flash</strong>を中心に、V3.2、R1からの進化、1Mコンテキスト、Agentic Coding、料金と移行上の注意点を整理します。</p>
+    <p>DeepSeekのモデル・API・オープンウェイト戦略を追跡します。現行API aliasの<strong>DeepSeek V4 Pro / V4 Flash</strong>を中心に、固定version、料金と移行上の注意点を分けて整理します。</p>
     <div class="summary"><p><strong>結論:</strong> V4は「安価な推論モデル」から「長文・Coding・Agentを統合するオープンウェイト基盤」への転換です。Proは1.6T/49B活性、Flashは284B/13B活性で、両方が1MコンテキストとThinking切替を備えます。</p></div>
-    <p class="last-update">最終更新: 2026-07-24（DeepSeek V4 正式リリース・旧 model alias 廃止対応を追記）</p>
+    <p class="last-update">最終更新: 2026-08-19（8/16公式API updateのV4 Pro / Flash alias mappingを反映）</p>
+  </section>
+
+  <section class="panel">
+    <h2>2026-08-19 公式ソース差分</h2>
+    <div class="grid-3">
+      <article class="card"><h3><code>deepseek-v4-pro</code></h3><p>calling aliasは<strong>DeepSeek-V4-Pro-0813</strong>を指します。再現性が必要な評価ではaliasと固定versionを分けて記録します。</p></article>
+      <article class="card"><h3><code>deepseek-v4-flash</code></h3><p>calling aliasは<strong>DeepSeek-V4-Flash-0731</strong>を指します。alias名が同じでも背後のversionが将来変わる可能性を残します。</p></article>
+      <article class="card"><h3>提供中 ≠ GA表記</h3><p>公式APIで呼べることは確認できますが、本ハブではこれだけを根拠に「V4 GA」と書きません。preview / alias / fixed versionを分離します。</p></article>
+    </div>
+    <p class="small">Source: <a href="https://api-docs.deepseek.com/news/news260816" target="_blank" rel="noopener">DeepSeek API — model update (2026-08-16)</a></p>
   </section>
 
   <section class="panel">
@@ -97,14 +107,15 @@
     <h2>🔌 API移行ガイド</h2>
     <div class="grid-2">
       <article class="card"><h3>最小変更</h3><ul><li>Base URLは <code>https://api.deepseek.com</code> のまま</li><li>モデル名を <code>deepseek-v4-pro</code> または <code>deepseek-v4-flash</code> へ変更</li><li>Anthropic形式は <code>/anthropic</code> を使用</li></ul></article>
-      <article class="card"><h3>重要な期限</h3><ul><li><code>deepseek-chat</code> と <code>deepseek-reasoner</code> は2026-07-24 15:59 UTCで廃止予定</li><li>移行前は両aliasがV4 FlashのNon-thinking / Thinkingへ対応</li><li>JSON、Tool Calls、FIM、Prefix Completionを両モデルが提供</li></ul></article>
+      <article class="card"><h3>発効済みの移行</h3><ul><li><code>deepseek-chat</code> と <code>deepseek-reasoner</code> は2026-07-24 15:59 UTCでretire済み</li><li>移行前は両aliasがV4 FlashのNon-thinking / Thinkingへ対応</li><li>固定model ID、fallback、scheduleに旧aliasが残っていないかを確認する段階</li></ul></article>
     </div>
   </section>
 
   <section class="panel">
     <h2>📅 タイムライン</h2>
     <div class="timeline">
-      <div class="item"><div class="date">2026-07-24</div><span class="tag">DeepSeek V4 GA</span><h3>DeepSeek V4 正式リリース</h3><p>V4 Pro / Flash が正式提供（GA）へ移行。1M標準コンテキスト、Token-wise Compression、DSA、Agentic Coding、OpenAI/Anthropic互換API、オープンウェイト重みが一般公開。旧 alias（deepseek-chat / deepseek-reasoner）は自動移行完了。</p></div>
+      <div class="item"><div class="date">2026-08-16</div><span class="tag">API alias update</span><h3>V4 Pro / Flashのcalling aliasを更新</h3><p><code>deepseek-v4-pro</code> → DeepSeek-V4-Pro-0813、<code>deepseek-v4-flash</code> → DeepSeek-V4-Flash-0731。API利用時のmodel nameは変えず、評価receiptには解決先versionも残します。</p></div>
+      <div class="item"><div class="date">2026-07-24</div><span class="tag">API migration</span><h3>旧aliasのretirementが発効</h3><p><code>deepseek-chat</code> / <code>deepseek-reasoner</code> は2026-07-24 15:59 UTCでretire。現行の公式API modelは <code>deepseek-v4-flash</code> / <code>deepseek-v4-pro</code> です。V4自体は公式release記事の表記に合わせてPreviewとして扱います。</p></div>
       <div class="item"><div class="date">2026-04-24</div><span class="tag">DeepSeek V4 Preview</span><h3>V4 Pro / Flashを公開</h3><p>1M標準コンテキスト、Token-wise Compression、DSA、Agentic Coding、OpenAI/Anthropic互換API、オープンウェイトを発表。</p></div>
       <div class="item"><div class="date">2025-12-01</div><span class="tag">DeepSeek V3.2</span><h3>Reasoning-first Agentモデル</h3><p>Thinking in Tool-Useを導入。V3.2-Specialeは高度推論の評価用として一時API提供され、モデルウェイトも公開。</p></div>
       <div class="item"><div class="date">2025-08-21</div><span class="tag">DeepSeek V3.1</span><h3>Think / Non-Think統合</h3><p>128K文脈、Agent Tool Use、Anthropic API形式、Strict Function Callingを強化。</p></div>
@@ -117,7 +128,7 @@
     <h2>✅ 強みと ⚠ 注意点</h2>
     <div class="grid-2">
       <article class="card"><h3>✅ 強み</h3><ul><li>1M文脈と最大384K出力</li><li>極めて低いAPI価格、とくにCache Hit</li><li>Pro/Flashの用途別二層構成</li><li>ThinkingとTool Useの統合</li><li>オープンウェイトと商用APIを並行提供</li><li>OpenAI/Anthropic形式への対応</li></ul></article>
-      <article class="card"><h3>⚠ 注意点</h3><ul><li>V4はPreview表記で、仕様・価格変更の可能性</li><li>Proの自前運用は1.6T規模で非常に重い</li><li>公式性能主張は第三者評価と分けて読む必要</li><li>旧model aliasは2026-07-24に廃止予定</li><li>長大出力は安価でも総トークン費用と検証負荷が増える</li></ul></article>
+      <article class="card"><h3>⚠ 注意点</h3><ul><li>V4は公式記事上Previewで、GAは別の一次情報が出るまで未確認</li><li>Proの自前運用は1.6T規模で非常に重い</li><li>公式性能主張は第三者評価と分けて読む必要</li><li>旧model aliasは2026-07-24にretire済み。固定値が残っていないか確認する</li><li>長大出力は安価でも総トークン費用と検証負荷が増える</li></ul></article>
     </div>
   </section>
 
@@ -130,6 +141,7 @@
     <h2>一次情報・出典</h2>
     <ul>
       <li><a href="https://api-docs.deepseek.com/news/news260424" target="_blank" rel="noopener">DeepSeek — V4 Preview Release</a></li>
+      <li><a href="https://api-docs.deepseek.com/news/news260816" target="_blank" rel="noopener">DeepSeek — V4 Pro / Flash API alias update</a></li>
       <li><a href="https://api-docs.deepseek.com/quick_start/pricing" target="_blank" rel="noopener">DeepSeek — Models &amp; Pricing</a></li>
       <li><a href="https://api-docs.deepseek.com/news/news251201" target="_blank" rel="noopener">DeepSeek — V3.2 Release</a></li>
       <li><a href="https://api-docs.deepseek.com/news/news250821" target="_blank" rel="noopener">DeepSeek — V3.1 Release</a></li>

@@ -106,25 +106,46 @@
       <p><a href="index.html">← Logs</a> / <a href="../index.html">Hub Top</a></p>
       <h1>Hub Health Dashboard</h1>
       <p>このハブ全体の<strong>運用健全性</strong>を可視化するページです。ページ数・最終更新からの経過日数・カテゴリカバレッジ・LLM トラッカー鮮度を一目で見えるようにし、「次に何を更新するか」の判断材料を提供します。</p>
-      <p><strong>計測時点:</strong> 2026-07-05 / <strong>計測対象:</strong> 全 .html ファイル（.git・node_modules を除く）。days old は各ファイルの <code>git log</code> 最終コミット日からの経過日数（<code>os.path.getmtime</code> はコンテナ再クローンで全ファイルが 0d 扱いになり誤動作するため、今回から git ベースの計測手法に切替。前回 6/26 版の一部カテゴリは実際には再計測されず前々回の数値が残っていたため、今回で正確な値に補正）。</p>
+      <p><strong>最新count計測:</strong> 2026-08-20 / <strong>対象:</strong> 全 .html（.git・node_modulesを除く）。GitHubの日次ニュース8/11〜8/19とCuratorのcurrent layerを統合した値です。下段のdays old表は<strong>2026-07-05のhistorical snapshot</strong>として凍結し、現在値として使いません。</p>
     </div>
 
     <div class="panel">
       <h2>全体サマリー</h2>
       <div class="stat-grid">
-        <div class="kpi"><div class="value">285</div><div class="label">総ページ数</div></div>
-        <div class="kpi"><div class="value">142,278</div><div class="label">総行数</div></div>
-        <div class="kpi"><div class="value">11</div><div class="label">主要カテゴリ</div></div>
-        <div class="kpi"><div class="value">6</div><div class="label">LLM トラッカー</div></div>
+        <div class="kpi"><div class="value">347</div><div class="label">総ページ数</div></div>
+        <div class="kpi"><div class="value">154,690</div><div class="label">総行数</div></div>
+        <div class="kpi"><div class="value">12</div><div class="label">主要カテゴリ</div></div>
+        <div class="kpi"><div class="value">10</div><div class="label">LLM トラッカー</div></div>
         <div class="kpi"><div class="value">4</div><div class="label">Index カテゴリ</div></div>
         <div class="kpi"><div class="value">6</div><div class="label">Trend 長文</div></div>
-        <div class="kpi"><div class="value">60</div><div class="label">AI News 日次</div></div>
+        <div class="kpi"><div class="value">107</div><div class="label">AI News / 公式確認便</div></div>
       </div>
-      <p style="font-size:0.85rem; color:#7f92ac; margin-top:10px;">前回計測（記載上は6/26、実際の recompute は6/17）比: +31ページ / +13,131行 / AI News 日次 +19本（6/18〜7/05 まで連続更新継続）。</p>
+      <p style="font-size:0.85rem; color:#7f92ac; margin-top:10px;">2026-08-19に公式差分ページを追加し、Gemini / Grok / Qwen / DeepSeek / MiniMax / OpenAI / Anthropicのcurrent layerを同期。AI Newsは速報レーダーの履歴として別層で保持。</p>
     </div>
 
     <div class="panel">
-      <h2>カテゴリ別の状況</h2>
+      <h2>2026-08-20 カテゴリ別count</h2>
+      <table>
+        <thead><tr><th>カテゴリ</th><th>HTML</th><th>総行数</th><th>更新の意味</th></tr></thead>
+        <tbody>
+          <tr><td class="cat">research</td><td>154</td><td>34,322</td><td>21 provider ledger、10 tracker、107 AI News記事、8/19公式差分とSignal → Leverageを含む</td></tr>
+          <tr><td class="cat">workbench</td><td>106</td><td>70,596</td><td>model-generations確認表を8/19 current layerへ同期</td></tr>
+          <tr><td class="cat">creator-system</td><td>25</td><td>28,170</td><td>local client / remote API / local inferenceの証拠境界を追加</td></tr>
+          <tr><td class="cat">foundations</td><td>14</td><td>4,431</td><td>site mapを347 HTML / 154 research pages / 10 trackersへ更新</td></tr>
+          <tr><td class="cat">Operations_Manuals</td><td>7</td><td>2,724</td><td>操作書架。今回のprovider操作はなし</td></tr>
+          <tr><td class="cat">claw-stack</td><td>6</td><td>3,336</td><td>変更なし</td></tr>
+          <tr><td class="cat">strategy</td><td>6</td><td>1,075</td><td>変更なし</td></tr>
+          <tr><td class="cat">logs</td><td>12</td><td>2,345</td><td>本health snapshotと次手を更新</td></tr>
+          <tr><td class="cat">_routines</td><td>7</td><td>1,301</td><td>日次速報はレーダー、公式確認層を別管理</td></tr>
+          <tr><td class="cat">demos</td><td>7</td><td>4,954</td><td>archive、変更なし</td></tr>
+          <tr><td class="cat">review</td><td>1</td><td>106</td><td>既存公開素材。独断で削除せず公開境界の既知課題として保持</td></tr>
+          <tr><td class="cat">root</td><td>2</td><td>1,300</td><td>topを338 pages / 12 categories / coverage ledgerへ同期</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel">
+      <h2>2026-07-05 historical age snapshot（現在値ではない）</h2>
       <table>
         <thead>
           <tr>
@@ -231,19 +252,19 @@
 
     <div class="panel">
       <h2>LLM トラッカー鮮度</h2>
-      <p class="info-card">LLM Updates Hub の<strong>全9トラッカー</strong>の最終更新日。全社並走で同じ粒度を維持する運用方針。</p>
+      <p class="info-card"><a href="../research/llm-tracker.html">LLM Coverage Ledger</a>で21 provider（中国系12）の公式入口を確認し、そのうち10 providerは長文trackerで履歴を保持します。providerごとに公開surfaceが異なるため、同じ粒度を装いません。</p>
       <div class="recommend-card">
-        <strong>🟢 最新同期完了（2026-07-24）— 全9トラッカー最新情報反映済み</strong>
-        <p>2026-07-24、全9トラッカー（Claude, ChatGPT, Gemini, Grok, Qwen, GLM, DeepSeek, Kimi, Muse）を一括再点検・更新。一次ソース（公式発表・API Docs・GitHub リリース）を横断確認し、Claude Code v2.1.217、ChatGPT Sites/Codexデスクトップ統合、Gemini 3.6 Flash、Grok Imagine、Qwen3.8-Max Preview、GLM-4.5予告、DeepSeek V4正式リリース、Kimi K3オープンウェイト公開確定などの最新情報を全トラッカーに反映完了。</p>
+        <strong>🟢 CURRENT LAYER同期（2026-08-19）— 21 provider ledger / 10 tracker</strong>
+        <p>8/11以後に公式差分が確認できた7 trackerと現行世代表を同期しました。過去のtimeline本文はhistorical snapshotであり、現在判断にはledgerと<a href="../research/official-model-delta-2026-08-19.html">8/19公式差分</a>を優先します。</p>
       </div>
       <table>
         <thead>
           <tr>
             <th>ベンダー</th>
             <th>ファイル</th>
-            <th>行数</th>
-            <th>最終更新</th>
-            <th>カバー範囲</th>
+            <th>Current layer</th>
+            <th>確認日</th>
+            <th>境界</th>
             <th>状態</th>
           </tr>
         </thead>
@@ -251,73 +272,81 @@
           <tr>
             <td class="cat">Claude / Anthropic</td>
             <td><a href="../research/claude-recent-updates.html">claude-recent-updates.html</a></td>
-            <td>2,048</td>
-            <td>2026-07-24</td>
-            <td>Claude Code v2.1.217・Enterprise Admin API・MemoryUI個別可視化改訂・HIPAAセルフサーブ設定・Claude for Government Desktop・Mythos Preview退役</td>
+            <td>Opus 5 / Sonnet 5</td>
+            <td>2026-08-19</td>
+            <td>Platform / Claude Code更新。旧Fable / Mythos記述はcurrentから除外</td>
             <td><span class="health ok">OK</span></td>
           </tr>
           <tr>
             <td class="cat">ChatGPT / OpenAI</td>
             <td><a href="../research/chatgpt-recent-updates.html">chatgpt-recent-updates.html</a></td>
-            <td>1,150</td>
-            <td>2026-07-24</td>
-            <td>ChatGPT Sites ベータ公開・Codex デスクトップアプリ完全統合・Atlas終了とUI刷新・GPT-5.6 Sol 脱獄と METR 評価に対する公式報告</td>
+            <td>GPT-5.6 family</td>
+            <td>2026-08-19</td>
+            <td>CLI 0.148.0。Codex sign-inの8/31移行とAPI surfaceを分離</td>
             <td><span class="health ok">OK</span></td>
           </tr>
           <tr>
             <td class="cat">Gemini / Google</td>
             <td><a href="../research/gemini-recent-updates.html">gemini-recent-updates.html</a></td>
-            <td>1,021</td>
-            <td>2026-07-24</td>
-            <td>Gemini 3.6 Flash 緊急投入・Google AI Studio / Vertex AI 提供開始・Gemini 3.5 Pro 再々延期</td>
+            <td>Gemini 3.7 Flash</td>
+            <td>2026-08-19</td>
+            <td>8/13 GA。旧Imagen 4 IDは8/17 shutdown</td>
             <td><span class="health ok">OK</span></td>
           </tr>
           <tr>
             <td class="cat">Grok / xAI</td>
             <td><a href="../research/grok-recent-updates.html">grok-recent-updates.html</a></td>
-            <td>749</td>
-            <td>2026-07-24</td>
-            <td>Grok Imagine 正式公開・Grok Build Apache 2.0 オープンソース化・Grok 4.5</td>
+            <td>Grok 4.6</td>
+            <td>2026-08-19</td>
+            <td>Build / API / X realtime surfaceを分離</td>
             <td><span class="health ok">OK</span></td>
           </tr>
           <tr>
             <td class="cat">Qwen / Alibaba</td>
             <td><a href="../research/qwen-recent-updates.html">qwen-recent-updates.html</a></td>
-            <td>632</td>
-            <td>2026-07-24</td>
-            <td>Qwen3.8-Max Preview 2.4兆パラメータ公開・試用開始・Apple Intelligence 中国採用</td>
+            <td>Qwen3.8 open family</td>
+            <td>2026-08-19</td>
+            <td>2.4T-A95B / 27B weights。licenseはmodel card別</td>
             <td><span class="health ok">OK</span></td>
           </tr>
           <tr>
             <td class="cat">GLM / Zhipu</td>
             <td><a href="../research/glm-recent-updates.html">glm-recent-updates.html</a></td>
-            <td>638</td>
-            <td>2026-07-24</td>
-            <td>GLM-4.5（7/28 リリース予告）・ZCode（07-02）・HK$31.41億株式プレースメント</td>
+            <td>GLM-5.2</td>
+            <td>2026-08-11</td>
+            <td>1M context / open weights / local serving</td>
             <td><span class="health ok">OK</span></td>
           </tr>
           <tr>
             <td class="cat">DeepSeek</td>
             <td><a href="../research/deepseek-recent-updates.html">deepseek-recent-updates.html</a></td>
-            <td>144</td>
-            <td>2026-07-24</td>
-            <td>DeepSeek V4 正式リリース・1Mコンテキスト・旧 alias 移行完了</td>
+            <td>DeepSeek V4 API family</td>
+            <td>2026-08-19</td>
+            <td>Pro-0813 / Flash-0731。aliasとGA表記を分離</td>
             <td><span class="health ok">OK</span></td>
           </tr>
           <tr>
             <td class="cat">Kimi / Moonshot</td>
             <td><a href="../research/kimi-recent-updates.html">kimi-recent-updates.html</a></td>
-            <td>132</td>
-            <td>2026-07-24</td>
-            <td>Kimi K3 Frontend Arena 首位・オープンウェイト 7/27 公開確定</td>
+            <td>Kimi K3</td>
+            <td>2026-08-11</td>
+            <td>weights / API / tool-history contractを分離</td>
             <td><span class="health ok">OK</span></td>
           </tr>
           <tr>
             <td class="cat">Muse / Meta</td>
             <td><a href="../research/muse-recent-updates.html">muse-recent-updates.html</a></td>
-            <td>676</td>
-            <td>2026-07-24</td>
-            <td>Muse Spark 1.1・Meta Model API・Contemplating Mode</td>
+            <td>Muse Spark 1.1</td>
+            <td>2026-08-11</td>
+            <td>Meta Model APIはpublic preview</td>
+            <td><span class="health ok">OK</span></td>
+          </tr>
+          <tr>
+            <td class="cat">MiniMax</td>
+            <td><a href="../research/minimax-recent-updates.html">minimax-recent-updates.html</a></td>
+            <td>MiniMax M3 / H3</td>
+            <td>2026-08-19</td>
+            <td>M3 LLM / H3 generation / Hailuo API / local inferenceを分離</td>
             <td><span class="health ok">OK</span></td>
           </tr>
         </tbody>
