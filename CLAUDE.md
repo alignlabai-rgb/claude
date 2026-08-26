@@ -5,7 +5,7 @@
 実験的に運用する前提はありますが、それは「壊してよい」という意味ではありません。
 正しい前提は `安全に更新し、必要なら戻せるようにする` です。
 
-**最終更新:** 2026-08-26
+**最終更新:** 2026-08-19
 
 ---
 
@@ -142,7 +142,7 @@
 10. **失敗事例があれば anti-patterns に記録**
 11. **新用語が出たら glossary に 1-2 行追加**
 
-LLM/providerの現行値はまず最新日付の `research/official-model-delta-YYYY-MM-DD.html`（現在は `official-model-delta-2026-08-26.html`）と `workbench/knowledge/model-generations.html` を更新します。旧日付のdeltaはhistorical snapshotとして残します。X・日次ニュース・issue由来の情報は、公式sourceを確認するまで `RADAR_UNVERIFIED` とし、価格、期限、model ID、契約、securityの断定へ使いません。
+LLM/providerの現行値はまず最新日付の `research/official-model-delta-YYYY-MM-DD.html`（現在は `official-model-delta-2026-08-19.html`）と `workbench/knowledge/model-generations.html` を更新します。旧日付のdeltaはhistorical snapshotとして残します。X・日次ニュース・issue由来の情報は、公式sourceを確認するまで `RADAR_UNVERIFIED` とし、価格、期限、model ID、契約、securityの断定へ使いません。
 
 詳細チェックリストは `foundations/definition-of-done.html` を参照。
 
