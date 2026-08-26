@@ -34,7 +34,13 @@
     <h1>Kimi / Moonshot AI 最新アップデート完全版</h1>
     <p>Moonshot AIの<strong>Kimiモデル群</strong>を、能力・アーキテクチャ・API・実務用途の観点から整理します。現行フラッグシップの<strong>Kimi K3</strong>、コーディング専用の<strong>Kimi K2.7 Code</strong>、汎用マルチモーダルの<strong>Kimi K2.6</strong>を中心に追跡します。</p>
     <div class="summary"><p><strong>結論:</strong> Kimiは「長い文脈を保持したまま、コードと知識労働を最後まで遂行する」方向に進化しています。K3は2.8Tパラメータ・1Mコンテキスト・ネイティブ視覚理解を備え、K2.7 Codeは256K文脈で長時間コーディングを担う、明確な二層構成です。</p></div>
-    <p class="last-update">最終更新: 2026-07-24（Kimi K3 Frontend Arena 首位・オープンウェイト 7/27 公開確定を追記）</p>
+    <p class="last-update">最終更新: 2026-08-26（公式API docsを再確認。current model IDはKimi K3で据え置き）</p>
+  </section>
+
+  <section class="panel">
+    <h2>2026-08-26 鮮度確認</h2>
+    <p><span class="tag">CHECKED_UNCHANGED</span> Moonshot公式API docsのcurrent chat modelはKimi K3で据え置きです。K3固有のdynamic tool message contractを維持し、新しいmodel名を速報だけで採用しません。</p>
+    <p class="small">Source: <a href="https://platform.kimi.ai/docs/api/chat" target="_blank" rel="noopener">Kimi API — Chat</a></p>
   </section>
 
   <section class="panel">
@@ -75,7 +81,7 @@
       <article class="card"><h3>Long-horizon Coding</h3><ul><li>大規模コードベースを理解し、ターミナルツールを連携</li><li>スクリーンショットの視覚フィードバックからUI・ゲーム・CADを改善</li><li>K2.7 CodeはK2.6比でAgent性能10%向上、過剰思考を平均30%削減と公式説明</li></ul></article>
       <article class="card"><h3>Knowledge Work</h3><ul><li>1M文脈に資料・履歴・成果物を保持</li><li>Tool Choiceと動的Tool Loadingで大規模なツール群を制御</li><li>自動Context Cacheで固定した長い接頭辞を再利用</li></ul></article>
     </div>
-    <div class="note"><p><strong>運用上の注意:</strong> K3は常時Thinkingで、現時点の <code>reasoning_effort</code> は <code>max</code> のみ。複数ターンやTool Callでは、APIが返したassistant message全体を保持する必要があります。</p></div>
+    <div class="note"><p><strong>運用上の注意:</strong> K3は常時Thinkingで、<code>reasoning_effort</code> は <code>low</code> / <code>high</code> / <code>max</code>（既定 <code>max</code>）。複数ターンやTool Callでは、<code>reasoning_content</code> と <code>tool_calls</code> を含むassistant message全体を履歴へ戻す必要があります。</p></div>
   </section>
 
   <section class="panel">
@@ -95,7 +101,7 @@
   <section class="panel">
     <h2>📅 タイムライン</h2>
     <div class="timeline">
-      <div class="item"><div class="date">2026-07-24</div><span class="tag">Kimi K3</span><h3>Frontend Code Arena 首位 &amp; 重み7/27公開確定</h3><p>Kimi K3（2.8T・1Mコンテキスト）が Frontend Code Arena で首位を獲得。Moonshot AI は 2026年7月27日にオープンウェイト（モデル重み）を正式公開することを再確認。</p></div>
+      <div class="item"><div class="date">2026-07-27</div><span class="tag">Kimi K3</span><h3>Full weightsとKimi K3 Licenseを公開</h3><p>Kimi K3（2.8T total / 104B active・1M context）のfull weights、技術報告、Kimi K3 Licenseが公式repositoryで公開済み。API model IDは <code>kimi-k3</code> です。</p></div>
       <div class="item"><div class="date">K3直前世代</div><span class="tag">K2.7 Code</span><h3>長時間コーディング専用モデルへ分化</h3><p>256Kコンテキスト、HighSpeed版、マルチモーダルTool結果を導入。K2.6より指示遵守と長時間Codingを強化。</p></div>
       <div class="item"><div class="date">K2系列</div><span class="tag">K2.6</span><h3>汎用マルチモーダルとThinking切替</h3><p>テキスト・画像・動画、Agent、Thinking/Non-thinkingを一つのモデルで提供。</p></div>
       <div class="item"><div class="date">2025-07</div><span class="tag">Kimi K2</span><h3>Open Agentic Intelligenceの基盤</h3><p>1T総パラメータ・32B活性・128K文脈。MuonClipとAgent最適化を打ち出し、Modified MITで公開。</p></div>
@@ -106,7 +112,7 @@
     <h2>✅ 強みと ⚠ 注意点</h2>
     <div class="grid-2">
       <article class="card"><h3>✅ 強み</h3><ul><li>1M文脈と長時間Codingの一体設計</li><li>画像・動画を含むネイティブな視覚理解</li><li>オープンウェイト路線を維持する巨大MoE</li><li>OpenAI互換APIと自動Context Cache</li><li>専用Codingモデルと高速版を選択可能</li></ul></article>
-      <article class="card"><h3>⚠ 注意点</h3><ul><li>K3のフルウェイトは更新日時点では公開予定段階</li><li>2.8Tモデルの自前運用は非常に重い</li><li>K3は常時Thinkingで、低遅延の単純応答にはK2.6等が適する</li><li>公式Web Searchは更新中で、短期の本番利用は非推奨</li><li>K3の詳細技術報告はウェイト公開と同時期に追加予定</li></ul></article>
+      <article class="card"><h3>⚠ 注意点</h3><ul><li>weightsは公開済みだが、2.8T modelの自前運用は非常に重い</li><li>ライセンスはModified MITではなく固有のKimi K3 License</li><li>K3は常時Thinkingで、履歴保持contractを崩すとagent loopの再現性が落ちる</li><li>公式Web Searchなど周辺surfaceは利用直前に状態を再確認する</li><li>OpenAI / Anthropic互換endpointでもvendor固有parameterとtool contractを事前検証する</li></ul></article>
     </div>
   </section>
 
@@ -122,6 +128,8 @@
       <li><a href="https://platform.kimi.ai/docs/guide/kimi-k2-7-code-quickstart" target="_blank" rel="noopener">Moonshot AI — Kimi K2.7 Code</a></li>
       <li><a href="https://platform.kimi.ai/docs/guide/kimi-k2-6-quickstart" target="_blank" rel="noopener">Moonshot AI — Kimi K2.6</a></li>
       <li><a href="https://platform.kimi.ai/docs/pricing/chat-k3" target="_blank" rel="noopener">Moonshot AI — Kimi K3 Pricing</a></li>
+      <li><a href="https://github.com/MoonshotAI/Kimi-K3" target="_blank" rel="noopener">MoonshotAI/Kimi-K3 — weights・technical report・license</a></li>
+      <li><a href="https://github.com/MoonshotAI/Kimi-Vendor-Verifier" target="_blank" rel="noopener">MoonshotAI/Kimi-Vendor-Verifier</a></li>
       <li><a href="https://github.com/MoonshotAI/Kimi-K2" target="_blank" rel="noopener">MoonshotAI/Kimi-K2 公式GitHub</a></li>
     </ul>
     <div class="footer-links"><a href="../workbench/knowledge/kimi.html">Kimi 深掘り</a><a href="muse-recent-updates.html">Muse 最新</a><a href="deepseek-recent-updates.html">DeepSeek 最新</a><a href="index.html">← Research Index</a></div>

@@ -202,18 +202,35 @@
           地味だが実務に効く更新が続いています。
         </p>
         <p>
-          7月下旬（7/18〜7/24）の本質は、<strong>Gemini 3.5 Pro 再延期と Gemini 3.6 Flash の緊急投入</strong>です。
-          期待されていた Gemini 3.5 Pro の正式リリースが再調整・延期となった一方で、Google DeepMind は最新アーキテクチャを採用した高速・高コスパモデル
-          <strong>Gemini 3.6 Flash</strong>（<code>gemini-3.6-flash</code>）を7/24に緊急リリースし、Google AI Studio および Vertex AI にて提供を開始しました。
+          7月下旬の公式差分は、<strong>Gemini 3.6 Flash と Gemini 3.5 Flash-Lite のGA</strong>です。
+          GoogleのGemini API release notesでは両モデルの正式日を<strong>2026年7月21日</strong>としており、
+          <code>gemini-3.6-flash</code> はagentic / multimodal task向け、<code>gemini-3.5-flash-lite</code> は高スループット自動化向けに位置づけられています。
+          以前の「3.5 Pro再延期に伴う7/24緊急投入」という因果説明は公式一次情報で確認できないため撤回しました。
         </p>
       </div>
-      <p class="last-update">最終更新: 2026-07-24（Gemini 3.6 Flash 緊急投入・Google AI Studio / Vertex AI 提供開始・Gemini 3.5 Pro 再々延期を追記）</p>
+      <p class="last-update">最終更新: 2026-08-26（公式changelogを再確認。現行general modelはGemini 3.7 Flashで据え置き）</p>
+    </section>
+
+    <section class="panel" style="border-color:rgba(125,211,252,.32)">
+      <h2>2026-08-26 鮮度確認</h2>
+      <p><span class="tag tag-product">CHECKED_UNCHANGED</span> Gemini API changelogを再確認し、8月19日以後に新しいgeneral model releaseは確認しませんでした。現行GAは<code>gemini-3.7-flash</code>のままです。更新がないことも確認日付きで残し、速報だけで世代名を上げません。</p>
+      <p class="small">Source: <a href="https://ai.google.dev/gemini-api/docs/changelog" target="_blank" rel="noopener">Gemini API changelog</a></p>
+    </section>
+
+    <section class="panel" style="border-color:rgba(102,224,194,.42)">
+      <h2>2026-08-19 公式ソース差分</h2>
+      <div class="grid-3">
+        <div class="card"><span class="tag tag-model">GA</span><h3>Gemini 3.7 Flash</h3><p><code>gemini-3.7-flash</code>は8月13日にGA。Googleはcoding、web development、computer-use、agentic workflow向けの高知能・低遅延modelとして案内しています。</p></div>
+        <div class="card"><span class="tag tag-product">Migration</span><h3>旧Imagen 4 IDはshutdown</h3><p><code>imagen-4.0-generate-001</code>、Ultra、Fastの3 IDは8月17日にshutdown。公式推奨先は3件とも<code>gemini-3.1-flash-image</code>です。</p></div>
+        <div class="card"><span class="tag tag-code">Boundary</span><h3>surfaceを分ける</h3><p>Gemini app、Gemini API、Vertex AI、画像・動画generationは同名でも提供時期とIDが異なります。実装時は対象surfaceのcatalogを再確認します。</p></div>
+      </div>
+      <p class="small">Source: <a href="https://ai.google.dev/gemini-api/docs/changelog" target="_blank">Gemini API changelog</a> / <a href="https://ai.google.dev/gemini-api/docs/models/gemini-3.7-flash" target="_blank">Gemini 3.7 Flash model page</a> / <a href="https://ai.google.dev/gemini-api/docs/deprecations" target="_blank">Gemini API deprecations</a></p>
     </section>
 
     <section class="grid-4">
       <div class="stat"><div class="value">2.5B</div><div class="label">AI Overviews MAU</div></div>
       <div class="stat"><div class="value">1B</div><div class="label">AI Mode MAU</div></div>
-      <div class="stat"><div class="value">3.5</div><div class="label">Gemini 最新フラッグシップ</div></div>
+      <div class="stat"><div class="value">3.7 Flash</div><div class="label">現行GA Flash（8/13）</div></div>
       <div class="stat"><div class="value">$0.034</div><div class="label">Nano Banana 2 Lite 1K画像あたり</div></div>
     </section>
 
@@ -256,12 +273,14 @@
       <div class="timeline">
 
         <article class="item hot">
-          <div class="date">2026-07-24</div>
-          <h3>Gemini 3.6 Flash 緊急リリース — 高速・高コスパモデルを Google AI Studio / Vertex AI で一斉提供 <span class="tag tag-model">Model</span><span class="tag tag-new">NEW</span></h3>
+          <div class="date">2026-07-21</div>
+          <h3>Gemini 3.6 Flash / 3.5 Flash-Lite がGA <span class="tag tag-model">Model</span><span class="tag tag-new">VERIFIED</span></h3>
           <p>
-            Google DeepMind がフラッグシップモデル Gemini 3.5 Pro の再延期に伴い、軽量・高速版の最新モデル <strong>Gemini 3.6 Flash</strong>（<code>gemini-3.6-flash</code>）を緊急投入。
-            Google AI Studio および Vertex AI にて提供が開始され、低遅延応答・マルチモーダル処理・コスト効率の高さで開発環境の標準モデルとして展開された。
+            Googleがstable modelとして <strong>Gemini 3.6 Flash</strong>（<code>gemini-3.6-flash</code>）と
+            <strong>Gemini 3.5 Flash-Lite</strong>（<code>gemini-3.5-flash-lite</code>）を公開。
+            両者は1M context、64K max output、thinking、Computer Useを含むbuilt-in toolsをサポートする。
           </p>
+          <p class="small">Source: <a href="https://ai.google.dev/gemini-api/docs/changelog" target="_blank">Gemini API Release notes</a> / <a href="https://ai.google.dev/gemini-api/docs/models" target="_blank">Official model catalog</a></p>
         </article>
 
         <article class="item hot">

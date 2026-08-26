@@ -62,8 +62,8 @@
             今後の新規パイプライン設計では Sora を選択肢から外すのが安全です。
           </p>
           <p style="color: var(--text-muted); font-size: 0.9rem;">
-            画像生成では Google が Imagen 4 を段階的に廃止し、<strong>Nano Banana 2 Lite / Nano Banana 2 / Nano Banana Pro</strong>の
-            3階層へ再編。動画側でも <strong>Gemini Omni Flash</strong>（テキスト・画像・動画→動画）が登場し、画像/動画ツールの境界が薄れつつあります。
+            画像生成では Google の旧Imagen 4 model IDが2026-08-17にshutdownし、公式推奨先は<strong><code>gemini-3.1-flash-image</code></strong>へ移行。
+            MiniMaxでは<strong>H3</strong>がtext・image・video・audio contextを統合するomni-modal generation modelとして加わり、画像/動画ツールの境界が薄れつつあります。
           </p>
           <p style="color: var(--text-muted); font-size: 0.78rem; margin-top: 1rem; opacity: 0.7;">
             ※ スコアやランキングは評価軸・時期・集計元（Artificial Analysis / 各社公式発表など）で大きく変動し、
@@ -139,12 +139,12 @@
             <td>2026-06-30 に開発者向けパブリックプレビュー開始。Google AI Studio・Gemini API・Gemini Enterprise Agent Platform・Gemini app・Google Flow で利用可</td>
           </tr>
           <tr>
-            <td><strong>WAN (Video 2.6 / 2.7)</strong></td>
+            <td><strong>Wan 3.0 Video</strong></td>
             <td>Alibaba</td>
-            <td>リーダーボードで上位観測が継続（バージョンは2.6→2.7の観測もあり、評価軸により変動）。Bailian / Cloud 経由で API 統合しやすい</td>
-            <td><span class="tag tag-cyan">低め（定性）</span></td>
-            <td>クラウド統合・大量バッチ生成</td>
-            <td>Alibaba Bailian/Cloud経由のAPI規約に準拠。地域・契約により条件差あり（要確認）</td>
+            <td>native audio/video、最大30秒、1080p、omni-reference。exact model IDは<code>wan3.0-video</code></td>
+            <td><span class="tag tag-cyan">公式pricing要確認</span></td>
+            <td>長めの音声付きclip、referenceを使うremote制作実験</td>
+            <td>2026-08-24公式release。Model Studioのpreviewで、model / endpoint / API keyは同一regionが必要。open weights / local inferenceは未確認</td>
           </tr>
           <tr>
             <td><strong>Seedance (2.0)</strong></td>
@@ -161,6 +161,14 @@
             <td><span class="tag tag-green">安め</span></td>
             <td>素材の動的化・短尺加工</td>
             <td>有償プランで商用利用可（規約要確認）</td>
+          </tr>
+          <tr>
+            <td><strong>MiniMax H3</strong></td>
+            <td>MiniMax</td>
+            <td>text・image・video・audio contextから生成するomni-modal model。videoはnative stereo、最大2K・15秒</td>
+            <td><span class="tag tag-cyan">要公式pricing確認</span></td>
+            <td>音声込み短尺、複数mediaをまたぐ制作実験</td>
+            <td>2026-07-31公式release。open modelの具体license・weights・提供surfaceは対象artifactごとに確認</td>
           </tr>
           <tr>
             <td><strong>Hailuo</strong></td>
@@ -218,7 +226,7 @@
             <td>Google</td>
             <td>2026-06-30、開発者向けに <strong>Nano Banana 2 Lite</strong>（最速・最安、text-to-image約4秒）が登場し、
               Lite ＜ <strong>Nano Banana 2</strong>（汎用バランス）＜ <strong>Nano Banana Pro</strong>（旧 Gemini 3 Pro Image、最高品質・SynthID透かし）の
-              3階層が明確化。旧 Imagen 4 は情報源により2026年6月〜8月の廃止時期にばらつきがあり、公式ドキュメントでの要確認だが、いずれにせよ移行が推奨される</td>
+              3階層が明確化。Gemini APIの旧Imagen 4 model ID 3件は2026-08-17にshutdown済みで、公式deprecation tableの推奨先は<code>gemini-3.1-flash-image</code></td>
             <td><span class="tag tag-orange">Lite目安$0.034/1K画像、Pro目安$0.134/画像（公表資料ベース、変動あり）</span></td>
             <td>指示忠実な汎用画像〜プロ品質の複雑指示画像まで階層的にカバー</td>
             <td>Google AI Studio・Gemini API・Gemini Enterprise Agent Platform 等で提供。利用規約はGoogle Cloud生成AI規約に準拠（要個別確認）</td>
@@ -251,10 +259,47 @@
       </table>
     </div>
     <p style="color: var(--text-muted); font-size: 0.82rem; margin-top: 0.75rem;">
-      ※ Whisk は確証ある料金・日付が薄いため、特徴は定性記述に留めています。Imagen 4 の正確な廃止日は出典間で揺れがあり、
-      本ページでは断定を避けています。ローカル運用の柔軟さが要るなら SDXL / FLUX.2、作風重視なら Midjourney、
+      ※ Whisk は確証ある料金・日付が薄いため、特徴は定性記述に留めています。旧Imagen 4 model IDはshutdown済みのためcurrent API候補から除外します。ローカル運用の柔軟さが要るなら SDXL / FLUX.2、作風重視なら Midjourney、
       Google エコシステム前提なら Nano Banana 系列、というのが基本の分かれ目です。
     </p>
+  </div>
+</section>
+
+<!-- Local / Remote Boundary -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label">運用境界 · 2026-08-26確認</div>
+    <h2 class="section-title">「ローカルで操作した」と<br>「ローカル推論した」を分ける</h2>
+    <div class="two-col">
+      <div>
+        <p style="color: var(--text-muted); margin-bottom: 1rem;">
+          動画ファイルが手元に保存されたこと、ローカルのMCPクライアントやCLIから生成を開始したことだけでは、
+          モデル本体がローカルGPUで推論した証明にはなりません。MiniMax公式の
+          <a href="https://github.com/minimax-ai/minimax-mcp">MiniMax MCP</a>は動画生成ツールを提供しますが、
+          API keyを設定してMiniMax APIを呼ぶ構成です。これは便利な<strong>ローカル操作の入口</strong>であり、
+          <strong>ローカル推論</strong>とは別の提供面です。
+        </p>
+        <p style="color: var(--text-muted); margin-bottom: 1rem;">
+          同様にWan 3.0の<code>wan3.0-video</code>はAlibaba Cloud Model Studioの<strong>remote preview</strong>です。
+          公式API referenceは同一regionのmodel・endpoint・API keyを要求します。公開済みのWan旧世代weightsやComfyUI workflowがあっても、Wan 3.0自体をlocal inferenceと推定しません。
+        </p>
+        <p style="color: var(--text-muted);">
+          非公開の検証結果を公開ページへ持ち込む場合も、モデル名や性能を先に断定しません。
+          公式model card・weights・license・実行receiptのうち、公開可能な根拠が揃った範囲だけを記載します。
+        </p>
+      </div>
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem;">
+        <h3 style="margin:0 0 .8rem;">採用前に残す最小評価記録</h3>
+        <ul class="checklist">
+          <li>engine / entrypoint / model ID / workflow version</li>
+          <li>remote API・local inference・hybrid の区分</li>
+          <li>hardware envelope / network dependency / cost class</li>
+          <li>license / commercial-use boundary / public evidence</li>
+          <li>生成秒数よりも usable rate・失敗型・人手介入</li>
+          <li>静止フレーム化などの失敗例を成功例と同じ条件で保存</li>
+        </ul>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -399,7 +444,7 @@
       <a href="openclaw.html">OpenClaw連携</a>
     </nav>
     <p>AI Creator Hub — AIでコンテンツをつくり、稼ぐ</p>
-    <p style="font-size:0.8rem;opacity:0.65;">最終更新: 2026-07-05（動画は Grok Imagine Video の GA・首位級ベンチマークで三つ巴→四つ巴へ、Sora は API 終了日 2026-09-24 が確定し表から除外。画像は Imagen→Nano Banana 系列への再編と FLUX.2 の追加、音楽は Suno/Udio のレーベル和解による用途変化（Udio はリミックス専用の会員制へ転換）を反映。全カテゴリに商用利用・API条件の列を新設し、確証なき料金は引き続き相対表記に留置）</p>
+    <p style="font-size:0.8rem;opacity:0.65;">最終更新: 2026-08-26（Wan 3.0 remote previewとregion境界を追加。MiniMax H3を含め、ローカル操作・remote API・local inferenceを区別し、導入前に各社公式仕様・価格・規約を再確認すること）</p>
   </div>
 </footer>
 

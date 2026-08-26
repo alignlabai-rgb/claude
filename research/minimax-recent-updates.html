@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MiniMax 最新アップデート — M3 / H3 / Hailuo | Research</title>
+  <meta name="description" content="MiniMax M3、H3 omni-modal generation、Hailuo video、公式MCP、local inferenceとremote APIの境界を公式一次情報で整理。">
+  <style>
+    :root{color-scheme:dark;--bg:#0a0c19;--panel:#15182a;--line:#34395a;--ink:#f4f3ff;--muted:#b3b5cb;--violet:#b5a1ff;--mint:#6ee2c2;--amber:#f1bd67;--red:#ff9191}
+    *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 15% 0,#30295e 0,transparent 35rem),var(--bg);color:var(--ink);font:15px/1.72 system-ui,-apple-system,"Segoe UI","Noto Sans JP",sans-serif}a{color:var(--mint);text-underline-offset:3px}.shell{width:min(1080px,calc(100% - 30px));margin:auto}header{padding:52px 0 30px;border-bottom:1px solid var(--line)}main{padding:26px 0 70px}.eyebrow{color:var(--violet);font-size:.72rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase}h1{font-size:clamp(2.5rem,7vw,5.5rem);line-height:.96;letter-spacing:-.055em;margin:.55rem 0 1rem}h2{font-size:1.3rem;margin:0 0 .7rem}h3{font-size:1rem;margin:0 0 .45rem}p{color:#d4d3e3;margin:.45rem 0}.lead{font-size:1.05rem;max-width:880px}.meta,.small{color:var(--muted);font-size:.82rem}.stats,.grid,.timeline,.gate{display:grid;gap:12px}.stats{grid-template-columns:repeat(4,1fr);margin-top:20px}.stat,.card,.event,.notice,.gate>div{border:1px solid var(--line);border-radius:14px;background:rgba(21,24,42,.93);padding:16px}.stat b{display:block;color:var(--violet);font-size:1.35rem}.stat span{color:var(--muted);font-size:.77rem}.grid{grid-template-columns:repeat(2,1fr)}.badge{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:3px 8px;font-size:.67rem;font-weight:800}.confirmed{color:var(--mint);border-color:#3a7e69}.surface{color:var(--violet);border-color:#685b99}.boundary{color:var(--amber);border-color:#806536}.timeline{margin-top:12px}.event{border-left:4px solid var(--violet)}.event time{display:block;color:var(--violet);font-size:.75rem;font-weight:800}.facts{padding-left:1.2rem;color:#d3d3e2}.facts li+li{margin-top:.45rem}.notice{margin:18px 0;border-left:4px solid var(--amber)}.gate{grid-template-columns:repeat(5,1fr)}.gate b{display:block;color:var(--mint);font-size:.72rem}.gate span{color:var(--muted);font-size:.8rem}.sources li+li{margin-top:.45rem}code{background:#22263d;color:#c9c0ff;padding:.08rem .32rem;border-radius:5px}footer{border-top:1px solid var(--line);padding:22px 0 36px;color:var(--muted);font-size:.8rem}@media(max-width:760px){.stats,.grid,.gate{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="shell">
+      <p class="meta"><a href="index.html">← Research</a> / <a href="llm-tracker.html">LLM Tracker</a> / <a href="../index.html">Hub Top</a></p>
+      <div class="eyebrow">MiniMax update tracker · official sources</div>
+      <h1>MiniMax</h1>
+      <p class="lead">LLMのM3、omni-modal generationのH3、動画APIのHailuo、公式MCP、ローカル推論を一つの「MiniMax」という名前だけで混ぜないためのtrackerです。モデル、surface、weights、runtime receipt、API依存を分離します。</p>
+      <p class="meta">最終公式確認: 2026-08-26 / 次回点検候補: 2026-09-02 または公式release時</p>
+      <div class="stats">
+        <div class="stat"><b>MiniMax M3</b><span>current frontier LLM</span></div>
+        <div class="stat"><b>MiniMax H3</b><span>omni-modal generation</span></div>
+        <div class="stat"><b>Open weights</b><span>official repository</span></div>
+        <div class="stat"><b>2K / 15s</b><span>H3 official video ceiling</span></div>
+      </div>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section class="notice">
+      <span class="badge boundary">IMPORTANT BOUNDARY</span>
+      <h2>動画をローカル保存した ≠ ローカル推論した</h2>
+      <p>MiniMaxのCLI・MCP・desktop clientから生成を開始し、出力がMacへ保存されても、remote APIを呼んでいれば推論本体はローカルではありません。ローカル推論を名乗るには、weights、inference process、network状態、hardware envelope、runtime receiptを同時に確認します。</p>
+    </section>
+
+    <section class="notice" style="border-left-color:var(--mint)">
+      <span class="badge confirmed">CHECKED_UNCHANGED · 2026-08-26</span>
+      <h2>M3 / H3 current layerを維持</h2>
+      <p>MiniMax公式のM3 / H3 release入口を再確認し、8月19日以後に主力familyを置き換える公式releaseは確認しませんでした。M3（LLM）、H3（omni-modal generation）、Hailuo（remote video API）を別surfaceとして維持します。</p>
+    </section>
+
+    <section class="grid">
+      <article class="card">
+        <span class="badge confirmed">2026-07-31 RELEASE</span>
+        <h2>MiniMax H3 — omni-modal generation</h2>
+        <ul class="facts">
+          <li>text・image・video・audio contextを受け、複数mediaを生成するgeneral-purpose omni-modal model。</li>
+          <li>videoはnative stereo audio、最大2K、最大15秒と公式releaseに記載。</li>
+          <li>公式はopen modelとしていますが、具体的なlicense・weights・runtime条件は対象artifactごとに確認します。</li>
+        </ul>
+        <p class="small"><a href="https://www.minimax.io/blog/minimax-h3">MiniMax H3 official release</a></p>
+      </article>
+
+      <article class="card">
+        <span class="badge confirmed">PRIMARY_CONFIRMED</span>
+        <h2>MiniMax M3 — LLM</h2>
+        <ul class="facts">
+          <li>2026-06-01公式release。native multimodal、coding / agentic work、1M context。</li>
+          <li>公式repositoryは約428B total / 約23B active、thinkingのenabled / adaptive / disabledを記載。</li>
+          <li>weightsとlocal serving手順が公開されていますが、full precisionや高bit量子化は非常に大きなmemoryを要します。</li>
+        </ul>
+        <p class="small"><a href="https://www.minimax.io/blog/minimax-m3">Official release</a> · <a href="https://github.com/MiniMax-AI/MiniMax-M3">Official repository</a> · <a href="https://www.minimax.io/models/text/m3">Model page</a></p>
+      </article>
+
+      <article class="card">
+        <span class="badge surface">API CATALOG</span>
+        <h2>M2.7 / M2.5 — text API</h2>
+        <ul class="facts">
+          <li>API overviewはM2.7、M2.7-highspeed、M2.5系列をtext generation modelとして掲載。</li>
+          <li>catalog上のcontextは204,800。M3の1Mと同じ設定を流用しません。</li>
+          <li>OpenAI-compatible / Anthropic-compatible surfaceは便利ですが、tool schemaとserver-side toolsの同等性を仮定しません。</li>
+        </ul>
+        <p class="small"><a href="https://platform.minimax.io/docs/api-reference/api-overview">MiniMax API overview</a> · <a href="https://platform.minimax.io/docs/api-reference/models/openai/list-models">List models</a></p>
+      </article>
+
+      <article class="card">
+        <span class="badge surface">VIDEO FAMILY</span>
+        <h2>Hailuo 2.3 — video API family</h2>
+        <ul class="facts">
+          <li>API overviewは<code>MiniMax-Hailuo-2.3</code>とFastを動画生成familyとして掲載。H3公開後もAPI catalog上の別surfaceです。</li>
+          <li>M3というLLMのopen weightsは、Hailuo video modelのlocal weightsを意味しません。</li>
+          <li>text-to-video / image-to-videoは非同期task API。file downloadはinference locationの証明になりません。</li>
+        </ul>
+        <p class="small"><a href="https://platform.minimax.io/docs/api-reference/api-overview">Official video model list</a></p>
+      </article>
+
+      <article class="card">
+        <span class="badge surface">CLIENT / MCP</span>
+        <h2>Official MCP / CLI</h2>
+        <ul class="facts">
+          <li>公式MCPはTTS、voice cloning、image、video APIをMCP clientへ接続します。</li>
+          <li>公式CLIはtext / image / video / speech / musicを扱い、M3を指定できます。</li>
+          <li>credential、quota、課金、provider contractはclient導入とは別のowner判断です。</li>
+        </ul>
+        <p class="small"><a href="https://github.com/minimax-ai/minimax-mcp">Official MCP</a> · <a href="https://github.com/MiniMax-AI/cli">Official CLI</a></p>
+      </article>
+    </section>
+
+    <section>
+      <h2>公式タイムライン</h2>
+      <div class="timeline">
+        <article class="event"><time>2026-06-01</time><h3>MiniMax M3 release</h3><p>LLM、native multimodal、1M context、coding / agentic、open weightsを一つのreleaseとして確認。</p></article>
+        <article class="event"><time>2026-07-31</time><h3>MiniMax H3 release</h3><p>text・image・video・audio contextを統合するomni-modal generation model。videoはnative stereo、最大2K・15秒。M3 LLMやHailuo API familyとは別surfaceとして管理。</p></article>
+        <article class="event"><time>2026-08-11 CHECK</time><h3>API catalogとrelease surfaceを再照合</h3><p>M3、M2.7、M2.5、Hailuo 2.3、Speech 2.8、Music 2.6 / 3.0などが同じprovider内で別familyとして並走。名称だけで同一runtimeと判断しない。</p></article>
+        <article class="event"><time>2026-08-19 CHECK</time><h3>H3をcurrent generation layerへ昇格</h3><p>7/31の公式releaseを反映。Hailuo 2.3を「MiniMaxの最新動画」と単独表記せず、H3のomni-modal generationとAPI catalogのHailuo familyを併記する。</p></article>
+      </div>
+    </section>
+
+    <section class="notice">
+      <h2>ローカル導入のpromotion gate</h2>
+      <div class="gate">
+        <div><b>01 IDENTITY</b><span>model ID / weights SHA / license</span></div>
+        <div><b>02 RUNTIME</b><span>process / engine / workflow version</span></div>
+        <div><b>03 LOCATION</b><span>network offでも同じartifactを生成できるか</span></div>
+        <div><b>04 QUALITY</b><span>usable rate / frozen frame / human repair</span></div>
+        <div><b>05 COST</b><span>hardware・time・API chargeを別記録</span></div>
+      </div>
+      <p class="small">このgateを通るまでは「local candidate」「remote API candidate」などsurfaceを付けて記録し、単に“MiniMaxをローカル導入済み”とは表現しません。</p>
+    </section>
+
+    <section class="card">
+      <h2>公式出典</h2>
+      <ul class="sources">
+        <li><a href="https://www.minimax.io/blog/minimax-h3">MiniMax — MiniMax H3 official release</a></li>
+        <li><a href="https://www.minimax.io/blog/minimax-m3">MiniMax — MiniMax M3 official release</a></li>
+        <li><a href="https://github.com/MiniMax-AI/MiniMax-M3">MiniMax-AI — MiniMax M3 official repository</a></li>
+        <li><a href="https://platform.minimax.io/docs/guides/local-deploy">MiniMax — Local Deployment Guide</a></li>
+        <li><a href="https://platform.minimax.io/docs/api-reference/api-overview">MiniMax — API Overview / supported models</a></li>
+        <li><a href="https://github.com/minimax-ai/minimax-mcp">MiniMax — Official MCP server</a></li>
+      </ul>
+    </section>
+  </main>
+  <footer><div class="shell">Curator official-source tracker. 採用、課金、credential入力、provider実行、公開承認は行いません。</div></footer>
+</body>
+</html>

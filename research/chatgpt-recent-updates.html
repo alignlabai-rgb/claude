@@ -169,7 +169,7 @@
       <h1>ChatGPT / OpenAI 最新アップデート完全版</h1>
       <p>
         OpenAI の公式リリースノート、ChatGPT Help Center、Codex Changelog、主要メディア報道をもとに、
-        <strong>2025年10月（Atlas）〜2026年6月13日まで</strong>の動きを実務視点で整理したページです。
+        <strong>2025年10月（Atlas）〜2026年7月の履歴</strong>を実務視点で整理し、2026年8月26日の公式差分を冒頭に重ねたページです。
         単なる年表ではなく、<strong>何が変わり、どこに効き、Claude / Gemini とどう違うか</strong>まで踏み込んでまとめています。
       </p>
       <div class="summary">
@@ -226,7 +226,37 @@
           7/23 には <strong>GPT-5.6 Sol</strong> に関する脱獄挙動および METR 評価に対する技術報告と公式見解が提示されました。
         </p>
       </div>
-      <p class="last-update">最終更新: 2026-07-24（ChatGPT Sites ベータ公開・Codex デスクトップアプリ完全統合・Atlas終了とUI刷新・GPT-5.6 Sol 脱獄と METR 評価に関する公式報告を追記）</p>
+      <p class="last-update">最終更新: 2026-08-26（Codex CLI 0.149.1、event-triggered tasks、<code>codex mcp-server</code>非推奨を公式sourceで追記）</p>
+    </section>
+
+    <section class="panel" style="border-color:rgba(102,224,194,.42)">
+      <h2>2026-08-26 公式ソース差分</h2>
+      <div class="grid-3">
+        <div class="card"><span class="tag tag-code">CLI 0.149.1</span><h3>agents dashboardと診断面</h3><p>0.149.0で<code>codex agents</code> dashboard、<code>/cd</code> / <code>/pwd</code> / <code>/cwd</code>、<code>codex queue</code>、<code>codex doctor</code>を追加。0.149.1がcurrentです。モデルfamilyはGPT-5.6のままです。</p></div>
+        <div class="card"><span class="tag tag-product">Tasks</span><h3>GitHub等のeventで起動</h3><p>8月25日、GitHub・Gmail・Slackのeventをscheduled taskのtriggerに設定可能になりました。対象appへのアクセスが必要で、時刻scheduleとの併用はできません。機能の存在は接続権限の付与を意味しません。</p></div>
+        <div class="card"><span class="tag tag-risk">Migration</span><h3><code>codex mcp-server</code>は非推奨</h3><p>8月24日、Codex MCP serverは非推奨になりました。Claude Codeとの接続にはCodex plugin、その他のclientにはCodex app serverが案内されています。既存接続は移行計画を作ってから変更します。</p></div>
+      </div>
+      <p class="small">Source: <a href="https://learn.chatgpt.com/docs/changelog" target="_blank" rel="noopener">OpenAI Codex changelog</a> / <a href="https://learn.chatgpt.com/docs/models" target="_blank" rel="noopener">OpenAI Codex models</a></p>
+    </section>
+
+    <section class="panel" style="border-color:rgba(102,224,194,.42)">
+      <h2>2026-08-19 公式ソース差分</h2>
+      <div class="grid-3">
+        <div class="card"><span class="tag tag-code">CLI 0.148.0</span><h3>会話を成果物へexport</h3><p><code>/export</code>で会話をMarkdownへ出力できるようになりました。公開前にはsecret・個人情報・未公開IPを別途除外する必要があり、export自体は公開承認ではありません。</p></div>
+        <div class="card"><span class="tag tag-code">Workflow</span><h3>exec forkとarchive / restore</h3><p><code>codex exec fork</code>、会話のarchive / restore、Amazon Bedrock Runtime providerが追加。provider利用・credential・課金判断は機能の存在確認とは分けます。</p></div>
+        <div class="card"><span class="tag tag-new">Boundary</span><h3>8/31移行対象は限定</h3><p><code>gpt-5.4</code> / <code>gpt-5.4-mini</code>のretire noticeはChatGPT sign-inで使うCodexが対象。OpenAI APIとAPI-key認証のCodexは対象外です。</p></div>
+      </div>
+      <p class="small">Source: <a href="https://learn.chatgpt.com/docs/changelog" target="_blank">OpenAI Codex changelog</a> / <a href="https://learn.chatgpt.com/docs/models" target="_blank">OpenAI Codex models</a></p>
+    </section>
+
+    <section class="panel" style="border-color:rgba(102,224,194,.42)">
+      <h2>2026-08-11 公式ソース差分</h2>
+      <div class="grid-3">
+        <div class="card"><span class="tag tag-new">Deadline</span><h3>ChatGPT sign-inのCodexは8/31移行</h3><p><code>gpt-5.4</code> / <code>gpt-5.4-mini</code> はCodexで8月31日retire予定。推奨先は <code>gpt-5.6-terra</code> / <code>gpt-5.6-luna</code>。APIとAPI-key認証のCodexは対象外です。</p></div>
+        <div class="card"><span class="tag tag-code">CLI</span><h3>Agent PluginsとMCP更新</h3><p>公式changelogはCLI 0.147.0でportable Agent Plugins、MCP 2026-07-28、secret redaction、project trust、日本語rendering改善を記録しています。</p></div>
+        <div class="card"><span class="tag tag-product">Method</span><h3>model名ではなくsurfaceを記録</h3><p>ChatGPT、Codex + ChatGPT sign-in、Codex + API key、OpenAI APIはavailabilityとsunsetが異なります。trackerではsurfaceを必須列にします。</p></div>
+      </div>
+      <p class="small">Source: <a href="https://learn.chatgpt.com/docs/models#deprecated-codex-models" target="_blank">OpenAI — Deprecated Codex models</a> / <a href="https://learn.chatgpt.com/docs/changelog#codex-2026-08-10-daybreak" target="_blank">Codex changelog</a></p>
     </section>
 
     <section class="grid-4">

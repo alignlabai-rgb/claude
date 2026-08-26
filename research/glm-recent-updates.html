@@ -174,8 +174,9 @@
         Claude / ChatGPT / Gemini のトラッカーと見た目・構成を統一しています。
       </p>
       <div class="summary">
+        <p style="border:1px solid #f4b860;padding:14px;border-radius:12px;background:rgba(244,184,96,.08);"><strong>2026-08-26公式監査:</strong> hosted currentは<strong>GLM-5.3</strong>、exact API IDは<code>glm-5.3</code>です。thinkingは常時有効で、<code>reasoning_effort</code>はlow / high / max。以下のGLM-5.2記述はopen-weight / local servingの一世代前の層として保持します。5.3 weightsは公開予告段階なので、まだlocal currentへ昇格させません。</p>
         <p>
-          現行は <strong>GLM-5.2</strong>（753B パラメータ MoE / 40B アクティブ、1M context）。軸は明確で、
+          open-weight / local servingで確認済みの層は <strong>GLM-5.2</strong>（753B パラメータ MoE / 40B アクティブ、1M context）。軸は明確で、
           <strong>① 長期コーディング/エージェントが強い</strong>、<strong>② SWE-Bench Pro 62.1%</strong>、
           <strong>③ オープンウェイト＋低コスト</strong>、そして本ハブにとって最大の意味である
           <strong>④「自動コンテンツ工場を安く回す作業馬」</strong>という位置づけです。
@@ -201,15 +202,25 @@
           HK$1,588/株（直近終値比 7〜13%ディスカウント）で決定後、株価は最大+22%上昇し時価総額は
           US$1,000億を突破したと報じられています。調達資金はR&D・事業拡大・M&Aに充当予定。
         <p>
-          2026年7月下旬（7/23）には、Zhipu AI（Z.ai）が次世代フラッグシップモデル <strong>GLM-4.5</strong> の7月28日リリースを正式予告。
-          マルチモーダル処理・マルチエージェント協働の強化が打ち出されています。
+          <strong>2026-08-11訂正:</strong> 「2026年7月23日にGLM-4.5の7月28日リリースを予告」という記述は年次を取り違えていました。
+          GLM-4.5は2025年7月28日の履歴です。8月11日の確認時点では<strong>GLM-5.2</strong>が現行で、1M context、IndexShare、long-horizon task向けのweightsと公式記事が公開されていました。現在のhosted currentは上記GLM-5.3です。
         </p>
       </div>
-      <p class="last-update">最終更新: 2026-07-24（7/23 発表の GLM-4.5（7/28 リリース予告）・ZCode（07-02）・HK$31.41億株式プレースメント（07-08）を追記）</p>
+      <p class="last-update">最終更新: 2026-08-26（hosted currentをGLM-5.3へ更新。thinking migrationとweights未公開境界を反映）</p>
+    </section>
+
+    <section class="panel" style="border-color:rgba(110,148,230,.45)">
+      <h2>2026-08-26 公式ソース差分</h2>
+      <div class="grid-3">
+        <div class="card"><span class="tag tag-new">HOSTED CURRENT</span><h3><code>glm-5.3</code></h3><p>Z.aiは8月14日にGLM-5.3を公開。APIのexact model IDは<code>glm-5.3</code>です。GLM-5.2からのpost-training更新で、base modelは同じと説明されています。</p></div>
+        <div class="card"><span class="tag tag-api">MIGRATION</span><h3>thinkingは常時有効</h3><p><code>thinking.type: disabled</code>は移行できません。reasoning強度は<code>reasoning_effort</code>のlow / high / maxで調整します。model名だけを差し替える更新ではありません。</p></div>
+        <div class="card"><span class="tag tag-risk">BOUNDARY</span><h3>weightsは予告段階</h3><p>公開記事はweightsをlaunch後2週間で公開予定としています。8月26日時点では、hosted currentとopen-weight / local currentを分け、後者はGLM-5.2を維持します。</p></div>
+      </div>
+      <p class="small">Source: <a href="https://z.ai/blog/glm-5.3" target="_blank" rel="noopener">Z.ai — GLM-5.3</a></p>
     </section>
 
     <section class="grid-4">
-      <div class="stat"><div class="value">GLM-5.2</div><div class="label">現行モデル（2026-06-16）</div></div>
+      <div class="stat"><div class="value">GLM-5.3</div><div class="label">hosted current（2026-08-14）</div></div>
       <div class="stat"><div class="value">62.1%</div><div class="label">SWE-Bench Pro（OW 首位）</div></div>
       <div class="stat"><div class="value">+131.9%</div><div class="label">FY2025 売上成長率（HKEX開示）</div></div>
       <div class="stat"><div class="value">$1.40/$4.40</div><div class="label">API 入力/出力 per 1M</div></div>
@@ -332,12 +343,20 @@
       <div class="timeline">
 
         <article class="item hot">
-          <div class="date">2026-07-23</div>
-          <h3>次世代フラッグシップ「GLM-4.5」7月28日リリースを公式発表 <span class="tag tag-new">NEW</span><span class="tag tag-model">Model</span></h3>
+          <div class="date">2026-08-14</div>
+          <h3>GLM-5.3 — hosted currentへ更新 <span class="tag tag-new">VERIFIED</span><span class="tag tag-model">Model</span></h3>
+          <p><code>glm-5.3</code>を公開。thinkingは常時有効で、reasoning effortはlow / high / max。weightsは公開予告段階のため、GLM-5.2のopen-weight / local servingと別surfaceで管理します。</p>
+          <p class="small">Source: <a href="https://z.ai/blog/glm-5.3" target="_blank" rel="noopener">Z.AI — GLM-5.3</a></p>
+        </article>
+
+        <article class="item hot">
+          <div class="date">2026-06</div>
+          <h3>GLM-5.2 — open-weight / local current <span class="tag tag-new">VERIFIED</span><span class="tag tag-model">Model</span></h3>
           <p>
-            Zhipu AI（Z.ai）が次世代フラッグシップモデル <strong>GLM-4.5</strong> の7月28日リリースを公式予告。
-            マルチモーダル理解・長文推論・マルチエージェントオーケストレーション機能の向上が予告されている。
+            Z.AIは<strong>GLM-5.2</strong>を2026年6月のflagshipとして公開。1M context、IndexShare、long-horizon RL、local serving向けweightsを公式記事とrepositoryで案内しています。8月26日現在はopen-weight / local currentとして参照します。
+            GLM-4.5は2025年7月28日の履歴であり、2026年の予告ではありません。
           </p>
+          <p class="small">Source: <a href="https://z.ai/blog/glm-5.2" target="_blank">Z.AI — GLM-5.2</a> / <a href="https://github.com/zai-org/GLM-5" target="_blank">official repository</a></p>
         </article>
 
         <article class="item hot">

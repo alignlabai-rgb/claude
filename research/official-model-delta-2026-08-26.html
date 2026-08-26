@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>主要AIモデル公式差分 — 2026-08-26 | Research</title>
+  <meta name="description" content="2026年8月26日時点の主要AIモデル、開発ツール、動画生成surfaceの公式一次情報による差分確認。速報と確定情報を分離する。">
+  <style>
+    :root{color-scheme:dark;--bg:#07111d;--panel:#101c2c;--line:#29415a;--ink:#eef5fb;--muted:#a9b9c9;--mint:#66dfc4;--amber:#efbd69;--blue:#7bb9ff;--red:#ff9292}
+    *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 12% 0,#173a4d 0,transparent 34rem),var(--bg);color:var(--ink);font:15px/1.72 system-ui,-apple-system,"Segoe UI","Noto Sans JP",sans-serif}a{color:var(--mint);text-underline-offset:3px}.shell{width:min(1120px,calc(100% - 30px));margin:auto}header{padding:52px 0 28px;border-bottom:1px solid var(--line)}main{padding:26px 0 70px;display:grid;gap:18px}h1{font-size:clamp(2.35rem,7vw,5.25rem);line-height:.98;letter-spacing:-.05em;margin:.55rem 0 1rem}h2{font-size:1.3rem;margin:0 0 .65rem}h3{font-size:1rem;margin:0 0 .4rem}p{color:#d0dbe6;margin:.45rem 0}.lead{font-size:1.04rem;max-width:900px}.meta,.small{color:var(--muted);font-size:.82rem}.eyebrow{color:var(--mint);font-size:.72rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase}.panel,.card,.legend{border:1px solid var(--line);border-radius:15px;background:rgba(16,28,44,.94)}.panel{padding:20px}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}.card{padding:16px}.tag{display:inline-block;border:1px solid currentColor;border-radius:999px;padding:3px 8px;font-size:.67rem;font-weight:800;letter-spacing:.04em}.confirmed{color:var(--mint)}.unchanged{color:var(--blue)}.radar{color:var(--amber)}.boundary{color:var(--red)}code{background:#192b3f;color:#b6efdb;padding:.08rem .3rem;border-radius:5px}table{width:100%;border-collapse:collapse;min-width:760px}th,td{padding:11px;text-align:left;vertical-align:top;border-bottom:1px solid rgba(255,255,255,.08)}th{font-size:.72rem;color:#c9d8e7;text-transform:uppercase;letter-spacing:.05em}.table-wrap{overflow:auto}.sources li{margin:.5rem 0;color:#ced9e4}.legend{display:flex;flex-wrap:wrap;gap:10px;padding:13px;margin-top:20px}footer{border-top:1px solid var(--line);padding:22px 0 36px;color:var(--muted);font-size:.8rem}@media(max-width:720px){.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="shell">
+      <p class="meta"><a href="index.html">← Research</a> / <a href="../index.html">Hub Top</a></p>
+      <div class="eyebrow">Official-source current layer · 2026-08-26 JST</div>
+      <h1>主要AIモデル<br>公式差分</h1>
+      <p class="lead">8月19日以後の日次ニュースを候補抽出に使い、provider公式のrelease notes、model docs、公式repositoryで再確認しました。ニュースの量ではなく、モデル名・提供surface・移行条件・運用境界が変わったものだけを現行層へ昇格します。</p>
+      <div class="legend" aria-label="Evidence legend">
+        <span class="tag confirmed">PRIMARY_CONFIRMED</span>
+        <span class="tag unchanged">CHECKED_UNCHANGED</span>
+        <span class="tag radar">RADAR_NOT_PROMOTED</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section class="panel">
+      <h2>今回、現行層を変える5件</h2>
+      <div class="grid">
+        <article class="card"><span class="tag confirmed">PRIMARY_CONFIRMED</span><h3>GLM-5.3 — hosted current model</h3><p>Z.aiは8月14日にGLM-5.3を公開。APIのmodel IDは <code>glm-5.3</code>、thinkingは常時有効で、<code>reasoning_effort</code> は low / high / maxです。5.2の「thinking無効」設定をそのまま移植できません。重みは公開予告段階なので、hosted提供とopen weightsを同一視しません。</p><p class="small"><a href="https://z.ai/blog/glm-5.3">Z.ai — GLM-5.3</a></p></article>
+        <article class="card"><span class="tag confirmed">PRIMARY_CONFIRMED</span><h3>DeepSeek-V4-Flash-Vision-Exp</h3><p>8月21日からAPIで提供。model IDは <code>deepseek-v4-flash-vision-exp</code>。textとimageの混在入力、Chat Completions / Messages / Responses、Files APIに対応します。実験modelであり、V4 Proの後継やGAとは扱いません。</p><p class="small"><a href="https://api-docs.deepseek.com/news/news260821/">DeepSeek — Vision Exp release</a> / <a href="https://api-docs.deepseek.com/quick_start/pricing/">Models &amp; Pricing</a></p></article>
+        <article class="card"><span class="tag confirmed">PRIMARY_CONFIRMED</span><h3>Anthropic platform / Claude Code 2.1.246</h3><p>browser useとcomputer useは8月19日にGA toolsetへ移行し、Python SDK v1.0は8月20日にPython 3.10以上・httpx 2へ更新。Claude Codeの公式changelog先頭は2.1.246で、広すぎるBash permission ruleへの起動時警告、Auto modeのpermission UI、安定性・security修正を含みます。</p><p class="small"><a href="https://platform.claude.com/docs/en/release-notes/overview">Claude Platform release notes</a> / <a href="https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md">Claude Code changelog</a></p></article>
+        <article class="card"><span class="tag confirmed">PRIMARY_CONFIRMED</span><h3>Codex 0.149.1 / event-triggered tasks</h3><p>Codex CLIは0.149.1がcurrent。0.149.0ではagents dashboard、<code>/cd</code>、<code>codex queue</code>、<code>codex doctor</code>などを追加しました。8月25日にはGitHub・Gmail・Slackイベントをscheduled taskのtriggerにできるようになりましたが、対象appへのアクセスが必要で、時刻scheduleとの併用はできません。<code>codex mcp-server</code>は非推奨です。</p><p class="small"><a href="https://learn.chatgpt.com/docs/changelog">OpenAI Codex changelog</a> / <a href="https://learn.chatgpt.com/docs/models">Codex models</a></p></article>
+        <article class="card"><span class="tag confirmed">PRIMARY_CONFIRMED</span><h3>Wan 3.0 video — remote preview</h3><p><code>wan3.0-video</code>はnative audio/video、最大30秒、1080p、omni-referenceを掲げるAlibaba Cloud Model Studioのpreviewです。modelとendpoint、API keyは同じregionに置く必要があります。公式open-weight releaseを確認していないため、ローカル推論候補には昇格しません。</p><p class="small"><a href="https://modelstudio.console.alibabacloud.com/model-releases/wan3.0-video">Wan 3.0 release</a> / <a href="https://www.alibabacloud.com/help/ja/model-studio/wan3-video-generation-api-reference">API reference</a></p></article>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>公式入口を再確認し、世代は据え置き</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Provider</th><th>Current</th><th>2026-08-26判断</th><th>Official source</th></tr></thead>
+        <tbody>
+          <tr><td>OpenAI</td><td>GPT-5.6 family</td><td><span class="tag unchanged">CHECKED_UNCHANGED</span> Codexのmodel familyは据え置き。toolingとtask triggerだけ更新。</td><td><a href="https://learn.chatgpt.com/docs/models">Models</a></td></tr>
+          <tr><td>Google</td><td>Gemini 3.7 Flash</td><td><span class="tag unchanged">CHECKED_UNCHANGED</span> 8月13日GA以後、新しいgeneral model entryなし。</td><td><a href="https://ai.google.dev/gemini-api/docs/changelog">Gemini changelog</a></td></tr>
+          <tr><td>xAI</td><td>Grok 4.6</td><td><span class="tag unchanged">CHECKED_UNCHANGED</span> 500K contextのcurrent flagshipを維持。</td><td><a href="https://docs.x.ai/developers/models">Models</a></td></tr>
+          <tr><td>Qwen</td><td>Qwen3.8 open family</td><td><span class="tag unchanged">CHECKED_UNCHANGED</span> 8月19日層から新しい公式family releaseを確認せず。</td><td><a href="https://github.com/QwenLM/Qwen3.8">Official repository</a></td></tr>
+          <tr><td>Moonshot</td><td>Kimi K3</td><td><span class="tag unchanged">CHECKED_UNCHANGED</span> APIのcurrent IDを維持。</td><td><a href="https://platform.kimi.ai/docs/api/chat">Kimi API</a></td></tr>
+          <tr><td>MiniMax</td><td>M3 / H3</td><td><span class="tag unchanged">CHECKED_UNCHANGED</span> LLMとomni-modal generationのcurrent layerを維持。</td><td><a href="https://www.minimax.io/blog/minimax-m3">M3</a> / <a href="https://www.minimax.io/blog/minimax-h3">H3</a></td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section class="panel">
+      <h2>ニュースを組織で再利用する3つの変換</h2>
+      <div class="grid">
+        <article class="card"><h3>1. 日次PR → 公式監査trigger候補</h3><p>GitHubの特定イベントでCodex taskを起動できるため、日次ニュースPRのmerge後に「model ID・期限・価格・security claimだけを公式sourceへ戻す」監査候補を作れます。接続権限の付与は別判断であり、このページは自動化を実行しません。</p></article>
+        <article class="card"><h3>2. 動画model → surface contract</h3><p>Wan 3.0はremote preview、MiniMax H3はopen model、Hailuoはremote API familyです。「同じ動画生成」でもcredential、region、weights、license、local receiptが違います。採用比較は品質順位より先にsurfaceを固定します。</p></article>
+        <article class="card"><h3>3. 古い断定 → quarantine</h3><p>新しい公式情報と衝突した旧記事は削除せず、ページ上部にcurrent layerを重ねます。速報の誤りを履歴として残しつつ、現行model表・移行判断・実装が古い記述を参照しない構造にします。</p></article>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>速報から昇格しなかったもの</h2>
+      <p><span class="tag radar">RADAR_NOT_PROMOTED</span> X由来の利用者数、非公式benchmark、資金調達額、未公開model名、単独の障害報告は、今回のmodel / surface current layerには使っていません。GrokPulseのローカル取得分は8月10日までだったため、8月19日以後の根拠にはしていません。</p>
+      <p class="small"><span class="tag boundary">BOUNDARY</span> このページはprovider採用、subscription、課金、credential投入、公開承認を行いません。価格は変動するため、実行直前に公式pricingとeffective dateを再確認します。</p>
+    </section>
+
+    <section class="panel sources">
+      <h2>監査メモ</h2>
+      <ul>
+        <li>事実欄は上記のprovider公式docs / official repositoryだけから再確認。</li>
+        <li>公式ブログ内の自社benchmarkや性能主張は、第三者検証済みの事実として一般化しない。</li>
+        <li>model family、exact model ID、提供surface、preview / GA、open weightsを別フィールドとして読む。</li>
+        <li>前回層: <a href="official-model-delta-2026-08-19.html">2026-08-19公式差分</a>。速報レーダー: <a href="ai-news/index.html">AI News</a>。</li>
+      </ul>
+    </section>
+  </main>
+  <footer><div class="shell">Curator · Public Knowledge Steward · official-source current layer · verified 2026-08-26 JST</div></footer>
+</body>
+</html>
