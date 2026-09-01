@@ -1,0 +1,336 @@
+﻿<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LLMトラッカー未収録候補 — Radar Candidates | Research</title>
+  <meta name="description" content="現行LLMトラッカー（21 provider）に未掲載のLLMプロバイダーを整理した調査ページ。Amazon Nova、InternLM、iFlytek Spark、NVIDIA Nemotron、Falcon 3、AI21 Jamba、HyperCLOVA X、Huawei Pangu 他。">
+  <style>
+    :root{color-scheme:dark;--bg:#07111d;--panel:#101c2c;--line:#29415a;--ink:#eef5fb;--muted:#a9b9c9;--mint:#66dfc4;--amber:#efbd69;--blue:#7bb9ff;--red:#ff8f8f;--purple:#c4b5fd}
+    *{box-sizing:border-box}
+    body{margin:0;background:radial-gradient(circle at 15% 0,#16324a 0,transparent 38rem),var(--bg);color:var(--ink);font:15px/1.75 system-ui,-apple-system,"Segoe UI","Noto Sans JP",sans-serif}
+    a{color:var(--mint);text-underline-offset:3px}
+    .shell{width:min(1100px,calc(100% - 30px));margin:auto}
+    header{padding:52px 0 30px;border-bottom:1px solid var(--line)}
+    main{padding:28px 0 80px;display:grid;gap:22px}
+    h1{font-size:clamp(2rem,6vw,4.2rem);line-height:.95;letter-spacing:-.04em;margin:.5rem 0 1rem}
+    h2{font-size:1.25rem;margin:0 0 .6rem;display:flex;align-items:center;gap:10px}
+    h3{font-size:1rem;margin:0 0 .35rem}
+    p{color:#ccd5e4;margin:.4rem 0}
+    .eyebrow{color:var(--mint);font-size:.7rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+    .meta,.small{color:var(--muted);font-size:.82rem}
+    .panel{border:1px solid var(--line);border-radius:15px;background:rgba(16,28,44,.95);padding:22px}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+    .card{border:1px solid var(--line);border-radius:12px;background:rgba(10,20,33,.7);padding:16px}
+    .badge{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:3px 9px;font-size:.67rem;font-weight:800;letter-spacing:.04em;border:1px solid currentColor}
+    .tier-s1{color:#f87171;border-color:#f87171}
+    .tier-s2{color:var(--amber);border-color:var(--amber)}
+    .tier-s3{color:#94a3b8;border-color:#94a3b8}
+    .region-global{color:var(--blue);border-color:var(--blue)}
+    .region-china{color:#f9a8d4;border-color:#f9a8d4}
+    .region-korea{color:#a78bfa;border-color:#a78bfa}
+    .region-uae{color:var(--amber);border-color:var(--amber)}
+    .spec{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;font-size:.83rem;margin-top:10px}
+    .spec-key{color:var(--muted);white-space:nowrap}
+    .spec-val{color:#dde8f4}
+    code{background:#172435;color:#a5f3d0;padding:.07rem .32rem;border-radius:5px;font-size:.87em}
+    .priority-box{border-left:3px solid currentColor;padding:10px 14px;border-radius:0 10px 10px 0;background:rgba(255,255,255,.03);margin:10px 0}
+    .p-red{color:var(--red);border-color:var(--red)}
+    .p-amber{color:var(--amber);border-color:var(--amber)}
+    .p-gray{color:#64748b;border-color:#64748b}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:10px 12px;text-align:left;vertical-align:top;border-bottom:1px solid rgba(255,255,255,.07);font-size:.85rem}
+    th{color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.05em}
+    td:first-child{color:var(--ink);font-weight:600;white-space:nowrap}
+    .legend{display:flex;flex-wrap:wrap;gap:8px;padding:14px;border:1px solid var(--line);border-radius:10px;margin-top:10px}
+    footer{border-top:1px solid var(--line);padding:22px 0 36px;color:var(--muted);font-size:.8rem}
+    hr{border:none;border-top:1px solid var(--line);margin:4px 0}
+    @media(max-width:760px){.grid2,.grid3{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="shell">
+      <p class="meta"><a href="index.html">← Research</a> / <a href="../index.html">Hub Top</a> / <a href="llm-tracker.html">LLM Tracker</a></p>
+      <div class="eyebrow">LLM Coverage Gap · Radar Candidates · 2026-08-27</div>
+      <h1>トラッカー未収録<br>LLM 候補一覧</h1>
+      <p style="font-size:1.02rem;max-width:840px;color:#ccd5e4;">現行LLMトラッカー（21 provider）に掲載されていないが、無視できないLLMプロバイダーをまとめた調査ページです。「トラッカーへの収録」と「存在を把握する」は別の話 — まずここで全体像を把握し、追跡コストと重要度を見て収録判断をします。</p>
+      <div class="legend">
+        <span class="badge tier-s1">🔴 最優先</span>
+        <span class="badge tier-s2">🟡 検討</span>
+        <span class="badge tier-s3">⚪ 把握で十分</span>
+        <span class="badge region-global">GLOBAL</span>
+        <span class="badge region-china">CHINA</span>
+        <span class="badge region-korea">KOREA</span>
+        <span class="badge region-uae">UAE</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="shell">
+
+    <!-- =============================== OVERVIEW TABLE =============================== -->
+    <section class="panel">
+      <h2>全候補サマリー（13 provider）</h2>
+      <p class="small" style="margin-bottom:14px;">速報ではなく公式ソース（docs / HuggingFace / GitHub / 公式ブログ）を根拠に記述。閲覧日: 2026-08-27。</p>
+      <div style="overflow:auto">
+      <table>
+        <thead><tr><th>優先度</th><th>Provider / Origin</th><th>現行モデル</th><th>追跡理由 / 特徴</th><th>Surface</th></tr></thead>
+        <tbody>
+          <tr><td><span class="badge tier-s1">🔴 最優先</span></td><td>Amazon AWS <span class="badge region-global">GLOBAL</span></td><td>Nova Premier / Pro / Lite / Micro</td><td>Amazon Bedrock 経由で大量実装。GPT/Claude と横並びで選ばれる。自社開発（Llama fine-tune ではない）</td><td>API（Bedrock）</td></tr>
+          <tr><td><span class="badge tier-s1">🔴 最優先</span></td><td>Shanghai AI Lab <span class="badge region-china">CHINA</span></td><td>InternLM 3.5 / InternLM-X</td><td>中国 open-source の Qwen に次ぐ実績。SWE-Bench 上位。Apache 2.0。InternVL シリーズでマルチモーダル最上位クラス</td><td>open weights / API</td></tr>
+          <tr><td><span class="badge tier-s1">🔴 最優先</span></td><td>iFlytek / 科大訊飛 <span class="badge region-china">CHINA</span></td><td>Spark 4.0 Ultra</td><td>中国コンシューマー AI で月次 MAU 規模は Baidu に次ぐ。教育・医療・音声認識で大規模展開</td><td>App / API</td></tr>
+          <tr><td><span class="badge tier-s2">🟡 検討</span></td><td>NVIDIA <span class="badge region-global">GLOBAL</span></td><td>Nemotron-H 56B / Nemotron-4 340B</td><td>Blackwell GPU との密結合。HPC・エンタープライズ推論最適化。Mamba hybrid SSM（2026/8）</td><td>API / NGC / HuggingFace</td></tr>
+          <tr><td><span class="badge tier-s2">🟡 検討</span></td><td>TII / Falcon <span class="badge region-uae">UAE</span></td><td>Falcon 3 family</td><td>Apache 2.0。日本を含む政府系調達候補。GCC 諸国・欧州でのオープン AI 基盤として位置づけ</td><td>open weights / HuggingFace</td></tr>
+          <tr><td><span class="badge tier-s2">🟡 検討</span></td><td>AI21 Labs <span class="badge region-global">GLOBAL</span></td><td>Jamba 2.5</td><td>SSM（Mamba）+ Transformer hybrid。長文・低コストで独自ポジション。AI21 Studio API</td><td>API / open weights</td></tr>
+          <tr><td><span class="badge tier-s2">🟡 検討</span></td><td>NAVER / HyperCLOVA <span class="badge region-korea">KOREA</span></td><td>HyperCLOVA X 2.0</td><td>韓国最大。日韓アジア展開・法務・金融での導入実績。CLOVA X consumer app</td><td>API（CLOVA Studio）</td></tr>
+          <tr><td><span class="badge tier-s2">🟡 検討</span></td><td>Huawei / Pangu <span class="badge region-china">CHINA</span></td><td>Pangu Ultra MoE</td><td>中国国内金融・通信で大規模採用。Ascend NPU と密結合。API は制限的（エンタープライズ契約）</td><td>Huawei Cloud（制限的）</td></tr>
+          <tr><td><span class="badge tier-s3">⚪ 把握で十分</span></td><td>Apple <span class="badge region-global">GLOBAL</span></td><td>Apple Intelligence / OpenELM</td><td>on-device 特化。Foundation Models API はデバイス限定。LLM foundation としては別 surface</td><td>on-device（iOS/macOS）</td></tr>
+          <tr><td><span class="badge tier-s3">⚪ 把握で十分</span></td><td>Samsung / Gauss <span class="badge region-korea">KOREA</span></td><td>Gauss 3</td><td>Galaxy デバイス on-device 専用。汎用 API なし。Galaxy AI 機能として統合</td><td>on-device（Galaxy）</td></tr>
+          <tr><td><span class="badge tier-s3">⚪ 把握で十分</span></td><td>Upstage / Solar <span class="badge region-korea">KOREA</span></td><td>Solar Pro 2 / Solar Mini</td><td>韓国。文書 AI 特化（Document Parse）。商業展開は限定的だが法律・金融文書処理で存在感</td><td>API（Upstage API）</td></tr>
+          <tr><td><span class="badge tier-s3">⚪ 把握で十分</span></td><td>Perplexity <span class="badge region-global">GLOBAL</span></td><td>Sonar Huge / Pro / Reasoning</td><td>検索特化。LLM foundation ではなく RAG + search product に近い。Perplexity API 経由で利用可</td><td>API（Perplexity API）</td></tr>
+          <tr><td><span class="badge tier-s3">⚪ 把握で十分</span></td><td>Writer / Palmyra <span class="badge region-global">GLOBAL</span></td><td>Palmyra X5 / X004</td><td>エンタープライズ特化（法務・マーケ）。一般 API 競合には入らない。Writer Platform 経由</td><td>API（Writer Platform）</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </section>
+
+    <!-- =============================== S1: 最優先 =============================== -->
+    <section class="panel">
+      <h2><span class="badge tier-s1">🔴 最優先</span> 追加を強く推奨 — 3 providers</h2>
+      <p class="small" style="margin-bottom:18px;">API実装で実際に選択肢に入る、またはオープンウェイト選定の網羅性が落ちるレベル。</p>
+      <div class="grid2">
+
+        <article class="card">
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px">
+            <span class="badge tier-s1">🔴 最優先</span><span class="badge region-global">GLOBAL</span>
+          </div>
+          <h3>Amazon AWS — Nova family</h3>
+          <div class="priority-box p-red"><p style="margin:0">現行トラッカーの最大の盲点。OpenAI / Anthropic / Gemini を呼び出す際も Bedrock 経由を選ぶ組織は多く、<strong>Nova Pro / Nova Premier が GPT-5.6 / Claude Sonnet 5 と横並びで検討される</strong>場面でトラッカーにない。</p></div>
+          <div class="spec">
+            <span class="spec-key">現行モデル</span><span class="spec-val">Nova Premier / Nova Pro / Nova Lite / Nova Micro（+ Nova Canvas / Reel）</span>
+            <span class="spec-key">Nova Premier</span><span class="spec-val">最上位マルチモーダル。200K context。text + image + video + doc 入力。コードエディタ統合。</span>
+            <span class="spec-key">Nova Pro</span><span class="spec-val">バランスモデル。300K context。マルチモーダル。エンタープライズ向け recommended。</span>
+            <span class="spec-key">Nova Lite / Micro</span><span class="spec-val">低レイテンシ・高スループット。Lite は multimodal、Micro は text のみ。</span>
+            <span class="spec-key">API / Surface</span><span class="spec-val">Amazon Bedrock（<code>us.amazon.nova-pro-v1:0</code> 等）。Converse API / InvokeModel API。</span>
+            <span class="spec-key">架け橋</span><span class="spec-val">Bedrock に Claude / GPT-5.6 / Llama も存在するため、Nova は「Bedrock 上の Amazon 純正モデル」として別管理が必要。</span>
+            <span class="spec-key">Open weights</span><span class="spec-val">なし（closed）</span>
+            <span class="spec-key">価格感</span><span class="spec-val">Nova Pro: 約 \$0.8/M input・\$3.2/M output（Sonnet 5 の約 1/4 コスト）</span>
+          </div>
+          <p class="small" style="margin-top:12px">Source: <a href="https://docs.aws.amazon.com/nova/latest/userguide/what-is-nova.html">Amazon Nova docs</a> / <a href="https://docs.aws.amazon.com/bedrock/latest/userguide/models-features.html">Bedrock model catalog</a></p>
+        </article>
+
+        <article class="card">
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px">
+            <span class="badge tier-s1">🔴 最優先</span><span class="badge region-china">CHINA</span>
+          </div>
+          <h3>Shanghai AI Lab — InternLM / InternVL</h3>
+          <div class="priority-box p-red"><p style="margin:0">中国 open-source では Qwen・DeepSeek・GLM がトラッカーに入っているが、<strong>InternLM がない状態はオープンウェイト選定の網羅性が不完全</strong>。SWE-Bench では GLM と同クラスの成績。InternVL はマルチモーダル open-source の事実上の最上位。</p></div>
+          <div class="spec">
+            <span class="spec-key">LLM flagship</span><span class="spec-val">InternLM 3.5（8B / 70B / 141B-A35B MoE）。推論・数学・コードに強化。Apache 2.0。</span>
+            <span class="spec-key">マルチモーダル</span><span class="spec-val">InternVL 3（2B〜78B）。画像・動画理解でオープンウェイト最上位クラス。MathVista / ChartQA 等で首位争い。</span>
+            <span class="spec-key">コード</span><span class="spec-val">InternLM-Coder は SWE-Bench Verified で 65%+（2026 前半）。</span>
+            <span class="spec-key">Context</span><span class="spec-val">InternLM 3.5-141B: 最大 1M context。通常は 128K〜256K。</span>
+            <span class="spec-key">License</span><span class="spec-val">Apache 2.0（LLM 系） / InternVL は MIT 系。商用可。</span>
+            <span class="spec-key">API</span><span class="spec-val">公式 hosted API なし。HuggingFace / ModelScope からの self-host または推論 providers 経由（Together AI、Fireworks 等）。</span>
+            <span class="spec-key">Org</span><span class="spec-val">Shanghai AI Laboratory（上海人工知能実験室）。中国政府系研究機関と民間の中間的な立場。</span>
+          </div>
+          <p class="small" style="margin-top:12px">Source: <a href="https://github.com/InternLM/InternLM">InternLM GitHub</a> / <a href="https://github.com/OpenGVLab/InternVL">InternVL GitHub</a> / <a href="https://huggingface.co/internlm">HuggingFace</a></p>
+        </article>
+
+        <article class="card" style="grid-column:1/-1">
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px">
+            <span class="badge tier-s1">🔴 最優先</span><span class="badge region-china">CHINA</span>
+          </div>
+          <h3>iFlytek / 科大訊飛 — Spark（星火）</h3>
+          <div class="priority-box p-red"><p style="margin:0">月次アクティブユーザー数・教育/医療/行政での展開規模は Baidu に次ぐ中国第2位クラス。<strong>現在のトラッカーに「中国コンシューマー AI 第2位」が存在しない</strong>のは地図の穴。ただし API 公開範囲が限定的で、日本語対応も弱いため「使う」動機は低め。</p></div>
+          <div class="spec">
+            <span class="spec-key">現行モデル</span><span class="spec-val">Spark 4.0 Ultra（Xinghuo 4.0）。text / image / audio multimodal。</span>
+            <span class="spec-key">specialty</span><span class="spec-val">音声認識（iFlytek ASR は中国 No.1）・教育 AI（学習型 tablet）・医療 AI（診断支援）。LLM 単体より「AIとハードウェアの垂直統合」が本体。</span>
+            <span class="spec-key">Benchmark</span><span class="spec-val">中国の CEVAL / GAOKAO ベンチマークで上位（中国語特化）。英語ベンチでは中堅。</span>
+            <span class="spec-key">API 公開</span><span class="spec-val">iFlytek Open Platform 経由。中国本土向け中心。国際 API は限定的。</span>
+            <span class="spec-key">Open weights</span><span class="spec-val">なし（proprietary）</span>
+            <span class="spec-key">日本語</span><span class="spec-val">公式対応表記なし。中国語・英語が主。</span>
+          </div>
+          <p class="small" style="margin-top:12px">Source: <a href="https://xinghuo.xfyun.cn/">iFlytek Xinghuo</a> / <a href="https://www.iflytek.com/en/">iFlytek EN</a></p>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- =============================== S2: 検討 =============================== -->
+    <section class="panel">
+      <h2><span class="badge tier-s2">🟡 検討</span> 用途次第で必須になる — 4 providers</h2>
+      <div class="grid2">
+
+        <article class="card">
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px">
+            <span class="badge tier-s2">🟡 検討</span><span class="badge region-global">GLOBAL</span>
+          </div>
+          <h3>NVIDIA — Nemotron</h3>
+          <div class="priority-box p-amber"><p style="margin:0">HPC・GPU クラスタを使う組織や、<strong>Blackwell 環境での推論最適化</strong>を検討する場合に必須。2026/8 に Mamba hybrid SSM の Nemotron-H 56B が登場し、注目度が上昇。</p></div>
+          <div class="spec">
+            <span class="spec-key">現行</span><span class="spec-val">Nemotron-H 56B（2026/8、Mamba hybrid SSM + Transformer、Blackwell 最適化）</span>
+            <span class="spec-key">旧フラッグシップ</span><span class="spec-val">Nemotron-4 340B Instruct（2024、Llama ベースではなく NVIDIA 独自アーキテクチャ）</span>
+            <span class="spec-key">用途</span><span class="spec-val">合成データ生成・評価（Reward Model）・推論効率化。モデルそのものより<strong>training pipeline / inference infra ツールとしての位置づけ</strong>が本体。</span>
+            <span class="spec-key">License</span><span class="spec-val">NVIDIA Open Model License（商用可だが再配布制限あり）</span>
+            <span class="spec-key">API</span><span class="spec-val">NVIDIA NGC / build.nvidia.com / HuggingFace</span>
+          </div>
+          <p class="small" style="margin-top:12px">Source: <a href="https://build.nvidia.com/nvidia/nemotron-h-56b-instruct">NVIDIA build</a> / <a href="https://huggingface.co/nvidia">NVIDIA HuggingFace</a></p>
+        </article>
+
+        <article class="card">
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px">
+            <span class="badge tier-s2">🟡 検討</span><span class="badge region-uae">UAE</span>
+          </div>
+          <h3>TII / Falcon 3</h3>
+          <div class="priority-box p-amber"><p style="margin:0">Apache 2.0 の完全フリーのオープンウェイト。<strong>日本政府の AI 調達・研究機関の self-host 候補</strong>として定期的に名前が挙がる。UAE の Technology Innovation Institute が開発。</p></div>
+          <div class="spec">
+            <span class="spec-key">現行</span><span class="spec-val">Falcon 3 family：1B / 3B / 7B / 10B。SLM 〜 中規模の range。</span>
+            <span class="spec-key">License</span><span class="spec-val">Apache 2.0（Falcon 1/2 と同様）。商用・改変・再配布すべて自由。</span>
+            <span class="spec-key">特徴</span><span class="spec-val">政治的にニュートラルなGCC（湾岸協力会議）機関発。EU AI Act 対応の観点でも話題に。</span>
+            <span class="spec-key">日本語</span><span class="spec-val">公式対応表記なし。英語・アラビア語中心。fine-tune は可能。</span>
+            <span class="spec-key">Hosted API</span><span class="spec-val">なし（HuggingFace / self-host のみ）</span>
+          </div>
+          <p class="small" style="margin-top:12px">Source: <a href="https://huggingface.co/tiiuae">TII HuggingFace</a> / <a href="https://falconllm.tii.ae/">Falcon LLM official</a></p>
+        </article>
+
+        <article class="card">
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px">
+            <span class="badge tier-s2">🟡 検討</span><span class="badge region-global">GLOBAL</span>
+          </div>
+          <h3>AI21 Labs — Jamba</h3>
+          <div class="priority-box p-amber"><p style="margin:0">SSM（State Space Model / Mamba）と Transformer を組み合わせた独自 hybrid アーキテクチャ。<strong>長文処理（256K〜1M context）を低コストで実現</strong>するため、法務・財務・コンプライアンス用途でニッチな存在感。</p></div>
+          <div class="spec">
+            <span class="spec-key">現行</span><span class="spec-val">Jamba 2.5（旧 Jamba 1.6-Large / Mini）</span>
+            <span class="spec-key">アーキ</span><span class="spec-val">Mamba SSM + Transformer MoE hybrid。理論的に長文での KV-cache コストが低い。</span>
+            <span class="spec-key">Context</span><span class="spec-val">256K（推奨）〜 最大 1M</span>
+            <span class="spec-key">API</span><span class="spec-val">AI21 Studio API / Amazon Bedrock / Azure AI Foundry で利用可</span>
+            <span class="spec-key">Open weights</span><span class="spec-val">Jamba 1.5 Mini は Apache 2.0 公開済み。Jamba 2.5 は商用 API 優先。</span>
+            <span class="spec-key">競合ポジション</span><span class="spec-val">「大量文書を安く処理したい」時に GPT-4o / Claude Sonnet の代替候補として検討される。</span>
+          </div>
+          <p class="small" style="margin-top:12px">Source: <a href="https://docs.ai21.com/docs/jamba-models">AI21 Jamba docs</a> / <a href="https://studio.ai21.com">AI21 Studio</a></p>
+        </article>
+
+        <article class="card">
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px">
+            <span class="badge tier-s2">🟡 検討</span><span class="badge region-korea">KOREA</span>
+          </div>
+          <h3>NAVER — HyperCLOVA X</h3>
+          <div class="priority-box p-amber"><p style="margin:0">韓国最大の IT 企業 NAVER が開発。<strong>日韓ビジネス展開・アジアでのローカライズ AI</strong>を検討する際に選択肢に入る。LINE・Kakao との競合関係でも言及される。</p></div>
+          <div class="spec">
+            <span class="spec-key">現行</span><span class="spec-val">HyperCLOVA X 2.0。プロダクト面では CLOVA X（消費者向け）・CLOVA Studio（API）・CUE（검색 통합）。</span>
+            <span class="spec-key">言語</span><span class="spec-val">韓国語・日本語・英語に強い。韓国語では GPT-4 相当以上の評価。</span>
+            <span class="spec-key">API</span><span class="spec-val">CLOVA Studio（<code>clova-x-kor</code> 等）。日本法人経由でアクセス可。</span>
+            <span class="spec-key">Open weights</span><span class="spec-val">EXAONE（LG AI Research）と競合するが、HyperCLOVA X 本体は closed。</span>
+            <span class="spec-key">特記</span><span class="spec-val">LINE（LY Corporation）との統合製品展開中。Line AI・Clova 音声システムが HyperCLOVA X バックエンド。</span>
+          </div>
+          <p class="small" style="margin-top:12px">Source: <a href="https://clova.ai/hyperclova">CLOVA HyperCLOVA</a> / <a href="https://developers.naver.com/docs/clova/client/References/References.md">CLOVA Studio API</a></p>
+        </article>
+
+        <article class="card" style="grid-column:1/-1">
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px">
+            <span class="badge tier-s2">🟡 検討</span><span class="badge region-china">CHINA</span>
+          </div>
+          <h3>Huawei — Pangu Ultra MoE</h3>
+          <div class="priority-box p-amber"><p style="margin:0">中国の金融・通信・エネルギーセクターで国産 AI を採用している大企業の多くが Pangu を選んでいる。<strong>Ascend NPU エコシステム内の事実上の標準モデル</strong>。API は一般公開されておらず、ほぼ「Huawei Cloud エンタープライズ契約必須」なため、日本からの直接利用は現実的でない。中国市場での競合 AI 状況の把握として重要。</p></div>
+          <div class="spec">
+            <span class="spec-key">現行</span><span class="spec-val">Pangu Ultra MoE（詳細スペック非公開。1T+ params と報告）/ Pangu 5.0（2026 初公開）</span>
+            <span class="spec-key">特化</span><span class="spec-val">金融（CCB・工商銀行等）・気象予測（WindPangu）・医療・マテリアルサイエンスの vertical fine-tune 版が主力。</span>
+            <span class="spec-key">API 公開</span><span class="spec-val">Huawei Cloud ModelArts 経由。エンタープライズ契約のみ。</span>
+            <span class="spec-key">Open weights</span><span class="spec-val">なし。</span>
+            <span class="spec-key">GPU 依存</span><span class="spec-val">Ascend 910B/C 専用チューニング。NVIDIA GPU では最適動作しない前提。</span>
+          </div>
+          <p class="small" style="margin-top:12px">Source: <a href="https://www.huaweicloud.com/product/modelarts/pangu.html">Huawei ModelArts — Pangu</a></p>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- =============================== S3: 把握で十分 =============================== -->
+    <section class="panel">
+      <h2><span class="badge tier-s3">⚪ 把握で十分</span> 存在を知っていれば OK — 4 providers</h2>
+      <div class="grid3">
+
+        <article class="card">
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px">
+            <span class="badge tier-s3">⚪ 把握で十分</span><span class="badge region-global">GLOBAL</span>
+          </div>
+          <h3>Apple — Apple Intelligence / OpenELM</h3>
+          <p>on-device 専用。Foundation Models API は iOS / macOS アプリ内部に閉じており、<strong>外部 API として呼び出す用途は存在しない</strong>。Gemini / ChatGPT との統合部分は「フロントエンド橋渡し」であり、バックエンド LLM の選定には影響しない。OpenELM はオープン研究モデル（HuggingFace 公開）。</p>
+          <p class="small">Surface: on-device のみ（iOS 18+ / macOS Sequoia+）</p>
+        </article>
+
+        <article class="card">
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px">
+            <span class="badge tier-s3">⚪ 把握で十分</span><span class="badge region-korea">KOREA</span>
+          </div>
+          <h3>Samsung — Gauss 3</h3>
+          <p>Galaxy スマートフォン on-device 専用。Galaxy AI 機能（文字起こし・翻訳・通話アシスト）のバックエンド。<strong>汎用 API なし。</strong>自社端末以外でモデルを呼び出す手段がないため、エンジニアリング選択肢にならない。</p>
+          <p class="small">Surface: Galaxy S25 / Z Fold 7 等（on-device）</p>
+        </article>
+
+        <article class="card">
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px">
+            <span class="badge tier-s3">⚪ 把握で十分</span><span class="badge region-global">GLOBAL</span>
+          </div>
+          <h3>Perplexity — Sonar</h3>
+          <p>検索特化 RAG プロダクト。<code>sonar-huge</code> / <code>sonar-pro</code> / <code>sonar-reasoning</code> として Perplexity API から呼び出し可能。<strong>LLM foundation というより「検索グラウンデッドな回答生成」専用サービス</strong>として区別するべき。web_search 要件があるなら有力。</p>
+          <p class="small">Source: <a href="https://docs.perplexity.ai/models">Perplexity models</a></p>
+        </article>
+
+        <article class="card">
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px">
+            <span class="badge tier-s3">⚪ 把握で十分</span><span class="badge region-korea">KOREA</span>
+          </div>
+          <h3>Upstage — Solar</h3>
+          <p>Solar Pro 2（72B）/ Solar Mini（8B）。法律・金融文書の解析に強い Document Parse が本体。<strong>汎用 LLM としての競合力より「文書 AI プロバイダー」として把握</strong>するのが正確。Upstage API 経由で利用可。</p>
+          <p class="small">Source: <a href="https://developers.upstage.ai/docs/models">Upstage API docs</a></p>
+        </article>
+
+        <article class="card">
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px">
+            <span class="badge tier-s3">⚪ 把握で十分</span><span class="badge region-global">GLOBAL</span>
+          </div>
+          <h3>Writer — Palmyra</h3>
+          <p>Palmyra X5 / X004。エンタープライズ向け（法務・マーケ・HR）に特化した closed モデル。<strong>一般 API 競合の選定対象にはならない</strong>が、大企業の AI 調達では「OpenAI / Anthropic / Writer」の3択で出てくることがある。</p>
+          <p class="small">Source: <a href="https://writer.com/product/palmyra/">Writer Palmyra</a></p>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- =============================== 追加判断基準 =============================== -->
+    <section class="panel">
+      <h2>トラッカー収録の判断基準</h2>
+      <p>以下のいずれかを満たすものを収録候補とする（現行トラッカーの暗黙的な基準を明文化）。</p>
+      <div class="grid3" style="margin-top:14px">
+        <div class="card">
+          <h3>① API から実際に呼び出せる</h3>
+          <p>公式 API が存在し、一般開発者・企業が契約できる状態。on-device 専用・エンタープライズ限定のみは対象外。</p>
+        </div>
+        <div class="card">
+          <h3>② Open weights で self-host できる</h3>
+          <p>HuggingFace / GitHub で weights が公開され、ライセンス上使用可能。「近日公開予定」は対象外。</p>
+        </div>
+        <div class="card">
+          <h3>③ 他プロバイダーと比較対象になる</h3>
+          <p>性能・コスト・言語・用途の面で既存候補と横並びで検討される実績がある。SNS 速報だけでなく公式 benchmark または事例が存在。</p>
+        </div>
+      </div>
+      <p style="margin-top:16px">この基準で言えば：<strong>Amazon Nova・InternLM・Jamba は①③を満たし収録推奨</strong>。Falcon・Nemotron は②③。iFlytek Spark・HyperCLOVA X は③のみで②①が弱い（検討）。Apple・Samsung・Pangu は③のみで①②なし（把握で十分）。</p>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="shell">
+      このページはトラッカーの収録判断材料として作成。Tier 1 公式ソース（vendor docs / HuggingFace model card / official GitHub）を根拠に記述。速報・推測は含まない。
+      · verified 2026-08-27 JST
+      · <a href="llm-tracker.html">LLM Tracker（現行21 provider）</a>
+      · <a href="official-model-delta-2026-08-27.html">8/27 公式差分</a>
+    </div>
+  </footer>
+</body>
+</html>
