@@ -1,0 +1,511 @@
+﻿<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Grok / Gemini サービス深掘り — Surface & Use Cases 2026-09-02 | Research</title>
+  <style>
+    :root{color-scheme:dark;--bg:#06101c;--panel:#0d1a2c;--line:#243550;--ink:#eaf2fb;--muted:#9fb2c8;--amber:#f4b860;--mint:#62d9be;--blue:#7ab5ff;--red:#f87171;--purple:#c4b5fd;--orange:#fb923c;--yellow:#fde047}
+    *{box-sizing:border-box}
+    body{margin:0;background:radial-gradient(circle at 8% 0,#1c2e42 0,transparent 36rem),var(--bg);color:var(--ink);font:15px/1.78 system-ui,-apple-system,"Segoe UI","Noto Sans JP",sans-serif}
+    a{color:var(--mint);text-underline-offset:3px}
+    .shell{width:min(1180px,calc(100% - 32px));margin:auto}
+    header{padding:50px 0 32px;border-bottom:1px solid var(--line)}
+    main{padding:30px 0 90px;display:grid;gap:22px}
+    h1{font-size:clamp(1.9rem,5vw,3.8rem);line-height:.93;letter-spacing:-.04em;margin:.5rem 0 1.1rem}
+    h2{font-size:1.2rem;margin:0 0 .5rem;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    h3{font-size:.97rem;font-weight:700;margin:0 0 .35rem}
+    p{color:#c8d6e8;margin:.35rem 0}
+    .eyebrow{color:var(--mint);font-size:.68rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+    .small{color:var(--muted);font-size:.81rem}
+    .panel{border:1px solid var(--line);border-radius:15px;background:rgba(13,26,44,.97);padding:22px 24px}
+    .panel-xai{border-color:rgba(244,184,96,.32)}
+    .panel-google{border-color:rgba(98,217,190,.32)}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+    .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+    .card{border:1px solid var(--line);border-radius:11px;background:rgba(6,16,28,.8);padding:15px 17px}
+    .card-xai{border-color:rgba(244,184,96,.18)}
+    .card-google{border-color:rgba(98,217,190,.18)}
+    .badge{display:inline-flex;align-items:center;border-radius:999px;padding:3px 10px;font-size:.66rem;font-weight:800;letter-spacing:.04em;border:1px solid currentColor;white-space:nowrap}
+    .b-amber{color:var(--amber);border-color:var(--amber)}
+    .b-mint{color:var(--mint);border-color:var(--mint)}
+    .b-blue{color:var(--blue);border-color:var(--blue)}
+    .b-red{color:var(--red);border-color:var(--red)}
+    .b-purple{color:var(--purple);border-color:var(--purple)}
+    .b-orange{color:var(--orange);border-color:var(--orange)}
+    .b-yellow{color:var(--yellow);border-color:var(--yellow)}
+    .b-gray{color:#64748b;border-color:#64748b}
+    .spec{display:grid;grid-template-columns:auto 1fr;gap:3px 14px;font-size:.82rem;margin:8px 0 12px}
+    .spec-key{color:var(--muted);white-space:nowrap;padding-top:1px}
+    .spec-val{color:#dde8f4}
+    code{background:#182b42;color:#a5f3d0;padding:.07rem .32rem;border-radius:4px;font-size:.86em}
+    .example{background:rgba(255,255,255,.04);border-left:3px solid var(--mint);border-radius:0 9px 9px 0;padding:11px 15px;margin:10px 0;font-size:.86rem;color:#bfcfdf}
+    .example-xai{border-color:var(--amber)}
+    .example b{color:var(--ink)}
+    .alert{border-radius:10px;padding:12px 16px;margin:10px 0;font-size:.86rem}
+    .alert-warn{background:rgba(251,146,60,.08);border:1px solid rgba(251,146,60,.3);color:#fcd8b0}
+    .alert-info{background:rgba(122,181,255,.07);border:1px solid rgba(122,181,255,.25);color:#c0d8f5}
+    .alert-new{background:rgba(98,217,190,.07);border:1px solid rgba(98,217,190,.25);color:#b0e8da}
+    .platform-row{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0}
+    .divider{border:none;border-top:1px solid var(--line);margin:14px 0}
+    .toc{display:flex;flex-wrap:wrap;gap:7px;padding:13px 16px;border:1px solid var(--line);border-radius:12px}
+    table{width:100%;border-collapse:collapse;font-size:.81rem}
+    th,td{padding:8px 11px;text-align:left;border-bottom:1px solid rgba(255,255,255,.07);vertical-align:top}
+    th{color:var(--muted);font-size:.69rem;text-transform:uppercase;letter-spacing:.05em}
+    td:first-child{font-weight:600;white-space:nowrap;color:var(--ink)}
+    .sect-head{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+    footer{border-top:1px solid var(--line);padding:22px 0 40px;color:var(--muted);font-size:.79rem}
+    @media(max-width:780px){.grid2,.grid3{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<header>
+  <div class="shell">
+    <p class="small"><a href="index.html">← Research</a> / <a href="../index.html">Hub Top</a> / <a href="llm-tracker.html">LLM Tracker</a></p>
+    <div class="eyebrow">Service Deep Dive · Tier 1 sources only · 2026-09-02 JST</div>
+    <h1>Grok / Gemini<br>サービス深掘り</h1>
+    <p style="font-size:.99rem;max-width:880px;color:#c8d6e8">「モデルが更新された」ではなく「何ができるサービスが何を変えたのか」。xAI Grok と Google Gemini の各サービス・アクセス経路・具体的な実例を記録します。2026年8〜9月の新サービスに重点を置いています。</p>
+    <div class="toc" style="margin-top:16px">
+      <span style="color:var(--muted);font-size:.75rem;align-self:center">JUMP:</span>
+      <a href="#grok-overview" class="badge b-amber">🔶 Grok 概要</a>
+      <a href="#grok-bot" class="badge b-amber">Grok Bot</a>
+      <a href="#grok-build" class="badge b-amber">Grok Build</a>
+      <a href="#grok-x" class="badge b-amber">X 統合</a>
+      <a href="#grok-gov" class="badge b-amber">政府向け</a>
+      <a href="#grok-cloud" class="badge b-amber">クラウド展開</a>
+      <a href="#aurora" class="badge b-orange">Aurora / Video</a>
+      <a href="#cursor" class="badge b-yellow">Cursor 買収</a>
+      <a href="#gemini-overview" class="badge b-mint">🟢 Gemini 概要</a>
+      <a href="#gemini-spark" class="badge b-mint">Gemini Spark</a>
+      <a href="#gemini-live" class="badge b-mint">Gemini Live</a>
+      <a href="#ai-mode" class="badge b-mint">AI Mode</a>
+      <a href="#notebooklm" class="badge b-purple">Gemini Notebook</a>
+      <a href="#workspace" class="badge b-blue">Workspace</a>
+      <a href="#astra" class="badge b-blue">Project Astra</a>
+      <a href="#compare" class="badge b-gray">比較表</a>
+    </div>
+  </div>
+</header>
+
+<main class="shell">
+
+<!-- ====================== XAI / GROK ====================== -->
+
+<section id="grok-overview" class="panel panel-xai">
+  <div class="sect-head">
+    <span style="font-size:2rem">🔶</span>
+    <div>
+      <div class="eyebrow" style="color:var(--amber)">SpaceXAI（旧 xAI）— Grok</div>
+      <h2 style="color:var(--amber);margin:0">サービス全体像（2026-09-02）</h2>
+    </div>
+  </div>
+  <div class="alert alert-info">
+    <strong>社名変更：</strong>xAI は2026年2月に SpaceX に買収され、2026年7月に <strong>SpaceXAI</strong> へ改名。ただし開発者向けドキュメント・API は引き続き「xAI」「Grok」ブランドを使用。
+  </div>
+  <div class="spec">
+    <span class="spec-key">現行フラッグシップ</span><span class="spec-val">Grok 4.6（2026/8/12〜）— 500K context、reasoning: Low/Medium/High/xHigh</span>
+    <span class="spec-key">Grok 5</span><span class="spec-val">学習継続中、未リリース（2026/9/2時点）</span>
+    <span class="spec-key">インフラ</span><span class="spec-val">Colossus（メンフィス、GPU 20万基）</span>
+  </div>
+  <div class="platform-row">
+    <span class="badge b-amber">Grok.com App</span>
+    <span class="badge b-amber">Grok Bot（自律エージェント）</span>
+    <span class="badge b-amber">Grok Build / Workflows</span>
+    <span class="badge b-amber">X プラットフォーム統合</span>
+    <span class="badge b-amber">Grok for Government</span>
+    <span class="badge b-amber">xAI API</span>
+    <span class="badge b-amber">Azure Foundry</span>
+    <span class="badge b-amber">Amazon Bedrock</span>
+    <span class="badge b-amber">Google Vertex AI</span>
+    <span class="badge b-amber">GitHub Copilot</span>
+    <span class="badge b-orange">Aurora（画像）</span>
+    <span class="badge b-orange">Imagine Video 1.5</span>
+    <span class="badge b-yellow">Cursor（買収済）</span>
+  </div>
+  <div style="overflow:auto;margin-top:14px">
+  <table>
+    <thead><tr><th>プラン</th><th>価格</th><th>主な内容</th></tr></thead>
+    <tbody>
+      <tr><td>Free</td><td>$0</td><td>制限付きクエリ、画像生成なし</td></tr>
+      <tr><td>SuperGrok Lite</td><td>~$10/月</td><td>基本 Imagine、AI エージェント1体</td></tr>
+      <tr><td>SuperGrok</td><td>~$30/月</td><td>Grok 4.6 フル、DeepSearch、Grok Bot、Aurora</td></tr>
+      <tr><td>X Premium+</td><td>~$40/月</td><td>SuperGrok + X 広告なし等の特典</td></tr>
+      <tr><td>SuperGrok Plus</td><td>~$100/月</td><td>利用上限大幅増、1080p 動画生成</td></tr>
+      <tr><td>SuperGrok Heavy</td><td>~$300/月</td><td>最大上限、Grok 4 Heavy アクセス</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- Grok Bot -->
+<section id="grok-bot" class="panel panel-xai">
+  <h2><span class="badge b-amber">NEW 8月</span> Grok Bot — 自律 AI エージェント（常時稼働）</h2>
+  <div class="alert alert-new">これが「Grok Bot」の実態。チャットボットではなく、クラウド VM 上でユーザーがオフラインの間も24時間自律実行するエージェント。SuperGrok ($30/月〜) に含まれる。</div>
+  <div class="spec">
+    <span class="spec-key">アクセス</span><span class="spec-val">SuperGrok ($30/月〜) に含まれる。X アカウント連携で X API クレジットも付与。</span>
+    <span class="spec-key">稼働</span><span class="spec-val">クラウド VM 上で24時間/7日、ユーザーがオフラインでも継続実行</span>
+    <span class="spec-key">できること</span><span class="spec-val">Web ブラウズ・ファイル操作・ターミナル実行・サードパーティツール連携・メール管理</span>
+  </div>
+  <div class="grid2">
+    <div class="card card-xai">
+      <h3>📬 受信トレイ管理エージェント</h3>
+      <p>メールを24時間監視 → 優先度でトリアージ → 返信案を生成して承認待ち → 毎日 Slack にダイジェスト投稿。人間が作業しない時間も動き続ける。</p>
+      <div class="example example-xai"><b>実例：</b>スタートアップ創業者がサポートメール対応用 Grok Bot を設定 → Bot が緊急度を判定して草稿を作成 → 創業者は承認するだけ。</div>
+    </div>
+    <div class="card card-xai">
+      <h3>📊 マーケット監視エージェント</h3>
+      <p>特定キーワード・競合企業・X 投稿を24時間監視 → センチメント変化を検知 → アラートと日次レポートを自動生成・配信。</p>
+      <div class="example example-xai"><b>実例：</b>PR 担当者の Grok Bot が自社ブランドへの X 言及を毎時スキャン → ネガティブ投稿を検知したら即座にアラート送信。</div>
+    </div>
+    <div class="card card-xai">
+      <h3>🤝 会議代理エージェント</h3>
+      <p>ユーザーが参加できない会議に代わりに参加（リスニング） → 議事録・アクションアイテム・決定事項をまとめて報告。</p>
+    </div>
+    <div class="card card-xai">
+      <h3>🛠️ X API 連携</h3>
+      <p>X アカウントと連携した Grok Bot は X API クレジットを取得し、投稿検索・タイムライン読み取り・ブックマーク管理を自動化できる。</p>
+    </div>
+  </div>
+</section>
+
+<!-- Grok Build -->
+<section id="grok-build" class="panel panel-xai">
+  <h2><span class="badge b-amber">5月・7月</span> Grok Build / Workflows — コーディング・マルチエージェント</h2>
+  <div class="spec">
+    <span class="spec-key">URL</span><span class="spec-val"><a href="https://grok.com/build">grok.com/build</a> / ターミナル: <code>npm install -g grok-build</code></span>
+    <span class="spec-key">IDE 統合</span><span class="spec-val">Warp / Kilo Code / OpenCode / OpenClaw（Antigravity）</span>
+    <span class="spec-key">Workflows 追加</span><span class="spec-val">2026年7月23日</span>
+  </div>
+  <div class="alert alert-new">
+    <strong>Workflows の核心：</strong>並列エージェントスワーム。標準予算 <strong>128 エージェント</strong>、最大 <strong>1,024 エージェント</strong> を並列稼働させ、大規模タスクを分散実行する。
+  </div>
+  <div class="grid2">
+    <div class="card card-xai">
+      <h3>⚙️ Workflows の仕組み</h3>
+      <p>多フェーズのタスク分解 → 各フェーズを並列エージェントが独立実行 → 「懐疑論者（skeptic）」エージェントが成果物を相互検証 → 結果を統合して最終成果物を生成。<code>.grok/workflows/</code> にスラッシュコマンドとして保存・チーム共有可能。</p>
+    </div>
+    <div class="card card-xai">
+      <h3>🔍 セキュリティ監査の実例</h3>
+      <p>50万行のコードベース全体を対象に128エージェントが並列でセキュリティ脆弱性を検索 → 懐疑論者エージェントが検出結果をクロスチェック → 修正提案付きの最終レポートを自動生成。</p>
+    </div>
+  </div>
+  <div class="spec" style="margin-top:12px">
+    <span class="spec-key">一時停止/再開</span><span class="spec-val">長期タスクの状態保存・再開に対応</span>
+    <span class="spec-key">Agent Dashboard</span><span class="spec-val">複数の並行セッションを一画面で管理</span>
+    <span class="spec-key">アクセス</span><span class="spec-val">SuperGrok ($30/月〜) / xAI API</span>
+  </div>
+</section>
+
+<!-- Grok on X -->
+<section id="grok-x" class="panel panel-xai">
+  <h2><span class="badge b-amber">X 統合</span> Grok on X — プラットフォームネイティブ</h2>
+  <div class="spec">
+    <span class="spec-key">アクセス</span><span class="spec-val">X Premium ($8/月〜) / 一部機能は無料ユーザーも制限付き利用可</span>
+    <span class="spec-key">特徴</span><span class="spec-val">X のリアルタイムデータストリームにネイティブアクセス（知識カットオフなし）</span>
+  </div>
+  <div class="grid2">
+    <div class="card card-xai">
+      <h3>📊 Trending Grok・Grok Stories</h3>
+      <p>トレンドトピックの AI リアルタイム要約カードを検索上部に表示。毎日 AI 生成ニュースダイジェストを Stories 形式で配信。</p>
+      <div class="example example-xai"><b>実例：</b>地震速報が X で拡散 → 検索上部に Grok Summary カードが自動表示。発生時刻・震源・目撃情報をリアルタイム合成。</div>
+    </div>
+    <div class="card card-xai">
+      <h3>🤖 @GrokAI メンション / カスタムタイムライン</h3>
+      <p>投稿に @GrokAI をメンション → Grok が公開リプライを自動投稿。ユーザーは最大75個の Grok 管理トピックフィードを作成可能。For You フィードは Grok LLM スコアリング全面移行済み。</p>
+      <div class="example example-xai"><b>実例：</b>「この論文 @GrokAI 要約して」→ Grok が要約・主要発見・限界点を公開リプライで返信。フォロワー全員が閲覧可能。</div>
+    </div>
+  </div>
+</section>
+
+<!-- Grok for Government -->
+<section id="grok-gov" class="panel panel-xai">
+  <h2><span class="badge b-red">8/31 新規</span> Grok for Government — 米国防総省 GenAI.mil</h2>
+  <div class="spec">
+    <span class="spec-key">展開日</span><span class="spec-val">2026年8月31日</span>
+    <span class="spec-key">対象</span><span class="spec-val">米国連邦政府・DoD 職員のみ（約170万〜300万人）。一般商業利用不可。</span>
+    <span class="spec-key">インフラ</span><span class="spec-val">Starshield（SpaceX の国防向けセキュリティ基盤）</span>
+    <span class="spec-key">認定</span><span class="spec-val">Impact Level 5 (IL5) — 管理対象非機密情報（CUI）最高ティア認定</span>
+    <span class="spec-key">競合</span><span class="spec-val">GenAI.mil 上で Google Gemini・ChatGPT Mil と並列提供（マルチベンダー方針）</span>
+  </div>
+  <div class="grid2">
+    <div class="card card-xai">
+      <h3>📋 Playbooks（ワークフロースクリプト）</h3>
+      <p>軍・政府業務向けの保存済みワークフロー。調達書類ドラフト・日次報告書・状況評価など繰り返しタスクをテンプレート化してチーム共有。</p>
+    </div>
+    <div class="card card-xai">
+      <h3>📁 Persistent Projects</h3>
+      <p>作戦・ミッション単位の AI セッションを永続保持。前回の分析結果・意思決定の経緯を参照しながら継続的な AI 支援が可能。推論モード: Auto / Fast / Expert から選択。</p>
+    </div>
+  </div>
+  <div class="example example-xai"><b>公式 DoD 発表より：</b>調達担当者が「Expert」推論モードで市場調査データを分析 → Playbook として保存 → 次回の調達でチーム全員が同じワークフローを再利用。</div>
+</section>
+
+<!-- Grok Cloud -->
+<section id="grok-cloud" class="panel panel-xai">
+  <h2><span class="badge b-amber">8月 週次展開</span> Grok クラウドプラットフォーム展開</h2>
+  <div style="overflow:auto">
+  <table>
+    <thead><tr><th>プラットフォーム</th><th>状態</th><th>日付</th><th>Grok バージョン</th><th>料金（参考）</th></tr></thead>
+    <tbody>
+      <tr><td>xAI API（直接）</td><td><span class="badge b-mint" style="font-size:.65rem">GA</span></td><td>継続</td><td>4.3 / 4.6</td><td>$2/M in・$6/M out（4.6）</td></tr>
+      <tr><td>GitHub Copilot</td><td><span class="badge b-mint" style="font-size:.65rem">GA</span></td><td>8/14</td><td>4.5 / 4.6</td><td>Copilot プランに含む</td></tr>
+      <tr><td>Amazon Bedrock</td><td><span class="badge b-mint" style="font-size:.65rem">GA</span></td><td>8/19</td><td>4.3 / 4.6</td><td>Bedrock 標準価格</td></tr>
+      <tr><td>Google Vertex AI</td><td><span class="badge b-mint" style="font-size:.65rem">GA</span></td><td>8/21</td><td>4.6</td><td>Vertex 標準価格</td></tr>
+      <tr><td>Microsoft Azure Foundry</td><td><span class="badge b-blue" style="font-size:.65rem">Preview</span></td><td>8/26</td><td>4.6</td><td>$2/M in・$6/M out</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="example example-xai" style="margin-top:12px"><b>GitHub Copilot での実例：</b>VS Code のモデルピッカーで Grok 4.6 を選択 → 500K context でリポジトリ全体（30ファイル以上）をメモリに保持したまま複雑なリファクタリングを指示。全ファイル間の依存関係を把握した上で変更案を生成。</div>
+  <p class="small" style="margin-top:8px">xAI API 新規アカウントに $25 クレジット付与。Web/X Search・コード実行: ~$5/1,000回。</p>
+</section>
+
+<!-- Aurora / Video -->
+<section id="aurora" class="panel panel-xai">
+  <h2><span class="badge b-orange">画像・動画</span> Aurora（画像）/ Imagine Video 1.5（動画）</h2>
+  <div class="grid2">
+    <div class="card card-xai">
+      <h3>🎨 Aurora — ネイティブ画像モデル</h3>
+      <div class="spec">
+        <span class="spec-key">アーキ</span><span class="spec-val">autoregressive MoE（テキスト+画像インターリーブで学習）</span>
+        <span class="spec-key">API</span><span class="spec-val">Preview（<code>aurora-image-v1</code>）。GA 未定。</span>
+        <span class="spec-key">機能</span><span class="spec-val">テキスト→画像生成、スタイル変換、マルチ画像編集（最大5ソース）、21:9 シネマ等新アスペクト比</span>
+      </div>
+      <div class="example example-xai"><b>実例：</b>「70年代ポスター風の夜の東京、ネオン多め」→ Aurora がチャット内で直接生成。「もう少し暗く」→ 調整して再生成。API: <code>aurora-image-v1</code></div>
+    </div>
+    <div class="card card-xai">
+      <h3>🎬 Imagine Video 1.5 — 1080p 動画生成</h3>
+      <div class="spec">
+        <span class="spec-key">機能</span><span class="spec-val">テキスト→動画、画像→動画、参照→動画、ナレーション音声プリセット</span>
+        <span class="spec-key">解像度</span><span class="spec-val">1080p（SuperGrok Plus〜）</span>
+        <span class="spec-key">Agent Mode</span><span class="spec-val">無限キャンバス — エージェントがショットリストを計画・各フレームを生成・つなぎ合わせ・ナレーション付与</span>
+      </div>
+      <div class="example example-xai"><b>実例：</b>ソロ映像作家が Imagine Agent Mode に「製品紹介ビデオ60秒」をプロンプト → エージェントがショットリスト作成・フレーム生成・ナレーション追加を全自動。</div>
+    </div>
+  </div>
+</section>
+
+<!-- Cursor -->
+<section id="cursor" class="panel panel-xai" style="border-color:rgba(253,224,71,.35)">
+  <h2><span class="badge b-yellow">8月 買収</span> Cursor（Anysphere）— $600億で買収</h2>
+  <div class="alert alert-warn">
+    SpaceXAI が AI ネイティブコードエディタ「Cursor」を開発する Anysphere を <strong>約600億ドル全額株式</strong> で買収（2026年8月）。開発者ツール市場の制圧が目的。
+  </div>
+  <div class="grid2">
+    <div class="card card-xai">
+      <h3>現在の影響</h3>
+      <p>Cursor は引き続き動作中。Grok 4.6 をバックエンドに深く統合中。Colossus（20万 GPU）で Cursor のオートコンプリート・Composer（エージェントコーディング）を高速化。</p>
+    </div>
+    <div class="card card-xai">
+      <h3>⚠️ OpenAI モデル除去（11/12 予定）</h3>
+      <p><strong>2026年11月12日</strong>までに Cursor から OpenAI モデルを削除予定（OpenAI が利用規約上の懸念を提起）。Claude（Anthropic）と Gemini は引き続き利用可能。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== GOOGLE / GEMINI ====================== -->
+
+<section id="gemini-overview" class="panel panel-google">
+  <div class="sect-head">
+    <span style="font-size:2rem">🟢</span>
+    <div>
+      <div class="eyebrow" style="color:var(--mint)">Google / Gemini</div>
+      <h2 style="color:var(--mint);margin:0">サービス全体像（2026-09-02）</h2>
+    </div>
+  </div>
+  <div class="alert alert-info">
+    <strong>サブスクリプション体系変更：</strong>2026年、Google は AI サブスクを3階層に統一。<strong>AI Plus $4.99/月</strong>（旧 Gemini Basic+）/ <strong>AI Pro $19.99/月</strong>（旧 Gemini Advanced）/ <strong>AI Ultra $99.99〜$200/月</strong>（最上位エージェント機能）。
+  </div>
+  <div class="alert alert-new">
+    <strong>Google Assistant → Gemini：</strong>2026年9月4日から Android スマートフォン・タブレット・Wear OS・ヘッドフォン・Android Auto でアシスタントが Gemini に全面移行。スマートスピーカー・Google TV は対象外。
+  </div>
+  <div class="platform-row">
+    <span class="badge b-mint">Gemini App（AI Pro）</span>
+    <span class="badge b-mint">Gemini Spark（常時エージェント）</span>
+    <span class="badge b-mint">Gemini Live</span>
+    <span class="badge b-mint">AI Mode in Search</span>
+    <span class="badge b-purple">Gemini Notebook（旧NotebookLM）</span>
+    <span class="badge b-blue">Gemini in Workspace</span>
+    <span class="badge b-blue">Google AI Studio</span>
+    <span class="badge b-blue">Project Astra</span>
+    <span class="badge b-gray">Gems → Skills（10/20廃止予定）</span>
+  </div>
+</section>
+
+<!-- Gemini Spark -->
+<section id="gemini-spark" class="panel panel-google">
+  <h2><span class="badge b-mint">5月〜 AI Ultra</span> Gemini Spark — 常時稼働 AI エージェント</h2>
+  <div class="alert alert-new">Grok Bot の Google 版に相当する「常時稼働型自律エージェント」。AI Ultra（$99.99/月〜）で利用可能。デバイスがロック中でも24時間バックグラウンドで実行。</div>
+  <div class="spec">
+    <span class="spec-key">発表</span><span class="spec-val">Google I/O 2026（5月）/ AI Ultra でベータ提供中</span>
+    <span class="spec-key">稼働</span><span class="spec-val">24時間/7日、デバイスロック中も継続実行</span>
+    <span class="spec-key">統合</span><span class="spec-val">Gmail・Calendar・Drive・Docs・Sheets・Slides / 外部: Canva・Dropbox・OpenTable・Zillow・MCP 拡張</span>
+    <span class="spec-key">プロトコル</span><span class="spec-val">Agent2Agent (A2A) — 他の専門エージェントと連携</span>
+  </div>
+  <div class="grid2">
+    <div class="card card-google">
+      <h3>📧 プロアクティブなタスクチェーン（実例）</h3>
+      <p>「contract」「proposal」というキーワードを含むメールを監視 → 案件金額を抽出 → Google Sheet に記録 → CRM エントリを更新 → 受領確認メールを下書き。全自動、人間の操作ゼロ。</p>
+    </div>
+    <div class="card card-google">
+      <h3>🌐 Chrome 自律ブラウジング</h3>
+      <p>Web を自律的に操作。保存された認証情報（許可制）を使ってフライト予約・予約取得なども実行可能。機密アクション（送金・メール送信）は人間承認が必要。</p>
+    </div>
+  </div>
+  <div class="spec" style="margin-top:12px">
+    <span class="spec-key">⚠️ Gems 廃止</span><span class="spec-val">静的なカスタム AI ペルソナ「Gems」は <strong>2026年10月20日</strong> に廃止予定。Gemini Spark の「Skills」（エージェント型）に移行。Gem のシステムプロンプトを手動でバックアップ推奨。</span>
+  </div>
+</section>
+
+<!-- Gemini Live -->
+<section id="gemini-live" class="panel panel-google">
+  <h2><span class="badge b-mint">拡張中</span> Gemini Live — リアルタイムマルチモーダル会話</h2>
+  <div class="spec">
+    <span class="spec-key">アクセス</span><span class="spec-val">AI Pro（フル） / 無料（基本音声のみ）</span>
+    <span class="spec-key">対応言語</span><span class="spec-val">40言語以上（8月に20言語から拡大）</span>
+  </div>
+  <div class="grid2">
+    <div class="card card-google">
+      <h3>📱 Guided Vision（9月 Android Feature Drop）</h3>
+      <p>カメラを向けると Gemini Live が周囲を口頭で説明。細かい文字の読み上げ・メニュー案内・物体の位置確認など。視覚障がい者向けアクセシビリティ機能として設計。カメラの向きが合っていなければ「少し左に向けて」と音声ガイド。</p>
+      <div class="example"><b>実例：</b>食料品店でスマートフォンを缶詰に向ける → Gemini Live が栄養表示を口頭で読み上げ、アレルゲン情報を確認。スーパーの棚を移動しながらリアルタイムで会話継続。</div>
+    </div>
+    <div class="card card-google">
+      <h3>🌍 リアルタイム翻訳 / 画面共有</h3>
+      <p>外国語を検出してリアルタイム翻訳・字幕表示。デスクトップ画面共有でアプリやドキュメントを見ながら音声会話が可能。フローティング pill UI で他のアプリと同時使用。</p>
+      <div class="example"><b>実例：</b>デザイナーが Figma 画面を共有 → 「このレイアウトの UX 的な問題点は？」→ Gemini が画面をリアルタイム分析して口頭でフィードバック。コピペ不要。</div>
+    </div>
+  </div>
+  <div class="alert alert-info" style="margin-top:10px"><strong>Project Astra との接続：</strong>Gemini Live の高度機能（長期記憶・物理世界認識）は DeepMind Project Astra から段階移植中。AI グラスへの展開が次フェーズ。</div>
+</section>
+
+<!-- AI Mode -->
+<section id="ai-mode" class="panel panel-google">
+  <h2><span class="badge b-mint">1億 MAU+</span> Google AI Mode in Search</h2>
+  <div class="spec">
+    <span class="spec-key">規模</span><span class="spec-val">月間アクティブユーザー <strong>10億人以上</strong>（2026年Q2）。200ヶ国以上で展開中。</span>
+    <span class="spec-key">バックエンド</span><span class="spec-val">Gemini 3.7 Flash（2026年8月確認）</span>
+    <span class="spec-key">アクセス</span><span class="spec-val">無料（AI Overviews）/ AI Ultra でフル機能（Information Agents等）</span>
+  </div>
+  <div class="grid2">
+    <div class="card card-google">
+      <h3>🤖 Information Agents（AI Ultra・6月〜）</h3>
+      <p>特定トピックを24時間監視する常時エージェント。設定した条件（「〇〇株が5%以上動いたら」「競合が新製品を発表したら」）を検知して自動通知・サマリー配信。</p>
+    </div>
+    <div class="card card-google">
+      <h3>🛍️ ショッピング統合 / 練習クイズ</h3>
+      <p>AI 回答内に商品比較・価格・Buy ボタンをインライン表示。学習トピックの AI 生成練習クイズで理解度確認も可能。Search Console に AI パフォーマンスレポート（8/31 全面展開）。</p>
+    </div>
+  </div>
+  <div class="example"><b>実例：</b>「予算2万円で初心者向けコーヒーグラインダーを選んで」→ AI Mode が5製品を比較、推薦理由・現在価格・購入リンクを一画面に表示。複数のECサイトを回る必要なし。</div>
+</section>
+
+<!-- Gemini Notebook -->
+<section id="notebooklm" class="panel panel-google">
+  <h2><span class="badge b-purple">7/16 改名</span> Gemini Notebook — 旧 NotebookLM</h2>
+  <div class="alert alert-info"><strong>リブランド：</strong>NotebookLM は2026年7月16日に <strong>Gemini Notebook</strong> に改名。URL (notebooklm.google.com) は当面リダイレクト継続。Gemini アプリ・Search と同期。</div>
+  <div class="spec">
+    <span class="spec-key">アクセス</span><span class="spec-val">無料 / AI Pro でフル Studio 機能</span>
+    <span class="spec-key">⚠️ 利用制限変更</span><span class="spec-val">2026年9月2日から計算ベースの課金へ移行。リセット間隔を24時間 → <strong>5時間</strong> に短縮。重い生成（Video Overview等）はスケジュール実行。</span>
+  </div>
+  <div class="grid3">
+    <div class="card card-google">
+      <h3>📚 Google Play Books 統合（8/29）</h3>
+      <p>購入済み電子書籍（10万タイトル以上）をノートのソースとして直接追加。法律書・技術書・医学書を丸ごとナレッジベースに。</p>
+      <div class="example"><b>実例：</b>医師が医学教科書5冊を追加 → 「第三世代抗ヒスタミン薬の禁忌を相互参照でまとめて」→ 5冊の引用付き統合表を生成。</div>
+    </div>
+    <div class="card card-google">
+      <h3>🎙️ Studio Panel 出力</h3>
+      <p>Audio Overview（80言語、ポッドキャスト形式）/ Video Overview（ナレーション付き動画）/ スライドデッキ / インフォグラフィック / マインドマップ / フラッシュカード / クイズを自動生成。</p>
+    </div>
+    <div class="card card-google">
+      <h3>🐍 Python 実行サンドボックス</h3>
+      <p>各ノートにクラウドコンピューティングサンドボックスが付属。ソースデータに対して Python でデータ分析を直接実行可能。</p>
+    </div>
+  </div>
+  <div class="example" style="margin-top:10px"><b>実例：</b>研究者が論文40本をアップロード → Audio Overview で20分のポッドキャスト生成 → 通勤中に研究サマリーをリスニング。翌日は同じノートでスライドデッキ生成 → 講義用資料として即使用。</div>
+</section>
+
+<!-- Workspace -->
+<section id="workspace" class="panel panel-google">
+  <h2><span class="badge b-blue">Workspace</span> Gemini in Google Workspace — 注目アップデート</h2>
+  <div class="spec">
+    <span class="spec-key">料金</span><span class="spec-val">Business Standard 以上に含む / AI 高度機能は AI Pro/Ultra アドオン($20/ユーザー/月)</span>
+  </div>
+  <div class="grid2">
+    <div class="card card-google">
+      <h3>📹 Meet: 対面会議の議事録</h3>
+      <p>「Take notes for me」機能がビデオ会議だけでなく<strong>対面会議</strong>にも対応。会議終了後2分以内にアクションアイテム付き議事録を参加者の Gmail に自動配信。</p>
+      <div class="example"><b>実例：</b>2時間の戦略会議終了 → 2分後に全員の Gmail に担当者別アクションアイテム付きサマリーが届く。書記不要。</div>
+    </div>
+    <div class="card card-google">
+      <h3>📊 Sheets Canvas</h3>
+      <p>Sheets データの上にインタラクティブなミニアプリ（ダッシュボード・ヒートマップ・かんばんボード）を作成。Salesforce / HubSpot からの直接データインポートも追加。</p>
+    </div>
+    <div class="card card-google">
+      <h3>🎬 Google Vids（Veo 3.1 統合）</h3>
+      <p>Google Docs / Slides → 動画を「Help me create」で自動変換。指示可能な AI アバタープレゼンター（カメラ不要）。Lyria 3 による BGM 自動生成。<a href="https://vids.new">vids.new</a> でアクセス。</p>
+      <div class="example"><b>実例：</b>会議の議事録ドキュメントを Vids に送る → 「プレゼン動画にして」→ AI アバターがナレーション付きで議事録を動画化。チームに共有。</div>
+    </div>
+    <div class="card card-google">
+      <h3>🏗️ Workspace Studio（ノーコード AI エージェント）</h3>
+      <p>平易な日本語でワークフローを記述するだけで、Workspace アプリをまたぐ AI エージェントを構築。Business Standard 以上に追加料金なし。</p>
+    </div>
+  </div>
+</section>
+
+<!-- Project Astra -->
+<section id="astra" class="panel panel-google">
+  <h2><span class="badge b-blue">研究→製品化</span> Project Astra — AI グラス・ユニバーサルエージェント</h2>
+  <div class="spec">
+    <span class="spec-key">URL</span><span class="spec-val"><a href="https://deepmind.google/technologies/project-astra/">deepmind.google/technologies/project-astra</a></span>
+    <span class="spec-key">消費者向け展開</span><span class="spec-val">2026年7月〜（AI グラス形態）</span>
+  </div>
+  <div class="grid2">
+    <div class="card card-google">
+      <h3>👓 AI グラス統合</h3>
+      <p>前面カメラ + マイク + 空間オーディオを搭載した AI グラス。リアルタイム視覚支援・ナビゲーション・文脈的理解。デバイス上の Gemini Nano で即時応答、複雑なクエリはクラウド Gemini へ。</p>
+      <div class="example"><b>実例：</b>ハードウェアショップで AI グラスを装着 → 棚の部品を見る → Astra が各部品の用途・価格比較を音声で説明。スマートフォンを取り出す必要がない。</div>
+    </div>
+    <div class="card card-google">
+      <h3>🧠 永続記憶</h3>
+      <p>以前のセッションで「見た」「話した」内容を記憶。「先週見たホワイトボードの説明をして」と言うと、前回のセッションの文脈と照合して解説。Gemini Live にも段階的に移植中。</p>
+    </div>
+  </div>
+</section>
+
+<!-- Compare -->
+<section id="compare" class="panel">
+  <h2>🔶 vs 🟢 比較表</h2>
+  <div style="overflow:auto">
+  <table>
+    <thead><tr><th>カテゴリ</th><th>xAI / Grok（SpaceXAI）</th><th>Google / Gemini</th></tr></thead>
+    <tbody>
+      <tr><td>コンシューマーApp</td><td>Grok.com (SuperGrok $30/月)</td><td>Gemini App (AI Pro $19.99/月)</td></tr>
+      <tr><td>常時稼働エージェント</td><td><strong>Grok Bot</strong>（8月〜、SuperGrok+）</td><td><strong>Gemini Spark</strong>（AI Ultra、5月〜）</td></tr>
+      <tr><td>コーディングエージェント</td><td>Grok Build / Workflows（最大1,024並列）</td><td>Google AI Studio + Antigravity</td></tr>
+      <tr><td>画像生成</td><td>Aurora / Imagine 2.0</td><td>Imagen 4 / Veo 3.1</td></tr>
+      <tr><td>動画生成</td><td>Imagine Video 1.5（1080p）</td><td>Veo 3.1 + Google Vids</td></tr>
+      <tr><td>音声モデル</td><td>Grok Voice Think Fast 2.0</td><td>Gemini Live（40言語、Guided Vision）</td></tr>
+      <tr><td>リサーチ</td><td>Grok DeepSearch</td><td>Gemini Deep Research + Gemini Notebook</td></tr>
+      <tr><td>政府向け</td><td>Grok for Gov / GenAI.mil (IL5、8/31)</td><td>Gemini for Gov / GenAI.mil</td></tr>
+      <tr><td>クラウドAPI展開</td><td>Azure・Bedrock・Vertex・Copilot</td><td>Vertex AI（ネイティブ）</td></tr>
+      <tr><td>ノーコードAgent</td><td>Grok Build（一部）</td><td>Workspace Studio（12/2025〜）</td></tr>
+      <tr><td>検索統合</td><td>X プラットフォーム（リアルタイム）</td><td>AI Mode in Search（10億+ MAU）</td></tr>
+      <tr><td>ウェアラブル</td><td>なし</td><td>Project Astra AI グラス（7月〜）</td></tr>
+      <tr><td>主要買収</td><td>Cursor $600億（8月）</td><td>なし</td></tr>
+      <tr><td>カスタムAI</td><td>Grok Bot 設定</td><td>Gems（10/20廃止）→ Skills</td></tr>
+      <tr><td>モート</td><td>リアルタイム X データ・Colossus 20万 GPU</td><td>Workspace 深度統合・10億人規模の Search</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+</main>
+<footer>
+  <div class="shell">
+    情報源: grok.com · x.ai/news · docs.x.ai · gemini.google.com · blog.google/products/gemini · notebooklm.google.com · workspace.google.com/blog · aistudio.google.com · deepmind.google/technologies/project-astra · defenseone.com — verified 2026-09-02 JST
+    · <a href="llm-tracker.html">LLM Tracker</a> · <a href="grok-recent-updates.html">Grok 詳細 tracker</a> · <a href="gemini-recent-updates.html">Gemini 詳細 tracker</a> · <a href="index.html">Research Top</a>
+  </div>
+</footer>
+</body>
+</html>
