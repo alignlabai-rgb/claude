@@ -13,16 +13,18 @@
 
 - [`research/llm-tracker.html`](research/llm-tracker.html)
   - 21 provider、中国系12 providerの現行model、surface、公式確認、専用tracker、鮮度gapを一画面で確認するcoverage ledger
+- [`research/official-model-delta-2026-09-23.html`](research/official-model-delta-2026-09-23.html)
+  - 21 providerのモデル・API surface・preview・鮮度gapを公式一次情報で再点検したcurrent layer。古い記事の誤った世代名をcurrent factsと分離
+- [`workbench/knowledge/model-generations.html`](workbench/knowledge/model-generations.html)
+  - provider別モデルとsurfaceを分けるcurrent model-generation reference。9/23公式差分と同期
 - [`research/official-model-delta-2026-08-19.html`](research/official-model-delta-2026-08-19.html)
-  - 8/11以後に変わった主要providerのmodel、alias、deprecation、tool更新を公式一次情報で確認するcurrent layer
+  - 8/19時点のhistorical snapshot。現在判断には9/23版を優先
 - [`research/official-model-delta-2026-08-11.html`](research/official-model-delta-2026-08-11.html)
   - 8/11時点のhistorical snapshot。現在判断は8/19版を優先
 - [`research/ai-news/index.html`](research/ai-news/index.html)
   - 毎朝のClaude Newsを速報レーダーとして残すアーカイブ。確定情報の根拠にはしない
 - [`research/signal-to-organizational-leverage.html`](research/signal-to-organizational-leverage.html)
   - Claude News / GrokPulse / Hermesなどのsignalを、重複除去・一次確認・候補owner・最小の次手・失効日へ変換する方法
-- [`workbench/knowledge/model-generations.html`](workbench/knowledge/model-generations.html)
-  - ハブ内の現行モデル世代SSOT
 
 ## Structure
 

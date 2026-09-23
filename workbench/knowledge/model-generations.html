@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>現行モデル世代 SSOT — ベンダー別フラッグシップの正本 | LLM 個別深掘り</title>
+  <title>現行モデル世代 SSOT — provider別モデルと提供面 | LLM 個別深掘り</title>
   <style>
     body { font-family: "Segoe UI", "Noto Sans JP", system-ui, sans-serif; margin: 0; background: #0b1220; color: #edf2fb; line-height: 1.7; padding: 28px 18px 64px; }
     .shell { max-width: 1100px; margin: 0 auto; display: grid; gap: 18px; }
@@ -51,11 +51,11 @@
 
     <div class="panel">
       <p class="small"><a href="index.html">← LLM 個別深掘り</a> / <a href="../../index.html">Hub Top</a></p>
-      <h1>現行モデル世代 SSOT — ベンダー別フラッグシップの確認表</h1>
+      <h1>現行モデル世代 SSOT — provider別モデルと提供面</h1>
       <div class="summary">
-        <p>このページは<strong>公式に現行世代を確認できたproviderの詳細表</strong>です。21 providerの網羅状況、専用tracker、鮮度gapは先に<a href="../../research/llm-tracker.html">LLM Coverage Ledger</a>を見てください。各深掘りページ・トラッカー・パイプライン記事の世代表記はこの確認表へ合わせ、新世代が出たらここを先に更新します。</p>
+        <p>このページはprovider・製品・API・weights・previewを分けた<strong>現行モデル参照表</strong>です。一次情報の確認日と不明点は<a href="../../research/official-model-delta-2026-09-23.html">2026-09-23公式差分</a>に記録し、21 providerのcoverage gapは<a href="../../research/llm-tracker.html">LLM Coverage Ledger</a>を参照します。過去のmodel releaseや個別ページの記述はcurrent factsとして無条件に引き継ぎません。</p>
       </div>
-      <p class="small">最終更新: <span class="ts">2026-08-19</span> ／ provider公式のmodel catalog・release notesで再確認</p>
+      <p class="small">最終更新: <span class="ts">2026-09-23</span> ／ provider公式の発表・model catalog・API release notesを照合</p>
     </div>
 
     <div class="panel">
@@ -69,150 +69,159 @@
     </div>
 
     <div class="panel">
-      <h2>現行世代テーブル（2026-08-19 公式確認）</h2>
+      <h2>現行世代テーブル（2026-09-23 公式確認）</h2>
       <table class="ssot-table">
         <thead>
           <tr>
             <th style="width:14%;">ベンダー</th>
-            <th style="width:24%;">現行フラッグシップ</th>
-            <th style="width:26%;">主要ティア</th>
+            <th style="width:24%;">現行モデル / 状態</th>
+            <th style="width:26%;">別surface・関連family</th>
             <th>備考</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td class="vendor">Anthropic<br>Claude</td>
-            <td class="flagship">Claude Opus 5<br><span class="note">advanced</span></td>
-            <td class="tier">Opus 5（advanced）／ Sonnet 5（balance）／ Haiku 4.5（fast / prior tier）</td>
-            <td class="note">Opus 5は<span class="ts">2026-07-24</span>公開、<code>claude-opus-5</code>、1M context、128K output、thinking on by default。今回の公式current docsで確認できないFable / Mythos / Opus 4.8は現行扱いしない。<a href="claude-model.html">claude-model</a> ／ <a href="../../research/claude-recent-updates.html">claude-recent-updates</a></td>
+            <td class="flagship">Claude Opus 5.5</td>
+            <td class="tier">Claude 5.5 family first model</td>
+            <td class="note">9/22発表。正確なAPI option・製品ごとの提供状況はAnthropic release notesを参照。性能・価格の比較文はprovider自身の報告と独立評価を区別。<a href="https://www.anthropic.com/claude-opus-5-5">Official announcement</a> ／ <a href="../../research/official-model-delta-2026-09-23.html">9/23 current layer</a></td>
           </tr>
           <tr>
             <td class="vendor">OpenAI</td>
-            <td class="flagship">GPT-5.6 family</td>
-            <td class="tier">Sol（最上位）／ Terra（balance）／ Luna（fast）</td>
-            <td class="note">CodexではChatGPT sign-in surfaceの <code>gpt-5.4</code> / <code>gpt-5.4-mini</code> が8/31 retire予定。推奨移行先はTerra / Luna。API surfaceはこの退役の対象外。<a href="chatgpt.html">chatgpt</a> ／ <a href="../../research/chatgpt-recent-updates.html">chatgpt-recent-updates</a></td>
+            <td class="flagship">GPT-6 family</td>
+            <td class="tier">Astra ／ Sol ／ Luna</td>
+            <td class="note">API changelogはAstra (9/3)、Sol / Luna (9/22)を記録。ChatGPT consumer product、Codex sign-in、API availabilityは分けて確認。<a href="https://developers.openai.com/api/docs/changelog">OpenAI API changelog</a> ／ <a href="../../research/official-model-delta-2026-09-23.html">9/23 current layer</a></td>
           </tr>
           <tr>
             <td class="vendor">Google<br>Gemini</td>
-            <td class="flagship">Gemini 3.7 Flash<br><span class="note">GA</span></td>
-            <td class="tier">3.7 Flash（GA）／ 3.6 Flash ／ 3.5 Flash-Lite ／ 3.1 Pro（preview）</td>
-            <td class="note"><code>gemini-3.7-flash</code>は<span class="ts">2026-08-13</span> GA。coding、web development、computer-use、agentic workflow向け。旧Imagen 4の3 model IDは8/17 shutdown済み。<a href="gemini.html">gemini</a> ／ <a href="../../research/gemini-recent-updates.html">gemini-recent-updates</a></td>
+            <td class="flagship">Gemini 3.8 Flash<br><span class="note">GA</span></td>
+            <td class="tier">3.8 Live ／ 3.8 Live Extended Thinking（audio）／ 3.7 Flash</td>
+            <td class="note">Gemini 3.8 Flash GA 9/2、Live family GA 9/15。2.5 API accessは既利用者に限定する変更で、廃止ではない。<a href="https://ai.google.dev/gemini-api/docs/changelog">Gemini API release notes</a> ／ <a href="../../research/official-model-delta-2026-09-23.html">9/23 current layer</a></td>
           </tr>
           <tr>
             <td class="vendor">xAI<br>Grok</td>
-            <td class="flagship">Grok 4.6</td>
-            <td class="tier">Grok Build / <code>grok-build-latest</code> ／ Imagine Video 1.5</td>
-            <td class="note"><code>grok-4.6</code>は公式model docsで確認。500K input、text / image input、function calling、structured output、reasoning対応。Grok Buildはcoding agentとして別surface。<a href="grok.html">grok</a> ／ <a href="../../research/grok-recent-updates.html">grok-recent-updates</a></td>
+            <td class="flagship">Grok 4.7</td>
+            <td class="tier"><code>grok-4.7</code> API ／ Grok Build</td>
+            <td class="note">9/21発表、API docsで500K contextを確認。Grok 4.7 FastのGrok Build / Cursor surfaceは公開APIと区別。<a href="https://docs.x.ai/developers/release-notes">xAI API release notes</a> ／ <a href="../../research/official-model-delta-2026-09-23.html">9/23 current layer</a></td>
           </tr>
           <tr>
             <td class="vendor">Alibaba<br>Qwen</td>
-            <td class="flagship">Qwen3.8 open family</td>
-            <td class="tier">2.4T-A95B（8/12）／ 27B（8/14）／ hosted serviceは別確認</td>
-            <td class="note">公式repositoryでweights公開を確認。repositoryのcode licenseと各weight model cardのlicenseを混同せず、利用対象ごとに確認する。<a href="qwen.html">qwen</a> ／ <a href="../../research/qwen-recent-updates.html">qwen-recent-updates</a></td>
+            <td class="flagship">Qwen3.8 family</td>
+            <td class="tier">Qwen3.8-Omni-Flash ／ Qwen3.8-LiveTranslate ／ Qwen-Image-2.1 (image family)</td>
+            <td class="note">Qwen official site lists Omni-Flash and LiveTranslate on 9/18, Image 2.1 on 9/20. Text, omnimodal, and image-generation model/license/surface are not interchangeable. <a href="https://qwen.ai/">Qwen official site</a> ／ <a href="../../research/official-model-delta-2026-09-23.html">9/23 current layer</a></td>
           </tr>
           <tr>
             <td class="vendor">Zhipu<br>GLM</td>
-            <td class="flagship">GLM-5.3 <span class="badge badge-new">最新</span></td>
-            <td class="tier">GLM-5.3（hosted）／ GLM-5.2（open weights / local）／ GLM-5.1</td>
-            <td class="note"><code>glm-5.3</code>は<span class="ts">2026-08-14</span>公開。thinking常時有効で<code>reasoning_effort</code>はlow / high / max。weightsは公開予告段階なので、GLM-5.2のopen-weight/local surfaceと分ける。<a href="glm.html">glm</a> ／ <a href="../../research/glm-recent-updates.html">glm-recent-updates</a></td>
+            <td class="flagship">GLM-5.3 / GLM-5.3-Flash</td>
+            <td class="tier">GLM-5.3 hosted flagship ／ 5.3-Flash multimodal / open weights</td>
+            <td class="note">AutoClaw/Z.aiは5.3-Flashを9/22公開。Flash記事は320B/18B activeとMIT weightsを報告する。仕様・license・API IDはofficial model repo/catalogで利用前に確認。<a href="https://autoclaw.z.ai/blog/model/glm-5.3-flash/">Official GLM-5.3-Flash post</a> ／ <a href="../../research/official-model-delta-2026-09-23.html">9/23 current layer</a></td>
           </tr>
           <tr>
             <td class="vendor">DeepSeek</td>
-            <td class="flagship">DeepSeek V4 API family</td>
-            <td class="tier">V4 Pro ／ V4 Flash</td>
-            <td class="note"><code>deepseek-v4-pro</code>はV4-Pro-0813、<code>deepseek-v4-flash</code>はV4-Flash-0731を指す（8/16公式API update）。固定版とaliasを分け、GAとは表記しない。<a href="deepseek.html">deepseek</a> ／ <a href="../../research/deepseek-recent-updates.html">tracker</a></td>
+            <td class="flagship">DeepSeek V4.1-Flash</td>
+            <td class="tier"><code>deepseek-flash</code> API alias ／ V4 Pro service continued</td>
+            <td class="note">9/10 release; predecessor IDs <code>deepseek-v4-flash</code> and <code>deepseek-v4-flash-vision-exp</code> temporarily route for compatibility. V4 Pro service continues after 9/14 per official notice. <a href="https://api-docs.deepseek.com/updates/">DeepSeek API changelog</a> ／ <a href="../../research/official-model-delta-2026-09-23.html">9/23 current layer</a></td>
           </tr>
           <tr>
             <td class="vendor">Moonshot<br>Kimi</td>
             <td class="flagship">Kimi K3</td>
             <td class="tier">K3（open weights / API）／ K2.7 Code ／ K2.6</td>
-            <td class="note">2.8T total / 104B active、1M context、full weightsとKimi K3 License公開済み。固有のthinking履歴contractに注意。<a href="kimi.html">kimi</a> ／ <a href="../../research/kimi-recent-updates.html">tracker</a></td>
+            <td class="note">Official Kimi-K3 repository lists 2.8T total / 104B active, 1M context, full weights and Kimi K3 License, plus API model name <code>kimi-k3</code>. Old K2 retirement claims need their own current source. <a href="https://github.com/MoonshotAI/Kimi-K3">Official Kimi K3 repo</a> ／ <a href="../../research/official-model-delta-2026-09-23.html">9/23 current layer</a></td>
           </tr>
           <tr>
             <td class="vendor">MiniMax</td>
             <td class="flagship">MiniMax M3</td>
-            <td class="tier">M3（LLM / open weights）／ H3（omni-modal generation / open model）／ Hailuo 2.3（video API family）</td>
-            <td class="note">H3は<span class="ts">2026-07-31</span>公開。text・image・video・audio contextから生成し、videoはnative stereo、最大2K・15秒。LLM、video generation、API、local inferenceを同一surfaceとして扱わない。<a href="../../research/minimax-recent-updates.html">MiniMax tracker</a> ／ <a href="https://www.minimax.io/blog/minimax-h3">H3 official release</a></td>
+            <td class="tier">M3 (LLM) ／ H3 (omni-modal generation/video; open-source release announced)</td>
+            <td class="note">H3 was launched 7/31; company source describes native stereo audio, up to 2K / 15 seconds, and an 8/3 open-source announcement. Do not treat H3 as the latest LLM. <a href="https://www.minimax.io/blog/minimax-m3">M3</a> ／ <a href="https://www.minimax.io/blog/minimax-h3">H3</a></td>
           </tr>
           <tr>
             <td class="vendor">Baidu<br>ERNIE</td>
             <td class="flagship">ERNIE 5.1<br><span class="note">product announcement</span></td>
-            <td class="tier">ERNIE 5.1（product）／ <code>ernie-5.0</code>（Qianfan international API list）</td>
-            <td class="note">Baidu公式IRは2026年5月の5.1 launchを記載する一方、6/25更新のinternational API listは5.0。product generationとAPI availabilityを分ける。<a href="https://ir.baidu.com/static-files/f6ac7a6b-3583-4b6d-b42a-75939e09d99b">Baidu IR</a> ／ <a href="https://intl.cloud.baidu.com/en/doc/qianfan/s/7m95lyy43-intl-en">Qianfan list</a></td>
+            <td class="tier">CN Qianfan API: <code>ernie-5.1</code> / <code>ernie-5.0</code> ／ international list: 5.0 (6/25 snapshot)</td>
+            <td class="note">CN model list updated 9/16 lists 5.1/5.0 and endpoint IDs. International list is dated 6/25; do not infer same region availability. <a href="https://cloud.baidu.com/doc/qianfan/s/rmh4stp0j">Qianfan CN list</a> ／ <a href="https://intl.cloud.baidu.com/en/doc/qianfan/s/7m95lyy43-intl-en">International list</a></td>
           </tr>
           <tr>
             <td class="vendor">ByteDance<br>Seed / Doubao</td>
-            <td class="flagship">Seed 2.0</td>
-            <td class="tier">Seed 2.0（research family）／ Doubao Seed 2.1 Turbo（Volcano Engine product）</td>
-            <td class="note">Seed research releaseとDoubaoの提供model catalogを別surfaceとして管理。Seedanceはvideo familyであり、general LLMの世代表へ混ぜない。<a href="https://seed.bytedance.com/en/models">Seed models</a> ／ <a href="https://www.volcengine.com/product/doubao">Doubao catalog</a></td>
+            <td class="flagship">Seed2.1</td>
+            <td class="tier">Pro / Turbo ／ Seed Audio-Visual Full-Duplex (audio family)</td>
+            <td class="note">Official Seed page calls Seed2.1 the current productivity family; 8/5 audio-visual full-duplex LLM is a distinct surface. Seedance/Seedream are generation models, not general LLM tiers. <a href="https://seed.bytedance.com/en/">Seed official site</a> ／ <a href="https://seed.bytedance.com/en/blog/seed2-1-officially-released-advancing-ai-productivity">Seed2.1 release</a></td>
           </tr>
           <tr>
             <td class="vendor">Tencent<br>Hunyuan</td>
-            <td class="flagship">HY3 Preview</td>
-            <td class="tier"><code>hy3-preview</code>（migration target）／ legacy Hunyuan text models（retiring）</td>
-            <td class="note">旧text modelは6/22に停止、旧platformは9/30閉鎖予定。現行判断はmigration noticeのtargetに限定し、previewをGAと呼ばない。<a href="https://cloud.tencent.com/document/product/1729/131925">Tencent migration notice</a></td>
+            <td class="flagship">移行中 — current model ID未確定</td>
+            <td class="tier">legacy Hunyuan platform shutdown scheduled 2026-09-30 ／ TokenHub replacement</td>
+            <td class="note">旧trackerの「Hy3 GA / Hy4 beta」は裏づけ不足として撤回。Tencentは旧platform停止とTokenHub移行を案内し、TokenHubのHy3 preview切替通知も掲載。利用可能IDはcurrent TokenHub catalogで要確認。<a href="https://cloud.tencent.com/document/product/1729/131925">Migration notice</a> ／ <a href="https://cloud.tencent.com/document/product/1823/130758">TokenHub notices</a></td>
           </tr>
           <tr>
             <td class="vendor">SenseTime<br>SenseNova</td>
-            <td class="flagship">SenseNova U1 Pro</td>
-            <td class="tier">U1 Pro（long-horizon multimodal agent base）／ U1・U1 Lite（open-source tiers）</td>
-            <td class="note">U1 Proは<span class="ts">2026-07-18</span>発表。open-sourceのU1 / Liteとhosted / product availabilityを分ける。<a href="https://www.sensetime.com/cn/news/51170769">U1 Pro official</a> ／ <a href="https://www.sensetime.com/en/news/51170625/">U1 open source</a></td>
+            <td class="flagship">SenseNova U1 / U1.5 family</td>
+            <td class="tier">U1.5-Lite (image creation) ／ Vision ／ 6.8-Flash-Lite ／ U1-Pro ／ SI-8B ／ Kairos 3.1</td>
+            <td class="note">8/26 company overview lists distinct model and product families; U1.5 Lite Token Plan announcement is 8/25. Avoid a single flagship label across unrelated tasks. <a href="https://sensetime.com/en/news/2026H1-results">SenseTime H1 model overview</a> ／ <a href="https://www.sensetime.com/en/news">Official news</a></td>
           </tr>
           <tr>
             <td class="vendor">Baichuan</td>
-            <td class="flagship">Baichuan M4<br><span class="note">official homepage surface</span></td>
-            <td class="tier">M4（general product surface）／ Baichuan4 Turbo・Air（platform）／ M3-235B（medical open model）</td>
-            <td class="note">general product、platform API、medical modelは用途が異なるため、数字だけで一列の世代比較をしない。<a href="https://www.baichuan-ai.com/">Baichuan official</a> ／ <a href="https://github.com/baichuan-inc">official GitHub</a></td>
+            <td class="flagship">鮮度gap — current model未確認</td>
+            <td class="tier">official public entry did not establish a current model/API catalog</td>
+            <td class="note">旧trackerのM4 / Turbo / Air / M3は今回current statusを一次確認できず。model card/API catalogを確認するまではflagshipを断定しない。<a href="https://www.baichuan-ai.com/">Baichuan official</a> ／ <a href="https://github.com/baichuan-inc">official GitHub</a></td>
           </tr>
           <tr>
             <td class="vendor">Meta<br>Muse</td>
-            <td class="flagship">Muse Spark 1.1</td>
-            <td class="tier">Muse Image（available）／ Muse Video（preview）</td>
-            <td class="note">Muse Spark 1.1は7/9公開、1M context、agentic / multimodal。Meta Model APIは正式GAではなくpublic preview。<a href="../../research/muse-recent-updates.html">muse tracker</a></td>
+            <td class="flagship">Muse Spark 1.3 (official announcements index)</td>
+            <td class="tier">Muse personal agent (product announced 9/8)</td>
+            <td class="note">Meta event index lists Spark 1.3 (9/2); personal Muse agent announcement says powered by Muse Spark. Do not infer the agent's exposed model/API version from the event listing. <a href="https://ai.meta.com/events/">Meta announcements</a> ／ <a href="https://about.fb.com/news/2026/09/introducing-muse-personal-ai-agent/">Muse agent</a></td>
           </tr>
           <tr>
             <td class="vendor">Mistral</td>
             <td class="flagship">Mistral Large 3</td>
-            <td class="tier">Large 3（open）／ Medium 3.1（premier）／ Devstral 2（code agent）／ Ministral 3</td>
-            <td class="note">公式model catalogのFeatured / Frontier分類へ同期。旧Small 4 / Medium 3.5表記は公式catalogで確認できないため除外。<a href="https://docs.mistral.ai/models/">Mistral official models</a> ／ <a href="mistral.html">historical deep dive</a></td>
+            <td class="tier">Medium 3.5 ／ Small 4 ／ Large 3 ／ Ministral 3</td>
+            <td class="note">All listed families appear in Mistral's current model catalog; specialist audio, OCR, and code models should remain separate from general family. <a href="https://docs.mistral.ai/models">Mistral official models</a></td>
           </tr>
           <tr>
             <td class="vendor">Cohere</td>
             <td class="flagship">Command A+</td>
             <td class="tier"><code>command-a-plus-05-2026</code> ／ 128K context ／ multimodal input</td>
-            <td class="note">open weights、enterprise deployment、hosted APIの可用性を分ける。<a href="https://docs.cohere.com/v1/docs/models">Cohere model catalog</a> ／ <a href="https://cohere.com/blog/command-a-plus">official release</a></td>
+            <td class="note">Official overview lists Command A+; exact current ID, region, and hosted availability should be checked in the relevant model/API page. <a href="https://docs.cohere.com/docs/models">Cohere model overview</a></td>
           </tr>
           <tr>
             <td class="vendor">Microsoft<br>Phi</td>
-            <td class="flagship">Phi-4 reasoning family</td>
-            <td class="tier">Phi-4-reasoning ／ reasoning-plus ／ mini-reasoning</td>
-            <td class="note">small / edge model family。Azure model catalogのregion・deployment availabilityは利用前に再確認する。<a href="https://azure.microsoft.com/en-us/blog/one-year-of-phi-small-language-models-making-big-leaps-in-ai/">Microsoft official overview</a> ／ <a href="phi.html">historical deep dive</a></td>
+            <td class="flagship">Phi-4 family — current-generation gap</td>
+            <td class="tier">Phi-4 mini ／ Phi-4 multimodal (official Phi page)</td>
+            <td class="note">Microsoft Phi landing page confirms these Phi-4 variants but does not by itself establish the latest model/API inventory. Old tracker claim for Phi-4 reasoning-vision as latest is unverified. <a href="https://azure.microsoft.com/en-us/products/phi">Microsoft Phi</a></td>
           </tr>
           <tr>
             <td class="vendor">Meta<br>Llama</td>
             <td class="flagship">Llama 4 <span class="badge badge-new">更新</span></td>
             <td class="tier">Scout（17B/16E・10M ctx）/ Maverick（17B/128E）</td>
-            <td class="note">2025-04-05 リリース（MoE・ネイティブマルチモーダル）。Behemoth は未リリース（学習中）。<a href="llama.html">llama</a> ／ <a href="intelligence-matrix.html">intelligence-matrix</a></td>
+            <td class="note">Official Llama get-started page lists Scout / Maverick. Muse is a separate family; availability and license should be checked per model. <a href="https://ai.meta.com/llama/get-started/">Llama official get started</a></td>
+          </tr>
+          <tr>
+            <td class="vendor">StepFun</td>
+            <td class="flagship">Step 5 Preview</td>
+            <td class="tier">Step 3.7 Flash ／ Step 3.5 Flash ／ StepAudio 3 (speech family)</td>
+            <td class="note">Official Open Platform lists Step 5 explicitly as Preview. Do not describe it as GA; confirm availability and stability on the provider catalog. <a href="https://platform.stepfun.com/">StepFun official catalog</a></td>
+          </tr>
+          <tr>
+            <td class="vendor">01.AI / Yi</td>
+            <td class="flagship">鮮度gap — current model未確認</td>
+            <td class="tier">official public catalog needs verification</td>
+            <td class="note">今回確認した公式public pagesからcurrent general-model/API IDを確定できず。過去trackerの9/3 shutdown予定も事後の一次確認がないため、停止済みと断定しない。<a href="https://01.ai/">01.AI official site</a> ／ <a href="https://github.com/01-ai/Yi">Yi repository</a></td>
           </tr>
         </tbody>
       </table>
-      <p class="small">★ 21 providerのcoverageとgapは<a href="../../research/llm-tracker.html">Coverage Ledger</a>、本表に掲載した世代の詳細はこの表を基準に修正する。StepFun / 01.AIは2026 current general modelを公式確認できなかったため本表へ昇格していない。</p>
+      <p class="small">★ 21 providerのcoverageとgapは<a href="../../research/llm-tracker.html">Coverage Ledger</a>と<a href="../../research/official-model-delta-2026-09-23.html">9/23公式差分</a>で確認する。本表のgapはcurrent status未確認を意味し、「providerにモデルがない」という意味ではない。</p>
     </div>
 
     <div class="panel">
       <h2>やってはいけない表記（ドリフト防止）</h2>
-      <p>以下は<strong>事実誤認</strong>です。各ページでこの書き方を見つけたら直してください。</p>
+      <p>以下の混同を避けてください。履歴記事は削除せず、更新日・確度・surfaceを明示してcurrent layerと分けます。</p>
       <ul class="donts">
-        <li><span class="x">❌</span> 「<strong>Gemini 3.6 Flashが現行Flash最上位</strong>」 — <strong>Gemini 3.7 Flash</strong>が8/13にGA済み。</li>
-        <li><span class="x">❌</span> 「<strong>GPT-5.6は未リリース</strong>」 — 現行family。Codexの8/31退役はChatGPT sign-in surfaceに限る。</li>
-        <li><span class="x">❌</span> 「<strong>Opus 4.8が現行advanced flagship</strong>」 — 7/24に<strong>Opus 5</strong>が公開済み。</li>
-        <li><span class="x">❌</span> 「<strong>Fable 5が現行highest capability</strong>」 — 今回確認したAnthropic公式current docsでは裏づけられない。速報履歴からSSOTへ昇格させない。</li>
-        <li><span class="x">❌</span> 「<strong>Claude Code Auto Modeが8/14から既定</strong>」 — 現行公式FAQは組織有効化 + user opt-in。</li>
-        <li><span class="x">❌</span> 「<strong>Qwen3.8全体が一律Apache 2.0</strong>」 — repository codeとweightsのlicenseは別。各model cardで確認する。</li>
-        <li><span class="x">❌</span> 「<strong>GLM-5.1 が現行最上位</strong>」 — 現行最上位は <strong>GLM-5.2</strong>。5.1 は継続利用可能な前世代。</li>
-        <li><span class="x">❌</span> 「<strong>DeepSeek V4 GA</strong>」 — 公式API aliasが提供中であることとGA表記を混同しない。</li>
-        <li><span class="x">❌</span> 「<strong>Hailuo 2.3がMiniMaxの最新映像モデル</strong>」 — 7/31公開のH3を別generation surfaceとして併記する。</li>
-        <li><span class="x">❌</span> 確証のない日付・ベンチ数値の記載 — providerの公式model card・release noteで条件まで確認できる値だけを書く。</li>
+        <li><span class="x">❌</span> X / GrokPulse / daily newsで見たモデル名を、一次発表・model catalog確認前にcurrent layerへ昇格する。</li>
+        <li><span class="x">❌</span> API alias、ChatGPTなどのconsumer product、coding agent、open weightsを同じ提供surfaceとして記録する。</li>
+        <li><span class="x">❌</span> Preview / limited access / migration targetをGA・恒久提供と呼ぶ。</li>
+        <li><span class="x">❌</span> provider自身のbenchmarkや性能説明を独立評価として記載する。</li>
+        <li><span class="x">❌</span> 廃止予定日の経過だけを根拠に「停止済み」と書く。実際のshutdownを公式通知で確認する。</li>
+        <li><span class="x">❌</span> model repositoryのcode licenseからweight licenseやcommercial rightsを推測する。</li>
+        <li><span class="x">❌</span> current API model ID、地域、価格、契約条件を古い個別ページから転記する。</li>
       </ul>
       <div class="warn"><strong>最重要:</strong> model名だけで「現行」を決めない。stable / preview、chat / API / coding agent / local weights、認証surfaceを必ず分ける。</div>
     </div>
@@ -220,8 +229,8 @@
     <div class="panel">
       <h2>更新手順（新世代が出たとき）</h2>
       <div class="step"><div class="num">1</div>
-        <h3>このページの表を直す</h3>
-        <p>出典 URL を確認し、確証のある日付・数値だけを反映。延期・予定は badge で明示。最終更新日を更新。</p>
+        <h3>公式差分と本表を更新する</h3>
+        <p>まず日付付き<a href="../../research/official-model-delta-2026-09-23.html">公式差分</a>へ一次情報と未確認点を記録し、次にこの表のcurrent generation / surfaceを同期。確証のある日付・数値だけを反映します。</p>
       </div>
       <div class="step"><div class="num">2</div>
         <h3>横断比較を更新</h3>
@@ -229,7 +238,7 @@
       </div>
       <div class="step"><div class="num">3</div>
         <h3>該当トラッカーへ展開</h3>
-        <p>該当ベンダーの <code>*-recent-updates</code> にタイムライン項目を追加。</p>
+        <p>必要な場合だけ該当ベンダーの <code>*-recent-updates</code> にタイムラインを追加。日次ニュースの代筆・重複生産はしません。</p>
       </div>
       <div class="step"><div class="num">4</div>
         <h3>深掘りページ・パイプライン記事へ波及</h3>
@@ -237,7 +246,7 @@
       </div>
       <div class="step"><div class="num">5</div>
         <h3>大きな世代交代なら ADR / ログ</h3>
-        <p>方針に関わる変更は <a href="../../foundations/decisions.html">decisions</a> / <a href="../../logs/next-actions.html">next-actions</a> に記録。</p>
+        <p>方針に関わる変更だけ <a href="../../foundations/decisions.html">decisions</a> / <a href="../../logs/next-actions.html">next-actions</a> に記録。モデル存在の記録はprovider採用・課金・契約判断ではありません。</p>
       </div>
     </div>
 
@@ -248,9 +257,9 @@
         <li><a href="intelligence-matrix.html">intelligence-matrix.html</a> — モデル横断の能力比較（世代の主参照元）</li>
         <li><a href="index.html">LLM 個別深掘り index</a> — 各ベンダー深掘りページの入口</li>
         <li>トラッカー: <a href="../../research/claude-recent-updates.html">claude</a> ／ <a href="../../research/chatgpt-recent-updates.html">chatgpt</a> ／ <a href="../../research/gemini-recent-updates.html">gemini</a> ／ <a href="../../research/grok-recent-updates.html">grok</a> ／ <a href="../../research/qwen-recent-updates.html">qwen</a> ／ <a href="../../research/glm-recent-updates.html">glm</a></li>
-        <li><strong>出典（canon）:</strong> 本ハブ内の <code>intelligence-matrix.html</code>・各 <code>*-recent-updates.html</code>・各深掘りページ。世代・日付・数値はこれら canon に確証のあるもののみ記載。</li>
+        <li><strong>出典優先順位:</strong> provider公式のrelease notes / model catalog → 日付付き公式差分 → このcurrent table → 個別trackerの履歴。trackerやこの表はprovider契約・組織canonの根拠ではありません。</li>
       </ul>
-      <p class="small">最終更新: <span class="ts">2026-08-19</span>（8/11版以後の公式差分を反映。詳細は<a href="../../research/llm-tracker.html">coverage ledger</a>と<a href="../../research/official-model-delta-2026-08-19.html">8/19公式差分</a>。<a href="../../research/official-model-delta-2026-08-11.html">8/11版</a>はhistorical snapshot）</p>
+      <p class="small">最終更新: <span class="ts">2026-09-23</span>。詳細は<a href="../../research/llm-tracker.html">coverage ledger</a>と<a href="../../research/official-model-delta-2026-09-23.html">9/23公式差分</a>。<a href="../../research/official-model-delta-2026-08-19.html">8/19版</a>以前はhistorical snapshot。</p>
     </div>
 
   </div>

@@ -55,10 +55,10 @@
 
   <div class="panel panel-accent">
     <div class="breadcrumb"><a href="../index.html">← Hub Top</a> / <a href="index.html">_routines</a></div>
-    <span class="badge badge-teal">月次ルーティン</span>
+    <span class="badge badge-teal">週次＋イベント駆動</span>
     <h1>LLM トラッカー更新</h1>
-    <p style="color:#c5d0e3;margin:8px 0 0;font-size:.95rem;">毎月初（5日以内）に実施。6 ベンダーの最新モデル情報・API 変更・料金改定を各トラッカーページに反映する。所要時間: 約 30〜45 分（Claude セッション）。</p>
-    <p style="margin-top:8px"><small>最終更新: 2026-06-01 | 実施頻度: 月1回（月初5日以内）</small></p>
+    <p style="color:#c5d0e3;margin:8px 0 0;font-size:.95rem;">週1回は公式一次ソースの鮮度・リンク・公開境界を点検し、重要なモデル/API変更は確認でき次第反映する。月1回は21プロバイダーの台帳と個別トラッカーを横断して抜けを確認する。日次速報を量産せず、差分がない週は更新を作らない。</p>
+    <p style="margin-top:8px"><small>最終更新: 2026-09-23 | 実施頻度: 週次の鮮度点検＋重要更新は随時、月次の横断確認</small></p>
   </div>
 
   <!-- ソースポリシー（最重要） -->
@@ -108,7 +108,7 @@
   <!-- 対象ページと公式ソース -->
   <div class="panel">
     <h2>更新対象トラッカーと公式ソース一覧</h2>
-    <p style="color:#7f92ac;font-size:.85rem;margin-bottom:12px;">各ベンダーの情報を調べる際は、以下の URL を WebSearch / WebFetch の起点にすること。</p>
+    <p style="color:#7f92ac;font-size:.85rem;margin-bottom:12px;">ここに個別の起点を載せた6社だけで網羅扱いにしない。対象は <a href="../workbench/knowledge/model-generations.html">モデル世代台帳</a>の21プロバイダーと、<a href="../research/official-model-delta-2026-09-23.html">2026-09-23公式差分</a>から追える個別トラッカー。各回、当該プロバイダーの公式発表・モデル一覧・API changelog・提供面（アプリ/クラウド/オープンウェイト）を確認する。差分ページは日付付きスナップショットであり、次回は公式ページを再確認する。</p>
 
     <div class="vendor-block">
       <div class="vendor-name">🟣 Anthropic (Claude) — <code>research/claude-recent-updates.html</code></div>
@@ -215,7 +215,7 @@
 推測や日次ニュースの引用は不可。」</div>
         <div class="note">
           公式ページにアクセスできなかった・情報が見つからなかった場合は、
-          「確認できなかった」と記録する。空白のまま次月に持ち越してよい。
+          「確認できなかった」と記録する。空白のまま次回へ持ち越してよい。
           不正確な情報を書くよりも空白の方が正しい。
         </div>
         <div class="note">
@@ -255,6 +255,7 @@
         <ul>
           <li><code>claw-stack/comparison.html</code> の LLM エンジン欄</li>
           <li><code>creator-system/</code> 内でモデル名を直接参照しているページ</li>
+          <li><code>workbench/knowledge/model-generations.html</code>（モデル世代台帳）</li>
           <li><code>workbench/knowledge/[vendor].html</code>（個別深掘りページ）</li>
         </ul>
       </div>
@@ -265,9 +266,9 @@
       <div class="step-body">
         <h3>コミット & プッシュ</h3>
         <div class="pre">git add research/*-recent-updates.html
-git commit -m "chore: 月次 LLM トラッカー更新 YYYY-MM
+git commit -m "chore: LLM 公式差分を更新 YYYY-MM-DD
 
-更新ベンダー: claude, chatgpt, gemini, grok, qwen, glm
+更新範囲: 確認できたベンダーと差分だけを列挙
 主な変更: [変更点の概要]
 ソース: 各ベンダー公式ブログ・APIドキュメント"
 git push</div>
@@ -291,7 +292,8 @@ git push</div>
       <div class="card">
         <h3>コンテンツ</h3>
         <ul>
-          <li>□ 6 ベンダー確認（または上位 3 優先: Claude → ChatGPT → Gemini）</li>
+          <li>□ 台帳上の21プロバイダーを対象に、今回確認した範囲と未確認の範囲を区別したか</li>
+          <li>□ 公式差分がない項目を無理に更新していないか</li>
           <li>□ 新モデルリリース情報を反映</li>
           <li>□ API 仕様変更・料金変更を反映（あれば）</li>
           <li>□ 廃止予告を反映（あれば）</li>
@@ -305,12 +307,12 @@ git push</div>
   <div class="panel">
     <h2>デイリーニュースとトラッカーの役割分担</h2>
     <table>
-      <thead><tr><th>観点</th><th>デイリーニュース（ai-news/）</th><th>月次トラッカー</th></tr></thead>
+      <thead><tr><th>観点</th><th>デイリーニュース（ai-news/）</th><th>公式トラッカー/モデル台帳</th></tr></thead>
       <tbody>
         <tr><td><strong>目的</strong></td><td>動向把握・気づき・速報</td><td>正本（SSOT）の維持</td></tr>
         <tr><td><strong>正確さ</strong></td><td>速報性 &gt; 正確さ（噂でも掲載OK）</td><td>正確さ最優先（公式確認のみ）</td></tr>
         <tr><td><strong>ソース</strong></td><td>Web全般（未確認含む）</td><td>公式ブログ・APIドキュメント・GitHub のみ</td></tr>
-        <tr><td><strong>更新頻度</strong></td><td>毎日</td><td>月1回（月初5日以内）</td></tr>
+        <tr><td><strong>更新頻度</strong></td><td>毎日（速報性を重視）</td><td>週次で鮮度・リンク・公開境界を点検。重要な公式変更は随時、月次に横断確認</td></tr>
         <tr><td><strong>デイリーニュースを</strong><br><strong>トラッカーに使う</strong></td><td colspan="2" style="color:#ff8080;font-weight:700;text-align:center;">❌ 禁止。daily-news が「注目トピックのシグナル」になることはよいが、ファクトの根拠にはしない。</td></tr>
       </tbody>
     </table>
