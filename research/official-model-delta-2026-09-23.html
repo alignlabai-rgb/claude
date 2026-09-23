@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="2026-09-23時点の主要LLM/provider trackerを公式一次情報で再点検した差分。モデル、API、製品、preview、確認できない点を分けて記録。">
+  <title>主要LLM公式差分 — 2026-09-23 | Claude Knowledge Hub</title>
+  <style>
+    :root{color-scheme:dark;--bg:#07111d;--panel:#101c2c;--line:#29415a;--ink:#eef5fb;--muted:#a4b5c7;--mint:#66dfc4;--amber:#efbd69;--blue:#7bb9ff;--red:#ff9292}
+    *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 12% 0,#173a4d 0,transparent 34rem),var(--bg);color:var(--ink);font:15px/1.7 system-ui,-apple-system,"Segoe UI","Noto Sans JP",sans-serif}a{color:var(--mint);text-underline-offset:3px}.shell{width:min(1120px,calc(100% - 30px));margin:auto}header{padding:48px 0 26px;border-bottom:1px solid var(--line)}main{padding:26px 0 64px}h1{font-size:clamp(2.3rem,7vw,4.7rem);line-height:1.05;letter-spacing:-.04em;margin:.35rem 0 .8rem}h2{font-size:1.3rem;margin:1.8rem 0 .6rem}p{color:#d0dbe6}.meta,.small{color:var(--muted);font-size:.84rem}.eyebrow{color:var(--mint);font-weight:800;font-size:.75rem;letter-spacing:.12em;text-transform:uppercase}.box{padding:16px 18px;margin:16px 0;border:1px solid var(--line);border-radius:13px;background:rgba(16,28,44,.9)}.warning{border-left:4px solid var(--amber)}.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:13px;background:rgba(16,28,44,.9)}table{border-collapse:collapse;width:100%;min-width:900px}th,td{text-align:left;vertical-align:top;padding:12px;border-bottom:1px solid rgba(255,255,255,.08)}th{background:#14243a;color:#d5e2ef;position:sticky;top:0;font-size:.8rem}td{color:#d0dbe6}td:first-child{font-weight:700;color:var(--ink);white-space:nowrap}.tag{display:inline-block;border:1px solid #377c67;border-radius:999px;padding:1px 7px;color:var(--mint);font-size:.7rem}.gap{border-color:#7b6335;color:var(--amber)}.sources li{margin:.35rem 0}footer{border-top:1px solid var(--line);padding:20px 0 32px;color:var(--muted);font-size:.82rem}
+    @media(max-width:650px){.shell{width:calc(100% - 22px)}header{padding-top:32px}}
+  </style>
+</head>
+<body>
+<header><div class="shell">
+  <p class="meta"><a href="index.html">← Research</a> / <a href="llm-tracker.html">LLM Tracker</a> / <a href="../index.html">Hub Top</a></p>
+  <div class="eyebrow">Primary-source refresh · 2026-09-23 JST</div>
+  <h1>主要LLM公式差分</h1>
+  <p>公式providerの発表・モデルcatalog・API変更を照合し、古いcurrent layerの置き換え候補を記録したページです。日次ニュースやX上の話題は発見用、ここは公式一次情報で確認できた事実の置き場です。</p>
+</div></header>
+<main class="shell">
+  <section class="box warning">
+    <h2>この更新の読み方</h2>
+    <p>これは市場調査の網羅証明でも、ALIGN Labの導入・契約・課金判断でもありません。対象の公式公開面を2026-09-23に確認したスナップショットです。API、consumer製品、weight、preview、agent、specialist modelを同じ「最新モデル」として混ぜず、未確認は未確認のまま残します。provider自身の性能・ベンチマーク記述はprovider発表として扱い、独立評価とは区別します。</p>
+    <p>前版にあった日付やモデル名でも、一次情報で支え直せないものは現行事実として引き継ぎません。古い履歴ページは削除しておらず、判断にはこの日付付きcurrent layerを優先してください。</p>
+  </section>
+  <h2>21 provider coverage ledger</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Provider</th><th>公式確認できた現在層 / 重要差分</th><th>境界・未確認点</th><th>一次情報</th></tr></thead>
+    <tbody>
+      <tr><td>OpenAI</td><td>APIはGPT-6 Astra / Sol / Luna。9/22にSolとLuna追加。テキスト・画像入力、Responses / Chat Completionsでテキスト生成。</td><td>ChatGPTアプリの提供状況とAPI catalogは別。ツール利用時のAPI差を移行前に確認。</td><td><a href="https://developers.openai.com/api/docs/changelog">API changelog</a> · <a href="https://developers.openai.com/api/docs/guides/latest-model">Model guidance</a></td></tr>
+      <tr><td>Anthropic</td><td>9/22発表のClaude Opus 5.5がClaude 5.5 familyの初モデル。Opus 5に対する性能・価格比較はAnthropic自身の発表。</td><td>model release・API仕様・Claude製品の提供可否は別に確認。評価数値は独立監査ではない。</td><td><a href="https://www.anthropic.com/claude-opus-5-5">Opus 5.5 announcement</a> · <a href="https://platform.claude.com/docs/en/release-notes/overview">Platform release notes</a></td></tr>
+      <tr><td>Google / Gemini</td><td>Gemini API: 3.8 Flash (9/2 GA)、3.8 Live / Live Extended Thinking (9/15 GA)。2.5 APIは既利用者に限定するアクセス変更で、廃止ではない。</td><td>モデルごとのsurfaceとshutdown予定を確認。Antigravity previewは別製品surface。</td><td><a href="https://ai.google.dev/gemini-api/docs/changelog">Gemini API release notes</a> · <a href="https://ai.google.dev/gemini-api/docs/deprecations">Deprecations</a></td></tr>
+      <tr><td>xAI / Grok</td><td>9/21発表のGrok 4.7。API ID <code>grok-4.7</code>、500K context。Grok 4.7 FastはGrok Build / Cursorのsurfaceであり、公開APIと同一扱いしない。</td><td>発表の速度・性能比較はxAIによるもの。Grok BuildのscheduleやX情報収集をAPI提供と混同しない。</td><td><a href="https://x.ai/news/grok-4-7">Grok 4.7 announcement</a> · <a href="https://docs.x.ai/developers/release-notes">API release notes</a> · <a href="https://x.ai/build/changelog">Grok Build changelog</a></td></tr>
+      <tr><td>Meta / Muse</td><td>Meta AI公式event indexはMuse Spark 1.3 (9/2)を掲載。個人向けMuse agentは9/8発表、Muse Spark搭載と説明。</td><td>agentの製品機能と公開API/weightは別。Spark 1.3がMuse agentの全surfaceで提供されるとは断定しない。</td><td><a href="https://ai.meta.com/events/">Meta AI announcements index</a> · <a href="https://about.fb.com/news/2026/09/introducing-muse-personal-ai-agent/">Muse agent announcement</a> · <a href="https://research.meta.ai/blog/introducing-muse-spark-meta-model-api">Muse Spark API post</a></td></tr>
+      <tr><td>Meta / Llama</td><td>公式get-started面ではLlama 4 Scout / Maverickを案内。Muse familyとは分離。</td><td>公式入口に表示される案内を確認。新しいweight/API availabilityを個別model cardで再確認。</td><td><a href="https://ai.meta.com/llama/get-started/">Llama get started</a></td></tr>
+      <tr><td>Mistral AI</td><td>公式catalogの主要general modelsにMedium 3.5、Small 4、Large 3。OCR、audio、codingなどのspecialistは別family。</td><td>Large/Smallのlicense、推論surface、endpoint IDは利用前にcatalog/model cardで確認。</td><td><a href="https://docs.mistral.ai/models">Official model catalog</a></td></tr>
+      <tr><td>Cohere</td><td>公式model catalogにCommand A+を掲載。</td><td>現行API model ID・availability・regionはcatalogと実際のservice docsで別途確認。専用trackerの鮮度不足。</td><td><a href="https://docs.cohere.com/docs/models">Official model overview</a></td></tr>
+      <tr><td>Microsoft / Phi</td><td>公式Phi landing pageでPhi-4 miniとPhi-4 multimodalを確認。</td><td>現行catalogだけでは最新版やAzure deployment availabilityを確定できない。旧ページの「Phi-4 reasoning visionが最新」という主張は未確認として保留。</td><td><a href="https://azure.microsoft.com/en-us/products/phi">Microsoft Phi</a> · <a href="https://ai.azure.com/explore/models">Azure AI model catalog</a></td></tr>
+      <tr><td>Alibaba / Qwen</td><td>公式Qwen siteはQwen3.8-Omni-FlashとQwen3.8-LiveTranslate (9/18)、Qwen-Image-2.1 (9/20)を掲載。text/omnimodal/image generationは別family。</td><td>公開モデル発表とhosted endpoint / open weightsの有無を区別する。</td><td><a href="https://qwen.ai/">Official Qwen site / latest research</a> · <a href="https://github.com/QwenLM/Qwen3.8">Qwen3.8 repository</a></td></tr>
+      <tr><td>Z.ai / GLM</td><td>9/22公式AutoClaw articleでGLM-5.3-Flashを公開: native multimodal、320B total / 18B active、official post says MIT weights. AutoClaw catalogはGLM-5.3をflagshipとして掲載。</td><td>記事のbenchmarksはprovider-reported。weight availabilityはofficial model repoでlicense/commitを確認してからlocal deploymentを語る。</td><td><a href="https://autoclaw.z.ai/blog/model/glm-5.3-flash/">GLM-5.3-Flash official post</a> · <a href="https://autoclaw.z.ai/models/">AutoClaw model list</a></td></tr>
+      <tr><td>DeepSeek</td><td>9/10 V4.1-Flashを公式release。API current aliasは<code>deepseek-flash</code>。V4 Flash / Vision Exp旧IDは互換目的で一時routing。</td><td>旧IDを恒久model identityと誤認しない。V4 Pro API継続は9/14後も料金変更なしとの告知。</td><td><a href="https://api-docs.deepseek.com/updates/">Official API changelog</a></td></tr>
+      <tr><td>Moonshot / Kimi</td><td>公式Kimi-K3 repositoryはK3をcurrent-capabilityモデルとして掲載。API model name <code>kimi-k3</code>、公開重みの記載あり。</td><td>benchmark/能力の説明はMoonshot報告。K2系の停止・後継について未確認の旧断定は再使用しない。</td><td><a href="https://github.com/MoonshotAI/Kimi-K3">Official Kimi K3 repo</a></td></tr>
+      <tr><td>MiniMax</td><td>M3はLLM。H3は別のomni-modal generation/video family。公式H3記事は最大2K/15秒/native stereo audioとし、IRはH3 open-source化を告知。</td><td>generation modelとLLMを同一tracker軸で比較しない。local inference条件・licenseはmodel repoを確認。</td><td><a href="https://www.minimax.io/blog/minimax-m3">M3 announcement</a> · <a href="https://www.minimax.io/blog/minimax-h3">H3 announcement</a> · <a href="https://ir.minimax.io/news-events/new-releases">IR releases</a></td></tr>
+      <tr><td>Baidu / ERNIE</td><td>CN Qianfan model list (9/16) はERNIE 5.0 / 5.1を推奨し、API endpoint <code>ernie-5.1</code>を掲載。International Qianfan list (6/25) はERNIE 5.0。</td><td>region・catalog surface/dateを混ぜない。International側は見た資料が古く、current endpointは利用前に再確認。</td><td><a href="https://cloud.baidu.com/doc/qianfan/s/rmh4stp0j">Qianfan model list, CN</a> · <a href="https://intl.cloud.baidu.com/en/doc/qianfan/s/7m95lyy43-intl-en">Qianfan international list</a></td></tr>
+      <tr><td>ByteDance / Seed</td><td>公式model portfolioはSeed2.1 (Pro/Turbo)を案内。別familyとしてSeed Audio-Visual Full-Duplex LLM (8/5)、Seedance 2.5 (7/31)、Seedream 5.0 Pro (7/8)も公式homeに掲載。</td><td>Seed language model、audio model、video/image generationを分離。latest visible site newsが8/5で、9月のgeneral LLM releaseは今回確認できず。</td><td><a href="https://seed.bytedance.com/en/">Seed official home</a> · <a href="https://seed.bytedance.com/en/blog/seed2-1-officially-released-advancing-ai-productivity">Seed2.1 announcement</a></td></tr>
+      <tr><td>Tencent / Hunyuan</td><td>旧Hunyuan platformは9/30全面停止予定。Tencent docsはTokenHub移行を案内。7/28にTokenHub上のHy3 previewの切替・終了通知もある。</td><td>「Hy3 GA」「Hy4 beta」とする旧tracker文言は根拠不十分として撤回。後継の正確なmodel IDはTokenHub current catalogで再確認要。</td><td><a href="https://cloud.tencent.com/document/product/1729/131925">Legacy platform migration</a> · <a href="https://cloud.tencent.com/document/product/1823/130758">TokenHub Hy3 preview notice</a></td></tr>
+      <tr><td>SenseTime</td><td>8/26 H1 official notice lists SenseNova U1, U1.5, U1.5-Lite, Vision, 6.8-Flash-Lite, U1-Pro, SI-8B, Kairos 3.1. U1.5 Lite is separately available on Token Plan (8/25).</td><td>These are distinct task/surface families; a single flagship label obscures the catalog. Performance comparisons are company claims.</td><td><a href="https://sensetime.com/en/news/2026H1-results">Official H1 model overview</a> · <a href="https://www.sensetime.com/en/news">Official news list</a></td></tr>
+      <tr><td>Baichuan</td><td>今回見た公式入口は現行model/API catalogを特定する情報が不足。</td><td><span class="tag gap">FRESHNESS GAP</span> 旧trackerのM4/Turbo/Air/M3をcurrentと断定しない。特定のmodel cardまたはAPI catalogが必要。</td><td><a href="https://www.baichuan-ai.com/">Official home</a> · <a href="https://github.com/baichuan-inc">Official GitHub organization</a></td></tr>
+      <tr><td>StepFun</td><td>公式Open PlatformはStep 5 Preview、Step 3.7 Flash、Step 3.5 Flashを掲載。StepAudio 3は別のspeech family。</td><td>Step 5は明示的にPreview。新規採用や長期API安定性をGAと同じ扱いにしない。</td><td><a href="https://platform.stepfun.com/">Official model catalog</a></td></tr>
+      <tr><td>01.AI / Yi</td><td>今回確認した公式public pagesから、現行general model/API catalogを確定できず。</td><td><span class="tag gap">FRESHNESS GAP</span> 旧trackerの「yi-lightning等が9/3廃止」は期限経過後の一次確認なし。廃止済みとは書かず、未確認として扱う。</td><td><a href="https://01.ai/">01.AI official site</a> · <a href="https://github.com/01-ai/Yi">Official Yi repository</a></td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>実用上の変更点</h2>
+  <section class="box">
+    <p><strong>1. trackerの「current」列は日付を必須にする。</strong> API alias / product release / weights / previewを明記し、別surfaceの名称を同一モデルだと推測しない。</p>
+    <p><strong>2. 速報は候補検出に使い、公式発表で確定する。</strong> X/GrokPulseなどの話題は価値あるsignalだが、噂・企業の自己評価・利用可能なAPI IDを同じ事実欄に混ぜない。</p>
+    <p><strong>3. 「見つからない」はgapとして残す。</strong> Baichuan、Yi、Phi、Tencent移行中のようなcatalog不確実性は、古いモデル名を最新と見なすより追跡対象として明示する。</p>
+  </section>
+  <h2>更新記録と次の確認点</h2>
+  <ul class="sources">
+    <li>確認日: 2026-09-23 JST。official release notes、provider announcements、model catalogsを優先して照合。</li>
+    <li>特に訂正した旧current主張: Claude Fable 5.1を最新扱い、GPT-5.6 familyだけをcurrent扱い、Gemini 3.7 Flashを最新扱い、Grok 4.6、Muse Spark 1.2 / Glimmer / Muse Code、GLM-5.2 current, Tencent Hy3 GA / Hy4 beta、yi-lightning 9/3 shutdown。</li>
+    <li>残る調査候補: Microsoft PhiのAzure API IDs、Cohere current API surface、Baichuan/Yi current catalog、Tencent TokenHub replacement IDs、Baidu region-specific endpoints。これらは推測で埋めず、次回一次確認する。</li>
+    <li>価格・契約・認証情報は変更していない。モデルの存在確認は導入推奨、provider selection、課金承認を意味しない。</li>
+  </ul>
+</main>
+<footer><div class="shell">Curator · Public-source facts only · dated snapshot checked 2026-09-23 JST; verify the provider's current official surface before making a present-day decision.</div></footer>
+</body>
+</html>
