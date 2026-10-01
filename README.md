@@ -13,12 +13,12 @@
 
 - [`research/llm-tracker.html`](research/llm-tracker.html)
   - 21 provider、中国系12 providerの現行model、surface、公式確認、専用tracker、鮮度gapを一画面で確認するcoverage ledger
-- [`research/official-model-delta-2026-09-23.html`](research/official-model-delta-2026-09-23.html)
-  - 21 providerのモデル・API surface・preview・鮮度gapを公式一次情報で再点検したcurrent layer。古い記事の誤った世代名をcurrent factsと分離
+- [`research/official-model-delta-2026-10-01.html`](research/official-model-delta-2026-10-01.html)
+  - 21 providerのモデル・API surface・preview・移行期限・鮮度gapを公式一次情報で再点検した最新日付層。前回9/23版は履歴として保持
 - [`workbench/knowledge/model-generations.html`](workbench/knowledge/model-generations.html)
-  - provider別モデルとsurfaceを分けるcurrent model-generation reference。9/23公式差分と同期
+  - provider別モデルとsurfaceを分けるcurrent model-generation reference。最新の日付付き公式差分と同期
 - [`research/official-model-delta-2026-08-19.html`](research/official-model-delta-2026-08-19.html)
-  - 8/19時点のhistorical snapshot。現在判断には9/23版を優先
+  - 8/19時点のhistorical snapshot。現在判断には最新の日付付き差分を優先
 - [`research/official-model-delta-2026-08-11.html`](research/official-model-delta-2026-08-11.html)
   - 8/11時点のhistorical snapshot。現在判断は8/19版を優先
 - [`research/ai-news/index.html`](research/ai-news/index.html)
