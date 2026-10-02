@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ontology Engineering — AIに意味の契約を与える | Workbench Knowledge</title><link rel="stylesheet" href="deep-dive.css"></head><body>
+<a class="skip" href="#main">本文へ</a><main class="shell" id="main">
+<header class="panel"><p><a href="index.html">← Knowledge</a> / <a href="../index.html">Workbench</a> / <a href="../../index.html">Hub Top</a></p><p class="eyebrow">Engineering deep dive · 2026-10-03</p><h1>Ontology Engineering<br>AIに「意味の契約」を与える</h1>
+<p class="lead">同じ「モデル」「使える」「採用」という言葉でも、担当者やAIによって解釈が違えば、情報を集めるほど誤解が増えます。オントロジー設計は、対象・関係・区別・推論の前提を明示し、複数のツールやエージェントが同じ意味で扱えるようにする仕事です。</p>
+<p class="notice">「グラフエンジニアリングの上位」という一方向の序列ではありません。意味を決めるオントロジー、関係や遷移を実装するグラフ、今回の判断に情報を届けるコンテキストは、相互に支える別の設計軸です。この整理と実装例は本ハブの設計提案です。</p>
+<nav aria-label="目次"><ul><li><a href="#differences">違い</a></li><li><a href="#questions">問いから設計</a></li><li><a href="#model">最小モデル</a></li><li><a href="#validation">検証</a></li><li><a href="#migration">運用</a></li><li><a href="#sources">一次資料</a></li></ul></nav></header>
+<section class="panel" id="differences"><h2>1. 用語集・スキーマ・知識グラフとの違い</h2>
+<div class="table-wrap"><table><thead><tr><th>設計対象</th><th>答える問い</th><th>成果物</th><th>単独ではできないこと</th></tr></thead><tbody>
+<tr><td>用語集／分類体系</td><td>何と呼ぶか、どの分類に入れるか</td><td>定義、別名、カテゴリ階層</td><td>複雑な関係の意味や制約の検証</td></tr>
+<tr><td>オントロジー</td><td>何が存在し、どう関係し、何を同一視しないか</td><td>クラス、関係、意味的な公理</td><td>実行権限の付与、現実の事実確認</td></tr>
+<tr><td>データスキーマ</td><td>どの字段・型・必須項目で記録するか</td><td>JSON Schema、DBスキーマ、SHACL形状</td><td>値が真実であることの保証</td></tr>
+<tr><td>知識グラフ</td><td>具体的に誰／何が何と関係するか</td><td>ノードとエッジ、RDFトリプル</td><td>抽出した関係が正しいことの自動保証</td></tr>
+<tr><td>状態グラフ</td><td>今どこにいて次に何をするか</td><td>状態、遷移条件、停止・再開</td><td>「承認」という語の意味の統一</td></tr>
+</tbody></table></div>
+<p>W3Cの<a href="https://www.w3.org/TR/rdf11-concepts/">RDF Concepts</a>は主語・述語・目的語で情報を表します。<a href="https://www.w3.org/TR/owl2-primer/">OWL 2 Primer</a>は、その上にクラスや関係の意味を記述する仕組みを説明します。RDFを採用しただけで、業務の語彙や判断基準が整うわけではありません。</p></section>
+<section class="panel" id="questions"><h2>2. 巨大な世界モデルではなく、答えたい問いから始める</h2>
+<p>最初に「AIの全知識」をモデル化すると保守が追いつきません。ここでは架空の技術調査チームが、新製品を試すか決める場面だけを扱います。設計の入口は、データがあれば答えられるべき問い（competency questions）です。</p>
+<ol><li>この主張は、どの製品の、どの利用形態についてですか。</li><li>一般提供、限定preview、発表のみのどれですか。</li><li>公式発表と自分たちの実測のどちらが根拠ですか。</li><li>同じ名前でもAPIモデルと個人向けアプリを混同していませんか。</li><li>誰が試験結果を判断し、どの操作はまだ許可されていませんか。</li></ol>
+<p>質問に不要な概念は今は入れません。たとえば動画制作の評価なら、モデルの知名度より、入力素材の権利、解像度、時間的一貫性、再生成条件が重要になることがあります。オントロジーは対象業務に依存し、普遍的な一枚の図ではありません。</p></section>
+<section class="panel" id="model"><h2>3. 最小モデル：「製品」より「主張」を中心に置く</h2>
+<p>同じ製品にも、時点・地域・プラン・surfaceによって違う事実があります。製品ノードに「利用可能=true」と一つだけ書くと、米国betaを日本での一般提供と誤読します。代わりに主張を独立させます。</p>
+<pre class="flow">Product ──hasSurface──▶ Surface
+Claim   ──about───────▶ Surface
+Claim   ──supportedBy─▶ Evidence
+Claim   ──supersedes──▶ Claim（旧時点の主張）
+Proposal──basedOn─────▶ Claim
+Proposal──reviewedBy──▶ Review（採用判断とは別）
+Review  ──hasDecision─▶ Decision</pre>
+<div class="table-wrap"><table><thead><tr><th>概念</th><th>保持するもの</th><th>避ける混同</th></tr></thead><tbody>
+<tr><td>Surface</td><td>API／Webアプリ／CLI／ローカル重み、対象地域とプラン</td><td>同一ブランドなら同機能という推論</td></tr>
+<tr><td>Claim</td><td>主張本文、対象、適用時点、確認日、状態</td><td>記事が新しい＝事実も新しい</td></tr>
+<tr><td>Evidence</td><td>出典、該当箇所、公式／実測などの種別</td><td>引用がある＝独立評価済み</td></tr>
+<tr><td>Proposal</td><td>期待効果、試験、候補担当、禁止操作</td><td>提案された＝採用された</td></tr>
+<tr><td>Decision</td><td>判断者、対象範囲、理由、有効期限</td><td>配送担当＝内容の決定者</td></tr>
+</tbody></table></div>
+<p><a href="https://www.w3.org/TR/prov-o/">PROV-O</a>はEntity・Activity・Agent等で由来を表す語彙です。出典や生成過程の追跡に使えますが、公式sourceの正確さや承認権限を証明する仕組みではありません。</p></section>
+<section class="panel" id="validation"><h2>4. OWLの推論と、入力検証を分離する</h2>
+<p>OWLは基本的に<strong>open-world</strong>の意味論です。記録されていないものを直ちに「存在しない」とはみなしません。たとえば必須のsourceが欠けている記録を業務上rejectしたいなら、意味的推論だけに頼らず、<a href="https://www.w3.org/TR/shacl/">SHACL</a>等で対象データの形を検証します。</p>
+<p>次はRDFの主張に出典IRIを最低一つ要求する、説明用のSHACL形状です。本ハブのサンプルであり、完全な承認policyでも実運用済みの形状でもありません。</p>
+<pre><code>@prefix ex: &lt;https://example.org/ai-hub/&gt; .
+@prefix sh: &lt;http://www.w3.org/ns/shacl#&gt; .
+ex:ClaimShape a sh:NodeShape ;
+  sh:targetClass ex:Claim ;
+  sh:property [
+    sh:path ex:supportedBy ;
+    sh:minCount 1 ;
+    sh:nodeKind sh:IRI
+  ] .</code></pre>
+<p><code>sh:minCount 1</code>が検証するのは値の有無です。リンクが公式か、原文が主張を支えるか、期限が切れていないかは別のチェックが必要です。逆に、schemaを通ったから採用してよいという判断もできません。</p>
+<details><summary>危険な推論：「技術担当だから本番変更できる」</summary><p>所属や専門性を示す関係から、実行権限を導出しない設計にします。<code>candidate_owner</code>は担当候補、<code>decision_owner</code>は判断責任、<code>authorized_effect</code>は具体的に許可された操作です。これらは別字段・別根拠です。</p></details></section>
+<section class="panel" id="migration"><h2>5. 保守の中心は同一性・時点・変更管理</h2>
+<h3>同一性</h3><p>別名は同一性ではありません。ブランド名、モデルID、alias、配布版、量子化版を区別します。似ているものを安易に<code>owl:sameAs</code>で結ぶと、相互に性質を引き継ぐ強い意味になり、API版の条件がローカル版へ誤伝播します。対応関係が不確実なら、弱い関連と確認状態で残します。</p>
+<h3>時点</h3><p>発表日、実際の適用日、確認日を別々にします。過去の主張は削除せず、新しい主張が何を置き換えたかを記録します。「APIはGAだがGoogle Cloudはprivate preview」のような併存も表現できます。</p>
+<h3>変更</h3><p>字段のrenameだけでなく意味の変更もversionを上げます。新旧schemaの変換で失われる情報を列挙し、旧データが新しい意味へ勝手に昇格しないことをnegative fixtureで確かめます。</p></section>
+<section class="panel"><h2>6. 小さく導入する手順と、採用しない条件</h2>
+<ol><li>現状で起きている誤解を三つ記録し、その区別だけを定義します。</li><li>既存のCSV／JSONに、surface・source・時点・状態を追加します。</li><li>正例と、sourceなし・期限切れ・surface不一致の反例を用意します。</li><li>検索やレポートが質問に答えられるか確かめ、失敗理由を修正します。</li><li>複数システムで同じ語彙を共有する必要が出てからRDF／OWLの導入を検討します。</li></ol>
+<p>単純な一枚の表で十分なら、専用グラフDBや推論器は不要です。評価するのはノード数ではなく、誤った同一視の減少、主張から元根拠へ戻れる割合、schema変更時の手戻りです。効果は自分のデータで測るまで未検証です。</p>
+<p>次の<a href="examples/evidence_pipeline.py">オフライン実験コード</a>では、JSONの小さな「意味の契約」を使い、source種別・利用形態・時点が違う記録を採用候補から外します。これはOWL／SHACL処理系ではなく、業務制約の最小実装です。</p></section>
+<section class="panel" id="sources"><h2>一次資料と更新条件</h2><ul>
+<li><a href="https://www.w3.org/TR/rdf11-concepts/">W3C — RDF 1.1 Concepts</a>：トリプルとグラフの基本。</li><li><a href="https://www.w3.org/TR/owl2-primer/">W3C — OWL 2 Primer</a>：クラス・関係・同一性・open-world。</li><li><a href="https://www.w3.org/TR/shacl/">W3C — SHACL</a>：RDFデータに対する形状検証。</li><li><a href="https://www.w3.org/TR/prov-o/">W3C — PROV-O</a>：由来の記述。</li></ul>
+<p class="small">公式仕様確認: 2026-10-03。引用ではなく概念を要約しています。規格改訂、扱う業務の変更、誤った推論が見つかった時に再点検します。</p></section>
+<footer class="panel"><h2>関連</h2><p><a href="context-engineering.html">Context Engineering</a> / <a href="graph-engineering.html">Graph Engineering</a> / <a href="../../research/always-on-agents-2026-10.html">常駐エージェント比較</a> / <a href="index.html">Knowledge</a> / <a href="../../index.html">Hub Top</a></p><p class="small">最終更新: 2026-10-03</p></footer>
+</main></body></html>
