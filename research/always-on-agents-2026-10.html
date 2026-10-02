@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>常駐AIと意味の設計 — Grok Bot・Muse・dots | Research</title><link rel="stylesheet" href="../workbench/knowledge/deep-dive.css"></head><body><a class="skip" href="#main">本文へ</a><main class="shell" id="main">
+<header class="panel"><p><a href="index.html">← Research</a> / <a href="../workbench/knowledge/index.html">Knowledge</a> / <a href="../index.html">Hub Top</a></p><p class="eyebrow">特集 · 公式一次情報で確認 2026-10-03</p><h1>常駐AIと「意味」の設計<br>Grok Bot・Muse・dotsを仕事へつなぐ</h1>
+<p class="lead">AIが会話の外でも働く時代に、重要なのは誰を何人動かすかだけではありません。何を事実と呼び、どう根拠を渡し、どの状態で止め、何をもって仕事を完了とするか。その設計から製品の使い分けまで、七つの深掘り記事をつなぐ特集です。</p>
+<p class="notice">本特集は製品紹介を導入済みの実績へ読み替えません。公式に説明された機能、発表・段階提供、未確認の利用条件、本ハブの試験提案を分けています。「GlockBot」はGrok Bot、「DOTS」はChatGPT dotsとして整理しました。</p>
+<nav aria-label="目次"><ul><li><a href="#reading">深掘り記事</a></li><li><a href="#architecture">設計の関係</a></li><li><a href="#comparison">製品比較</a></li><li><a href="#admission">導入判断</a></li><li><a href="#lab">試せる教材</a></li><li><a href="#sources">資料</a></li></ul></nav></header>
+<section class="panel" id="reading"><h2>1. 読みたい問いから入る</h2>
+<div class="grid">
+<article class="card"><h3><a href="../workbench/knowledge/ontology-engineering.html">Ontology Engineering</a></h3><p>「モデル」「使える」「採用」の意味を揃える。OWLの推論とSHACLの検証、同一性、時点、schema変更を深掘りします。</p></article>
+<article class="card"><h3><a href="../workbench/knowledge/context-engineering.html">Context Engineering</a></h3><p>モデルに何を見せるか。情報契約、取得、圧縮、記憶、根拠不足の評価まで本文を改訂しました。</p></article>
+<article class="card"><h3><a href="../workbench/knowledge/graph-engineering.html">Graph Engineering</a></h3><p>知識と実行を分離する。再開、idempotency、review対象の固定、GraphRAGの選び方まで扱います。</p></article>
+<article class="card"><h3><a href="grok-bot-deep-dive.html">Grok Bot</a></h3><p>名前付きBot、共有computer、個別memory、skill／routine。複数担当に分ける時の境界を整理します。</p></article>
+<article class="card"><h3><a href="muse-agent-deep-dive.html">Muse agent</a></h3><p>Goals、Activity、Secure VM、Small Business。Spark／Code／APIとは違う個人agentを解説します。</p></article>
+<article class="card"><h3><a href="chatgpt-dots-deep-dive.html">ChatGPT dots</a></h3><p>cloud coordination、local execution、memory、proactive research、schedule、停止の違いを整理します。</p></article>
+</div><p>Meta familyの最新差分は<a href="muse-recent-updates.html">改訂したMuse / Meta tracker</a>へ。21 provider全体のモデル確認層は<a href="official-model-delta-2026-10-01.html">10月1日snapshot</a>です。本特集の10月3日確認を、全providerの全面再確認とは扱いません。</p></section>
+<section class="panel" id="architecture"><h2>2. Ontology・Graph・Contextは、序列ではなく接続</h2>
+<pre class="flow">問いと業務の区別
+        ↓
+Ontology：対象・関係・状態の意味を合意
+        ├──▶ Knowledge Graph：根拠や依存を関係として保持
+        └──▶ State Graph：許される遷移と停止を実装
+                    ↓
+Context：今回必要な根拠・指示・状態だけを届ける
+                    ↓
+Agent：推論、ツール、成果物
+                    ↓
+評価・receipt ──▶ 記録を訂正し、設計へ戻す</pre>
+<p>この図は本ハブの整理です。グラフDBを導入せずJSONと通常検索で始めても構いません。たとえば「official claim」「radar」「local measurement」を区別できれば、先に大きなontologyを構築しなくても、ニュースを事実と取り違える失敗を減らすための試験ができます。</p>
+<p>また、意味を合意しても入力を誤れば誤った関係ができます。状態を保存しても外部actionが二重になることがあります。contextを整理してもmodelが判断を誤ることがあります。各層の検査を別々に残す設計が必要です。</p></section>
+<section class="panel" id="comparison"><h2>3. 三製品を「仕事の単位」で比べる</h2>
+<p>以下は2026-10-03に読んだ公式資料の要約で、各製品を実行して比較したbenchmarkではありません。</p>
+<div class="table-wrap"><table><thead><tr><th>比較軸</th><th>Grok Bot</th><th>Muse agent</th><th>ChatGPT dots</th></tr></thead><tbody>
+<tr><td>中心となる単位</td><td>複数の名前付きBot</td><td>個人のagentと目標</td><td>継続した責任を持つdot</td></tr>
+<tr><td>実行環境</td><td>同一アカウントのBotがcloud computerを共有</td><td>専用Muse Secure VM</td><td>cloud computer＋許可された接続local computer</td></tr>
+<tr><td>継続性</td><td>個別contextと共有files／sessions</td><td>main／side chat、memory、Goals</td><td>会話context、ChatGPT memory、dot notes</td></tr>
+<tr><td>反復</td><td>skillとroutineを分離</td><td>長期目標とbackground work</td><td>assigned work、schedule、対応event、read-only研究を分離</td></tr>
+<tr><td>最初に確認する条件</td><td>共有環境が扱う情報に適するか</td><td>地域、connector、承認対象</td><td>rollout、plan、local接続、停止範囲</td></tr>
+<tr><td>詳細source</td><td><a href="https://docs.x.ai/grok-bot/overview">Overview</a> / <a href="https://docs.x.ai/grok-bot/computer-and-apps">Computer</a></td><td><a href="https://introducing.muse.ai/">Design</a> / <a href="https://about.fb.com/news/2026/09/introducing-muse-small-business/">Business更新</a></td><td><a href="https://learn.chatgpt.com/docs/dots">Overview</a> / <a href="https://learn.chatgpt.com/docs/dots/tasks-and-memory">Tasks</a></td></tr>
+</tbody></table></div>
+<p>「専用VM」「共有computer」「notes」から、絶対的な安全性や全memoryの隔離を推定しません。製品が選んだ構造と、その構造が自分の仕事に適するかを別に評価します。</p></section>
+<section class="panel" id="admission"><h2>4. ニュースを、組織が使える提案へ変える</h2>
+<p>新しい製品の発見は入口です。小さな技術チームなら、記事全文を繰り返し読む運用より、次の区別を保った短い提案が判断に使いやすくなります。これは一般化した設計案で、特定組織の役割任命や権限変更ではありません。</p>
+<div class="table-wrap"><table><thead><tr><th>段階</th><th>必要な情報</th><th>次の遷移</th><th>ここでは意味しないこと</th></tr></thead><tbody>
+<tr><td>RADAR</td><td>見つけた情報、URL、未確認点</td><td>公式sourceの照合</td><td>仕様確定、利用可能</td></tr>
+<tr><td>FACT_CHECKED</td><td>主張、surface、時点、元根拠</td><td>業務上の仮説を作る</td><td>性能が自組織で実証済み</td></tr>
+<tr><td>TEST_PROPOSED</td><td>対象課題、試験入力、合格・棄却条件</td><td>scopeと担当を確認する</td><td>契約、課金、担当への作業命令</td></tr>
+<tr><td>TEST_RECORDED</td><td>成果物、条件、結果、失敗、費用</td><td>domain判断者が採否を決める</td><td>一回の成功で一般保証</td></tr>
+<tr><td>METHOD_REUSABLE</td><td>手順、入力条件、反例、再評価条件</td><td>同条件で再利用する</td><td>他業務へ無検査で拡張</td></tr>
+</tbody></table></div>
+<p>配送係は宛先とrouteを確認できますが、domainの採否まで代行しません。担当候補を付けても、その担当に責任が移るわけではありません。採用しない・まだ待つという結果も、理由と再検討条件が残れば有益です。</p>
+<pre><code>小さな提案例（架空）
+問題: 技術調査の草稿でconsumer appとAPIを混同する
+発見: 常駐agentが複数sourceを継続照合できそう
+公式事実: 該当機能、対象surface、確認日、未確認の条件
+仮説: source付きの主張表を先に作れば混同が減る
+試験: 同一の公開資料10件、境界違反を含む反例3件
+合格: 原文照合・保留理由が揃い、無許可の外部変更がない
+棄却: 根拠の捏造、訂正無視、停止不能、手直し負担増
+候補担当: 調査評価担当（非拘束）
+求める判断: 小さな試験を行うか。製品契約の承認ではない</code></pre></section>
+<section class="panel" id="lab"><h2>5. 今すぐ試せるオフライン教材</h2>
+<p><a href="../workbench/knowledge/examples/evidence_pipeline.py" download>evidence_pipeline.pyをダウンロード</a>できます。Python 3.10以上、標準libraryのみ、credential・API・network・file writeは不要です。すべて架空のデータで、実際のprovider情報や配送ではありません。</p>
+<pre><code>python3 evidence_pipeline.py
+# 6件の架空主張から、対象APIの公式preview 1件を候補に選択
+# rumor、別surface、期限切れ、sourceなし、発表のみを保留
+# 19件の契約テストを実行</code></pre>
+<p>選択された根拠が何かを表示し、hashに結びつくsource reviewと、疑似配送の重複排除を検査します。reviewer名は自己申告のfixture値で、認証済みreviewerを証明しません。source-kindも入力ラベルで、原文の正確さを自動判定しません。in-memoryの重複排除は再起動を越えて残らず、本番exactly-onceの保証でもありません。</p>
+<h3>三つの反例を考える</h3>
+<ol><li>公式記事に「米国consumer appで提供」とあるのに、API導入の資料へ入れました。sourceが公式なら合格でしょうか。</li><li>reviewerが草稿を確認した後、producerが配送先と試験案を書き換えました。同じpacket IDなら進めてよいでしょうか。</li><li>同じ入力を二度処理して、receiptが一つでした。これで実際のメールも二重送信されないと証明できましたか。</li></ol>
+<details><summary>解説を見る</summary><ol><li>いいえ。sourceの権威と適用surfaceは別条件です。対象不一致を保留します。</li><li>いいえ。reviewの対象hashが変わったので、変更した版を再確認します。</li><li>いいえ。教材は一つのprocess内の疑似ledgerです。通信断、再起動、外部serviceの重複排除は別試験です。</li></ol></details></section>
+<section class="panel"><h2>6. 次に深掘りする時の優先順位</h2>
+<p>ニュース件数ではなく、現在の作業に接続する問いを優先します。第一は、公式仕様が変わって既存手順が壊れるもの。第二は、今の失敗を小さな試験で改善できそうなもの。第三は、schema、skill、評価fixtureのように次回へ再利用できるものです。</p>
+<p>価格や契約を比較する記事は、同じ地域・plan・課金単位で資料を揃えてから追加します。Memoryやconnectorの組織導入は、公開素材だけの試験と、実データを接続する判断を分離します。本特集では新しいsubscriptionやprovider導入を実行していません。</p></section>
+<section class="panel" id="sources"><h2>一次資料と更新の扱い</h2>
+<p><a href="agent-knowledge-source-review-2026-10-03.json">今回のsource照合記録（JSON）</a>には、主張と一次資料の対応、訂正、検証の範囲を記録しています。著者による照合であり、独立第三者監査ではありません。</p>
+<p>製品の根拠は各深掘り記事の公式リンクへ。概念の根拠は<a href="https://www.w3.org/TR/owl2-primer/">W3C OWL 2</a>、<a href="https://www.w3.org/TR/shacl/">SHACL</a>、<a href="https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents">Anthropic Context Engineering</a>、<a href="https://docs.langchain.com/oss/python/langgraph/interrupts">LangGraph Interrupts</a>、<a href="https://microsoft.github.io/graphrag/query/overview/">Microsoft GraphRAG</a>です。</p>
+<p class="small">一次情報確認: 2026-10-03。各頁の「次の更新条件」に該当する公式変更と、試験で見つかった誤りを優先して反映します。教材のテストPASSは、製品の性能PASSや組織への導入承認ではありません。</p></section>
+<footer class="panel"><h2>関連</h2><p><a href="signal-to-organizational-leverage.html">Signalから組織活用へ</a> / <a href="llm-tracker.html">LLM Tracker</a> / <a href="muse-recent-updates.html">Meta tracker</a> / <a href="index.html">Research</a> / <a href="../index.html">Hub Top</a></p><p class="small">最終更新: 2026-10-03</p></footer></main></body></html>

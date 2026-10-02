@@ -11,6 +11,11 @@
 
 ## Current entry points
 
+- [`research/always-on-agents-2026-10.html`](research/always-on-agents-2026-10.html)
+  - 2026-10-03特集。Ontology / Context / Graphの設計とGrok Bot / Muse / ChatGPT dotsの深掘り、導入判断、オフライン教材（19テスト）を接続
+- [`research/muse-recent-updates.html`](research/muse-recent-updates.html)
+  - Meta familyを10/3に再確認。Spark 1.3、Model API GA、Code、Glimmerと個人agent / Small Businessを分離
+
 - [`research/llm-tracker.html`](research/llm-tracker.html)
   - 21 provider、中国系12 providerの現行model、surface、公式確認、専用tracker、鮮度gapを一画面で確認するcoverage ledger
 - [`research/official-model-delta-2026-10-01.html`](research/official-model-delta-2026-10-01.html)

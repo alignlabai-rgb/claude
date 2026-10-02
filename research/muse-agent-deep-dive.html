@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Muse — 個人の目標を、追跡できる実行へ | Research</title><link rel="stylesheet" href="../workbench/knowledge/deep-dive.css"></head><body><a class="skip" href="#main">本文へ</a><main class="shell" id="main">
+<header class="panel"><p><a href="index.html">← Research</a> / <a href="../index.html">Hub Top</a></p><p class="eyebrow">Always-on agent deep dive · 公式確認 2026-10-03</p><h1>Muse — 個人の目標を、追跡できる実行へ</h1><p class="lead">Museという名前は、個人向けエージェント、Sparkモデル、Code、APIを含む広いfamilyで使われます。本稿は個人向けMuseを中心に、Small Business拡張と、業務へ持ち込む際の設計課題を整理します。</p><p class="small">製品の公式説明と、本ハブの導入設計案を分けています。実アカウントでの機能試験・有料契約・接続設定は行っていません。</p></header>
+<section class="panel"><h2>1. 個人向けMuseとモデルAPIを分ける</h2>
+<p><a href="https://about.fb.com/news/2026/09/introducing-muse-personal-ai-agent/">9月8日の公式発表</a>は、専用のMuse Secure VMとbrowserを持ち、アプリを閉じても仕事を続ける個人agentを説明します。MuseアプリとWhatsAppが接点です。一方、Sparkは推論モデル、Codeはcoding agent、Model APIは開発者向けsurfaceで、同じ利用権や機能とは限りません。</p>
+<p>提供地域は発表時点の米国から、<a href="https://about.fb.com/news/2026/09/introducing-muse-small-business/">9月29日のSmall Business記事では米国・カナダ</a>の説明へ変わっています。日本で一般利用できるとの根拠は今回確認できていません。APIのglobal GAからconsumer appの日本提供を推論しません。</p>
+<div class="table-wrap"><table><thead><tr><th>名称</th><th>対象</th><th>混同しないこと</th></tr></thead><tbody><tr><td>Muse agent</td><td>個人の継続した仕事・目標</td><td>アプリとconnector、専用VM</td></tr><tr><td>Muse Spark</td><td>モデル能力</td><td>モデルを呼ぶだけで同じ常駐環境になるわけではありません</td></tr><tr><td>Muse Code</td><td>ソフトウェア開発</td><td>個人agentの画面や利用枠と同一ではありません</td></tr><tr><td>Muse Glimmer</td><td>open-weightモデル</td><td>重みの取得と、動作・ライセンス・品質は別に確認します</td></tr></tbody></table></div></section>
+<section class="panel"><h2>2. 長い会話と、明示的な状態を組み合わせる</h2>
+<p><a href="https://introducing.muse.ai/">公式design解説</a>は、main chat、side chat、背景作業、Activity、Goals、編集できるMemory files、構造化された承認UIを説明しています。会話を続けられることに加えて、何を進め、何を待ち、何が承認されたかを見る面が用意されています。</p>
+<p>ここから導ける実務上の論点は、「自然な会話」と「明示的な記録」が競合するのではなく、違う問題を解くことです。会話で優先順位を変えても、最終成果物の版、依存する根拠、未決の条件は記録として残す必要があります。</p>
+<pre><code>目標の設計例（本ハブ提案）
+goal: 公開可能な技術比較の草稿を完成する
+deliverable: 比較表、source、未確認点、試験案
+done_when: 元資料と全主張を照合できる
+not_in_scope: 公開、契約、課金、未公開素材の共有
+notify_when: sourceの撤回、重大な矛盾、人間判断が必要
+do_not_notify: 変更なし、同じ確認の繰り返し</code></pre></section>
+<section class="panel"><h2>3. セキュリティ説明を、導入要件へ翻訳する</h2>
+<p><a href="https://research.meta.ai/blog/security-and-safety-for-ai-agents-our-approach-with-muse">Metaの技術説明</a>は、agent runtimeとsecurity-sensitive serviceを分離し、Sentinelがconnector actionとnetwork egressのpermission authorityになる構造を説明しています。credentialはagentから隔離され、VMから推論やtelemetryに必要な限定データが出るとも記載されています。</p>
+<p>「専用VM」だから完全にlocal／offlineという意味ではありません。また設計説明は第三者による運用保証ではありません。利用前は、どのデータが読み出されるか、保持や削除、接続先のread/write、組織要件に合うかを確認します。</p>
+<p>初期発表の<strong>Confidential VMは年内予定</strong>です。Secure VMと同じ現在提供機能として説明しません。sourceの日付だけでなく、本文の「今」と「今後」を区別する必要があります。<a href="https://about.fb.com/news/2026/09/introducing-muse-personal-ai-agent/">初期発表</a></p></section>
+<section class="panel"><h2>4. Small Businessの価値は、connectorの数より仕事の接続</h2>
+<p><a href="https://about.fb.com/news/2026/09/introducing-muse-small-business/">9月29日の公式発表</a>は、Asana、Canva、Box、Figma、Notion、Shopify、Slack、Stripe等やFacebook／Instagram business accountへのconnectorを挙げています。公開・送信・支出は承認が必要と説明し、利用可能なconnector一覧はアプリ設定で確認するとしています。</p>
+<p>一般的な小規模制作チームなら、資料→ブランド草稿→編集可能な制作物→評価という接続が候補になります。ただし、接続済みだから全工程を自動実行してよいわけではありません。草稿を返す試験と、外部に公開する運用は別です。</p>
+<div class="grid"><article class="card"><h3>素材から比較記事へ</h3><p>権利確認済みの資料だけを渡し、source付き草稿を作ります。確認項目は引用の一致、公開不可データの非混入、編集可能な形式です。</p></article><article class="card"><h3>業務ツールの整理案</h3><p>架空の作業一覧から、重複入力や待ちを抽出します。特定製品の契約を前提にせず、手順改善で解けるかも比較します。</p></article><article class="card"><h3>長い目標の追跡</h3><p>期限・依存・未決事項を追います。担当候補の提示と担当任命、進捗集約と内容の承認を分離できるかを検査します。</p></article></div><p class="small">三つは試験案であり、導入済み・効果実証済みの事例ではありません。</p></section>
+<section class="panel"><h2>5. Connect発表を、現在提供へ読み替えない</h2>
+<p><a href="https://about.fb.com/news/2026/09/the-biggest-news-from-connect-2026/">9月24日のConnect記事</a>は、AI glassesへのMuse展開をcoming monthsと説明しています。音声、connector、専用email、Muse Charmも発表の一覧に含まれますが、すべての地域・アカウントで即時利用可能という意味ではありません。</p>
+<p>動画やdemoで魅力を理解することと、利用条件を確認することは別工程です。導入の比較表には「公式発表あり」「自アカウントで表示」「試験成功」の三つを別欄にします。Model APIやCodeの最新差分は<a href="muse-recent-updates.html">Meta tracker</a>で管理します。</p></section>
+<section class="panel"><h2>一次資料・更新条件</h2><ul><li><a href="https://about.fb.com/news/2026/09/introducing-muse-personal-ai-agent/">個人向けMuse発表</a></li><li><a href="https://introducing.muse.ai/">How We Designed Muse</a></li><li><a href="https://research.meta.ai/blog/security-and-safety-for-ai-agents-our-approach-with-muse">Security and safety design</a></li><li><a href="https://about.fb.com/news/2026/09/introducing-muse-small-business/">Small Business更新</a></li><li><a href="https://about.fb.com/news/2026/09/the-biggest-news-from-connect-2026/">Connect 2026</a></li></ul><p class="small">確認: 2026-10-03。地域拡大、connector権限、Confidential VM提供、保持設定、組織向け要件の変更で再点検します。</p></section>
+<footer class="panel"><h2>関連</h2><p><a href="always-on-agents-2026-10.html">特集・3製品の比較</a> / <a href="../workbench/knowledge/ontology-engineering.html">Ontology</a> / <a href="../workbench/knowledge/context-engineering.html">Context</a> / <a href="../workbench/knowledge/graph-engineering.html">Graph</a> / <a href="index.html">Research</a> / <a href="../index.html">Hub Top</a></p><p class="small">最終更新: 2026-10-03</p></footer></main></body></html>

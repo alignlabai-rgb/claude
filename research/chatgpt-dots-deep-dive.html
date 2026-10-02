@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ChatGPT dots — 会話を越えて責任を持ち越すagent | Research</title><link rel="stylesheet" href="../workbench/knowledge/deep-dive.css"></head><body><a class="skip" href="#main">本文へ</a><main class="shell" id="main">
+<header class="panel"><p><a href="index.html">← Research</a> / <a href="../index.html">Hub Top</a></p><p class="eyebrow">Always-on agent deep dive · 公式確認 2026-10-03</p><h1>ChatGPT dots — 会話を越えて責任を持ち越すagent</h1><p class="lead">dotsは、継続した仕事を調整する常駐agentです。クラウドで続く仕事、接続したlocal computerで行う仕事、記憶、background research、scheduleを分けると、何を任せられるかと、何を見届けるべきかが明確になります。</p><p class="small">製品の公式説明と、本ハブの導入設計案を分けています。実アカウントでの機能試験・有料契約・接続設定は行っていません。</p></header>
+<section class="panel"><h2>1. 公式overviewが示す仕組み</h2>
+<p><a href="https://learn.chatgpt.com/docs/dots">OpenAIの公式overview</a>は、GPT-6 Astraで動くdotがクラウドにcomputerとbrowserを持ち、deviceがoffでもcloud workを継続すると説明します。ChatGPT、Slack、Teams、callは同じdotへの接点ですが、conversation表示は各channelに残ります。</p>
+<p>messaging channel、plugin接続、local computer接続は別です。Slackへ追加してもメールやローカルファイルへの権限は自動的に得られず、channelを追加しただけで監視も始まりません。これはconnectorを付けただけで責任が発生する、という誤解を避ける重要な区別です。<a href="https://learn.chatgpt.com/docs/dots/channels#slack-and-teams">公式channel説明</a></p>
+<div class="table-wrap"><table><thead><tr><th>接続</th><th>可能になること</th><th>前提にできないこと</th></tr></thead><tbody><tr><td>Messaging channel</td><td>会話と結果の受取</td><td>他serviceの操作権限</td></tr><tr><td>Plugin／app</td><td>許可された情報・操作</td><td>無制限access、local browser sessionの移転</td></tr><tr><td>Local computer</td><td>そのcomputerのfiles／tools／tasks</td><td>全アプリ全会話への包括access</td></tr></tbody></table></div></section>
+<section class="panel"><h2>2. Cloudで調整しても、local作業にはcomputerが必要</h2>
+<p><a href="https://learn.chatgpt.com/docs/dots/computers-and-apps#connect-your-computer">公式computer説明</a>では個人computerは同時に一台接続でき、その作業にcomputerがonlineかつChatGPT appがopenである必要があります。cloudの仕事が続くことから、offlineのlocal deviceにアクセスできると推論しません。</p>
+<p><a href="https://learn.chatgpt.com/docs/dots/tasks-and-memory">Tasks and memory</a>は、新しいlocal Work／Codex task、既存local Codex task、設定済みCodex cloud environmentを使う仕事を区別します。新taskにはその仕事向けのcontextを渡しますが、dotの全会話を自動的に渡すわけではありません。接続computerを変えても既存taskが自動移転するわけではありません。</p>
+<p>実務では、各成果物に実行場所と保存先を残します。「cloudで進んでいる」という説明だけでは、どのrepo・版・fileが変わったかを把握できません。</p></section>
+<section class="panel"><h2>3. Memoryは、全文記録や現在の権限ではない</h2>
+<p><a href="https://learn.chatgpt.com/docs/dots/tasks-and-memory">公式memory説明</a>は、conversation context、関連ChatGPT memory、dot自身のsaved notesを区別します。dotのnotesは完全なtranscriptではなく、ChatGPTのsaved-memory設定を変えても既存notesが必ず同じように変わるとは限りません。</p>
+<p>channelを越えて情報を利用できても、別のaudienceへ開示してよいとは限りません。privateな期限を使って予定を整理することと、privateな会話をチームへ転送することは別です。</p>
+<pre><code>長期責任の依頼例（本ハブ提案）
+公開の公式changelogだけを調べ、前回との差分を整理する。
+根拠、surface、確認日、未確認点を残す。
+記憶した仕様ではなく最新sourceを照合する。
+担当候補と試験案を返すが、採用・契約・公開は実行しない。
+sourceが取れない時は過去結果を今日の結果にしない。</code></pre></section>
+<section class="panel"><h2>4. Proactive research、依頼された仕事、scheduleの違い</h2>
+<p><a href="https://learn.chatgpt.com/docs/dots/tasks-and-memory">公式資料</a>では、proactive researchは許可された情報のread-only調査であり、送信、appの変更、browser／computer操作をしません。発見後のactionには、そのactionのpermissionsとapprovalsが適用されます。</p>
+<p>一方、依頼済みの仕事はscope内のactionを含み得ます。固定時刻に繰り返す仕事はsaved scheduleが必要です。時刻、timezone、期間、入力source、通知条件、配送先を確認します。対応eventもservice依存なので、接続だけで監視できると断定しません。</p>
+<h3>通知の設計</h3><p>「常に教えて」ではなく、期限変更、source撤回、テスト失敗、決定が必要な時を通知条件にします。変更なしは記録に留め、結果が未確認の時には完了通知を出さない設計にします。</p></section>
+<section class="panel"><h2>5. 停止は三つに分かれる</h2>
+<p><a href="https://learn.chatgpt.com/docs/dots/controls">公式Controls</a>は、Pauseが現在のmain taskを止め、delegated taskとscheduleは別に停止・解除する必要があると説明します。停止しても完了済みactionは取り消されません。</p>
+<div class="table-wrap"><table><thead><tr><th>対象</th><th>確認する面</th><th>見届けること</th></tr></thead><tbody><tr><td>dot自身のmain task</td><td>Pause／Resume</td><td>今の処理が止まったか</td></tr><tr><td>delegated task</td><td>Activity</td><td>workerも必要に応じて止めたか</td></tr><tr><td>将来の反復</td><td>Scheduled</td><td>次のrunが残っていないか</td></tr></tbody></table></div>
+<p>custom ruleはbuilt-in safetyやapp接続権限を上書きしません。自然言語の境界は役立ちますが、誤りもあり得るため、権限・操作先・成果物版を明示して検証します。</p></section>
+<section class="panel"><h2>6. 利用条件と、導入の検査課題</h2>
+<p><a href="https://learn.chatgpt.com/docs/dots">2026-10-03確認時の公式overview</a>は段階rolloutを示し、Pro 100／200／500は18歳超・EEA／英国／スイス外、Business PremiumとEnterpriseはworldwideと説明します。Enterpriseは管理者が有効化する必要があります。eligibleでも即表示とは限りません。</p>
+<p>dotとの会話、dotが開始・管理するWork／Codex task、deeper work allowanceは別の扱いです。「会話が通常usageに数えられない」ことを「すべての処理が無制限」と読み替えません。購入前は自分のplanと現在の表示を再確認します。</p>
+<p><a href="https://learn.chatgpt.com/docs/enterprise/cloud-local-access">Enterpriseのlocal access guide</a>も、local executionとcloud executionのcontrolsを分けています。Enterprise betaのdotsはresidency非対応などの条件があり、個人向け機能説明だけで企業要件を満たすとは判断できません。</p>
+<div class="grid"><article class="card"><h3>context引継ぎ試験</h3><p>同じ架空案件を途中で変更し、古い決定ではなく訂正を使えるか確認します。</p></article><article class="card"><h3>停止試験</h3><p>main、worker、scheduleを区別して列挙・停止できるか確認します。実際の操作先への影響も別に記録します。</p></article><article class="card"><h3>完了試験</h3><p>run終了ではなく、成果物、根拠、検査結果、配送receiptが揃ったか確認します。</p></article></div><p class="small">以上は導入前の設計案であり、本ハブでの製品試験結果ではありません。</p></section>
+<section class="panel"><h2>一次資料・更新条件</h2><ul><li><a href="https://learn.chatgpt.com/docs/dots">Meet dots</a></li><li><a href="https://learn.chatgpt.com/docs/dots/tasks-and-memory">Tasks and memory</a></li><li><a href="https://learn.chatgpt.com/docs/dots/controls">Control your dot</a></li><li><a href="https://learn.chatgpt.com/docs/enterprise/cloud-local-access">Local computer access for Work Cloud and dots</a></li></ul><p class="small">公式確認: 2026-10-03。rollout、plan、memory、stop behavior、enterprise controlsの変更で再点検します。</p></section>
+<footer class="panel"><h2>関連</h2><p><a href="always-on-agents-2026-10.html">特集・3製品の比較</a> / <a href="../workbench/knowledge/ontology-engineering.html">Ontology</a> / <a href="../workbench/knowledge/context-engineering.html">Context</a> / <a href="../workbench/knowledge/graph-engineering.html">Graph</a> / <a href="index.html">Research</a> / <a href="../index.html">Hub Top</a></p><p class="small">最終更新: 2026-10-03</p></footer></main></body></html>

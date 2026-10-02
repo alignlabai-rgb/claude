@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Grok Bot — 複数のAI担当を、再利用できる仕事へ | Research</title><link rel="stylesheet" href="../workbench/knowledge/deep-dive.css"></head><body><a class="skip" href="#main">本文へ</a><main class="shell" id="main">
+<header class="panel"><p><a href="index.html">← Research</a> / <a href="../index.html">Hub Top</a></p><p class="eyebrow">Always-on agent deep dive · 公式確認 2026-10-03</p><h1>Grok Bot — 複数のAI担当を、再利用できる仕事へ</h1><p class="lead">複数の名前付きBotに仕事を任せる製品です。重要なのはBotを増やすことより、共有環境、個別記憶、スキル、定期実行、完了証拠をどう分けるかです。Grokのチャット、Grok Build、X上のニュース生成とは別のsurfaceとして理解します。</p><p class="small">製品の公式説明と、本ハブの導入設計案を分けています。実アカウントでの機能試験・有料契約・接続設定は行っていません。</p></header>
+<section class="panel"><h2>1. 公式仕様：名前は別でも、コンピューターは共有</h2>
+<p><a href="https://docs.x.ai/grok-bot/overview">公式overview</a>は、永続的なクラウドコンピューター、ブラウザー、filesystem、terminalを持つBotを説明しています。macOS／Windows／LinuxとiOS／Androidに対応し、有料個人Cursorプラン、Cursor Teams、連携した対象SuperGrokプランで利用できます。プランごとの詳細は契約画面で再確認が必要です。</p>
+<p>設計上とくに重要なのは、<a href="https://docs.x.ai/grok-bot/computer-and-apps">同一アカウントのBotが一台のクラウドコンピューターを共有する</a>点です。ファイル、ブラウザーsession、command-line credentialを共有します。Botごとの画面は別でもsecurity boundaryではありません。</p>
+<div class="table-wrap"><table><thead><tr><th>層</th><th>区別</th><th>実務上の意味</th></tr></thead><tbody><tr><td>Botの役割と記憶</td><td>Botごとの会話・学習context</td><td>調査と制作の仕事を整理できます</td></tr><tr><td>クラウドコンピューター</td><td>同一アカウント内で共有</td><td>名前を分けても秘密の分離にはなりません</td></tr><tr><td>外部アプリ</td><td>接続と権限に依存</td><td>ログインできることと、操作してよいことは別です</td></tr></tbody></table></div>
+<p>これはアカウント間まで同じ環境という意味ではありません。共有範囲を取り違えず、異なる機密区分や顧客情報を載せる判断には、製品の組織向け仕様と自組織の要件を別に確認します。</p></section>
+<section class="panel"><h2>2. Skillは方法、Routineは実行の契約</h2>
+<p><a href="https://docs.x.ai/grok-bot/skills-routines-and-automations">公式Skills and routines</a>は、skillを再利用する指示、routineを担当Botと実行時刻／対応eventの設定として分けます。一回の仕事を確かめ、方法を保存し、その後に定期化する流れです。私有skillのlibraryはBot間で共有されます。</p>
+<p>画面操作を教えるTeach a taskは段階提供とされ、見えない場合は文章からskillを作れます。デモから学んだ手順は草稿です。一回の成功では、空データ、session切れ、UI変更、重複入力の処理までは学べません。</p>
+<pre><code>調査skillの設計例（本ハブ提案）
+入力: 公式source URL一覧、前回確認日、対象surface
+処理: 差分発見 → 元資料照合 → 主張と未確認点を分離
+結果: source付き変更表、変更なし、取得失敗のいずれか
+禁止: 古い結果を今日の確認として再利用しない
+Routine: 担当Bot、時刻とtimezone、通知条件、終了日を固定</code></pre>
+<p>「毎日レポートして」だけでは、変更のない日にも文章が増えます。意味のある差分・取得失敗・判断が必要な時だけ通知し、いつ何を見たかは軽い記録で残す設計が向いています。これは製品の自動保証ではなく運用案です。</p></section>
+<section class="panel"><h2>3. 承認は文章だけで完結させない</h2>
+<p><a href="https://docs.x.ai/grok-bot/approvals-security-and-privacy">公式承認資料</a>は、Auto Reviewをmodel-basedと説明し、最小権限の代わりにはしないよう勧めています。Ask firstとAllow automaticallyが一致する時はAsk firstが優先します。承認は既に行った操作を元に戻すものではありません。</p>
+<p>「すべて任せる」より、対象、操作、出力先を限定します。公開前の文章、外部メール、課金、本番変更は、調査や草稿とは別の段階です。ログインの引継ぎは専用のsecure flowやtakeoverを使い、普通の会話にpasswordや認証codeを入れないようにします。</p>
+<h3>共有Botのreviewを独立監査と呼ばない</h3><p>別名のBotに確認させると観点を増やせますが、同じファイルや同じ未検証sourceに依存していれば独立性は弱いままです。reviewerへ元資料と判定基準を渡し、producerの結論をそのまま採用しない検査を設計します。</p></section>
+<section class="panel"><h2>4. 三つの試験課題</h2><p>以下は実績ではなく、製品を比較するための架空の課題です。</p>
+<div class="grid"><article class="card"><h3>公式更新の差分担当</h3><p>少数の公式URLから前回との差分を取り、モデル・アプリ・APIを分離します。合格条件は、全主張の根拠と、取得できなかったsourceの明示です。Xの話題性は別欄に残します。</p></article><article class="card"><h3>草稿と検証の二担当</h3><p>一方が資料から比較文を作り、もう一方がsourceを開いて確かめます。合格条件は訂正の差分と根拠が追えること。Botが二人いるだけで合格にしません。</p></article><article class="card"><h3>再利用するroutine</h3><p>同じ入力を二度渡し、重複報告・二重操作がないかを検査します。次にsource一つを取得不能にし、古い結果を新しい結果として報告しないか確かめます。</p></article></div></section>
+<section class="panel"><h2>5. GrokPulseとの接続は「発見→裏取り→提案」</h2>
+<p>Xベースの速報には、早い兆候や利用者の不満を発見する価値があります。そのまま仕様の確定値や導入判断に使わず、候補にsourceを付け、公式資料で確かめる部分と、まだ裏取りできない部分を分けます。Grok Botが使えることだけから、X API creditの付与や無制限のX検索を推論してはいけません。</p>
+<p><a href="https://docs.x.ai/grok-bot/get-started">Get started</a>ではCursorアカウント、対象プラン、クラウドデータ設定が前提です。本稿は現在の公式ページから「X連携でcreditが自動付与」という旧記事の記述を裏付けられなかったため、利用前提から外しています。Xアクセスは実際のconnector／契約／利用条件を確認します。</p>
+<p>組織向けには、ニュース全文の転送より、「何が変わったか」「どの作業に効きそうか」「どう小さく検証するか」を揃えた<a href="signal-to-organizational-leverage.html">Signal Packet</a>が再利用しやすくなります。</p></section>
+<section class="panel"><h2>一次資料・更新条件</h2><ul><li><a href="https://docs.x.ai/grok-bot/overview">Overview</a></li><li><a href="https://docs.x.ai/grok-bot/get-started">Get started</a></li><li><a href="https://docs.x.ai/grok-bot/computer-and-apps">Computer and apps</a></li><li><a href="https://docs.x.ai/grok-bot/skills-routines-and-automations">Skills and routines</a></li><li><a href="https://docs.x.ai/grok-bot/approvals-security-and-privacy">Approvals, security and privacy</a></li></ul><p class="small">公式docs表示更新日: 2026-09-21、確認日: 2026-10-03。共有computer仕様、接続権限、plan、routine仕様の変更で再点検します。</p></section>
+<footer class="panel"><h2>関連</h2><p><a href="always-on-agents-2026-10.html">特集・3製品の比較</a> / <a href="../workbench/knowledge/ontology-engineering.html">Ontology</a> / <a href="../workbench/knowledge/context-engineering.html">Context</a> / <a href="../workbench/knowledge/graph-engineering.html">Graph</a> / <a href="index.html">Research</a> / <a href="../index.html">Hub Top</a></p><p class="small">最終更新: 2026-10-03</p></footer></main></body></html>
