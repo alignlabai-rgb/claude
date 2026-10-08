@@ -57,14 +57,50 @@
   </div>
 
   <!-- News Items -->
-  <div class="section-label">🔴 Claude / Anthropic</div>
+    <div class="section-label">🔴 Claude / Anthropic</div>
 
   <div class="news-card">
-    <p class="news-title"><span class="badge badge-red">新モデル</span>Anthropic、小型モデル「Claude Haiku 5.5」を発表</p>
-    <p class="news-body">Anthropicは同クラスで最速・最安・最高性能と位置づける新しい小型モデルを公開。大量処理やコスト重視の用途向け。価格・モデルID等の詳細は公式発表で確認すること。</p>
-    <p class="news-meta"><span>Source: Anthropic Newsroom（2026-10-07）</span></p>
+    <p class="news-title"><span class="badge badge-red">新モデル</span>Anthropic、小型モデル「Claude Haiku 5.5」を発表（claude-haiku-5-5）</p>
+    <p class="news-body">同社の小型クラスで最速・最安・最高性能と位置づけ。コンテキスト100万トークン、最大出力12.8万トークン、adaptive thinking対応。価格は入力$0.10／出力$0.50（MTokあたり、10万超のプロンプトは$0.50／$2.50）。Haiku 4.5からの移行では、手動の extended thinking（`budget_tokens`）が400エラーになり、adaptive thinkingが既定で有効なため応答がthinkingブロックから始まりトークン消費も増える点に注意。</p>
+    <p class="news-meta"><span>Source: Anthropic Newsroom／Claude Platform Release Notes／Claude Code v2.1.293（2026-10-07）</span></p>
+  </div>
+  <div class="news-card">
+    <p class="news-title"><span class="badge badge-red">価格</span>Claude Sonnet 5.5 のキャッシュ読み取りが値下げ（$0.20 → $0.10/MTok）</p>
+    <p class="news-body">キャッシュ読み取り料金が基本入力価格の0.05倍に。キャッシュ書き込みなど他の料金は変更なし。同じ長いコンテキストを繰り返し使うエージェントや制作パイプラインのコスト低減に効く。</p>
+    <p class="news-meta"><span>Source: Claude Platform Release Notes（2026-10-07）</span></p>
+  </div>
+  <div class="news-card">
+    <p class="news-title"><span class="badge badge-red">SDK</span>Python／TypeScript SDKに browser use／computer use ツールのベータクラスを追加</p>
+    <p class="news-body">クラスを継承して1ツールにつき1メソッドを実装すれば、ツールループ、URL／ファイルポリシー、承認コールバックをSDK側が処理する。自作エージェントでブラウザ・画面操作を安全に組み込む作業が簡素化される。</p>
+    <p class="news-meta"><span>Source: Claude Platform Release Notes（2026-10-07）</span></p>
+  </div>
+  <div class="news-card">
+    <p class="news-title"><span class="badge badge-red">プラン</span>Claude Max／Team プランに月次APIクレジットが付帯</p>
+    <p class="news-body">サブスクリプション利用者向けに毎月のAPIクレジットが含まれるようになった。サブスクとAPI開発を別契約にしていた場合の費用見直し材料になる。付与額は公式の「API credits for Max and Team plans」ページを参照。</p>
+    <p class="news-meta"><span>Source: Claude Platform Release Notes（2026-10-07）</span></p>
+  </div>
+  <div class="news-card">
+    <p class="news-title"><span class="badge badge-red">仕様変更</span>Managed Agents：limitedネットワークがweb_search／web_fetchにも適用、web_fetchは既出URLのみに制限</p>
+    <p class="news-body">`allowed_hosts` が `web_search`／`web_fetch` に適用され、許可外ホストへの `web_fetch` は `url_not_allowed` を返す。`allowed_hosts` は `*.` で始まらない限り完全一致で、`docs.example.com` は `["example.com"]` に含まれない。また `web_fetch` はセッション内に既に現れたURL（ユーザー発言・検索結果・取得済みページ）に限定され、それ以外は `url_not_in_prior_context` となる。既存エージェントの挙動が変わり得るため要確認。</p>
+    <p class="news-meta"><span>Source: Claude Platform Release Notes（2026-10-07）</span></p>
+  </div>
+  <div class="news-card">
+    <p class="news-title"><span class="badge badge-red">更新</span>Claude Code v2.1.293：Haiku 5.5を既定のHaikuに、MCPのメモリリーク等を修正</p>
+    <p class="news-body">Anthropic API上の既定Haikuを `claude-haiku-5-5` に変更。HTTP MCP接続が送信済みリクエストを閉じるまで保持するメモリリークを修正し、コンパクション後に自分の過去の操作を「完了済み」と扱う問題も修正。TeamとEnterpriseでは、ポリシー／管理設定をより早く取得するよう起動を改善。</p>
+    <p class="news-meta"><span>Source: GitHub anthropics/claude-code releases（2026-10-07）</span></p>
   </div>
 
+  <div class="section-label">🟠 GPT / OpenAI / Codex</div>
+
+  <div class="news-card">
+    <p class="news-title"><span class="badge badge-orange">更新</span>Codex CLI 0.161.0：GPT-6.1 Solが既定モデルに、`/mcp login` を追加</p>
+    <p class="news-body">バンドルおよびAmazon Bedrockのカタログで既定モデルがGPT-6.1 Solに。`/mcp login <name>` でターミナルからMCPサーバーにサインインでき、`codex exec --cyber-access-program` でターン単位にCyberアクセスプログラムを選択可能。音声会話ではマイク・スピーカー・入力チャンネルを選べる。ファイルシステム権限の昇格や再接続時の権限保持などの修正も含む。</p>
+    <p class="news-meta"><span>Source: GitHub openai/codex releases（2026-10-07）</span></p>
+  </div>
+
+  <div class="news-card">
+    <p class="news-meta"><span>巡回した一次ソース: anthropic.com/news、Claude Platform Release Notes、GitHub（claude-code / codex / openclaw / hermes-agent）。OpenAI・xAI・Google公式サイトは取得不可、中国系LLM・動画生成・Adobe系は検索でも当日付の新着を確認できず</span></p>
+  </div>
 
   <!-- Footer -->
   <div class="footer-nav">
