@@ -50,6 +50,7 @@ class Page(HTMLParser):
 
 def main():
     catalog = json.loads((ROOT / "research/refresh-2026-10-13/catalog.json").read_text())
+    baseline_html = {entry["path"] for entry in catalog["pages"]}
     def git_paths(*args):
         return set(x.decode("utf-8") for x in subprocess.check_output(["git", *args, "-z"], cwd=ROOT).split(b"\0") if x)
     tracked = git_paths("ls-files")
@@ -70,7 +71,7 @@ def main():
         if page.stack: issues.append({"path": path, "issue": "unclosed_tags:" + ",".join(page.stack)})
         if page.headings["h1"] != 1: issues.append({"path": path, "issue": "h1_count:" + str(page.headings["h1"])})
         if DATE not in data: issues.append({"path": path, "issue": "missing_refresh_date"})
-        if path in tracked and BASE not in data:
+        if path in baseline_html and BASE not in data:
             issues.append({"path": path, "issue": "missing_pinned_old_version"})
         if not re.search(r"<title[ >]", data): issues.append({"path": path, "issue": "missing_title"})
         if not re.search(r"name=[\"']viewport[\"']", data): issues.append({"path": path, "issue": "missing_viewport"})
