@@ -1,0 +1,208 @@
+{
+  "schema_version": 1,
+  "checked_on": "2026-10-13",
+  "status": "AUTHOR_SOURCE_RECONCILED_PENDING_INDEPENDENT_REVIEW",
+  "independent_audit": false,
+  "scope": "公開ハブの編集・保守・教材。内部組織の命令・権限・予算・canon・実行環境は新規本文の対象外",
+  "baseline_commit": "4535dd63a3b2acf62ec793c02c9f8dbffabeece5",
+  "pages": [
+    "foundations/agent-protocol.html",
+    "foundations/align-lab-context.html",
+    "foundations/anti-patterns.html",
+    "foundations/archive-policy.html",
+    "foundations/operating-principles.html",
+    "foundations/definition-of-done.html",
+    "foundations/multi-instance-protocol.html",
+    "foundations/onboarding-checklist.html",
+    "foundations/decisions.html",
+    "foundations/glossary.html",
+    "foundations/style-guide.html",
+    "_routines/session-start.html",
+    "_routines/hub-health-check.html",
+    "_routines/link-checker.html",
+    "_routines/llm-tracker-update.html",
+    "_routines/ai-tools-map-update.html",
+    "_routines/index.html",
+    "workbench/vibe-coding-guide/index.html",
+    "_routines/news-template.html"
+  ],
+  "method": "本文は現行編集設計として再構成。架空例は明記。外部事実は下記 actual fetch / 明示再利用のみ。過去ADRの採択や内容を捏造改定しない。",
+  "repository_sources": [
+    {
+      "path": "README.md",
+      "read": "full_current_file",
+      "supports": [
+        "公開AIハブ",
+        "現行トラッカーと方法記事と履歴の分離",
+        "source mapは著者確認で独立監査ではない"
+      ]
+    },
+    {
+      "path": "CLAUDE.md",
+      "read": "full_current_file",
+      "supports": [
+        "既存差分保全",
+        "primaryactualfetch",
+        "権限拒否の迂回禁止",
+        "local/commit/push/merge/deploy別",
+        "非公開clone自動指示なし"
+      ]
+    },
+    {
+      "path": "research/refresh-2026-10-13/EDITORIAL_CONTRACT.md",
+      "read": "full_current_file",
+      "supports": [
+        "ゼロベース本文",
+        "baseline固定旧版",
+        "用途・仕組み・選択・例・失敗・評価",
+        "nonbinding候補配送とdomain判断分離"
+      ]
+    },
+    {
+      "path": "_routines/daily-news.md",
+      "read": "full_current_file",
+      "supports": [
+        "research/ai-news/YYYY-MM-DD.html",
+        "DATE/DATE_JP/NEWS_ITEMS",
+        "news-list/date-tag/latestNEW出力",
+        "実自動設定は今回未変更"
+      ],
+      "gaps": [
+        "intro/注意はdirectmainpush、Step6はbranchpush→PR即mergeで表記矛盾",
+        "実際のスケジュール・当日の自動実行は観測していない"
+      ],
+      "edited": false
+    },
+    {
+      "path": "scripts/check-knowledge-links.py",
+      "read": "full_current_file",
+      "supports": [
+        "localtargets存在確認",
+        "externalURL列挙のみ",
+        "strict対象8旧記事限定",
+        "指定HTML検査は読み取り"
+      ],
+      "edited": false
+    },
+    {
+      "path": "research/refresh-2026-10-13/model-ledger.json",
+      "read": "current_schema_and_initial_rows",
+      "supports": [
+        "current tracker台帳入口",
+        "scope網羅保証なし",
+        "provider/model/surface/stage/gaps構造"
+      ],
+      "notes": "現行モデル名をこのcohort本文へ複製しない"
+    },
+    {
+      "path": "foundations/decisions.html @ fixed baseline",
+      "read": "old_titles_and_anchors_before_rewrite",
+      "supports": [
+        "旧ADR001〜014意味付き固定入口",
+        "既存inboundアンカー維持"
+      ],
+      "notes": "過去採択再認定や内部指示を移植しない"
+    }
+  ],
+  "sources": [
+    {
+      "id": "w3c-page-structure",
+      "url": "https://www.w3.org/WAI/tutorials/page-structure/",
+      "fetch": "actual_page_fetched",
+      "checked_on": "2026-10-13",
+      "pages": [
+        "foundations/definition-of-done.html",
+        "workbench/vibe-coding-guide/index.html"
+      ],
+      "supported_claims": [
+        "論理的見出し、意味のある領域・要素、本文へ進む読み方"
+      ]
+    },
+    {
+      "id": "w3c-headings",
+      "url": "https://www.w3.org/WAI/tutorials/page-structure/headings/",
+      "fetch": "actual_page_fetched",
+      "checked_on": "2026-10-13",
+      "pages": [
+        "foundations/style-guide.html"
+      ],
+      "supported_claims": [
+        "見出しは構成を伝え、論理的に階層化"
+      ],
+      "notes": "h1一つは本ハブ規約でW3C普遍義務と断定しない"
+    },
+    {
+      "id": "w3c-tables",
+      "url": "https://www.w3.org/WAI/tutorials/tables/",
+      "fetch": "actual_page_fetched",
+      "checked_on": "2026-10-13",
+      "pages": [
+        "foundations/style-guide.html",
+        "foundations/definition-of-done.html"
+      ],
+      "supported_claims": [
+        "th/tdと関係の明示",
+        "scope等の関連付け",
+        "レイアウト用tableを避ける"
+      ]
+    },
+    {
+      "id": "git-worktree",
+      "url": "https://git-scm.com/docs/git-worktree",
+      "fetch": "actual_page_fetched",
+      "checked_on": "2026-10-13",
+      "pages": [
+        "foundations/multi-instance-protocol.html"
+      ],
+      "supported_claims": [
+        "同一repo複数workingtrees",
+        "複数branch checkoutの仕組み"
+      ],
+      "notes": "作成/削除は実行していない。sharedfile統合の保証なしは編集方法の注意"
+    },
+    {
+      "id": "github-secret-removal",
+      "url": "https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository",
+      "fetch": "explicit_reuse_actual_fetch_map",
+      "reuse_from": "research/refresh-2026-10-13/dev-local-sources.json#github-secret-removal",
+      "checked_on": "2026-10-13",
+      "pages": [
+        "foundations/archive-policy.html"
+      ],
+      "supported_claims": [
+        "削除だけで古いcommit/cloneから消えるとは限らない",
+        "secret漏洩は通常archive整理と別対応"
+      ]
+    }
+  ],
+  "validation": {
+    "type": "author_check_not_independent_audit",
+    "html_count": 19,
+    "one_title_and_h1": true,
+    "balanced_tags": true,
+    "no_duplicate_ids": true,
+    "local_links_and_anchors": true,
+    "news_template_resolution_base": "research/ai-news/YYYY-MM-DD.html",
+    "existing_placeholders": [
+      "DATE",
+      "DATE_JP",
+      "NEWS_ITEMS"
+    ],
+    "placeholder_set_unchanged": true,
+    "host_paths_in_new_body": 0
+  },
+  "gaps": [
+    "実際のニュース自動設定未確認/未変更",
+    "daily-news.md公開反映表記矛盾は未変更で統合担当へ通知",
+    "provider/runtime性能/価格実測なし",
+    "外部fetchは公式文書確認でアカウント利用確認ではない",
+    "独立audit待ち"
+  ],
+  "effects": {
+    "git_mutation": false,
+    "provider_inference": false,
+    "NAS_change": false,
+    "credential_change": false,
+    "publication": false
+  }
+}

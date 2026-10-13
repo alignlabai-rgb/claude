@@ -1,0 +1,536 @@
+{
+  "schema_version": 1,
+  "audit_kind": "independent_non_author_primary_source_audit",
+  "auditor": "refresh_google",
+  "checked_at": "2026-10-13",
+  "repository": "claude-knowledge-hub",
+  "excluded_authored_cohorts": [
+    "google",
+    "creative-production",
+    "claude-design"
+  ],
+  "overall_result": "SAMPLED_CLAIMS_SUPPORTED_AFTER_AUTHOR_REVISION",
+  "scope": "他担当執筆のAnthropic/Claude Code・Claw Stackから重要主張25件を抽出。独立に本文を読み、公式一次情報を再取得して照合。全ページ・全主張の認定ではない。",
+  "claims": [
+    {
+      "id": "AC01",
+      "articles": [
+        "workbench/knowledge/claude-model.html:7"
+      ],
+      "claim": "通常用途の出発点はOpus 5.5、難しい推論・長時間作業で評価不足ならFable 5.1という提供側の選択案内。",
+      "sources": [
+        {
+          "url": "https://platform.claude.com/docs/en/models/overview",
+          "locator": "Compare models, lines 55-65"
+        }
+      ],
+      "assessment": "SUPPORTED",
+      "reason": "現行overviewの選択条件・モデル系列・API IDを確認。提供側の推奨を万能な費用優位として書いていない。"
+    },
+    {
+      "id": "AC02",
+      "articles": [
+        "workbench/knowledge/claude-mythos.html:6",
+        "workbench/knowledge/claude-model.html:24"
+      ],
+      "claim": "Mythos 5.1はActiveだがverification required。claude-mythos-5-1、Fable 5.1と同じ仕様・料金、検証済み組織向け。",
+      "sources": [
+        {
+          "url": "https://platform.claude.com/docs/en/models/mythos-5-1/overview",
+          "locator": "Overview lines 48-80; Availability lines 148-158"
+        }
+      ],
+      "assessment": "SUPPORTED",
+      "reason": "Activeと一般提供を分離している。通常有料プランの購入だけで使えると主張していない。"
+    },
+    {
+      "id": "AC03",
+      "articles": [
+        "workbench/knowledge/claude-model.html:18",
+        "workbench/knowledge/claude-model.html:26"
+      ],
+      "claim": "Opus 5.5はclaude-opus-5-5、標準API入力$4/出力$20 MTok、1M context/128K output。300K outputはBatch API betaの別条件。",
+      "sources": [
+        {
+          "url": "https://platform.claude.com/docs/en/models/opus-5-5/overview",
+          "locator": "Overview lines 57-75; Capabilities lines 128-141; Good to know lines 169-171"
+        }
+      ],
+      "assessment": "SUPPORTED",
+      "reason": "300Kを通常リクエスト上限へ置換していない。公式はoutput-300k-2026-03-24 beta headerを指定。"
+    },
+    {
+      "id": "AC04",
+      "articles": [
+        "workbench/knowledge/claude-model.html:39",
+        "research/claude-recent-updates.html:25"
+      ],
+      "claim": "Opus移行にはthinking無効化不可、forced tool use、thinking block継続、旧computer tool、tool間進捗表示の変更がある。",
+      "sources": [
+        {
+          "url": "https://platform.claude.com/docs/en/models/opus-5-5/overview",
+          "locator": "Overview lines 77-78"
+        }
+      ],
+      "assessment": "SUPPORTED",
+      "reason": "旧computer_20251124拒否はClaude APIとGoogle Cloudの条件、進捗表示はdefault displayでthinking textが空になる変更として公式確認。記事はmodel IDだけの置換を薦めない。"
+    },
+    {
+      "id": "AC05",
+      "articles": [
+        "workbench/knowledge/claude-model.html:20",
+        "workbench/knowledge/claude-model.html:23",
+        "research/claude-recent-updates.html:19"
+      ],
+      "claim": "Haiku 5.5の入力/出力料金はprompt100k以下$0.10/$0.50、100k超$0.50/$2.50。境界は入力長でcache reads/writesも含む。",
+      "sources": [
+        {
+          "url": "https://platform.claude.com/docs/en/models/haiku-5-5/overview",
+          "locator": "Pricing lines 109-121"
+        },
+        {
+          "url": "https://platform.claude.com/docs/en/about-claude/pricing",
+          "locator": "Long context pricing lines 228-229"
+        }
+      ],
+      "assessment": "SUPPORTED",
+      "reason": "100k超のtierを出力長の条件と混同していない。"
+    },
+    {
+      "id": "AC06",
+      "articles": [
+        "research/claude-recent-updates.html:18"
+      ],
+      "claim": "現在Sonnet 5.5のcache readは$0.10 MTok、9/28発表は$0.20。",
+      "sources": [
+        {
+          "url": "https://platform.claude.com/docs/en/about-claude/pricing",
+          "locator": "Model pricing line 64; Prompt caching lines 166-168"
+        },
+        {
+          "url": "https://www.anthropic.com/claude-sonnet-5-5",
+          "locator": "September 28, 2026; Cost lines 32 and 220-225"
+        }
+      ],
+      "assessment": "SUPPORTED",
+      "reason": "告知時点と現行料金表を分けた記述が妥当。変更の正確な施行日はこの比較だけでは認定しない。"
+    },
+    {
+      "id": "AC07",
+      "articles": [
+        "research/claude-recent-updates.html:22",
+        "research/claude-recent-updates.html:23"
+      ],
+      "claim": "Max5x月$100、Max20x月$200、Team seat合算上限$500のAPI credit。Console orgをlinkしてclaimし、API/Managed Agents/Agent SDK/Playgroundが対象、Code/app extra usage/他cloudは対象外。期限とrolloverも別管理。",
+      "sources": [
+        {
+          "url": "https://platform.claude.com/docs/en/about-claude/api-credits-for-subscribers",
+          "locator": "At a glance lines 51-80; Claim lines 85-115; coverage/expiry lines 119-136"
+        }
+      ],
+      "assessment": "SUPPORTED",
+      "reason": "金額と使用面が一致。Free/Pro/Enterprise対象外、新規eligible planは7日後、TeamはStandard$20/Premium$100 seat、link権限が別に必要という詳細は原資料にある。記事から契約済み・claim済みとは推定していない。"
+    },
+    {
+      "id": "AC08",
+      "articles": [
+        "research/claude-recent-updates.html:35",
+        "workbench/knowledge/claude-model.html:40",
+        "workbench/knowledge/claude-mythos.html:9"
+      ],
+      "claim": "Sonnet4.5は11/30退役予定でSonnet5.5へ移行。MythosPreviewはDeprecated/退役TBA。Haiku4.5のnot sooner than10/15は退役告知ではない。提供面別日程。",
+      "sources": [
+        {
+          "url": "https://platform.claude.com/docs/en/about-claude/model-deprecations",
+          "locator": "Overview line 65; Model status lines 108-124; history lines 131-137"
+        }
+      ],
+      "assessment": "SUPPORTED",
+      "reason": "Anthropic運営のAPI/Platform on AWS/Foundryと、Bedrock/Google独自日程を正しく区別。"
+    },
+    {
+      "id": "AC09",
+      "articles": [
+        "workbench/knowledge/claude-mythos.html:17"
+      ],
+      "claim": "拡張CVPはDefense/Red Team/Specializedの三層。通常レビュー・既知問題の修正・所有ソースの問題探索は一般提供モデルでも継続可能。",
+      "sources": [
+        {
+          "url": "https://www.anthropic.com/news/cyber-verification-program",
+          "locator": "New access tiers lines 23-35; publication Oct 6, 2026"
+        }
+      ],
+      "assessment": "SUPPORTED",
+      "reason": "用途と検証条件を限定し、すべてのsecurity作業にMythosが必須とはしていない。"
+    },
+    {
+      "id": "AC10",
+      "articles": [
+        "workbench/knowledge/claude-code/computer-use.html:3"
+      ],
+      "claim": "CLI computer useはmacOS research preview、Pro/Max、interactive session条件。API/desktopとは別面。",
+      "sources": [
+        {
+          "url": "https://code.claude.com/docs/en/computer-use",
+          "locator": "Intro lines 37-42; Enable lines 70-98"
+        }
+      ],
+      "assessment": "SUPPORTED",
+      "reason": "公式はTeam/Enterpriseと非interactive -pでは利用不可と明記。記事はこのCLI条件を他面へ一括適用していない。"
+    },
+    {
+      "id": "AC11",
+      "articles": [
+        "workbench/knowledge/claude-code/routines.html:2"
+      ],
+      "claim": "cloud routine作成はCLI /schedule（alias /routines）v2.1.225+、管理list/update/runはv2.1.227+。session内は /loop・Cron*、Desktop Local taskは端末上。",
+      "sources": [
+        {
+          "url": "https://code.claude.com/docs/en/routines",
+          "locator": "Create from CLI lines 135-138; Intro lines 37-46"
+        },
+        {
+          "url": "https://code.claude.com/docs/en/scheduled-tasks",
+          "locator": "Run repeatedly with /loop lines 65-72; Manage tasks lines 172-177"
+        },
+        {
+          "url": "https://code.claude.com/docs/en/desktop-scheduled-tasks",
+          "locator": "Intro line 84; How tasks run lines 139-147"
+        }
+      ],
+      "assessment": "SUPPORTED_AFTER_REVISION",
+      "reason": "著者修正後の4頁を独立再read。公式Create from CLIとManage routinesの版条件、session schedulingの復元例外、実行面の区別と一致。",
+      "proposed_fix": "冒頭を『クラウドRoutinesはWeb/Desktop/CLIの /scheduleから作成。DesktopのLocal scheduled taskは端末上、CLIの /loop・Cron*は開いているセッション内』と明示。",
+      "initial_assessment": "NEEDS_CLARIFICATION",
+      "original_claim": "『CLIのscheduleはsession内の仕組み』という対比。",
+      "recheck_articles": [
+        "workbench/knowledge/claude-code/routines.html:2",
+        "demos/routines-deep-dive.html:3",
+        "Operations_Manuals/ClaudeCode_Operation/index.html:11",
+        "workbench/knowledge/claude-code/glossary.html:7"
+      ]
+    },
+    {
+      "id": "AC12",
+      "articles": [
+        "workbench/knowledge/claude-code/routines.html:2",
+        "workbench/knowledge/claude-code/routines.html:7",
+        "workbench/knowledge/claude-code/routines.html:10"
+      ],
+      "claim": "Routinesはresearch preview、schedule/API/GitHub event。fire textはuntrusted payload。緑statusはinfrastructure成功で業務成功ではない。",
+      "sources": [
+        {
+          "url": "https://code.claude.com/docs/en/routines",
+          "locator": "Intro lines 37-46; payload lines 201-204; View runs lines 305-308"
+        }
+      ],
+      "assessment": "SUPPORTED",
+      "reason": "保存済みpromptとrun-specific payloadを分ける記事の注意と一致。緑表示から成果採用へ飛躍していない。"
+    },
+    {
+      "id": "AC13",
+      "articles": [
+        "workbench/knowledge/claude-code/architecture.html:10",
+        "workbench/knowledge/claude-code/antipatterns.html:12"
+      ],
+      "claim": "checkpointはbackupではなく、Bash変更や通常subagent編集等の復旧に制約。",
+      "sources": [
+        {
+          "url": "https://code.claude.com/docs/en/checkpointing",
+          "locator": "Limitations lines 117-144"
+        }
+      ],
+      "assessment": "SUPPORTED",
+      "reason": "Bash変更は追跡外、通常subagent編集はcheckpointに入らない。foreground forked skill例外があるため記事の『通常』という限定が重要。"
+    },
+    {
+      "id": "AC14",
+      "articles": [
+        "workbench/knowledge/claude-code/agent-teams.html:2"
+      ],
+      "claim": "Agent Teamsはexperimental/既定無効、teammateは独立contextで相互連絡、再開/task/終了に制約。",
+      "sources": [
+        {
+          "url": "https://code.claude.com/docs/en/agent-teams",
+          "locator": "Intro lines 79-81; Limitations lines 524-531"
+        }
+      ],
+      "assessment": "SUPPORTED",
+      "reason": "一時的な実験機能を常設組織・全環境の保証にしていない。"
+    },
+    {
+      "id": "AC15",
+      "articles": [
+        "workbench/knowledge/openclaw/index.html:6"
+      ],
+      "claim": "現在のOpenClaw Node要件は24.16+または26.1+、Node26推奨。",
+      "sources": [
+        {
+          "url": "https://docs.openclaw.ai/start/getting-started",
+          "locator": "What you need lines 652-659"
+        }
+      ],
+      "assessment": "SUPPORTED",
+      "reason": "旧Node20要件を現行から外した更新が公式現況と一致。インストールは未実行。"
+    },
+    {
+      "id": "AC16",
+      "articles": [
+        "workbench/knowledge/openclaw/mission-control.html:12"
+      ],
+      "claim": "現在の名前はAutomations、openclaw cronは同じcommand群のalias。",
+      "sources": [
+        {
+          "url": "https://docs.openclaw.ai/automation/cron-jobs",
+          "locator": "Intro lines 645-652"
+        }
+      ],
+      "assessment": "SUPPORTED",
+      "reason": "旧URL cron-jobsの保持と現行製品名称を分けている。"
+    },
+    {
+      "id": "AC17",
+      "articles": [
+        "workbench/knowledge/openclaw/mission-control.html:6",
+        "workbench/knowledge/openclaw/mission-control.html:10"
+      ],
+      "claim": "ControlUIはGatewayが配信するSPA、Gateway WebSocketへ直接接続。再接続のcached rowsはsession変更権限にならない。",
+      "sources": [
+        {
+          "url": "https://docs.openclaw.ai/web/control-ui",
+          "locator": "Intro lines 651-658; cached reconnect lines 665-673"
+        }
+      ],
+      "assessment": "SUPPORTED",
+      "reason": "cached表示とlive操作権限の区別が公式に明記される。UIで見えていることだけから変更成功を認定していない。"
+    },
+    {
+      "id": "AC18",
+      "articles": [
+        "workbench/knowledge/openclaw/index.html:6"
+      ],
+      "claim": "OpenClaw sandboxは既定off。tool executionを移すものでGateway本体はhostに残る。",
+      "sources": [
+        {
+          "url": "https://docs.openclaw.ai/gateway/sandboxing",
+          "locator": "Intro lines 653-656"
+        }
+      ],
+      "assessment": "SUPPORTED",
+      "reason": "containerを使えば全体が完全隔離されるという旧説明を引き継いでいない。"
+    },
+    {
+      "id": "AC19",
+      "articles": [
+        "claw-stack/nanoclaw/index.html:6"
+      ],
+      "claim": "NanoClawはNode.js hostがchannels/routingを担い、active sessionごとにDocker container、SQLite対で入力/出力を受渡す。",
+      "sources": [
+        {
+          "url": "https://docs.nanoclaw.dev/concepts/architecture",
+          "locator": "Intro lines 91-98; shipped storage lines 187-193"
+        }
+      ],
+      "assessment": "SUPPORTED",
+      "reason": "hostの配送とcontainer内agentを区別している。SQLite pairはshipped実装の説明であり、他transportの一般保証ではない。"
+    },
+    {
+      "id": "AC20",
+      "articles": [
+        "claw-stack/nanoclaw/index.html:8"
+      ],
+      "claim": "同一agent groupではsessionを分けてもfiles/memoryとgroup内history取得を共有。秘密領域はgroupを分ける。",
+      "sources": [
+        {
+          "url": "https://docs.nanoclaw.dev/concepts/isolation-levels",
+          "locator": "Isolation table lines 96-101; same-group warning lines 117-119"
+        }
+      ],
+      "assessment": "SUPPORTED",
+      "reason": "thread/session名をconfidentiality boundaryと扱わない記述が現行公式と一致。"
+    },
+    {
+      "id": "AC21",
+      "articles": [
+        "claw-stack/nanoclaw/index.html:10"
+      ],
+      "claim": "NanoClawの外向き通信は既定open、egress lockdownは別hardening。",
+      "sources": [
+        {
+          "url": "https://docs.nanoclaw.dev/operate/hardening",
+          "locator": "Network egress lines 99-105"
+        }
+      ],
+      "assessment": "SUPPORTED",
+      "reason": "コンテナの存在からインターネット遮断を推定していない。"
+    },
+    {
+      "id": "AC22",
+      "articles": [
+        "claw-stack/picoclaw/index.html:6",
+        "claw-stack/picoclaw/index.html:12"
+      ],
+      "claim": "PicoClawは独立したGo実装でOpenClaw/NanoBot forkではない。READMEは未解決securityとv1.0前production導入を警告。",
+      "sources": [
+        {
+          "url": "https://github.com/sipeed/picoclaw",
+          "locator": "README lines 237-251"
+        }
+      ],
+      "assessment": "SUPPORTED",
+      "reason": "低memory比較を独立実測や成熟保証として転記せず、最近build10-20MBの条件も記事に残す。"
+    },
+    {
+      "id": "AC23",
+      "articles": [
+        "claw-stack/picoclaw/index.html:10"
+      ],
+      "claim": "PicoClaw .security.ymlは構造/field名のdirect mapping、ref: string参照ではない。",
+      "sources": [
+        {
+          "url": "https://github.com/sipeed/picoclaw/blob/main/docs/security/security_configuration.md",
+          "locator": "How it works lines 210-218"
+        }
+      ],
+      "assessment": "SUPPORTED",
+      "reason": "現行公式設定方式と一致。実keyやsecretを記事へ導入していない。"
+    },
+    {
+      "id": "AC24",
+      "articles": [
+        "workbench/knowledge/hermes-agent.html:8"
+      ],
+      "claim": "Hermes MEMORY.md/USER.mdはbounded curated memory、session開始時frozen snapshot。複数processで同じHermes homeを共有しない。",
+      "sources": [
+        {
+          "url": "https://hermes-agent.nousresearch.com/docs/user-guide/features/memory",
+          "locator": "How it works lines 52-67; frozen snapshot lines 95-101"
+        }
+      ],
+      "assessment": "SUPPORTED",
+      "reason": "記憶保存の自己申告を永続化証明と扱わず、プロファイルとsession境界を分離している。"
+    },
+    {
+      "id": "AC25",
+      "articles": [
+        "workbench/knowledge/hermes-agent.html:12"
+      ],
+      "claim": "Hermesは危険command承認modeとcron/single-query/unattended設定を分ける。denylist等はOS完全隔離ではない。",
+      "sources": [
+        {
+          "url": "https://hermes-agent.nousresearch.com/docs/user-guide/security",
+          "locator": "Approval modes lines 62-98; Defense-in-depth lines 364-366"
+        }
+      ],
+      "assessment": "SUPPORTED",
+      "reason": "cron_mode/single_query_mode/unattended_modeの既定denyとmode smart/manual/offが別。file write guardsはwrite_file/patch限定でterminalは同OSuser、という公式の能力境界を記事は安全保証へ拡大していない。"
+    }
+  ],
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "P2",
+      "claim_id": "AC11",
+      "status": "RESOLVED_AFTER_AUTHOR_REVISION",
+      "file": "workbench/knowledge/claude-code/routines.html",
+      "line": 2,
+      "impact": "読者が /schedule をセッション内と誤認すると、実行場所・persist条件・データ境界を逆に判断する。",
+      "correction_owner": "root/author",
+      "auditor_changed_article": false,
+      "original_status": "MAIN_BOUNDARY_CORRECTED_VERSION_DETAIL_PENDING",
+      "resolution": "著者が修正し監査者が独立再read。実行面と作成225/管理227を明示。"
+    },
+    {
+      "id": "F02",
+      "severity": "P2",
+      "claim_id": "AC11",
+      "status": "RESOLVED_AFTER_AUTHOR_REVISION",
+      "files": [
+        "workbench/knowledge/claude-code/routines.html",
+        "demos/routines-deep-dive.html",
+        "Operations_Manuals/ClaudeCode_Operation/index.html"
+      ],
+      "impact": "修正文のv2.1.225以降で作成・管理という断定は、公式の管理操作v2.1.227条件を取り落としていた。",
+      "source_url": "https://code.claude.com/docs/en/routines",
+      "evidence_locator": "Create from CLI line 138; Manage from CLI lines 324-326",
+      "proposed_fix": "作成v2.1.225+、管理v2.1.227+を分離。",
+      "auditor_changed_article": false,
+      "original_status": "REPORTED_TO_AUTHOR_AND_ROOT",
+      "resolution": "著者が修正し監査者が独立再read。実行面と作成225/管理227を明示。"
+    }
+  ],
+  "summary": {
+    "sampled_claims": 25,
+    "supported_without_revision": 24,
+    "supported_after_revision": 1,
+    "open_findings": 0,
+    "resolved_findings": 2,
+    "unverified_sampled_claims": 0,
+    "primary_sources_unique": 26,
+    "author_pages_audited": 0
+  },
+  "source_acquisition": {
+    "method": "既存source mapはURL選択の補助だけ。実際の公式page取得と本文照合で判定。各claims.sourcesのURLは今回再取得済み。",
+    "all_claim_sources_refetched": true,
+    "errors": [
+      {
+        "url": "https://www.anthropic.com/news/claude-sonnet-5-5",
+        "result": "Internal Error",
+        "context": "監査者が推測した非map URL。再試行せず、既存map記載の正規発表URL /claude-sonnet-5-5を取得。",
+        "permission_denial": false
+      }
+    ],
+    "denial_bypass": false
+  },
+  "limits": [
+    "25重要主張の抽出監査。対象群の全文章・全外部link・全地域/plan・全releaseを網羅した証明ではない。",
+    "公式現況と記事の整合を確認した。性能比較、実環境の導入、実際の請求・契約・資格・動作は検証していない。",
+    "独立fact auditはproducer自己ACCEPTでも公開承認でもない。抽出したfindingは著者修正後に再readして閉じた。全体の統合・公開判断はparentが担当。"
+  ],
+  "effects": {
+    "article_writes": 0,
+    "provider_execution": 0,
+    "credential_changes": 0,
+    "nas_writes": 0,
+    "external_publication": 0,
+    "git_write_operations": 0
+  },
+  "recheck": {
+    "checked_at": "2026-10-13",
+    "files_read": [
+      "workbench/knowledge/claude-code/routines.html",
+      "demos/routines-deep-dive.html",
+      "Operations_Manuals/ClaudeCode_Operation/index.html",
+      "workbench/knowledge/claude-code/glossary.html"
+    ],
+    "confirmed": [
+      "/schedule cloudと/loop・Cron* sessionの区別",
+      "保存済みpromptは割当task、fire textはuntrustedの区別",
+      "session taskの--resume復元例外",
+      "作成v2.1.225+とlist/update/run管理v2.1.227+の区別"
+    ],
+    "pending": [],
+    "file_pins": [
+      {
+        "path": "workbench/knowledge/claude-code/routines.html",
+        "bytes": 8094,
+        "sha256": "f0bcdcc5a2051360abccfa0e2109765a67c6691394293eaeff8f5918a180750b"
+      },
+      {
+        "path": "demos/routines-deep-dive.html",
+        "bytes": 8383,
+        "sha256": "d3f1fc4f343073b3952752afe21e3f4145440b9315c3b63afd0941bb1f82268e"
+      },
+      {
+        "path": "Operations_Manuals/ClaudeCode_Operation/index.html",
+        "bytes": 8376,
+        "sha256": "d9dad8ed5d3ffdbe52e60e4a77e039355b940d0f384e077a47a975b7535e94ff"
+      },
+      {
+        "path": "workbench/knowledge/claude-code/glossary.html",
+        "bytes": 7205,
+        "sha256": "04d105748464344d4eeffce59d7299339d4687292d6d069f703d3be0faaec3b9"
+      }
+    ]
+  }
+}

@@ -1,57 +1,10 @@
 <!doctype html>
-<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Context Engineering — 根拠を選び、判断を再現する | Workbench Knowledge</title><link rel="stylesheet" href="deep-dive.css"></head><body><a class="skip" href="#main">本文へ</a><main class="shell" id="main">
-<header class="panel"><p><a href="index.html">← Knowledge</a> / <a href="../index.html">Workbench</a> / <a href="../../index.html">Hub Top</a></p><p class="eyebrow">Engineering deep dive · 本文改訂 2026-10-03</p><h1>Context Engineering<br>根拠を選び、判断を再現する</h1>
-<p class="lead">プロンプトだけでなく、指示・検索結果・記憶・ツール出力・進行状態のうち、何を、いつ、どの権威でモデルへ渡すかを設計します。目標は最大量の入力ではなく、必要な根拠を欠かさず、関係のない情報や古い判断に引きずられないことです。</p>
-<p class="notice">本稿の七つの区分、予算例、評価方法は実務用の整理です。普遍的な標準や効果保証ではありません。旧版の未裏付けの時短率・成功率を除き、公式一次情報と再現可能な架空例へ改訂しています。</p><nav aria-label="目次"><ul><li><a href="#contract">情報契約</a></li><li><a href="#layers">七つの区分</a></li><li><a href="#retrieval">取得と圧縮</a></li><li><a href="#evaluation">評価</a></li><li><a href="#examples">実践例</a></li><li><a href="#sources">資料</a></li></ul></nav></header>
-<section class="panel" id="contract"><h2>1. 窓を埋める前に、判断の情報契約を作る</h2>
-<p><a href="https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents">Anthropicの技術解説</a>は、推論ごとに入る情報全体を選び、維持する問題としてcontext engineeringを説明します。長いウィンドウの存在だけでは、重要事項を拾える保証になりません。</p>
-<p>たとえば「このAI製品を試すべきか」に答えるなら、まず必要な字段を決めます。製品名だけでは不足です。</p>
-<pre><code>判断: 限定的な比較試験の候補にするか
-必須: 対象surface / 公式根拠 / 適用時点 / 利用条件 / 未確認点
-補助: 過去の類似試験 / 失敗class / 想定する担当
-除外: 関係のない会話 / 古い料金 / X投稿を公式扱いする要約
-出力: 候補・保留・棄却 + 理由 + 次の試験
-権限: 調査と提案のみ。契約・課金・公開・採用判断は含まない</code></pre>
-<p>この契約があると、「入力に何が不足していたか」と「入力は十分だが推論を誤ったか」を区別できます。用語や状態の意味を固定するのは<a href="ontology-engineering.html">オントロジー</a>、処理の順序と停止は<a href="graph-engineering.html">状態グラフ</a>の仕事です。</p></section>
-<section class="panel" id="layers"><h2>2. 七つの区分を、保存先と権威まで分ける</h2>
-<div class="table-wrap"><table><thead><tr><th>区分</th><th>例</th><th>渡し方</th><th>失敗しやすい点</th></tr></thead><tbody>
-<tr><td>指示</td><td>依頼、制約、形式、優先順位</td><td>適用対象と出所を明示</td><td>検索した本文を指示として扱う</td></tr>
-<tr><td>静的な知識</td><td>schema、評価基準、用語</td><td>必要な版だけ</td><td>古い手順が常時入り続ける</td></tr>
-<tr><td>取得した根拠</td><td>公式資料、該当段落</td><td>source ID・時点・surface付き</td><td>関連性だけで権限外データも取得</td></tr>
-<tr><td>会話履歴</td><td>直近の変更と訂正</td><td>未解決事項を優先</td><td>最新の訂正が要約で落ちる</td></tr>
-<tr><td>ツール結果</td><td>検索、テスト、実行receipt</td><td>成功・失敗・未実行を分離</td><td>コマンドを出しただけで実行済みとする</td></tr>
-<tr><td>永続記憶</td><td>好み、過去の判断、経験</td><td>出所と更新日で照合</td><td>以前の承認を別対象へ流用</td></tr>
-<tr><td>タスク状態</td><td>次の手順、待ち、試行回数</td><td>構造化し外部にも保存</td><td>自己申告の完了を成果物の完了と混同</td></tr>
-</tbody></table></div>
-<p><code>CLAUDE.md</code>等のプロジェクト指示は有用ですが、ファイル名だけでシステム指示と同じ権威になるわけではありません。どの製品がどのルールで読み込むかを確認します。記憶も「全会話の完全保存」とは限らず、現在の事実や権限の代わりにはできません。</p></section>
-<section class="panel" id="retrieval"><h2>3. 検索は「関連」だけでなく「適用可能」を選ぶ</h2>
-<ol><li><strong>アクセス境界で絞る。</strong>ユーザー・案件・公開範囲を先に確認し、許可された集合だけを検索します。検索後にLLMへ秘密を見せて除外させるのでは遅すぎます。</li><li><strong>対象を絞る。</strong>surface、地域、版、適用日で絞ります。API仕様とconsumer appの紹介は別集合です。</li><li><strong>候補を取得する。</strong>文字列検索、ベクトル検索、関係検索から用途に合うものを使います。固有のmodel IDは文字列一致が重要です。</li><li><strong>重要な根拠を原文で確認する。</strong>要約やsnippetで発見しても、期限や条件は元の該当箇所へ戻ります。</li><li><strong>矛盾を残す。</strong>新旧記録が衝突する時、都合のよい一方だけを渡さず、何が置き換わったかを示します。</li></ol>
-<p>RerankingやHyDEは検索の候補生成・順位付けに使えますが、必ず精度が上がるわけではありません。仮生成した「理想回答」を根拠として混ぜないことが重要です。Microsoft GraphRAGの<a href="https://microsoft.github.io/graphrag/query/overview/">公式query説明</a>も、entity向けのLocalと全体俯瞰向けのGlobal等を分けています。</p>
-<h3>トークン予算は最適値ではなく、計測の仮説</h3>
-<p>たとえば全体の上限から、出力とツール往復に使う枠を確保し、残りを指示・状態・根拠へ配分します。「七区分を均等にする」「長文ほど良い」と固定せず、根拠を削るとどの質問が壊れるかを測ります。文字数はtoken数と同じではありません。</p></section>
-<section class="panel"><h2>4. 圧縮・キャッシュ・記憶は別の問題を解く</h2>
-<p>圧縮はモデルに渡す情報を減らします。キャッシュは同じprefix等の再処理を減らす機構で、内容の正確さを改善するものではありません。永続記憶は将来の作業へ情報を持ち越します。三つをまとめて「賢くなる」と説明すると、原因も失敗も追えなくなります。</p>
-<p><a href="https://developers.openai.com/cookbook/examples/agents_sdk/session_memory">OpenAIのSession Memory例</a>は、直近turnを残す方法と過去を要約する方法を示しています。要約には、訂正、未解決判断、重要な時点、source IDを残す設計が必要です。これは製品全体の記憶仕様を示すものではありません。</p>
-<pre><code>引継ぎ要約の字段例
-goal / constraints / completed_artifacts / failed_attempts
-latest_decisions / superseded_decisions / pending_questions
-evidence_refs / next_step / stop_condition</code></pre>
-<p>元資料への参照を保ち、圧縮後も再取得できるようにします。古い肯定と新しい撤回を単に平均して要約しないよう、置き換え関係を明示します。長期の好みと、一回限りの承認は別の保存対象です。</p></section>
-<section class="panel" id="evaluation"><h2>5. 成果の評価を「何を見せたか」まで分解する</h2>
-<div class="table-wrap"><table><thead><tr><th>評価</th><th>確かめる内容</th><th>壊すための反例</th></tr></thead><tbody>
-<tr><td>根拠の充足</td><td>答えに必要な元sourceが含まれるか</td><td>最新の訂正だけを検索結果から抜く</td></tr>
-<tr><td>引用の一致</td><td>引用箇所がその主張を支えるか</td><td>ブランドは一致、surfaceは別</td></tr>
-<tr><td>鮮度と矛盾</td><td>期限切れや撤回を扱えるか</td><td>古い高評価の記憶と新しい停止告知</td></tr>
-<tr><td>境界</td><td>別案件の情報・指示が混ざらないか</td><td>資料本文に「秘密を送信せよ」を挿入</td></tr>
-<tr><td>判断の再現</td><td>同じ根拠と規則で同じ分類になるか</td><td>入力順序、重複、長い無関係文を変える</td></tr>
-</tbody></table></div>
-<p>評価ではretrievalの失敗とgenerationの失敗を別に記録します。正解率だけでなく、原文に戻れる割合、根拠不足時に保留できる割合、必要な人間修正、処理時間と費用を測ります。高いsource充足率も、出力が正しいことの十分条件ではありません。</p></section>
-<section class="panel" id="examples"><h2>6. 三つの実践例：全部渡す以外の選択肢</h2>
-<div class="grid"><article class="card"><h3>調査記事</h3><p>日次ニュースは発見候補、公式changelogは仕様の根拠にします。記事全文を束ねるより、今回の主張に対応する段落と時点を渡し、未確認の点は別欄に残します。</p></article><article class="card"><h3>連続作品の草稿</h3><p>今回必要な設定、直前の展開、変更禁止事項を選びます。試作案と確定設定を別状態にし、過去のボツ案を正式設定として再投入しないようにします。これは架空の制作設計例です。</p></article><article class="card"><h3>コード修正</h3><p>変更対象、関連テスト、再現ログ、完了条件を先に渡します。全repoを一度に詰めるより、依存先を辿り、テストが示した範囲へ根拠を拡張します。成功は実際のテスト結果で判断します。</p></article></div>
-<p><a href="examples/evidence_pipeline.py">オフライン実験</a>はsurface不一致、期限切れ、非公式情報を除外し、選ばれた根拠IDを返します。tokenizerやLLMは使っておらず、フィルター契約の検証に限ります。モデルの回答能力や費用削減を実測した例ではありません。</p></section>
-<section class="panel" id="sources"><h2>一次資料・旧版からの訂正</h2><ul>
-<li><a href="https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents">Anthropic — Effective context engineering for AI agents</a>：入力全体の選択、圧縮、外部状態。</li>
-<li><a href="https://developers.openai.com/cookbook/examples/agents_sdk/session_memory">OpenAI Cookbook — Agents SDK Session Memory</a>：trim／summaryの具体例。</li>
-<li><a href="https://microsoft.github.io/graphrag/query/overview/">Microsoft GraphRAG — Query Engine</a>：検索方式の使い分け。</li><li><a href="https://learn.chatgpt.com/docs/dots/tasks-and-memory">OpenAI — dots Tasks and memory</a>：製品の記憶とcontextの区別。</li></ul>
-<p>旧版の「2025年に命名」「Gartner認定」「特定ツールで作業85%削減」を一般的な成立根拠として使うのをやめました。またモデル世代・料金は本稿に固定せず、<a href="model-generations.html">現行モデル表</a>へ分離しました。</p><p class="small">一次情報確認: 2026-10-03。利用するSDKや製品の記憶仕様、データ権限、評価課題が変わった時に更新します。</p></section>
-<footer class="panel"><h2>関連</h2><p><a href="ontology-engineering.html">Ontology</a> / <a href="graph-engineering.html">Graph</a> / <a href="agent-memory.html">メモリツール旧比較</a> / <a href="harness-engineering.html">Harness</a> / <a href="index.html">Knowledge</a> / <a href="../../index.html">Hub Top</a></p><p class="small">最終更新: 2026-10-03</p></footer></main></body></html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>コンテキスト設計：必要な情報を、使える状態で渡す | Claude Knowledge Hub</title><link rel="stylesheet" href="deep-dive.css"></head><body><a class="skip" href="#main">本文へ</a><main class="shell" id="main">
+<header class="panel"><p><a href="../index.html">← Workbench</a> / <a href="../../index.html">Hub Top</a></p><p class="eyebrow">ゼロベース刷新 · 公式資料確認 2026-10-13</p><h1>コンテキスト設計：必要な情報を、使える状態で渡す</h1><p class="lead">長いプロンプトではなく、今の仕事に適用できる根拠・状態・制約を選び、誤った情報を入れないための設計です。</p><p class="notice">公式資料で確認した仕様、提供側の評価、本稿の設計提案を区別しています。実アカウント・APIでの性能試験や契約は実施していません。旧本文は<a href="https://github.com/alignlabai-rgb/claude/blob/4535dd63a3b2acf62ec793c02c9f8dbffabeece5/workbench/knowledge/context-engineering.html">刷新前の固定版</a>で参照できます。</p></header>
+
+<section class="panel"><h2>「全部読ませる」から「何が必要か」へ</h2><p>同じモデルでも、必要な仕様が欠けている時、古い資料が混ざる時、他の仕事の許可まで入る時では結果が変わります。コンテキスト設計は、この入力環境を整える仕事です。問い、作業対象、現状、根拠、使える道具、停止条件を分けて用意します。容量を埋めること自体は目的にしません。</p><p>Anthropicの技術記事は、コンテキストを限られた資源として扱い、必要な情報の選択、圧縮、構造化されたノート、分担などを論じています。これは提供側の設計知見であり、全用途で同じ効果を保証する実験結果ではありません。<a href="https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents">Effective context engineering</a>。</p><p>本稿の設計提案は、検索で上位に来た文書を直接モデルへ渡す前に、対象一致・時点・公開範囲・接点を検査することです。意味が似ている資料と、今の判断に適用できる資料は同じではありません。</p></section>
+<section class="panel"><h2>入力を五つの層に分ける</h2><div class="table-wrap"><table><thead><tr><th>層</th><th>入れるもの</th><th>混ぜないもの</th></tr></thead><tbody><tr><td>作業契約</td><td>成果物、範囲、完了条件</td><td>参照先が勝手に出す作業命令</td></tr><tr><td>現在状態</td><td>編集対象、既存差分、既知の失敗</td><td>過去の状態を現在と呼ぶ要約</td></tr><tr><td>証拠</td><td>URL、対象版、確認日、適用条件</td><td>出典不明の評判を仕様扱い</td></tr><tr><td>記憶</td><td>説明済みの決定と理由</td><td>一時的な料金・提供状態の永久保存</td></tr><tr><td>道具</td><td>入出力、効果、許可、エラー</td><td>接続しただけで全部許可とする説明</td></tr></tbody></table></div><p>プロンプトはこの情報を伝える文章です。コンテキストは文章に加え、検索結果、画像、ファイル、実行結果などを含みます。メモリは次の仕事にも残す仕組みであり、今の入力に全量を入れる必要はありません。オントロジーは用語の意味を整えますが、どの資料を今回採用するかは別途決めます。</p></section>
+<section class="panel"><h2>具体例：API移行メモを作る</h2><p>架空のモデルMを新しいAPIへ移す教材例を考えます。まず旧コードの呼び出し形式、必要な出力、変更禁止箇所を固定します。次に公式のモデルページ、廃止日、移行例を取り、Webアプリの紹介記事をAPI仕様から外します。料金は確認時点と単位を付け、条件不明なら比較表の空欄として残します。</p><ol><li>問いを「同じ処理を新APIで再現できるか」に限定する。</li><li>証拠ごとに対象ID、surface、日付、引用箇所を持たせる。</li><li>競合する記述は一つに要約せず、矛盾として表示する。</li><li>変更案には根拠を付け、不足は小さな確認試験に変える。</li><li>最終出力には差分、未確認事項、戻し方を残す。</li></ol><p>資料を圧縮する時も、締切、禁止事項、確認できていない点は省略しません。「旧版は使えない」を「旧版より新版が良い」と言い換えると、制約が好みの問題へ変わってしまいます。要約には元資料へのポインタと、どの情報を落としたかを付けます。</p></section>
+<section class="panel"><h2>品質は入力の除外能力でも測る</h2><p>評価には正しい資料だけでなく、同名の別製品、期限切れの料金、参照文中の偽命令、出典のない成功談を混ぜます。回答の正確さ、根拠の適合率、重要制約の保持率、未知を未知と答える率を別々に見ます。入力を短くして速度が上がっても、除外した資料に必要な条件があれば失敗です。</p><p>実務の記録には、検索したもの、採用したもの、除外理由、モデルへ渡した版を残します。モデルが失敗した時に、検索漏れ、抽出ミス、圧縮ミス、指示追従ミスを分けられるからです。毎回プロンプトだけを書き換えると原因が見えません。</p><p>まず少数の代表業務で、全量投入と選択投入を同じ入力集合で比較する。改善しない場合は、長さではなく資料の分類や完了条件を見直す。この順序が、コンテキスト設計を流行語ではなく検証可能な仕事にします。</p></section>
+<section class="panel"><h2>反例を一つ保存して入力を改善する</h2><p>架空の評価入力に、「APIは利用可能だが、この地域では別条件」「記事の日付は新しいが引用した仕様は旧版」という二つの反例を入れます。回答が新しい方の文書を機械的に選ぶなら、更新日の順位ではなく主張の適用条件を渡す必要があります。どの資料を採用したかだけでなく、なぜ他の資料を退けたかを出力に残します。</p><p>この失敗を修正する時、全資料を追加し直すのではなく、主張単位で地域と接点を保持する変更を試します。修正前後の入力集合は変えず、必要情報の保持と誤適用の減少を比べます。これが入力設計の再利用可能な知見になります。</p></section>
+<footer class="panel"><h2>関連・更新条件</h2><p><a href="ontology-engineering.html">意味の契約</a> · <a href="prompt-engineering.html">プロンプト設計</a> · <a href="agent-memory.html">メモリ設計</a></p><p class="small">最終更新: 2026-10-13。モデルID・提供段階・権限・地域・利用条件が変わった時に元資料から再確認します。</p></footer></main></body></html>

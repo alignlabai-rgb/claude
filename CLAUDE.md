@@ -1,190 +1,63 @@
-# Claude Workspace Instructions
+# Public AI Knowledge Hub — 作業指示
 
-このフォルダは、Claude / Codex / その他エージェントに外部から更新や整理を依頼するための作業対象です。
+最終更新: 2026-10-13
 
-実験的に運用する前提はありますが、それは「壊してよい」という意味ではありません。
-正しい前提は `安全に更新し、必要なら戻せるようにする` です。
+このrepoは公開可能なAI技術・運用・制作の知識を扱います。Claude専用でも、非公開の組織資料を投影する場所でもありません。依頼された内容を安全に更新し、読者が判断・試験できる本文を残します。
 
-**最終更新:** 2026-10-01
+## 作業開始
 
----
+1. README、現在の依頼、環境側の現行instructionsを読む。
+2. exact編集root、Git branch、remote、worktreeの既存差分を確認する。旧文書のパス例を現行配置の権限とみなさない。
+3. 対象と対象外、書込ownerを固定する。他人の差分は消さない。
+4. [編集contract](research/refresh-2026-10-13/EDITORIAL_CONTRACT.md)、[onboarding](foundations/onboarding-checklist.html)、[並列作業](foundations/multi-instance-protocol.html)を読む。
 
-## Purpose
+非公開repoのclone、認証変更、NAS操作はこの指示だけでは行いません。公開情報の更新に内部資料を持ち込む必要はありません。
 
-- 自分用の技術ハブとして機能させる
-- Claude を使う方法論・公開情報の整理を蓄積する
-- 外出中でも Claude に非同期で更新を依頼できる基盤にする
-- 必要に応じて Codex でも同じ構造を理解できる状態を保つ
-- 複数のセッション（Claude / Codex の並走）が同時稼働しても破綻しないこと
-- 日次速報をレーダー、provider公式sourceを現行事実、local receiptを自組織での適合証拠として分離すること
+## 本文の原則
 
-このハブは<strong>公開リポジトリ</strong>です（外部から見られても問題ない設計）。`ALIGN_Lab` 本体は<strong>非公開の別レポ</strong>で、本ハブには ALIGN_Lab の中身は書きません。AI セッションが方向性を理解する必要がある時は、ローカルの `../ALIGN_Lab/` を直接参照します。詳細は [`foundations/align-lab-context.html`](foundations/align-lab-context.html) と [ADR-010](foundations/decisions.html#010-align-lab-decouple) を参照。
+- 継ぎ足しではなく、現在の読者の用途から再構成する。
+- 製品・model ID・API・partner hosted・weights・harnessを分ける。
+- 公式資料の実取得を根拠にする。search snippetだけを確認済みにしない。
+- 発表日、確認日、期限、予定、停止実証を区別する。
+- 提供者benchmarkを独立測定へ読み替えない。
+- 固有の仕組み、選択、合成例、失敗条件、評価方法を含める。
+- 試験案・未実行・未確認を明示する。実績を作らない。
+- 秘密、個人情報、未公開IP、credential、内部host情報を公開本文へ追加しない。
 
----
+## 旧情報
 
-## 新しいセッションで最初に読むべきページ
+刷新前commitへの固定linkを末尾に置き、[資料棚](research/archive/index.html)からも読めるようにします。旧本文を新版の中へ折り畳んで残しません。過去の日次ニュース、日付付きsnapshot、sessionsは当時の記録として保持します。既存reviewを独断で削除・非公開化しません。
 
-1. このファイル（**CLAUDE.md**）
-2. **[foundations/onboarding-checklist.html](foundations/onboarding-checklist.html)** — 最初の10分の具体ステップ（Phase A: git 確認 / Phase B: 必読チェック / Phase C: 過去判断確認）
-3. **[foundations/multi-instance-protocol.html](foundations/multi-instance-protocol.html)** — 並走セッションの作法（並走は常態）
-4. [foundations/align-lab-context.html](foundations/align-lab-context.html) — ALIGN_Lab 道しるべ（非公開別レポへのポインタ）
-5. [foundations/agent-protocol.html](foundations/agent-protocol.html) — エージェントとして作業する際のプロトコル・ルール
-6. [logs/next-actions.html](logs/next-actions.html) — 直近の TODO と優先タスク
-7. [logs/hub-health.html](logs/hub-health.html) — ハブ全体の鮮度・ALERT 確認
+古い指示やADRは当時の判断として参照し、現在の依頼や現行の保存配置instructionsへ無条件に移し替えません。組織の権限・canon・契約を本repoの編集で改定しません。
 
-迷ったら `foundations/operating-principles.html` も参照。
+## 並列作業
 
----
+- 子担当のexclusiveファイル群を決める。共有index、search、Gitの操作は統合担当が扱う。
+- authorの確認と独立reviewを区別する。自分の記事の自己点検を独立監査と呼ばない。
+- 完了時に対象、source map、検査、未確認、他担当に関係する差分を返す。
+- 統合後に全体の名称、期限、提供面、リンクを再検査する。
+- network権限拒否を別transportで迂回しない。未実施を残し、許可された仕事だけを続ける。
 
-## トップ index.html の構造（2026-05-31 から）
+## 現行modelの配置
 
-トップは以下の **4カテゴリ構造** で運用しています（ADR-012 参照）:
+[LLM Tracker](research/llm-tracker.html)が現行coverageの読み口です。[model ledger](research/refresh-2026-10-13/model-ledger.json)には公式根拠とgap、[日付付き差分](research/official-model-delta-2026-10-13.html)には確認時点の変更と期限、個別guideには使い方を置きます。[モデル世代](workbench/knowledge/model-generations.html)は識別と評価の方法です。第二のcurrent表を大量に複製しません。
 
-### 🎬 生成AI・クリエイター（主軸）
+## 検査と反映
 
-- **Creator System**（spotlight: 力点領域）— 動画・漫画パイプライン、評価、マネタイズ
-- **Claw Stack** — Claude / PicoClaw / NanoClaw / OpenClaw
-- **Google AI エコシステム** — Gemini / Veo / Flow / Imagen / Gemma（制作パイプライン直結）
+新規ページをcategory入口・全索引・検索へ接続します。提供された索引生成と構造検査を使い、source確認・秘密境界・必要な独立reviewを別に行います。
 
-### 💼 エンタープライズAI・生産性
+```sh
+python3 scripts/build-refresh-catalog.py
+python3 scripts/build-reading-navigation.py
+python3 scripts/audit-refresh.py
+python3 scripts/check-knowledge-links.py
+node scripts/test-reader-controls.js
+python3 workbench/knowledge/examples/evidence_pipeline.py -q
+git diff --check
+```
 
-- **Microsoft AI エコシステム**（spotlight）— M365 Copilot / Power Platform / Copilot Studio / Azure AI Foundry / Phi-4
-- **深掘りガイド群** — Power Automate 完全実践（実例50選）/ Power Platform 実践大全 / Copilot Studio 実践大全
-- **AI ツール比較ノート** — Codex / Claude Code 実務比較・シナリオ資料（demos/）
+catalog/navigation/refresh auditは今回の2026-10-13と固定baselineを再現するscriptです。次の刷新では対象・日付・新規記事の取込を確認して更新し、機械再生成で後続の記事を落としません。scriptのPASSは外部の全リンクや表示品質を保証しません。実行した検査と未実行を別々に報告します。
 
-> ⚠️ Google AI は「生成AI・クリエイター」、Microsoft AI は「エンタープライズAI・生産性」に分離。
-> 両エコシステムは `workbench/knowledge/` に物理ファイルが置かれているが、表示カテゴリは異なる。
+公開作用は現在の依頼に含まれる範囲だけ。branch push、PR、main merge、deploymentを別に読み戻します。反映前にremoteの日次writer更新を取り込み、他の更新を保ちます。force push、無断reset、history rewriteは禁止です。
 
-### 📚 LLMナレッジ & テック
-
-- **Industry Trends** — ベンダー横断の長文分析（research/trend-*）
-- **LLM 個別深掘り** — ベンダー別の特性・実装メモ（Google / Microsoft 以外の横断知識）
-- **Tech Workbench** — 開発実務（git・docker・mac・VSCode・Vibe Coding 等）
-
-### 🛠 ハブ運用
-
-- **Foundations** — 前提・理念・運用プロトコル・参照ドキュメント
-- **Strategy** — 事業接続・能力マップ・優先順位・ロードマップ
-- **Logs** — ダッシュボード・四半期レビュー・TODO・セッションログ
-
-トップにはこのほか **Daily News Hub**（最上段）と **LLM Updates Hub**（カード群の直前）が常設されています。
-
----
-
-## Priorities
-
-1. **リンク切れを作らない** — 移動より上書き、削除より別場所への退避を優先
-2. **ルートの index.html を常に総合ポータルとして維持する**
-3. **新規情報がどのカテゴリに属するか明確にする** — 迷ったら ADR で「暫定配置」を記録
-4. **将来の拡張に耐える構造を保つ** — `物理パスとカテゴリラベルは分離可能` という思想
-5. **重要な変更は記録する** — 構造変更は ADR（`foundations/decisions.html`）に必ず追記
-6. **並走を前提に動く** — push 前に必ず fetch、別セッションのブランチ・コミットを消さない
-
----
-
-## Folder Rules
-
-物理フォルダの命名規約と用途:
-
-| フォルダ | 用途 |
-|---|---|
-| `foundations/` | 目的・理念・運用原則・運用プロトコル・参照ドキュメント（用語集 / 決定ログ / アンチパターン / Onboarding / 並走プロトコル / Site Map / Page Template / Style Guide） |
-| `strategy/` | 事業接続・能力マップ・能力進化・優先順位・ロードマップ・リスクレジスター |
-| `creator-system/` | ★ 主軸: 制作システム本体（動画・漫画パイプライン、評価、マネタイズ、OpenClaw 連携） |
-| `claw-stack/` | Claude / PicoClaw / NanoClaw / OpenClaw の比較・導入・運用判断 |
-| `workbench/` | 実務知識・操作ガイド・LLM 個別深掘り（60+ ページ） |
-| `research/` | 調査記事・LLM トラッカー・Industry Trends 長文・AI News 日次・OpenClaw News |
-| `demos/` | AI ツール比較・導入検討ノート集（Codex / Claude Code 実務比較・シナリオ資料）|
-| `logs/` | 変更ログ・実験メモ・TODO・ダッシュボード・四半期レビュー |
-| `_routines/` | 日次運用テンプレート（AI News 等の生成用） |
-
-新カテゴリ追加は ADR-012（4カテゴリ構造）の方針に沿って慎重に判断する。
-
----
-
-## Editing Policy
-
-### 基本原則
-
-- 既存情報を消す前に、まず整理して入口を作る
-- 文字化けやリンク切れは最優先で直す
-- カテゴリをまたぐ変更は `logs/` に記録する
-- 大きい構造変更をしたら `README.md` と必要な指示書を更新する
-- 公開リポなので、機密情報・取引先固有情報は混入させない
-- 「動く」だけでなく「次のエージェントが理解できる」状態を目指す
-
-### 並走前提のルール
-
-- セッション開始時に必ず `git fetch && git status && git branch -r` で状態確認
-- 自分のフィーチャーブランチは `claude/*` / `codex/*` / `feat/*` / `fix/*` 等に切る
-- 他セッションのブランチ・コミットを消さない（force push 厳禁）
-- 詳細は [`foundations/multi-instance-protocol.html`](foundations/multi-instance-protocol.html)
-
-### 構造変更時のルール
-
-- 後から戻すコストが大きい変更（物理リネーム・フォルダ削除・カテゴリ統合）は<strong>必ず ADR を書く</strong>
-- 大きな変更前にユーザーに選択肢を A/B/C で提示する
-- 物理パスは触らず<strong>表示ラベルだけ変える</strong>選択肢を必ず検討（ADR-005 / ADR-004 のパターン）
-
----
-
-## When Adding New Content
-
-1. **カテゴリを決める**（上の Folder Rules 参照）
-2. **テンプレートを選ぶ**（`foundations/page-template.html` の Light / Rich）
-3. **スタイルガイドに従う**（`foundations/style-guide.html`）
-4. **本文を書く**
-5. **必須末尾要件をクリア**：最終更新日・関連リンク・出典実 URL
-6. **親カテゴリ index.html からリンク**を張る
-7. **必要なら top index.html のカードにも surface**
-8. **`foundations/site-map.html` に追記**
-9. **大きな変更なら ADR を書く**（`foundations/decisions.html`）
-10. **失敗事例があれば anti-patterns に記録**
-11. **新用語が出たら glossary に 1-2 行追加**
-
-LLM/providerの現行値は、まず最新日付の `research/official-model-delta-YYYY-MM-DD.html` と `workbench/knowledge/model-generations.html` を照合・更新します。トップ、coverage ledger、個別trackerからcurrent layerへリンクし、旧日付deltaはhistorical snapshotとして残します。X・日次ニュース・issue由来の情報は、公式sourceを確認するまで `RADAR_UNVERIFIED` とし、価格、期限、model ID、契約、securityの断定へ使いません。
-
-詳細チェックリストは `foundations/definition-of-done.html` を参照。
-
----
-
-## 重要な参照ドキュメント
-
-| 用途 | パス |
-|---|---|
-| 新セッションの作業開始手順 | `foundations/onboarding-checklist.html` |
-| 並走時の作法 | `foundations/multi-instance-protocol.html` |
-| 全ページ索引 | `foundations/site-map.html` |
-| 用語集 | `foundations/glossary.html` |
-| 決定ログ（ADR） | `foundations/decisions.html` |
-| アンチパターン集 | `foundations/anti-patterns.html` |
-| ページテンプレート | `foundations/page-template.html` |
-| スタイルガイド | `foundations/style-guide.html` |
-| Done 定義 | `foundations/definition-of-done.html` |
-| Hub 健全性 | `logs/hub-health.html` |
-| 直近 TODO | `logs/next-actions.html` |
-| 四半期レビュー | `logs/2026-q2-review.html` |
-| リスクレジスター | `strategy/risk-register.html` |
-
----
-
-## ALIGN_Lab との関係
-
-ALIGN_Lab は<strong>非公開の別レポ</strong>で、作品・IP コンテンツ・戦略・固有資産が置かれています。本ハブには ALIGN_Lab の中身を直接書きません。
-
-AI セッション（Claude / Codex）が方向性を理解する必要がある時は、ローカルの `../ALIGN_Lab/` を sibling フォルダとして参照します（読むだけ）。存在しなければ `git clone https://github.com/alignlabai-rgb/ALIGN_Lab.git` で取得。
-
-詳細・運用ワークフローは [foundations/align-lab-context.html](foundations/align-lab-context.html)、決定経緯は [ADR-010](foundations/decisions.html#010-align-lab-decouple) を参照。
-
----
-
-## このファイル自体のメンテナンス
-
-このファイルは「ハブの憲法」的役割を持ちます。以下のタイミングで更新:
-
-- 新カテゴリを追加した時（Folder Rules を更新）
-- 構造変更時（Editing Policy を更新）
-- 新しい必読ドキュメントを追加した時（読書リスト更新）
-- 四半期に1回（鮮度確認）
-
-過去の版は git 履歴に残るので、削除より追記・置換が望ましい。
+[刷新前CLAUDE.md](https://github.com/alignlabai-rgb/claude/blob/4535dd63a3b2acf62ec793c02c9f8dbffabeece5/CLAUDE.md)

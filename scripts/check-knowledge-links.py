@@ -3,6 +3,7 @@
 from html.parser import HTMLParser
 from pathlib import Path
 import json
+import re
 import subprocess
 import sys
 from urllib.parse import unquote, urlsplit
@@ -91,7 +92,7 @@ def main():
                 errors.append([name, issue])
             if doc.stack:
                 errors.append([name, "unclosed tags: " + repr(doc.stack)])
-            if "最終更新: 2026-10-03" not in path.read_text(encoding="utf-8"):
+            if not re.search(r"最終更新[^<]*\d{4}-\d{2}-\d{2}", path.read_text(encoding="utf-8")):
                 errors.append([name, "missing update date"])
         for ref in doc.refs:
             url = urlsplit(ref)
@@ -99,7 +100,9 @@ def main():
                 if url.scheme in {"http", "https"}:
                     external_refs.add(ref)
                 continue
-            target = (path.parent / unquote(url.path)).resolve() if url.path else path
+            # Daily news links resolve from the generated article, not the source template.
+            ref_base = ROOT / "research/ai-news" if name == "_routines/news-template.html" else path.parent
+            target = (ref_base / unquote(url.path)).resolve() if url.path else path
             if target.is_dir():
                 target = target / "index.html"
             local_refs += 1

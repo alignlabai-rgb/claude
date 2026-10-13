@@ -1,96 +1,10 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Operating Principles | Foundations</title>
-  <style>
-    body { font-family: "Segoe UI", "Noto Sans JP", system-ui, sans-serif; margin: 0; background: #0b1220; color: #edf2fb; line-height: 1.75; padding: 28px 18px 48px; }
-    .shell { max-width: 980px; margin: 0 auto; display: grid; gap: 18px; }
-    .panel { background: #111a2b; border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 26px; }
-    a { color: #75d7c0; }
-    h1, h2, h3 { margin: 0 0 10px; }
-    p, li { color: #c5d0e3; }
-    .principle { border-left: 3px solid #3dd8c5; padding-left: 16px; margin: 18px 0; }
-    .principle h3 { color: #edf2fb; font-size: 1rem; margin-bottom: 4px; }
-    .principle p { margin: 4px 0; font-size: 0.95rem; }
-    .why { color: #a0aec0; font-size: 0.88rem; font-style: italic; }
-    .tag { display: inline-block; background: rgba(61,216,197,0.12); color: #3dd8c5; border-radius: 6px; padding: 1px 8px; font-size: 0.8rem; margin-right: 6px; }
-  </style>
-</head>
-<body>
-  <div class="shell">
-    <div class="panel">
-      <p><a href="index.html">← Foundations</a> / <a href="../index.html">Hub Top</a></p>
-      <h1>運用原則</h1>
-      <p>このリポジトリを複数の Claude インスタンスが非同期で更新し続けるために必要な原則です。「なぜその原則があるか」を記録することで、新しいインスタンスが初めて来ても同じ判断ができる状態を目指しています。</p>
-    </div>
-
-    <div class="panel">
-      <h2>基本姿勢</h2>
-      <div class="principle">
-        <h3>壊してよいではなく、戻せる前提で更新する</h3>
-        <p>実験的な運用であっても、破壊的な変更は Git の履歴に必ず残す。削除より「別の場所に移す」を優先する。</p>
-        <p class="why">→ なぜ：誰かが何かを消したとき、「意図的な削除」と「事故」を区別できないと復元判断ができない。</p>
-      </div>
-      <div class="principle">
-        <h3>ルートの index.html を総合ポータルとして維持する</h3>
-        <p>どんな変更をしても、ルートの入口だけは常に全カテゴリへ辿れる状態にする。</p>
-        <p class="why">→ なぜ：初めてアクセスするインスタンスや人が、ここから全体を把握できることが最低保証。</p>
-      </div>
-      <div class="principle">
-        <h3>カテゴリ責務をまたぐ変更は logs/ に記録する</h3>
-        <p>複数カテゴリに影響する構造変更は、変更日・変更内容・理由を logs/ に残す。</p>
-        <p class="why">→ なぜ：なぜ構造がこうなっているかを後のインスタンスが理解できない場合、同じ変更を繰り返すか、意図に反した変更をする。</p>
-      </div>
-    </div>
-
-    <div class="panel">
-      <h2>コンテンツ追加の原則</h2>
-      <div class="principle">
-        <h3>追加前にカテゴリを決める</h3>
-        <p>新しいページを作る前に、どのフォルダに属するかを決め、そのフォルダの index から辿れるようにする。</p>
-        <p class="why">→ なぜ：フォルダに入れてもリンクされていないページは「存在しない」のと同じ。発見できないコンテンツに価値はない。</p>
-      </div>
-      <div class="principle">
-        <h3>リンク切れと文字化けを最優先で直す</h3>
-        <p>新規追加よりも既存の壊れた状態の修正を優先する。</p>
-        <p class="why">→ なぜ：壊れたリンクは信頼性を損なう。「増やしているが使えない」状態は「何もない」より悪い。</p>
-      </div>
-      <div class="principle">
-        <h3>次のインスタンスが理解できる状態を目指す</h3>
-        <p>「動く」だけでなく、なぜその構造・内容にしたかが伝わるように書く。</p>
-        <p class="why">→ なぜ：このリポジトリは複数インスタンスが引き継いで更新する。意図が伝わらなければ毎回ゼロから判断することになる。</p>
-      </div>
-    </div>
-
-    <div class="panel">
-      <h2>インスタンス間の協調原則</h2>
-      <p>このリポジトリは複数の Claude インスタンスが同時・非同期で更新する場合があります。</p>
-      <div class="principle">
-        <h3>ファイル単位で責務を分ける</h3>
-        <p>同一ファイルへの同時編集は Git コンフリクトの原因になる。担当領域を分けて作業する。</p>
-      </div>
-      <div class="principle">
-        <h3>CLAUDE.md を共通の判断基準とする</h3>
-        <p>迷ったときは CLAUDE.md に立ち返る。CLAUDE.md に書かれていない判断をしたときは、その判断を logs/ か foundations/ に記録する。</p>
-      </div>
-      <div class="principle">
-        <h3>main への直接 push は小さな変更のみ</h3>
-        <p>大きな構造変更はブランチを切って PR 経由でマージする。小さな修正・追記は main への直接 push で可。</p>
-      </div>
-    </div>
-
-    <div class="panel">
-      <h2>判断に迷ったときのフロー</h2>
-      <ol>
-        <li>CLAUDE.md を確認する</li>
-        <li>foundations/ の関連ページを確認する</li>
-        <li>logs/ の最近の記録を確認する</li>
-        <li>それでも迷う場合は、より保守的な選択をして logs/ にその旨を記録する</li>
-        <li>大きな変更は人間（リポジトリオーナー）に確認を求める</li>
-      </ol>
-    </div>
-  </div>
-</body>
-</html>
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>運用原則 — 情報量を判断と制作へつなげる | Foundations</title><link rel="stylesheet" href="../workbench/knowledge/deep-dive.css"></head>
+<body><a class="skip" href="#main">本文へ</a><div class="shell"><nav><a href="index.html">Foundations</a> / <a href="../index.html">Hub Top</a></nav><header class="panel"><p class="eyebrow">PUBLIC KNOWLEDGE EDITORIAL METHOD</p><h1>運用原則 — 情報量を判断と制作へつなげる</h1><p class="lead">知識ハブは記事を増やすだけでは育ちません。読む人が違いを理解し、次の小さな試験を設計でき、失敗から方法を残せることが価値です。ここでは本ハブの編集原則を示します。内部組織のauthorityや契約を新しく定める文書ではありません。</p><p>最終更新: 2026-10-13</p></header><main id="main">
+<section class="panel"><h2>速報と確定を敵にしない</h2><p>日次ニュースやX由来の観測は、早く変化を見つける入口です。未確認だから無価値という扱いも、速いからすべて正しいという扱いも避けます。ニュースでは発見源と確認範囲を示し、現行guideやtrackerでは一次情報を取得してclaimへ結びつけます。</p><p>提供者が主張する性能、独立の試験、自分の未実行案を分けます。ベンチマークが優れているという発表から、特定の制作taskが成功するという結論へ飛びません。readerに必要なのは最新の名前だけでなく、どの条件でその情報を使えるかです。<a href="../README.md">ハブの根拠方針</a></p></section>
+<section class="panel"><h2>一つの問いを端から端まで扱う</h2><p>更新を始めたら、source確認、本文、具体例、失敗条件、links、検査まで一つのテーマを完成させます。管理資料やACKだけを成果にしないでください。途中の発見を全部新記事にするより、同じ問いに対する比較を読める形へまとめます。</p><p>大きな刷新では独立したファイル群を並列に扱えますが、共有indexや反映操作は統合担当がまとめます。一つのpageを複数writerが競って直すことは、調査の並列化と同じではありません。<a href="multi-instance-protocol.html">並列作業の手順</a></p></section>
+<section class="panel"><h2>modelの名前よりsurfaceを見る</h2><p>app、API、partner hosted、weights、local inferenceは違う使い方です。利用者のaccountやregionで可用性が変わる場合もあります。「最新」が何を意味するか、stageと確認日を明記します。公開weightsがあることは、そのまま全runtimeで動く証拠ではありません。</p><p>現行coverageは<a href="../research/llm-tracker.html">LLM Tracker</a>へ戻り、個別guideには仕組みと使い方を置きます。同じcurrent表をたくさん複製しないことで、日々の更新と深掘りを両立します。source mapはauthorの根拠照合で、独立reviewの範囲は別に示します。</p></section>
+<section class="panel"><h2>制作の提案は採用判断ではない</h2><p>あるtoolが役立ちそうなら、用途、根拠、未確認、限定試験、candidate recipientを小さくまとめます。候補の宛先は非拘束の提案で、配送の確認は宛先と重複などに限定します。domain担当が意味、採否、実行可能性を決めます。</p><p>記事の完成、packetの配送準備、試験の許可、契約、公開は別の状態です。公開知識の更新を通して組織のauthorityや未公開作品の設定を変更しません。考え方の接続は<a href="align-lab-context.html">公開・非公開の境界</a>を参照してください。</p></section>
+<section class="panel"><h2>失敗を消費で終わらせない</h2><p>試験の失敗は、入力条件、期待、観測、原因仮説、次のfixtureが残れば再利用できます。長いlogをすべて公開する必要はありません。公開可能な最小例へ変え、同じ失敗が次のmodelにも検出できるようにします。</p><p>良い記録は「このmodelはダメ」ではなく、「このschemaで曖昧な日付を架空補完した」「このcontext長で必要条件を落とした」のように失敗を限定します。条件を外した一般化を避け、成功した例にも同じinputとtestを付けます。<a href="anti-patterns.html">失敗から検査へ</a></p></section>
+<section class="panel"><h2>更新の頻度は情報の寿命で考える</h2><p>API廃止、重要なmodel公開、提供面の変更はevent-drivenで確認します。定期の鮮度・リンク確認と横断coverage確認も組み合わせます。安定した操作guideを日次で書き換える必要はなく、高頻度更新のmodel trackerを月次だけに限定する必要もありません。具体的な候補頻度は<a href="../_routines/index.html">routine一覧</a>へ。</p><p>差分がない時は更新を捏造しません。確認だけをした日と本文を変更した日を分けます。tokenや記事数を使い切ることより、人が読める完成物、次に使えるfixture、sourceに戻れる判断を残すことを評価します。</p></section>
+<section class="panel"><h2>関連と履歴</h2><p><a href="agent-protocol.html">agent-protocol</a> / <a href="onboarding-checklist.html">onboarding-checklist</a> / <a href="definition-of-done.html">definition-of-done</a></p><p><a href="https://github.com/alignlabai-rgb/claude/blob/4535dd63a3b2acf62ec793c02c9f8dbffabeece5/foundations/operating-principles.html">刷新前の旧版（固定履歴）</a>。旧指示は当時の記録で、現在の作用許可ではありません。</p></section></main></div></body></html>
