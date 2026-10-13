@@ -1,52 +1,10 @@
 <!doctype html>
-<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Graph Engineering — 知識と実行を混同しない | Workbench Knowledge</title><link rel="stylesheet" href="deep-dive.css"></head><body><a class="skip" href="#main">本文へ</a><main class="shell" id="main">
-<header class="panel"><p><a href="index.html">← Knowledge</a> / <a href="../index.html">Workbench</a> / <a href="../../index.html">Hub Top</a></p><p class="eyebrow">Engineering deep dive · 本文改訂 2026-10-03</p><h1>Graph Engineering<br>知識と実行を混同しない</h1><p class="lead">関係を辿る知識グラフと、仕事を進める状態グラフは別物です。両者を結びつける価値は、情報を大量に蓄えることより、根拠を追え、途中から再開でき、誤った遷移を止められることにあります。</p>
-<p class="notice">Graph Engineeringは本ハブで使う横断的な実務ラベルであり、単一の標準規格ではありません。旧版の「14時間→45分」「精度96.5%」「破壊修正率0%」等、元実験を確認できない成果主張を除去し、説明用設計と実測を分けました。</p><nav aria-label="目次"><ul><li><a href="#types">三つのグラフ</a></li><li><a href="#state">状態設計</a></li><li><a href="#resume">再開と副作用</a></li><li><a href="#rag">GraphRAG</a></li><li><a href="#tests">検証</a></li><li><a href="#sources">資料</a></li></ul></nav></header>
-<section class="panel" id="types"><h2>1. グラフにする前に、エッジの意味を決める</h2>
-<div class="table-wrap"><table><thead><tr><th>種類</th><th>ノード／エッジ</th><th>用途</th><th>例</th></tr></thead><tbody>
-<tr><td>知識グラフ</td><td>対象／意味のある関係</td><td>依存、由来、関連の探索</td><td>モデル→提供surface→公式根拠</td></tr>
-<tr><td>状態・処理グラフ</td><td>状態や処理／遷移条件</td><td>実行順、分岐、待ち、再試行</td><td>収集→検証→草稿→評価→完了</td></tr>
-<tr><td>依存グラフ</td><td>成果物や部品／必要条件</td><td>変更の波及や実行順の計算</td><td>共通ライブラリ→利用モジュール→テスト</td></tr>
-</tbody></table></div>
-<p>「担当者Aが製品Bを知っている」という関係は、「AがBを導入してよい」という遷移許可ではありません。意味を<a href="ontology-engineering.html">オントロジー</a>で明示し、実行条件は別のpolicyとしてコード化します。グラフに書かれた関係も、sourceなしなら未確認情報です。</p></section>
-<section class="panel" id="state"><h2>2. 状態は進捗より、再開に必要な情報で設計する</h2>
-<p>架空の技術調査を次の状態機械にします。これは説明用の設計例です。レビュー待ちは停止状態であり、黙って承認済みへ進めません。</p>
-<pre class="flow">COLLECTED → VALIDATED → DRAFTED → REVIEW_PENDING
-    │            │                  │
-    └→ HELD      └→ HELD            ├→ REJECTED
-                                    └→ REVIEWED → DELIVERED
-                        （公開・契約・本番反映はこのグラフの外）</pre>
-<div class="table-wrap"><table><thead><tr><th>字段</th><th>必要な理由</th><th>守る条件</th></tr></thead><tbody>
-<tr><td>task_id / revision</td><td>別案件や旧版を取り違えない</td><td>一意ID、更新の競合検出</td></tr>
-<tr><td>artifact_ref / content_hash</td><td>何をレビューしたか固定</td><td>成果物が変わればレビューを無効化</td></tr>
-<tr><td>evidence_ids</td><td>根拠の由来を復元</td><td>必要sourceへ辿れる</td></tr>
-<tr><td>attempts / failure_class</td><td>同じ失敗の無限反復を防ぐ</td><td>上限と終了理由を保持</td></tr>
-<tr><td>review</td><td>生成と評価を分離</td><td>判断者・判定・対象hash</td></tr>
-<tr><td>effect_receipt</td><td>配送等の実行を追跡</td><td>予定と実行結果を別記録</td></tr>
-</tbody></table></div>
-<p>巨大な本文や画像は状態へ複製せず、参照とhashを持たせます。<a href="https://docs.langchain.com/oss/python/langgraph/persistence">LangGraphのPersistence</a>は、thread内のcheckpointと、threadをまたぐStoreを区別します。RAMだけのcheckpointerはプロセス再起動を越えて残らないため、本番の復旧とは別に扱います。</p></section>
-<section class="panel" id="resume"><h2>3. 再開できることと、一度だけ実行されることは違う</h2>
-<p><a href="https://docs.langchain.com/oss/python/langgraph/interrupts">LangGraphのInterrupts</a>では、再開時にinterruptを呼んだノードを再実行します。承認待ちの前でメール送信・課金・追記を済ませていると、再開で重複する危険があります。</p>
-<ol><li>読み取り、草稿生成、承認、外部操作を別ノードにします。</li><li>承認対象のhash、操作先、具体的な値を固定します。</li><li>外部操作の直前で対象と承認の一致を再検証します。</li><li>可能なら操作先にidempotency keyを渡し、receiptを保存します。</li><li>通信断で結果が不明なら、再送前に操作先を照会します。</li></ol>
-<p>checkpointだけでは外部APIのexactly-onceを保証しません。「送信成功だがreceipt保存前にクラッシュ」の隙間があります。transactional outboxや操作先の重複排除などを検討し、結果不明という状態を残します。本稿のオフラインコードの重複排除は、メモリ内の疑似配送に限るものです。</p>
-<h3>並列処理にも合流規則が必要</h3><p>複数workerの結果をリストへ追加するだけでは、同じIDの矛盾や再試行の重複が残ります。安定したIDで重複を識別し、同一IDで内容が違う時はconflictとして保留します。部分失敗、timeout、入力欠落の各経路を定義します。</p></section>
-<section class="panel" id="rag"><h2>4. GraphRAGは、質問の構造に合わせて使う</h2>
-<p><a href="https://microsoft.github.io/graphrag/query/overview/">Microsoft GraphRAGの公式資料</a>は、Local、Global、DRIFT、Basicの検索方式を説明します。特定entityの問いと全体を俯瞰する問いは同じ検索ではありません。全体集約にはresource-intensiveな処理もあり、単純なFAQへ無条件に導入するものではありません。</p>
-<div class="table-wrap"><table><thead><tr><th>問い</th><th>最初に試す方法</th><th>注意</th></tr></thead><tbody>
-<tr><td>このAPIのmodel IDは？</td><td>公式catalogの文字列検索</td><td>グラフ推論でIDを生成しない</td></tr>
-<tr><td>この廃止が何に影響する？</td><td>依存関係と元sourceの探索</td><td>エッジの更新日と漏れを検査</td></tr>
-<tr><td>文書群全体の共通課題は？</td><td>community report等の集約</td><td>要約の過程と少数の例外を追えるか</td></tr>
-<tr><td>あるentityと広い周辺論点を調べる</td><td>Local／DRIFT等を比較</td><td>展開しすぎたノイズを評価</td></tr>
-</tbody></table></div>
-<p>LLMが抽出したエッジは「確定事実」ではなく候補です。元文書・該当箇所・時点を保ち、誤抽出を訂正できるようにします。権限フィルタは検索前にも適用し、他ユーザーのグラフやcommunity summary経由で情報が漏れないかを確かめます。</p></section>
-<section class="panel" id="tests"><h2>5. 正しい経路より、危険な経路を先にテストする</h2>
-<ul><li>根拠なしの記録がVALIDATEDへ到達できない。</li><li>レビュー対象hashが変わるとDELIVEREDへ進めない。</li><li>producer本人の自己承認ではレビュー待ちを越えない。</li><li>再実行しても同じ疑似配送receiptが二つにならない。</li><li>retry上限を越えると、失敗理由を持って停止する。</li><li>未知の状態・判定値は暗黙の成功ではなくrejectされる。</li></ul>
-<p><a href="examples/evidence_pipeline.py">標準ライブラリだけの実験コード</a>には、このうち根拠選択、hashに結びつくレビュー、producer／reviewerの分離、疑似配送の重複排除のテストを含めています。DB永続化・ネットワーク・実モデルは使いません。LangGraphの互換性テストや本番の承認基盤を名乗るものではありません。</p>
-<pre><code>python3 workbench/knowledge/examples/evidence_pipeline.py
-# 内蔵の架空fixtureを検証し、選ばれた根拠IDとテスト結果を表示
-# ファイル変更、API呼び出し、外部送信はしません</code></pre></section>
-<section class="panel"><h2>6. グラフ化を見送る判断も設計</h2>
-<p>単純な直列処理なら、通常の関数とログが読みやすい場合があります。条件分岐、長い待ち、並列処理、再開、監査が現実に必要になった部分をグラフ化します。ノード数やagent数を価値指標にしません。</p>
-<p>導入判断では、失敗後にどこから再開できるか、外部操作を重複させないか、入力から出力まで根拠を追えるかを比較します。GraphRAGの効果は、同じ質問集合で通常検索と比較するまで未検証です。</p></section>
-<section class="panel" id="sources"><h2>一次資料と更新条件</h2><ul><li><a href="https://docs.langchain.com/oss/python/langgraph/persistence">LangGraph — Persistence</a>：checkpointとStore。</li><li><a href="https://docs.langchain.com/oss/python/langgraph/interrupts">LangGraph — Interrupts</a>：停止、再実行、副作用。</li><li><a href="https://microsoft.github.io/graphrag/query/overview/">Microsoft GraphRAG — Query overview</a>：検索方式の違い。</li><li><a href="https://www.w3.org/TR/rdf11-concepts/">W3C — RDF Concepts</a>：知識グラフの基礎。</li></ul><p class="small">確認: 2026-10-03。利用するSDKの変更、復旧テストの失敗、新しい検索方式の採用時に再点検します。</p></section>
-<footer class="panel"><h2>関連</h2><p><a href="ontology-engineering.html">Ontology</a> / <a href="context-engineering.html">Context</a> / <a href="loop-engineering.html">Loop</a> / <a href="../../research/signal-to-organizational-leverage.html">Signal Packet</a> / <a href="index.html">Knowledge</a> / <a href="../../index.html">Hub Top</a></p><p class="small">最終更新: 2026-10-03</p></footer></main></body></html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>グラフ設計：関係を検索と実行に使い分ける | Claude Knowledge Hub</title><link rel="stylesheet" href="deep-dive.css"></head><body><a class="skip" href="#main">本文へ</a><main class="shell" id="main">
+<header class="panel"><p><a href="../index.html">← Workbench</a> / <a href="../../index.html">Hub Top</a></p><p class="eyebrow">ゼロベース刷新 · 公式資料確認 2026-10-13</p><h1>グラフ設計：関係を検索と実行に使い分ける</h1><p class="lead">知識のつながりと、仕事の進み方は別のグラフです。図を増やすのではなく、どの問いと失敗を扱えるようになるかで設計します。</p><p class="notice">公式資料で確認した仕様、提供側の評価、本稿の設計提案を区別しています。実アカウント・APIでの性能試験や契約は実施していません。旧本文は<a href="https://github.com/alignlabai-rgb/claude/blob/4535dd63a3b2acf62ec793c02c9f8dbffabeece5/workbench/knowledge/graph-engineering.html">刷新前の固定版</a>で参照できます。</p></header>
+
+<section class="panel"><h2>三種類のグラフを混ぜない</h2><p>知識グラフは対象と関係、依存グラフは前提と影響、実行グラフは状態と遷移を表します。「製品AはモデルMを使う」という辺と、「承認後に送信する」という辺は同じ意味ではありません。前者を知っていても後者の操作権限は生まれません。最初に、グラフの種類と各辺の意味を宣言します。</p><p>検索用なら、エンティティの同一性、主張の出典、時間、否定・撤回の扱いが重要です。実行用なら、状態の保存、再開、効果の重複、停止条件が重要です。両者をつなげる場合も、検索結果から実行命令へ直接飛ばず、適用条件を検査する節点を置きます。</p></section>
+<section class="panel"><h2>GraphRAGは問いに応じて方式を変える</h2><p>MicrosoftのGraphRAG資料では、Localは抽出したグラフと原文の断片を組み合わせ、Globalはコミュニティレポートを広く使い、DRIFTはコミュニティ情報を局所検索に取り入れます。Basicのベクトル検索も比較用に用意されています。Globalは資源消費の大きい方式として説明されています。<a href="https://microsoft.github.io/graphrag/query/overview/">Query Engine</a>。</p><div class="table-wrap"><table><thead><tr><th>教材の問い</th><th>まず比べる案</th><th>評価の焦点</th></tr></thead><tbody><tr><td>製品AのAPI制限は何か</td><td>原文検索とLocal</td><td>対象一致と条件の取りこぼし</td></tr><tr><td>資料全体で繰り返す課題は何か</td><td>集計とGlobal</td><td>少数の反例を消していないか</td></tr><tr><td>未知の関連事項を探索したい</td><td>LocalとDRIFT</td><td>追加情報が根拠あるものか</td></tr></tbody></table></div><p>これは選択案であり、本ハブで性能差を測定した結果ではありません。グラフ抽出にも誤りが入り得ます。引用元へ戻れない関係、文脈を離れた共起、同名対象の誤統合は、検索方式を変えても残ります。最初に通常の検索を基準として置き、増えた費用に見合う改善があるかを比較します。</p></section>
+<section class="panel"><h2>実行グラフでは再開を疑う</h2><p>LangGraphはthread単位のcheckpointerと、threadをまたぐstoreを分けます。またinterrupt後の再開では、そのinterruptを含むnodeの冒頭から処理が再実行されます。保存点があるから送信が一度だけになる、とは言えません。<a href="https://docs.langchain.com/oss/python/langgraph/persistence">Persistence</a>・<a href="https://docs.langchain.com/oss/python/langgraph/interrupts">Interrupts</a>。</p><p>架空のレポート配送では、収集→根拠確認→原稿作成→レビュー待ち→送信→受領確認を分けます。送信nodeの中で承認待ちを入れるより、レビューの結果と内容の指紋を保存してから、効果を伴う操作へ進む構成を検討します。再開時に同じ内容か、既に送ったか、受領が確認されたかを照合します。</p><ol><li>各nodeに入力・出力・外部効果を書き出す。</li><li>エラーと待機を通常の状態として定義する。</li><li>再試行できる操作と、照合が先の操作を分ける。</li><li>承認は対象版に結び付ける。内容変更後は旧承認を使わない。</li><li>終了時には結果だけでなく未完の効果を表示する。</li></ol></section>
+<section class="panel"><h2>失敗注入で設計を検査する</h2><p>検索の試験では、矛盾した関係、出典削除、対象名の衝突を入れます。実行の試験では、送信直後のタイムアウト、再起動、承認待ちの期限切れ、同じIDで内容が変わった入力を入れます。ノードが全部通過したことではなく、最終状態が正しいことを見ます。</p><p>グラフ図は境界と経路を見せる助けになりますが、辺にラベルがない図では何も検査できません。件数や中央性の高さも、情報の正しさや人物の権限を意味しません。採用するのは、必要な問いに答え、失敗後の状態を説明でき、平坦な表や単純な手順より保守しやすい時です。</p><p>小さく始めるなら、十数件の公開資料と三つの問いで検索比較を行い、外部送信のない実行fixtureで再開を試す。知識グラフと実行グラフの改善を別々に記録するのが、効果を見失わない方法です。</p></section>
+<section class="panel"><h2>辺の来歴を残す最小記録</h2><p>教材の一つの関係を「製品A supports 機能F」とだけ保存するより、出典、接点、確認日、抽出方法、確定・候補の区別を伴わせる設計を検討します。別の資料で機能Fが撤回された場合も、古い辺を無言で消すのではなく、どの時点にどの根拠があったかを説明できます。</p><p>ただし説明用の来歴を付けても、関係の真偽や使用許可は検査されていません。試験では誤抽出の辺を混ぜ、原文に戻って除外できるか、回答の根拠として使わないかを確認します。見栄えの良い可視化より、誤った辺から判断を守れることを先に評価します。</p></section>
+<footer class="panel"><h2>関連・更新条件</h2><p><a href="ontology-engineering.html">オントロジー</a> · <a href="loop-engineering.html">ループ制御</a> · <a href="harness-engineering.html">実行環境</a></p><p class="small">最終更新: 2026-10-13。モデルID・提供段階・権限・地域・利用条件が変わった時に元資料から再確認します。</p></footer></main></body></html>

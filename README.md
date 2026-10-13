@@ -1,61 +1,55 @@
-# Claude Knowledge Hub
+# AI運用知識ハブ
 
-`claude/` は、Claude専用フォルダではなく、公開可能なAI運用知識を安全に更新・再利用するためのKnowledge Hubです。
+Claudeだけでなく、主要LLM、中国系モデル、常設agent、知識設計、開発、制作、企業利用を扱う公開の知識ハブです。速報を消すのではなく、一次根拠・用途・限定試験・導入判断へつなげます。
 
-## Role
+最終更新: 2026-10-13
 
-- ALIGN_Lab の理念や制作活動を支える技術基盤
-- 自分が学ぶべき知識を継続的に蓄積するハブ
-- Claude / Codex に更新や整理を依頼しやすい構造を持つ作業領域
-- 公開しても問題のない技術・運用・調査情報の置き場
+## 読む入口
 
-## Current entry points
+- [総合トップ](index.html) / [検索](search.html) / [全ページ索引](foundations/site-map.html)
+- [LLM Tracker](research/llm-tracker.html): 22の提供者・モデル系列。中国発13系列。全世界・全accountの網羅を保証しません。
+- [10/13公式差分](research/official-model-delta-2026-10-13.html): 変更、移行期限、確認範囲、gap
+- [モデル世代の読み方](workbench/knowledge/model-generations.html): model ID・surface・段階・licenseを分ける
+- [Ontology](workbench/knowledge/ontology-engineering.html) / [Context](workbench/knowledge/context-engineering.html) / [Graph](workbench/knowledge/graph-engineering.html)
+- [常設agentの比較](research/always-on-agents-2026-10.html): Grok Bot・Muse・dots
+- [情報を組織で活かす方法](research/signal-to-organizational-leverage.html)
+- [制作](creator-system/index.html) / [開発・道具](workbench/index.html) / [操作マニュアル](Operations_Manuals/index.html)
+- [日次ニュース](research/ai-news/index.html): 当日の観測。現行事実の確定根拠とは別。
 
-- [`research/always-on-agents-2026-10.html`](research/always-on-agents-2026-10.html)
-  - 2026-10-03特集。Ontology / Context / Graphの設計とGrok Bot / Muse / ChatGPT dotsの深掘り、導入判断、オフライン教材（19テスト）を接続
-- [`research/muse-recent-updates.html`](research/muse-recent-updates.html)
-  - Meta familyを10/3に再確認。Spark 1.3、Model API GA、Code、Glimmerと個人agent / Small Businessを分離
+## 現行本文と保存版
 
-- [`research/llm-tracker.html`](research/llm-tracker.html)
-  - 21 provider、中国系12 providerの現行model、surface、公式確認、専用tracker、鮮度gapを一画面で確認するcoverage ledger
-- [`research/official-model-delta-2026-10-01.html`](research/official-model-delta-2026-10-01.html)
-  - 21 providerのモデル・API surface・preview・移行期限・鮮度gapを公式一次情報で再点検した最新日付層。前回9/23版は履歴として保持
-- [`workbench/knowledge/model-generations.html`](workbench/knowledge/model-generations.html)
-  - provider別モデルとsurfaceを分けるcurrent model-generation reference。最新の日付付き公式差分と同期
-- [`research/official-model-delta-2026-08-19.html`](research/official-model-delta-2026-08-19.html)
-  - 8/19時点のhistorical snapshot。現在判断には最新の日付付き差分を優先
-- [`research/official-model-delta-2026-08-11.html`](research/official-model-delta-2026-08-11.html)
-  - 8/11時点のhistorical snapshot。現在判断は8/19版を優先
-- [`research/ai-news/index.html`](research/ai-news/index.html)
-  - 毎朝のClaude Newsを速報レーダーとして残すアーカイブ。確定情報の根拠にはしない
-- [`research/signal-to-organizational-leverage.html`](research/signal-to-organizational-leverage.html)
-  - Claude News / GrokPulse / Hermesなどのsignalを、重複除去・一次確認・候補owner・最小の次手・失効日へ変換する方法
+各guideは用途・仕組み・選択・具体例・失敗条件・評価から再構成します。古い本文は新版の中に追記や折り畳みで混ぜず、[固定版の資料棚](research/archive/index.html)へ分離しています。
 
-## Structure
+保存の基準はcommit `4535dd63a3b2acf62ec793c02c9f8dbffabeece5`。日次ニュース、日付付き調査、過去sessionsは当時の記録として保持します。既存公開reviewの保持は公開適合性の再認定ではありません。
 
-- `index.html`
-  - ハブ全体の総合トップ
-- `foundations/`
-  - このハブの目的、運用原則、ALIGN_Lab との関係
-- `strategy/`
-  - 事業との接続、優先順位、能力マップ、ロードマップ
-- `creator-system/`
-  - AI Creator Hub 本体
-- `claw-stack/`
-  - Claude / PicoClaw / NanoClaw / OpenClaw 系の導入・比較
-- `research/`
-  - 調査アーカイブ
-- `workbench/`
-  - 実務知識・学習ハブ
-- `logs/`
-  - 実験メモ、更新履歴、TODO
+## 根拠の扱い
 
-## Maintenance
+- 発見源（ニュース・X）、公式事実、提供者評価、独立試験を分けます。
+- 確認日と出来事の日付を別々に書きます。予定を実施済みにしません。
+- app / API / partner hosted / weights / local inferenceを混ぜません。
+- 取得できなかった資料やcurrent catalogのgapを明示します。
+- 合成例と未実行の試験を成功実績として書きません。
+- 秘密、個人情報、未公開IP、credential、内部host情報を追加しません。
+- routingの提案、domain判断、作用の許可を区別します。
 
-- Claude に作業させる前提の指示書は `CLAUDE.md`
-- 公開前はリンク検査を行う
-- 速報・公式確認・ローカル観測を同じ確度で混ぜない
-- local client、remote API、local inferenceを区別し、model ID・license・実行receiptを確認する
-- 秘密、個人情報、未公開IP、credential、内部host情報を公開ハブへ入れない
-- 新しいページは、どのカテゴリに属するかを先に決めてから追加する
-- 壊れてよいのではなく、戻せる前提で安全に更新する
+今回の[出典対応記録](research/refresh-2026-10-13/)はauthorの確認mapです。独立監査は別の記録で範囲を示します。
+
+## 維持と検査
+
+作業指示は[CLAUDE.md](CLAUDE.md)。ページはHTML/CSSで読むことができ、検索は外部CDNやfetchに依存しません。
+
+```sh
+python3 scripts/build-refresh-catalog.py
+python3 scripts/build-reading-navigation.py
+python3 scripts/audit-refresh.py
+python3 scripts/check-knowledge-links.py
+node scripts/test-reader-controls.js
+python3 workbench/knowledge/examples/evidence_pipeline.py -q
+git diff --check
+```
+
+上二つは今回の索引の機械再生成です。個別本文を自動で執筆・事実認定するものではありません。catalog/navigation/refresh auditは2026-10-13の対象・baselineに固定した再現用scriptです。将来の刷新では日付と対象を見直し、新規記事を失わないよう更新してから使います。検査scriptも実機試験、外部リンクの全面live検査、表示QA、独立出典監査の代わりではありません。
+
+local編集、commit、branch push、PR、main merge、site deploymentは別状態です。他writerの日次更新を反映直前に確認し、force pushや無断resetで消しません。
+
+[刷新前README](https://github.com/alignlabai-rgb/claude/blob/4535dd63a3b2acf62ec793c02c9f8dbffabeece5/README.md)

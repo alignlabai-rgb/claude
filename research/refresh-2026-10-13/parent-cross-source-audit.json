@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "reviewed_on": "2026-10-13",
+  "review_kind": "non_author_primary_source_spot_audit",
+  "independent_audit": true,
+  "reviewer": "parent editor; not author of the sampled guides",
+  "scope": [
+    "workbench/knowledge/claude-model.html",
+    "research/claude-recent-updates.html",
+    "workbench/knowledge/claude-code/agent-teams.html",
+    "workbench/knowledge/claude-code/cowork.html",
+    "workbench/knowledge/claude-code/routines.html",
+    "workbench/knowledge/gemini-omni.html",
+    "workbench/knowledge/gemini-live.html",
+    "workbench/knowledge/azure-ai-foundry.html"
+  ],
+  "method": "別著者の記事を読み、重要な料金・提供面・移行・実験段階の主張を公式本文へ戻って照合した。自分が書いたtracker/delta/OpenAI頁の自己確認を独立auditへ算入しない。",
+  "checks": [
+    {
+      "id": "PA-01",
+      "files": [
+        "workbench/knowledge/claude-model.html",
+        "research/claude-recent-updates.html"
+      ],
+      "claim": "Haiku 5.5料金はprompt 100k以下と超過で異なり、10/7 release。",
+      "source": "https://platform.claude.com/docs/en/models/haiku-5-5/overview",
+      "retrieval": "actual official page open, pricing and availability sections",
+      "result": "matched; fixed USD per MTok table is not app subscription or full bill"
+    },
+    {
+      "id": "PA-02",
+      "files": [
+        "workbench/knowledge/claude-model.html",
+        "research/claude-recent-updates.html"
+      ],
+      "claim": "Sonnet4.5 11/30退役予定とHaiku4.5 not-sooner-thanを区別。日程はAnthropic-operated提供面に限定。",
+      "source": "https://platform.claude.com/docs/en/about-claude/model-deprecations",
+      "retrieval": "actual official page open, overview and model status",
+      "result": "matched after scope clarification; partner Bedrock/Google Cloud schedules are separate"
+    },
+    {
+      "id": "PA-03",
+      "files": [
+        "workbench/knowledge/claude-code/agent-teams.html"
+      ],
+      "claim": "Agent Teams experimental/default off、resume/task/shutdown制約。",
+      "source": "https://code.claude.com/docs/en/agent-teams",
+      "retrieval": "actual official page open, experimental notice and limitations",
+      "result": "matched; no runtime support guarantee"
+    },
+    {
+      "id": "PA-04",
+      "files": [
+        "workbench/knowledge/claude-code/routines.html"
+      ],
+      "claim": "Routinesはresearch preview、schedule/API/GitHub triggers、cloudまたはself-hosted。",
+      "source": "https://code.claude.com/docs/en/routines",
+      "retrieval": "actual official page open, introduction and trigger sections",
+      "result": "matched; author separates device-local and session scheduling"
+    },
+    {
+      "id": "PA-05",
+      "files": [
+        "workbench/knowledge/claude-code/cowork.html"
+      ],
+      "claim": "Pro/Max新taskは10/6以降cloud、既存localtaskは維持。local接続はDesktop app条件。",
+      "source": "https://support.claude.com/en/articles/15520349-use-claude-cowork-on-web-desktop-and-mobile",
+      "retrieval": "actual official page open, Oct6 and local-file access notes",
+      "result": "matched; close laptop continuity does not imply local access"
+    },
+    {
+      "id": "PA-06",
+      "files": [
+        "workbench/knowledge/claude-code/cowork.html"
+      ],
+      "claim": "cloud agent/codeとserver処理、connected folder bridge、Team/Enterprise条件を分ける。",
+      "source": "https://support.claude.com/en/articles/14479288-claude-cowork-architecture-overview",
+      "retrieval": "actual official page open, execution and architecture sections",
+      "result": "matched; device original location is not data-processing locality"
+    },
+    {
+      "id": "PA-07",
+      "files": [
+        "workbench/knowledge/gemini-omni.html"
+      ],
+      "claim": "Omni1.1 card Stableとcatalog Previewの相違、10s入力と3〜10s出力を記載。",
+      "sources": [
+        "https://ai.google.dev/gemini-api/docs/models/gemini-omni-flash",
+        "https://ai.google.dev/gemini-api/docs/models"
+      ],
+      "retrieval": "both actual official pages opened, individual version section and catalog preview grouping",
+      "result": "matched; the guide correctly does not infer universal GA"
+    },
+    {
+      "id": "PA-08",
+      "files": [
+        "workbench/knowledge/gemini-live.html"
+      ],
+      "claim": "3.8 Live移行はIDのみでなくthinking_level削除、async default、proactive always、affective除去、audio response/transcript。",
+      "source": "https://ai.google.dev/gemini-api/docs/models/gemini-3.8-live",
+      "retrieval": "actual correct model card open, migration section",
+      "result": "matched; card's broad output table does not replace migration response modality note"
+    },
+    {
+      "id": "PA-09",
+      "files": [
+        "workbench/knowledge/azure-ai-foundry.html"
+      ],
+      "claim": "portal GAは全機能GAではなく、Workflows12/1退役とAgent Framework新規開発案内。",
+      "source": "https://learn.microsoft.com/en-us/azure/foundry/concepts/general-availability",
+      "retrieval": "actual official page open, readiness table and pitfalls",
+      "result": "matched; memory/monitoring preview and workflow-specific scope retained"
+    }
+  ],
+  "findings": [
+    {
+      "id": "PA-F01",
+      "severity": "scope_clarification",
+      "files": [
+        "workbench/knowledge/claude-model.html",
+        "research/claude-recent-updates.html"
+      ],
+      "description": "Sonnet4.5の11/30を全cloud共通と読ませない対象scopeの追記を依頼。",
+      "resolution": "author independently re-fetched source and added Anthropic-operated versus partner schedule scope to both pages and source map"
+    }
+  ],
+  "unverified": [
+    "全文章の網羅的fact auditではない",
+    "実account・provider実行・料金合計・性能・visual rendering・全外部リンク・hosting配備は未検証",
+    "誤って指定した gemini-3.8-flash-live URL は取得失敗し根拠として不使用。本文の正しい gemini-3.8-live cardを実取得して照合"
+  ],
+  "decision": "No unresolved blocking finding within this exact sample; not blanket ACCEPT or adoption approval"
+}

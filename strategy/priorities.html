@@ -1,97 +1,16 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Priorities | Strategy</title>
-  <style>
-    body { font-family: "Segoe UI", "Noto Sans JP", system-ui, sans-serif; margin: 0; background: #0b1220; color: #edf2fb; line-height: 1.75; padding: 28px 18px 48px; }
-    .shell { max-width: 980px; margin: 0 auto; display: grid; gap: 18px; }
-    .panel { background: #111a2b; border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 22px; }
-    a { color: #75d7c0; }
-    h1, h2 { margin: 0 0 10px; }
-    p, li { color: #c5d0e3; }
-    .done { text-decoration: line-through; color: #4a5a6a; }
-    .tag { display: inline-block; font-size: 0.72rem; font-weight: 700; padding: 0.15rem 0.45rem; border-radius: 5px; margin-right: 0.4rem; }
-    .tag-high  { background: rgba(255,100,100,0.15); color: #ff9090; }
-    .tag-mid   { background: rgba(247,183,51,0.15);  color: #f7b733; }
-    .tag-low   { background: rgba(120,130,150,0.15); color: #8090a8; }
-    .tag-done  { background: rgba(0,220,130,0.15);   color: #4FFFB0; }
-    small { color: #6a7a8a; font-size: 0.82rem; display: block; margin-top: 2px; }
-  </style>
-</head>
-<body>
-  <div class="shell">
-    <div class="panel">
-      <p><a href="index.html">← Strategy</a> / <a href="../index.html">Hub Top</a></p>
-      <h1>Priorities</h1>
-      <p>技術ハブは「知識量」より「事業への効き方」で並べます。最終更新：2026-05-30（<a href="../logs/next-actions.html">next-actions</a> の Q3 枠と同期）</p>
-    </div>
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AI導入の優先順位：話題より、解ける痛点から | AI Knowledge Hub</title><link rel="stylesheet" href="../workbench/knowledge/deep-dive.css"></head><body><a class="skip" href="#main">本文へ</a><main class="shell" id="main">
+<header class="panel"><p><a href="index.html">← Strategy</a> / <a href="../index.html">Hub Top</a></p><p class="eyebrow">ゼロベース刷新 · 一次資料確認 2026-10-13</p><h1>AI導入の優先順位：話題より、解ける痛点から</h1><p class="lead">使えるツールが増えるほど、全部を試すことは難しくなります。ここでは、必須の境界を守りながら、比較可能な小さな試験を選ぶ方法を提案します。</p><p class="notice">確認した事実、提供者の主張、筆者の設計提案を区別します。合成例は実績ではなく、未実行の試験です。個別の法律適合・投資価値・契約の判断を代行しません。</p></header>
 
-    <div class="panel">
-      <h2>優先度 高（今すぐ取り組む — Q3 最優先）</h2>
-      <ul>
-        <li><span class="tag tag-high">HIGH</span> Creator System 本体の深化（R-01 / <a href="../foundations/decisions.html#011-studio-notes-conclude">ADR-011</a>）
-          <small>主軸宣言した領域。動画・漫画パイプラインの実装状況反映、評価・マネタイズ仕様改訂、KPI ダッシュボード新設。Studio Notes 10 章を素材として活用。</small>
-        </li>
-        <li><span class="tag tag-high">HIGH</span> Claw Stack 全面更新（R-04）
-          <small>OpenClaw 再解禁（5/24）が未反映。PicoClaw / NanoClaw / OpenClaw / Hermes Agent の関係整理。</small>
-        </li>
-      </ul>
-    </div>
-
-    <div class="panel">
-      <h2>優先度 中（次のフェーズで取り組む）</h2>
-      <ul>
-        <li><span class="tag tag-mid">MID</span> LLM トラッカー6本の月次反映ルーチン定着
-          <small>Claude / ChatGPT / Gemini / Grok / Qwen / GLM の6トラッカーを新設済。daily-news が拾った6社の動向を月末に各 research/*-recent-updates へ反映する運用を回す（捏造で埋めず日次の積み上げで深める、R-09 の運用例）。</small>
-        </li>
-        <li><span class="tag tag-mid">MID</span> Industry Trends の月次更新リズム化
-          <small>現状は単発記事の集合。月末に各記事の数値・最新動向を棚卸しする運用に移行（R-09 の運用例）。</small>
-        </li>
-        <li><span class="tag tag-mid">MID</span> Meta Llama 単独ページの要否判断
-          <small>LLM 深掘りは Grok/Qwen/GLM/Mistral/DeepSeek/Kimi/Claude を整備済だが Llama は未着手。単独ページ新設の是非を需要・鮮度維持コストと照らして判断。</small>
-        </li>
-        <li><span class="tag tag-mid">MID</span> Hub Health の半自動化
-          <small>四半期ごとに手動再計測している hub-health を Python スクリプト → GitHub Actions で半自動化。</small>
-        </li>
-        <li><span class="tag tag-mid">MID</span> ALIGN_Lab ローカル参照運用の観察
-          <small>ADR-010 で道しるべ化済。新セッションが Onboarding Phase B(3b) で実際にローカル参照できるか検証。</small>
-        </li>
-      </ul>
-    </div>
-
-    <div class="panel">
-      <h2>優先度 低（余裕があれば）</h2>
-      <ul>
-        <li><span class="tag tag-low">LOW</span> デザインの全面刷新</li>
-        <li><span class="tag tag-low">LOW</span> 過度な機能追加・JavaScript 化</li>
-        <li><span class="tag tag-low">LOW</span> 外部公開向けの見やすさ向上（今は内部利用が主）</li>
-      </ul>
-    </div>
-
-    <div class="panel">
-      <h2>完了済み（参考）</h2>
-      <ul>
-        <li class="done"><span class="tag tag-done">DONE</span> Claude に安全に更新させる運用基盤 → foundations/agent-protocol.html</li>
-        <li class="done"><span class="tag tag-done">DONE</span> Creator System の仕様明確化 → creator-system/spec.html</li>
-        <li class="done"><span class="tag tag-done">DONE</span> Claw Stack の比較と使い分け → claw-stack/comparison.html</li>
-        <li class="done"><span class="tag tag-done">DONE</span> Research の要約と判断材料化 → research/highlights.html + claude-timeline + claude-recent-updates</li>
-        <li class="done"><span class="tag tag-done">DONE</span> Workbench の実務知識拡張 → 25ページ体制（claude-code/ サブハブ含む）</li>
-        <li class="done"><span class="tag tag-done">DONE</span> demos/ に深掘り3本追加 → agent-deep-dive・routines-deep-dive・why-claude-code（4/17 デモ前に完成）</li>
-        <li class="done"><span class="tag tag-done">DONE</span> CLAUDE.md に新インスタンス向け案内を追記（4/17）</li>
-        <li class="done"><span class="tag tag-done">DONE</span> strategy/capability-map.html の demos/ 行を4本体制に更新（4/17）</li>
-        <li class="done"><span class="tag tag-done">DONE</span> ハブ運用カテゴリ強化 Phase 1-4（Onboarding / 並走 / Template / Style / ADR / Risk / Done 等、5/26）</li>
-        <li class="done"><span class="tag tag-done">DONE</span> claude-recent-updates を5月分まで全更新・Opus 4.8 反映（5/25〜29）</li>
-        <li class="done"><span class="tag tag-done">DONE</span> Studio Notes VOL.2 完結・制作リソースを Creator System 本体へ集中（ADR-011、6/01）</li>
-        <li class="done"><span class="tag tag-done">DONE</span> research/highlights.html を5月版に更新（Opus 4.8 / Gemini I/O 2026、5/30）</li>
-        <li class="done"><span class="tag tag-done">DONE</span> LLM Updates Hub を 3→6 本化 — Grok / Qwen / GLM トラッカー新設（research/*-recent-updates、5/30）</li>
-        <li class="done"><span class="tag tag-done">DONE</span> LLM 個別深掘り拡張（grok / qwen（ローカル運用・コスト）/ glm / mistral / deepseek / kimi / claude-model）・世代を現行に同期（5/30）</li>
-        <li class="done"><span class="tag tag-done">DONE</span> ツール群ハブ新設 → <a href="../workbench/knowledge/google-ecosystem.html">google-ecosystem</a>（Google AI 全体像）/ <a href="../creator-system/genai-tools.html">genai-tools</a>（生成AIツール比較）/ <a href="../claw-stack/agent-brain-guide.html">agent-brain-guide</a>（エージェント頭脳選定、5/30）</li>
-        <li class="done"><span class="tag tag-done">DONE</span> slm-guide をローカルLLM運用の正本に格上げ・PicoClaw 世代修正・daily-news を6社連動に拡張（5/30）</li>
-        <li class="done"><span class="tag tag-done">DONE</span> creator-system（index / evaluation / monetization）現行化（5/30）</li>
-      </ul>
-    </div>
-  </div>
-</body>
-</html>
+<section class="panel"><h2>まず、点数で越えてはいけない条件を分ける</h2><p>データを送ってよいか、外部操作が許可されているか、利用条件を満たすか、止めて戻せるか。これらは便利さの点数で相殺する条件ではありません。未確認なら保留にし、必要な担当へ判断材料を渡します。高度な機能があることは、権限があることを意味しません。</p><p>NIST AI RMFは、AIの設計、開発、利用、評価を通じたリスク管理の任意の枠組みです。ここでの優先順位はその趣旨を参考にした筆者の手順案であり、NIST認定の評価表や法律適合の判定ではありません。<a href="https://www.nist.gov/itl/ai-risk-management-framework">NIST公式</a></p></section>
+<section class="panel"><h2>候補は、技術名ではなく変更案として書く</h2><p>「エージェントを入れる」では、比較対象がありません。「毎週の資料確認で、変更箇所の候補だけを自動抽出し、人が根拠を読む」にすると、範囲、現行手順、失敗条件が決まります。候補ごとに、困っている作業、対象の量、現行の手間、改善の仮説、最小試験、撤退方法を書きます。</p><p>次に、試験で得られる判断が重要かを見ます。成功しても誰も使わない機能や、失敗しても次の選択に影響しない試験は優先しません。作る量ではなく、どの不確実性を減らすかを評価します。</p></section>
+<section class="panel"><h2>比較する四つの軸</h2><div class="table-wrap"><table><thead><tr><th>軸</th><th>高く評価する条件</th><th>注意</th></tr></thead><tbody>
+<tr><td>実務上の痛点</td><td>繰り返し起き、修正や待ち時間が観測できる</td><td>不満の声だけを件数にしない</td></tr>
+<tr><td>試験の識別力</td><td>合格・不合格が次の判断を変える</td><td>見栄えのデモだけで終わらない</td></tr>
+<tr><td>再利用性</td><td>入力、試験、失敗条件を別の作業へ使える</td><td>一般化できる範囲を限定する</td></tr>
+<tr><td>撤退の容易さ</td><td>元の資料と手順を保ち、依存を外せる</td><td>設定の削除だけで戻せるとは限らない</td></tr>
+</tbody></table></div><p>数値を付ける場合も、点数の根拠と不確実性を添えます。精密そうな合計値を、実測された効果として見せないでください。閾値や重みは、利用者の目的に合わせて決めるものです。</p></section>
+<section class="panel"><h2>合成例：三候補から一つを選ぶ</h2><p>架空の候補Aは、記事の自動投稿。Bは、公開資料の差分抽出。Cは、新しい文章生成モデルへの全面切替です。外部投稿の許可が未確認ならAは評価点に関係なく保留。Bは手元の資料で比較でき、結果を人が読める。Cは過去の入力との比較ができるまで、改善の仮説が弱い。そこでBを最初の限定試験にする、という選択が考えられます。</p><p>これはBが普遍的に最良という意味ではありません。別の状況では、生成品質の重大な問題を解くCが先になります。境界を守り、現在の痛点と証拠の得やすさを説明できることが、選択の正しさの基礎です。</p></section>
+<section class="panel"><h2>進行中を増やす前に、終了条件を決める</h2><p>筆者の運用案では、最初は一つの試験へ集中します。開始時に、必要な入力、完成物、比較対象、最大の試行範囲、失敗時の止め方を決めます。試験を続ける理由が「まだ新しい機能を試していない」だけになったら、目的を見直します。</p><p>結果は採用、再設計、保留、棄却に分けます。棄却でも、再現できる負例や条件が残れば有用です。時間と利用量は試験の費用として記録し、成果の価値そのものにしません。使わない候補を減らすことも、判断の成果です。</p><p>次の候補へ進む前に、最初の試験の結果を他者が読める形にします。根拠、失敗、対象範囲、未確認が揃うと、同じ調査をやり直す負担を減らせます。公開や課金を伴う次段階は、その権限を持つ判断と別に扱います。</p></section>
+<section class="panel"><h2>不確実性が大きい候補の扱い</h2><p>効果が大きそうでも、入力資料や利用条件が不明なら、制作に入る前の確認を小さな仕事として切り出します。逆に、効果が小さくても毎回の修正を減らし、すぐ比較できるなら先に試せます。見込みの大きさと、証拠を得る難しさを別に書くと、期待だけで順番が決まることを避けられます。</p><p>優先順位は一度決めた順番を守るためのものではありません。痛点が消えた、前提が変わった、試験が比較不能になったなら、候補を外す理由も残して見直します。</p></section>
+<footer class="panel"><h2>関連・更新条件</h2><p><a href="capability-map.html">能力の不足を見つける</a> · <a href="roadmap.html">段階を進める条件</a> · <a href="risk-register.html">先に守る条件</a></p><p>旧情報は<a href="https://github.com/alignlabai-rgb/claude/blob/4535dd63a3b2acf62ec793c02c9f8dbffabeece5/strategy/priorities.html">刷新前の固定版</a>で読めます。本文へ混在させていません。</p><p class="small">最終更新: 2026-10-13。仕様・提供条件・根拠の変更を確認し、試験済みと未確認を分けて改訂します。</p></footer></main></body></html>
