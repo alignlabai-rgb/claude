@@ -82,5 +82,29 @@
     "Main merge and hosting deployment are separate; this file records pre-publication integration checks"
   ],
   "publication_state_at_validation": "local pre-commit; later GitHub PR and main status are evidenced by Git history, not predicted here",
-  "editorial_counts_are_not_value_kpi": true
+  "editorial_counts_are_not_value_kpi": true,
+  "post_merge_replay": {
+    "main_content_commit": "48dfc518cb8065018ec190a15e4f60efe0562235",
+    "problem_found": "コミット後の新規2 HTMLを既存ページと誤認し旧版linkを要求するfalse positive。clean checkoutでは旧link checkerが0頁となるscope不足。",
+    "correction": "旧版link判定はbaseline catalog membershipに限定。HTMLの作業差分がない場合、link checkerは固定baselineとの差分を再検査。",
+    "article_body_changes": 0,
+    "structural": {
+      "changed_html": 238,
+      "local_references_checked": 2424,
+      "issues": [],
+      "secret_or_private_location_flags": []
+    },
+    "link_checker": {
+      "selection": "baseline_fallback",
+      "changed_html": 238,
+      "strict_article_checks": 8,
+      "local_refs_checked": 2424,
+      "external_urls_in_changed_pages": 812,
+      "errors": []
+    },
+    "reader_control_assertions": 1000,
+    "python_compile": true,
+    "git_diff_check": true,
+    "publication_at_replay": "content main merged; replay script correction is a separate follow-up commit"
+  }
 }

@@ -9,6 +9,7 @@ import sys
 from urllib.parse import unquote, urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
+BASE = "4535dd63a3b2acf62ec793c02c9f8dbffabeece5"
 VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link",
         "meta", "param", "source", "track", "wbr"}
 STRICT = {
@@ -79,6 +80,12 @@ def main():
         git_paths("diff", "--name-only", "-z", "HEAD")
         + git_paths("ls-files", "--others", "--exclude-standard", "-z")))
     paths = [path for path in paths if path.endswith(".html")]
+    selection = "explicit_paths" if sys.argv[1:] else "working_changes"
+    if not paths and not sys.argv[1:]:
+        # A clean checkout must still replay the published refresh checks.
+        paths = sorted(path for path in git_paths("diff", "--name-only", "-z", BASE)
+                       if path.endswith(".html"))
+        selection = "baseline_fallback"
     errors, local_refs, external_refs, strict_docs = [], 0, set(), 0
     cache = {}
     for name in paths:
@@ -113,7 +120,7 @@ def main():
                     cache[target] = parse(target)
                 if unquote(url.fragment) not in cache[target].ids:
                     errors.append([name, "missing anchor: " + ref])
-    print(json.dumps({"changed_html": len(paths), "strict_article_checks": strict_docs,
+    print(json.dumps({"selection": selection, "changed_html": len(paths), "strict_article_checks": strict_docs,
                       "local_refs_checked": local_refs,
                       "external_urls_in_changed_pages": len(external_refs),
                       "errors": errors}, ensure_ascii=False, indent=2))
