@@ -6,6 +6,8 @@ Article prose is authored separately. No network or Git mutations.
 import html
 import json
 import os
+import re
+import sys
 from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import quote
@@ -61,7 +63,44 @@ def section(path, title, description, paths):
     return '<section class="panel"><h2>' + e(title) + "</h2><p>" + e(description) + "</p><ul>" + "".join(item(path, x) for x in paths if x in INFO) + "</ul></section>"
 def prefix(prefix, kinds=("current_guide",), deep=True):
     return [x for x, row in ENTRIES.items() if x.startswith(prefix) and row["kind"] in kinds and (deep or "/" not in x[len(prefix):])]
+NEWS_PAGES = ("index.html", "research/index.html")
+NEWS_START = "<!-- daily-news-entry:start -->"
+NEWS_END = "<!-- daily-news-entry:end -->"
+
+def news_entry():
+    """Stable public indexes: never pin the reader to yesterday's issue."""
+    return NEWS_START + '''<section class="panel" id="daily-news" aria-labelledby="daily-news-title">
+<h2 id="daily-news-title">毎日のニュースを読む</h2>
+<p>ClaudeのAI Newsと、GrokのGrokPulse。いつも読む2つの速報へ、ここから直接移動できます。</p>
+<div class="grid">
+<a class="card" href="https://alignlabai-rgb.github.io/claude/research/ai-news/" aria-label="ClaudeのAI News公開版を読む">
+<h3>Claude · AI News</h3><p>Claude側の日次AIニュース。公開版の日付一覧から、新しい号を読めます。</p><strong>Claudeのニュースを読む →</strong></a>
+<a class="card" href="https://alignlabai-rgb.github.io/GrokPulse/" aria-label="GrokPulseの最新ニュースを読む">
+<h3>Grok · GrokPulse</h3><p>Xから集めた話題を日別・カテゴリ別に読む速報。噂や反応も含めて流れを追えます。</p><strong>GrokPulseのニュースを読む →</strong></a>
+</div>
+<p class="small">どちらも日付固定の記事ではなく、更新される公開入口へのリンクです。掲載日はリンク先で確認できます。</p>
+<p class="small">旧版の補助入口：<a href="https://alignlabai-rgb.github.io/ai-news-from-x/">X Tech News（カテゴリ一覧）</a></p>
+</section>''' + NEWS_END
+
+def restore_news_entries():
+    """Update only the two entry pages; do not replay the Oct 13 catalog."""
+    for path in NEWS_PAGES:
+        target = ROOT / path
+        page = target.read_text(encoding="utf-8")
+        if NEWS_START in page:
+            pattern = re.escape(NEWS_START) + r".*?" + re.escape(NEWS_END)
+            page, count = re.subn(pattern, lambda _: news_entry(), page, flags=re.S)
+            if count != 1:
+                raise ValueError(f"Expected one news entry in {path}, got {count}")
+        else:
+            if page.count("</header>") != 1:
+                raise ValueError(f"Expected one header in {path}")
+            page = page.replace("</header>", "</header>" + news_entry(), 1)
+        target.write_text(page, encoding="utf-8")
+
 def render(path, title, lead, body):
+    if path in NEWS_PAGES:
+        body = news_entry() + body
     css = rel(path, "workbench/knowledge/deep-dive.css")
     return '<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' + e(title) + '</title><link rel="stylesheet" href="' + css + '"></head><body><a class="skip" href="#main">本文へ</a><main class="shell" id="main"><header class="panel"><nav>' + link(path, "index.html", "Hub Top") + " / " + link(path, "search.html", "検索") + " / " + link(path, "foundations/site-map.html", "全ページ索引") + '</nav><h1>' + e(title) + '</h1><p class="lead">' + e(lead) + '</p><p class="small">最終更新: ' + DATE + " / 入口の編集日と、個別記事の公式確認日は別です。</p></header>" + body + '<footer class="panel"><h2>旧版と読み方</h2><p>' + link(path, "research/archive/index.html", "旧版の資料棚") + " / " + link(path, "foundations/archive-policy.html", "履歴を読む") + '</p><p><a href="https://github.com/alignlabai-rgb/claude/blob/' + BASE + "/" + quote(path, safe="/") + '">この入口の刷新前固定版</a>。過去の本文は新版に混在させていません。</p></footer></main></body></html>\n'
 def write(path, title, lead, groups):
@@ -147,4 +186,10 @@ def main():
     (ROOT / "search-index.json").write_text(json.dumps(data,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     search_page(data)
     print(json.dumps({"indexed_pages":len(data),"navigation_rebuilt":14,"external_search_dependency":False}))
-if __name__ == "__main__": main()
+if __name__ == "__main__":
+    if sys.argv[1:] == ["--news-only"]:
+        restore_news_entries()
+    elif sys.argv[1:]:
+        raise SystemExit("Usage: build-reading-navigation.py [--news-only]")
+    else:
+        main()
