@@ -6,6 +6,8 @@ Claudeだけでなく、主要LLM、中国系モデル、常設agent、知識設
 
 ## 読む入口
 
+- 毎日のニュース（公開版）：[Claude · AI News](https://alignlabai-rgb.github.io/claude/research/ai-news/) / [Grok · GrokPulse](https://alignlabai-rgb.github.io/GrokPulse/)
+- 旧版の補助入口：[X Tech News（カテゴリ一覧）](https://alignlabai-rgb.github.io/ai-news-from-x/)
 - [総合トップ](index.html) / [検索](search.html) / [全ページ索引](foundations/site-map.html)
 - [LLM Tracker](research/llm-tracker.html): 22の提供者・モデル系列。中国発13系列。全世界・全accountの網羅を保証しません。
 - [10/13公式差分](research/official-model-delta-2026-10-13.html): 変更、移行期限、確認範囲、gap
@@ -49,6 +51,8 @@ git diff --check
 ```
 
 上二つは今回の索引の機械再生成です。個別本文を自動で執筆・事実認定するものではありません。catalog/navigation/refresh auditは2026-10-13の対象・baselineに固定した再現用scriptです。将来の刷新では日付と対象を見直し、新規記事を失わないよう更新してから使います。検査scriptも実機試験、外部リンクの全面live検査、表示QA、独立出典監査の代わりではありません。
+
+ニュース入口だけを復旧する場合は `python3 scripts/build-reading-navigation.py --news-only` を使います。トップとResearchのニュース欄だけが対象で、後続の日次記事・一覧・検索索引を再生成しません。導線の回帰検査は `python3 scripts/test-news-navigation.py` です（導線復旧: 2026-10-26。上記の本文確認日とは別）。
 
 local編集、commit、branch push、PR、main merge、site deploymentは別状態です。他writerの日次更新を反映直前に確認し、force pushや無断resetで消しません。
 
