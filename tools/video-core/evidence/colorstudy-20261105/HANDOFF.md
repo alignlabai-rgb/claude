@@ -40,7 +40,7 @@ python -m video_core plan|render ... --color-policy {baseline,bt709-tv-gbrp-v1} 
 * Default (`None`/`baseline`): canonical plan, hash, argv **byte-for-byte unchanged** (test pins `4bc20b3f…`, equals `evidence/plan.canonical.json`).
 * Opt-in: colour clips get `…setpts=PTS-STARTPTS,format=gbrp,scale=out_color_matrix=bt709:out_range=tv,setsar=1,format=yuv420p`; canonical plan gains `"color_policy"` (only then) → a **different** hash. Schema string `video_core.plan/1` is unchanged — the owner should decide whether the extra key warrants `plan/2`.
 * Unknown policy → `ValidationFailed(color_policy_invalid)` before anything else; file sources untouched.
-* Tests (patch adds `tests/test_color_policy.py`, 11 tests, 1 opt-in): TESTRESULTS
+* Tests (patch adds `tests/test_color_policy.py`, 11 tests, 1 opt-in): on fresh temporary exports of base `b4ca4a3` (`patch-test-results.json`, `regression/`), Python 3.11.18 / 3.12.3 / 3.13.18, each identical: **A** unmodified base: 454 total / 451 pass / 3 skip / 0 fail; **B** patched, full suite: 465 / 461 / 4 / 0; **C** patched code, original tests only (new test file removed): 454 / 451 / 3 / 0 — i.e. the default suite counts are unchanged; default plan hash `4bc20b3f…9f21` in A, B and C; opt-in hash `74d3ce28…c377`. **D** opt-in real-ffmpeg test (3.13, `VIDEO_CORE_INTEGRATION=1`, `tests.test_color_policy`): 11 / 11 / 0 / 0.
 * Owner decisions: adopt/not; version bump; a fresh render with the policy if it should become evidence; whether to also pin FFmpeg builds (behaviour is build-dependent); making it the default would change every plan hash and needs its own versioned decision.
 
 ### Unresolved
@@ -83,7 +83,7 @@ python -m video_core plan|render ... --color-policy {baseline,bt709-tv-gbrp-v1} 
 * 既定:canonical plan・ハッシュ・argv は**バイト単位で不変**(テストで `4bc20b3f…` を固定、`evidence/plan.canonical.json` と一致)。
 * opt-in:色クリップが `…setpts=PTS-STARTPTS,format=gbrp,scale=out_color_matrix=bt709:out_range=tv,setsar=1,format=yuv420p`。canonical plan に `"color_policy"` が(その時だけ)加わり**別のハッシュ**になる。スキーマ文字列 `video_core.plan/1` は不変 — 追加キーで `plan/2` にするかは所有者判断。
 * 未知のポリシー → `ValidationFailed(color_policy_invalid)`。ファイルソースは不変。
-* テスト(パッチは `tests/test_color_policy.py` 11件・うちopt-in 1件を追加):TESTRESULTS
+* テスト(パッチは `tests/test_color_policy.py` 11件・うちopt-in 1件を追加):ベース `b4ca4a3` の新規一時exportで実行(`patch-test-results.json`、`regression/`)。Python 3.11.18 / 3.12.3 / 3.13.18 で全て同一結果:**A** 無変更ベース 454件/合格451/skip3/失敗0、**B** patch適用・全テスト 465/461/4/0、**C** patch適用コード+元テストのみ(新テストファイル除去)454/451/3/0 = 既定スイートの件数は不変。既定planハッシュ `4bc20b3f…9f21` はA・B・Cで一致、opt-inハッシュ `74d3ce28…c377`。**D** opt-in実ffmpegテスト(3.13、`VIDEO_CORE_INTEGRATION=1`、`tests.test_color_policy`)11/11/0/0。
 * 所有者の判断事項:採否、バージョン、方針適用での再レンダ(証拠化する場合)、FFmpegビルドの固定(挙動がビルド依存)。既定化は全planハッシュが変わるため別途バージョン決定が必要。
 
 ### 未解決
