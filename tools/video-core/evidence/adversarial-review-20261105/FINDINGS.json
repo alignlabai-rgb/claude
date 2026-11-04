@@ -1,0 +1,626 @@
+{
+  "schema": "adversarial-review-findings/1",
+  "review": {
+    "repository": "alignlabai-rgb/claude",
+    "branch": "codex/video-core-adversarial-20261105",
+    "source_sha": "b4ca4a3b031351a631c0fbe1eb149935f4db19ba",
+    "date": "2026-11-04",
+    "nature": "separate automated adversarial review; NOT production acceptance, NOT security certification, NOT visual/audio quality approval"
+  },
+  "scope_notes": [
+    "No production file, original six spec, or prior evidence byte was modified (see INTEGRITY in REPORT.md).",
+    "Only synthetic technical fixtures in temporary directories; no real ffmpeg run, no media generated, no network.",
+    "Known AAC zero-vs-absent summary defect and the CPU/memory cap gap belong to the other session and were not rediscovered or fixed here."
+  ],
+  "severity_scale": {
+    "MEDIUM": "wrong or misleading truthful-status/qualification behaviour on an advertised guarantee, no data loss",
+    "LOW": "contract slip, robustness or narrow-domain defect; conservative failure mode",
+    "STATIC/OBSERVATION": "not a defect claim"
+  },
+  "validated_defects": [
+    {
+      "id": "F-INT-1",
+      "kind": "VALIDATED_DEFECT",
+      "severity": "MEDIUM",
+      "lane": 4,
+      "title": "SIGTERM/SIGINT outside the mux/render step is swallowed by run_bounded; the run is misreported and keeps launching child processes",
+      "source": [
+        "tools/video-core/video_core/runner.py:268-270 (KeyboardInterrupt converted into a normal RunResult(outcome=INTERRUPTED))",
+        "tools/video-core/video_core/tools.py:98-100 + render.py:74-77 + avmux/mux.py:96-99 (interrupted version probe => 'tool unavailable' => SKIPPED_TOOL_UNAVAILABLE, exit 3)",
+        "tools/video-core/video_core/avmux/mux.py:108-112 (both preflight ffprobe calls always run; INTERRUPTED => ValidationFailed preflight_probe_failed, exit 1)",
+        "tools/video-core/video_core/avmux/mux.py:249-253 + 158 and readback.py run_probe (interrupted readback => INSPECTION_FAILED, exit 4)",
+        "only the mux/render step itself maps INTERRUPTED: avmux/mux.py:180-184, render.py:155-161"
+      ],
+      "trigger": "Owned fake ffmpeg/ffprobe (adv_fake_tools.py) that sleeps 8 s at (a) `ffmpeg -version`, (b) preflight `ffprobe` of the video, (c) the first readback `ffmpeg -f framemd5`; SIGTERM sent to the avmux CLI pid only, after the sleep marker file appears.",
+      "command": "python3 run_audit.py -v --pattern 'test_adv_lane4_exec.py'   # or: python3 -m unittest test_adv_lane4_exec.InterruptSemantics (ADV_STRICT=1 makes it a hard failure)",
+      "expected": "exit code 130, status INTERRUPTED, no child process launched after the signal",
+      "actual": "(a) rc 3 SKIPPED_TOOL_UNAVAILABLE ('version probe did not exit cleanly: INTERRUPTED'), 1 further child launched; (b) rc 1 rejection preflight_probe_failed, 1 further child launched (the audio probe); (c) rc 4, on-disk receipt INSPECTION_FAILED, 1 further child launched (output decode)",
+      "consequence": "A cancellation is reported as 'tool unavailable', 'input invalid' or 'readback failed'; automation that branches on exit codes 1/3/4 will treat a user cancel as a technical outcome, and processes keep being started after the cancel. Same pattern in the video `render` command (render.py:70-77).",
+      "severity_rationale": "Truthful-status defect on an advertised guarantee ('record phase/exit/signal/timeout/drain separately', 130 = interrupted) that affects every stage except the mux step; not data-destructive; no wrong media.",
+      "proposed_fix": "Minimal: add `def raise_if_interrupted(res): if res.outcome == INTERRUPTED: raise KeyboardInterrupt` to runner.py and call it right after every run_bounded in tools.probe_version/_listing, readback.run_probe, avmux/mux.py:_probe/_hash_text/_run and render.py; add `except KeyboardInterrupt: receipt['status']=STATUS_INTERRUPTED` beside the existing `except Exception` in render() and mux() (audiomix/mix.py:179-180 is the model). The existing INTERRUPTED mapping of the mux/render step stays.",
+      "tests": [
+        "test_adv_lane4_exec.InterruptSemantics.test_sigterm_in_any_stage_ends_the_run_as_interrupted_without_launching_more_children"
+      ],
+      "reproducibility": "deterministic (marker-synchronised); reproduced on Python 3.11, 3.12, 3.13",
+      "platform": "Linux x86_64 only; Windows not run",
+      "overlap_with_other_session": "none"
+    },
+    {
+      "id": "F-ENC-1",
+      "kind": "VALIDATED_DEFECT",
+      "severity": "LOW",
+      "lane": 4,
+      "title": "A caller-chosen root whose path contains a non-UTF-8 byte strands an IN_PROGRESS receipt after the run (video render) or after creating the run directory (avmux)",
+      "source": [
+        "tools/video-core/video_core/receipt.py:47-48 (json.dumps(ensure_ascii=False).encode('utf-8') is strict)",
+        "tools/video-core/video_core/paths.py:113-123 (real_directory accepts a name that cannot be encoded)",
+        "tools/video-core/video_core/render.py:95-114 (final receipt carries argv with the run directory; encode error escapes after output.mp4 was promoted)",
+        "tools/video-core/video_core/avmux/mux.py:123-137 (run directory created, first receipt already contains the asset root through the preflight probe argv)"
+      ],
+      "trigger": "Directory named b'out_caf\\xe9' (valid on Linux; Python str '\\udce9'); video render with the owned fake tools, and avmux mux with an assets directory named b'assets_caf\\xe9'.",
+      "command": "python3 run_audit.py -v --pattern 'test_adv_lane4_exec.py'  (NonUtf8Roots)",
+      "expected": "either refuse the root before anything is created, or finish with a terminal receipt",
+      "actual": "video: UnicodeEncodeError escapes render(); output.mp4 exists; receipt.json still says IN_PROGRESS/stage render. avmux: UnicodeEncodeError; run directory exists and is empty (no receipt).",
+      "consequence": "Caller gets an exception instead of a receipt although a render completed; the only record says IN_PROGRESS (= UNKNOWN by documented convention, so the failure is conservative, but it contradicts 'raises before anything is created' and strands a promoted output).",
+      "severity_rationale": "Rare precondition (raw non-UTF-8 directory name, Linux); failure mode is conservative (IN_PROGRESS means UNKNOWN); no wrong media or hash.",
+      "proposed_fix": "In paths.real_directory add `try: real.encode('utf-8') except UnicodeEncodeError: raise UnsafePath(... 'root_invalid')` (rejects before any side effect). Defence in depth: receipt.dumps(...).encode('utf-8','backslashreplace').",
+      "tests": [
+        "test_adv_lane4_exec.NonUtf8Roots.test_caller_chosen_root_with_a_non_utf8_byte_never_strands_an_in_progress_receipt"
+      ],
+      "reproducibility": "deterministic",
+      "platform": "Linux (raw bytes in names). macOS/Windows not applicable or not run",
+      "overlap_with_other_session": "none"
+    },
+    {
+      "id": "F-RCPT-1",
+      "kind": "VALIDATED_DEFECT",
+      "severity": "LOW",
+      "lane": 4,
+      "title": "After an unexpected exception the receipt inventories no outputs, records no sha256_after, and (avmux/render) leaves tmp/ undocumented, although the partial files exist",
+      "source": [
+        "tools/video-core/video_core/audiomix/mix.py:181-183 (handler) vs 230 (outputs only set on the normal path), 233-238 (sha256_after only on the normal path)",
+        "tools/video-core/video_core/avmux/mux.py:140-142 vs 220-224 (outputs, tmp cleanup)",
+        "tools/video-core/video_core/render.py:110-112 vs 195-211"
+      ],
+      "trigger": "An input file vanishes while the run is in progress: audiomix (asset removed by the cancel hook before chunk 2), avmux (owned fake ffmpeg removes the WAV during the mux).",
+      "command": "python3 run_audit.py -v   # tests ...test_receipt_inventory_after_an_internal_error_lists_what_is_on_disk and ...test_an_input_vanishing_during_the_mux_leaves_a_truthful_inventory",
+      "expected": "status UNKNOWN (correct) AND outputs[] listing stem.wav.partial/output.mov.partial/plan.canonical.json/ffprobe.output.json, inputs with sha256_after (null if unreadable), tmp_cleanup stated",
+      "actual": "status UNKNOWN + internal_error (correct), but outputs == [], no sha256_after, no tmp_cleanup; avmux leaves tmp/ and ffprobe.output.json unlisted",
+      "consequence": "The one document that is supposed to describe a run that went wrong omits the evidence that exists next to it; a reader who trusts the receipt would not know a partial output is there.",
+      "severity_rationale": "Status is already conservative (UNKNOWN); only the inventory is incomplete.",
+      "proposed_fix": "Move the inventory/hash/cleanup block of each _run into a helper `finalize(run_dir, receipt)` that is also called (best-effort, in its own try) from the `except` handler in mix()/mux()/render().",
+      "tests": [
+        "test_adv_lane2_paths.HashAcrossStages.test_receipt_inventory_after_an_internal_error_lists_what_is_on_disk",
+        "test_adv_lane4_exec.AvmuxOrchestration.test_an_input_vanishing_during_the_mux_leaves_a_truthful_inventory"
+      ],
+      "reproducibility": "deterministic",
+      "platform": "Linux (avmux/render use POSIX fake tools)",
+      "overlap_with_other_session": "none (the other session fixes AAC zero-vs-absent summaries and the OPTIONAL resource envelope)"
+    },
+    {
+      "id": "F-REC-1",
+      "kind": "VALIDATED_DEFECT",
+      "severity": "LOW",
+      "lane": 1,
+      "title": "avmux plan: a malformed audio receipt raises AttributeError/RecursionError instead of a typed rejection",
+      "source": [
+        "tools/video-core/video_core/avmux/plan.py:100-113 (json.loads without type checks; .get() on whatever was decoded)"
+      ],
+      "trigger": "Receipt file (hash pinned in the manifest) whose JSON is `[]`, `null`, `\"x\"`, `1`, or {status MIXED_VERIFIED, outputs:\"x\"}, outputs:[1], readback.wav:\"x\", or 100000 nested arrays.",
+      "command": "python3 -m unittest test_adv_lane1_parsers.AudioReceiptInput  (exploratory origin: probes/p3.py); CLI: python3 -m video_core.avmux plan MANIFEST --asset-root ROOT => traceback, exit 1, empty stdout",
+      "expected": "ValidationFailed/UnsafePath with an audio_receipt_* issue code (exit 1 with the structured error)",
+      "actual": "AttributeError ('list'/'NoneType'/'str'/'int' object has no attribute 'get'); RecursionError for deep nesting",
+      "consequence": "Untyped crash from untrusted-ish input at plan time; callers that catch VideoCoreError (as the CLIs do) get a traceback.",
+      "severity_rationale": "Plan-time robustness; no side effects occur; input must be a file the caller pinned by SHA-256.",
+      "proposed_fix": "Reuse the strict loader: `rec = parse_json_bytes(raw, limits)`; then `if not isinstance(rec, dict) ... outputs must be a list of objects ... readback.wav must be an object` each raising audio_receipt_unreadable/_shape; catch RecursionError (parse_json_bytes already does).",
+      "tests": [
+        "test_adv_lane1_parsers.AudioReceiptInput.test_malformed_receipt_content_is_a_typed_rejection",
+        "test_adv_lane1_parsers.AudioReceiptInput.test_control_a_receipt_written_by_the_real_audio_mixer_is_accepted"
+      ],
+      "reproducibility": "deterministic",
+      "platform": "any",
+      "overlap_with_other_session": "none"
+    },
+    {
+      "id": "F-REC-2",
+      "kind": "VALIDATED_DEFECT",
+      "severity": "MEDIUM",
+      "lane": 1,
+      "title": "avmux 'qualification' by an audio receipt checks three fields only: a hand-written or internally inconsistent receipt qualifies the stem",
+      "source": [
+        "tools/video-core/video_core/avmux/plan.py:105-112 (status == MIXED_VERIFIED, one outputs[role=stem].sha256, readback.wav.sample_count)"
+      ],
+      "trigger": "Receipts with only {status, outputs:[{role:stem,sha256}], readback:{wav:{sample_count}}} (3 fields); with readback.all_ok=false; with outputs[stem].partial=true; with quality_evaluated=true; with duplicate `status` keys (last wins: HOLD then MIXED_VERIFIED); with sample_count 4800.0 (float).",
+      "command": "python3 -m unittest test_adv_lane1_parsers.AudioReceiptInput",
+      "expected": "documented contract: receipt must be an audio-planner receipt for exactly this stem; internally inconsistent or schema-less receipts refused",
+      "actual": "all of the above are accepted and recorded as `status: MIXED_VERIFIED` in the avmux plan/receipt (plan_sha256 None)",
+      "consequence": "Any adopter who reads `audio.receipt.status == MIXED_VERIFIED` in the avmux plan as machine-checked qualification is trusting a caller-authored JSON; inconsistent combinations (all_ok=false + MIXED_VERIFIED) that the audio planner never emits are accepted.",
+      "severity_rationale": "The feature exists to qualify stems; the weak check can mislead an adopter although nothing in the docs claims authentication. Because receipts are inherently unauthenticated, the minimum is consistency + a clear statement.",
+      "proposed_fix": "Require schema == 'video_core.audio_receipt/1', written is True, stage == 'complete', readback.all_ok is True, every readback check ok, stem entry partial is False, quality_evaluated is False, sample_count `type is int`, 64-hex plan_sha256 present; parse with the strict duplicate-key-rejecting loader; copy warnings/coverage.gap_count into the avmux plan (see O-1); state in AVMUX_SPEC that the receipt is a pinned but unauthenticated caller file.",
+      "tests": [
+        "test_adv_lane1_parsers.AudioReceiptInput.test_inconsistent_or_schema_less_receipts_do_not_qualify_a_stem"
+      ],
+      "reproducibility": "deterministic",
+      "platform": "any",
+      "overlap_with_other_session": "none (other session: AAC receipt accuracy of the avmux OUTPUT receipt, not this INPUT receipt qualification)"
+    },
+    {
+      "id": "F-RUN-1",
+      "kind": "VALIDATED_DEFECT",
+      "severity": "LOW",
+      "lane": 4,
+      "title": "Drain-limit breach is classified FLOOD_KILLED or EXITED_ZERO/ok depending on a 50 ms polling race",
+      "source": [
+        "tools/video-core/video_core/runner.py:254-267 (flood flag only consulted while the child is still running)",
+        "tools/video-core/video_core/runner.py:171 (flag set by the drain thread)"
+      ],
+      "trigger": "Child writes 2 MB to stdout and exits at once with max_drain_bytes=1000; control: same child lingers 1 s.",
+      "command": "python3 -m unittest test_adv_lane4_exec.RunnerDefects.test_output_beyond_the_drain_limit_is_never_reported_as_a_clean_exit (ADV_STRICT=1 for a hard failure)",
+      "expected": "the documented bound ('child output beyond this => killed') is visible in the outcome either way",
+      "actual": "quick child: EXITED_ZERO, ok=True, 2000000 bytes captured/hashed; lingering child: FLOOD_KILLED",
+      "consequence": "Bounded-diagnostics receipts can report a clean exit for an output stream that exceeded the configured bound (mostly cosmetic for ffmpeg stderr; relevant for the decoded-PCM drain bound used by the avmux readback).",
+      "severity_rationale": "Classification race on an edge condition; data is still fully drained and hashed; readbacks have independent size checks.",
+      "proposed_fix": "After the wait loop: `if state['flood'].is_set() and result.kill_reason is None: result.kill_reason = 'flood'` (classify() then yields FLOOD_KILLED for an already exited child).",
+      "tests": [
+        "test_adv_lane4_exec.RunnerDefects.test_output_beyond_the_drain_limit_is_never_reported_as_a_clean_exit"
+      ],
+      "reproducibility": "racy by construction; quick-exit case reproduced in every run of the matrix",
+      "platform": "Linux; POSIX poll loop",
+      "overlap_with_other_session": "OPTIONAL resource envelope is a CPU/memory cap; this is the existing byte bound's classification, not a new cap"
+    },
+    {
+      "id": "F-RUN-2",
+      "kind": "VALIDATED_DEFECT",
+      "severity": "LOW",
+      "lane": 4,
+      "title": "Interrupt (Ctrl-C) during pipe drain escapes run_bounded and leaves a process of the owned group running",
+      "source": [
+        "tools/video-core/video_core/runner.py:272-282 (drain/orphan section is outside the try that handles KeyboardInterrupt, lines 253-270)"
+      ],
+      "trigger": "Child exits 0 leaving one self-expiring (5 s) grandchild that holds the pipes; SIGINT delivered 0.6 s after the grandchild exists, i.e. while run_bounded waits (drain_timeout 3 s).",
+      "command": "python3 -m unittest test_adv_lane4_exec.RunnerDefects.test_interrupt_during_pipe_drain_does_not_leave_a_member_of_the_owned_group_running",
+      "expected": "no member of the owned process group survives the unwinding of run_bounded",
+      "actual": "KeyboardInterrupt escapes; grandchild still alive (the test kills it itself afterwards)",
+      "consequence": "The 'only owned children, nothing left behind' guarantee has a window; effect bounded by the child's own lifetime.",
+      "severity_rationale": "Narrow window; needs an orphaned pipe holder and a cancel during drain.",
+      "proposed_fix": "Wrap lines 272-282 in the same try (or try/finally that calls _signal_group(proc, SIGKILL) when drain is incomplete before re-raising).",
+      "tests": [
+        "test_adv_lane4_exec.RunnerDefects.test_interrupt_during_pipe_drain_does_not_leave_a_member_of_the_owned_group_running"
+      ],
+      "reproducibility": "deterministic with marker synchronisation (the first matrix run showed an environment-dependent harness defect, see harness_defects H7)",
+      "platform": "Linux (POSIX process groups)",
+      "overlap_with_other_session": "none"
+    },
+    {
+      "id": "F-NUM-1",
+      "kind": "VALIDATED_DEFECT",
+      "severity": "LOW",
+      "lane": 1,
+      "title": "numeric.finite_seconds raises OverflowError (not the documented ValueError) for an absurdly large Python int",
+      "source": [
+        "tools/video-core/video_core/numeric.py:54 (`{value:g}` formats an int > 1e308 through float)"
+      ],
+      "trigger": "Limits(max_runtime_seconds=10**400), AudioLimits(...), Limits().replace(probe_timeout_seconds=10**400), run_bounded(timeout_s=10**400)",
+      "command": "python3 -m unittest test_adv_lane1_parsers.NumericAlgebra.test_absurd_finite_integer_limits_raise_value_error_not_overflow",
+      "expected": "ValueError (module docstring: 'all violations raise ValueError')",
+      "actual": "OverflowError: int too large to convert to float",
+      "consequence": "Library callers catching ValueError (as the CLIs do) miss it; CLI flags are float-typed so the CLI path is unaffected (inf is rejected cleanly).",
+      "severity_rationale": "API-contract slip, no side effect, not reachable from the CLI.",
+      "proposed_fix": "line 54: `f\"{name} must be <= {ceiling:g} seconds (got {_describe(value)})\"` (the helper exists on line 21).",
+      "tests": [
+        "test_adv_lane1_parsers.NumericAlgebra.test_absurd_finite_integer_limits_raise_value_error_not_overflow"
+      ],
+      "reproducibility": "deterministic",
+      "platform": "any",
+      "overlap_with_other_session": "none"
+    },
+    {
+      "id": "F-CLI-1",
+      "kind": "VALIDATED_DEFECT",
+      "severity": "LOW",
+      "lane": 1,
+      "title": "All three CLIs crash with a traceback (empty stdout) when a rejected input contains a lone-surrogate JSON key",
+      "source": [
+        "tools/video-core/video_core/episode.py:161 and audiomix/manifest.py:88 (issue path embeds the raw key)",
+        "tools/video-core/video_core/receipt.py:47-48 (strict UTF-8 encode)",
+        "tools/video-core/video_core/cli.py:29-31, audiomix/cli.py:30-32, avmux/cli.py:30-32 (_emit)"
+      ],
+      "trigger": "Manifest/episode JSON with an extra key written as \"\\ud800\".",
+      "command": "python3 -m video_core validate EP.json ; python3 -m video_core.audiomix validate M.json ; python3 -m video_core.avmux validate M.json",
+      "expected": "exit 1 with a structured {ok:false,error:{...}} document on stdout",
+      "actual": "UnicodeEncodeError traceback on stderr, stdout empty, exit 1 (indistinguishable by code from a structured rejection)",
+      "consequence": "The documented machine-readable rejection is missing for this input class. Library API behaves correctly (ValidationFailed with code unknown_field).",
+      "severity_rationale": "Hostile-input robustness of the error channel; nothing launched or created.",
+      "proposed_fix": "CLI _emit: `sys.stdout.buffer.write(rc.dumps(obj))` with dumps(ensure_ascii=True) for stdout (receipt files may keep ensure_ascii=False if F-ENC-1 is fixed), or use `ascii(k)` in the issue path at the two sites.",
+      "tests": [
+        "test_adv_lane1_parsers.ParserDefects.test_cli_error_output_survives_a_lone_surrogate_in_a_rejected_input"
+      ],
+      "reproducibility": "deterministic",
+      "platform": "any",
+      "overlap_with_other_session": "none"
+    },
+    {
+      "id": "F-AUD-1",
+      "kind": "VALIDATED_DEFECT",
+      "severity": "LOW",
+      "lane": 3,
+      "title": "Audio planner rejects the whole manifest for a zero-sample frame range on an unselected or OMIT event (fps > 48000)",
+      "source": [
+        "tools/video-core/video_core/audiomix/plan.py:109-113 (zero-sample check applies to every event that has a frame range)"
+      ],
+      "trigger": "fps 60000/1; selected INTENTIONAL_SILENCE [0,10) plus an UNKNOWN (unselected) or OMIT (selected) event on frames [2,3) which map to samples [2,2).",
+      "command": "python3 -m unittest test_adv_lane1_parsers.ParserDefects.test_zero_sample_range_of_unselected_or_omitted_event_must_not_reject_the_manifest",
+      "expected": "AUDIO_SPEC: unselected events are never verified and never block a valid selected scope; OMIT consumes nothing => READY",
+      "actual": "ValidationFailed event_zero_samples (whole manifest rejected)",
+      "consequence": "Only reachable above 48 kHz frame rate (manifest allows up to 60000/1); a documented independence guarantee is violated in that corner.",
+      "severity_rationale": "Very narrow input domain; reject is conservative.",
+      "proposed_fix": "line 112: `if info['s1'] <= info['s0'] and sel and e.state in ('USE','INTENTIONAL_SILENCE'):` (only events that are actually consumed need a non-empty span).",
+      "tests": [
+        "test_adv_lane1_parsers.ParserDefects.test_zero_sample_range_of_unselected_or_omitted_event_must_not_reject_the_manifest"
+      ],
+      "reproducibility": "deterministic",
+      "platform": "any",
+      "overlap_with_other_session": "none"
+    },
+    {
+      "id": "F-PATH-1",
+      "kind": "STATIC_CONCERN_STUB_ONLY",
+      "severity": "LOW",
+      "lane": 2,
+      "title": "check_media_for_inspect tests S_ISLNK only; resolve_asset uses is_link_like (also Windows reparse points)",
+      "source": [
+        "tools/video-core/video_core/paths.py:214 vs 80-84 (is_link_like) / 388-389"
+      ],
+      "trigger": "os.lstat stubbed to return a regular-file mode with FILE_ATTRIBUTE_REPARSE_POINT; NO real junction or Windows run.",
+      "command": "python3 -m unittest test_adv_lane2_paths.WindowsReparseStub",
+      "expected": "same link-like rejection as resolve_asset",
+      "actual": "stubbed reparse-point file is accepted by the inspect-path check",
+      "consequence": "Only a read-only `inspect` of a caller-named path; platform-specific and unverified.",
+      "severity_rationale": "Read-only command, Windows-only, unverified on a real reparse point.",
+      "proposed_fix": "line 214: `if is_link_like(st):`",
+      "tests": [
+        "test_adv_lane2_paths.WindowsReparseStub.test_inspect_path_check_ignores_reparse_points_unlike_resolve_asset"
+      ],
+      "reproducibility": "stub-deterministic; real-platform behaviour UNVERIFIED",
+      "platform": "Windows (untested)",
+      "overlap_with_other_session": "none"
+    }
+  ],
+  "documented_limitations_and_observations": [
+    {
+      "id": "R-1",
+      "kind": "DECLARED_LIMITATION_CONFIRMED",
+      "title": "Transient swap-and-restore of an audio asset during the mix is undetected and yields MIXED_VERIFIED with inputs_unchanged=true",
+      "source": [
+        "tools/video-core/video_core/audiomix/mix.py:107-109 (asset re-opened and re-parsed for every chunk and event)",
+        "tools/video-core/video_core/audiomix/mix.py:233-238 (hash only after the run)"
+      ],
+      "note": "Documented as 'race windows' (AUDIO_SPEC.md, LIMITATIONS.md). New information: LIMITATIONS.md describes 'the tiny gap' for FFmpeg's open(); for the mixer the unprotected window is the whole mix. Persistent swaps ARE detected (UNKNOWN). Hardening proposal: open each asset once after hashing, keep the descriptor, and compare fstat(ino,size,mtime_ns) before every chunk (or read the needed PCM range into memory right after the hash).",
+      "tests": [
+        "test_adv_lane2_paths.HashAcrossStages.test_transient_swap_and_restore_is_not_detected_documented_residual",
+        "test_adv_lane2_paths.HashAcrossStages.test_persistent_swap_is_reported_unknown"
+      ]
+    },
+    {
+      "id": "L-HARDLINK",
+      "kind": "DECLARED_LIMITATION_CONFIRMED",
+      "title": "Hard link to an outside file is accepted",
+      "note": "LIMITATIONS.md says so; confirmed (st_nlink == 2 accepted).",
+      "tests": [
+        "test_adv_lane2_paths.AssetResolution.test_hard_link_to_outside_file_is_accepted_documented_limitation"
+      ]
+    },
+    {
+      "id": "L-SIGKILL",
+      "kind": "DECLARED_LIMITATION_CONFIRMED",
+      "title": "SIGKILL of the orchestrator leaves the child running and the receipt IN_PROGRESS",
+      "note": "Confirmed with the owned fake (only recorded pids signalled).",
+      "tests": [
+        "test_adv_lane4_exec.InterruptSemantics.test_sigkill_of_the_orchestrator_leaves_in_progress_documented_limitation"
+      ]
+    },
+    {
+      "id": "O-1",
+      "kind": "OBSERVATION",
+      "title": "A manifest selecting only OMIT events (ALLOW_ZERO_FILL) mixes an all-zero stem with status MIXED_VERIFIED; avmux qualification reads status only",
+      "source": [
+        "tools/video-core/video_core/audiomix/plan.py:168-171 (warnings)",
+        "tools/video-core/video_core/avmux/plan.py:105-113 (ignores warnings/coverage)"
+      ],
+      "note": "By design and labelled in warnings, but a downstream qualifier that reads only `status` cannot tell zero-fill from audio. Proposal in F-REC-2 (surface warnings/gap_count in the avmux plan).",
+      "tests": [
+        "test_adv_lane3_timeline.SelectionAndHold.test_all_omit_manifest_yields_a_verified_all_zero_stem_characterisation"
+      ]
+    },
+    {
+      "id": "O-2",
+      "kind": "OBSERVATION",
+      "title": "Decoded-frame and copied-packet hash comparisons drop the stream/dts/pts/duration columns",
+      "source": [
+        "tools/video-core/video_core/avmux/checks.py:131-134",
+        "tools/video-core/video_core/avmux/mux.py:249-255"
+      ],
+      "note": "A copy with identical payload hashes but different per-frame timestamps is accepted when ffprobe's summary fields (start 0, fps, frame count) still match. Not a violation of the written contract, a coverage gap.",
+      "tests": [
+        "test_adv_lane4_exec.AvmuxOrchestration.test_hash_comparison_ignores_timestamp_columns_characterisation"
+      ]
+    },
+    {
+      "id": "O-3",
+      "kind": "STATIC_CONCERN_MEASURED_SMALL",
+      "title": "fontcheck scan is O(distinct code points x cmap groups/segments)",
+      "source": [
+        "tools/video-core/video_core/fontcheck.py:85-94, 112-122"
+      ],
+      "note": "Measured 0.43 us per (group x code point) at 8,000 groups x 80 code points. Extrapolation only (NOT executed): 5,000 distinct characters x 20,000 groups ~ 43 s; limits-maximum (262,144 x 1,000,000) ~ 31 h of plan-time CPU. Proposal: sort groups once and bisect.",
+      "tests": [
+        "test_adv_lane1_parsers.FontParser.test_scan_cost_is_linear_in_codepoints_times_groups_measured_small"
+      ]
+    },
+    {
+      "id": "O-4",
+      "kind": "ENVIRONMENT_CONDITIONAL",
+      "title": "Integer-literal bomb defence is the interpreter's 4300-digit limit",
+      "source": [
+        "tools/video-core/video_core/episode.py:117 (json.loads)"
+      ],
+      "note": "Default interpreters reject; with PYTHONINTMAXSTRDIGITS=0 a 4 MiB literal costs integer-conversion time (3.11: 1M digits = 4.3 s measured by hand; 100k/200k measured in the suite; larger sizes extrapolated).",
+      "tests": [
+        "test_adv_lane1_parsers.JsonStrictness.test_decoder_digit_limit_is_the_only_integer_bomb_defence"
+      ]
+    },
+    {
+      "id": "O-5",
+      "kind": "PLATFORM_UNVERIFIED",
+      "title": "Names accepted that may be reserved or aliased on Windows/macOS",
+      "note": "COM¹.wav, U+FF0F fullwidth solidus, U+2024, NFD vs NFC spellings are accepted (Linux characterisation only).",
+      "tests": [
+        "test_adv_lane2_paths.PathSyntax.test_observed_accepted_names_that_deserve_platform_review"
+      ]
+    }
+  ],
+  "non_reproduced_hypotheses": [
+    {
+      "id": "H-WAV",
+      "hypothesis": "WAV parser accepts a malformed file / rejects a valid one",
+      "result": "457 byte-level cases (every truncation point, every header byte flipped x3, 45 structural variants) vs an independent oracle: 0 disagreements"
+    },
+    {
+      "id": "H-ROUND",
+      "hypothesis": "frame->sample or frame->ms rounding drifts or rounds to even",
+      "result": "4,775 oracle comparisons over 19 frame rates incl. 318 exact-half sample cases and 235 exact-half ms cases: 0 differences; 30000/1001 boundary table and 28,828,800 total reproduced"
+    },
+    {
+      "id": "H-MIX",
+      "hypothesis": "planner/mixer disagrees with an independent Fraction oracle (gain, channel rules, clipping, overlap, coverage, HOLD)",
+      "result": "700 seeded scenarios (271 reject, 346 hold, 83 mixed incl. 10 CLIPPING_REJECTED and 4 MIXED_WITH_CLAMPING) + 8-cell channel matrix: 0 disagreements"
+    },
+    {
+      "id": "H-EP",
+      "hypothesis": "episode validator / SRT disagree with an oracle",
+      "result": "900 seeded episodes (64 accepted, 836 rejected): 0 disagreements in acceptance, SRT bytes identical for all accepted"
+    },
+    {
+      "id": "H-JSON",
+      "hypothesis": "hostile JSON bytes leak a non-ValidationFailed exception",
+      "result": "75 mutations over 3 loaders + 150k-deep arrays/60k-deep objects: all typed rejections"
+    },
+    {
+      "id": "H-PATH",
+      "hypothesis": "traversal / symlink / FIFO / existing-output overwrite",
+      "result": "66 hostile names rejected, 8 ordinary accepted; 8 link/special-file cases rejected; existing outputs (file, dir, dangling link, link to assets) never overwritten"
+    },
+    {
+      "id": "H-INERT",
+      "hypothesis": "a rejected request creates files or launches a process",
+      "result": "27 rejected requests (audio 15, avmux 9, video 3) under an audit hook: zero launches, zero file writes, output tree and input hashes unchanged"
+    },
+    {
+      "id": "H-PURITY",
+      "hypothesis": "plan/validate/dry-run launch or write",
+      "result": "11 CLI invocations in-process under an audit hook: zero events, tree unchanged"
+    },
+    {
+      "id": "H-FONT",
+      "hypothesis": "corrupt font leaks a stray exception",
+      "result": "1,380 truncations/bit-flips over format 4 and 12: 0 leaks"
+    },
+    {
+      "id": "H-HASH",
+      "hypothesis": "video-only default / canonical plan hash changes",
+      "result": "baseline plan hash 4bc20b3f...9f21 reproduced byte-for-byte against the archived plan, identical with/without importing audiomix/avmux; argv keeps -an/-sn/-dn and maps only [vout]"
+    },
+    {
+      "id": "H-DIAG",
+      "hypothesis": "diagnostic truncation miscounts or loses the full-stream hash",
+      "result": "10 sizes x 2 write patterns around head+tail boundaries: exact head/tail bytes, totals, dropped count and SHA-256"
+    },
+    {
+      "id": "H-TIMEOUT",
+      "hypothesis": "wall-clock bound not honoured / child survives timeout",
+      "result": "silent child 0.5 s limit returns < 3 s; SIGTERM-ignoring child is killed after grace; both pids gone"
+    }
+  ],
+  "test_harness_defects_found_and_fixed": [
+    {
+      "id": "H1",
+      "description": "Lane 2 first draft: avmux fixtures named the wav 'a.wav' but the case files wrote 'mono.wav' => every avmux case 'asset_missing' (fixed in the test)."
+    },
+    {
+      "id": "H2",
+      "description": "Lane 1: the manifest() builder coerced a string scope into a list, so 'scope: \"a\"' was never tested (fixed)."
+    },
+    {
+      "id": "H3",
+      "description": "Lane 1: the first fps catalogue contained no exact .5 sample boundary (needs 2^8 | n); the test that asserts their presence failed and the catalogue was extended."
+    },
+    {
+      "id": "H4",
+      "description": "Lane 3: argv audio check matched 'a=0' inside the filtergraph; audited-body indentation; asset shorter than the longest span (Rng assertion) (fixed)."
+    },
+    {
+      "id": "H5",
+      "description": "Lane 4: fake ffmpeg wrote the partial output after sleeping/failing (real muxers have it earlier); wrong md5 literal in a mutation; incomplete-drain expectation (drain_complete is True after the group kill, orphan_group_killed is the signal) (fixed)."
+    },
+    {
+      "id": "H6",
+      "description": "F-RUN-2 harness had a quoting IndentationError that was swallowed as 'expected failure'. Consequence: known_defect now re-reports any non-AssertionError as ERROR and scenario preconditions use harness_check() (HarnessError)."
+    },
+    {
+      "id": "H7",
+      "description": "First full matrix: the F-RUN-2 scenario did not run because a background job started with '&' inherits SIGINT=SIG_IGN, so Python never installed its KeyboardInterrupt handler. The HarnessError guard reported 5 ERRORs; fixed by installing default_int_handler in the scenario. Logs kept in logs/attempts/."
+    }
+  ],
+  "unverified_or_out_of_reach": [
+    "Windows and macOS (nothing run; reparse-point and name-aliasing behaviour is stub/characterisation only)",
+    "Real FFmpeg/ffprobe behaviour of the mux, AAC encoder delay, real decoded-frame hashes (no real tool was run on media; the owned fakes emit canned answers and are never mux evidence)",
+    "Ceiling-sized inputs (10-minute / 200 M-work audio, 4 GiB sources, 18000-frame decodes)",
+    "EACCES/EIO on a readable-looking asset (suite runs as root; static concern: audiomix/plan.py opens the asset outside a try block so an OSError would surface untyped)",
+    "audiomix CLI SIGTERM wiring (cancel flag) end to end; only the API-level cancel hook is exercised",
+    "Perceptual A/V sync, audio or visual quality, creative selection/voice/timing (explicitly not evaluated)"
+  ],
+  "test_runs": {
+    "existing_default_suite_unchanged": {
+      "py3.11": {
+        "total": 454,
+        "passed": 451,
+        "skipped": 3,
+        "failures": 0,
+        "errors": 0,
+        "log": "logs/baseline-default-suite-python3.11.log"
+      },
+      "py3.12": {
+        "total": 454,
+        "passed": 451,
+        "skipped": 3,
+        "failures": 0,
+        "errors": 0,
+        "log": "logs/baseline-default-suite-python3.12.log"
+      },
+      "py3.13": {
+        "total": 454,
+        "passed": 451,
+        "skipped": 3,
+        "failures": 0,
+        "errors": 0,
+        "log": "logs/baseline-default-suite-python3.13.log"
+      }
+    },
+    "audit_suite": {
+      "py3.11-default": {
+        "python": "3.11.18",
+        "mode": "default",
+        "total": 89,
+        "passed": 78,
+        "skipped": 0,
+        "failures": 0,
+        "errors": 0,
+        "expected_failures_reproduced_defects": 11,
+        "unexpected_successes": 0,
+        "wall_seconds": 28.96
+      },
+      "py3.11-strict": {
+        "python": "3.11.18",
+        "mode": "strict",
+        "total": 89,
+        "passed": 78,
+        "skipped": 0,
+        "failures": 11,
+        "errors": 0,
+        "expected_failures_reproduced_defects": 0,
+        "unexpected_successes": 0,
+        "wall_seconds": 29.0
+      },
+      "py3.12-default": {
+        "python": "3.12.3",
+        "mode": "default",
+        "total": 89,
+        "passed": 78,
+        "skipped": 0,
+        "failures": 0,
+        "errors": 0,
+        "expected_failures_reproduced_defects": 11,
+        "unexpected_successes": 0,
+        "wall_seconds": 29.5
+      },
+      "py3.12-strict": {
+        "python": "3.12.3",
+        "mode": "strict",
+        "total": 89,
+        "passed": 78,
+        "skipped": 0,
+        "failures": 11,
+        "errors": 0,
+        "expected_failures_reproduced_defects": 0,
+        "unexpected_successes": 0,
+        "wall_seconds": 29.4
+      },
+      "py3.13-default": {
+        "python": "3.13.18",
+        "mode": "default",
+        "total": 89,
+        "passed": 78,
+        "skipped": 0,
+        "failures": 0,
+        "errors": 0,
+        "expected_failures_reproduced_defects": 11,
+        "unexpected_successes": 0,
+        "wall_seconds": 29.13
+      },
+      "py3.13-strict": {
+        "python": "3.13.18",
+        "mode": "strict",
+        "total": 89,
+        "passed": 78,
+        "skipped": 0,
+        "failures": 11,
+        "errors": 0,
+        "expected_failures_reproduced_defects": 0,
+        "unexpected_successes": 0,
+        "wall_seconds": 28.82
+      }
+    },
+    "seeds_and_case_counts": {
+      "episode_differential": {
+        "cases": 900,
+        "seed": 20261106
+      },
+      "font_corpus": {
+        "cases": 1380,
+        "seed": 20261204
+      },
+      "frame_boundary_oracle": {
+        "cases": 4775,
+        "seed": 20261108
+      },
+      "gain_avg_oracle": {
+        "cases": 13565,
+        "seed": 20261107
+      },
+      "planner_mixer_property": {
+        "cases": 700,
+        "seed": 20261110
+      },
+      "span_oracle": {
+        "cases": 640,
+        "seed": 20261111
+      },
+      "wav_differential": {
+        "cases": 457,
+        "seed": 20261105
+      }
+    },
+    "baseline_plan_sha256": "4bc20b3fd703f46651c868c1929efd3d9df3fc3c0a99f86607502ca92d5d9f21",
+    "wall_limit_seconds": 300,
+    "child_limit_seconds": 10
+  },
+  "counts": {
+    "validated_defects": 10,
+    "stub_only_static_concerns": 1,
+    "reproducer_tests_marked_known_defect": 11,
+    "by_severity": {
+      "MEDIUM": 2,
+      "LOW": 8
+    }
+  }
+}
