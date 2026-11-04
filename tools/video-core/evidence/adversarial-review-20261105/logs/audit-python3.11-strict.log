@@ -1,0 +1,268 @@
+== Python 3.11.18  mode=strict
+== cmd: python3.11 run_audit.py --strict -v (cwd evidence/adversarial-review-20261105)
+== start: 2026-11-04T22:26:32Z
+test_acceptance_and_srt_agree_with_independent_oracle (test_adv_lane1_parsers.EpisodeDifferential.test_acceptance_and_srt_agree_with_independent_oracle) ... ok
+test_collections_and_wrong_magic_are_rejected (test_adv_lane1_parsers.FontParser.test_collections_and_wrong_magic_are_rejected) ... ok
+test_corrupt_fonts_only_raise_font_error (test_adv_lane1_parsers.FontParser.test_corrupt_fonts_only_raise_font_error) ... ok
+test_scan_cost_is_linear_in_codepoints_times_groups_measured_small (test_adv_lane1_parsers.FontParser.test_scan_cost_is_linear_in_codepoints_times_groups_measured_small)
+STATIC CONCERN, measured at small scale only (bounded). _format12_has / _format4_has scan every group/segment for every distinct ... ok
+test_decoder_digit_limit_is_the_only_integer_bomb_defence (test_adv_lane1_parsers.JsonStrictness.test_decoder_digit_limit_is_the_only_integer_bomb_defence)
+Environment-conditional observation, not a defect. Default interpreters refuse integer literals above 4300 digits (asserted below). ... ok
+test_deep_nesting_is_rejected_cleanly_in_a_bounded_child (test_adv_lane1_parsers.JsonStrictness.test_deep_nesting_is_rejected_cleanly_in_a_bounded_child) ... ok
+test_every_loader_raises_only_typed_validation_errors (test_adv_lane1_parsers.JsonStrictness.test_every_loader_raises_only_typed_validation_errors) ... ok
+test_valid_docs_are_accepted (test_adv_lane1_parsers.JsonStrictness.test_valid_docs_are_accepted) ... ok
+test_audio_manifest_numeric_boundaries (test_adv_lane1_parsers.ManifestBounds.test_audio_manifest_numeric_boundaries) ... ok
+test_avmux_manifest_numeric_and_state_boundaries (test_adv_lane1_parsers.ManifestBounds.test_avmux_manifest_numeric_and_state_boundaries) ... ok
+test_event_and_gain_boundaries (test_adv_lane1_parsers.ManifestBounds.test_event_and_gain_boundaries) ... ok
+test_scope_semantics (test_adv_lane1_parsers.ManifestBounds.test_scope_semantics) ... ok
+test_30000_1001_boundaries_do_not_accumulate (test_adv_lane1_parsers.NumericAlgebra.test_30000_1001_boundaries_do_not_accumulate) ... ok
+test_absurd_finite_integer_limits_raise_value_error_not_overflow (test_adv_lane1_parsers.NumericAlgebra.test_absurd_finite_integer_limits_raise_value_error_not_overflow)
+numeric.py promises every violation is a ValueError. A huge Python int is formatted with `:g` and raises OverflowError. ... FAIL
+test_exact_half_boundaries_round_up_not_to_even (test_adv_lane1_parsers.NumericAlgebra.test_exact_half_boundaries_round_up_not_to_even)
+Search for fps/frames whose 48 kHz position is exactly k+1/2 and check both k even and k odd resolve upward. ... ok
+test_frame_to_sample_and_ms_match_fraction_oracle_including_exact_halves (test_adv_lane1_parsers.NumericAlgebra.test_frame_to_sample_and_ms_match_fraction_oracle_including_exact_halves) ... ok
+test_gain_and_average_rounding_match_fraction_oracle (test_adv_lane1_parsers.NumericAlgebra.test_gain_and_average_rounding_match_fraction_oracle) ... ok
+test_other_numeric_edge_values_are_rejected_as_value_error (test_adv_lane1_parsers.NumericAlgebra.test_other_numeric_edge_values_are_rejected_as_value_error) ... ok
+test_cli_error_output_survives_a_lone_surrogate_in_a_rejected_input (test_adv_lane1_parsers.ParserDefects.test_cli_error_output_survives_a_lone_surrogate_in_a_rejected_input)
+A JSON key written as "\ud800" is a lone surrogate. The unknown-field issue embeds it in `path`; the CLI then fails to encode ... FAIL
+test_zero_sample_range_of_unselected_or_omitted_event_must_not_reject_the_manifest (test_adv_lane1_parsers.ParserDefects.test_zero_sample_range_of_unselected_or_omitted_event_must_not_reject_the_manifest)
+AUDIO_SPEC: unselected events are never verified and never block a valid selected scope; OMIT consumes nothing. ... FAIL
+test_wav_differential_against_independent_oracle (test_adv_lane1_parsers.WavParser.test_wav_differential_against_independent_oracle) ... ok
+test_wav_known_documented_strictness_points (test_adv_lane1_parsers.WavParser.test_wav_known_documented_strictness_points)
+Spot checks of decisions that are easy to get wrong; these pin the *documented* behaviour. ... ok
+test_zero_sample_wav_cannot_be_bound_by_a_use_event (test_adv_lane1_parsers.WavParser.test_zero_sample_wav_cannot_be_bound_by_a_use_event)
+data chunk of 0 samples is a valid WAV; a USE event must be rejected by the range check, never read. ... ok
+test_audio_plan_never_opens_unselected_or_unbound_assets (test_adv_lane2_paths.AssetResolution.test_audio_plan_never_opens_unselected_or_unbound_assets)
+Only assets bound by a SELECTED USE event are touched: a hostile unselected binding (symlink, FIFO) must not be opened. ... ok
+test_hard_link_to_outside_file_is_accepted_documented_limitation (test_adv_lane2_paths.AssetResolution.test_hard_link_to_outside_file_is_accepted_documented_limitation)
+LIMITATIONS.md: 'Hard links to outside files cannot be detected.' Confirmed (characterisation, not a new defect). ... ok
+test_links_fifos_and_directories_are_refused (test_adv_lane2_paths.AssetResolution.test_links_fifos_and_directories_are_refused) ... ok
+test_size_limit_is_enforced_before_reading (test_adv_lane2_paths.AssetResolution.test_size_limit_is_enforced_before_reading) ... ok
+test_symlinked_asset_root_is_accepted_by_design_but_links_below_it_are_not (test_adv_lane2_paths.AssetResolution.test_symlinked_asset_root_is_accepted_by_design_but_links_below_it_are_not) ... ok
+test_avmux_plan_labels_caller_stated_video_properties_as_unverified (test_adv_lane2_paths.HashAcrossStages.test_avmux_plan_labels_caller_stated_video_properties_as_unverified) ... ok
+test_decoy_with_matching_extension_but_other_content_is_rejected (test_adv_lane2_paths.HashAcrossStages.test_decoy_with_matching_extension_but_other_content_is_rejected) ... ok
+test_deleted_input_during_mix_is_reported_unknown_not_a_crash (test_adv_lane2_paths.HashAcrossStages.test_deleted_input_during_mix_is_reported_unknown_not_a_crash) ... ok
+test_persistent_swap_is_reported_unknown (test_adv_lane2_paths.HashAcrossStages.test_persistent_swap_is_reported_unknown) ... ok
+test_receipt_inventory_after_an_internal_error_lists_what_is_on_disk (test_adv_lane2_paths.HashAcrossStages.test_receipt_inventory_after_an_internal_error_lists_what_is_on_disk)
+After an unexpected exception the run keeps its partial files (documented) but the receipt says outputs=[] and has no ... FAIL
+test_transient_swap_and_restore_is_not_detected_documented_residual (test_adv_lane2_paths.HashAcrossStages.test_transient_swap_and_restore_is_not_detected_documented_residual)
+The mixer re-opens the asset for every chunk, so the unprotected window is the WHOLE mix, not the 'tiny gap' LIMITATIONS.md ... ok
+test_bad_output_names_are_refused_and_nothing_is_created (test_adv_lane2_paths.OutputProtection.test_bad_output_names_are_refused_and_nothing_is_created) ... ok
+test_existing_locations_are_never_overwritten (test_adv_lane2_paths.OutputProtection.test_existing_locations_are_never_overwritten) ... ok
+test_output_may_not_alias_or_contain_the_asset_root (test_adv_lane2_paths.OutputProtection.test_output_may_not_alias_or_contain_the_asset_root) ... ok
+test_unusable_roots (test_adv_lane2_paths.OutputProtection.test_unusable_roots) ... ok
+test_hostile_names_are_rejected_and_ordinary_names_accepted (test_adv_lane2_paths.PathSyntax.test_hostile_names_are_rejected_and_ordinary_names_accepted) ... ok
+test_non_string_paths_are_not_crashes (test_adv_lane2_paths.PathSyntax.test_non_string_paths_are_not_crashes) ... ok
+test_observed_accepted_names_that_deserve_platform_review (test_adv_lane2_paths.PathSyntax.test_observed_accepted_names_that_deserve_platform_review)
+Characterisation only (no pass/fail claim about Windows/macOS, which were not run): these names are accepted today. ... ok
+test_unicode_normalisation_aliases_are_two_distinct_names_here (test_adv_lane2_paths.PathSyntax.test_unicode_normalisation_aliases_are_two_distinct_names_here)
+NFC vs NFD spelling of one visible name are both accepted and distinct on Linux. If a caller binds both as separate assets on a ... ok
+test_rejected_requests_launch_nothing_and_create_nothing (test_adv_lane2_paths.RejectedInputsAreInert.test_rejected_requests_launch_nothing_and_create_nothing) ... ok
+test_inspect_path_check_ignores_reparse_points_unlike_resolve_asset (test_adv_lane2_paths.WindowsReparseStub.test_inspect_path_check_ignores_reparse_points_unlike_resolve_asset)
+STUB ONLY (no Windows run, no real junction): resolve_asset() uses is_link_like() (symlink OR FILE_ATTRIBUTE_REPARSE_POINT) but ... ok
+test_channel_rule_matrix_against_oracle (test_adv_lane3_timeline.PlannerMixerProperty.test_channel_rule_matrix_against_oracle) ... ok
+test_seeded_scenarios_agree_with_the_independent_planner_and_mixer_oracle (test_adv_lane3_timeline.PlannerMixerProperty.test_seeded_scenarios_agree_with_the_independent_planner_and_mixer_oracle) ... ok
+test_adjacent_frame_ranges_tile_the_sample_axis_without_gap_or_overlap (test_adv_lane3_timeline.SampleSpans.test_adjacent_frame_ranges_tile_the_sample_axis_without_gap_or_overlap) ... ok
+test_avmux_declared_sample_count_accepts_exactly_the_oracle_count (test_adv_lane3_timeline.SampleSpans.test_avmux_declared_sample_count_accepts_exactly_the_oracle_count) ... ok
+test_planner_event_spans_and_totals_match_oracle_for_odd_frame_rates (test_adv_lane3_timeline.SampleSpans.test_planner_event_spans_and_totals_match_oracle_for_odd_frame_rates) ... ok
+test_use_event_source_length_must_equal_timeline_length_at_alternating_boundaries (test_adv_lane3_timeline.SampleSpans.test_use_event_source_length_must_equal_timeline_length_at_alternating_boundaries)
+30000/1001: one frame is 1601 or 1602 samples depending on position. The planner must accept the exact oracle length and ... ok
+test_all_omit_manifest_yields_a_verified_all_zero_stem_characterisation (test_adv_lane3_timeline.SelectionAndHold.test_all_omit_manifest_yields_a_verified_all_zero_stem_characterisation)
+Design observation O-1 (not a defect): with ALLOW_ZERO_FILL a manifest that selects only OMIT events mixes a stem of pure ... ok
+test_concurrency_limit_is_exact (test_adv_lane3_timeline.SelectionAndHold.test_concurrency_limit_is_exact) ... ok
+test_omit_is_not_coverage_but_intentional_silence_is (test_adv_lane3_timeline.SelectionAndHold.test_omit_is_not_coverage_but_intentional_silence_is) ... ok
+test_selected_unresolved_is_hold_never_silence_even_when_zero_fill_is_allowed (test_adv_lane3_timeline.SelectionAndHold.test_selected_unresolved_is_hold_never_silence_even_when_zero_fill_is_allowed) ... ok
+test_silence_may_not_overlap_consumed_audio_but_touching_is_fine (test_adv_lane3_timeline.SelectionAndHold.test_silence_may_not_overlap_consumed_audio_but_touching_is_fine) ... ok
+test_unselected_unresolved_is_reported_but_never_blocks (test_adv_lane3_timeline.SelectionAndHold.test_unselected_unresolved_is_reported_but_never_blocks) ... ok
+test_zero_fill_is_labelled_and_exact (test_adv_lane3_timeline.SelectionAndHold.test_zero_fill_is_labelled_and_exact) ... ok
+test_baseline_plan_hash_and_bytes_are_stable_and_video_only (test_adv_lane3_timeline.VideoOnlyDefault.test_baseline_plan_hash_and_bytes_are_stable_and_video_only) ... ok
+test_burn_in_enable_windows_agree_with_srt_cue_ends_and_oracle (test_adv_lane3_timeline.VideoOnlyDefault.test_burn_in_enable_windows_agree_with_srt_cue_ends_and_oracle) ... ok
+test_importing_the_audio_modules_does_not_change_the_video_plan (test_adv_lane3_timeline.VideoOnlyDefault.test_importing_the_audio_modules_does_not_change_the_video_plan) ... ok
+test_srt_matches_example_file_and_oracle (test_adv_lane3_timeline.VideoOnlyDefault.test_srt_matches_example_file_and_oracle) ... ok
+test_cancel_keeps_a_partial_that_is_labelled_and_never_looks_like_a_stem (test_adv_lane4_exec.AudioMixerStops.test_cancel_keeps_a_partial_that_is_labelled_and_never_looks_like_a_stem) ... ok
+test_clipping_reject_stops_at_the_first_clipped_chunk_and_reports_the_exact_sample (test_adv_lane4_exec.AudioMixerStops.test_clipping_reject_stops_at_the_first_clipped_chunk_and_reports_the_exact_sample) ... ok
+test_injected_clock_timeout_is_a_timeout_not_a_success (test_adv_lane4_exec.AudioMixerStops.test_injected_clock_timeout_is_a_timeout_not_a_success) ... ok
+test_keyboard_interrupt_inside_the_run_is_recorded_as_interrupted (test_adv_lane4_exec.AudioMixerStops.test_keyboard_interrupt_inside_the_run_is_recorded_as_interrupted) ... ok
+test_statuses_never_claim_quality (test_adv_lane4_exec.AudioMixerStops.test_statuses_never_claim_quality) ... ok
+test_a_clean_exit_with_a_surviving_pipe_holder_is_unknown (test_adv_lane4_exec.AvmuxOrchestration.test_a_clean_exit_with_a_surviving_pipe_holder_is_unknown)
+An existing test covers the same contract with its own double; this one runs it end to end with one self-expiring holder. ... ok
+test_aac_tolerance_boundary_is_exactly_one_aac_frame (test_adv_lane4_exec.AvmuxOrchestration.test_aac_tolerance_boundary_is_exactly_one_aac_frame) ... ok
+test_an_input_vanishing_during_the_mux_leaves_a_truthful_inventory (test_adv_lane4_exec.AvmuxOrchestration.test_an_input_vanishing_during_the_mux_leaves_a_truthful_inventory)
+Input deleted while ffmpeg runs: status UNKNOWN is right, but the receipt lists outputs=[] although output.mov.partial exists, ... FAIL
+test_diagnostics_truncation_in_the_receipt_is_exact_and_bounded (test_adv_lane4_exec.AvmuxOrchestration.test_diagnostics_truncation_in_the_receipt_is_exact_and_bounded) ... ok
+test_failure_modes_have_truthful_distinct_statuses_and_keep_partials (test_adv_lane4_exec.AvmuxOrchestration.test_failure_modes_have_truthful_distinct_statuses_and_keep_partials) ... ok
+test_happy_path_with_a_faithful_double_and_the_in_progress_marker_during_the_run (test_adv_lane4_exec.AvmuxOrchestration.test_happy_path_with_a_faithful_double_and_the_in_progress_marker_during_the_run) ... ok
+test_hash_comparison_ignores_timestamp_columns_characterisation (test_adv_lane4_exec.AvmuxOrchestration.test_hash_comparison_ignores_timestamp_columns_characterisation)
+Observation O-2 (a coverage gap, not a contract violation): the decoded-frame and copied-packet checks compare (size, hash) rows only; ... ok
+test_readback_mismatches_are_mismatches_and_the_file_is_quarantined (test_adv_lane4_exec.AvmuxOrchestration.test_readback_mismatches_are_mismatches_and_the_file_is_quarantined) ... ok
+test_sigkill_of_the_orchestrator_leaves_in_progress_documented_limitation (test_adv_lane4_exec.InterruptSemantics.test_sigkill_of_the_orchestrator_leaves_in_progress_documented_limitation)
+LIMITATIONS.md: killing the orchestrator with SIGKILL leaves the child running and the receipt IN_PROGRESS (= UNKNOWN). ... ok
+test_sigterm_during_the_mux_step_itself_is_interrupted_and_partial_is_kept (test_adv_lane4_exec.InterruptSemantics.test_sigterm_during_the_mux_step_itself_is_interrupted_and_partial_is_kept) ... ok
+test_sigterm_in_any_stage_ends_the_run_as_interrupted_without_launching_more_children (test_adv_lane4_exec.InterruptSemantics.test_sigterm_in_any_stage_ends_the_run_as_interrupted_without_launching_more_children) ... FAIL
+test_caller_chosen_root_with_a_non_utf8_byte_never_strands_an_in_progress_receipt (test_adv_lane4_exec.NonUtf8Roots.test_caller_chosen_root_with_a_non_utf8_byte_never_strands_an_in_progress_receipt)
+A directory name containing byte 0xE9 is legal on Linux (Python decodes it with surrogateescape). Receipts embed argv paths and are ... FAIL
+test_plan_validate_and_dry_run_launch_nothing_and_create_nothing (test_adv_lane4_exec.PlanPurity.test_plan_validate_and_dry_run_launch_nothing_and_create_nothing) ... ok
+test_interrupt_during_pipe_drain_does_not_leave_a_member_of_the_owned_group_running (test_adv_lane4_exec.RunnerDefects.test_interrupt_during_pipe_drain_does_not_leave_a_member_of_the_owned_group_running) ... FAIL
+test_output_beyond_the_drain_limit_is_never_reported_as_a_clean_exit (test_adv_lane4_exec.RunnerDefects.test_output_beyond_the_drain_limit_is_never_reported_as_a_clean_exit)
+Racy classification: a child that writes more than max_drain_bytes and exits inside the 50 ms poll window is EXITED_ZERO/ok, ... FAIL
+test_diagnostic_truncation_keeps_exact_head_tail_totals_and_full_stream_hash (test_adv_lane4_exec.RunnerSemantics.test_diagnostic_truncation_keeps_exact_head_tail_totals_and_full_stream_hash) ... ok
+test_incomplete_drain_is_recorded_and_the_owned_group_is_cleaned (test_adv_lane4_exec.RunnerSemantics.test_incomplete_drain_is_recorded_and_the_owned_group_is_cleaned)
+One grandchild (self-expiring after 5 s) inherits the pipes after its parent exited 0. This replicates an existing scenario ... ok
+test_invalid_numeric_arguments_fail_before_any_launch (test_adv_lane4_exec.RunnerSemantics.test_invalid_numeric_arguments_fail_before_any_launch) ... ok
+test_outcome_matrix_keeps_exit_signal_timeout_and_drain_separate (test_adv_lane4_exec.RunnerSemantics.test_outcome_matrix_keeps_exit_signal_timeout_and_drain_separate) ... ok
+test_wall_clock_bound_is_respected_for_a_silent_child (test_adv_lane4_exec.RunnerSemantics.test_wall_clock_bound_is_respected_for_a_silent_child) ... ok
+
+======================================================================
+FAIL: test_absurd_finite_integer_limits_raise_value_error_not_overflow (test_adv_lane1_parsers.NumericAlgebra.test_absurd_finite_integer_limits_raise_value_error_not_overflow)
+numeric.py promises every violation is a ValueError. A huge Python int is formatted with `:g` and raises OverflowError.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/claude/tools/video-core/evidence/adversarial-review-20261105/test_adv_lane1_parsers.py", line 358, in test_absurd_finite_integer_limits_raise_value_error_not_overflow
+    self.assertEqual(leaks, {})
+AssertionError: {'finite_seconds': 'OverflowError', 'Limit[82 chars]ror'} != {}
++ {}
+- {'AudioLimits': 'OverflowError',
+-  'Limits': 'OverflowError',
+-  'Limits.replace': 'OverflowError',
+-  'finite_seconds': 'OverflowError'}
+
+======================================================================
+FAIL: test_cli_error_output_survives_a_lone_surrogate_in_a_rejected_input (test_adv_lane1_parsers.ParserDefects.test_cli_error_output_survives_a_lone_surrogate_in_a_rejected_input)
+A JSON key written as "\ud800" is a lone surrogate. The unknown-field issue embeds it in `path`; the CLI then fails to encode
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/claude/tools/video-core/evidence/adversarial-review-20261105/test_adv_lane1_parsers.py", line 650, in test_cli_error_output_survives_a_lone_surrogate_in_a_rejected_input
+    self.assertEqual(failures, {})
+AssertionError: {'video': {'rc': 1, 'stdout': '', 'stderr_[433 chars]ed"}} != {}
+Diff is 770 characters long. Set self.maxDiff to None to see it.
+
+======================================================================
+FAIL: test_zero_sample_range_of_unselected_or_omitted_event_must_not_reject_the_manifest (test_adv_lane1_parsers.ParserDefects.test_zero_sample_range_of_unselected_or_omitted_event_must_not_reject_the_manifest)
+AUDIO_SPEC: unselected events are never verified and never block a valid selected scope; OMIT consumes nothing.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/claude/tools/video-core/evidence/adversarial-review-20261105/test_adv_lane1_parsers.py", line 627, in test_zero_sample_range_of_unselected_or_omitted_event_must_not_reject_the_manifest
+    self.assertEqual(outcomes, {"unselected UNKNOWN": "READY", "selected OMIT": "READY"})
+AssertionError: {'uns[16 chars]: 'REJECTED:event_zero_samples', 'selected OMI[29 chars]les'} != {'uns[16 chars]: 'READY', 'selected OMIT': 'READY'}
++ {'selected OMIT': 'READY', 'unselected UNKNOWN': 'READY'}
+- {'selected OMIT': 'REJECTED:event_zero_samples',
+-  'unselected UNKNOWN': 'REJECTED:event_zero_samples'}
+
+======================================================================
+FAIL: test_receipt_inventory_after_an_internal_error_lists_what_is_on_disk (test_adv_lane2_paths.HashAcrossStages.test_receipt_inventory_after_an_internal_error_lists_what_is_on_disk)
+After an unexpected exception the run keeps its partial files (documented) but the receipt says outputs=[] and has no
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/claude/tools/video-core/evidence/adversarial-review-20261105/test_adv_lane2_paths.py", line 442, in test_receipt_inventory_after_an_internal_error_lists_what_is_on_disk
+    self.assertEqual(listed, on_disk)
+AssertionError: Lists differ: [] != ['plan.canonical.json', 'stem.wav.partial']
+
+Second list contains 2 additional elements.
+First extra element 0:
+'plan.canonical.json'
+
+- []
++ ['plan.canonical.json', 'stem.wav.partial']
+
+======================================================================
+FAIL: test_an_input_vanishing_during_the_mux_leaves_a_truthful_inventory (test_adv_lane4_exec.AvmuxOrchestration.test_an_input_vanishing_during_the_mux_leaves_a_truthful_inventory)
+Input deleted while ffmpeg runs: status UNKNOWN is right, but the receipt lists outputs=[] although output.mov.partial exists,
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/claude/tools/video-core/evidence/adversarial-review-20261105/test_adv_lane4_exec.py", line 490, in test_an_input_vanishing_during_the_mux_leaves_a_truthful_inventory
+    self.assertEqual(listed, expect)
+AssertionError: Lists differ: [] != ['ffprobe.output.json', 'output.mov.partial', 'plan.canonical.json']
+
+Second list contains 3 additional elements.
+First extra element 0:
+'ffprobe.output.json'
+
+- []
++ ['ffprobe.output.json', 'output.mov.partial', 'plan.canonical.json']
+
+======================================================================
+FAIL: test_sigterm_in_any_stage_ends_the_run_as_interrupted_without_launching_more_children (test_adv_lane4_exec.InterruptSemantics.test_sigterm_in_any_stage_ends_the_run_as_interrupted_without_launching_more_children)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/claude/tools/video-core/evidence/adversarial-review-20261105/test_adv_lane4_exec.py", line 600, in test_sigterm_in_any_stage_ends_the_run_as_interrupted_without_launching_more_children
+    self.assertEqual(problems, [])
+AssertionError: Lists differ: [{'stage': 'tool_version_probe', 'reached'[472 chars]: 1}] != []
+
+First list contains 3 additional elements.
+First extra element 0:
+{'stage': 'tool_version_probe', 'reached': True, 'rc': 3, 'reported': 'SKIPPED_TOOL_UNAVAILABLE', 'disk_receipt_status': None, 'children_launched_after_interrupt': 1}
+
++ []
+- [{'children_launched_after_interrupt': 1,
+-   'disk_receipt_status': None,
+-   'rc': 3,
+-   'reached': True,
+-   'reported': 'SKIPPED_TOOL_UNAVAILABLE',
+-   'stage': 'tool_version_probe'},
+-  {'children_launched_after_interrupt': 1,
+-   'disk_receipt_status': None,
+-   'rc': 1,
+-   'reached': True,
+-   'reported': 'REJECTED:preflight_probe_failed',
+-   'stage': 'preflight_input_probe'},
+-  {'children_launched_after_interrupt': 1,
+-   'disk_receipt_status': 'INSPECTION_FAILED',
+-   'rc': 4,
+-   'reached': True,
+-   'reported': 'INSPECTION_FAILED',
+-   'stage': 'readback_decode'}]
+
+======================================================================
+FAIL: test_caller_chosen_root_with_a_non_utf8_byte_never_strands_an_in_progress_receipt (test_adv_lane4_exec.NonUtf8Roots.test_caller_chosen_root_with_a_non_utf8_byte_never_strands_an_in_progress_receipt)
+A directory name containing byte 0xE9 is legal on Linux (Python decodes it with surrogateescape). Receipts embed argv paths and are
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/claude/tools/video-core/evidence/adversarial-review-20261105/test_adv_lane4_exec.py", line 549, in test_caller_chosen_root_with_a_non_utf8_byte_never_strands_an_in_progress_receipt
+    self.assertEqual(bad, {})
+AssertionError: {'video_render': {'exception': 'UnicodeEnc[278 chars]lse}} != {}
++ {}
+- {'avmux_mux': {'exception': 'UnicodeEncodeError',
+-                'on_disk_receipt_status': None,
+-                'promoted_output': False,
+-                'returned_status': None,
+-                'run_dir_exists': True},
+-  'video_render': {'exception': 'UnicodeEncodeError',
+-                   'on_disk_receipt_status': 'IN_PROGRESS',
+-                   'promoted_output': True,
+-                   'returned_status': None,
+-                   'run_dir_exists': True}}
+
+======================================================================
+FAIL: test_interrupt_during_pipe_drain_does_not_leave_a_member_of_the_owned_group_running (test_adv_lane4_exec.RunnerDefects.test_interrupt_during_pipe_drain_does_not_leave_a_member_of_the_owned_group_running)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/claude/tools/video-core/evidence/adversarial-review-20261105/test_adv_lane4_exec.py", line 180, in test_interrupt_during_pipe_drain_does_not_leave_a_member_of_the_owned_group_running
+    self.assertIn("alive=False", out.decode(), out.decode())
+AssertionError: 'alive=False' not found in 'KeyboardInterrupt\nalive=True\n' : KeyboardInterrupt
+alive=True
+
+
+======================================================================
+FAIL: test_output_beyond_the_drain_limit_is_never_reported_as_a_clean_exit (test_adv_lane4_exec.RunnerDefects.test_output_beyond_the_drain_limit_is_never_reported_as_a_clean_exit)
+Racy classification: a child that writes more than max_drain_bytes and exits inside the 50 ms poll window is EXITED_ZERO/ok,
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/claude/tools/video-core/evidence/adversarial-review-20261105/test_adv_lane4_exec.py", line 168, in test_output_beyond_the_drain_limit_is_never_reported_as_a_clean_exit
+    self.assertEqual((quick.outcome, quick.ok), ("FLOOD_KILLED", False))
+AssertionError: Tuples differ: ('EXITED_ZERO', True) != ('FLOOD_KILLED', False)
+
+First differing element 0:
+'EXITED_ZERO'
+'FLOOD_KILLED'
+
+- ('EXITED_ZERO', True)
++ ('FLOOD_KILLED', False)
+
+----------------------------------------------------------------------
+Ran 86 tests in 29.206s
+
+FAILED (failures=9)
+
+SUMMARY {"python": "3.11.18", "mode": "strict", "total": 86, "passed": 77, "skipped": 0, "failures": 9, "errors": 0, "expected_failures_reproduced_defects": 0, "unexpected_successes": 0, "wall_seconds": 29.21}
+== exit: 1
+== end: 2026-11-04T22:27:02Z
