@@ -11,4 +11,8 @@ Checked at the end of the review (commands run from the repository root).
 | no bytecode/media left in the tree | `find tools/video-core -name __pycache__`; `*.wav`, `*.mp4`, `*.partial` are git-ignored | removed / none retained |
 | `codex/video-core-cloud-20261105` untouched | only `git push origin codex/video-core-adversarial-20261105` was issued | yes |
 
-Clean-export validation: the commit was exported with `git archive` into a fresh empty directory (outside the repository) and `run_audit.py` was executed from that export on Python 3.13 (default mode). Result is appended below by the final step.
+Clean-export validation (final commit, see git log for the exact SHA): `git archive <sha> tools/video-core` into a fresh empty directory outside the repository, then
+1. the exported file list equals `git ls-tree -r <sha> tools/video-core` (651 files; four evidence file names that contained a raw non-UTF-8 byte from the F-ENC-1 fixture were renamed with a backslash-escaped form before the final commit so the tree is safe for any tool);
+2. every file that existed at `b4ca4a3` is byte-identical in the export (`cmp`, no output);
+3. `python3.13 run_audit.py` run from the export: 89 tests, 78 passed, 0 skipped, 0 failures, 0 errors, 11 expected failures (reproduced defects), 0 unexpected successes;
+4. `FINDINGS.json` parses (10 validated defects: 2 MEDIUM, 8 LOW; 1 stub-only static concern; 11 reproducer tests).

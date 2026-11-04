@@ -150,7 +150,7 @@ class Sandbox:
                 for n in files:
                     src = os.path.join(base, n)
                     if n.endswith((".json", ".log", ".txt", ".out", ".err")) and not os.path.islink(src) and os.path.getsize(src) <= 65536:
-                        rel = os.path.relpath(src, self.root).replace(os.sep, "__")
+                        rel = os.path.relpath(src, self.root).replace(os.sep, "__").encode("utf-8", "backslashreplace").decode("utf-8")  # raw non-UTF-8 names (F-ENC-1 fixtures) stay repo-safe
                         shutil.copyfile(src, os.path.join(dest, rel))
         finally:
             if os.environ.get("ADV_KEEP_TMP") != "1":
