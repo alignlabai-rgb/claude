@@ -1,0 +1,1036 @@
+{
+ "schema": "colorstudy.preregistration/1",
+ "written_before_any_numbered_experiment": true,
+ "sealed_files_sha256": {
+  "study_lib.py": "9513b715e61a3b83495fed41796f6bffd27c0fffcbbc53e4b27630fe20cbd146",
+  "run_study.py": "fa5a9c648b018ae0e62f6c3ce7482cfc1a7ce5e2686955679cbed232d4d27c13",
+  "make_fixtures.py": "efef3ba454c7940ed68ad781d01fe5bc94607ffb35e43a874ace7d17439a7e1e",
+  "fixtures/fixtures.sha256": "777e583c9505eedd9a6037f30063189629f4b15993da532d1eb05e0c27310cd6",
+  "fixtures/patches.json": "dd72e20b10f670ddd535d8f48f0320bcb1356fbfac5e4001d5b33a9a2f94c190"
+ },
+ "experiments": {
+  "E01": {
+   "title": "chart of 32 colour sources, BASELINE chain (as committed)",
+   "kind": "chart_color",
+   "variant": "baseline",
+   "tags": "709",
+   "geom": "chart"
+  },
+  "E02": {
+   "title": "chart of 32 colour sources, +format=gbrp before scale (proposed)",
+   "kind": "chart_color",
+   "variant": "gbrp",
+   "tags": "709",
+   "geom": "chart"
+  },
+  "E03": {
+   "title": "chart of 32 colour sources, +format=rgb24 before scale (alternative intermediate)",
+   "kind": "chart_color",
+   "variant": "rgb24",
+   "tags": "709",
+   "geom": "chart"
+  },
+  "E04": {
+   "title": "chart of 32 colour sources, gbrp + scale flags accurate_rnd+full_chroma_int",
+   "kind": "chart_color",
+   "variant": "gbrp_accurate",
+   "tags": "709",
+   "geom": "chart"
+  },
+  "E05": {
+   "title": "chart of 32 colour sources, gbrp + zscale (libzimg) reference engine",
+   "kind": "chart_color",
+   "variant": "gbrp_zscale",
+   "tags": "709",
+   "geom": "chart"
+  },
+  "E06": {
+   "title": "PNG rgb24 chart through the FILE branch, BASELINE chain",
+   "kind": "chart_png",
+   "variant": "baseline",
+   "tags": "709",
+   "geom": "chart"
+  },
+  "E07": {
+   "title": "PNG rgb24 chart through the FILE branch, +format=gbrp",
+   "kind": "chart_png",
+   "variant": "gbrp",
+   "tags": "709",
+   "geom": "chart"
+  },
+  "E08": {
+   "title": "TAG-ONLY: E01 chain unchanged, mp4 tagged smpte170m/bt470bg-class instead of bt709",
+   "kind": "chart_color",
+   "variant": "baseline",
+   "tags": "170m",
+   "geom": "chart"
+  },
+  "E09": {
+   "title": "flat 256x144 #30506a, BASELINE chain (reported colour, single full frame)",
+   "kind": "flat",
+   "variant": "baseline",
+   "tags": "709",
+   "geom": "flat"
+  },
+  "E10": {
+   "title": "flat 256x144 #30506a, +format=gbrp",
+   "kind": "flat",
+   "variant": "gbrp",
+   "tags": "709",
+   "geom": "flat"
+  },
+  "E11": {
+   "title": "COUNTEREXAMPLE: exact BT.709 yuv420p *file* source through baseline vs. gbrp-misapplied",
+   "kind": "yuv_counterexample",
+   "variant": "both",
+   "tags": "none",
+   "geom": "chart"
+  },
+  "E12": {
+   "title": "RESERVED for a numbered correction of a harness bug; unused unless a record says otherwise",
+   "kind": "reserved",
+   "variant": "none",
+   "tags": "none",
+   "geom": "chart"
+  }
+ },
+ "limits": {
+  "wall_seconds": 10,
+  "cpus": [
+   0,
+   1
+  ],
+  "rlimit_cpu_s": 10,
+  "rlimit_fsize_bytes": 4194304,
+  "rlimit_as_bytes": 6442450944,
+  "ffmpeg_threads": 2,
+  "filter_complex_threads": 1,
+  "max_dim": 256
+ },
+ "regions": {
+  "patch_px": 32,
+  "interior": "distance to nearest patch edge >= 4 px",
+  "boundary": "distance <= 1 px",
+  "transition": "2..3 px, excluded from both",
+  "chroma_interior": "a 4:2:0 chroma sample whose four luma pixels are all interior"
+ },
+ "oracle": {
+  "kind": "fractions.Fraction exact arithmetic, round half up, standard luma coefficients",
+  "bt709": "Kr=0.2126 Kb=0.0722",
+  "bt601": "Kr=0.299 Kb=0.114",
+  "ranges": "limited: Y 16..235, C 16..240; RGB full 0..255",
+  "decode_chroma_upsampling": "nearest (replicate) for the arithmetic oracle; the ffmpeg read-back uses swscale's own filter",
+  "exact_tie_cases_in_forward_conversion": []
+ },
+ "numerical_uncertainty": {
+  "quantisation_floor_max_channel_error_on_chart": 2,
+  "analytic_half_code_bound_rgb": {
+   "R": 1.4785623165362036,
+   "G": 0.9552707522385046,
+   "B": 1.6383926736790606
+  },
+  "note": "8-bit limited-range YCbCr cannot represent every RGB triple: the best achievable interior error is the floor above (<= 2 on this chart). swscale uses fixed-point coefficients and may differ from exact rounding by 1 code; x264 (crf 18) and the decoder add more. These are the reasons for the tolerances below; they are engineering choices, not standard values."
+ },
+ "tolerances": {
+  "T_YUV_codes": 1,
+  "T_RGB_raw_interior": 3,
+  "T_RGB_mp4_interior": 4,
+  "T_symptom_min_error_baseline": 3,
+  "justification": {
+   "T_YUV_codes": "swscale fixed point vs exact rounding: one code per plane",
+   "T_RGB_raw_interior": "floor (2) + one residual level from <=1-code plane drift; also the level the author reported (<=3)",
+   "T_RGB_mp4_interior": "T_RGB_raw_interior + 1 for x264 and the decoder's own conversion",
+   "T_symptom_min_error_baseline": "the reported symptom was 44,78,102 vs 48,80,106 (largest channel 4)"
+  }
+ },
+ "hypotheses": {
+  "H1": "the baseline `color` source draws BT.601 limited-range yuv420p; the following scale (yuv420p->yuv420p, matrix change only) does not re-convert; the stream is tagged bt709, so decoders read 601 data as 709.  Prediction (E01, patch reported_30506a): raw codes (79,144,112) -> RGB (45,78,107) when read as BT.709. PRE-RUN DISCREPANCY: the reported decode was (44,78,102), blue 5 lower than H1 predicts, so H1 may be incomplete; E01 raw codes decide.",
+  "H2": "inserting format=gbrp before the scaler makes the colour source draw RGB and the scaler perform a real RGB->BT.709 limited conversion: raw codes within 1 of the BT.709 ideal for all 32 patches (criterion K1) and interior RGB error <= T_RGB_raw_interior (K2).",
+  "H3": "neutral patches are unaffected by the matrix (Kr+Kg+Kb=1): baseline and fix agree on grays; errors concentrate in saturated patches.",
+  "H4": "the PNG (rgb24) FILE branch is already correct in the baseline (E06 passes K1,K2) and format=gbrp changes nothing there (E07 vs E06 within 1 code).",
+  "H5": "tag-only relabelling changes decoded RGB but not a single pixel: sha256(E08 raw) == sha256(E01 raw).",
+  "H6": "gbrp applied to a source that is already BT.709 yuv420p is harmful: round-trip drift > 1 code for some patches (E11).",
+  "H7": "rgb24 (E03), gbrp+flags (E04) and zscale (E05) are all within K1/K2; differences between them are quantisation-level."
+ },
+ "criteria": {
+  "K1": "for each experiment and each patch: interior max |dY|,|dCb|,|dCr| vs BT.709 exact-rounded ideal <= T_YUV_codes",
+  "K2": "interior max abs channel error of the arithmetic-oracle decode of the raw frame vs nominal RGB <= T_RGB_raw_interior",
+  "K3": "interior max abs channel error of the ffmpeg-decoded mp4 vs nominal RGB <= T_RGB_mp4_interior",
+  "K4": "E09 reproduces the symptom: ffmpeg-decoded interior max channel error >= T_symptom_min_error_baseline",
+  "K5": "sha256(E08 raw) == sha256(E01 raw)",
+  "K6": "E06 passes K1+K2; max |dYUV| between E06 and E07 over all pixels <= T_YUV_codes",
+  "K8": "E11: drift of the gbrp-misapplied output versus the exact source is reported (no pass/fail); H6 is supported when max interior |dYUV| > T_YUV_codes",
+  "boundary": "reported only (max/mean per route); compared with the exact-arithmetic aligned-edge floor; never a pass/fail"
+ },
+ "per_patch_predictions": {
+  "black": {
+   "rgb": [
+    0,
+    0,
+    0
+   ],
+   "ideal_codes_bt709": [
+    16,
+    128,
+    128
+   ],
+   "ideal_codes_bt601": [
+    16,
+    128,
+    128
+   ],
+   "H1_bt601_codes_read_as_bt709_rgb": [
+    0,
+    0,
+    0
+   ],
+   "bt709_codes_read_as_bt709_rgb": [
+    0,
+    0,
+    0
+   ]
+  },
+  "gray10": {
+   "rgb": [
+    16,
+    16,
+    16
+   ],
+   "ideal_codes_bt709": [
+    30,
+    128,
+    128
+   ],
+   "ideal_codes_bt601": [
+    30,
+    128,
+    128
+   ],
+   "H1_bt601_codes_read_as_bt709_rgb": [
+    16,
+    16,
+    16
+   ],
+   "bt709_codes_read_as_bt709_rgb": [
+    16,
+    16,
+    16
+   ]
+  },
+  "gray20": {
+   "rgb": [
+    32,
+    32,
+    32
+   ],
+   "ideal_codes_bt709": [
+    43,
+    128,
+    128
+   ],
+   "ideal_codes_bt601": [
+    43,
+    128,
+    128
+   ],
+   "H1_bt601_codes_read_as_bt709_rgb": [
+    31,
+    31,
+    31
+   ],
+   "bt709_codes_read_as_bt709_rgb": [
+    31,
+    31,
+    31
+   ]
+  },
+  "gray40": {
+   "rgb": [
+    64,
+    64,
+    64
+   ],
+   "ideal_codes_bt709": [
+    71,
+    128,
+    128
+   ],
+   "ideal_codes_bt601": [
+    71,
+    128,
+    128
+   ],
+   "H1_bt601_codes_read_as_bt709_rgb": [
+    64,
+    64,
+    64
+   ],
+   "bt709_codes_read_as_bt709_rgb": [
+    64,
+    64,
+    64
+   ]
+  },
+  "gray80": {
+   "rgb": [
+    128,
+    128,
+    128
+   ],
+   "ideal_codes_bt709": [
+    126,
+    128,
+    128
+   ],
+   "ideal_codes_bt601": [
+    126,
+    128,
+    128
+   ],
+   "H1_bt601_codes_read_as_bt709_rgb": [
+    128,
+    128,
+    128
+   ],
+   "bt709_codes_read_as_bt709_rgb": [
+    128,
+    128,
+    128
+   ]
+  },
+  "grayC0": {
+   "rgb": [
+    192,
+    192,
+    192
+   ],
+   "ideal_codes_bt709": [
+    181,
+    128,
+    128
+   ],
+   "ideal_codes_bt601": [
+    181,
+    128,
+    128
+   ],
+   "H1_bt601_codes_read_as_bt709_rgb": [
+    192,
+    192,
+    192
+   ],
+   "bt709_codes_read_as_bt709_rgb": [
+    192,
+    192,
+    192
+   ]
+  },
+  "grayE0": {
+   "rgb": [
+    224,
+    224,
+    224
+   ],
+   "ideal_codes_bt709": [
+    208,
+    128,
+    128
+   ],
+   "ideal_codes_bt601": [
+    208,
+    128,
+    128
+   ],
+   "H1_bt601_codes_read_as_bt709_rgb": [
+    224,
+    224,
+    224
+   ],
+   "bt709_codes_read_as_bt709_rgb": [
+    224,
+    224,
+    224
+   ]
+  },
+  "white": {
+   "rgb": [
+    255,
+    255,
+    255
+   ],
+   "ideal_codes_bt709": [
+    235,
+    128,
+    128
+   ],
+   "ideal_codes_bt601": [
+    235,
+    128,
+    128
+   ],
+   "H1_bt601_codes_read_as_bt709_rgb": [
+    255,
+    255,
+    255
+   ],
+   "bt709_codes_read_as_bt709_rgb": [
+    255,
+    255,
+    255
+   ]
+  },
+  "reported_30506a": {
+   "rgb": [
+    48,
+    80,
+    106
+   ],
+   "ideal_codes_bt709": [
+    80,
+    143,
+    113
+   ],
+   "ideal_codes_bt601": [
+    79,
+    144,
+    112
+   ],
+   "H1_bt601_codes_read_as_bt709_rgb": [
+    45,
+    78,
+    107
+   ],
+   "bt709_codes_read_as_bt709_rgb": [
+    48,
+    79,
+    106
+   ]
+  },
+  "reported_6a5030": {
+   "rgb": [
+    106,
+    80,
+    48
+   ],
+   "ideal_codes_bt709": [
+    87,
+    111,
+    141
+   ],
+   "ideal_codes_bt601": [
+    88,
+    110,
+    142
+   ],
+   "H1_bt601_codes_read_as_bt709_rgb": [
+    109,
+    80,
+    46
+   ],
+   "bt709_codes_read_as_bt709_rgb": [
+    106,
+    79,
+    47
+   ]
+  },
+  "dark_102030": {
+   "rgb": [
+    16,
+    32,
+    48
+   ],
+   "ideal_codes_bt709": [
+    42,
+    137,
+    120
+   ],
+   "ideal_codes_bt601": [
+    41,
+    137,
+    120
+   ],
+   "H1_bt601_codes_read_as_bt709_rgb": [
+    15,
+    31,
+    48
+   ],
+   "bt709_codes_read_as_bt709_rgb": [
+    16,
+    33,
+    49
+   ]
+  },
+  "dark_301020": {
+   "rgb": [
+    48,
+    16,
+    32
+   ],
+   "ideal_codes_bt709": [
+    37,
+    132,
+    141
+   ],
+   "ideal_codes_bt601": [
+    40,
+    130,
+    141
+   ],
+   "H1_bt601_codes_read_as_bt709_rgb": [
+    51,
+    21,
+    32
+   ],
+   "bt709_codes_read_as_bt709_rgb": [
+    48,
+    17,
+    33
+   ]
+  },
+  "dark_203010": {
+   "rgb": [
+    32,
+    48,
+    16
+   ],
+   "ideal_codes_bt709": [
+    52,
+    116,
+    122
+   ],
+   "ideal_codes_bt601": [
+    50,
+    116,
+    123
+   ],
+   "H1_bt601_codes_read_as_bt709_rgb": [
+    31,
+    45,
+    14
+   ],
+   "bt709_codes_read_as_bt709_rgb": [
+    31,
+    48,
+    17
+   ]
+  },
+  "dark_0a0a30": {
+   "rgb": [
+    10,
+    10,
+    48
+   ],
+   "ideal_codes_bt709": [
+    27,
+    145,
+    126
+   ],
+   "ideal_codes_bt601": [
+    28,
+    145,
+    125
+   ],
+   "H1_bt601_codes_read_as_bt709_rgb": [
+    9,
+    12,
+    50
+   ],
+   "bt709_codes_read_as_bt709_rgb": [
+    9,
+    10,
+    49
+   ]
+  },
+  "dark_300a0a": {
+   "rgb": [
+    48,
+    10,
+    10
+   ],
+   "ideal_codes_bt709": [
+    32,
+    124,
+    145
+   ],
+   "ideal_codes_bt601": [
+    34,
+    122,
+    145
+   ],
+   "H1_bt601_codes_read_as_bt709_rgb": [
+    51,
+    13,
+    8
+   ],
+   "bt709_codes_read_as_bt709_rgb": [
+    49,
+    10,
+    10
+   ]
+  },
+  "dark_0a300a": {
+   "rgb": [
+    10,
+    48,
+    10
+   ],
+   "ideal_codes_bt709": [
+    48,
+    115,
+    113
+   ],
+   "ideal_codes_bt601": [
+    44,
+    117,
+    114
+   ],
+   "H1_bt601_codes_read_as_bt709_rgb": [
+    8,
+    42,
+    9
+   ],
+   "bt709_codes_read_as_bt709_rgb": [
+    10,
+    48,
+    10
+   ]
+  },
+  "red": {
+   "rgb": [
+    255,
+    0,
+    0
+   ],
+   "ideal_codes_bt709": [
+    63,
+    102,
+    240
+   ],
+   "ideal_codes_bt601": [
+    81,
+    90,
+    240
+   ],
+   "H1_bt601_codes_read_as_bt709_rgb": [
+    255,
+    24,
+    0
+   ],
+   "bt709_codes_read_as_bt709_rgb": [
+    255,
+    1,
+    0
+   ]
+  },
+  "green": {
+   "rgb": [
+    0,
+    255,
+    0
+   ],
+   "ideal_codes_bt709": [
+    173,
+    42,
+    26
+   ],
+   "ideal_codes_bt601": [
+    145,
+    54,
+    34
+   ],
+   "H1_bt601_codes_read_as_bt709_rgb": [
+    0,
+    216,
+    0
+   ],
+   "bt709_codes_read_as_bt709_rgb": [
+    0,
+    255,
+    1
+   ]
+  },
+  "blue": {
+   "rgb": [
+    0,
+    0,
+    255
+   ],
+   "ideal_codes_bt709": [
+    32,
+    240,
+    118
+   ],
+   "ideal_codes_bt601": [
+    41,
+    240,
+    110
+   ],
+   "H1_bt601_codes_read_as_bt709_rgb": [
+    0,
+    15,
+    255
+   ],
+   "bt709_codes_read_as_bt709_rgb": [
+    1,
+    0,
+    255
+   ]
+  },
+  "cyan": {
+   "rgb": [
+    0,
+    255,
+    255
+   ],
+   "ideal_codes_bt709": [
+    188,
+    154,
+    16
+   ],
+   "ideal_codes_bt601": [
+    170,
+    166,
+    16
+   ],
+   "H1_bt601_codes_read_as_bt709_rgb": [
+    0,
+    231,
+    255
+   ],
+   "bt709_codes_read_as_bt709_rgb": [
+    0,
+    254,
+    255
+   ]
+  },
+  "magenta": {
+   "rgb": [
+    255,
+    0,
+    255
+   ],
+   "ideal_codes_bt709": [
+    78,
+    214,
+    230
+   ],
+   "ideal_codes_bt601": [
+    106,
+    202,
+    222
+   ],
+   "H1_bt601_codes_read_as_bt709_rgb": [
+    255,
+    39,
+    255
+   ],
+   "bt709_codes_read_as_bt709_rgb": [
+    255,
+    0,
+    254
+   ]
+  },
+  "yellow": {
+   "rgb": [
+    255,
+    255,
+    0
+   ],
+   "ideal_codes_bt709": [
+    219,
+    16,
+    138
+   ],
+   "ideal_codes_bt601": [
+    210,
+    16,
+    146
+   ],
+   "H1_bt601_codes_read_as_bt709_rgb": [
+    255,
+    240,
+    0
+   ],
+   "bt709_codes_read_as_bt709_rgb": [
+    254,
+    255,
+    0
+   ]
+  },
+  "orange_ff8000": {
+   "rgb": [
+    255,
+    128,
+    0
+   ],
+   "ideal_codes_bt709": [
+    141,
+    59,
+    189
+   ],
+   "ideal_codes_bt601": [
+    146,
+    53,
+    193
+   ],
+   "H1_bt601_codes_read_as_bt709_rgb": [
+    255,
+    133,
+    0
+   ],
+   "bt709_codes_read_as_bt709_rgb": [
+    255,
+    128,
+    0
+   ]
+  },
+  "violet_8000ff": {
+   "rgb": [
+    128,
+    0,
+    255
+   ],
+   "ideal_codes_bt709": [
+    55,
+    227,
+    174
+   ],
+   "ideal_codes_bt601": [
+    74,
+    221,
+    166
+   ],
+   "H1_bt601_codes_read_as_bt709_rgb": [
+    136,
+    27,
+    255
+   ],
+   "bt709_codes_read_as_bt709_rgb": [
+    128,
+    0,
+    255
+   ]
+  },
+  "mid_804040": {
+   "rgb": [
+    128,
+    64,
+    64
+   ],
+   "ideal_codes_bt709": [
+    83,
+    122,
+    156
+   ],
+   "ideal_codes_bt601": [
+    87,
+    119,
+    156
+   ],
+   "H1_bt601_codes_read_as_bt709_rgb": [
+    133,
+    70,
+    64
+   ],
+   "bt709_codes_read_as_bt709_rgb": [
+    128,
+    64,
+    65
+   ]
+  },
+  "mid_408040": {
+   "rgb": [
+    64,
+    128,
+    64
+   ],
+   "ideal_codes_bt709": [
+    110,
+    106,
+    102
+   ],
+   "ideal_codes_bt601": [
+    103,
+    109,
+    104
+   ],
+   "H1_bt601_codes_read_as_bt709_rgb": [
+    58,
+    118,
+    61
+   ],
+   "bt709_codes_read_as_bt709_rgb": [
+    63,
+    128,
+    63
+   ]
+  },
+  "mid_404080": {
+   "rgb": [
+    64,
+    64,
+    128
+   ],
+   "ideal_codes_bt709": [
+    75,
+    156,
+    125
+   ],
+   "ideal_codes_bt601": [
+    77,
+    156,
+    123
+   ],
+   "H1_bt601_codes_read_as_bt709_rgb": [
+    62,
+    68,
+    130
+   ],
+   "bt709_codes_read_as_bt709_rgb": [
+    63,
+    64,
+    128
+   ]
+  },
+  "skin_e0b090": {
+   "rgb": [
+    224,
+    176,
+    144
+   ],
+   "ideal_codes_bt709": [
+    174,
+    109,
+    150
+   ],
+   "ideal_codes_bt601": [
+    176,
+    107,
+    151
+   ],
+   "H1_bt601_codes_read_as_bt709_rgb": [
+    228,
+    179,
+    142
+   ],
+   "bt709_codes_read_as_bt709_rgb": [
+    223,
+    176,
+    144
+   ]
+  },
+  "sky_90c0e0": {
+   "rgb": [
+    144,
+    192,
+    224
+   ],
+   "ideal_codes_bt709": [
+    174,
+    147,
+    106
+   ],
+   "ideal_codes_bt601": [
+    172,
+    149,
+    105
+   ],
+   "H1_bt601_codes_read_as_bt709_rgb": [
+    140,
+    189,
+    226
+   ],
+   "bt709_codes_read_as_bt709_rgb": [
+    145,
+    192,
+    224
+   ]
+  },
+  "lcg1": {
+   "rgb": [
+    130,
+    204,
+    88
+   ],
+   "ideal_codes_bt709": [
+    170,
+    84,
+    100
+   ],
+   "ideal_codes_bt601": [
+    161,
+    88,
+    104
+   ],
+   "H1_bt601_codes_read_as_bt709_rgb": [
+    126,
+    190,
+    84
+   ],
+   "bt709_codes_read_as_bt709_rgb": [
+    129,
+    204,
+    86
+   ]
+  },
+  "lcg2": {
+   "rgb": [
+    226,
+    106,
+    217
+   ],
+   "ideal_codes_bt709": [
+    136,
+    165,
+    176
+   ],
+   "ideal_codes_bt601": [
+    149,
+    159,
+    173
+   ],
+   "H1_bt601_codes_read_as_bt709_rgb": [
+    236,
+    124,
+    220
+   ],
+   "bt709_codes_read_as_bt709_rgb": [
+    226,
+    106,
+    218
+   ]
+  },
+  "lcg3": {
+   "rgb": [
+    226,
+    175,
+    205
+   ],
+   "ideal_codes_bt709": [
+    177,
+    136,
+    149
+   ],
+   "ideal_codes_bt601": [
+    182,
+    134,
+    148
+   ],
+   "H1_bt601_codes_read_as_bt709_rgb": [
+    229,
+    181,
+    206
+   ],
+   "bt709_codes_read_as_bt709_rgb": [
+    225,
+    175,
+    204
+   ]
+  }
+ },
+ "stop_rules": [
+  "a failing criterion stays failing; no experiment id is run twice",
+  "a harness bug keeps its run and gets a new numbered experiment (E12 is the only reserved slot)",
+  "analysis bugs are fixed in analyze.py; the first analysis output is kept as measurements.run1-*.json if it was wrong"
+ ]
+}
