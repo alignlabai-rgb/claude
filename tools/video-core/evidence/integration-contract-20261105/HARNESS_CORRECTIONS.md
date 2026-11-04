@@ -1,0 +1,17 @@
+# Harness failures and corrections (kept, not hidden)
+
+Every item below happened during development of *this* harness. None is a library change. Excerpts are copied from the development console. “Library behaviour” was never altered to make a test pass.
+
+| # | When | What failed / was wrong | Cause | Correction |
+|---|---|---|---|---|
+| 1 | first run of `test_a4` | `AssertionError: … 0: (5, 4805) … != … 0: (0, 4805)` for range `[0,3)` | **My expectation**: the full range covers the whole timeline, so the plan is READY/exit 0, not HOLD/5 | expectation now `0 if (a,b)==(0,frames) else 5`; library unchanged |
+| 2 | first run of `test_d2` | `'json_array_not_object': (1, ['audio_receipt_unreadable'])` expected, `(1, [])` observed | **My assumption** that a JSON array would be refused with a structured code. Probe: `AttributeError: 'list' object has no attribute 'get'` — eight mis-shaped receipts crash `avmux plan` | **promoted to GAP-14** and a dedicated case `test_d2b`; nothing was papered over |
+| 3 | first run of `test_s1` | `'silence_row_state_UNKNOWN_and_selected': (1, None, ['range_incomplete'])` | harness bug: an `or`-chained mutation stopped before removing `end_frame` | replaced by an explicit mutation function |
+| 4 | first run of `test_g2` | `KeyError: 'receipt'` | harness bug: `pop("receipt")` twice | `pop("receipt", None)` |
+| 5 | first b/c runs | `ResourceWarning: unclosed file` (two reads) | harness bug | `rb()` helper with a context manager |
+| 6 | first 3-version comparison | `cases_digest` differed between 3.11 / 3.12 / 3.13 | (a) an absolute temp path inside one check, (b) the sentinel stub's bytes embedded the interpreter path and log path, (c) records contained `stderr_bytes` and import-time read counts, which are version/path dependent | deterministic `/bin/sh` sentinel (log path via env), world-relative paths, version-dependent counters dropped from the records; digests are now identical on all three versions |
+| 7 | review before the first 3.11 run | nested same-type quotes inside an f-string (valid on 3.12+, a SyntaxError on 3.11) | harness bug found by reading | `%`-formatting |
+| 8 | design review | the positive-control “real ffmpeg not on PATH” check was a tautology; the foreign-read allow-list initially allowed all of `sys.prefix` (i.e. `/usr`) | weak instrument | check now compares the resolved `ffmpeg` to the sentinel stub; allow-list narrowed to stdlib/site directories + library + world; positive control reads one file outside them and must be reported |
+| 9 | design review | the per-case budget assertion allowed +2 s slack | leniency | strict `<= 10 s` |
+
+Mutation self-check (`results/MUTATION_SELF_CHECK.json`): six one-line changes applied to scratch *copies* of the library were all detected (including a plan that launches the located tool, and a plan that creates the output directory), and closing GAP-02 / GAP-04 makes the pinned permissive checks fail.

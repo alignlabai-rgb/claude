@@ -1,0 +1,280 @@
+{
+  "case": "test_g3_rollback_on_isolated_copies",
+  "checks": [
+    {
+      "expected": [
+        "786149c43e22082b5877d64b72a9bb1eb8bd1c62b76d5c33c8fe97001edf643f",
+        "8f2d3620c5bd5b75955f8985b09621d6a8d01bc8588ab92c7a5c122cd75dc642",
+        "2e9d3fd6b75dbe268b52d81334b1c82dce7474bacfedd63b157b4e64af40f58e"
+      ],
+      "kind": "ROLLBACK",
+      "name": "original files carry the pinned fixture hashes",
+      "observed": [
+        "786149c43e22082b5877d64b72a9bb1eb8bd1c62b76d5c33c8fe97001edf643f",
+        "8f2d3620c5bd5b75955f8985b09621d6a8d01bc8588ab92c7a5c122cd75dc642",
+        "2e9d3fd6b75dbe268b52d81334b1c82dce7474bacfedd63b157b4e64af40f58e"
+      ],
+      "ok": true
+    },
+    {
+      "expected": 0,
+      "kind": "ROLLBACK",
+      "name": "plan on the original state succeeds",
+      "observed": 0,
+      "ok": true
+    },
+    {
+      "expected": [
+        1,
+        [
+          "audio_sha256_mismatch"
+        ]
+      ],
+      "kind": "ROLLBACK",
+      "name": "library detects the bad promotion (stem no longer matches the pinned hash)",
+      "observed": [
+        1,
+        [
+          "audio_sha256_mismatch"
+        ]
+      ],
+      "ok": true
+    },
+    {
+      "expected": "322f4132e90b99d9f10a4295e751478df5746ce188bfb902f48c2c49aebd06ae",
+      "kind": "ROLLBACK",
+      "name": "R1: tree after rollback == tree before promotion (all of assets/docs/out)",
+      "observed": "322f4132e90b99d9f10a4295e751478df5746ce188bfb902f48c2c49aebd06ae",
+      "ok": true
+    },
+    {
+      "expected": [
+        "786149c43e22082b5877d64b72a9bb1eb8bd1c62b76d5c33c8fe97001edf643f",
+        "8f2d3620c5bd5b75955f8985b09621d6a8d01bc8588ab92c7a5c122cd75dc642",
+        "2e9d3fd6b75dbe268b52d81334b1c82dce7474bacfedd63b157b4e64af40f58e"
+      ],
+      "kind": "ROLLBACK",
+      "name": "R1: original pinned hashes verified again after restoration",
+      "observed": [
+        "786149c43e22082b5877d64b72a9bb1eb8bd1c62b76d5c33c8fe97001edf643f",
+        "8f2d3620c5bd5b75955f8985b09621d6a8d01bc8588ab92c7a5c122cd75dc642",
+        "2e9d3fd6b75dbe268b52d81334b1c82dce7474bacfedd63b157b4e64af40f58e"
+      ],
+      "ok": true
+    },
+    {
+      "expected": "56fac667d239bf657e4fffe49190f161c5b6eaa60bd182ad058f9cc5899e2d8c",
+      "kind": "ROLLBACK",
+      "name": "R1: the previous output was never touched",
+      "observed": "56fac667d239bf657e4fffe49190f161c5b6eaa60bd182ad058f9cc5899e2d8c",
+      "ok": true
+    },
+    {
+      "expected": "e19416a7796750cdb8e3192432d81bc4207057f4614298eec308e99e13eb1fbc",
+      "kind": "ROLLBACK",
+      "name": "R1: same plan_sha256 as before the promotion",
+      "observed": "e19416a7796750cdb8e3192432d81bc4207057f4614298eec308e99e13eb1fbc",
+      "ok": true
+    },
+    {
+      "expected": [
+        1,
+        [
+          "audio_sha256_mismatch"
+        ]
+      ],
+      "kind": "ROLLBACK",
+      "name": "library detects the damage",
+      "observed": [
+        1,
+        [
+          "audio_sha256_mismatch"
+        ]
+      ],
+      "ok": true
+    },
+    {
+      "expected": "322f4132e90b99d9f10a4295e751478df5746ce188bfb902f48c2c49aebd06ae",
+      "kind": "ROLLBACK",
+      "name": "R2: tree == original",
+      "observed": "322f4132e90b99d9f10a4295e751478df5746ce188bfb902f48c2c49aebd06ae",
+      "ok": true
+    },
+    {
+      "expected": "e19416a7796750cdb8e3192432d81bc4207057f4614298eec308e99e13eb1fbc",
+      "kind": "ROLLBACK",
+      "name": "R2: same plan_sha256 again",
+      "observed": "e19416a7796750cdb8e3192432d81bc4207057f4614298eec308e99e13eb1fbc",
+      "ok": true
+    },
+    {
+      "expected": true,
+      "kind": "ROLLBACK",
+      "name": "every mutation stayed inside the isolated world (relative paths only)",
+      "observed": true,
+      "ok": true
+    }
+  ],
+  "evidence": {
+    "backup_tree": {
+      "audio_receipt.json": "2e9d3fd6b75dbe268b52d81334b1c82dce7474bacfedd63b157b4e64af40f58e",
+      "stem.wav": "786149c43e22082b5877d64b72a9bb1eb8bd1c62b76d5c33c8fe97001edf643f",
+      "video_ok.mp4": "8f2d3620c5bd5b75955f8985b09621d6a8d01bc8588ab92c7a5c122cd75dc642"
+    },
+    "isolation": {
+      "mutating_operations": 23,
+      "touched_paths_relative_to_world": [
+        "assets/current",
+        "assets/current.failed",
+        "assets/current.new",
+        "assets/current.new/audio_receipt.json",
+        "assets/current.new/stem.wav",
+        "assets/current.new/video_ok.mp4",
+        "assets/current.old",
+        "assets/current/audio_receipt.json",
+        "assets/current/stem.wav",
+        "assets/current/stem.wav.restore",
+        "assets/current/video_ok.mp4",
+        "docs/av.json",
+        "out/candidate-001",
+        "out/candidate-001/output.mov.partial",
+        "out/prev_good/output.mov",
+        "snap"
+      ],
+      "world": "temp dir created by the harness for this one test and deleted afterwards"
+    },
+    "plan_sha256_before_and_after_both_rollbacks": "e19416a7796750cdb8e3192432d81bc4207057f4614298eec308e99e13eb1fbc",
+    "steps": [
+      {
+        "step": "0 state before: isolated copy of the 'current' stem/video/receipt + one previous output",
+        "tree_digest": "322f4132e90b99d9f10a4295e751478df5746ce188bfb902f48c2c49aebd06ae"
+      },
+      {
+        "backup_tree": {
+          "audio_receipt.json": "2e9d3fd6b75dbe268b52d81334b1c82dce7474bacfedd63b157b4e64af40f58e",
+          "stem.wav": "786149c43e22082b5877d64b72a9bb1eb8bd1c62b76d5c33c8fe97001edf643f",
+          "video_ok.mp4": "8f2d3620c5bd5b75955f8985b09621d6a8d01bc8588ab92c7a5c122cd75dc642"
+        },
+        "step": "1 backup copy taken",
+        "tree_digest": "322f4132e90b99d9f10a4295e751478df5746ce188bfb902f48c2c49aebd06ae"
+      },
+      {
+        "step": "2 candidate promoted by rename swap (stem v2, stale receipt) + a half-written candidate output dir",
+        "tree_digest": "b3ac660b145b3b53d1d29a882a319bf9a942c40731d6386e2ede8ee537993666"
+      },
+      {
+        "failed_candidate_tree": {
+          "audio_receipt.json": "2e9d3fd6b75dbe268b52d81334b1c82dce7474bacfedd63b157b4e64af40f58e",
+          "stem.wav": "9721df39e5b8535206e8d023122f6f9d43e7895f6597bef288cff4b6669af3c4",
+          "video_ok.mp4": "8f2d3620c5bd5b75955f8985b09621d6a8d01bc8588ab92c7a5c122cd75dc642"
+        },
+        "step": "3 rolled back (rename swap back, candidate output removed, failed copy kept only as a hash record)",
+        "tree_digest": "322f4132e90b99d9f10a4295e751478df5746ce188bfb902f48c2c49aebd06ae"
+      },
+      {
+        "step": "4 in-place damage: 64 bytes of the stem overwritten",
+        "tree_digest": "862f4e4a85ae1616cf97bbdef6924b356b443ccfacce60b5b5059b80e639c731"
+      },
+      {
+        "step": "5 restored from the backup copy",
+        "tree_digest": "322f4132e90b99d9f10a4295e751478df5746ce188bfb902f48c2c49aebd06ae"
+      }
+    ],
+    "what_this_is": "A caller-side rollback protocol exercised on temporary copies built from synthetic fixtures. The library has no rollback and creates only fresh output directories; its plan paths created nothing here.",
+    "what_this_is_not": "No production state was read, copied, changed or restored. No mix/mux/render was run, so no real stage output was rolled back."
+  },
+  "invocations": [
+    {
+      "argv": [
+        "plan",
+        "<WORLD>/docs/av.json",
+        "--asset-root",
+        "<WORLD>/assets"
+      ],
+      "exit_code": 0,
+      "label": "plan on the original state",
+      "module": "video_core.avmux",
+      "runner_events": {
+        "foreign_reads": 0,
+        "mutation": 0,
+        "network": 0,
+        "process": 0
+      },
+      "stdout_sha256": "5de320a7317190794ea09bde66073471ee533f47fd698a5b1e31b27f90c0b5d3"
+    },
+    {
+      "argv": [
+        "plan",
+        "<WORLD>/docs/av.json",
+        "--asset-root",
+        "<WORLD>/assets"
+      ],
+      "exit_code": 1,
+      "label": "plan on the promoted candidate",
+      "module": "video_core.avmux",
+      "runner_events": {
+        "foreign_reads": 0,
+        "mutation": 0,
+        "network": 0,
+        "process": 0
+      },
+      "stdout_sha256": "11970c22399b5b5da6b5382f1f8de07256036a26121518a90bed947f7625b50d"
+    },
+    {
+      "argv": [
+        "plan",
+        "<WORLD>/docs/av.json",
+        "--asset-root",
+        "<WORLD>/assets"
+      ],
+      "exit_code": 0,
+      "label": "plan after R1 rollback",
+      "module": "video_core.avmux",
+      "runner_events": {
+        "foreign_reads": 0,
+        "mutation": 0,
+        "network": 0,
+        "process": 0
+      },
+      "stdout_sha256": "5de320a7317190794ea09bde66073471ee533f47fd698a5b1e31b27f90c0b5d3"
+    },
+    {
+      "argv": [
+        "plan",
+        "<WORLD>/docs/av.json",
+        "--asset-root",
+        "<WORLD>/assets"
+      ],
+      "exit_code": 1,
+      "label": "plan on the damaged stem",
+      "module": "video_core.avmux",
+      "runner_events": {
+        "foreign_reads": 0,
+        "mutation": 0,
+        "network": 0,
+        "process": 0
+      },
+      "stdout_sha256": "8f42d670e2c8bffe9508cfca392ca1355918429e425456d08c9a9fadfa901bcd"
+    },
+    {
+      "argv": [
+        "plan",
+        "<WORLD>/docs/av.json",
+        "--asset-root",
+        "<WORLD>/assets"
+      ],
+      "exit_code": 0,
+      "label": "plan after R2 restore",
+      "module": "video_core.avmux",
+      "runner_events": {
+        "foreign_reads": 0,
+        "mutation": 0,
+        "network": 0,
+        "process": 0
+      },
+      "stdout_sha256": "5de320a7317190794ea09bde66073471ee533f47fd698a5b1e31b27f90c0b5d3"
+    }
+  ],
+  "reproduce": "python3 contract_suite.py   # test_g3_rollback_on_isolated_copies; the world is a temp dir created and deleted by the test",
+  "title": "REAL rollback (rename-swap and restore-from-copy) on isolated temp copies; original hashes re-verified; no production state read or changed."
+}
