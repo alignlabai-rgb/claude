@@ -12,6 +12,7 @@ from dataclasses import asdict, dataclass, fields
 from fractions import Fraction
 
 from .errors import Issue, ValidationFailed
+from .numeric import finite_seconds, positive_int
 
 SCHEMA_MAX_FRAMES = 18_000
 SCHEMA_MAX_DIMENSION = 7_680
@@ -44,11 +45,16 @@ class Limits:
     max_drain_bytes: int = 64 * 1024**2  # child output beyond this => killed
     max_output_bytes: int = 2 * 1024**3  # passed to ffmpeg -fs
 
+    FLOAT_FIELDS = ("max_runtime_seconds", "probe_timeout_seconds", "inspect_timeout_seconds")
+
     def __post_init__(self) -> None:
+        # every field is validated strictly *before* anything else looks at it: no bool, no NaN/inf, no float for an integer limit
         for f in fields(self):
             v = getattr(self, f.name)
-            if isinstance(v, bool) or not isinstance(v, (int, float)) or v <= 0:
-                raise ValueError(f"limit {f.name} must be a positive number")
+            if f.name in self.FLOAT_FIELDS:
+                finite_seconds(f"limit {f.name}", v)
+            else:
+                positive_int(f"limit {f.name}", v)
         ceilings = {
             "max_frames": SCHEMA_MAX_FRAMES,
             "max_dimension": SCHEMA_MAX_DIMENSION,

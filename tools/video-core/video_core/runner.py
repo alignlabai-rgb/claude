@@ -20,6 +20,8 @@ import threading
 import time
 from dataclasses import dataclass, field
 
+from .numeric import GRACE_CEILING_SECONDS, finite_seconds, non_negative_int, positive_int
+
 POSIX = os.name == "posix"
 
 EXITED_ZERO = "EXITED_ZERO"
@@ -214,6 +216,16 @@ def run_bounded(
 ) -> RunResult:
     if not isinstance(argv, (list, tuple)) or not argv or not all(isinstance(a, str) and "\x00" not in a for a in argv):
         raise TypeError("argv must be a non-empty list of NUL-free strings")
+    # Public numeric boundary: validated before anything is created or launched (NaN/inf/bool/negative/zero are rejected).
+    finite_seconds("timeout_s", timeout_s)
+    finite_seconds("grace_s", grace_s, GRACE_CEILING_SECONDS)
+    finite_seconds("drain_timeout_s", drain_timeout_s, GRACE_CEILING_SECONDS)
+    positive_int("max_drain_bytes", max_drain_bytes)
+    for label, pair in (("stdout_limits", stdout_limits), ("stderr_limits", stderr_limits)):
+        if not isinstance(pair, (tuple, list)) or len(pair) != 2:
+            raise ValueError(f"{label} must be a (head_bytes, tail_bytes) pair")
+        non_negative_int(f"{label}[0]", pair[0])
+        non_negative_int(f"{label}[1]", pair[1])
     result = RunResult(phase=phase, argv=list(argv), outcome=LAUNCH_FAILED, timeout_seconds=timeout_s)
     result.stdout, result.stderr = _Capture(*stdout_limits), _Capture(*stderr_limits)
     t0 = time.monotonic()

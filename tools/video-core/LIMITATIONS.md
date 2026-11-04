@@ -65,3 +65,12 @@ Delivered as a generic, optional component (`video_core/audiomix`, `AUDIO_SPEC.m
 * **Race windows.** Assets are hashed at plan time and re-hashed after mixing (`inputs_unchanged`); a change in between is reported as `UNKNOWN`, not prevented. Windows reparse-point (junction) rejection is implemented and unit-tested with a stat stub on Linux, not on a real junction. Cancellation by SIGTERM was exercised on Linux only (`signal.SIGTERM` handling differs on Windows).
 * **Integration seam still open.** No existing workflow consumes this yet; manifests must be produced by a caller that owns the creative/binding decisions.
 * Colour-conversion drift (baseline) is unchanged and still open.
+
+## Finite-limits fix (fifth commit)
+
+Independently reproduced finding: `Limits(max_runtime_seconds=nan|inf)`, `Limits(probe_timeout_seconds=nan)` and `Limits(max_drain_bytes=nan)` were accepted at `6206b1d`
+(and the same at `8f1e4c5`, including `AudioLimits`); a NaN deadline makes `monotonic() >= deadline` permanently false, silently disabling the wall-clock bound. Now `numeric.py`
+validates every caller limit (`Limits`, `AudioLimits`, `.replace()`), every CLI flag that reaches them, and the numeric arguments of `runner.run_bounded` itself
+(`timeout_s`, `grace_s`, `drain_timeout_s`, `max_drain_bytes`, the capture-limit pairs). Rules: no bool; integer limits must be real ints (no `100.0`/`5.5`);
+time limits finite, > 0 and <= 86400 s (grace/drain waits <= 3600 s); sub-second positive timeouts remain valid. All rejections are `ValueError` raised before any process launch or file write;
+the CLIs turn them into exit code 2. Tested on Linux only (author); the requester's Windows retest should rerun the default suite. Existing ceilings, defaults and the baseline plan hash are unchanged.

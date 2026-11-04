@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass, fields
 
+from ..numeric import finite_seconds, positive_int
+
 SCHEMA_MAX_FRAMES = 18_000
 SCHEMA_MAX_EVENTS = 1_024
 SCHEMA_MAX_ASSETS = 256
@@ -31,8 +33,10 @@ class AudioLimits:
     def __post_init__(self) -> None:
         for f in fields(self):
             v = getattr(self, f.name)
-            if isinstance(v, bool) or not isinstance(v, (int, float)) or v <= 0:
-                raise ValueError(f"limit {f.name} must be a positive number")
+            if f.name == "max_runtime_seconds":
+                finite_seconds("limit max_runtime_seconds", v)  # finite, > 0, <= 24 h; NaN/inf/bool rejected
+            else:
+                positive_int(f"limit {f.name}", v)
         for name, ceiling in (("max_events", SCHEMA_MAX_EVENTS), ("max_assets", SCHEMA_MAX_ASSETS), ("max_frames", SCHEMA_MAX_FRAMES)):
             if getattr(self, name) > ceiling:
                 raise ValueError(f"limit {name} may not exceed the v1 ceiling {ceiling}")

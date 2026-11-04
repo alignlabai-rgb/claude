@@ -23,7 +23,7 @@ python3 -m video_core srt examples/episode.synthetic.json > captions.srt   # byt
 | `inspect MEDIA [--episode EPISODE]` | Read-only ffprobe readback of an existing local mp4/mov/mkv/webm; optional comparison with the episode's width/height/fps/frames. |
 
 Tools: `--ffmpeg PATH` / `--ffprobe PATH`, otherwise PATH lookup (reported as `discovery` in the receipt).
-Limits (lower the defaults, never exceed the v1 schema ceilings): `--max-frames --max-dimension --max-clips --max-captions
+Limits (lower the defaults, never exceed the v1 schema ceilings; every value must be a finite, correctly typed number — NaN, ±infinity, bools, floats for integer limits and time limits above 24 h are rejected with a usage error before anything is written or launched): `--max-frames --max-dimension --max-clips --max-captions
 --max-pixel-volume --max-duration-seconds --max-fps --max-source-bytes --max-argv-bytes --max-windows-cmdline-chars --max-runtime-seconds
 --max-output-bytes --max-diag-bytes`. Defaults are in `video_core/limits.py`.
 
