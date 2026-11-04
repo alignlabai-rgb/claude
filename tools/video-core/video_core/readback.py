@@ -28,6 +28,7 @@ def run_probe(ffprobe: str, media_abs: str, demuxer: str, limits: Limits, cwd: s
         stdout_limits=(1024 * 1024, 0), stderr_limits=(limits.max_diag_bytes // 2, limits.max_diag_bytes // 2),
         max_drain_bytes=limits.max_drain_bytes, cwd=cwd, env=probe_env(),
     )
+    runner.raise_if_interrupted(res)  # RunInterrupted.result lets an orchestrator that has a receipt record this execution before it ends the run
     raw = res.stdout_bytes()
     parsed = None
     if res.ok and res.stdout is not None and not res.stdout.summary()["truncated"]:

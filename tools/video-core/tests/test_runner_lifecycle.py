@@ -1,0 +1,272 @@
+"""Runner resource-boundary and cancellation regressions (audit findings F-RUN-1 and F-RUN-2, plus the interrupt coverage they imply).
+
+Every child is an owned tiny `python -c` program; each scenario is bounded (<= 10 s outer, no child outlives its scenario), writes at most a few MB to a pipe (discarded by the
+runner) and allocates nothing large. No FFmpeg and no media. Signals go only to this process (a SIGINT it handles) or to process groups the runner itself owns; an unrelated
+sentinel process in its own session is checked to survive.
+"""
+
+import hashlib
+import os
+import signal
+import subprocess
+import sys
+import threading
+import time
+import unittest
+from unittest import mock
+
+from tests.helpers import POSIX, TmpCase, pid_dead
+from tests.lifecycle_support import PY, interrupt_when, pid_alive, read_pid, sigint_default
+from video_core import runner
+
+BIG = 2_000_000
+LIMIT = 1000
+
+
+def py(code):
+    return [PY, "-c", code]
+
+
+class Sentinel:
+    """An unrelated process in its own session; the runner must never signal it."""
+
+    def __init__(self):
+        self.proc = subprocess.Popen([PY, "-c", "import time; time.sleep(30)"], start_new_session=True)
+
+    def alive(self):
+        return self.proc.poll() is None
+
+    def close(self):
+        if self.proc.poll() is None:
+            self.proc.kill()
+        self.proc.wait()
+
+
+class DrainBound(unittest.TestCase):
+    """F-RUN-1: exceeding max_drain_bytes is visible whether or not the child was still running when it was noticed."""
+
+    def run_writer(self, code, **kw):
+        kw.setdefault("timeout_s", 8)
+        kw.setdefault("stdout_limits", (8, 8))
+        kw.setdefault("max_drain_bytes", LIMIT)
+        return runner.run_bounded(py(code), phase="t", **kw)
+
+    def test_child_that_writes_beyond_the_bound_and_exits_at_once_is_never_a_clean_success(self):
+        full_sha = hashlib.sha256(b"x" * BIG).hexdigest()
+        for attempt in range(8):  # the original race depended on a 50 ms poll; repeat so a lucky scheduling cannot hide it
+            r = self.run_writer(f"import sys; sys.stdout.buffer.write(b'x'*{BIG})")
+            self.assertTrue(r.drain_limit_exceeded, attempt)
+            self.assertFalse(r.ok, attempt)
+            # the facts are kept, nothing is claimed that did not happen
+            self.assertEqual((r.exit_code, r.signal), (0, None), "the actual exit 0 is preserved")
+            self.assertEqual(r.outcome, runner.EXITED_ZERO, "it exited on its own; the runner must not rename that into a kill")
+            self.assertIsNone(r.kill_reason)
+            self.assertEqual((r.kill_attempted, r.kill_delivered, r.orphan_group_killed, r.timed_out), (False, False, False, False))
+            self.assertTrue(r.drain_complete)
+            s = r.stdout.summary()
+            self.assertEqual((s["total_bytes"], s["sha256_full_stream"]), (BIG, full_sha), "bytes and hash of the full stream are unchanged")
+
+    def test_lingering_child_is_killed_and_both_facts_are_recorded(self):
+        t0 = time.monotonic()
+        r = self.run_writer(f"import sys, time; sys.stdout.buffer.write(b'x'*{BIG}); sys.stdout.flush(); time.sleep(5)")
+        self.assertLess(time.monotonic() - t0, 6)
+        self.assertEqual((r.outcome, r.kill_reason), (runner.FLOOD_KILLED, "flood"))
+        self.assertTrue(r.drain_limit_exceeded and r.kill_attempted and r.kill_delivered)
+        self.assertFalse(r.ok)
+        self.assertIsNone(r.exit_code, "killed by our SIGTERM, not an exit")
+        self.assertEqual(r.signal, signal.SIGTERM if POSIX else None)
+
+    def test_boundary_exactly_at_the_limit_is_fine_one_byte_over_is_not(self):
+        at = self.run_writer(f"import sys; sys.stdout.buffer.write(b'y'*{LIMIT})")
+        over = self.run_writer(f"import sys; sys.stdout.buffer.write(b'y'*{LIMIT + 1})")
+        under = self.run_writer("import sys; sys.stdout.buffer.write(b'y'*10)")
+        self.assertEqual([(r.ok, r.drain_limit_exceeded) for r in (under, at, over)], [(True, False), (True, False), (False, True)])
+        self.assertEqual((over.outcome, over.exit_code), (runner.EXITED_ZERO, 0))
+
+    def test_the_bound_is_shared_by_stdout_and_stderr(self):
+        r = self.run_writer(f"import sys; sys.stdout.write('a'*{LIMIT // 2 + 1}); sys.stdout.flush(); sys.stderr.write('b'*{LIMIT // 2 + 1})", stderr_limits=(8, 8))
+        self.assertTrue(r.drain_limit_exceeded)
+        self.assertFalse(r.ok)
+        self.assertEqual((r.stdout.total, r.stderr.total), (LIMIT // 2 + 1, LIMIT // 2 + 1))
+
+    def test_raw_exit_signal_and_timeout_distinctions_survive_a_breach(self):
+        nz = self.run_writer(f"import sys; sys.stdout.buffer.write(b'x'*{BIG}); sys.exit(3)")
+        self.assertEqual((nz.outcome, nz.exit_code, nz.signal, nz.drain_limit_exceeded), (runner.NONZERO_EXIT, 3, None, True))
+        if POSIX:
+            sg = self.run_writer(f"import os, signal, sys; sys.stdout.buffer.write(b'x'*{BIG}); sys.stdout.flush(); os.kill(os.getpid(), signal.SIGKILL)")
+            self.assertEqual((sg.outcome, sg.exit_code, sg.signal, sg.drain_limit_exceeded, sg.kill_attempted), (runner.SIGNALED, None, signal.SIGKILL, True, False))
+        to = self.run_writer("import time; time.sleep(30)", timeout_s=0.5)
+        self.assertEqual((to.outcome, to.timed_out, to.drain_limit_exceeded, to.kill_attempted, to.kill_delivered), (runner.TIMEOUT, True, False, True, True))
+
+    def test_unbreached_runs_keep_their_old_shape(self):
+        r = self.run_writer("import sys; sys.stdout.write('hello'); sys.stderr.write('warn')", stdout_limits=(64, 0), stderr_limits=(64, 0), max_drain_bytes=1 << 20)
+        self.assertTrue(r.ok)
+        self.assertEqual((r.outcome, r.exit_code, r.stdout_bytes(), r.kill_attempted, r.drain_limit_exceeded, r.drain_limit_bytes), (runner.EXITED_ZERO, 0, b"hello", False, False, 1 << 20))
+        d = r.to_dict()
+        self.assertEqual((d["drain_limit_exceeded"], d["kill_attempted"], d["kill_delivered"], d["drain_limit_bytes"]), (False, False, False, 1 << 20))
+        self.assertIn("EXITED_ZERO", r.describe())
+
+    def test_describe_and_reason_text_do_not_claim_a_kill_that_did_not_happen(self):
+        quick = self.run_writer(f"import sys; sys.stdout.buffer.write(b'x'*{BIG})")
+        self.assertIn("exited on its own", quick.exit0_not_ok_reason("tool"))
+        self.assertNotIn("killed", quick.describe())
+        self.assertIn("no kill was needed or performed", quick.exit0_not_ok_reason("tool"))
+        slow = self.run_writer(f"import sys, time; sys.stdout.buffer.write(b'x'*{BIG}); sys.stdout.flush(); time.sleep(5)")
+        self.assertIn("runner killed it", slow.describe())
+
+    @unittest.skipUnless(POSIX, "process groups")
+    def test_orphan_that_keeps_flooding_after_the_leader_exits_is_cut_off_promptly(self):
+        """The leader exits 0 at once; a grandchild in the owned group keeps the pipe open and keeps writing (finite: <= ~6 s). Previously the runner only noticed after the
+        whole drain timeout; now the breach itself ends it."""
+        child = ("import subprocess, sys; subprocess.Popen([sys.executable, '-c', "
+                 "\"import sys, time\\nend = time.time() + 6\\nwhile time.time() < end:\\n sys.stdout.write('z' * 4096); sys.stdout.flush(); time.sleep(0.005)\"])")
+        t0 = time.monotonic()
+        r = self.run_writer(child, timeout_s=8, drain_timeout_s=5.0, grace_s=1.0)
+        self.assertLess(time.monotonic() - t0, 3.5, "must not wait out the 5 s drain timeout")
+        self.assertTrue(r.drain_limit_exceeded)
+        self.assertTrue(r.orphan_group_killed and r.kill_attempted and r.kill_delivered)
+        self.assertEqual((r.outcome, r.exit_code), (runner.EXITED_ZERO, 0), "the leader's own exit is still what it was")
+        self.assertFalse(r.ok)
+        self.assertTrue(r.drain_complete)
+
+
+class Descriptions(unittest.TestCase):
+    def test_raise_if_interrupted_contract(self):
+        ok = runner.RunResult(phase="p", argv=["x"], outcome=runner.EXITED_ZERO)
+        self.assertIs(runner.raise_if_interrupted(ok), ok)
+        for outcome in (runner.TIMEOUT, runner.NONZERO_EXIT, runner.FLOOD_KILLED, runner.LAUNCH_FAILED, runner.CONTAINMENT_REFUSED, runner.SIGNALED):
+            runner.raise_if_interrupted(runner.RunResult(phase="p", argv=["x"], outcome=outcome))
+        res = runner.RunResult(phase="phase-1", argv=["x"], outcome=runner.INTERRUPTED)
+        with self.assertRaises(KeyboardInterrupt) as cm:
+            runner.raise_if_interrupted(res)
+        self.assertIsInstance(cm.exception, runner.RunInterrupted)
+        self.assertIs(cm.exception.result, res)
+        self.assertIn("phase-1", str(cm.exception))
+
+
+@unittest.skipUnless(POSIX, "POSIX process groups and signals; Windows interrupt behaviour is tested separately by the requester")
+class InterruptCleanup(TmpCase):
+    """F-RUN-2 and its neighbours: a KeyboardInterrupt in ANY phase after the child exists ends with the owned group cleaned up and the usual INTERRUPTED RunResult
+    (existing API semantics), and nothing outside the group is touched."""
+
+    def setUp(self):
+        super().setUp()
+        self.sentinel = Sentinel()
+        self.addCleanup(self.sentinel.close)
+        self.addCleanup(self.kill_leftovers)
+        self.pids = []
+
+    def kill_leftovers(self):
+        for pid in self.pids:  # our own test grandchildren, if a test failed before they were reaped
+            if pid_alive(pid):
+                os.kill(pid, signal.SIGKILL)
+
+    def child_program(self, tag, *, leader_sleep=0.0, grandchild_seconds=5, ignore_term=False):
+        marker = os.path.join(self.tmp, tag + ".pid")
+        gc = (f"import os, time\\nopen({marker!r}, 'w').write(str(os.getpid()))\\n" + ("import signal\\nsignal.signal(signal.SIGTERM, signal.SIG_IGN)\\n" if ignore_term else "")
+              + f"time.sleep({grandchild_seconds})")
+        code = f"import subprocess, sys, time, os\nsubprocess.Popen([sys.executable, '-c', \"{gc}\"])\n" \
+               f"while not os.path.exists({marker!r}):\n time.sleep(0.01)\ntime.sleep({leader_sleep})\n"
+        return marker, py(code)
+
+    def assert_clean(self, marker, r, t0, limit):
+        gc = read_pid(marker)
+        self.pids.append(gc)
+        self.assertTrue(pid_dead(gc, wait=4), "a member of the owned group survived the unwinding of run_bounded")
+        self.assertLess(time.monotonic() - t0, limit)
+        self.assertTrue(self.sentinel.alive(), "an unrelated process in its own session must survive")
+
+    def test_interrupt_during_the_final_pipe_drain_wait_cleans_the_group(self):
+        """The audit reproducer's trigger: the leader exits 0 leaving a pipe-holding grandchild; SIGINT arrives while run_bounded waits for EOF. The audit's own harness expected
+        the KeyboardInterrupt to ESCAPE; the specified API behaviour (kept) is to convert an interrupt into outcome INTERRUPTED, so the assertion here is on that plus cleanup."""
+        marker, argv = self.child_program("drain")
+        t0 = time.monotonic()
+        with sigint_default():
+            interrupt_when(marker, delay=0.6)
+            r = runner.run_bounded(argv, phase="t", timeout_s=9, drain_timeout_s=4.0, grace_s=1.0)
+        self.assertEqual((r.outcome, r.kill_reason), (runner.INTERRUPTED, "interrupt"))
+        self.assertEqual((r.exit_code, r.signal), (0, None), "the leader had really exited 0; that is not rewritten")
+        self.assertTrue(r.kill_attempted and r.kill_delivered, "the surviving group member was signalled")
+        self.assertTrue(r.drain_complete, "pipes reached EOF once the member was gone")
+        self.assertFalse(r.ok)
+        self.assert_clean(marker, r, t0, 3.5)
+
+    def test_interrupt_during_the_drain_wait_when_the_member_ignores_sigterm_is_still_bounded(self):
+        marker, argv = self.child_program("drainterm", ignore_term=True)
+        t0 = time.monotonic()
+        with sigint_default():
+            interrupt_when(marker, delay=0.5)
+            r = runner.run_bounded(argv, phase="t", timeout_s=9, drain_timeout_s=4.0, grace_s=0.7)
+        self.assertEqual(r.outcome, runner.INTERRUPTED)
+        self.assertTrue(r.kill_delivered)
+        self.assert_clean(marker, r, t0, 4.0)
+
+    def test_interrupt_while_the_leader_is_still_running_reaps_leader_and_member(self):
+        marker, argv = self.child_program("wait", leader_sleep=30)
+        t0 = time.monotonic()
+        with sigint_default():
+            interrupt_when(marker, delay=0.3)
+            r = runner.run_bounded(argv, phase="t", timeout_s=9, grace_s=1.0)
+        self.assertEqual((r.outcome, r.kill_reason, r.timed_out), (runner.INTERRUPTED, "interrupt", False))
+        self.assertEqual(r.signal, signal.SIGTERM)
+        self.assertTrue(r.kill_attempted and r.kill_delivered)
+        self.assert_clean(marker, r, t0, 4.0)
+
+    def test_a_second_interrupt_during_the_cleanup_escalates_to_sigkill_instead_of_abandoning_it(self):
+        ready = os.path.join(self.tmp, "ready")
+        prog = py(f"import signal, time\nsignal.signal(signal.SIGTERM, signal.SIG_IGN)\nopen({ready!r}, 'w').write('1')\ntime.sleep(30)")
+        t0 = time.monotonic()
+        with sigint_default():
+            interrupt_when(ready, delay=0.3)  # first cancel: the runner sends SIGTERM, which this child ignores, and waits `grace` (5 s)
+            timer = threading.Timer(1.2, lambda: os.kill(os.getpid(), signal.SIGINT))  # second cancel, inside that wait
+            timer.start()
+            try:
+                r = runner.run_bounded(prog, phase="t", timeout_s=9, grace_s=5.0)
+            finally:
+                timer.cancel()
+        self.assertEqual(r.outcome, runner.INTERRUPTED)
+        self.assertEqual(r.signal, signal.SIGKILL, "the escalation killed it; the 5 s grace was not waited out")
+        self.assertLess(time.monotonic() - t0, 3.5)
+        self.assertTrue(self.sentinel.alive())
+
+    def test_interrupt_while_starting_the_drain_threads_kills_the_child_and_does_not_hang(self):
+        real_start = threading.Thread.start
+        calls = []
+
+        def start(self_thread):
+            calls.append(1)
+            if len(calls) == 1:
+                raise KeyboardInterrupt()
+            return real_start(self_thread)
+
+        t0 = time.monotonic()
+        with mock.patch.object(threading.Thread, "start", start):
+            r = runner.run_bounded(py("import time; time.sleep(30)"), phase="t", timeout_s=9, grace_s=1.0, drain_timeout_s=3.0)
+        self.assertEqual((r.outcome, r.kill_reason), (runner.INTERRUPTED, "interrupt"))
+        self.assertTrue(r.kill_attempted and r.kill_delivered)
+        self.assertLess(time.monotonic() - t0, 3.0, "pipes whose reader never started are not waited for")
+        self.assertTrue(self.sentinel.alive())
+
+    def test_interrupt_inside_the_after_start_hook_is_unchanged(self):
+        def hook(proc):
+            raise KeyboardInterrupt()
+
+        r = runner.run_bounded(py("import time; time.sleep(30)"), phase="t", timeout_s=9, grace_s=1.0, after_start=hook)
+        self.assertEqual((r.outcome, r.kill_reason), (runner.INTERRUPTED, "interrupt"))
+        self.assertTrue(r.kill_attempted and r.kill_delivered)
+
+    def test_an_interrupt_after_a_timeout_kill_is_recorded_as_interrupted_but_keeps_timed_out(self):
+        """timeout fires (leader killed, member keeps the pipe) and the user cancels while the runner waits for EOF."""
+        t0 = time.monotonic()
+        with sigint_default():
+            # the timeout at 0.8 s TERMs the whole group; use a member that ignores TERM so the pipe stays open into the drain phase
+            marker2, argv2 = self.child_program("afto2", leader_sleep=30, ignore_term=True)
+            interrupt_when(marker2, delay=1.4)
+            r = runner.run_bounded(argv2, phase="t", timeout_s=0.8, grace_s=0.3, drain_timeout_s=4.0)
+        self.assertEqual(r.outcome, runner.INTERRUPTED)
+        self.assertTrue(r.timed_out, "the timeout really happened and stays recorded")
+        self.assert_clean(marker2, r, t0, 4.5)
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -22,6 +22,7 @@ import unittest
 from unittest import mock
 
 from tests.helpers import POSIX, ROOT, TmpCase, jl, no_process, pid_dead
+from tests.lifecycle_support import sigint_default
 from video_core import numeric, runner
 from video_core.containment import ResourceEnvelope, contained, run_contained, unsupported_limits, validate_hello
 from video_core.containment import envelope as E
@@ -336,7 +337,8 @@ class NativePosix(TmpCase):
         timer = threading.Timer(1.5, lambda: signal.pthread_kill(threading.main_thread().ident, signal.SIGINT))
         timer.start()
         try:
-            r = run({"cpu_seconds": 30}, self.tree_target(pidfile), timeout=10)
+            with sigint_default():  # a suite started with `cmd &` from a non-interactive shell inherits SIGINT=SIG_IGN; without this the signal would be dropped and the run would time out
+                r = run({"cpu_seconds": 30}, self.tree_target(pidfile), timeout=10)
         finally:
             timer.cancel()
         self.assertEqual((r.outcome, r.kill_reason), (runner.INTERRUPTED, "interrupt"))

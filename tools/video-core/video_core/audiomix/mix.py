@@ -16,7 +16,7 @@ from __future__ import annotations
 import os
 import time
 
-from .. import receipt as rc
+from .. import finalize, receipt as rc
 from ..errors import Issue, UnsafePath
 from ..tools import sha256_file
 from . import plan as planmod
@@ -178,17 +178,14 @@ def mix(manifest_bytes: bytes, *, limits: AudioLimits = AudioLimits(), asset_roo
         _run(plan, limits, run_dir, receipt_path, receipt, cancel, clock)
     except KeyboardInterrupt:
         receipt["status"] = S_INTERRUPTED
+        _finalize(plan, limits, run_dir, receipt, abnormal=True)
     except Exception as exc:  # keep partial state, say so, never retry
         receipt["status"] = S_UNKNOWN
         receipt["internal_error"] = {"type": type(exc).__name__, "message": str(exc)[:300], "stage": receipt.get("stage")}
+        _finalize(plan, limits, run_dir, receipt, abnormal=True)  # best effort: what is actually on disk + input hashes (null and a reason if unreadable)
     receipt["finished_utc"] = rc.utc_now()
     rc.replace_atomic(receipt_path, rc.dumps(receipt))
     return receipt
-
-
-def _file_record(path, name, role, partial=False):
-    size = os.path.getsize(path)
-    return {"name": name, "role": role, "bytes": size, "sha256": sha256_file(path, size), "partial": partial}
 
 
 def _run(plan: AudioPlan, limits, run_dir, receipt_path, receipt, cancel, clock) -> None:
@@ -222,23 +219,33 @@ def _run(plan: AudioPlan, limits, run_dir, receipt_path, receipt, cancel, clock)
             status = S_MISMATCH
         else:
             status = S_CLAMPED if stats["clipped_samples"] else S_VERIFIED
-    outputs = []
-    for name, role, part in ((planmod.STEM_NAME, "stem", False), (planmod.STEM_PARTIAL, "stem_partial", True), (planmod.PLAN_NAME, "plan", False)):
-        p = os.path.join(run_dir, name)
-        if os.path.isfile(p):
-            outputs.append(_file_record(p, name, role, part))
-    receipt["outputs"] = outputs
-    unchanged = True
-    for entry in receipt["input"]["assets"]:
-        rf = plan.asset_files[entry["id"]]
-        try:
-            entry["sha256_after"] = sha256_file(rf.abspath, limits.max_source_bytes)
-        except (OSError, ValueError):
-            entry["sha256_after"] = None
-        unchanged = unchanged and entry["sha256_after"] == entry["sha256_before"]
-    receipt["input"]["inputs_unchanged"] = unchanged
+    unchanged = _finalize(plan, limits, run_dir, receipt)
     if not unchanged and status in (S_VERIFIED, S_CLAMPED, S_MISMATCH):
-        receipt["unknown_reason"] = "an input file changed while mixing"
+        receipt["unknown_reason"] = "an input file changed (or became unreadable) while mixing"
         status = S_UNKNOWN
     receipt["status"] = status
     receipt["stage"] = "complete" if status in (S_VERIFIED, S_CLAMPED, S_MISMATCH) else receipt["stage"]
+
+
+_KNOWN_OUTPUTS = ((planmod.STEM_NAME, "stem", False), (planmod.STEM_PARTIAL, "stem_partial", True), (planmod.PLAN_NAME, "plan", False))
+
+
+def _finalize(plan: AudioPlan, limits, run_dir: str, receipt: dict, *, abnormal: bool = False) -> bool:
+    """Best-effort and never raises (Exception): inventory the files that actually exist (partial flags, hashes) and re-hash the inputs (sha256_after null plus a reason when
+    unreadable). Used on the normal path AND on every error/interrupt path. Returns True only if every input was re-read and is unchanged."""
+    try:
+        receipt["outputs"] = finalize.inventory(run_dir, _KNOWN_OUTPUTS, lambda size: size, include_unrecognised=abnormal)
+    except Exception as exc:
+        finalize.note_error(receipt, "inventory", exc)
+    unchanged = False
+    try:
+        inp = receipt.get("input")
+        if not isinstance(inp, dict):
+            inp = receipt["input"] = {"manifest_sha256": plan.manifest_sha256, "manifest_bytes": plan.manifest_bytes}
+        if not isinstance(inp.get("assets"), list):
+            inp["assets"] = [{"id": k, "path": plan.asset_files[k].rel, "bytes": plan.asset_files[k].size, "sha256_before": v} for k, v in plan.asset_hashes.items()]
+        unchanged = finalize.rehash_inputs(inp["assets"], lambda e: sha256_file(plan.asset_files[e["id"]].abspath, limits.max_source_bytes))
+        inp["inputs_unchanged"] = unchanged
+    except Exception as exc:
+        finalize.note_error(receipt, "input_rehash", exc)
+    return unchanged

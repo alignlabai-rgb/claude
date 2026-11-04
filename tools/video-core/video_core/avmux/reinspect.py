@@ -34,6 +34,7 @@ def _probe(ffprobe, argv_tail, phase, limits, cwd, executions):
                              stdout_limits=(4 * 1024 * 1024, 0), stderr_limits=(limits.max_diag_bytes // 2, limits.max_diag_bytes // 2), max_drain_bytes=limits.max_drain_bytes,
                              cwd=cwd, env=tools.probe_env())
     executions.append(res)
+    runner.raise_if_interrupted(res)
     if not res.ok or res.stdout.summary()["truncated"]:
         return None, b""
     raw = res.stdout_bytes()

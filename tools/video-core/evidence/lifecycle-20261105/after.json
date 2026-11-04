@@ -1,0 +1,129 @@
+{
+ "python": "3.13.18",
+ "scenarios": {
+  "F-INT-1": {
+   "stages": [
+    {
+     "children_launched_after_the_cancelled_one": 0,
+     "escaped": "KeyboardInterrupt",
+     "receipt_on_disk_status": null,
+     "returned": false,
+     "stage": "ffmpeg -version"
+    },
+    {
+     "children_launched_after_the_cancelled_one": 0,
+     "escaped": "KeyboardInterrupt",
+     "receipt_on_disk_status": null,
+     "returned": false,
+     "stage": "preflight ffprobe of the video"
+    },
+    {
+     "children_launched_after_the_cancelled_one": 0,
+     "reasons": [],
+     "receipt_on_disk_status": "INTERRUPTED",
+     "returned": true,
+     "stage": "readback decode",
+     "status": "INTERRUPTED"
+    }
+   ],
+   "trigger": "SIGINT delivered while the owned fake tool sleeps at the named stage (the CLIs translate SIGTERM into the same KeyboardInterrupt)"
+  },
+  "F-RCPT-1": {
+   "files_on_disk": [
+    "fake_observed.json",
+    "output.mov.partial",
+    "plan.canonical.json",
+    "receipt.json"
+   ],
+   "finalize_errors": "<absent in this version>",
+   "input_sha256_after_present": {
+    "audio": true,
+    "video": true
+   },
+   "internal_error": {
+    "message": "synthetic internal error after the mux",
+    "stage": "readback",
+    "type": "RuntimeError"
+   },
+   "receipt_outputs": [
+    "output.mov.partial",
+    "plan.canonical.json",
+    "fake_observed.json"
+   ],
+   "status": "UNKNOWN",
+   "tmp_cleanup": "removed",
+   "tmp_dir_still_on_disk": false,
+   "trigger": "unexpected exception raised inside the avmux readback (after the mux produced output.mov.partial)"
+  },
+  "F-RUN-1": {
+   "lingering_control": {
+    "drain_limit_exceeded": true,
+    "kill_attempted": true,
+    "kill_delivered": true,
+    "kill_reason": "flood",
+    "ok": false,
+    "outcome": "FLOOD_KILLED"
+   },
+   "quick_exit_x5": [
+    {
+     "drain_limit_exceeded": true,
+     "exit_code": 0,
+     "kill_attempted": false,
+     "kill_reason": null,
+     "ok": false,
+     "outcome": "EXITED_ZERO",
+     "total_bytes": 2000000
+    },
+    {
+     "drain_limit_exceeded": true,
+     "exit_code": 0,
+     "kill_attempted": false,
+     "kill_reason": null,
+     "ok": false,
+     "outcome": "EXITED_ZERO",
+     "total_bytes": 2000000
+    },
+    {
+     "drain_limit_exceeded": true,
+     "exit_code": 0,
+     "kill_attempted": false,
+     "kill_reason": null,
+     "ok": false,
+     "outcome": "EXITED_ZERO",
+     "total_bytes": 2000000
+    },
+    {
+     "drain_limit_exceeded": true,
+     "exit_code": 0,
+     "kill_attempted": false,
+     "kill_reason": null,
+     "ok": false,
+     "outcome": "EXITED_ZERO",
+     "total_bytes": 2000000
+    },
+    {
+     "drain_limit_exceeded": true,
+     "exit_code": 0,
+     "kill_attempted": false,
+     "kill_reason": null,
+     "ok": false,
+     "outcome": "EXITED_ZERO",
+     "total_bytes": 2000000
+    }
+   ],
+   "trigger": "child writes 2,000,000 bytes to stdout and exits at once; max_drain_bytes=1000 (control: same child lingers 1 s)"
+  },
+  "F-RUN-2": {
+   "exit_code": 0,
+   "grandchild_alive_after_run_bounded_left": false,
+   "kill_attempted": true,
+   "kill_delivered": true,
+   "kill_reason": "interrupt",
+   "outcome": "INTERRUPTED",
+   "returned": true,
+   "trigger": "leader exits 0 leaving a 5 s pipe-holding grandchild; SIGINT 0.6 s later, while run_bounded waits for EOF",
+   "wall_seconds": 0.67
+  }
+ },
+ "tree": "working tree (fix)"
+}

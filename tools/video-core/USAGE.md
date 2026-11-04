@@ -128,3 +128,18 @@ python3 -m unittest discover -s tests -t .                  # 320+ tests (3 opt-
 VIDEO_CORE_INTEGRATION=1 python3 -m unittest tests.test_integration_ffmpeg -v   # opt-in: real ffmpeg on generated synthetic media
 VIDEO_CORE_INTEGRATION=1 VIDEO_CORE_TEST_FONT=/path/font.ttf python3 -m unittest tests.test_integration_ffmpeg -v  # + burn-in
 ```
+
+### Addendum: drain bound, kill facts, cancellation and failure inventory (lifecycle fixes)
+
+* Every `executions[]` entry now also carries `drain_limit_bytes`, `drain_limit_exceeded`, `kill_attempted` and `kill_delivered`. `drain_limit_exceeded` is true whenever the child
+  wrote more than the bound, **whether it was still running (then it is killed: `FLOOD_KILLED`, `kill_reason: "flood"`) or had already exited on its own** (then `outcome` stays
+  `EXITED_ZERO` with the real `exit_code`, `kill_attempted` is false, the execution is not `ok`, and the run's status is `UNKNOWN` with an `unknown_reason` that says the bound was
+  breached although the child had exited). `kill_attempted` / `kill_delivered` say whether the runner itself signalled the owned process group and whether a signal reached it; the
+  outcome name alone is not the evidence. A surviving group member that keeps flooding after the leader exited is cut off as soon as the breach is seen, not after the drain timeout.
+* A cancel (Ctrl-C, or SIGTERM translated by the CLIs) at ANY point after a child exists, including the final wait for its pipes to close, cleans up the owned process group within a
+  bound and returns the usual `INTERRUPTED` result. The orchestrators then stop: **exit 130**, no further child is launched. Before the run directory exists nothing is written and no
+  receipt is printed; afterwards the returned and on-disk receipt end with status `INTERRUPTED`, the interrupted execution is recorded, partial files are kept and listed.
+* After the run directory exists, every failure path (an input that vanished, an unexpected exception, a cancel) still finalizes the receipt on a best-effort basis: `outputs[]` lists the
+  files that actually exist (`bytes`, `sha256`, `partial`; on the error path also unrecognised files, role `unrecognised`), each input gets `sha256_after` (`null` plus
+  `sha256_after_error`, an exception class name, when unreadable; an unreadable input counts as changed), and `tmp_cleanup` states `removed`, `not created` or `left in place: <class>`.
+  A problem during that finalization is recorded in `finalize_errors` and never replaces the original `internal_error` / status. Nothing is retried or overwritten.

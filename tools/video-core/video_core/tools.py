@@ -95,8 +95,9 @@ def probe_version(name: str, path: str, how: str, limits: Limits, cwd: str) -> t
         cwd=cwd, env=probe_env(),
     )
     runs.append(res)
+    runner.raise_if_interrupted(res)  # a cancel is not "tool unavailable": stop here, launch nothing further
     if not res.ok:
-        rec.problem = f"version probe did not exit cleanly: {res.outcome}"
+        rec.problem = f"version probe did not exit cleanly: {res.describe()}"
         return rec, runs
     first = res.stdout_bytes().decode("utf-8", "replace").splitlines()[:1]
     m = _VERSION.match(first[0]) if first else None
@@ -117,6 +118,7 @@ def _listing(path: str, flag: str, limits: Limits, cwd: str):
         [path, "-hide_banner", flag], phase=f"probe_capability:{flag}", timeout_s=limits.probe_timeout_seconds,
         stdout_limits=(1024 * 1024, 0), stderr_limits=(2048, 2048), max_drain_bytes=limits.max_drain_bytes, cwd=cwd, env=probe_env(),
     )
+    runner.raise_if_interrupted(res)
     if not res.ok or res.stdout is None or res.stdout.summary()["truncated"]:
         return res, None
     return res, capabilities.PARSERS[flag](res.stdout_bytes().decode("utf-8", "replace"))
@@ -140,7 +142,7 @@ def missing_capabilities(path: str, requirements: dict, limits: Limits, cwd: str
         runs.append(res)
         if listing is None:
             failed.append(flag)
-            details[flag] = {"reason": f"listing unavailable: {res.outcome}" + (" (output truncated)" if res.ok else "")}
+            details[flag] = {"reason": f"listing unavailable: {res.describe()}" + (" (output truncated)" if res.ok else "")}
             continue
         details[flag] = listing.summary()
         if listing.recognised == 0:

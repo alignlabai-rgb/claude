@@ -17,7 +17,7 @@ import os
 import shutil
 from fractions import Fraction
 
-from .. import readback, receipt as rc, runner, tools
+from .. import finalize, readback, receipt as rc, runner, tools
 from ..errors import Issue, UnsafePath, ValidationFailed
 from ..limits import Limits, check_argv_budget
 from ..paths import check_output_location
@@ -45,7 +45,11 @@ def _skip(plan: AvPlan, reasons, records, executions) -> dict:
 
 
 def _probe(ffprobe, path, demuxer, limits, cwd, phase, executions):
-    res, parsed, raw = readback.run_probe(ffprobe, path, demuxer, limits, cwd, phase=phase)
+    try:
+        res, parsed, raw = readback.run_probe(ffprobe, path, demuxer, limits, cwd, phase=phase)
+    except runner.RunInterrupted as exc:  # the interrupted probe is evidence: record it, then keep unwinding (no further child is launched)
+        executions.append(exc.result)
+        raise
     executions.append(res)
     return res, parsed, raw
 
@@ -66,6 +70,7 @@ def _run(argv, phase, limits, cwd, env, executions, *, timeout=None, stdout=(0, 
     res = runner.run_bounded(argv, phase=phase, timeout_s=timeout or limits.inspect_timeout_seconds, stdout_limits=stdout, stderr_limits=(half, half),
                              max_drain_bytes=drain or limits.max_drain_bytes, cwd=cwd, env=env)
     executions.append(res)
+    runner.raise_if_interrupted(res)
     return res
 
 
@@ -117,7 +122,7 @@ def mux(manifest_bytes: bytes, *, limits: Limits = Limits(), asset_root: str | N
     ares, aparsed, _ = _probe(fp, plan.audio_file.abspath, "wav", limits, location.root, "preflight_probe_audio", executions)
     for what, res, parsed in (("video", vres, vparsed), ("audio", ares, aparsed)):
         if not res.ok or parsed is None:
-            raise ValidationFailed(f"ffprobe could not measure the {what} input", [Issue("preflight_probe_failed", f"/{what}", f"ffprobe on the {what} input ended {res.outcome} or returned no usable JSON")])
+            raise ValidationFailed(f"ffprobe could not measure the {what} input", [Issue("preflight_probe_failed", f"/{what}", f"ffprobe on the {what} input ended {res.describe()} or returned no usable JSON")])
     src_checks = (ck.check_layout_single_video(vparsed) + ck.check_video(vparsed, width=m.width, height=m.height, fps=fps, frames=m.total_frames)
                   + ck.check_audio_source(aparsed, channels=m.audio_channels, samples=plan.expected_samples))
     _reject_checks(src_checks, "inputs")
@@ -145,18 +150,19 @@ def mux(manifest_bytes: bytes, *, limits: Limits = Limits(), asset_root: str | N
     rc.write_new(receipt_path, rc.dumps(receipt))  # a stale IN_PROGRESS receipt means UNKNOWN
     try:
         _run_mux(plan, limits, argv, run_dir, tmp_dir, ff, fp, executions, receipt, receipt_path, location.root, envelope)
+    except KeyboardInterrupt as exc:  # Ctrl-C / SIGTERM outside the mux step itself (e.g. a readback decode): the run was cancelled; no further child was launched
+        if isinstance(exc, runner.RunInterrupted) and not any(e is exc.result for e in executions):
+            executions.append(exc.result)
+        receipt["status"] = rc.STATUS_INTERRUPTED
+        _finalize(plan, limits, run_dir, tmp_dir, receipt, abnormal=True)
     except Exception as exc:  # preserve partial state and say so; never retry
         receipt["status"] = rc.STATUS_UNKNOWN
         receipt["internal_error"] = {"type": type(exc).__name__, "message": str(exc)[:300], "stage": receipt.get("stage")}
+        _finalize(plan, limits, run_dir, tmp_dir, receipt, abnormal=True)  # best effort: what is actually on disk, input hashes (null + reason if unreadable), tmp result
     receipt["executions"] = [e.to_dict() for e in executions]
     receipt["finished_utc"] = rc.utc_now()
     rc.replace_atomic(receipt_path, rc.dumps(receipt))
     return receipt
-
-
-def _file_record(path, name, role, limits, partial=False):
-    size = os.path.getsize(path)
-    return {"name": name, "role": role, "bytes": size, "sha256": tools.sha256_file(path, max(limits.max_output_bytes, size)), "partial": partial}
 
 
 def _hash_text(ff, path, mode, limits, tmp, env, executions, phase):
@@ -199,24 +205,19 @@ def _run_mux(plan: AvPlan, limits, argv, run_dir, tmp_dir, ff, fp, executions, r
     if res.outcome != runner.EXITED_ZERO:
         status = by_outcome[res.outcome]
     elif not res.ok:
-        status, receipt["unknown_reason"] = rc.STATUS_UNKNOWN, "ffmpeg exited 0 but its output pipes did not drain cleanly (possible surviving child process)"
+        status, receipt["unknown_reason"] = rc.STATUS_UNKNOWN, res.exit0_not_ok_reason("ffmpeg")
     elif not os.path.exists(partial):
         status, receipt["unknown_reason"] = rc.STATUS_UNKNOWN, "ffmpeg exited 0 but produced no output file"
     receipt["stage"] = "mux" if status else "readback"
 
-    checks: list = []
-    obs: dict = {}
+    checks, obs = receipt["checks"], receipt["observations"]  # the receipt's own containers: whatever the readback recorded survives an exception
     if status is None:
         status = _readback(plan, limits, partial, ff, fp, tmp_dir, env, executions, checks, obs, run_dir)
-    receipt["checks"], receipt["observations"] = checks, obs
 
-    # input re-hash decides the status BEFORE any file is promoted
-    post = {"video": tools.sha256_file(plan.video_file.abspath, limits.max_source_bytes), "audio": tools.sha256_file(plan.audio_file.abspath, limits.max_source_bytes)}
-    receipt["input"]["video"]["sha256_after"], receipt["input"]["audio"]["sha256_after"] = post["video"], post["audio"]
-    unchanged = post["video"] == receipt["input"]["video"]["sha256_before"] and post["audio"] == receipt["input"]["audio"]["sha256_before"]
-    receipt["input"]["inputs_unchanged"] = unchanged
+    # input re-hash decides the status BEFORE any file is promoted (an unreadable input counts as changed)
+    unchanged = _rehash_inputs(plan, limits, receipt)
     if not unchanged and status in OK_STATUSES + (S_MISMATCH,):
-        receipt["unknown_reason"] = "an input file changed while muxing"
+        receipt["unknown_reason"] = "an input file changed (or became unreadable) while muxing"
         status = rc.STATUS_UNKNOWN
 
     receipt["technical_verdict"] = {"contract": plan.canonical["contract"]["id"], "met": status in OK_STATUSES, "sample_exact": status == S_MOV_OK,
@@ -227,20 +228,41 @@ def _run_mux(plan: AvPlan, limits, argv, run_dir, tmp_dir, ff, fp, executions, r
     elif os.path.exists(partial) and receipt["stage"] != "mux" and status in (S_MISMATCH, S_INSPECT_FAILED, rc.STATUS_UNKNOWN):
         os.rename(partial, mismatch)  # a file that failed its contract must not look like a deliverable
 
-    outputs = []
-    for name, role, part in ((final_name, "media", False), (partial_name, "media_partial", True), (mismatch_name, "media_unverified", True),
-                             (planmod.PLAN_NAME, "plan", False), (planmod.PROBE_OUT_NAME, "ffprobe_output", False)):
-        p = os.path.join(run_dir, name)
-        if os.path.isfile(p):
-            outputs.append(_file_record(p, name, role, limits, partial=part))
-    receipt["outputs"] = outputs
-    try:
-        shutil.rmtree(tmp_dir)
-        receipt["tmp_cleanup"] = "removed"
-    except OSError as exc:
-        receipt["tmp_cleanup"] = f"left in place: {type(exc).__name__}"
+    _finalize(plan, limits, run_dir, tmp_dir, receipt)
     receipt["status"] = status
     receipt["stage"] = "complete" if status in OK_STATUSES + (S_MISMATCH,) else receipt["stage"]
+
+
+def _rehash_inputs(plan: AvPlan, limits, receipt: dict) -> bool:
+    """Set sha256_after on the video/audio input entries (null plus a reason when unreadable); True only if both were re-read and are unchanged. Never raises (Exception)."""
+    try:
+        inp = receipt["input"]
+        entries = [inp["video"], inp["audio"]]
+        paths = {id(inp["video"]): plan.video_file.abspath, id(inp["audio"]): plan.audio_file.abspath}
+        unchanged = finalize.rehash_inputs(entries, lambda e: tools.sha256_file(paths[id(e)], limits.max_source_bytes))
+        inp["inputs_unchanged"] = unchanged
+        return unchanged
+    except Exception as exc:
+        finalize.note_error(receipt, "input_rehash", exc)
+        return False
+
+
+def _finalize(plan: AvPlan, limits, run_dir: str, tmp_dir: str, receipt: dict, *, abnormal: bool = False) -> None:
+    """Best-effort and never raises (Exception): inventory the files that actually exist (partial/unverified flags, hashes), re-hash the inputs if that has not happened yet,
+    and remove the owned tmp/ and say what happened. Used on the normal path AND on every error/interrupt path. Nothing is renamed, retried or deleted except tmp/."""
+    final_name, partial_name, mismatch_name = planmod.output_names(plan.manifest.route)
+    known = ((final_name, "media", False), (partial_name, "media_partial", True), (mismatch_name, "media_unverified", True),
+             (planmod.PLAN_NAME, "plan", False), (planmod.PROBE_OUT_NAME, "ffprobe_output", False))
+    try:
+        receipt["outputs"] = finalize.inventory(run_dir, known, lambda size: max(limits.max_output_bytes, size), include_unrecognised=abnormal)
+    except Exception as exc:
+        finalize.note_error(receipt, "inventory", exc)
+    if "inputs_unchanged" not in (receipt.get("input") or {}):
+        _rehash_inputs(plan, limits, receipt)
+    try:
+        receipt["tmp_cleanup"] = finalize.cleanup_tmp(tmp_dir)
+    except Exception as exc:
+        finalize.note_error(receipt, "tmp_cleanup", exc)
 
 
 def _readback(plan: AvPlan, limits, out_path, ff, fp, tmp_dir, env, executions, checks, obs, run_dir) -> str:  # noqa: C901
@@ -275,7 +297,7 @@ def _readback(plan: AvPlan, limits, out_path, ff, fp, tmp_dir, env, executions, 
     ares = _run(_ffmpeg_in(ff, out_path) + ["-map", "0:a:0", "-c:a", "pcm_s16le", "-f", "s16le", "-"], "readback_decode_audio_output", limits, tmp_dir, env, executions,
                 stdout=(0, 0), drain=pcm_bytes + PCM_DRAIN_SLACK)
     if not ares.ok:
-        obs["decoded_audio_error"] = f"audio decode ended {ares.outcome}"
+        obs["decoded_audio_error"] = f"audio decode ended {ares.describe()}"
         return S_INSPECT_FAILED
     summ = ares.stdout.summary()
     decoded_bytes, decoded_sha = summ["total_bytes"], summ["sha256_full_stream"]

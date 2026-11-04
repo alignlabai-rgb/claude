@@ -14,7 +14,7 @@ import os
 import shutil
 
 from . import plan as planmod
-from . import readback, receipt as rc, runner, tools
+from . import finalize, readback, receipt as rc, runner, tools
 from .errors import Issue, UnsafePath, ValidationFailed
 from .limits import Limits, check_argv_budget
 from .paths import check_output_location
@@ -117,17 +117,18 @@ def render(episode_bytes: bytes, *, limits: Limits = Limits(), asset_root: str |
     rc.write_new(receipt_path, rc.dumps(receipt))  # a stale IN_PROGRESS file means UNKNOWN
     try:
         _run(plan, limits, argv, run_dir, tmp_dir, paths, real_assets, pre_hashes, receipt, envelope)
+    except KeyboardInterrupt as exc:  # Ctrl-C / the CLI's SIGTERM translation outside the render step itself (e.g. during the readback probe): the run was cancelled
+        if isinstance(exc, runner.RunInterrupted):
+            receipt["executions"].append(exc.result.to_dict())  # the interrupted child run is evidence too
+        receipt["status"] = rc.STATUS_INTERRUPTED
+        _finalize(plan, limits, run_dir, tmp_dir, pre_hashes, receipt, abnormal=True)
     except Exception as exc:  # keep partial state and say so; never retry
         receipt["status"] = rc.STATUS_UNKNOWN
         receipt["internal_error"] = {"type": type(exc).__name__, "message": str(exc)[:300], "stage": receipt.get("stage")}
+        _finalize(plan, limits, run_dir, tmp_dir, pre_hashes, receipt, abnormal=True)  # best effort: what is actually on disk, input hashes (null + reason if unreadable), tmp result
     receipt["finished_utc"] = rc.utc_now()
     rc.replace_atomic(receipt_path, rc.dumps(receipt))
     return receipt
-
-
-def _file_record(path: str, name: str, role: str, limits: Limits, partial: bool = False) -> dict:
-    size = os.path.getsize(path)
-    return {"name": name, "role": role, "bytes": size, "sha256": tools.sha256_file(path, max(limits.max_output_bytes, size)), "partial": partial}
 
 
 def _run(plan: Plan, limits: Limits, argv: list, run_dir: str, tmp_dir: str, paths: dict, real_assets, pre_hashes: dict, receipt: dict, envelope=None) -> None:
@@ -179,7 +180,7 @@ def _run(plan: Plan, limits: Limits, argv: list, run_dir: str, tmp_dir: str, pat
         status = status_by_outcome[res.outcome]
     elif not res.ok:
         status = rc.STATUS_UNKNOWN
-        receipt["unknown_reason"] = "ffmpeg exited 0 but its output pipes did not drain cleanly (possible surviving child process)"
+        receipt["unknown_reason"] = res.exit0_not_ok_reason("ffmpeg")
     elif not os.path.exists(partial):
         status = rc.STATUS_UNKNOWN
         receipt["unknown_reason"] = "ffmpeg exited 0 but produced no output file"
@@ -205,26 +206,40 @@ def _run(plan: Plan, limits: Limits, argv: list, run_dir: str, tmp_dir: str, pat
             status = rc.STATUS_MATCH if cmp["all_ok"] else rc.STATUS_MISMATCH
     receipt["readback"] = readback_result
 
-    for name, role in ((planmod.OUTPUT_FINAL, "video"), (planmod.OUTPUT_PARTIAL, "video_partial"), (planmod.SRT_NAME, "srt"),
-                       (planmod.PLAN_NAME, "plan"), (planmod.PROBE_NAME, "ffprobe_json")):
-        p = os.path.join(run_dir, name)
-        if os.path.isfile(p):
-            outputs.append(_file_record(p, name, role, limits, partial=(role == "video_partial")))
-    receipt["outputs"] = outputs
-
-    post = _hash_assets(plan, limits)
-    for entry in receipt["input"]["assets"]:
-        entry["sha256_after"] = post.get(entry["path"])
-    unchanged = post == pre_hashes
-    receipt["input"]["inputs_unchanged"] = unchanged
+    unchanged = _finalize(plan, limits, run_dir, tmp_dir, pre_hashes, receipt)
     if not unchanged and status in (rc.STATUS_MATCH, rc.STATUS_MISMATCH):
-        receipt["unknown_reason"] = "an input file changed while rendering"
+        receipt["unknown_reason"] = "an input file changed (or became unreadable) while rendering"
         status = rc.STATUS_UNKNOWN
-
-    try:
-        shutil.rmtree(tmp_dir)
-        receipt["tmp_cleanup"] = "removed"
-    except OSError as exc:
-        receipt["tmp_cleanup"] = f"left in place: {type(exc).__name__}"
     receipt["status"] = status
     receipt["stage"] = "complete" if status in (rc.STATUS_MATCH, rc.STATUS_MISMATCH) else receipt["stage"]
+
+
+_KNOWN_OUTPUTS = ((planmod.OUTPUT_FINAL, "video", False), (planmod.OUTPUT_PARTIAL, "video_partial", True), (planmod.SRT_NAME, "srt", False),
+                  (planmod.PLAN_NAME, "plan", False), (planmod.PROBE_NAME, "ffprobe_json", False))
+
+
+def _finalize(plan: Plan, limits: Limits, run_dir: str, tmp_dir: str, pre_hashes: dict, receipt: dict, *, abnormal: bool = False) -> bool:
+    """Best-effort and never raises (Exception): inventory the files that actually exist (partial flags, hashes), re-hash the inputs (sha256_after null plus a reason when
+    unreadable), remove the owned tmp/ and say what happened. Used on the normal path AND on every error/interrupt path, so a receipt never omits evidence that is on disk.
+    Returns True only if every input was re-read and is unchanged."""
+    try:
+        receipt["outputs"] = finalize.inventory(run_dir, _KNOWN_OUTPUTS, lambda size: max(limits.max_output_bytes, size), include_unrecognised=abnormal)
+    except Exception as exc:
+        finalize.note_error(receipt, "inventory", exc)
+    unchanged = False
+    try:
+        inp = receipt.get("input")
+        if not isinstance(inp, dict):
+            inp = receipt["input"] = {"episode_sha256": plan.episode_sha256, "episode_bytes": plan.episode_size}
+        if not isinstance(inp.get("assets"), list):
+            inp["assets"] = [{"path": a.rel, "bytes": a.size, "sha256_before": pre_hashes.get(a.rel)} for a in plan.assets]
+        abspath = {a.rel: a.abspath for a in plan.assets}
+        unchanged = finalize.rehash_inputs(inp["assets"], lambda e: tools.sha256_file(abspath[e["path"]], limits.max_source_bytes))
+        inp["inputs_unchanged"] = unchanged
+    except Exception as exc:
+        finalize.note_error(receipt, "input_rehash", exc)
+    try:
+        receipt["tmp_cleanup"] = finalize.cleanup_tmp(tmp_dir)
+    except Exception as exc:
+        finalize.note_error(receipt, "tmp_cleanup", exc)
+    return unchanged

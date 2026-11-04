@@ -1,0 +1,128 @@
+{
+ "python": "3.13.18",
+ "scenarios": {
+  "F-INT-1": {
+   "stages": [
+    {
+     "children_launched_after_the_cancelled_one": 1,
+     "reasons": [
+      "version probe did not exit cleanly: INTERRUPTED"
+     ],
+     "receipt_on_disk_status": null,
+     "returned": true,
+     "stage": "ffmpeg -version",
+     "status": "SKIPPED_TOOL_UNAVAILABLE"
+    },
+    {
+     "children_launched_after_the_cancelled_one": 1,
+     "issues": [
+      "preflight_probe_failed"
+     ],
+     "raised": "ValidationFailed: ffprobe could not measure the video input",
+     "receipt_on_disk_status": null,
+     "returned": false,
+     "stage": "preflight ffprobe of the video"
+    },
+    {
+     "children_launched_after_the_cancelled_one": 1,
+     "reasons": [],
+     "receipt_on_disk_status": "INSPECTION_FAILED",
+     "returned": true,
+     "stage": "readback decode",
+     "status": "INSPECTION_FAILED"
+    }
+   ],
+   "trigger": "SIGINT delivered while the owned fake tool sleeps at the named stage (the CLIs translate SIGTERM into the same KeyboardInterrupt)"
+  },
+  "F-RCPT-1": {
+   "files_on_disk": [
+    "fake_observed.json",
+    "output.mov.partial",
+    "plan.canonical.json",
+    "receipt.json",
+    "tmp"
+   ],
+   "finalize_errors": "<absent in this version>",
+   "input_sha256_after_present": {
+    "audio": false,
+    "video": false
+   },
+   "internal_error": {
+    "message": "synthetic internal error after the mux",
+    "stage": "readback",
+    "type": "RuntimeError"
+   },
+   "receipt_outputs": [],
+   "status": "UNKNOWN",
+   "tmp_cleanup": "<absent>",
+   "tmp_dir_still_on_disk": true,
+   "trigger": "unexpected exception raised inside the avmux readback (after the mux produced output.mov.partial)"
+  },
+  "F-RUN-1": {
+   "lingering_control": {
+    "drain_limit_exceeded": "<absent in this version>",
+    "kill_attempted": "<absent in this version>",
+    "kill_delivered": "<absent in this version>",
+    "kill_reason": "flood",
+    "ok": false,
+    "outcome": "FLOOD_KILLED"
+   },
+   "quick_exit_x5": [
+    {
+     "drain_limit_exceeded": "<absent in this version>",
+     "exit_code": 0,
+     "kill_attempted": "<absent in this version>",
+     "kill_reason": null,
+     "ok": true,
+     "outcome": "EXITED_ZERO",
+     "total_bytes": 2000000
+    },
+    {
+     "drain_limit_exceeded": "<absent in this version>",
+     "exit_code": 0,
+     "kill_attempted": "<absent in this version>",
+     "kill_reason": null,
+     "ok": true,
+     "outcome": "EXITED_ZERO",
+     "total_bytes": 2000000
+    },
+    {
+     "drain_limit_exceeded": "<absent in this version>",
+     "exit_code": 0,
+     "kill_attempted": "<absent in this version>",
+     "kill_reason": null,
+     "ok": true,
+     "outcome": "EXITED_ZERO",
+     "total_bytes": 2000000
+    },
+    {
+     "drain_limit_exceeded": "<absent in this version>",
+     "exit_code": 0,
+     "kill_attempted": "<absent in this version>",
+     "kill_reason": null,
+     "ok": true,
+     "outcome": "EXITED_ZERO",
+     "total_bytes": 2000000
+    },
+    {
+     "drain_limit_exceeded": "<absent in this version>",
+     "exit_code": 0,
+     "kill_attempted": "<absent in this version>",
+     "kill_reason": null,
+     "ok": true,
+     "outcome": "EXITED_ZERO",
+     "total_bytes": 2000000
+    }
+   ],
+   "trigger": "child writes 2,000,000 bytes to stdout and exits at once; max_drain_bytes=1000 (control: same child lingers 1 s)"
+  },
+  "F-RUN-2": {
+   "escaped": "KeyboardInterrupt",
+   "grandchild_alive_after_run_bounded_left": true,
+   "returned": false,
+   "trigger": "leader exits 0 leaving a 5 s pipe-holding grandchild; SIGINT 0.6 s later, while run_bounded waits for EOF",
+   "wall_seconds": 0.68
+  }
+ },
+ "tree": "pre-fix export of f42c2db"
+}
