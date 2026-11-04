@@ -16,7 +16,7 @@ import shutil
 from . import plan as planmod
 from . import readback, receipt as rc, runner, tools
 from .errors import Issue, UnsafePath, ValidationFailed
-from .limits import Limits
+from .limits import Limits, check_argv_budget
 from .paths import check_output_location
 from .plan import Plan, materialize, prepare
 
@@ -83,9 +83,7 @@ def render(episode_bytes: bytes, *, limits: Limits = Limits(), asset_root: str |
 
     # ---- last rejection-only step: materialize + size check --------------------------------
     argv = materialize(plan, ffmpeg_path=paths["ffmpeg"][0], asset_root=real_assets, run_dir=location.run_dir)
-    if sum(len(a.encode("utf-8")) + 1 for a in argv) > limits.max_argv_bytes:
-        raise ValidationFailed("ffmpeg argument list too large",
-                               [Issue("limit_argv_bytes", "argv", f"materialized ffmpeg arguments exceed {limits.max_argv_bytes} bytes")])
+    argv_budget_used = check_argv_budget(argv, limits)  # exact materialized argv; Windows bound enforced on Windows
     try:
         pre_hashes = _hash_assets(plan, limits)
     except (OSError, ValueError) as exc:
@@ -103,7 +101,7 @@ def render(episode_bytes: bytes, *, limits: Limits = Limits(), asset_root: str |
         "quality_evaluated": False, "note": rc.QUALITY_NOTE, "started_utc": rc.utc_now(),
         "plan_sha256": plan.sha256, "platform": rc.platform_facts(),
         "tools": {k: v.to_dict() for k, v in records.items()},
-        "limits": limits.to_dict(), "executions": [e.to_dict() for e in executions], "outputs": [], "readback": None,
+        "limits": limits.to_dict(), "argv_budget": argv_budget_used, "executions": [e.to_dict() for e in executions], "outputs": [], "readback": None,
     }
     receipt_path = os.path.join(run_dir, planmod.RECEIPT_NAME)
     rc.write_new(receipt_path, rc.dumps(receipt))  # a stale IN_PROGRESS file means UNKNOWN

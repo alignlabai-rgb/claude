@@ -35,7 +35,7 @@ def _limit_args(p: argparse.ArgumentParser) -> None:
     g = p.add_argument_group("resource limits (lower the defaults; schema ceilings cannot be raised)")
     for name, typ in (
         ("max-frames", int), ("max-dimension", int), ("max-clips", int), ("max-captions", int), ("max-pixel-volume", int),
-        ("max-duration-seconds", int), ("max-fps", int), ("max-source-bytes", int), ("max-argv-bytes", int),
+        ("max-duration-seconds", int), ("max-fps", int), ("max-source-bytes", int), ("max-argv-bytes", int), ("max-windows-cmdline-chars", int),
         ("max-runtime-seconds", float), ("max-output-bytes", int), ("max-diag-bytes", int),
     ):
         g.add_argument(f"--{name}", type=typ, default=None, dest=name.replace("-", "_"))

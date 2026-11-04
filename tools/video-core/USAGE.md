@@ -24,7 +24,7 @@ python3 -m video_core srt examples/episode.synthetic.json > captions.srt   # byt
 
 Tools: `--ffmpeg PATH` / `--ffprobe PATH`, otherwise PATH lookup (reported as `discovery` in the receipt).
 Limits (lower the defaults, never exceed the v1 schema ceilings): `--max-frames --max-dimension --max-clips --max-captions
---max-pixel-volume --max-duration-seconds --max-fps --max-source-bytes --max-argv-bytes --max-runtime-seconds
+--max-pixel-volume --max-duration-seconds --max-fps --max-source-bytes --max-argv-bytes --max-windows-cmdline-chars --max-runtime-seconds
 --max-output-bytes --max-diag-bytes`. Defaults are in `video_core/limits.py`.
 
 Exit codes: `0` ok · `1` rejected before launch · `2` usage · `3` skipped (tool unavailable) ·
@@ -46,6 +46,25 @@ the path (not only escapes), FIFOs/devices/directories, extensions outside an al
 containers cannot be smuggled in), output names that are unsafe, **existing** output locations (no overwrite),
 and output locations inside the asset root.
 
+## FFmpeg capability probe (fail-closed)
+
+Before anything is created, `render` runs `ffmpeg -encoders/-filters/-demuxers` (only for what the plan needs) and parses the
+listings with the pure parsers in `video_core/capabilities.py`. Accepted entry layouts: filters with a 2- or 3-character flag
+column (`..C scale V->V` in FFmpeg 6.1.1, `.. scale V->V` as reported for 8.1.2), encoders with a 6-character flag column
+(`V....D libx264`), demuxers (` D  image2`, ` DE mov,mp4,...`); LF or CRLF. Names match exactly (`scale` ≠ `scale2ref`).
+Outcomes in the `SKIPPED_TOOL_UNAVAILABLE` receipt (`reasons[0].detail`): `missing` = understood listing, name truly absent;
+`probe_failed` = listing failed, was truncated, or exited 0 but **no line matched a known layout**
+(`details[flag].reason`, `ignored_lines`, up to 5 truncated `sample_ignored` lines) — never treated as success and never reported as
+"everything is missing".
+
+## Argument-list bounds
+
+`max_argv_bytes` (default 100000) applies on every platform. `max_windows_cmdline_chars` (default 32000, ceiling 32766, the Win32
+`CreateProcess` limit) is measured with `subprocess.list2cmdline` — the string Python passes on Windows, executable included — and is
+**enforced when running on Windows**; on other platforms `plan` only reports it (`observations.argv_budget.fits_windows_limit`, an
+estimate using the real roots when known, else 260 characters each). `render` re-checks the real argv before creating anything.
+Rule of thumb from measurement: about 200 colour-only clips fit the Windows bound; 256 do not.
+
 ## Render pipeline and receipt
 
 `preflight → tool probe → create fresh ROOT/NAME → input hash → render → inspect → output hash → input re-hash → receipt`.
@@ -58,7 +77,7 @@ font copy, `HOME` for FFmpeg); it is removed at the end.
 
 Receipt fields: `status`, `stage`, tool `version_line` + executable SHA-256 + discovery, `input` (episode / asset / font
 hashes before and after, `inputs_unchanged`), `plan_sha256`, every `executions[]` entry (phase, actual argv, outcome,
-`exit_code`, `signal`, `timed_out`, `kill_reason`, `drain_complete`, `orphan_group_killed`, wall seconds, stderr head+tail,
+`exit_code`, `signal` (POSIX only; on Windows a runner-killed child reports exit code 1 and no signal, so the outcome comes from `kill_reason`, never from the code), `timed_out`, `kill_reason`, `drain_complete`, `orphan_group_killed`, wall seconds, stderr head+tail,
 total bytes, truncation flag and SHA-256 of the full stream), `outputs[]` (bytes, SHA-256, `partial`), `readback`
 (summary of ffprobe + every expected/observed check), `quality_evaluated: false`.
 
@@ -87,7 +106,7 @@ audio adapter (no voice service, no provider, no network).
 
 ```bash
 cd tools/video-core
-python3 -m unittest discover -s tests -t .                  # 152 tests (2 opt-in skipped); fake ffmpeg/ffprobe; no real render
+python3 -m unittest discover -s tests -t .                  # 194 tests (3 opt-in skipped); fake ffmpeg/ffprobe; no real render
 VIDEO_CORE_INTEGRATION=1 python3 -m unittest tests.test_integration_ffmpeg -v   # opt-in: real ffmpeg on generated synthetic media
 VIDEO_CORE_INTEGRATION=1 VIDEO_CORE_TEST_FONT=/path/font.ttf python3 -m unittest tests.test_integration_ffmpeg -v  # + burn-in
 ```

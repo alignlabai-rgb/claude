@@ -53,9 +53,13 @@ class Outcomes(TmpCase):
             r = runner.run_bounded(py("import time; time.sleep(60)"), phase="render", timeout_s=0.5)
             self.assertLess(time.monotonic() - t0, 15)
             self.assertEqual((r.outcome, r.timed_out, r.kill_reason), (runner.TIMEOUT, True, "timeout"))
-            if POSIX:
+            if POSIX:  # killed by a signal: no exit code
                 self.assertIn(r.signal, (15, 9))
-            self.assertIsNone(r.exit_code)
+                self.assertIsNone(r.exit_code)
+            else:  # Windows: TerminateProcess forces an exit code (1); there are no signals
+                self.assertIsNone(r.signal)
+                self.assertIsNotNone(r.exit_code)
+                self.assertNotEqual(r.exit_code, 0)
             self.assertFalse(r.ok)
             self.assertIsNone(bystander.poll(), "an unrelated process must never be killed")
         finally:
@@ -90,6 +94,33 @@ class Outcomes(TmpCase):
         self.assertEqual(r.outcome, runner.NONZERO_EXIT)
         with open(counter) as fh:
             self.assertEqual(fh.read(), "x")
+
+
+class PlatformSemantics(unittest.TestCase):
+    """Pure-function checks of both platforms' return-code rules (run on any OS; not a Windows run)."""
+
+    def test_split_returncode_posix_and_windows(self):
+        self.assertEqual(runner.split_returncode(-15, True), (None, 15))
+        self.assertEqual(runner.split_returncode(-9, True), (None, 9))
+        self.assertEqual(runner.split_returncode(3, True), (3, None))
+        self.assertEqual(runner.split_returncode(0, True), (0, None))
+        self.assertEqual(runner.split_returncode(1, False), (1, None), "Windows TerminateProcess code is an exit code")
+        self.assertEqual(runner.split_returncode(-1, False), (-1, None), "no signal concept off POSIX")
+        self.assertEqual(runner.split_returncode(0xC0000005, False), (0xC0000005, None))
+        self.assertEqual(runner.split_returncode(None, True), (None, None))
+
+    def test_runner_kill_beats_the_reported_code_on_both_platforms(self):
+        # POSIX-shaped: SIGTERM after our timeout; Windows-shaped: exit code 1 after our timeout
+        for posix, rc in ((True, -15), (True, -9), (False, 1), (False, 0xC000013A)):
+            code, sig = runner.split_returncode(rc, posix)
+            self.assertEqual(runner.classify("timeout", sig, rc), runner.TIMEOUT)
+            self.assertEqual(runner.classify("flood", sig, rc), runner.FLOOD_KILLED)
+            self.assertEqual(runner.classify("interrupt", sig, rc), runner.INTERRUPTED)
+
+    def test_without_a_runner_kill_the_code_decides(self):
+        self.assertEqual(runner.classify(None, 9, -9), runner.SIGNALED)
+        self.assertEqual(runner.classify(None, None, 0), runner.EXITED_ZERO)
+        self.assertEqual(runner.classify(None, None, 1), runner.NONZERO_EXIT, "an external exit code 1 on Windows is a plain failure")
 
 
 class NoShell(TmpCase):

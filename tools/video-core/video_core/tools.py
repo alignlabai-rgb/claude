@@ -14,7 +14,7 @@ import shutil
 import stat
 from dataclasses import dataclass
 
-from . import runner
+from . import capabilities, runner
 from .limits import Limits
 
 _VERSION = re.compile(r"^(ffmpeg|ffprobe) version (\S+)")
@@ -112,38 +112,42 @@ def probe_version(name: str, path: str, how: str, limits: Limits, cwd: str) -> t
 
 
 def _listing(path: str, flag: str, limits: Limits, cwd: str):
+    """Run one listing command. Returns (RunResult, Listing or None)."""
     res = runner.run_bounded(
         [path, "-hide_banner", flag], phase=f"probe_capability:{flag}", timeout_s=limits.probe_timeout_seconds,
         stdout_limits=(1024 * 1024, 0), stderr_limits=(2048, 2048), max_drain_bytes=limits.max_drain_bytes, cwd=cwd, env=probe_env(),
     )
-    names = set()
-    if res.ok:
-        for line in res.stdout_bytes().decode("utf-8", "replace").splitlines():
-            parts = line.split()
-            if flag == "-encoders" and len(parts) >= 2 and re.fullmatch(r"[VAS][A-Z.]{5}", parts[0]):
-                names.add(parts[1])
-            elif flag == "-filters" and len(parts) >= 2 and re.fullmatch(r"[A-Z.]{3}", parts[0]):
-                names.add(parts[1])
-            elif flag == "-demuxers" and len(parts) >= 2 and re.fullmatch(r"[D.][E.]?", parts[0]):
-                names.update(parts[1].split(","))
-    return res, names
+    if not res.ok or res.stdout is None or res.stdout.summary()["truncated"]:
+        return res, None
+    return res, capabilities.PARSERS[flag](res.stdout_bytes().decode("utf-8", "replace"))
 
 
 def missing_capabilities(path: str, requirements: dict, limits: Limits, cwd: str) -> tuple[dict, list]:
-    """Check requirements {'encoders': [...], 'filters': [...], 'demuxers': [...]}.
-    Returns ({'missing': {...}, 'probe_failed': [...]}, run results)."""
+    """Check requirements {'encoders': [...], 'filters': [...], 'demuxers': [...]}. Fail-closed.
+
+    Returns ({'missing': {kind: [names]}, 'probe_failed': [flags], 'details': {flag: {...}}}, run results).
+    * missing      -- the listing was understood and the name is truly absent
+    * probe_failed -- the listing could not be obtained or understood (non-zero exit, truncated output,
+                      or exit 0 but zero recognisable entries, i.e. an unknown layout). Never treated as success.
+    """
     flags = {"encoders": "-encoders", "filters": "-filters", "demuxers": "-demuxers"}
-    runs, missing, failed = [], {}, []
+    runs, missing, failed, details = [], {}, [], {}
     for key, flag in flags.items():
         wanted = requirements.get(key) or []
         if not wanted:
             continue
-        res, names = _listing(path, flag, limits, cwd)
+        res, listing = _listing(path, flag, limits, cwd)
         runs.append(res)
-        if not res.ok:
+        if listing is None:
             failed.append(flag)
+            details[flag] = {"reason": f"listing unavailable: {res.outcome}" + (" (output truncated)" if res.ok else "")}
             continue
-        gone = [w for w in wanted if w not in names]
+        details[flag] = listing.summary()
+        if listing.recognised == 0:
+            failed.append(flag)
+            details[flag]["reason"] = "listing format not recognised (no entry line matched a known layout)"
+            continue
+        gone = [w for w in wanted if w not in listing.names]
         if gone:
             missing[key] = gone
-    return {"missing": missing, "probe_failed": failed}, runs
+    return {"missing": missing, "probe_failed": failed, "details": details}, runs

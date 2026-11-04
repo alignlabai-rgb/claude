@@ -123,6 +123,40 @@ class RunResult:
         }
 
 
+def split_returncode(rc: int | None, posix: bool) -> tuple[int | None, int | None]:
+    """Interpret a Popen return code as (exit_code, signal).
+
+    POSIX: a negative code means "terminated by signal -rc" -> (None, -rc).
+    Windows has no signals: every code, including the 1 that Popen.terminate() /
+    TerminateProcess forces on a runner-killed child, is an exit code -> (rc, None).
+    The code alone therefore never decides the outcome; see classify().
+    """
+    if rc is None:
+        return None, None
+    if posix and rc < 0:
+        return None, -rc
+    return rc, None
+
+
+def classify(kill_reason: str | None, signal: int | None, rc: int | None) -> str:
+    """Outcome precedence: what *we* did (kill_reason) beats what the OS reports.
+
+    A runner-killed child looks like a signal on POSIX and like "exit code 1" on Windows;
+    only kill_reason says it was a timeout/flood/interrupt.
+    """
+    if kill_reason == "timeout":
+        return TIMEOUT
+    if kill_reason == "flood":
+        return FLOOD_KILLED
+    if kill_reason == "interrupt":
+        return INTERRUPTED
+    if signal is not None:
+        return SIGNALED
+    if rc == 0:
+        return EXITED_ZERO
+    return NONZERO_EXIT
+
+
 def _drain(fd: int, cap: _Capture, state: dict, done: threading.Event) -> None:
     try:
         while True:
@@ -242,21 +276,7 @@ def run_bounded(
             pass
 
     rc = proc.returncode
-    if rc is not None and rc < 0 and POSIX:
-        result.signal = -rc
-    elif rc is not None:
-        result.exit_code = rc
-    if result.kill_reason == "timeout":
-        result.outcome = TIMEOUT
-    elif result.kill_reason == "flood":
-        result.outcome = FLOOD_KILLED
-    elif result.kill_reason == "interrupt":
-        result.outcome = INTERRUPTED
-    elif result.signal is not None:
-        result.outcome = SIGNALED
-    elif rc == 0:
-        result.outcome = EXITED_ZERO
-    else:
-        result.outcome = NONZERO_EXIT
+    result.exit_code, result.signal = split_returncode(rc, POSIX)
+    result.outcome = classify(result.kill_reason, result.signal, rc)
     result.wall_seconds = time.monotonic() - t0
     return result

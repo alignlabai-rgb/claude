@@ -126,9 +126,19 @@ if name == "ffprobe":
     print(json.dumps(b["probe"])); sys.exit(0)
 if "-encoders" in args:
     print(" V....D " + b.get("encoder", "libx264") + "              fake"); sys.exit(0)
+def emit(line):
+    sys.stdout.write(line + ("\r\n" if b.get("crlf") else "\n"))
 if "-filters" in args:
+    if b.get("filters_exit"):
+        sys.stderr.write("listing failed"); sys.exit(b["filters_exit"])
+    layout = b.get("filters_layout", "three")
+    if layout == "unknown":
+        for line in ("Filters:", "  X = unknown legend", " <color> video source", "color: |->V"):
+            emit(line)
+        sys.exit(0)
+    emit("Filters:")
     for f in b.get("filters", ["color","trim","setpts","scale","format","setsar","concat","fps","pad","drawtext","null"]):
-        print(" ... " + f + "            V->V       fake")
+        emit((" .. " if layout == "two" else " ... ") + f + "            V->V       fake")
     sys.exit(0)
 if "-demuxers" in args:
     print(" DE mov,mp4,m4a,3gp,3g2,mj2 fake"); print(" DE matroska,webm fake"); print(" D  image2 fake"); sys.exit(0)

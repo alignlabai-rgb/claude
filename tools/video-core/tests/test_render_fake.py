@@ -216,6 +216,53 @@ class RenderFake(TmpCase):
         self.assertEqual(r["status"], rc.STATUS_SKIPPED)
         self.assertIn("scale", r["reasons"][0]["detail"]["missing"]["filters"])
 
+    def test_two_flag_filter_listing_layout_renders_like_the_three_flag_layout(self):
+        """FFmpeg 8-style listing (two flag characters), also with CRLF as a Windows pipe would deliver."""
+        for crlf in (False, True):
+            self.tools(filters_layout="two", crlf=crlf)
+            r = self.go(name=f"two-{crlf}")
+            self.assertEqual(r["status"], rc.STATUS_MATCH, r.get("reasons"))
+            self.assertGreaterEqual(len(self.render_calls()), 1, "ffmpeg was actually launched after the capability probe")
+
+    def test_unrecognised_listing_layout_is_a_diagnosable_skip_and_creates_nothing(self):
+        self.tools(filters_layout="unknown")
+        before = tree_snapshot(self.tmp)
+        r = self.go()
+        self.assertEqual(r["status"], rc.STATUS_SKIPPED)
+        detail = r["reasons"][0]["detail"]
+        self.assertEqual(detail["probe_failed"], ["-filters"])
+        self.assertEqual(detail["missing"], {}, "an unknown layout must not be reported as 'everything is missing'")
+        self.assertIn("not recognised", detail["details"]["-filters"]["reason"])
+        self.assertTrue(detail["details"]["-filters"]["sample_ignored"])
+        self.assertFalse(os.path.exists(self.run_dir()))
+        self.assertEqual([c for c in self.render_calls()], [])
+        self.assertEqual({k: v for k, v in tree_snapshot(self.tmp).items() if not k.startswith("bin")}, {k: v for k, v in before.items() if not k.startswith("bin")})
+
+    def test_listing_command_failure_is_fail_closed(self):
+        self.tools(filters_exit=3)
+        r = self.go()
+        self.assertEqual(r["status"], rc.STATUS_SKIPPED)
+        self.assertEqual(r["reasons"][0]["detail"]["probe_failed"], ["-filters"])
+        self.assertFalse(os.path.exists(self.run_dir()))
+
+    def test_receipt_records_the_argv_budget(self):
+        self.tools()
+        r = self.go()
+        self.assertEqual(set(r["argv_budget"]), {"argv_bytes", "windows_cmdline_chars"})
+        self.assertGreater(r["argv_budget"]["argv_bytes"], 500)
+
+    def test_materialized_argv_too_long_for_windows_is_rejected_before_anything_is_created(self):
+        from unittest import mock
+        from video_core import limits as L
+        self.tools()
+        before = tree_snapshot(self.tmp)
+        with mock.patch.object(L, "is_windows", return_value=True):
+            with self.assertRaises(ValidationFailed) as cm:
+                self.go(limits=Limits(max_windows_cmdline_chars=400))
+        self.assertIn("limit_cmdline_windows", {i.code for i in cm.exception.issues})
+        self.assertEqual(tree_snapshot(self.tmp), before)
+        self.assertEqual(fake_calls(self.bin), [], "not even a version probe ran: the plan-time check fires first")
+
     # ------------------------------------------------------------------ overwrite / source / output protection
     def test_overwrite_is_refused_and_first_output_is_untouched(self):
         self.tools()

@@ -22,7 +22,7 @@ from dataclasses import dataclass, field
 from . import fontcheck, tools
 from .episode import ColorSource, Episode, FileSource, load_episode
 from .errors import Issue, UnsafePath, ValidationFailed
-from .limits import Limits
+from .limits import Limits, WIN_CMDLINE_HARD_LIMIT, argv_budget, check_argv_budget
 from .paths import FONT_EXTENSIONS, SOURCE_EXTENSIONS, ResolvedFile, check_output_location, resolve_asset
 from .srt import export_srt
 from .timebase import frame_to_srt, frame_to_seconds, ratio_str
@@ -69,14 +69,19 @@ class Plan:
         }
 
 
-def _argv_bytes(argv: list) -> int:
-    total = 0
-    for el in argv:
+def estimate_argv(template: list, asset_root: str | None, run_dir: str | None, exe: str | None) -> list:
+    """Concrete-looking argv for budgeting. Unknown roots are assumed to be 260 characters (MAX_PATH)."""
+    unknown = "x" * 260
+    out = []
+    for el in template:
         if isinstance(el, str):
-            total += len(el.encode("utf-8")) + 1
-        else:  # placeholder: assume a generous absolute-path length
-            total += len(next(iter(el.values())).encode("utf-8")) + 1 + 1024
-    return total
+            out.append(el)
+        elif "asset" in el:
+            out.append(os.path.join(asset_root or unknown, *el["asset"].split("/")))
+        else:
+            out.append(os.path.join(run_dir or unknown, el["run_file"]))
+    out[0] = exe or unknown
+    return out
 
 
 def _clip_filter(index: int, clip, ep: Episode, input_index: int | None) -> str:
@@ -175,10 +180,6 @@ def build_canonical(ep: Episode, assets: dict, font: ResolvedFile | None, font_s
              "-colorspace", "bt709", "-color_primaries", "bt709", "-color_trc", "bt709", "-color_range", "tv",
              "-map_metadata", "-1", "-fflags", "+bitexact", "-flags:v", "+bitexact", "-movflags", "+faststart",
              "-fs", str(limits.max_output_bytes), "-f", "mp4", {"run_file": OUTPUT_PARTIAL}]
-    if _argv_bytes(argv) > limits.max_argv_bytes:
-        raise ValidationFailed("ffmpeg argument list too large",
-                               [Issue("limit_argv_bytes", "/clips", f"generated ffmpeg arguments exceed {limits.max_argv_bytes} bytes")])
-
     filters = ["color", "trim", "setpts", "scale", "format", "setsar", "concat"]
     if inputs:
         filters += ["fps", "pad"]
@@ -259,11 +260,18 @@ def prepare(episode_bytes: bytes, *, limits: Limits = Limits(), asset_root: str 
     )
     ff, how_ff = tools.locate("ffmpeg", ffmpeg)
     fp, how_fp = tools.locate("ffprobe", ffprobe)
+    estimate = estimate_argv(canonical["ffmpeg"]["argv"], os.path.realpath(asset_root) if asset_root else None,
+                             location.run_dir if location else None, ff)
+    budget = check_argv_budget(estimate, limits)  # raises limit_argv_bytes (all platforms) / limit_cmdline_windows (on Windows)
     plan.observations = {
         "input": {"episode_sha256": plan.episode_sha256, "episode_bytes": len(episode_bytes)},
         "assets": [{"path": a.rel, "bytes": a.size} for a in plan.assets],
         "output": None if location is None else {"root": location.root, "name": location.name, "fresh": True},
         "tools_located": {"ffmpeg": {"path": ff, "discovery": how_ff}, "ffprobe": {"path": fp, "discovery": how_fp}},
+        "argv_budget": {"estimated_argv_bytes": budget["argv_bytes"], "estimated_windows_cmdline_chars": budget["windows_cmdline_chars"],
+                        "windows_limit_chars": limits.max_windows_cmdline_chars, "windows_hard_limit_chars": WIN_CMDLINE_HARD_LIMIT,
+                        "fits_windows_limit": budget["windows_cmdline_chars"] <= limits.max_windows_cmdline_chars,
+                        "basis": "estimate: known roots/tool path, else 260 characters each; render re-checks the real argv"},
         "limits": limits.to_dict(),
         "side_effects": "none (no files created, no process launched by plan)",
     }

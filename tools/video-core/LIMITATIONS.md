@@ -23,3 +23,20 @@ creative, visual or audio acceptance. The author's checks below are not an indep
 
 ## Known failures
 None in the default suite at the time of writing. Two integration tests are skipped by default (opt-in) and were run once manually with the result recorded in `evidence/`. A first run of `evidence/independent_check.py` reported two failures caused by a parsing bug in that script (it dropped a `0,` csv row); the media was fine, the script was fixed, and both runs are kept in `evidence/`.
+
+## Compatibility follow-up (second commit; Windows findings)
+
+Changed: (1) the runner's return-code interpretation and outcome classification are now pure, tested functions
+(`split_returncode`, `classify`) so the POSIX-signal and Windows-exit-code conventions are both pinned by tests that run on any OS —
+no Windows execution happened in the Linux cloud; the failing `exit_code is None` expectation was a POSIX-only assumption, not a runner bug;
+(2) FFmpeg capability listings are parsed by `capabilities.py` (2- and 3-flag filter layouts, CRLF, exact names, noise rejected) and an
+unrecognised layout is an explicit `probe_failed` instead of "all missing"; (3) a Windows command-line bound plus a plan-time estimate that fixes
+a defect of the first delivery (1024 bytes of slack per file input falsely rejected ≈100 file clips).
+
+Unchanged on purpose: the planned command and the colour behaviour — the baseline plan hash `4bc20b3f…9f21` is pinned by a test, and the **colour
+conversion drift described above remains an open issue**. The baseline was not re-rendered.
+
+Still not verified: any Windows run (the follow-up tests that need POSIX fake tools remain skipped there); FFmpeg 8.1.2 **encoder and demuxer** listing layouts
+(only the filter lines quoted in the finding were available; the 6-character encoder layout is assumed from libx264 having been found on 8.1.2);
+the two-flag fixture is a reconstruction, not captured output (see `tests/fixtures/ffmpeg_listings/README.md`); on Windows, episodes needing more than
+≈200 colour clips (≈100+ file clips depending on path length) exceed the command-line bound and are rejected rather than split.

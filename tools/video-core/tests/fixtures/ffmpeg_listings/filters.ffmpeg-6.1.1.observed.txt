@@ -1,0 +1,25 @@
+Filters:
+  T.. = Timeline support
+  .S. = Slice threading
+  ..C = Command support
+  A = Audio input/output
+  V = Video input/output
+  N = Dynamic number and/or type of input/output
+  | = Source or sink filter
+ ... abench            A->A       Benchmark part of a filtergraph.
+ ... acrossfade        AA->A      Cross fade two input audio streams.
+ ... abuffersink       A->|       Buffer audio frames, and make them available to the end of the filter graph.
+ ..C color             |->V       Provide an uniformly colored input.
+ TSC colorkey          V->V       Turns a certain color into transparency. Operates on RGB colors.
+ ..C concat            N->N       Concatenate audio and video streams.
+ T.C drawtext          V->V       Draw text on top of video frames using libfreetype library.
+ ... format            V->V       Convert the input video to one of the specified pixel formats.
+ ... fps               V->V       Force constant framerate.
+ ... null              V->V       Pass the source unchanged to the output.
+ ... nullsink          V->|       Do absolutely nothing with the input video.
+ ... pad               V->V       Pad the input video.
+ ..C scale             V->V       Scale the input video size and/or convert the image format.
+ ..C scale2ref         VV->VV     Scale the input video size and/or convert the image format to the given reference.
+ ..C setpts            V->V       Set PTS for the output video frame.
+ ... setsar            V->V       Set the pixel sample aspect ratio.
+ ... trim              V->V       Pick one continuous section from the input, drop the rest.
