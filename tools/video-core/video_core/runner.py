@@ -11,8 +11,12 @@
 * The drain bound (`max_drain_bytes`) is a bound on what the child may WRITE, not only on how long it lingers: a breach is recorded as
   `drain_limit_exceeded` whether the child was still running (it is then killed: FLOOD_KILLED) or had already exited on its own (the actual exit code is kept,
   no kill is claimed, and `ok` is False).
-* `kill_attempted` / `kill_delivered` say whether the runner itself signalled the owned group and whether a signal reached it, so an outcome name is never the only
-  evidence of a kill.
+* Termination is reported as facts, never inferred from an outcome name (`termination_requests[]`, one entry per request, each with `state`):
+  `not_sent_already_exited` (nothing was sent: the child had exited, so it is never reported killed), `accepted` (the OS accepted the request for a live target:
+  POSIX `killpg` returned success; Windows `TerminateProcess` on the owned handle succeeded), `issued_unconfirmed` (Windows only, when the owned-handle call is not
+  available: `Popen.terminate()` returns nothing and silently does nothing for an exited child, so acceptance is unknown) or `refused:<ExceptionClass>`.
+  `kill_attempted` = a request was actually issued; `kill_delivered` = some request was `accepted`; `kill_confirmed` = the leader's own exit status shows our signal
+  (POSIX only; `None` where an exit status cannot prove it, e.g. Windows' forced exit code 1, or when nothing was issued).
 * KeyboardInterrupt (Ctrl-C / the CLIs' SIGTERM translation) is handled in EVERY phase after the child exists (start of the drain threads, the optional hook, the wait loop and
   the final pipe-drain wait): the owned group is cleaned up within a bound and the call returns outcome INTERRUPTED (never an escaping exception that strands a member of
   the group). Orchestrators turn that into a stop with `raise_if_interrupted`.
@@ -102,8 +106,10 @@ class RunResult:
     containment: dict | None = None  # set only by video_core.containment.run_contained (requested/applied/unsupported receipt)
     drain_limit_bytes: int = 0  # the max_drain_bytes this run was held to
     drain_limit_exceeded: bool = False  # more than max_drain_bytes was written, whether or not the child was still running when that was noticed
-    kill_attempted: bool = False  # the runner itself signalled the owned group (timeout / flood / interrupt / containment refusal / surviving pipe holders)
-    kill_delivered: bool = False  # ... and at least one of those signals reached a live process (False when the group was already gone)
+    kill_attempted: bool = False  # a termination request was actually ISSUED (timeout / flood / interrupt / containment refusal / surviving pipe holders); not set when the child had already exited
+    kill_delivered: bool = False  # ... and the OS ACCEPTED at least one of them for a live target (not proof of the effect; see kill_confirmed)
+    kill_confirmed: bool | None = None  # POSIX: True if the leader died of a signal we sent, False if requests were issued but its status shows otherwise; None if unknowable/not issued
+    termination_requests: list = field(default_factory=list)  # [{"signal", "state", "leader_exited_before"}] in order
 
     @property
     def ok(self) -> bool:
@@ -156,6 +162,8 @@ class RunResult:
             "drain_limit_exceeded": self.drain_limit_exceeded,
             "kill_attempted": self.kill_attempted,
             "kill_delivered": self.kill_delivered,
+            "kill_confirmed": self.kill_confirmed,
+            "termination_requests": [dict(r) for r in self.termination_requests],
             "stdout": cap(self.stdout, False),  # stdout is structured data (ffprobe) or unused
             "stderr": cap(self.stderr, include_text),
             **({"containment": self.containment} if self.containment is not None else {}),
@@ -214,25 +222,69 @@ def _drain(fd: int, cap: _Capture, state: dict, done: threading.Event) -> None:
         done.set()
 
 
+try:  # Windows only: the owned process handle's TerminateProcess is what Popen.terminate() itself uses, but it hides the result
+    import _winapi
+except ImportError:
+    _winapi = None
+
+ST_NOT_SENT = "not_sent_already_exited"
+ST_ACCEPTED = "accepted"
+ST_UNCONFIRMED = "issued_unconfirmed"
+_tls = threading.local()  # the request log of the run_bounded call on this thread (so _terminate/_clean_survivors keep their (proc, grace) signatures)
+
+
+def _request(proc: subprocess.Popen, sig: int) -> tuple[str, bool]:
+    """Issue ONE termination request to the child's own group (POSIX) / own process (Windows) and report exactly what is known: (state, leader_exited_before).
+    Never touches anything but the child this module started."""
+    exited = proc.poll() is not None  # also reaps a zombie leader
+    if POSIX:
+        try:
+            os.killpg(proc.pid, sig)  # pgid == pid because of start_new_session; success = the OS delivered/queued the signal to at least one member of the group
+            return ST_ACCEPTED, exited
+        except ProcessLookupError:
+            return ST_NOT_SENT, exited  # the group is gone (leader reaped and no members left)
+        except OSError as exc:
+            return f"refused:{type(exc).__name__}", exited
+    if exited:  # Windows: there is no group to reach; an exited child cannot be terminated, and Popen.terminate() would silently do nothing
+        return ST_NOT_SENT, True
+    handle = getattr(proc, "_handle", None)
+    if _winapi is not None and handle is not None:
+        try:
+            _winapi.TerminateProcess(handle, 1)
+            return ST_ACCEPTED, False  # succeeds only for a process that was still alive
+        except PermissionError:  # ERROR_ACCESS_DENIED: what Windows reports for a process that already died (Popen.terminate() swallows this exact case) - or a real denial
+            try:
+                code = _winapi.GetExitCodeProcess(handle)
+            except OSError:
+                return "refused:PermissionError", False
+            if code == _winapi.STILL_ACTIVE:
+                return "refused:PermissionError", False
+            proc.returncode = code  # the same bookkeeping Popen.terminate() does
+            return ST_NOT_SENT, True
+        except OSError as exc:
+            return f"refused:{type(exc).__name__}", False
+    try:  # fallback (no owned-handle access): Popen.terminate() returns nothing, so acceptance cannot be known
+        proc.terminate()
+    except OSError as exc:
+        return f"refused:{type(exc).__name__}", False
+    return ST_UNCONFIRMED, False
+
+
 def _signal_group(proc: subprocess.Popen, sig: int) -> bool:
-    """Signal only the child's own process group. Returns True if a signal was delivered."""
-    try:
-        if POSIX:
-            os.killpg(proc.pid, sig)  # pgid == pid because of start_new_session
-        elif sig == getattr(_signal, "SIGKILL", None):
-            proc.kill()
-        else:
-            proc.terminate()
-        return True
-    except (ProcessLookupError, PermissionError, OSError):
-        return False
+    """Issue a termination request; True only if the OS ACCEPTED it for a live target. Records the request in the current run's log. An already-exited child yields False."""
+    state, exited = _request(proc, sig)
+    log = getattr(_tls, "log", None)
+    if log is not None:
+        name = _signal.Signals(sig).name if POSIX else "TerminateProcess"
+        log.append({"signal": name, "state": state, "leader_exited_before": exited})
+    return state == ST_ACCEPTED
 
 
 _KILL = getattr(_signal, "SIGKILL", _signal.SIGTERM)
 
 
 def _terminate(proc: subprocess.Popen, grace: float) -> bool:
-    """SIGTERM the owned group, wait up to `grace` for the leader, then SIGKILL. Returns True if any signal was delivered.
+    """SIGTERM the owned group, wait up to `grace` for the leader, then SIGKILL. Returns True if the OS accepted any request.
     A second interrupt during the cleanup escalates to an immediate SIGKILL instead of abandoning it."""
     delivered = _signal_group(proc, _signal.SIGTERM)
     try:
@@ -254,7 +306,7 @@ def _terminate(proc: subprocess.Popen, grace: float) -> bool:
 
 def _clean_survivors(proc: subprocess.Popen, dones, grace: float) -> bool:
     """Interrupt (or flood) AFTER the leader exited: members of the owned group may still hold the pipes. Signal only that group (TERM, then KILL after `grace`)
-    and wait for EOF within a bound. Returns True if any signal was delivered. Never touches anything outside the group."""
+    and wait for EOF within a bound. Returns True if the OS accepted any request. Never touches anything outside the group."""
     delivered = _signal_group(proc, _signal.SIGTERM)
     try:
         end = time.monotonic() + grace
@@ -270,6 +322,36 @@ def _clean_survivors(proc: subprocess.Popen, dones, grace: float) -> bool:
         except KeyboardInterrupt:
             pass
     return delivered
+
+
+def _leader_reached(reqs: list, rc, posix: bool) -> bool:
+    """Did a termination request demonstrably reach the LEADER while it was alive? An 'accepted' request only counts if the leader had not already exited when it was issued
+    (a request that only reached surviving group members says nothing about the leader). An unconfirmed Windows request counts only if the exit code is the forced code 1."""
+    for r in reqs:
+        if r["state"] == ST_ACCEPTED and not r["leader_exited_before"]:
+            return True
+        if r["state"] == ST_UNCONFIRMED and (posix or rc == 1):
+            return True
+    return False
+
+
+def _settle_termination_facts(result: "RunResult", rc) -> None:
+    """Derive the summary facts from the request log + the leader's real exit status; never from the outcome name.
+    A flood 'kill' that never reached the leader (it had exited on its own) is not recorded as a kill: kill_reason is cleared and the exit status stands.
+    Timeout / interrupt keep their labels (the deadline passed / the caller cancelled are facts of their own); only the delivery facts are truthful."""
+    reqs = result.termination_requests
+    issued = [r for r in reqs if r["state"] != ST_NOT_SENT]
+    result.kill_attempted = bool(issued)
+    result.kill_delivered = any(r["state"] == ST_ACCEPTED for r in reqs)
+    if result.kill_reason == "flood" and not _leader_reached(reqs, rc, POSIX):
+        result.kill_reason = None
+    if not issued:
+        result.kill_confirmed = None
+    elif POSIX:
+        sent = {_signal.Signals[r["signal"]].value for r in issued}
+        result.kill_confirmed = bool(rc is not None and rc < 0 and -rc in sent)
+    else:
+        result.kill_confirmed = None  # Windows: exit code 1 is what TerminateProcess forces, but a child can exit 1 on its own
 
 
 class RunInterrupted(KeyboardInterrupt):
@@ -332,6 +414,15 @@ def run_bounded(
         result.wall_seconds = time.monotonic() - t0
         return result
 
+    prev_log = getattr(_tls, "log", None)
+    _tls.log = result.termination_requests
+    try:
+        return _supervise(proc, result, t0, timeout_s, grace_s, drain_timeout_s, max_drain_bytes, after_start)
+    finally:
+        _tls.log = prev_log
+
+
+def _supervise(proc, result, t0, timeout_s, grace_s, drain_timeout_s, max_drain_bytes, after_start) -> RunResult:
     state = {"bytes": 0, "limit": max_drain_bytes, "flood": threading.Event()}
     dones = (threading.Event(), threading.Event())
     threads: list = []
@@ -354,8 +445,7 @@ def run_bounded(
             if refused is not None:
                 if result.kill_reason is None:
                     result.kill_reason = refused if str(refused).startswith("containment") else f"containment: {refused}"
-                result.kill_attempted = True
-                result.kill_delivered |= _terminate(proc, grace_s)
+                _terminate(proc, grace_s)
         while refused is None:
             try:
                 proc.wait(timeout=0.05)
@@ -364,18 +454,15 @@ def run_bounded(
                 pass
             if state["flood"].is_set():
                 result.kill_reason = "flood"
-                result.kill_attempted = True
-                result.kill_delivered |= _terminate(proc, grace_s)
+                _terminate(proc, grace_s)
                 break
             if time.monotonic() >= deadline:
                 result.timed_out, result.kill_reason = True, "timeout"
-                result.kill_attempted = True
-                result.kill_delivered |= _terminate(proc, grace_s)
+                _terminate(proc, grace_s)
                 break
     except KeyboardInterrupt:  # during thread start, the hook's own cleanup, the wait loop or a kill's wait
         result.kill_reason = "interrupt"
-        result.kill_attempted = True
-        result.kill_delivered |= _terminate(proc, grace_s)
+        _terminate(proc, grace_s)
         for i, d in enumerate(dones):
             if i >= len(threads) or threads[i].ident is None:  # never started: nothing will ever read (or EOF-signal) this pipe
                 d.set()
@@ -389,16 +476,13 @@ def run_bounded(
             time.sleep(0.01)
         if not all(d.is_set() for d in dones):
             if POSIX or proc.poll() is None:
-                result.kill_attempted = True
                 result.orphan_group_killed = _signal_group(proc, _KILL)
-                result.kill_delivered |= result.orphan_group_killed
             for d in dones:
                 d.wait(1.0)
     except KeyboardInterrupt:
         result.kill_reason = "interrupt"  # overrides an earlier timeout/flood label: the caller cancelled (timed_out stays True if the timeout had fired)
         if proc.poll() is None or not all(d.is_set() for d in dones):
-            result.kill_attempted = True
-            result.kill_delivered |= _clean_survivors(proc, dones, grace_s) if POSIX else _terminate(proc, grace_s)
+            _clean_survivors(proc, dones, grace_s) if POSIX else _terminate(proc, grace_s)
     result.drain_limit_exceeded = state["flood"].is_set()
     result.drain_complete = all(d.is_set() for d in dones)
     for stream in (proc.stdout, proc.stderr):
@@ -410,6 +494,7 @@ def run_bounded(
 
     rc = proc.returncode
     result.exit_code, result.signal = split_returncode(rc, POSIX)
+    _settle_termination_facts(result, rc)
     result.outcome = classify(result.kill_reason, result.signal, rc)
     result.wall_seconds = time.monotonic() - t0
     return result

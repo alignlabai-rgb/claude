@@ -143,3 +143,13 @@ VIDEO_CORE_INTEGRATION=1 VIDEO_CORE_TEST_FONT=/path/font.ttf python3 -m unittest
   files that actually exist (`bytes`, `sha256`, `partial`; on the error path also unrecognised files, role `unrecognised`), each input gets `sha256_after` (`null` plus
   `sha256_after_error`, an exception class name, when unreadable; an unreadable input counts as changed), and `tmp_cleanup` states `removed`, `not created` or `left in place: <class>`.
   A problem during that finalization is recorded in `finalize_errors` and never replaces the original `internal_error` / status. Nothing is retried or overwritten.
+
+### Addendum: termination facts (what was requested, accepted, confirmed)
+
+`executions[]` entries carry `termination_requests[]` (one per request: `signal`, `state`, `leader_exited_before`) and three summaries derived from it, never from the outcome name:
+`kill_attempted` (a request was actually issued), `kill_delivered` (the OS **accepted** a request for a live target: POSIX `killpg` succeeded / Windows `TerminateProcess` succeeded) and
+`kill_confirmed` (POSIX: the leader's own exit status shows our signal; `null` when that cannot be proven, e.g. on Windows, where TerminateProcess forces exit code 1 but a child can
+exit 1 by itself). States: `not_sent_already_exited` (nothing was sent because the child had exited), `accepted`, `issued_unconfirmed` (Windows fallback through `Popen.terminate()`, which
+returns nothing), `refused:<ExceptionClass>`. A child that exited before any request reached it is **never** reported killed: a flood "kill" that never reached the leader leaves
+`kill_reason: null` and the real exit status (`EXITED_ZERO`, `drain_limit_exceeded: true`, `ok: false`). `TIMEOUT` and `INTERRUPTED` keep their labels (the deadline passed / the caller cancelled
+are facts of their own) while their delivery facts stay truthful.

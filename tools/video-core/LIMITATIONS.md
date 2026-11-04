@@ -121,3 +121,20 @@ Source: the adversarial audit's confirmed findings (checkpoint `c3d44872…`, fi
 * **F-RCPT-1** — after an input vanished or an unexpected exception, `outputs[]` was empty, `sha256_after` absent and `tmp_cleanup` absent although partial files existed. `video_core/finalize.py` now inventories files, re-hashes inputs and cleans the owned `tmp/` on every exit path, never raising and never hiding the original failure. Receipts of normal runs keep their shape (plus the four additive execution fields and, for an unreadable input, `sha256_after_error`).
 * **Test harness:** tests that deliver SIGINT to themselves now install Python's default handler for the duration (`tests/lifecycle_support.sigint_default`); a suite started as a background job (`cmd &`) inherits SIGINT=SIG_IGN, which silently drops the signal. This had made `test_containment…test_cancellation_cleans_up…` fail in one clean-export run.
 * Not changed: the `INTERRUPTED` receipt for SIGKILL of the orchestrator itself (still `IN_PROGRESS`, i.e. UNKNOWN), partial renames, the CLI files, receipt.py, paths, manifests and plan boundaries (owned by `codex/video-core-input-contract-20261105`).
+
+## Termination provenance (follow-up to the lifecycle fixes; Windows finding on `59db31e`)
+
+* **Finding (independently demonstrated on Windows):** `_signal_group` returned True after `Popen.terminate()` had become a silent no-op for an already-exited child, so an exit-0 child that flooded
+  was reported `FLOOD_KILLED` with `kill_attempted` and `kill_delivered` true. CPython's Windows `terminate()` is `if returncode is not None: return` or `TerminateProcess(handle, 1)` with
+  `ERROR_ACCESS_DENIED` swallowed when the process is no longer active: it returns nothing either way. A poll() guard alone still races (the child can exit between the poll and the call).
+* **Fix (`runner._request`):** never send to a child known to have exited (POSIX: `poll()` first, which also reaps a zombie leader); on Windows call `TerminateProcess` on the owned handle - the
+  same call `Popen.terminate()` makes - and report the result: success = `accepted` (only possible for a live process), ACCESS_DENIED with an exit code that is not STILL_ACTIVE = `not_sent_already_exited`
+  (this closes the poll-to-call window), anything else `refused:<class>`. If the owned handle is unavailable the fallback is `Popen.terminate()` and the result is `issued_unconfirmed`, never
+  "delivered". Only the child this module started is ever touched.
+* **Not verified by me:** the Windows branch has been exercised on Linux with fakes standing in for `_winapi` and the handle (tests/test_termination_truth.py, `WindowsBranchLogic`) - logic only, not Windows
+  evidence. The Windows-only real-child tests are skipped on Linux with an explicit reason and are for the requester to run. The original defect cannot be reproduced on Linux (`killpg` on a reaped
+  group raises `ProcessLookupError`); the Linux evidence is the deterministic barrier race and the live-kill control.
+* **Semantics kept:** exit codes, signals, timeout / interruption labels, containment and the `run_bounded` signature are unchanged; `_terminate(proc, grace)` / `_clean_survivors(proc, dones, grace)` keep their
+  signatures (the request log is thread-local, so a wrapper that does not return the original's value is still truthful). `kill_confirmed` can only be True on POSIX.
+* **Residual:** `accepted` means the OS accepted the request, not that the process died of it; a Windows child that exits 1 by itself cannot be distinguished from a killed one by exit code alone.
+* **Recovery transport:** `evidence/containment-envelope/recovery/` holds create-only ASCII base64 + manifest of the already-authorized 1889-byte tiny-env `output.mp4` (decoded SHA-256 verified); no re-render.

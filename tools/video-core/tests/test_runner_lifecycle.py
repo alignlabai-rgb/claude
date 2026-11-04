@@ -51,30 +51,85 @@ class DrainBound(unittest.TestCase):
         kw.setdefault("max_drain_bytes", LIMIT)
         return runner.run_bounded(py(code), phase="t", **kw)
 
+    def assert_truthful_termination(self, r):
+        """Invariants that hold for EVERY scheduling (the kill/exit race is real and platform dependent): a kill is only reported if a request was accepted for the live leader,
+        an actual exit 0 is never labelled killed, and the breach itself is always visible."""
+        self.assertTrue(r.drain_limit_exceeded)
+        self.assertFalse(r.ok)
+        accepted_live = [q for q in r.termination_requests if q["state"] == runner.ST_ACCEPTED and not q["leader_exited_before"]]
+        if r.outcome == runner.FLOOD_KILLED:
+            self.assertEqual(r.kill_reason, "flood")
+            self.assertTrue(accepted_live, "FLOOD_KILLED requires an accepted request for the live leader")
+            self.assertTrue(r.kill_attempted and r.kill_delivered)
+            self.assertNotEqual(r.exit_code, 0)
+        else:
+            self.assertEqual(r.outcome, runner.EXITED_ZERO)
+            self.assertEqual((r.exit_code, r.signal, r.kill_reason), (0, None, None))
+            self.assertFalse(accepted_live, "nothing was accepted for a live leader, so nothing may be called a kill")
+            self.assertIsNot(r.kill_confirmed, True)
+        if r.exit_code == 0:
+            self.assertNotEqual(r.outcome, runner.FLOOD_KILLED, "an actual exit 0 is never reported as killed")
+
     def test_child_that_writes_beyond_the_bound_and_exits_at_once_is_never_a_clean_success(self):
         full_sha = hashlib.sha256(b"x" * BIG).hexdigest()
-        for attempt in range(8):  # the original race depended on a 50 ms poll; repeat so a lucky scheduling cannot hide it
+        outcomes = set()
+        for attempt in range(8):  # the original race depended on a 50 ms poll and, on Windows, on termination timing; every scheduling must satisfy the invariants
             r = self.run_writer(f"import sys; sys.stdout.buffer.write(b'x'*{BIG})")
-            self.assertTrue(r.drain_limit_exceeded, attempt)
-            self.assertFalse(r.ok, attempt)
-            # the facts are kept, nothing is claimed that did not happen
-            self.assertEqual((r.exit_code, r.signal), (0, None), "the actual exit 0 is preserved")
-            self.assertEqual(r.outcome, runner.EXITED_ZERO, "it exited on its own; the runner must not rename that into a kill")
-            self.assertIsNone(r.kill_reason)
-            self.assertEqual((r.kill_attempted, r.kill_delivered, r.orphan_group_killed, r.timed_out), (False, False, False, False))
+            self.assert_truthful_termination(r)
+            outcomes.add(r.outcome)
             self.assertTrue(r.drain_complete)
             s = r.stdout.summary()
             self.assertEqual((s["total_bytes"], s["sha256_full_stream"]), (BIG, full_sha), "bytes and hash of the full stream are unchanged")
+        self.assertTrue(outcomes <= {runner.EXITED_ZERO, runner.FLOOD_KILLED})
+
+    def test_exit_first_is_deterministic_when_the_child_has_provably_exited_before_any_termination_request(self):
+        """The public-API race with only a scheduling barrier: the real child exits 0 BEFORE the original termination routine runs."""
+        original = runner._terminate
+
+        def barrier(proc, grace):
+            self.assertEqual(proc.wait(timeout=3), 0, "the owned child really exited 0 first")
+            return original(proc, grace)
+        with mock.patch.object(runner, "_terminate", barrier):
+            r = runner.run_bounded(py(f"import sys,time;sys.stdout.buffer.write(b'x'*{BIG});sys.stdout.flush();time.sleep(0.2)"), phase="actual_exit_during_termination_race",
+                                   timeout_s=5, stdout_limits=(8, 8), max_drain_bytes=LIMIT)
+        self.assertEqual((r.outcome, r.exit_code, r.signal, r.kill_reason), (runner.EXITED_ZERO, 0, None, None), "an exited child is never reported killed")
+        self.assertTrue(r.drain_limit_exceeded)
+        self.assertFalse(r.ok)
+        self.assertEqual((r.kill_attempted, r.kill_delivered, r.kill_confirmed, r.orphan_group_killed), (False, False, None, False))
+        self.assertTrue(r.termination_requests, "the attempt is on record")
+        self.assertEqual({q["state"] for q in r.termination_requests}, {runner.ST_NOT_SENT})
+        self.assertTrue(all(q["leader_exited_before"] for q in r.termination_requests))
+        self.assertEqual(r.stdout.summary()["sha256_full_stream"], hashlib.sha256(b"x" * BIG).hexdigest())
+        self.assertEqual(r.stdout.total, BIG)
+        self.assertNotIn("killed", r.describe())
+
+    def test_timeout_race_keeps_the_timeout_label_but_never_claims_delivery(self):
+        original = runner._terminate
+
+        def barrier(proc, grace):
+            self.assertEqual(proc.wait(timeout=3), 0)
+            return original(proc, grace)
+        with mock.patch.object(runner, "_terminate", barrier):
+            r = runner.run_bounded(py("import time; time.sleep(0.6)"), phase="timeout_race", timeout_s=0.3)
+        self.assertEqual((r.outcome, r.timed_out, r.exit_code), (runner.TIMEOUT, True, 0), "the deadline did pass; the real exit status is kept")
+        self.assertEqual((r.kill_attempted, r.kill_delivered, r.kill_confirmed), (False, False, None))
+        self.assertEqual({q["state"] for q in r.termination_requests}, {runner.ST_NOT_SENT})
 
     def test_lingering_child_is_killed_and_both_facts_are_recorded(self):
+        """Positive live-kill control. POSIX: killed by our SIGTERM (no exit code, signal SIGTERM, confirmed by the exit status). Windows: TerminateProcess forces exit code 1 and
+        there are no signals, so the exit status cannot confirm it (None) - the request was accepted for a live process."""
         t0 = time.monotonic()
         r = self.run_writer(f"import sys, time; sys.stdout.buffer.write(b'x'*{BIG}); sys.stdout.flush(); time.sleep(5)")
         self.assertLess(time.monotonic() - t0, 6)
         self.assertEqual((r.outcome, r.kill_reason), (runner.FLOOD_KILLED, "flood"))
         self.assertTrue(r.drain_limit_exceeded and r.kill_attempted and r.kill_delivered)
         self.assertFalse(r.ok)
-        self.assertIsNone(r.exit_code, "killed by our SIGTERM, not an exit")
-        self.assertEqual(r.signal, signal.SIGTERM if POSIX else None)
+        if POSIX:
+            self.assertEqual((r.exit_code, r.signal, r.kill_confirmed), (None, signal.SIGTERM, True))
+        else:
+            self.assertEqual((r.exit_code, r.signal, r.kill_confirmed), (1, None, None))
+        first = r.termination_requests[0]
+        self.assertEqual((first["state"], first["leader_exited_before"]), (runner.ST_ACCEPTED, False))
 
     def test_boundary_exactly_at_the_limit_is_fine_one_byte_over_is_not(self):
         at = self.run_writer(f"import sys; sys.stdout.buffer.write(b'y'*{LIMIT})")

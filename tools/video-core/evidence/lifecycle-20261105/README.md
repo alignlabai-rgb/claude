@@ -21,3 +21,10 @@ regression test (`tests/test_runner_lifecycle.py::InterruptCleanup`) asserts tha
 
 Tests added: `tests/test_runner_lifecycle.py` (runner), `tests/test_lifecycle_orchestrators.py` (orchestrators, CLI exit 130, finalization), support `tests/lifecycle_support.py`.
 Suite logs for this commit: `default-suite.lifecycle.log`.
+
+## Follow-up: Windows scheduler-sensitive tests and termination provenance
+
+Kept unchanged: the 59db31e results above. Windows reported (by the requester, 43 targeted tests: 10 pass, 31 skip, 2 fail): (1) `test_lingering_child_is_killed_and_both_facts_are_recorded` assumed POSIX
+`exit_code None` (Windows: TerminateProcess ⇒ exit code 1, no signal); (2) the fast-exit-flood test assumed `EXITED_ZERO`/no kill on every real scheduling (Windows saw actual exit 0 with `FLOOD_KILLED`),
+and a real provenance defect (`_signal_group` True after a no-op `terminate()`). Both tests are now platform-aware / invariant-based (not skipped), and the provenance is fixed in `runner._request`
+(see LIMITATIONS.md "Termination provenance"). Linux evidence only from this session; the Windows branch is covered with fakes (logic only).
