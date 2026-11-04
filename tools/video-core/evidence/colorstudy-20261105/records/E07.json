@@ -1,0 +1,221 @@
+{
+ "id": "E07",
+ "title": "PNG rgb24 chart through the FILE branch, +format=gbrp",
+ "spec": {
+  "title": "PNG rgb24 chart through the FILE branch, +format=gbrp",
+  "kind": "chart_png",
+  "variant": "gbrp",
+  "tags": "709",
+  "geom": "chart"
+ },
+ "tools": {
+  "ffmpeg": "/usr/bin/ffmpeg",
+  "ffmpeg_realpath": "/usr/bin/ffmpeg",
+  "ffmpeg_version": "ffmpeg version 6.1.1-3ubuntu5 Copyright (c) 2000-2023 the FFmpeg developers",
+  "ffmpeg_sha256": "ed16af623947494a72e284b6eb8ff225f2da22b38b5d5069c2fd4b4ba3384e41",
+  "ffprobe": "/usr/bin/ffprobe",
+  "ffprobe_version": "ffprobe version 6.1.1-3ubuntu5 Copyright (c) 2007-2023 the FFmpeg developers"
+ },
+ "limits": {
+  "wall_seconds": 10,
+  "cpus": [
+   0,
+   1
+  ],
+  "rlimit_cpu_s": 10,
+  "rlimit_fsize_bytes": 4194304,
+  "rlimit_as_bytes": 6442450944,
+  "ffmpeg_threads": 2,
+  "filter_complex_threads": 1,
+  "max_dim": 256
+ },
+ "geometry": {
+  "w": 256,
+  "h": 128,
+  "pw": 32,
+  "ph": 32,
+  "cols": 8,
+  "rows": 4
+ },
+ "filter_graph": "[0:v:0]fps=fps=30/1,trim=end_frame=1,setpts=PTS-STARTPTS,format=gbrp,scale=256:128:force_original_aspect_ratio=decrease:force_divisible_by=2:out_color_matrix=bt709:out_range=tv,pad=256:128:(ow-iw)/2:(oh-ih)/2:color=black,setsar=1,format=yuv420p,split=2[raw][enc]",
+ "main": {
+  "argv": [
+   "/usr/bin/ffmpeg",
+   "-nostdin",
+   "-hide_banner",
+   "-loglevel",
+   "verbose",
+   "-nostats",
+   "-n",
+   "-filter_complex_threads",
+   "1",
+   "-protocol_whitelist",
+   "file",
+   "-f",
+   "image2",
+   "-pattern_type",
+   "none",
+   "-loop",
+   "1",
+   "-framerate",
+   "30/1",
+   "-i",
+   "fixtures/chart.png",
+   "-filter_complex",
+   "[0:v:0]fps=fps=30/1,trim=end_frame=1,setpts=PTS-STARTPTS,format=gbrp,scale=256:128:force_original_aspect_ratio=decrease:force_divisible_by=2:out_color_matrix=bt709:out_range=tv,pad=256:128:(ow-iw)/2:(oh-ih)/2:color=black,setsar=1,format=yuv420p,split=2[raw][enc]",
+   "-map",
+   "[raw]",
+   "-an",
+   "-sn",
+   "-dn",
+   "-frames:v",
+   "1",
+   "-threads",
+   "2",
+   "-f",
+   "rawvideo",
+   "-pix_fmt",
+   "yuv420p",
+   "raw/E07.yuv",
+   "-map",
+   "[enc]",
+   "-an",
+   "-sn",
+   "-dn",
+   "-frames:v",
+   "1",
+   "-threads",
+   "2",
+   "-c:v",
+   "libx264",
+   "-preset",
+   "medium",
+   "-crf",
+   "18",
+   "-x264-params",
+   "threads=2:lookahead-threads=1",
+   "-pix_fmt",
+   "yuv420p",
+   "-colorspace",
+   "bt709",
+   "-color_primaries",
+   "bt709",
+   "-color_trc",
+   "bt709",
+   "-color_range",
+   "tv",
+   "-map_metadata",
+   "-1",
+   "-fflags",
+   "+bitexact",
+   "-flags:v",
+   "+bitexact",
+   "-movflags",
+   "+faststart",
+   "-f",
+   "mp4",
+   "raw/E07.mp4"
+  ],
+  "cwd": "<study directory>",
+  "started_utc": "2026-11-04T22:13:15Z",
+  "wall_seconds": 0.066,
+  "returncode": 0,
+  "signal": null,
+  "timed_out": false,
+  "stderr_file": "raw/E07.ffmpeg.log",
+  "stderr_bytes": 6526,
+  "stderr_sha256": "5516a273d8fba41491ef5dea9f064cc1aa5dcb2565cb2b0a1c0fc05bf2738c77",
+  "stdout_file": null
+ },
+ "outputs": {
+  "raw": {
+   "path": "raw/E07.yuv",
+   "bytes": 49152,
+   "sha256": "3f41f6db0a580b3f8f4afb5df5ec237a5030f5f8c5934d1b95ae3dc0a2ef1dd8"
+  },
+  "mp4": {
+   "path": "raw/E07.mp4",
+   "bytes": 2009,
+   "sha256": "24c4da8665254c80f1176b657aba1109b60f23d33662969499efc9942f6966f1"
+  }
+ },
+ "readbacks": [
+  {
+   "argv": [
+    "/usr/bin/ffprobe",
+    "-v",
+    "error",
+    "-show_streams",
+    "-show_format",
+    "-of",
+    "json",
+    "raw/E07.mp4"
+   ],
+   "cwd": "<study directory>",
+   "started_utc": "2026-11-04T22:13:15Z",
+   "wall_seconds": 0.066,
+   "returncode": 0,
+   "signal": null,
+   "timed_out": false,
+   "stderr_file": "raw/E07.ffprobe.err",
+   "stderr_bytes": 0,
+   "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "stdout_file": "raw/E07.ffprobe.json",
+   "name": "ffprobe -show_streams -show_format",
+   "output": {
+    "path": "raw/E07.ffprobe.json",
+    "bytes": 2751,
+    "sha256": "966b397e8e19e59e83e6ad931581b0ab4e707119e723e7544e25b07f9ab0609b"
+   }
+  },
+  {
+   "argv": [
+    "/usr/bin/ffmpeg",
+    "-nostdin",
+    "-hide_banner",
+    "-loglevel",
+    "verbose",
+    "-nostats",
+    "-n",
+    "-threads",
+    "2",
+    "-i",
+    "raw/E07.mp4",
+    "-frames:v",
+    "1",
+    "-f",
+    "rawvideo",
+    "-pix_fmt",
+    "rgb24",
+    "raw/E07.mp4.rgb24"
+   ],
+   "cwd": "<study directory>",
+   "started_utc": "2026-11-04T22:13:15Z",
+   "wall_seconds": 0.066,
+   "returncode": 0,
+   "signal": null,
+   "timed_out": false,
+   "stderr_file": "raw/E07.decode.log",
+   "stderr_bytes": 3314,
+   "stderr_sha256": "3a28cc7561585cf5a65451c0a815c3f926f4978a96a3b687e68a7a2c10b87f91",
+   "stdout_file": null,
+   "name": "ffmpeg decode first frame -> rgb24 (default swscale, stream tags honoured)",
+   "output": {
+    "path": "raw/E07.mp4.rgb24",
+    "bytes": 98304,
+    "sha256": "d034b07a5e159edfd496e5155d6f2b1c23130df5d5df2525d025f701955a6248"
+   },
+   "negotiated_scaler_lines": {
+    "unique_count": 0,
+    "first": []
+   }
+  }
+ ],
+ "negotiated_scaler_lines": {
+  "unique_count": 1,
+  "first": [
+   "[scale] w:256 h:128 fmt:gbrp sar:0/1 -> w:256 h:128 fmt:yuv420p sar:0/1 "
+  ]
+ },
+ "finished_utc": "2026-11-04T22:13:15Z"
+}

@@ -48,6 +48,8 @@ VARIANTS = {
     "rgb24": {"pre": "format=rgb24,", "scaler": SCALE_709},
     "gbrp_accurate": {"pre": "format=gbrp,", "scaler": SCALE_709 + ":flags=accurate_rnd+full_chroma_int"},
     "gbrp_zscale": {"pre": "format=gbrp,", "scaler": "zscale=matrixin=gbr:rangein=full:matrix=709:range=limited"},
+    # amendment 1 (E12): diagnostic tap, the baseline chain WITHOUT the scale step, to separate what the colour source draws from what scale does
+    "noscale": {"pre": "", "scaler": None},
 }
 
 
@@ -55,7 +57,8 @@ def color_clip_chain(hex6: str, w: int, h: int, variant: str, fps="30/1", n_fram
     """Exactly plan._clip_filter's colour branch (minus the output label), with a variant hook.  variant=baseline, n_frames=90,
     640x360 reproduces the committed evidence/plan.canonical.json text byte for byte (checked by verify_scope.py)."""
     v = VARIANTS[variant]
-    return (f"color=c=0x{hex6}:s={w}x{h}:r={fps},trim=end_frame={n_frames},setpts=PTS-STARTPTS,{v['pre']}{v['scaler']},"
+    scaler = f"{v['scaler']}," if v["scaler"] else ""
+    return (f"color=c=0x{hex6}:s={w}x{h}:r={fps},trim=end_frame={n_frames},setpts=PTS-STARTPTS,{v['pre']}{scaler}"
             f"setsar=1,format=yuv420p")
 
 
@@ -119,7 +122,8 @@ EXPERIMENTS = {
     "E09": dict(title="flat 256x144 #30506a, BASELINE chain (reported colour, single full frame)", kind="flat", variant="baseline", tags="709", geom="flat"),
     "E10": dict(title="flat 256x144 #30506a, +format=gbrp", kind="flat", variant="gbrp", tags="709", geom="flat"),
     "E11": dict(title="COUNTEREXAMPLE: exact BT.709 yuv420p *file* source through baseline vs. gbrp-misapplied", kind="yuv_counterexample", variant="both", tags="none", geom="chart"),
-    "E12": dict(title="RESERVED for a numbered correction of a harness bug; unused unless a record says otherwise", kind="reserved", variant="none", tags="none", geom="chart"),
+    # E12 was reserved at pre-registration.  Amendment 1 (committed before E12 ran, after E01-E11 were recorded): used for a diagnostic tap.
+    "E12": dict(title="DIAGNOSTIC TAP (amendment 1): E01 chain with the scale step removed (colour source -> setsar -> format=yuv420p)", kind="chart_color", variant="noscale", tags="709", geom="chart"),
 }
 BUILDERS = {"chart_color": graph_chart_color, "chart_png": graph_chart_png, "flat": graph_flat, "yuv_counterexample": graph_yuv_counterexample}
 GEOM = {"chart": _geometry_chart, "flat": _geometry_flat}

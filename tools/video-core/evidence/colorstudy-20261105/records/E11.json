@@ -1,0 +1,125 @@
+{
+ "id": "E11",
+ "title": "COUNTEREXAMPLE: exact BT.709 yuv420p *file* source through baseline vs. gbrp-misapplied",
+ "spec": {
+  "title": "COUNTEREXAMPLE: exact BT.709 yuv420p *file* source through baseline vs. gbrp-misapplied",
+  "kind": "yuv_counterexample",
+  "variant": "both",
+  "tags": "none",
+  "geom": "chart"
+ },
+ "tools": {
+  "ffmpeg": "/usr/bin/ffmpeg",
+  "ffmpeg_realpath": "/usr/bin/ffmpeg",
+  "ffmpeg_version": "ffmpeg version 6.1.1-3ubuntu5 Copyright (c) 2000-2023 the FFmpeg developers",
+  "ffmpeg_sha256": "ed16af623947494a72e284b6eb8ff225f2da22b38b5d5069c2fd4b4ba3384e41",
+  "ffprobe": "/usr/bin/ffprobe",
+  "ffprobe_version": "ffprobe version 6.1.1-3ubuntu5 Copyright (c) 2007-2023 the FFmpeg developers"
+ },
+ "limits": {
+  "wall_seconds": 10,
+  "cpus": [
+   0,
+   1
+  ],
+  "rlimit_cpu_s": 10,
+  "rlimit_fsize_bytes": 4194304,
+  "rlimit_as_bytes": 6442450944,
+  "ffmpeg_threads": 2,
+  "filter_complex_threads": 1,
+  "max_dim": 256
+ },
+ "geometry": {
+  "w": 256,
+  "h": 128,
+  "pw": 32,
+  "ph": 32,
+  "cols": 8,
+  "rows": 4
+ },
+ "filter_graph": "[0:v:0]fps=fps=30/1,trim=end_frame=1,setpts=PTS-STARTPTS,setparams=range=tv:colorspace=bt709,split=2[a][b];[a]scale=out_color_matrix=bt709:out_range=tv,setsar=1,format=yuv420p[rawbase];[b]format=gbrp,scale=out_color_matrix=bt709:out_range=tv,setsar=1,format=yuv420p[rawgbrp]",
+ "main": {
+  "argv": [
+   "/usr/bin/ffmpeg",
+   "-nostdin",
+   "-hide_banner",
+   "-loglevel",
+   "verbose",
+   "-nostats",
+   "-n",
+   "-filter_complex_threads",
+   "1",
+   "-f",
+   "rawvideo",
+   "-pixel_format",
+   "yuv420p",
+   "-video_size",
+   "256x128",
+   "-framerate",
+   "30/1",
+   "-i",
+   "fixtures/chart_bt709_ideal.yuv420p",
+   "-filter_complex",
+   "[0:v:0]fps=fps=30/1,trim=end_frame=1,setpts=PTS-STARTPTS,setparams=range=tv:colorspace=bt709,split=2[a][b];[a]scale=out_color_matrix=bt709:out_range=tv,setsar=1,format=yuv420p[rawbase];[b]format=gbrp,scale=out_color_matrix=bt709:out_range=tv,setsar=1,format=yuv420p[rawgbrp]",
+   "-map",
+   "[rawbase]",
+   "-an",
+   "-sn",
+   "-dn",
+   "-frames:v",
+   "1",
+   "-threads",
+   "2",
+   "-f",
+   "rawvideo",
+   "-pix_fmt",
+   "yuv420p",
+   "raw/E11.raw_baseline.yuv",
+   "-map",
+   "[rawgbrp]",
+   "-an",
+   "-sn",
+   "-dn",
+   "-frames:v",
+   "1",
+   "-threads",
+   "2",
+   "-f",
+   "rawvideo",
+   "-pix_fmt",
+   "yuv420p",
+   "raw/E11.raw_gbrp.yuv"
+  ],
+  "cwd": "<study directory>",
+  "started_utc": "2026-11-04T22:13:16Z",
+  "wall_seconds": 0.065,
+  "returncode": 0,
+  "signal": null,
+  "timed_out": false,
+  "stderr_file": "raw/E11.ffmpeg.log",
+  "stderr_bytes": 6256,
+  "stderr_sha256": "5f05400bbb3d30eb5e77f42c8574a0e8943f8aa1d09e82449d17a6a5732c961a",
+  "stdout_file": null
+ },
+ "outputs": {
+  "raw_baseline": {
+   "path": "raw/E11.raw_baseline.yuv",
+   "bytes": 49152,
+   "sha256": "5b9591fefc615e88af0d9f2d672b0f360fe59461b1456b32215d268b51386b93"
+  },
+  "raw_gbrp": {
+   "path": "raw/E11.raw_gbrp.yuv",
+   "bytes": 49152,
+   "sha256": "b6f961adaaa834b1744c01e273ada9fe4dff7d9343a49349374413cc6a5bf561"
+  }
+ },
+ "readbacks": [],
+ "negotiated_scaler_lines": {
+  "unique_count": 2,
+  "first": [
+   "[scale] w:256 h:128 fmt:yuv420p sar:0/1 -> w:256 h:128 fmt:yuv420p sar:0/1 ",
+   "[scale] w:256 h:128 fmt:gbrp sar:0/1 -> w:256 h:128 fmt:yuv420p sar:0/1 "
+  ]
+ },
+ "finished_utc": "2026-11-04T22:13:16Z"
+}
