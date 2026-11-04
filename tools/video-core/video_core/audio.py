@@ -4,6 +4,9 @@ The colour/caption baseline needs no audio and produces a video-only MP4 (`-an`)
 A future adapter would turn already-local audio assets into a frame-aligned plan
 that a later render stage can mux. This module deliberately contains no voice
 synthesis, no provider client and no network code; it is a typing contract only.
+
+The concrete offline planner/mixer lives in `video_core.audiomix` (see AUDIO_SPEC.md); it is
+separate, optional, and does not change the video-only behaviour of the commands here.
 """
 
 from __future__ import annotations

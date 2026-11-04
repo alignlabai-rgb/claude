@@ -130,6 +130,13 @@ def _inside(root: str, candidate: str) -> bool:
         return False
 
 
+def is_link_like(st) -> bool:
+    """Symlink, or a Windows reparse point (junction, mount point, other link-like object)."""
+    if stat.S_ISLNK(st.st_mode):
+        return True
+    return bool(getattr(st, "st_file_attributes", 0) & stat.FILE_ATTRIBUTE_REPARSE_POINT)
+
+
 def resolve_asset(asset_root: str, rel: str, *, ptr: str, allowed_ext=None, max_bytes: int | None = None) -> ResolvedFile:
     """Resolve `rel` under `asset_root` without following any symlink."""
     problems = check_relative_path(rel, allowed_ext=allowed_ext)
@@ -144,8 +151,8 @@ def resolve_asset(asset_root: str, rel: str, *, ptr: str, allowed_ext=None, max_
             st = os.lstat(cur)
         except OSError:
             raise UnsafePath("source file does not exist", [Issue("asset_missing", ptr, f"{rel!r} does not exist under the asset root")]) from None
-        if stat.S_ISLNK(st.st_mode):
-            raise UnsafePath("symlink in source path", [Issue("symlink_rejected", ptr, f"{rel!r} passes through a symlink; symlinks are rejected")])
+        if is_link_like(st):
+            raise UnsafePath("symlink in source path", [Issue("symlink_rejected", ptr, f"{rel!r} passes through a symlink or reparse point (junction); these are rejected")])
     assert st is not None
     if not stat.S_ISREG(st.st_mode):
         raise UnsafePath("source is not a regular file", [Issue("not_regular_file", ptr, f"{rel!r} is not a regular file")])

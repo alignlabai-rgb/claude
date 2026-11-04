@@ -12,10 +12,12 @@ FORBIDDEN = {"socket", "ssl", "urllib", "http", "ftplib", "smtplib", "telnetlib"
 
 
 def sources():
-    for name in sorted(os.listdir(PKG)):
-        if name.endswith(".py"):
-            with open(os.path.join(PKG, name), encoding="utf-8") as fh:
-                yield name, ast.parse(fh.read(), filename=name)
+    for sub in ("", "audiomix"):
+        base = os.path.join(PKG, sub)
+        for name in sorted(os.listdir(base)):
+            if name.endswith(".py"):
+                with open(os.path.join(base, name), encoding="utf-8") as fh:
+                    yield os.path.join(sub, name), ast.parse(fh.read(), filename=name)
 
 
 class Guards(unittest.TestCase):
@@ -52,10 +54,27 @@ class Guards(unittest.TestCase):
                     if isinstance(base, ast.Name) and base.id == "subprocess":
                         self.fail(f"{name} uses subprocess directly")
 
-    def test_python_311_syntax_floor(self):
-        for name in sorted(os.listdir(PKG)) + ["../tests/" + n for n in sorted(os.listdir(os.path.join(ROOT, "tests"))) if n.endswith(".py")]:
-            if not name.endswith(".py"):
+    def test_audio_package_never_imports_subprocess_or_network_modules(self):
+        seen = 0
+        for name, tree in sources():
+            if not name.startswith("audiomix"):
                 continue
+            seen += 1
+            for node in ast.walk(tree):
+                mods = []
+                if isinstance(node, ast.Import):
+                    mods = [a.name.split(".")[0] for a in node.names]
+                elif isinstance(node, ast.ImportFrom) and node.level == 0 and node.module:
+                    mods = [node.module.split(".")[0]]
+                for m in mods:
+                    self.assertNotIn(m, {"subprocess", "socket", "ssl", "urllib", "http", "multiprocessing", "ctypes"}, f"{name} imports {m}")
+        self.assertGreaterEqual(seen, 6)
+
+    def test_python_311_syntax_floor(self):
+        names = [n for n in sorted(os.listdir(PKG)) if n.endswith(".py")]
+        names += ["audiomix/" + n for n in sorted(os.listdir(os.path.join(PKG, "audiomix"))) if n.endswith(".py")]
+        names += ["../tests/" + n for n in sorted(os.listdir(os.path.join(ROOT, "tests"))) if n.endswith(".py")]
+        for name in names:
             with open(os.path.join(PKG, name), encoding="utf-8") as fh:
                 ast.parse(fh.read(), feature_version=(3, 11))
 

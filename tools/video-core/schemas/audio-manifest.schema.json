@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Offline audio manifest v1 (video_core.audiomix)",
+  "description": "Caller-supplied selection of already-local, measured 48 kHz signed 16-bit PCM WAV ranges. Ids and references are opaque caller assertions. Additional checks the schema cannot express (range lengths equal the timeline sample length, overlap/gap policy, asset hashes, WAV headers) are specified in AUDIO_SPEC.md and enforced by the validator/planner.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["manifest_version", "timeline", "output", "scope", "policy", "assets", "events"],
+  "properties": {
+    "manifest_version": {"const": 1},
+    "timeline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fps", "total_frames"],
+      "properties": {
+        "fps": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["n", "d"],
+          "properties": {
+            "n": {"type": "integer", "minimum": 1, "maximum": 60000},
+            "d": {"type": "integer", "minimum": 1, "maximum": 1001}
+          }
+        },
+        "total_frames": {"type": "integer", "minimum": 1, "maximum": 18000},
+        "episode_sha256": {"type": "string", "pattern": "^[0-9a-fA-F]{64}$"}
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sample_rate", "channels", "bits"],
+      "properties": {
+        "sample_rate": {"const": 48000},
+        "channels": {"type": "integer", "minimum": 1, "maximum": 2},
+        "bits": {"const": 16}
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["event_ids"],
+      "properties": {
+        "event_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/id"}}
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["gap"],
+      "properties": {
+        "gap": {"enum": ["ALLOW_ZERO_FILL", "REQUIRE_FULL_COVERAGE"]},
+        "overlap": {"enum": ["REJECT", "ALLOW_SUM"], "default": "REJECT"},
+        "clipping": {"enum": ["REJECT", "CLAMP"], "default": "REJECT"}
+      }
+    },
+    "assets": {
+      "type": "array",
+      "maxItems": 256,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "path", "sha256"],
+        "properties": {
+          "id": {"$ref": "#/$defs/id"},
+          "path": {"type": "string", "minLength": 1, "maxLength": 512, "description": "relative, '/'-separated, .wav, no ':' '\\' '..' leading '-' or '.'; symlinks/junctions rejected"},
+          "sha256": {"type": "string", "pattern": "^[0-9a-fA-F]{64}$"}
+        }
+      }
+    },
+    "events": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1024,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "source_id", "state"],
+        "properties": {
+          "id": {"$ref": "#/$defs/id"},
+          "source_id": {"$ref": "#/$defs/id"},
+          "state": {"enum": ["USE", "OMIT", "INTENTIONAL_SILENCE", "MISSING", "UNKNOWN", "PROXY"]},
+          "role": {"type": "string", "pattern": "^[a-zA-Z0-9_-]{1,32}$"},
+          "decision_ref": {"$ref": "#/$defs/opaque"},
+          "provenance_ref": {"$ref": "#/$defs/opaque"},
+          "start_frame": {"type": "integer", "minimum": 0},
+          "end_frame": {"type": "integer", "minimum": 1},
+          "asset": {"$ref": "#/$defs/id"},
+          "source_in_sample": {"type": "integer", "minimum": 0},
+          "source_out_sample": {"type": "integer", "minimum": 1},
+          "gain": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["num", "den"],
+            "properties": {
+              "num": {"type": "integer", "minimum": 0, "maximum": 262144},
+              "den": {"type": "integer", "minimum": 1, "maximum": 65536}
+            }
+          },
+          "channel_rule": {"enum": ["COPY", "MONO_TO_STEREO_DUPLICATE", "STEREO_TO_MONO_LEFT", "STEREO_TO_MONO_RIGHT", "STEREO_TO_MONO_AVERAGE"]}
+        },
+        "allOf": [
+          {"if": {"properties": {"state": {"const": "USE"}}}, "then": {"required": ["asset", "source_in_sample", "source_out_sample", "start_frame", "end_frame"]}},
+          {"if": {"properties": {"state": {"const": "INTENTIONAL_SILENCE"}}}, "then": {"required": ["decision_ref", "start_frame", "end_frame"]}},
+          {"if": {"properties": {"state": {"const": "OMIT"}}}, "then": {"required": ["decision_ref"]}},
+          {"if": {"properties": {"state": {"enum": ["OMIT", "INTENTIONAL_SILENCE", "MISSING", "UNKNOWN", "PROXY"]}}},
+           "then": {"not": {"anyOf": [{"required": ["asset"]}, {"required": ["source_in_sample"]}, {"required": ["source_out_sample"]}, {"required": ["gain"]}, {"required": ["channel_rule"]}]}}}
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "id": {"type": "string", "pattern": "^[a-zA-Z0-9_-]{1,64}$"},
+    "opaque": {"type": "string", "minLength": 1, "maxLength": 128}
+  }
+}

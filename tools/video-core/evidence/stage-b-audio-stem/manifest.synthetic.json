@@ -1,0 +1,74 @@
+{
+  "manifest_version": 1,
+  "timeline": {
+    "fps": {
+      "n": 30,
+      "d": 1
+    },
+    "total_frames": 3
+  },
+  "output": {
+    "sample_rate": 48000,
+    "channels": 1,
+    "bits": 16
+  },
+  "scope": {
+    "event_ids": [
+      "ev_square",
+      "ev_triangle"
+    ]
+  },
+  "policy": {
+    "gap": "REQUIRE_FULL_COVERAGE",
+    "overlap": "ALLOW_SUM",
+    "clipping": "REJECT"
+  },
+  "assets": [
+    {
+      "id": "asset_square",
+      "path": "tone_square_480.wav",
+      "sha256": "d36db9849d17b05aade0c6a283e407841f31b9ba43d67e184444833f42e16d25"
+    },
+    {
+      "id": "asset_triangle",
+      "path": "tone_triangle_600.wav",
+      "sha256": "90284631a487a62f48643fb8cdfb3c72d5d813e8cd57dc98c81684e088711bf6"
+    }
+  ],
+  "events": [
+    {
+      "id": "ev_square",
+      "source_id": "synthetic_square_480hz",
+      "state": "USE",
+      "asset": "asset_square",
+      "source_in_sample": 0,
+      "source_out_sample": 3200,
+      "start_frame": 0,
+      "end_frame": 2,
+      "decision_ref": "synthetic-demo/decision-001",
+      "role": "tone"
+    },
+    {
+      "id": "ev_triangle",
+      "source_id": "synthetic_triangle_600hz",
+      "state": "USE",
+      "asset": "asset_triangle",
+      "source_in_sample": 0,
+      "source_out_sample": 3200,
+      "start_frame": 1,
+      "end_frame": 3,
+      "gain": {
+        "num": 1,
+        "den": 2
+      },
+      "decision_ref": "synthetic-demo/decision-002",
+      "role": "tone"
+    },
+    {
+      "id": "ev_unresolved_not_selected",
+      "source_id": "synthetic_placeholder",
+      "state": "MISSING",
+      "role": "diegetic"
+    }
+  ]
+}

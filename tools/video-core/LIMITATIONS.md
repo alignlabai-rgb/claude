@@ -52,3 +52,16 @@ the two-flag fixture is a reconstruction, not captured output (see `tests/fixtur
   directories and hit WinError 3 because Windows long paths are off (it now checks long-root arithmetic with pure string estimates and creates no long paths).
   Long paths were not enabled and no genuine bound was relaxed.
 * Author checks are Linux-only (Python 3.11/3.12/3.13, FFmpeg 6.1.1); the Windows results above are the requester's. Baseline plan hash and colour behaviour unchanged.
+
+## Stage B (fourth commit): offline audio planner and WAV mixer
+
+Delivered as a generic, optional component (`video_core/audiomix`, `AUDIO_SPEC.md`). Author checks are **Linux-only**; nothing was run on Windows or macOS.
+
+* **No mux and no quality verdict.** The deliverable is a structurally verified WAV stem. Audio, speech and creative quality are not evaluated; `READBACK` means RIFF fields, sample counts, peaks and hashes only. A later mux needs its own validation (see the seam in `AUDIO_SPEC.md`).
+* **Opaque assertions.** `source_id`, `role`, `decision_ref`, `provenance_ref` are caller text. Nothing authenticates them; they are not evidence of human adoption.
+* **Strict inputs only.** Only 48 kHz signed 16-bit PCM WAV (mono/stereo, plain PCM, no WAVE_FORMAT_EXTENSIBLE). Everything else is rejected, never converted.
+* **Pure-Python mixing.** Speed is bounded by `max_mix_work`/`max_runtime_seconds`, not optimised: tens of millions of sample-channels per minute-scale run. The default 10-minute / 200 M-work ceilings are untested at their maximum size here.
+* **Partial files are not valid WAVs.** `stem.wav.partial` carries the planned length in its header; it is preserved for inspection only.
+* **Race windows.** Assets are hashed at plan time and re-hashed after mixing (`inputs_unchanged`); a change in between is reported as `UNKNOWN`, not prevented. Windows reparse-point (junction) rejection is implemented and unit-tested with a stat stub on Linux, not on a real junction. Cancellation by SIGTERM was exercised on Linux only (`signal.SIGTERM` handling differs on Windows).
+* **Integration seam still open.** No existing workflow consumes this yet; manifests must be produced by a caller that owns the creative/binding decisions.
+* Colour-conversion drift (baseline) is unchanged and still open.

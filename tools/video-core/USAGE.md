@@ -102,14 +102,16 @@ into argv or the filtergraph, so filtergraph escaping and shell escaping do not 
 
 ## Audio
 
-Out of scope. The output is video-only (`-an`). `video_core/audio.py` is a typing-only interface for a future optional local
-audio adapter (no voice service, no provider, no network).
+The video commands are unchanged: output is video-only (`-an`). An **optional, separate** offline audio planner and 48 kHz / 16-bit PCM WAV
+mixer lives in `video_core/audiomix` and is run as `python -m video_core.audiomix {validate,plan,mix}` (see `AUDIO_SPEC.md` and
+`schemas/audio-manifest.schema.json`). It writes a verified WAV stem only — no mux, no speech/TTS, no resampling, no network.
+`video_core/audio.py` remains the typing-only adapter interface.
 
 ## Tests
 
 ```bash
 cd tools/video-core
-python3 -m unittest discover -s tests -t .                  # see evidence/stage-a-windows-residuals/README.md for current counts; fake ffmpeg/ffprobe; no real render
+python3 -m unittest discover -s tests -t .                  # 320+ tests (3 opt-in skipped); counts per stage are in evidence/*/README.md; fake ffmpeg/ffprobe; no real render
 VIDEO_CORE_INTEGRATION=1 python3 -m unittest tests.test_integration_ffmpeg -v   # opt-in: real ffmpeg on generated synthetic media
 VIDEO_CORE_INTEGRATION=1 VIDEO_CORE_TEST_FONT=/path/font.ttf python3 -m unittest tests.test_integration_ffmpeg -v  # + burn-in
 ```
