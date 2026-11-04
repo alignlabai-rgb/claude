@@ -20,8 +20,13 @@ PREFIX = "tools/video-core/evidence/colorstudy-20261105/"
 PLAN_SHA = "4bc20b3fd703f46651c868c1929efd3d9df3fc3c0a99f86607502ca92d5d9f21"
 
 
+ROOT = subprocess.run(["git", "-C", HERE, "rev-parse", "--show-toplevel"], capture_output=True, text=True, check=True).stdout.strip()
+
+
 def git(*a, **kw):
-    return subprocess.run(["git", "-C", HERE, *a], capture_output=True, text=True, check=True, **kw).stdout
+    # always from the repository root: `git ls-tree` is cwd-relative, and an earlier version of this script (run from the study directory)
+    # compared two empty listings for the tools/video-core check and a truncated one for the whole-repo check
+    return subprocess.run(["git", "-C", ROOT, *a], capture_output=True, text=True, check=True, **kw).stdout
 
 
 def sha(path):
@@ -32,7 +37,7 @@ def main():
     ref = sys.argv[sys.argv.index("--ref") + 1] if "--ref" in sys.argv else "HEAD"
     out = {"base": BASE, "ref": git("rev-parse", ref).strip(), "checks": {}}
     ok = lambda name, cond, detail=None: out["checks"].__setitem__(name, {"ok": bool(cond), **({"detail": detail} if detail is not None else {})})
-    ok("ref_descends_from_base", subprocess.run(["git", "-C", HERE, "merge-base", "--is-ancestor", BASE, ref]).returncode == 0)
+    ok("ref_descends_from_base", subprocess.run(["git", "-C", ROOT, "merge-base", "--is-ancestor", BASE, ref]).returncode == 0)
     names = git("diff", "--name-status", BASE, ref).splitlines()
     outside = [n for n in names if not n.split("\t", 1)[1].startswith(PREFIX)]
     statuses = {n.split("\t")[0] for n in names}
@@ -40,13 +45,15 @@ def main():
     ok("only_additions", statuses <= {"A"}, sorted(statuses))
     out["changed_path_count"] = len(names)
     root = git("rev-parse", "--show-toplevel").strip()
+    assert git("ls-tree", "-r", BASE, "--", "tools/video-core").strip(), "empty listing would make the comparison vacuous"
     base_tree = git("ls-tree", "-r", BASE, "--", "tools/video-core")
     ref_tree = "".join(l + "\n" for l in git("ls-tree", "-r", ref, "--", "tools/video-core").splitlines() if "\t" + PREFIX not in l)
     ok("everything_else_under_tools_video_core_identical_to_base", base_tree == ref_tree)
     whole_base = git("ls-tree", "-r", BASE)
+    assert whole_base.count("\n") > 500
     whole_ref = "".join(l + "\n" for l in git("ls-tree", "-r", ref).splitlines() if "\t" + PREFIX not in l)
     ok("whole_repo_outside_colorstudy_dir_identical_to_base", whole_base == whole_ref)
-    blob = subprocess.run(["git", "-C", HERE, "show", f"{ref}:tools/video-core/evidence/plan.canonical.json"], capture_output=True, check=True).stdout
+    blob = subprocess.run(["git", "-C", ROOT, "show", f"{ref}:tools/video-core/evidence/plan.canonical.json"], capture_output=True, check=True).stdout
     ok("baseline_plan_canonical_sha256", hashlib.sha256(blob).hexdigest() == PLAN_SHA, hashlib.sha256(blob).hexdigest())
     ok("no_pycache_tracked", not [l for l in git("ls-tree", "-r", "--name-only", ref).splitlines() if "__pycache__" in l or l.endswith(".pyc")])
     # filter text equality against production code from a temporary base export
