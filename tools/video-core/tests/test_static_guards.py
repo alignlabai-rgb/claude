@@ -74,6 +74,7 @@ class Guards(unittest.TestCase):
         names = [n for n in sorted(os.listdir(PKG)) if n.endswith(".py")]
         names += ["audiomix/" + n for n in sorted(os.listdir(os.path.join(PKG, "audiomix"))) if n.endswith(".py")]
         names += ["avmux/" + n for n in sorted(os.listdir(os.path.join(PKG, "avmux"))) if n.endswith(".py")]
+        names += ["containment/" + n for n in sorted(os.listdir(os.path.join(PKG, "containment"))) if n.endswith(".py")]
         names += ["../tests/" + n for n in sorted(os.listdir(os.path.join(ROOT, "tests"))) if n.endswith(".py")]
         for name in names:
             with open(os.path.join(PKG, name), encoding="utf-8") as fh:

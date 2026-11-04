@@ -22,7 +22,7 @@ from .manifest import load_manifest
 from .mux import OK_STATUSES, mux
 from .plan import prepare_plan
 
-SUBCOMMANDS = ("validate", "plan", "mux")
+SUBCOMMANDS = ("validate", "plan", "mux", "reinspect")
 _LIMIT_FLAGS = (("max-frames", int), ("max-source-bytes", int), ("max-argv-bytes", int), ("max-windows-cmdline-chars", int), ("max-runtime-seconds", float),
                 ("max-output-bytes", int), ("max-diag-bytes", int), ("max-drain-bytes", int), ("probe-timeout-seconds", float), ("inspect-timeout-seconds", float))
 
@@ -47,7 +47,7 @@ def _read(path: str, limit: int) -> bytes:
 
 def _parser() -> argparse.ArgumentParser:
     ap = argparse.ArgumentParser(prog="python -m video_core.avmux", description=__doc__.split("\n\n")[0])
-    sub = ap.add_subparsers(dest="cmd", metavar="{validate,plan,mux}")
+    sub = ap.add_subparsers(dest="cmd", metavar="{validate,plan,mux,reinspect}")
     for name, help_ in (("validate", "validate the manifest only (reads nothing else; creates nothing)"),
                         ("plan", "validate, hash the two inputs, parse the WAV, print the canonical plan (default; no files, no processes)"),
                         ("mux", "mux into a fresh directory (requires --mux; otherwise a dry run)")):
@@ -61,10 +61,42 @@ def _parser() -> argparse.ArgumentParser:
             p.add_argument("--ffprobe")
         if name == "mux":
             p.add_argument("--mux", action="store_true", help="actually run ffprobe checks and the mux (explicit opt-in)")
+            from ..containment import add_cli_args as _add_envelope_args
+
+            _add_envelope_args(p)
         g = p.add_argument_group("resource limits (finite numbers only; schema ceilings cannot be raised)")
         for flag, typ in _LIMIT_FLAGS:
             g.add_argument(f"--{flag}", type=typ, default=None, dest=flag.replace("-", "_"))
+    _add_reinspect(sub)
     return ap
+
+
+def _add_reinspect(sub) -> None:
+    p = sub.add_parser("reinspect", help="re-read an EXISTING muxed file's audio packet side data into a NEW correction receipt (never remuxes)")
+    p.add_argument("media", help="existing local .mp4/.mov/.m4v/.mkv/.webm (read-only)")
+    p.add_argument("--expect-sha256", required=True, help="the media's SHA-256 recorded in the original receipt; a mismatch inspects nothing")
+    p.add_argument("--original-receipt", help="the original receipt.json (referenced by SHA-256 and compared)")
+    p.add_argument("--output-root", required=True)
+    p.add_argument("--output-name")
+    p.add_argument("--ffprobe")
+    p.add_argument("--reinspect", action="store_true", help="actually run ffprobe and write the correction receipt (explicit opt-in; otherwise a dry run)")
+    g = p.add_argument_group("resource limits (finite numbers only)")
+    for flag, typ in _LIMIT_FLAGS:
+        g.add_argument(f"--{flag}", type=typ, default=None, dest=flag.replace("-", "_"))
+
+
+def _cmd_reinspect(ns, limits) -> int:
+    from .reinspect import reinspect_audio_packets
+
+    name = ns.output_name or "reinspect-" + ns.expect_sha256[:12].lower()
+    if not ns.reinspect:
+        _emit({"mode": "dry_run", "media": os.path.basename(ns.media), "expect_sha256": ns.expect_sha256, "output": os.path.join(ns.output_root, name),
+               "note": "nothing read or written; pass --reinspect to hash the media, run ffprobe and write the correction receipt"})
+        return 0
+    receipt = reinspect_audio_packets(ns.media, expected_sha256=ns.expect_sha256, output_root=ns.output_root, output_name=name, ffprobe=ns.ffprobe,
+                                      original_receipt_path=ns.original_receipt, limits=limits)
+    _emit(receipt)
+    return {"REINSPECTED": 0, "SKIPPED_TOOL_UNAVAILABLE": 3}.get(receipt["status"], 4)
 
 
 def _limits(ns) -> Limits:
@@ -108,11 +140,15 @@ def _cmd_mux(ns, limits) -> int:
     if not ns.mux:
         out = prepare_plan(data, output_root=ns.output_root, output_name=name, **_kw(ns, limits)).to_dict()
         out["mode"], out["note"] = "dry_run", "nothing created and no process launched; pass --mux to run the ffprobe preflight and the mux"
+        if ns.envelope is not None:
+            from ..containment import unsupported_limits
+
+            out["envelope"] = {"requested": ns.envelope.requested(), "unsupported_here": unsupported_limits(ns.envelope), "applied": "nothing: a dry run starts no process"}
         _emit(out)
         return 0
     old = signal.signal(signal.SIGTERM, lambda *_: (_ for _ in ()).throw(KeyboardInterrupt())) if hasattr(signal, "SIGTERM") else None
     try:
-        receipt = mux(data, output_root=ns.output_root, output_name=name, **_kw(ns, limits))
+        receipt = mux(data, output_root=ns.output_root, output_name=name, envelope=ns.envelope, **_kw(ns, limits))
     finally:
         if old is not None:
             signal.signal(signal.SIGTERM, old)
@@ -134,8 +170,17 @@ def main(argv=None) -> int:
     except ValueError as exc:
         print(f"usage error: {exc}", file=sys.stderr)
         return 2
+    ns.envelope = None
+    if ns.cmd == "mux":
+        from ..containment import envelope_from_args
+
+        try:
+            ns.envelope = envelope_from_args(ns)
+        except ValueError as exc:
+            print(f"usage error: {exc}", file=sys.stderr)
+            return 2
     try:
-        return {"validate": _cmd_validate, "plan": _cmd_plan, "mux": _cmd_mux}[ns.cmd](ns, limits)
+        return {"validate": _cmd_validate, "plan": _cmd_plan, "mux": _cmd_mux, "reinspect": _cmd_reinspect}[ns.cmd](ns, limits)
     except ToolUnavailable as exc:
         _emit({"ok": False, "error": exc.to_dict()})
         return 3

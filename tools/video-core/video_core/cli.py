@@ -84,6 +84,9 @@ def _parser() -> argparse.ArgumentParser:
         p.add_argument("--ffmpeg", help="ffmpeg executable (default: PATH lookup)")
         p.add_argument("--ffprobe", help="ffprobe executable (default: PATH lookup)")
     r.add_argument("--render", action="store_true", help="actually execute ffmpeg (explicit opt-in)")
+    from .containment import add_cli_args as _add_envelope_args
+
+    _add_envelope_args(r)
     i = sub.add_parser("inspect", help="read back an existing local MP4/MOV/MKV/WEBM with ffprobe (read-only)")
     i.add_argument("media")
     i.add_argument("--episode", help="compare against this episode's expected width/height/fps/frames")
@@ -141,13 +144,17 @@ def _cmd_render(ns, limits) -> int:
         out = p.to_dict()
         out["mode"] = "dry_run"
         out["note"] = "nothing executed or created; pass --render to render"
+        if ns.envelope is not None:
+            from .containment import unsupported_limits
+
+            out["envelope"] = {"requested": ns.envelope.requested(), "unsupported_here": unsupported_limits(ns.envelope), "applied": "nothing: a dry run starts no process"}
         _emit(out)
         return 0
     old = None
     if hasattr(signal, "SIGTERM"):
         old = signal.signal(signal.SIGTERM, lambda *_: (_ for _ in ()).throw(KeyboardInterrupt()))
     try:
-        receipt = render(data, output_root=ns.output_root, output_name=name, **kw)
+        receipt = render(data, output_root=ns.output_root, output_name=name, envelope=ns.envelope, **kw)
     finally:
         if old is not None:
             signal.signal(signal.SIGTERM, old)
@@ -210,6 +217,15 @@ def main(argv=None) -> int:
     except ValueError as exc:
         print(f"usage error: {exc}", file=sys.stderr)
         return 2
+    ns.envelope = None
+    if ns.cmd == "render":
+        from .containment import envelope_from_args
+
+        try:
+            ns.envelope = envelope_from_args(ns)
+        except ValueError as exc:
+            print(f"usage error: {exc}", file=sys.stderr)
+            return 2
     handler = {"validate": _cmd_validate, "plan": _cmd_plan, "render": _cmd_render, "inspect": _cmd_inspect, "srt": _cmd_srt}[ns.cmd]
     try:
         return handler(ns, limits)

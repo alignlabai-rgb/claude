@@ -193,7 +193,11 @@ class Mp4AacRoute(Base):
         self.assertEqual((o["sample_exact_claimed"], o["perceptual_sync_evaluated"]), (False, False))
         self.assertIn("not a sample-exact claim", o["note"])
         pk = r["observations"]["audio_packets"]
-        self.assertEqual((pk["skip_samples"], pk["discard_padding"], pk["skip_samples_side_data_seen"], pk["packet_count"]), (1024, 1000, True, 6))
+        self.assertEqual(pk["packet_count"], 6)
+        self.assertEqual(pk["skip_samples"]["nonzero"], [{"packet_index": 0, "value": 1024}])
+        self.assertEqual(pk["discard_padding"]["nonzero"], [{"packet_index": 5, "value": 1000}])
+        self.assertEqual(pk["discard_padding"]["observed_zero_in_records"], 1, "the first record's observed discard_padding=0 is preserved as a zero")
+        self.assertEqual([r["observed"] for r in pk["side_data_records"]], [{"skip_samples": 1024, "discard_padding": 0}, {"skip_samples": 0, "discard_padding": 1000}])
         self.assertEqual(r["observations"]["output_audio_stream"]["time_base"], "1/48000")
         self.assertTrue(os.path.exists(os.path.join(self.rdir(), "output.mp4")))
         self.assertEqual([e["phase"] for e in r["executions"]][-2:], ["readback_decode_audio_output", "readback_audio_packets"])
@@ -234,8 +238,9 @@ class Mp4AacRoute(Base):
         self.tools("MP4_AAC", decoded_audio_hex=aac_audio(4800), packets=packets_json(skip=None, padding=None))
         r = self.go("MP4_AAC")
         pk = r["observations"]["audio_packets"]
-        self.assertEqual((r["status"], pk["skip_samples_side_data_seen"], pk["skip_samples"], pk["discard_padding"]), (M.S_MP4_OK, False, None, None))
-        self.assertIn("absence is not evidence of zero", pk["note"])
+        self.assertEqual((r["status"], pk["side_data_record_count"], pk["side_data_records"]), (M.S_MP4_OK, 0, []))
+        self.assertEqual((pk["skip_samples"]["reported_in_records"], pk["skip_samples"]["observed_zero_in_records"], pk["discard_padding"]["observed_zero_in_records"]), (0, 0, 0))
+        self.assertIn("NOT reported", pk["note"])
 
     def test_unusable_packet_listing_is_reported_but_does_not_fake_observations(self):
         self.tools("MP4_AAC", decoded_audio_hex=aac_audio(4800), packets={"not": "packets"})

@@ -42,13 +42,23 @@ def _hash_assets(plan: Plan, limits: Limits) -> dict:
 
 def render(episode_bytes: bytes, *, limits: Limits = Limits(), asset_root: str | None, output_root: str, output_name: str,
            burn_in_font: str | None = None, font_size: int | None = None, ffmpeg: str | None = None,
-           ffprobe: str | None = None) -> dict:
+           ffprobe: str | None = None, envelope=None) -> dict:
     """Render one episode into the fresh directory output_root/output_name.
+
+    `envelope` (optional, default None = nothing changes): a video_core.containment.ResourceEnvelope applied ONLY to the main ffmpeg render process (not to ffprobe/readback).
+    A limit this platform cannot apply is rejected before anything is created; a limit the worker fails to apply at launch yields status CONTAINMENT_REFUSED (target not started).
 
     Raises (before anything is created) ValidationFailed / UnsafePath for rejected input.
     Otherwise returns a receipt dict whose `status` is the honest outcome; the dict is
     also written to receipt.json unless the status is SKIPPED_TOOL_UNAVAILABLE.
     """
+    if envelope is not None:
+        from .containment import unsupported_limits
+
+        uns = unsupported_limits(envelope)
+        if uns:
+            raise ValidationFailed("the requested resource envelope cannot be applied on this platform",
+                                   [Issue("envelope_unsupported", f"/envelope/{u['limit']}", u["reason"]) for u in uns])
     plan = prepare(episode_bytes, limits=limits, asset_root=asset_root, output_root=output_root, output_name=output_name,
                    burn_in_font=burn_in_font, font_size=font_size, ffmpeg=ffmpeg, ffprobe=ffprobe)
     location = check_output_location(output_root, output_name, asset_root)
@@ -106,7 +116,7 @@ def render(episode_bytes: bytes, *, limits: Limits = Limits(), asset_root: str |
     receipt_path = os.path.join(run_dir, planmod.RECEIPT_NAME)
     rc.write_new(receipt_path, rc.dumps(receipt))  # a stale IN_PROGRESS file means UNKNOWN
     try:
-        _run(plan, limits, argv, run_dir, tmp_dir, paths, real_assets, pre_hashes, receipt)
+        _run(plan, limits, argv, run_dir, tmp_dir, paths, real_assets, pre_hashes, receipt, envelope)
     except Exception as exc:  # keep partial state and say so; never retry
         receipt["status"] = rc.STATUS_UNKNOWN
         receipt["internal_error"] = {"type": type(exc).__name__, "message": str(exc)[:300], "stage": receipt.get("stage")}
@@ -120,7 +130,7 @@ def _file_record(path: str, name: str, role: str, limits: Limits, partial: bool 
     return {"name": name, "role": role, "bytes": size, "sha256": tools.sha256_file(path, max(limits.max_output_bytes, size)), "partial": partial}
 
 
-def _run(plan: Plan, limits: Limits, argv: list, run_dir: str, tmp_dir: str, paths: dict, real_assets, pre_hashes: dict, receipt: dict) -> None:
+def _run(plan: Plan, limits: Limits, argv: list, run_dir: str, tmp_dir: str, paths: dict, real_assets, pre_hashes: dict, receipt: dict, envelope=None) -> None:
     ffmpeg_path, ffprobe_path = paths["ffmpeg"][0], paths["ffprobe"][0]
     rc.write_new(os.path.join(run_dir, planmod.PLAN_NAME), plan.canonical_json)
     rc.write_new(os.path.join(run_dir, planmod.SRT_NAME), plan.srt)
@@ -143,10 +153,17 @@ def _run(plan: Plan, limits: Limits, argv: list, run_dir: str, tmp_dir: str, pat
 
     env = {"PATH": os.environ.get("PATH", ""), "HOME": tmp_dir, "XDG_CACHE_HOME": os.path.join(tmp_dir, "cache"), "TMPDIR": tmp_dir}
     half = max(1, limits.max_diag_bytes // 2)
-    res = runner.run_bounded(
-        argv, phase="render", timeout_s=limits.max_runtime_seconds, stdout_limits=(0, 0), stderr_limits=(half, half),
-        max_drain_bytes=limits.max_drain_bytes, cwd=tmp_dir, env=env,
-    )
+    if envelope is None:
+        res = runner.run_bounded(
+            argv, phase="render", timeout_s=limits.max_runtime_seconds, stdout_limits=(0, 0), stderr_limits=(half, half),
+            max_drain_bytes=limits.max_drain_bytes, cwd=tmp_dir, env=env,
+        )
+    else:
+        from .containment import run_contained
+
+        res = run_contained(argv, envelope, phase="render", timeout_s=limits.max_runtime_seconds, stdout_limits=(0, 0), stderr_limits=(half, half),
+                            max_drain_bytes=limits.max_drain_bytes, cwd=tmp_dir, env=env)
+        receipt["containment"] = res.containment
     receipt["executions"].append(res.to_dict())
 
     partial = os.path.join(run_dir, planmod.OUTPUT_PARTIAL)
@@ -155,6 +172,7 @@ def _run(plan: Plan, limits: Limits, argv: list, run_dir: str, tmp_dir: str, pat
     status_by_outcome = {
         runner.NONZERO_EXIT: rc.STATUS_PROCESS_FAILED, runner.TIMEOUT: rc.STATUS_TIMEOUT, runner.SIGNALED: rc.STATUS_SIGNALED,
         runner.FLOOD_KILLED: rc.STATUS_FLOOD, runner.INTERRUPTED: rc.STATUS_INTERRUPTED, runner.LAUNCH_FAILED: rc.STATUS_LAUNCH_FAILED,
+        runner.CONTAINMENT_REFUSED: rc.STATUS_CONTAINMENT_REFUSED,
     }
     status = None
     if res.outcome != runner.EXITED_ZERO:

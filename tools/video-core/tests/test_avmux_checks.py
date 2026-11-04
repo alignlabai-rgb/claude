@@ -1,7 +1,7 @@
 import unittest
 from fractions import Fraction
 
-from tests.avmux_fakes import hash_text, out_probe, packets_json, video_probe, wav_probe
+from tests.avmux_fakes import hash_text, out_probe, packets_custom, packets_json, video_probe, wav_probe
 from video_core.avmux import checks as ck
 
 FPS = Fraction(30)
@@ -118,14 +118,76 @@ class HashAndPackets(unittest.TestCase):
         text = "#format: frame checksums\n#extradata 0,                              51, c17c8a76\n#tb 0: 1/15360\n#stream#, dts,        pts, duration,     size, hash\n0,          0,          0,        1,   345600, ff9940e9748415c6c3247cdc3716a55b\n"
         self.assertEqual(ck.parse_hash_lines(text), [(345600, "ff9940e9748415c6c3247cdc3716a55b")])
 
-    def test_packet_summary_reports_side_data_only_when_present(self):
+    def test_packet_summary_keeps_every_record_with_observed_zero_distinct_from_absent(self):
         s = ck.packet_summary(packets_json(skip=1024, padding=1000))
-        self.assertEqual((s["packet_count"], s["skip_samples_side_data_seen"], s["skip_samples"], s["discard_padding"]), (6, True, 1024, 1000))
+        self.assertEqual((s["schema"], s["packet_count"], s["side_data_record_count"]), ("video_core.avmux_audio_packets/2", 6, 2))
+        first, last = s["side_data_records"]
+        self.assertEqual((first["packet_index"], first["observed"], first["absent_fields"]), (0, {"skip_samples": 1024, "discard_padding": 0}, []))
+        self.assertEqual((last["packet_index"], last["observed"], last["absent_fields"]), (5, {"skip_samples": 0, "discard_padding": 1000}, []))
+        self.assertEqual(s["skip_samples"], {"reported_in_records": 2, "absent_in_records": 0, "observed_zero_in_records": 1, "nonzero": [{"packet_index": 0, "value": 1024}], "unparsed": []})
+        self.assertEqual(s["discard_padding"], {"reported_in_records": 2, "absent_in_records": 0, "observed_zero_in_records": 1, "nonzero": [{"packet_index": 5, "value": 1000}], "unparsed": []})
+        self.assertEqual((s["first_packet_has_skip_record"], s["last_packet_has_skip_record"]), (True, True))
         self.assertEqual(s["first_packet"]["pts"], 0)
-        none = ck.packet_summary(packets_json(skip=None, padding=None))
-        self.assertEqual((none["skip_samples_side_data_seen"], none["skip_samples"], none["discard_padding"]), (False, None, None))
-        self.assertIn("absence is not evidence of zero", none["note"])
-        self.assertEqual(ck.packet_summary({})["packet_count"], 0)
+
+    def test_the_real_ffmpeg_shape_first_packet_zero_padding_no_record_on_the_last_packet(self):
+        """The exact situation of the real 3-frame MP4: first packet Skip Samples 1024 with discard_padding 0, no side data at all on the last packet."""
+        s = ck.packet_summary(packets_custom({0: [{"side_data_type": "Skip Samples", "skip_samples": 1024, "discard_padding": 0, "skip_reason": 0, "discard_reason": 0}]}))
+        self.assertEqual(s["side_data_record_count"], 1)
+        self.assertEqual(s["side_data_records"][0]["observed"], {"skip_samples": 1024, "discard_padding": 0, "skip_reason": 0, "discard_reason": 0})
+        self.assertEqual(s["discard_padding"]["observed_zero_in_records"], 1, "an observed zero is recorded as a zero, not as null")
+        self.assertEqual(s["discard_padding"]["nonzero"], [])
+        self.assertEqual((s["first_packet_has_skip_record"], s["last_packet_has_skip_record"]), (True, False), "absence on the last packet is visible")
+
+    def test_absent_everywhere_is_not_zero(self):
+        s = ck.packet_summary(packets_json(skip=None, padding=None))
+        self.assertEqual(s["side_data_record_count"], 0)
+        for f in ("skip_samples", "discard_padding"):
+            self.assertEqual(s[f], {"reported_in_records": 0, "absent_in_records": 0, "observed_zero_in_records": 0, "nonzero": [], "unparsed": []})
+        self.assertEqual((s["first_packet_has_skip_record"], s["last_packet_has_skip_record"]), (False, False))
+        self.assertIn("NOT reported", s["note"])
+        e = ck.packet_summary({})
+        self.assertEqual((e["packet_count"], e["first_packet_has_skip_record"], e["last_packet_has_skip_record"]), (0, None, None))
+
+    def test_a_record_that_prints_only_one_field_names_the_other_as_absent(self):
+        s = ck.packet_summary(packets_custom({2: [{"side_data_type": "Skip Samples", "skip_samples": 0}], 4: [{"side_data_type": "Skip Samples", "discard_padding": 700}]}))
+        a, b = s["side_data_records"]
+        self.assertEqual((a["packet_index"], a["observed"], a["absent_fields"]), (2, {"skip_samples": 0}, ["discard_padding"]))
+        self.assertEqual((b["packet_index"], b["observed"], b["absent_fields"]), (4, {"discard_padding": 700}, ["skip_samples"]))
+        self.assertEqual(s["skip_samples"], {"reported_in_records": 1, "absent_in_records": 1, "observed_zero_in_records": 1, "nonzero": [], "unparsed": []})
+        self.assertEqual(s["discard_padding"], {"reported_in_records": 1, "absent_in_records": 1, "observed_zero_in_records": 0, "nonzero": [{"packet_index": 4, "value": 700}], "unparsed": []})
+
+    def test_multiple_records_on_one_packet_and_across_packets_are_all_kept_in_order(self):
+        s = ck.packet_summary(packets_custom({0: [{"side_data_type": "Skip Samples", "skip_samples": 1024, "discard_padding": 0},
+                                                   {"side_data_type": "Skip Samples", "skip_samples": 7, "discard_padding": 3}],
+                                              3: [{"side_data_type": "Skip Samples", "skip_samples": 0, "discard_padding": 0}],
+                                              5: [{"side_data_type": "Skip Samples", "skip_samples": 0, "discard_padding": 320}]}))
+        self.assertEqual([(r["packet_index"], r["observed"]["skip_samples"], r["observed"]["discard_padding"]) for r in s["side_data_records"]],
+                         [(0, 1024, 0), (0, 7, 3), (3, 0, 0), (5, 0, 320)])
+        self.assertEqual(s["skip_samples"]["nonzero"], [{"packet_index": 0, "value": 1024}, {"packet_index": 0, "value": 7}])
+        self.assertEqual(s["skip_samples"]["observed_zero_in_records"], 2)
+        self.assertEqual(s["discard_padding"]["nonzero"], [{"packet_index": 0, "value": 3}, {"packet_index": 5, "value": 320}])
+        self.assertEqual(s["discard_padding"]["observed_zero_in_records"], 2)
+        self.assertEqual((s["first_packet_has_skip_record"], s["last_packet_has_skip_record"]), (True, True))
+
+    def test_other_side_data_types_are_ignored_and_odd_values_are_kept_untouched(self):
+        s = ck.packet_summary(packets_custom({1: [{"side_data_type": "Replay Gain", "track_gain": 5}],
+                                              2: [{"side_data_type": "Skip Samples", "skip_samples": "1024", "discard_padding": "abc"}],
+                                              3: [{"side_data_type": "Skip Samples"}]}))
+        self.assertEqual(s["side_data_record_count"], 2)
+        self.assertEqual(s["side_data_records"][0]["observed"], {"skip_samples": "1024", "discard_padding": "abc"}, "values are never coerced in the record")
+        self.assertEqual(s["skip_samples"]["nonzero"], [{"packet_index": 2, "value": 1024}])
+        self.assertEqual(s["discard_padding"]["unparsed"], [{"packet_index": 2, "value": "abc"}])
+        self.assertEqual(s["side_data_records"][1]["observed"], {})
+        self.assertEqual(s["side_data_records"][1]["absent_fields"], ["skip_samples", "discard_padding"])
+        self.assertEqual(s["skip_samples"]["absent_in_records"], 1)
+        s2 = ck.packet_summary(packets_custom({0: [{"side_data_type": "Skip Samples", "skip_samples": True, "discard_padding": False}]}))
+        self.assertEqual(s2["skip_samples"]["unparsed"], [{"packet_index": 0, "value": True}], "a JSON bool is not an integer count")
+
+    def test_record_list_is_bounded_but_counts_are_exact(self):
+        many = {i: [{"side_data_type": "Skip Samples", "skip_samples": 1, "discard_padding": 0}] for i in range(1200)}
+        s = ck.packet_summary(packets_custom(many, count=1200))
+        self.assertEqual((s["side_data_record_count"], len(s["side_data_records"]), s["side_data_records_truncated"]), (1200, 1000, True))
+        self.assertEqual(s["skip_samples"]["reported_in_records"], 1200)
 
 
 if __name__ == "__main__":

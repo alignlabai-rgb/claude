@@ -87,3 +87,15 @@ Author checks are **Linux-only, FFmpeg/ffprobe 6.1.1-3ubuntu5 only**; no other F
 * **Race window:** inputs are hashed at plan time and re-hashed after the mux (`inputs_unchanged`); a change in between is reported as `UNKNOWN`, not prevented.
 * **Tests use fake FFmpeg/ffprobe scripts** for orchestration (POSIX only; they skip on Windows); they are never mux evidence. Windows junction rejection is stub-tested on Linux.
 * **No integration:** nothing consumes this; the caller owns which video/stem to mux and every creative decision. Colour-conversion drift (baseline) is unchanged and still open.
+
+## Stage C (seventh commit): AAC packet record correction and optional resource containment
+
+**A. AAC receipt accuracy.** The earlier receipt summarised packet side data as first-non-zero scalars, so the real MP4's observed `discard_padding: 0` showed as `null`. The mux receipt now records every Skip Samples record per packet (`side_data_records`: `observed` keys exactly as ffprobe printed them, `absent_fields`),
+with per-field counts of reported / absent / observed-zero / non-zero (traceable by `packet_index`). Old evidence and receipts are untouched; `evidence/avmux-aac-packet-correction/` holds NEW re-inspection-only receipts for the existing outputs (hashes verified before and after, nothing remuxed).
+The earlier statement "Receipt imprecision (documented, not hidden)" in the AV mux section is therefore resolved for new runs, not rewritten for old ones.
+
+**B. Optional resource envelope (`CONTAINMENT.md`).** Closes the documented "no CPU or memory cap" gap only for callers that opt in, and only for the main ffmpeg process.
+* **Verified on the author's Linux host:** per-process `RLIMIT_CPU/AS/FSIZE` applied by a new worker, read back, inherited by the target; CPU and memory exhaustion of owned fixtures; unsupported requests refuse before any launch; timeout/cancel cleanup of a target/child/grandchild with an unrelated sentinel surviving.
+* **Not verified:** any Windows host (Job Object code, nested-job refusal, kill-on-close, `ActiveProcessLimit` accounting) — the Windows tests are written and skipped here; the official Microsoft and Python documentation pages could not be read (network policy denied `learn.microsoft.com`, `docs.python.org`), so Windows API facts in the code are from prior knowledge and protected only by read-back verification.
+* **Still uncontained:** wall time (runner), POSIX tree-wide CPU/memory, resident memory (RLIMIT_AS is address space), descendants that leave the process group, ffprobe/readback commands, cgroups/namespaces/seccomp/network/filesystem isolation. macOS untested.
+* The one real contained run used generous limits; it shows the mechanism works with the real ffmpeg, not that ffmpeg approached a limit. Colour-conversion drift (baseline) is unchanged.

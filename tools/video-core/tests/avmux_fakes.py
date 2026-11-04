@@ -66,6 +66,9 @@ if last.endswith(".partial"):                       # ---- the mux itself
         seen = {{"receipt_status_during_mux": rec.get("status"), "pid": os.getpid()}}
     except Exception as exc:
         seen = {{"receipt_error": repr(exc), "pid": os.getpid()}}
+    if b.get("record_rlimits"):
+        import resource
+        seen["rlimits"] = {{n: resource.getrlimit(getattr(resource, n)) for n in ("RLIMIT_CPU", "RLIMIT_AS", "RLIMIT_FSIZE")}}
     with open(os.path.join(run_dir, "fake_observed.json"), "w") as fh:
         json.dump(seen, fh)
     if b.get("touch_input"):
@@ -140,6 +143,14 @@ def packets_json(skip=1024, padding=None, count=6):
         pk[0]["side_data_list"] = [{"side_data_type": "Skip Samples", "skip_samples": skip, "discard_padding": 0}]
     if padding is not None:
         pk[-1]["side_data_list"] = [{"side_data_type": "Skip Samples", "skip_samples": 0, "discard_padding": padding}]
+    return {"packets": pk}
+
+
+def packets_custom(side_data_by_index: dict, count: int = 6) -> dict:
+    """Packets whose side_data_list is given explicitly per packet index (a list of dicts, exactly as ffprobe would print them)."""
+    pk = [{"pts": 1024 * (i - 1), "dts": 1024 * (i - 1), "duration": 1024, "size": 300} for i in range(count)]
+    for i, sd in side_data_by_index.items():
+        pk[i]["side_data_list"] = sd
     return {"packets": pk}
 
 

@@ -107,11 +107,18 @@ mixer lives in `video_core/audiomix` and is run as `python -m video_core.audiomi
 `schemas/audio-manifest.schema.json`). It writes a verified WAV stem only — no mux, no speech/TTS, no resampling, no network.
 `video_core/audio.py` remains the typing-only adapter interface.
 
+## Resource containment (optional, explicit)
+
+`render` and `avmux mux` accept an optional resource envelope (`--envelope-cpu-seconds`, `--envelope-memory-bytes`, `--envelope-max-file-bytes`, plus Windows-only `--envelope-tree-cpu-seconds`, `--envelope-tree-memory-bytes`, `--envelope-max-processes`)
+applied **only to the main ffmpeg process** through a small isolated worker. Nothing is limited unless a flag is given; defaults, plans and hashes are unchanged. A limit this platform cannot apply is rejected before anything is created or probed; one that fails to apply at launch gives status
+`CONTAINMENT_REFUSED` and the target never starts (no retry, no weaker limits). Receipts show requested / applied (read back from the OS) / unsupported. POSIX limits are per process (no tree accounting); Windows (Job Object) is **unverified by the author**. See `CONTAINMENT.md`.
+
 ## Muxing (optional, separate)
 
 `python -m video_core.avmux {validate,plan,mux}` muxes one explicitly selected local H.264 video (stream copy) with one qualified 48 kHz s16 PCM WAV stem into a fresh directory —
 route `MOV_PCM_S16LE` (sample-exact PCM, independently verified) or `MP4_AAC` (lossy review candidate; tolerance and observed delay/padding reported, never called sample-exact). See `AVMUX_SPEC.md`
 and `schemas/avmux-manifest.schema.json`. `validate`/`plan` launch no process and create no file (video metadata stays `CALLER_STATED_UNVERIFIED`); `mux --mux` runs a bounded ffprobe preflight and rejects mismatches before creating anything.
+`python -m video_core.avmux reinspect MEDIA --expect-sha256 … --output-root … --reinspect` re-reads an existing muxed file's audio packet side data into a NEW correction receipt (never remuxes; see `evidence/avmux-aac-packet-correction/`).
 
 ## Tests
 

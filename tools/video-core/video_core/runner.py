@@ -31,6 +31,7 @@ TIMEOUT = "TIMEOUT"
 FLOOD_KILLED = "FLOOD_KILLED"
 INTERRUPTED = "INTERRUPTED"
 LAUNCH_FAILED = "LAUNCH_FAILED"
+CONTAINMENT_REFUSED = "CONTAINMENT_REFUSED"  # an explicit resource envelope could not be applied; the target was NOT started
 
 
 class _Capture:
@@ -90,6 +91,7 @@ class RunResult:
     launch_error: str | None = None
     stdout: _Capture | None = field(default=None, repr=False)
     stderr: _Capture | None = field(default=None, repr=False)
+    containment: dict | None = None  # set only by video_core.containment.run_contained (requested/applied/unsupported receipt)
 
     @property
     def ok(self) -> bool:
@@ -122,6 +124,7 @@ class RunResult:
             "launch_error": self.launch_error,
             "stdout": cap(self.stdout, False),  # stdout is structured data (ffprobe) or unused
             "stderr": cap(self.stderr, include_text),
+            **({"containment": self.containment} if self.containment is not None else {}),
         }
 
 
@@ -152,6 +155,8 @@ def classify(kill_reason: str | None, signal: int | None, rc: int | None) -> str
         return FLOOD_KILLED
     if kill_reason == "interrupt":
         return INTERRUPTED
+    if kill_reason and kill_reason.startswith("containment"):
+        return CONTAINMENT_REFUSED
     if signal is not None:
         return SIGNALED
     if rc == 0:
@@ -213,7 +218,11 @@ def run_bounded(
     env: dict | None = None,
     grace_s: float = 2.0,
     drain_timeout_s: float = 2.0,
+    after_start=None,
 ) -> RunResult:
+    """`after_start(proc)` (optional, default None = unchanged behaviour) runs once, on the calling thread, after the child and the drain threads exist and before the
+    wait loop. It must be bounded by its own timeouts. It returns None to let the child run, or a string beginning with "containment" to refuse: the child's
+    process group is then terminated and the outcome is CONTAINMENT_REFUSED. Wall-clock `timeout_s` includes the hook's time."""
     if not isinstance(argv, (list, tuple)) or not argv or not all(isinstance(a, str) and "\x00" not in a for a in argv):
         raise TypeError("argv must be a non-empty list of NUL-free strings")
     # Public numeric boundary: validated before anything is created or launched (NaN/inf/bool/negative/zero are rejected).
@@ -250,8 +259,20 @@ def run_bounded(
         t.start()
 
     deadline = t0 + timeout_s
+    refused = None
+    if after_start is not None:
+        try:
+            refused = after_start(proc)
+        except KeyboardInterrupt:
+            result.kill_reason, refused = "interrupt", "interrupt"
+        except Exception as exc:  # a broken hook must not leave a running child behind
+            refused = f"containment_hook_error: {type(exc).__name__}"
+        if refused is not None:
+            if result.kill_reason is None:
+                result.kill_reason = refused if str(refused).startswith("containment") else f"containment: {refused}"
+            _terminate(proc, grace_s)
     try:
-        while True:
+        while refused is None:
             try:
                 proc.wait(timeout=0.05)
                 break

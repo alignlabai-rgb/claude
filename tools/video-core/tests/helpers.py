@@ -152,6 +152,9 @@ try:
 except Exception as exc:
     seen = {{"receipt_error": repr(exc)}}
 seen["pid"] = os.getpid()
+if b.get("record_rlimits"):
+    import resource
+    seen["rlimits"] = {{n: resource.getrlimit(getattr(resource, n)) for n in ("RLIMIT_CPU", "RLIMIT_AS", "RLIMIT_FSIZE")}}
 seen["cap_files"] = {{n: open(n, "rb").read().hex() for n in sorted(os.listdir(".")) if n.startswith("cap_")}}
 with open(os.path.join(run_dir, "fake_observed.json"), "w") as fh:
     json.dump(seen, fh)

@@ -70,9 +70,17 @@ def _run(argv, phase, limits, cwd, env, executions, *, timeout=None, stdout=(0, 
 
 
 def mux(manifest_bytes: bytes, *, limits: Limits = Limits(), asset_root: str | None, output_root: str, output_name: str,
-        ffmpeg: str | None = None, ffprobe: str | None = None) -> dict:
-    """Mux into the fresh directory output_root/output_name. Raises (before anything is created) for rejected input;
+        ffmpeg: str | None = None, ffprobe: str | None = None, envelope=None) -> dict:
+    """Mux into the fresh directory output_root/output_name. `envelope` (optional, default None = unchanged) is a video_core.containment.ResourceEnvelope applied ONLY to the
+    main ffmpeg mux process (not to ffprobe or the readback decodes); unsupported limits are rejected before anything is created. Raises (before anything is created) for rejected input;
     otherwise returns the receipt dict (also written to receipt.json unless the status is SKIPPED_TOOL_UNAVAILABLE)."""
+    if envelope is not None:
+        from ..containment import unsupported_limits
+
+        uns = unsupported_limits(envelope)
+        if uns:
+            raise ValidationFailed("the requested resource envelope cannot be applied on this platform",
+                                   [Issue("envelope_unsupported", f"/envelope/{u['limit']}", u["reason"]) for u in uns])
     plan = prepare_plan(manifest_bytes, limits=limits, asset_root=asset_root, output_root=output_root, output_name=output_name, ffmpeg=ffmpeg, ffprobe=ffprobe)
     m = plan.manifest
     location = check_output_location(output_root, output_name, asset_root)
@@ -136,7 +144,7 @@ def mux(manifest_bytes: bytes, *, limits: Limits = Limits(), asset_root: str | N
     receipt_path = os.path.join(run_dir, planmod.RECEIPT_NAME)
     rc.write_new(receipt_path, rc.dumps(receipt))  # a stale IN_PROGRESS receipt means UNKNOWN
     try:
-        _run_mux(plan, limits, argv, run_dir, tmp_dir, ff, fp, executions, receipt, receipt_path, location.root)
+        _run_mux(plan, limits, argv, run_dir, tmp_dir, ff, fp, executions, receipt, receipt_path, location.root, envelope)
     except Exception as exc:  # preserve partial state and say so; never retry
         receipt["status"] = rc.STATUS_UNKNOWN
         receipt["internal_error"] = {"type": type(exc).__name__, "message": str(exc)[:300], "stage": receipt.get("stage")}
@@ -163,7 +171,7 @@ def _hash_text(ff, path, mode, limits, tmp, env, executions, phase):
         return None, res
 
 
-def _run_mux(plan: AvPlan, limits, argv, run_dir, tmp_dir, ff, fp, executions, receipt, receipt_path, probe_cwd) -> None:  # noqa: C901
+def _run_mux(plan: AvPlan, limits, argv, run_dir, tmp_dir, ff, fp, executions, receipt, receipt_path, probe_cwd, envelope=None) -> None:  # noqa: C901
     m = plan.manifest
     final_name, partial_name, mismatch_name = planmod.output_names(m.route)
     partial, final, mismatch = (os.path.join(run_dir, n) for n in (partial_name, final_name, mismatch_name))
@@ -174,11 +182,19 @@ def _run_mux(plan: AvPlan, limits, argv, run_dir, tmp_dir, ff, fp, executions, r
     rc.replace_atomic(receipt_path, rc.dumps(receipt))
     env = {"PATH": os.environ.get("PATH", ""), "HOME": tmp_dir, "XDG_CACHE_HOME": os.path.join(tmp_dir, "cache"), "TMPDIR": tmp_dir}
     half = max(1, limits.max_diag_bytes // 2)
-    res = runner.run_bounded(argv, phase="mux", timeout_s=limits.max_runtime_seconds, stdout_limits=(0, 0), stderr_limits=(half, half),
-                             max_drain_bytes=limits.max_drain_bytes, cwd=tmp_dir, env=env)
+    if envelope is None:
+        res = runner.run_bounded(argv, phase="mux", timeout_s=limits.max_runtime_seconds, stdout_limits=(0, 0), stderr_limits=(half, half),
+                                 max_drain_bytes=limits.max_drain_bytes, cwd=tmp_dir, env=env)
+    else:
+        from ..containment import run_contained
+
+        res = run_contained(argv, envelope, phase="mux", timeout_s=limits.max_runtime_seconds, stdout_limits=(0, 0), stderr_limits=(half, half),
+                            max_drain_bytes=limits.max_drain_bytes, cwd=tmp_dir, env=env)
+        receipt["containment"] = res.containment
     executions.append(res)
     by_outcome = {runner.NONZERO_EXIT: rc.STATUS_PROCESS_FAILED, runner.TIMEOUT: rc.STATUS_TIMEOUT, runner.SIGNALED: rc.STATUS_SIGNALED, runner.FLOOD_KILLED: rc.STATUS_FLOOD,
-                  runner.INTERRUPTED: rc.STATUS_INTERRUPTED, runner.LAUNCH_FAILED: rc.STATUS_LAUNCH_FAILED}
+                  runner.INTERRUPTED: rc.STATUS_INTERRUPTED, runner.LAUNCH_FAILED: rc.STATUS_LAUNCH_FAILED,
+                  runner.CONTAINMENT_REFUSED: rc.STATUS_CONTAINMENT_REFUSED}
     status = None
     if res.outcome != runner.EXITED_ZERO:
         status = by_outcome[res.outcome]

@@ -135,23 +135,53 @@ def parse_hash_lines(text: str) -> list[tuple]:
     return rows
 
 
+PACKET_SCHEMA = "video_core.avmux_audio_packets/2"
+SKIP_FIELDS = ("skip_samples", "discard_padding")  # the two values whose presence/zero-ness must never be conflated
+SIDE_DATA_FIELDS = SKIP_FIELDS + ("skip_reason", "discard_reason")
+MAX_SIDE_DATA_RECORDS = 1000
+
+
+def _int_or_none(v):
+    if isinstance(v, bool):
+        return None
+    try:
+        return int(v)
+    except (TypeError, ValueError):
+        return None
+
+
 def packet_summary(parsed: dict) -> dict:
-    """Observations from `ffprobe -show_packets` on the audio stream (AAC delay/padding evidence). Never inferred if absent."""
+    """Audio packet timing and EVERY skip-samples side-data record ffprobe reported, with absent vs zero kept distinct.
+
+    `side_data_records` is the source of truth: one entry per side-data object of type "Skip Samples" (or carrying skip_samples/discard_padding),
+    giving the packet index and timing, `observed` (exactly the keys ffprobe printed, values untouched, so an observed 0 stays 0) and `absent_fields`
+    (which of skip_samples/discard_padding ffprobe did NOT print for that record). The per-field summaries are derived from the records and traceable
+    to them by packet_index: reported_in_records (field printed), absent_in_records (field not printed), observed_zero_in_records (printed and == 0),
+    nonzero (every printed non-zero value with its packet_index), unparsed (printed but not an integer). Nothing is inferred when a field is absent.
+    """
     pk = parsed.get("packets") or []
-    skip = pad = None
-    side_seen = False
-    for p in pk:
+    records = []
+    for i, p in enumerate(pk):
         for sd in p.get("side_data_list") or []:
-            if "skip_samples" in sd or "discard_padding" in sd or sd.get("side_data_type") == "Skip Samples":
-                side_seen = True
-                skip = sd.get("skip_samples") if skip is None and sd.get("skip_samples") else skip
-                if sd.get("discard_padding"):
-                    pad = sd.get("discard_padding")
+            if sd.get("side_data_type") == "Skip Samples" or any(f in sd for f in SKIP_FIELDS):
+                records.append({"packet_index": i, "pts": p.get("pts"), "dts": p.get("dts"), "duration": p.get("duration"), "side_data_type": sd.get("side_data_type"),
+                                "observed": {f: sd[f] for f in SIDE_DATA_FIELDS if f in sd}, "absent_fields": [f for f in SKIP_FIELDS if f not in sd]})
+    summary = {}
+    for f in SKIP_FIELDS:
+        reported = [r for r in records if f in r["observed"]]
+        ints = [(r["packet_index"], _int_or_none(r["observed"][f])) for r in reported]
+        summary[f] = {"reported_in_records": len(reported), "absent_in_records": len(records) - len(reported),
+                      "observed_zero_in_records": sum(1 for _i, v in ints if v == 0),
+                      "nonzero": [{"packet_index": i, "value": v} for i, v in ints if v not in (0, None)],
+                      "unparsed": [{"packet_index": i, "value": r["observed"][f]} for (i, v), r in zip(ints, reported) if v is None]}
     first, last = (pk[0], pk[-1]) if pk else ({}, {})
-    return {"packet_count": len(pk), "first_packet": {k: first.get(k) for k in ("pts", "dts", "duration", "size")},
-            "last_packet": {k: last.get(k) for k in ("pts", "dts", "duration", "size")},
-            "skip_samples_side_data_seen": side_seen, "skip_samples": skip, "discard_padding": pad,
-            "note": "skip/padding values are reported only if ffprobe exposes them as packet side data; absence is not evidence of zero"}
+    idx = {r["packet_index"] for r in records}
+    return {"schema": PACKET_SCHEMA, "packet_count": len(pk),
+            "first_packet": {k: first.get(k) for k in ("pts", "dts", "duration", "size")}, "last_packet": {k: last.get(k) for k in ("pts", "dts", "duration", "size")},
+            "first_packet_has_skip_record": 0 in idx if pk else None, "last_packet_has_skip_record": (len(pk) - 1) in idx if pk else None,
+            "side_data_record_count": len(records), "side_data_records": records[:MAX_SIDE_DATA_RECORDS], "side_data_records_truncated": len(records) > MAX_SIDE_DATA_RECORDS,
+            "skip_samples": summary["skip_samples"], "discard_padding": summary["discard_padding"],
+            "note": "Records are exactly what ffprobe printed. A field in absent_fields was NOT reported (unknown), which is different from a reported 0; no value is inferred for absent fields."}
 
 
 def tolerance_checks(decoded_samples: int, expected: int, tolerance: int) -> list:

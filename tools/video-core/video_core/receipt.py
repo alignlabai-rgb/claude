@@ -21,6 +21,7 @@ STATUS_SIGNALED = "SIGNALED"
 STATUS_FLOOD = "FLOOD_KILLED"
 STATUS_INTERRUPTED = "INTERRUPTED"
 STATUS_LAUNCH_FAILED = "LAUNCH_FAILED"
+STATUS_CONTAINMENT_REFUSED = "CONTAINMENT_REFUSED"  # an explicit resource envelope could not be applied; the target was not started
 STATUS_UNKNOWN = "UNKNOWN"
 STATUS_IN_PROGRESS = "IN_PROGRESS"  # a receipt still saying this means the run did not finish: treat as UNKNOWN
 
