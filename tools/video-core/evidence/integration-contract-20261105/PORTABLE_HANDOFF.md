@@ -70,7 +70,7 @@ py -3.13 -B $H\portable_harness.py --library-root tools\video-core --scratch-roo
 ```powershell
 # B. full strict acceptance run on the pinned original (expect exit 0). ~454 serial children; budget 600 s.
 py -3.13 -B $H\portable_harness.py --library-root tools\video-core --scratch-root C:\vcp\scratch --out-dir C:\vcp\out-full-001 --strict --budget-seconds 600
-# B2. same without the mutation controls (~230 children) if B exhausts its budget
+# B2. same without the mutation controls (~315 children) if B exhausts its budget (it still runs the 11 contract cases and all mechanism self-tests)
 py -3.13 -B $H\portable_harness.py --library-root tools\video-core --scratch-root C:\vcp\scratch --out-dir C:\vcp\out-full-002 --strict --skip-mutation --budget-seconds 600
 ```
 ```powershell
