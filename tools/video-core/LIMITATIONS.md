@@ -1,0 +1,25 @@
+# Limitation report (author's self-check — not independent acceptance)
+
+Status: code and tests delivered for review. This is **not** a claim of production integration (SYS015/Motion) or of
+creative, visual or audio acceptance. The author's checks below are not an independent review.
+
+## Verified here, and where
+* Linux x86_64, Python 3.11.x / 3.12.x / 3.13.x (default suite passes on all three), FFmpeg/ffprobe `6.1.1-3ubuntu5` with libx264 and the filters listed in the plan.
+* One real render of the supplied case plus two additional opt-in synthetic integration renders (see `evidence/README.md`).
+
+## Not verified / not claimed
+* **macOS and Windows: untested.** Paths, process-group handling and `os.rename` are written to be portable and POSIX-only tests are skipped elsewhere, but no claim is made for those platforms. On Windows only `CREATE_NEW_PROCESS_GROUP` is used: orphan cleanup is weaker, there are no POSIX signals, and `max_argv_bytes` should be lowered to ≈30000.
+* **Rendered quality is not evaluated.** `READBACK_MATCH` means ffprobe metadata + decoded frame count equal the plan. Solid-colour pixel samples of the evidence file are within ±4/255 of the nominal colour but systematically *lower* (e.g. nominal `#30506a` = 48,80,106 decoded as 44,78,102). Cause: the colour source is converted YUV→YUV through its internal format before the explicit BT.709 conversion; plus 8-bit limited-range 4:2:0 quantisation. A dev experiment (single frame, not an MP4) showed that inserting `format=gbrp` before the `scale=out_color_matrix=bt709` step brings the error to ≤3. **Not applied** because the supplied case was to be rendered once and the evidence must match the committed code; it is a one-line follow-up in `plan._clip_filter`.
+* Burn-in: the integration test shows ffmpeg accepts the generated `drawtext` graph with a real CJK font and that the output reads back with the expected properties. Glyph appearance, line breaking, bidirectional/complex-script shaping and legibility were **not** visually reviewed. The cmap check proves coverage only, supports sfnt formats 4/12, rejects `.ttc`.
+* File sources are lightly exercised (one synthetic mp4 + png + colour run). They are conformed to the project rate with `fps` (drop/duplicate), letter-boxed to the canvas, audio ignored, always start at source time 0. A source shorter than its clip is **not padded**: the frame count then mismatches and the receipt says `READBACK_MISMATCH`.
+* Resource bounds: wall-clock, drained bytes, output size (`-fs`, truncation ⇒ invalid partial ⇒ mismatch), frame/pixel/duration/argv limits. **No CPU or memory cap** on FFmpeg itself.
+* TOCTOU: sources are checked at plan time, re-resolved and hashed immediately before launch, and re-hashed afterwards (`inputs_unchanged`); a file swapped in the tiny gap between the last check and FFmpeg's `open` is not prevented. Hard links to outside files cannot be detected.
+* Killing the *orchestrator* with SIGKILL leaves its FFmpeg child running until FFmpeg ends on its own (bounded by `-frames:v`/`-fs`) and the receipt stays `IN_PROGRESS` (= UNKNOWN). SIGINT/SIGTERM are handled only by the CLI; library callers must handle them (the runner catches `KeyboardInterrupt`).
+* MP4 bytes are not promised reproducible across machines/FFmpeg builds/thread schedules (bit-exact flags are set; hashes are recorded, not compared).
+* Requires FFmpeg with `-fps_mode` (≥ 5.1) and libx264; no version gate beyond reporting the version and probing the encoder/filters/demuxers. Other FFmpeg versions are unverified.
+* The validator is a hand-written stdlib mirror of `schemas/episode.schema.json` (a test pins its bounds to the schema file). It is deliberately stricter: JSON integers only, clips must be listed in order, captions may not contain `\r`, blank lines or other control characters. Clip ids and caption ids are unique per collection, not across both; captions may overlap each other.
+* Audio is an interface only (`audio.py`); nothing is muxed.
+* SRT has millisecond resolution; at frame rates where two frame boundaries round to the same millisecond (> 1000 fps) validation rejects the episode (`caption_srt_resolution`) instead of emitting a zero-length cue.
+
+## Known failures
+None in the default suite at the time of writing. Two integration tests are skipped by default (opt-in) and were run once manually with the result recorded in `evidence/`. A first run of `evidence/independent_check.py` reported two failures caused by a parsing bug in that script (it dropped a `0,` csv row); the media was fine, the script was fixed, and both runs are kept in `evidence/`.
