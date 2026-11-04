@@ -38,3 +38,9 @@ python3 -m video_core render episode.envelope-tiny.json --output-root <scratch>/
 
 ## Not shown
 Windows behaviour; macOS; cgroups; tree-wide POSIX accounting; limits applied to probes/readback; byte-reproducible containers; any quality or creative property.
+
+## Addendum (later commit): coordinator-supplied Microsoft notes, and what counts as native evidence
+
+* The coordinator supplied readbacks of the official Microsoft pages (fetched outside the cloud host on 2026-11-04 UTC; see `CONTAINMENT.md`). They are not proof of any Windows execution, which remains untested by the author.
+* **Native containment evidence in this directory = the owned small Python fixtures** (all caps ≤ 256 MiB, each probe ≤ 10 s). Tests that use a fake ffmpeg script under the real worker are wiring tests, not FFmpeg runs.
+* **The one real FFmpeg run** above used a 3 GiB address-space cap, which exceeds the later ≤ 256 MiB guidance for cloud native tests; FFmpeg cannot fit 256 MiB here (sampled `VmPeak` ≈ 604 MB lower bound). It was not repeated, no cap was raised, and no 256 MiB attempt was made. It is evidence that the mechanism works with real FFmpeg and generous limits only.

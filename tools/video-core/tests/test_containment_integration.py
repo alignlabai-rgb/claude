@@ -84,6 +84,40 @@ class StaticBoundary(unittest.TestCase):
         creates = [n for n in ast.walk(tree) if isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute) and n.func.attr == "CreateJobObjectW"]
         self.assertEqual([[ast.unparse(a) for a in c.args] for c in creates], [["None", "None"]], "unnamed job with default (non-inheritable) security")
 
+    def test_windows_job_flags_are_exactly_the_allowed_set_with_no_breakaway_ui_or_security_flag(self):
+        """Flag set pinned. Four constants are confirmed by the coordinator-supplied Microsoft notes; PROCESS_TIME and PROCESS_MEMORY are NOT in those notes
+        (author's recollection, to be checked by the reviewer) -- the test records that distinction instead of hiding it."""
+        tree = ast.parse(read_text(os.path.join(PKG, "_worker.py")))
+        consts = {}
+        for node in tree.body:
+            if isinstance(node, ast.Assign) and isinstance(node.targets[0], ast.Name) and node.targets[0].id.startswith(("JOB_OBJECT_", "JobObject")):
+                consts[node.targets[0].id] = ast.literal_eval(node.value)
+        self.assertEqual(set(consts), {"JOB_OBJECT_LIMIT_PROCESS_TIME", "JOB_OBJECT_LIMIT_JOB_TIME", "JOB_OBJECT_LIMIT_ACTIVE_PROCESS", "JOB_OBJECT_LIMIT_PROCESS_MEMORY",
+                                       "JOB_OBJECT_LIMIT_JOB_MEMORY", "JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE", "JobObjectExtendedLimitInformation"})
+        confirmed = {"JOB_OBJECT_LIMIT_JOB_TIME": 0x4, "JOB_OBJECT_LIMIT_ACTIVE_PROCESS": 0x8, "JOB_OBJECT_LIMIT_JOB_MEMORY": 0x200,
+                     "JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE": 0x2000, "JobObjectExtendedLimitInformation": 9}
+        for name, value in confirmed.items():
+            self.assertEqual(consts[name], value, name)
+        unconfirmed = {"JOB_OBJECT_LIMIT_PROCESS_TIME": 0x2, "JOB_OBJECT_LIMIT_PROCESS_MEMORY": 0x100}  # not in the supplied notes: reviewer to verify
+        for name, value in unconfirmed.items():
+            self.assertEqual(consts[name], value, name)
+        bits = [v for k, v in consts.items() if k.startswith("JOB_OBJECT_LIMIT_")]
+        self.assertEqual(len(set(bits)), len(bits))
+        self.assertTrue(all(b & (b - 1) == 0 for b in bits))
+        used = 0
+        for b in bits:
+            used |= b
+        for forbidden_bit in (0x800, 0x1000, 0x10, 0x20, 0x80):  # breakaway-ok, silent-breakaway-ok, affinity, priority class, scheduling class
+            self.assertEqual(used & forbidden_bit, 0)
+        self.assertFalse([k for k in consts if any(w in k for w in ("BREAKAWAY", "UI", "SECURITY", "DESKTOP", "HANDLES"))])
+
+    def test_the_documentation_states_the_corrected_readback_guarantee_and_the_provenance_of_the_notes(self):
+        doc = read_text(os.path.join(ROOT, "CONTAINMENT.md"))
+        for needle in ("coordinator-supplied", "not proof that any Windows execution was tested", "does **not** detect a wrongly numbered flag constant", "user-mode time only",
+                       "committed", "PROCESS_MEMORY", "3 GiB", "an FFmpeg run and are not presented as one", "jobapi2/nf-jobapi2-assignprocesstojobobject"):
+            self.assertIn(needle, doc)
+        self.assertNotIn("a wrong flag constant or layout makes the read-back disagree", doc, "the earlier overstated claim must be gone")
+
     def test_other_packages_still_obey_the_original_guards(self):
         # the pre-existing guard modules scan video_core/, audiomix/ and avmux/ for ctypes/subprocess/socket; the containment package is deliberately outside them
         for sub in ("", "audiomix", "avmux"):
