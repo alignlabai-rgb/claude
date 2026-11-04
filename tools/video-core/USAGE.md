@@ -59,10 +59,13 @@ Outcomes in the `SKIPPED_TOOL_UNAVAILABLE` receipt (`reasons[0].detail`): `missi
 
 ## Argument-list bounds
 
-`max_argv_bytes` (default 100000) applies on every platform. `max_windows_cmdline_chars` (default 32000, ceiling 32766, the Win32
-`CreateProcess` limit) is measured with `subprocess.list2cmdline` — the string Python passes on Windows, executable included — and is
-**enforced when running on Windows**; on other platforms `plan` only reports it (`observations.argv_budget.fits_windows_limit`, an
-estimate using the real roots when known, else 260 characters each). `render` re-checks the real argv before creating anything.
+`max_argv_bytes` (default 100000, UTF-8 bytes) applies on every platform. `max_windows_cmdline_chars` (default 32000, ceiling 32766, the Win32
+`CreateProcess` limit; the flag name is kept for compatibility but the **unit is UTF-16 code units**) is measured on the string
+`subprocess.list2cmdline` builds — the one Python passes on Windows, executable included — counting BMP characters as 1 and non-BMP
+characters (e.g. emoji) as 2. It is **enforced when running on Windows**, together with a ban on ill-formed text (an unpaired surrogate,
+`argv_ill_formed_utf16`); on other platforms `plan` only reports them (`observations.argv_budget.{estimated_windows_cmdline_utf16_units,
+fits_windows_limit, ill_formed_utf16}`; an estimate using the real roots when known, else 260 characters each) and `render` re-checks the
+real argv before creating anything. Measuring never raises: a lone surrogate counts as one UTF-16 unit and three UTF-8 bytes.
 Rule of thumb from measurement: about 200 colour-only clips fit the Windows bound; 256 do not.
 
 ## Render pipeline and receipt
@@ -106,7 +109,7 @@ audio adapter (no voice service, no provider, no network).
 
 ```bash
 cd tools/video-core
-python3 -m unittest discover -s tests -t .                  # 194 tests (3 opt-in skipped); fake ffmpeg/ffprobe; no real render
+python3 -m unittest discover -s tests -t .                  # see evidence/stage-a-windows-residuals/README.md for current counts; fake ffmpeg/ffprobe; no real render
 VIDEO_CORE_INTEGRATION=1 python3 -m unittest tests.test_integration_ffmpeg -v   # opt-in: real ffmpeg on generated synthetic media
 VIDEO_CORE_INTEGRATION=1 VIDEO_CORE_TEST_FONT=/path/font.ttf python3 -m unittest tests.test_integration_ffmpeg -v  # + burn-in
 ```

@@ -40,3 +40,15 @@ Still not verified: any Windows run (the follow-up tests that need POSIX fake to
 (only the filter lines quoted in the finding were available; the 6-character encoder layout is assumed from libx264 having been found on 8.1.2);
 the two-flag fixture is a reconstruction, not captured output (see `tests/fixtures/ffmpeg_listings/README.md`); on Windows, episodes needing more than
 ≈200 colour clips (≈100+ file clips depending on path length) exceed the command-line bound and are rejected rather than split.
+
+## Stage A (third commit): Windows residuals
+
+* **Unit corrected.** The Windows command-line bound counted Python code points (`len(list2cmdline(...))`); Windows consumes UTF-16 code units. The
+  requester's own Windows launch of an owned Python with one 17000-emoji argument measured python_len 17106 / UTF-16 34106 / UTF-8 68106 and failed with
+  WinError 206, which the 100000-byte and 32000-character checks both under-counted. `limits.cmdline_utf16_units` now measures UTF-16 code units; lone
+  surrogates are counted as one unit (measurement never raises) and rejected on Windows (`argv_ill_formed_utf16`), only reported elsewhere.
+* **Two Windows test failures fixed in the tests, not in the product:** one asserted an absolute estimate `< 40000` that depends on the host TEMP prefix
+  (it now asserts the estimate equals the really materialized argv, which also proves there is no per-file slack); the other created three 100-character
+  directories and hit WinError 3 because Windows long paths are off (it now checks long-root arithmetic with pure string estimates and creates no long paths).
+  Long paths were not enabled and no genuine bound was relaxed.
+* Author checks are Linux-only (Python 3.11/3.12/3.13, FFmpeg 6.1.1); the Windows results above are the requester's. Baseline plan hash and colour behaviour unchanged.

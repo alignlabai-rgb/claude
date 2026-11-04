@@ -36,7 +36,7 @@ class Limits:
     max_source_bytes: int = 4 * 1024**3
     max_font_bytes: int = 32 * 1024**2
     max_argv_bytes: int = 100_000  # total UTF-8 bytes of all arguments (+1 each)
-    max_windows_cmdline_chars: int = 32_000  # list2cmdline length; enforced when running on Windows
+    max_windows_cmdline_chars: int = 32_000  # UTF-16 code units of the list2cmdline string; enforced on Windows (name kept for CLI compatibility)
     max_runtime_seconds: float = 600.0  # render wall clock
     probe_timeout_seconds: float = 30.0  # -version / -encoders / -filters
     inspect_timeout_seconds: float = 120.0  # ffprobe -count_frames
@@ -80,36 +80,60 @@ def is_windows() -> bool:
     return os.name == "nt"
 
 
-def cmdline_chars(argv: list) -> int:
-    """Length of the Windows command line Python would build for `argv` (list2cmdline).
+def utf16_units(text: str) -> int:
+    """Number of UTF-16 code units in `text`: BMP = 1, non-BMP = 2 (surrogate pair).
 
-    This is the exact string subprocess passes to CreateProcess on Windows, executable
-    included, so the count is meaningful as an interface bound on any platform.
+    Windows measures the CreateProcessW command line in UTF-16 code units, not in Python code
+    points and not in UTF-8 bytes. A lone surrogate (ill-formed text) counts as the single unit
+    CreateProcessW would receive for it, so measurement never raises.
     """
-    return len(subprocess.list2cmdline([str(a) for a in argv]))
+    return len(text) + sum(1 for ch in text if ord(ch) > 0xFFFF)
+
+
+def has_ill_formed_utf16(text: str) -> bool:
+    """True if `text` contains a surrogate code point. In a Python str a well-formed pair is stored
+    as one non-BMP code point, so any surrogate code point present is unpaired."""
+    return any(0xD800 <= ord(ch) <= 0xDFFF for ch in text)
+
+
+def cmdline_utf16_units(argv: list) -> int:
+    """UTF-16 code units of the Windows command line Python builds for `argv` (list2cmdline),
+    executable included. list2cmdline is the exact quoting subprocess applies on Windows, so the
+    count is meaningful as an interface bound on any platform."""
+    return utf16_units(subprocess.list2cmdline([str(a) for a in argv]))
+
+
+cmdline_chars = cmdline_utf16_units  # backward-compatible name; the unit is UTF-16 code units, not code points
 
 
 def argv_budget(argv: list) -> dict:
+    texts = [str(a) for a in argv]
     return {
-        "argv_bytes": sum(len(str(a).encode("utf-8")) + 1 for a in argv),
-        "windows_cmdline_chars": cmdline_chars(argv),
+        # UTF-8 bytes (+1 separator each); surrogatepass keeps the count total and conservative (3 bytes per lone surrogate)
+        "argv_bytes": sum(len(t.encode("utf-8", "surrogatepass")) + 1 for t in texts),
+        "windows_cmdline_utf16_units": cmdline_utf16_units(texts),
+        "ill_formed_utf16": any(has_ill_formed_utf16(t) for t in texts),
     }
 
 
 def check_argv_budget(argv: list, limits: Limits, *, windows: bool | None = None) -> dict:
     """Reject an argument list that is too large *before* launch. Returns the measured budget.
 
-    The byte bound applies everywhere. The Windows command-line bound is enforced when running
-    on Windows (or when `windows=True` is passed, e.g. by tests); on other platforms it is only
-    reported, so a plan can say whether it would fit on Windows.
+    * The UTF-8 byte bound applies on every platform.
+    * The Windows bound (UTF-16 code units of the list2cmdline string) and the ban on ill-formed
+      text (lone surrogates) are enforced when running on Windows or with `windows=True` (tests);
+      elsewhere they are only reported (`windows_cmdline_utf16_units`, `ill_formed_utf16`).
     """
     budget = argv_budget(argv)
     if budget["argv_bytes"] > limits.max_argv_bytes:
         raise ValidationFailed("ffmpeg argument list too large",
                                [Issue("limit_argv_bytes", "argv", f"ffmpeg arguments are {budget['argv_bytes']} bytes; limit is {limits.max_argv_bytes}")])
     win = is_windows() if windows is None else windows
-    if win and budget["windows_cmdline_chars"] > limits.max_windows_cmdline_chars:
+    if win and budget["ill_formed_utf16"]:
+        raise ValidationFailed("ill-formed text in command line",
+                               [Issue("argv_ill_formed_utf16", "argv", "an argument contains an unpaired surrogate; it cannot be passed to a Windows process as valid text")])
+    if win and budget["windows_cmdline_utf16_units"] > limits.max_windows_cmdline_chars:
         raise ValidationFailed("ffmpeg command line too long for Windows",
                                [Issue("limit_cmdline_windows", "argv",
-                                      f"command line is {budget['windows_cmdline_chars']} characters; Windows limit used is {limits.max_windows_cmdline_chars} (hard limit {WIN_CMDLINE_HARD_LIMIT})")])
+                                      f"command line is {budget['windows_cmdline_utf16_units']} UTF-16 code units; Windows limit used is {limits.max_windows_cmdline_chars} (hard limit {WIN_CMDLINE_HARD_LIMIT})")])
     return budget

@@ -248,7 +248,7 @@ class RenderFake(TmpCase):
     def test_receipt_records_the_argv_budget(self):
         self.tools()
         r = self.go()
-        self.assertEqual(set(r["argv_budget"]), {"argv_bytes", "windows_cmdline_chars"})
+        self.assertEqual(set(r["argv_budget"]), {"argv_bytes", "windows_cmdline_utf16_units", "ill_formed_utf16"})
         self.assertGreater(r["argv_budget"]["argv_bytes"], 500)
 
     def test_materialized_argv_too_long_for_windows_is_rejected_before_anything_is_created(self):
