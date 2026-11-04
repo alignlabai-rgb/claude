@@ -1,0 +1,697 @@
+{
+  "case": "PC03_unresolved_hold_and_selection",
+  "checks": [
+    {
+      "expected": {
+        "ev_x_missing": [
+          5,
+          "HOLD",
+          [
+            [
+              "SELECTED_UNRESOLVED",
+              "MISSING"
+            ]
+          ]
+        ],
+        "ev_x_proxy": [
+          5,
+          "HOLD",
+          [
+            [
+              "SELECTED_UNRESOLVED",
+              "PROXY"
+            ]
+          ]
+        ],
+        "ev_x_unknown": [
+          5,
+          "HOLD",
+          [
+            [
+              "SELECTED_UNRESOLVED",
+              "UNKNOWN"
+            ]
+          ]
+        ]
+      },
+      "key": "PC03_unresolved_hold_and_selection::selected MISSING/UNKNOWN/PROXY -> exit 5, HOLD, SELECTED_UNRESOLVED with the state",
+      "layer": "LIBRARY_ENFORCED",
+      "name": "selected MISSING/UNKNOWN/PROXY -> exit 5, HOLD, SELECTED_UNRESOLVED with the state",
+      "observed": {
+        "ev_x_missing": [
+          5,
+          "HOLD",
+          [
+            [
+              "SELECTED_UNRESOLVED",
+              "MISSING"
+            ]
+          ]
+        ],
+        "ev_x_proxy": [
+          5,
+          "HOLD",
+          [
+            [
+              "SELECTED_UNRESOLVED",
+              "PROXY"
+            ]
+          ]
+        ],
+        "ev_x_unknown": [
+          5,
+          "HOLD",
+          [
+            [
+              "SELECTED_UNRESOLVED",
+              "UNKNOWN"
+            ]
+          ]
+        ]
+      },
+      "outcome": "PASS"
+    },
+    {
+      "expected": [
+        0,
+        "READY",
+        [
+          [
+            "ev_x_missing",
+            false
+          ],
+          [
+            "ev_x_unknown",
+            false
+          ],
+          [
+            "ev_x_proxy",
+            false
+          ]
+        ],
+        {
+          "asset_a": true,
+          "asset_unselected": false
+        }
+      ],
+      "key": "PC03_unresolved_hold_and_selection::unselected MISSING/UNKNOWN/PROXY/unread-USE rows are excluded and reported",
+      "layer": "LIBRARY_ENFORCED",
+      "name": "unselected MISSING/UNKNOWN/PROXY/unread-USE rows are excluded and reported",
+      "observed": [
+        0,
+        "READY",
+        [
+          [
+            "ev_x_missing",
+            false
+          ],
+          [
+            "ev_x_unknown",
+            false
+          ],
+          [
+            "ev_x_proxy",
+            false
+          ]
+        ],
+        {
+          "asset_a": true,
+          "asset_unselected": false
+        }
+      ],
+      "outcome": "PASS"
+    },
+    {
+      "expected": [
+        0,
+        "READY"
+      ],
+      "key": "PC03_unresolved_hold_and_selection::unselected rows never take part in overlap analysis",
+      "layer": "LIBRARY_ENFORCED",
+      "name": "unselected rows never take part in overlap analysis",
+      "observed": [
+        0,
+        "READY"
+      ],
+      "outcome": "PASS"
+    },
+    {
+      "expected": [
+        1,
+        [
+          "event_range_invalid"
+        ]
+      ],
+      "key": "PC03_unresolved_hold_and_selection::OB-01: an unselected row must still be schema-valid",
+      "layer": "LIBRARY_ENFORCED",
+      "name": "OB-01: an unselected row must still be schema-valid",
+      "observed": [
+        1,
+        [
+          "event_range_invalid"
+        ]
+      ],
+      "outcome": "PASS"
+    },
+    {
+      "expected": {
+        "HOLD": [
+          1,
+          [
+            "invalid_enum"
+          ]
+        ],
+        "absent": [
+          1,
+          [
+            "missing_field"
+          ]
+        ],
+        "lowercase": [
+          1,
+          [
+            "invalid_enum"
+          ]
+        ],
+        "null": [
+          1,
+          [
+            "invalid_enum"
+          ]
+        ]
+      },
+      "key": "PC03_unresolved_hold_and_selection::NULL / absent / HOLD / lowercase states are rejected, never defaulted",
+      "layer": "LIBRARY_ENFORCED",
+      "name": "NULL / absent / HOLD / lowercase states are rejected, never defaulted",
+      "observed": {
+        "HOLD": [
+          1,
+          [
+            "invalid_enum"
+          ]
+        ],
+        "absent": [
+          1,
+          [
+            "missing_field"
+          ]
+        ],
+        "lowercase": [
+          1,
+          [
+            "invalid_enum"
+          ]
+        ],
+        "null": [
+          1,
+          [
+            "invalid_enum"
+          ]
+        ]
+      },
+      "outcome": "PASS"
+    },
+    {
+      "expected": {
+        "duplicate": [
+          1,
+          [
+            "scope_duplicate"
+          ]
+        ],
+        "empty": [
+          1,
+          [
+            "scope_empty"
+          ]
+        ],
+        "star": [
+          1,
+          [
+            "invalid_id"
+          ]
+        ],
+        "unknown_id": [
+          1,
+          [
+            "scope_unknown_event"
+          ]
+        ]
+      },
+      "key": "PC03_unresolved_hold_and_selection::scope is explicit: empty / unknown / duplicate / '*' rejected (no implicit all)",
+      "layer": "LIBRARY_ENFORCED",
+      "name": "scope is explicit: empty / unknown / duplicate / '*' rejected (no implicit all)",
+      "observed": {
+        "duplicate": [
+          1,
+          [
+            "scope_duplicate"
+          ]
+        ],
+        "empty": [
+          1,
+          [
+            "scope_empty"
+          ]
+        ],
+        "star": [
+          1,
+          [
+            "invalid_id"
+          ]
+        ],
+        "unknown_id": [
+          1,
+          [
+            "scope_unknown_event"
+          ]
+        ]
+      },
+      "outcome": "PASS"
+    },
+    {
+      "expected": {
+        "audio:HOLD": [
+          1,
+          [
+            "input_state_not_use"
+          ]
+        ],
+        "audio:MISSING": [
+          1,
+          [
+            "input_state_not_use"
+          ]
+        ],
+        "audio:None": [
+          1,
+          [
+            "invalid_enum"
+          ]
+        ],
+        "audio:PROXY": [
+          1,
+          [
+            "input_state_not_use"
+          ]
+        ],
+        "audio:UNKNOWN": [
+          1,
+          [
+            "input_state_not_use"
+          ]
+        ],
+        "video:HOLD": [
+          1,
+          [
+            "input_state_not_use"
+          ]
+        ],
+        "video:MISSING": [
+          1,
+          [
+            "input_state_not_use"
+          ]
+        ],
+        "video:None": [
+          1,
+          [
+            "invalid_enum"
+          ]
+        ],
+        "video:PROXY": [
+          1,
+          [
+            "input_state_not_use"
+          ]
+        ],
+        "video:UNKNOWN": [
+          1,
+          [
+            "input_state_not_use"
+          ]
+        ]
+      },
+      "key": "PC03_unresolved_hold_and_selection::avmux accepts only USE inputs; every other state is a rejection code (HOLD survives only as input_state_not_use)",
+      "layer": "LIBRARY_ENFORCED",
+      "name": "avmux accepts only USE inputs; every other state is a rejection code (HOLD survives only as input_state_not_use)",
+      "observed": {
+        "audio:HOLD": [
+          1,
+          [
+            "input_state_not_use"
+          ]
+        ],
+        "audio:MISSING": [
+          1,
+          [
+            "input_state_not_use"
+          ]
+        ],
+        "audio:None": [
+          1,
+          [
+            "invalid_enum"
+          ]
+        ],
+        "audio:PROXY": [
+          1,
+          [
+            "input_state_not_use"
+          ]
+        ],
+        "audio:UNKNOWN": [
+          1,
+          [
+            "input_state_not_use"
+          ]
+        ],
+        "video:HOLD": [
+          1,
+          [
+            "input_state_not_use"
+          ]
+        ],
+        "video:MISSING": [
+          1,
+          [
+            "input_state_not_use"
+          ]
+        ],
+        "video:None": [
+          1,
+          [
+            "invalid_enum"
+          ]
+        ],
+        "video:PROXY": [
+          1,
+          [
+            "input_state_not_use"
+          ]
+        ],
+        "video:UNKNOWN": [
+          1,
+          [
+            "input_state_not_use"
+          ]
+        ]
+      },
+      "outcome": "PASS"
+    },
+    {
+      "expected": {
+        "binding_ref_on_clip": [
+          1,
+          [
+            "unknown_field"
+          ]
+        ],
+        "null_source": [
+          1,
+          [
+            "type_error"
+          ]
+        ],
+        "state_on_clip": [
+          1,
+          [
+            "unknown_field"
+          ]
+        ]
+      },
+      "key": "PC03_unresolved_hold_and_selection::video-only cannot carry a state or binding ref (unknown_field) and refuses a null source",
+      "layer": "LIBRARY_ENFORCED",
+      "name": "video-only cannot carry a state or binding ref (unknown_field) and refuses a null source",
+      "observed": {
+        "binding_ref_on_clip": [
+          1,
+          [
+            "unknown_field"
+          ]
+        ],
+        "null_source": [
+          1,
+          [
+            "type_error"
+          ]
+        ],
+        "state_on_clip": [
+          1,
+          [
+            "unknown_field"
+          ]
+        ]
+      },
+      "outcome": "PASS"
+    },
+    {
+      "expected": [
+        0,
+        []
+      ],
+      "gap": "GAP-01",
+      "intended_contract_hint": "an unresolved/proxy selected input should stop the call before an episode exists",
+      "key": "PC03_unresolved_hold_and_selection::video-only accepts a proxy file (it cannot know)",
+      "layer": "LIBRARY_PERMISSIVE",
+      "name": "video-only accepts a proxy file (it cannot know)",
+      "observed": [
+        0,
+        []
+      ],
+      "outcome": "OBSERVED_OPEN_GAP"
+    },
+    {
+      "expected": [
+        0,
+        []
+      ],
+      "gap": "GAP-01",
+      "intended_contract_hint": "substituting unresolved input must not be silent",
+      "key": "PC03_unresolved_hold_and_selection::video-only accepts a colour stand-in for an unresolved clip",
+      "layer": "LIBRARY_PERMISSIVE",
+      "name": "video-only accepts a colour stand-in for an unresolved clip",
+      "observed": [
+        0,
+        []
+      ],
+      "outcome": "OBSERVED_OPEN_GAP"
+    }
+  ],
+  "elapsed_seconds": 2.937,
+  "gaps": [
+    "GAP-01"
+  ],
+  "invocations": [
+    {
+      "denied_attempts": 0,
+      "exit_code": 5,
+      "label": "audio plan, selected ev_x_missing",
+      "no": 22,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 5,
+      "label": "audio plan, selected ev_x_unknown",
+      "no": 23,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 5,
+      "label": "audio plan, selected ev_x_proxy",
+      "no": 24,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 0,
+      "label": "audio plan, subset only",
+      "no": 25,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 0,
+      "label": "audio plan, unselected rows overlapping the selected frames",
+      "no": 26,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 1,
+      "label": "audio plan, malformed UNSELECTED row",
+      "no": 27,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 1,
+      "label": "audio state null",
+      "no": 28,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 1,
+      "label": "audio state absent",
+      "no": 29,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 1,
+      "label": "audio state HOLD",
+      "no": 30,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 1,
+      "label": "audio state lowercase",
+      "no": 31,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 1,
+      "label": "audio scope empty",
+      "no": 32,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 1,
+      "label": "audio scope unknown_id",
+      "no": 33,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 1,
+      "label": "audio scope duplicate",
+      "no": 34,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 1,
+      "label": "audio scope star",
+      "no": 35,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 1,
+      "label": "avmux video state MISSING",
+      "no": 36,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 1,
+      "label": "avmux video state UNKNOWN",
+      "no": 37,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 1,
+      "label": "avmux video state PROXY",
+      "no": 38,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 1,
+      "label": "avmux video state HOLD",
+      "no": 39,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 1,
+      "label": "avmux video state None",
+      "no": 40,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 1,
+      "label": "avmux audio state MISSING",
+      "no": 41,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 1,
+      "label": "avmux audio state UNKNOWN",
+      "no": 42,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 1,
+      "label": "avmux audio state PROXY",
+      "no": 43,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 1,
+      "label": "avmux audio state HOLD",
+      "no": 44,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 1,
+      "label": "avmux audio state None",
+      "no": 45,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 1,
+      "label": "video state_on_clip",
+      "no": 46,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 1,
+      "label": "video binding_ref_on_clip",
+      "no": 47,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 1,
+      "label": "video null_source",
+      "no": 48,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 0,
+      "label": "video plan naming a proxy file",
+      "no": 49,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 0,
+      "label": "video plan with a colour stand-in for an unresolved clip",
+      "no": 50,
+      "status": "OK"
+    }
+  ],
+  "source_refs": [
+    "video_core/audiomix/plan.py:analyze",
+    "video_core/audiomix/manifest.py:STATES",
+    "video_core/avmux/manifest.py:_state"
+  ],
+  "status": "PASS",
+  "title": "Selected UNKNOWN/MISSING/PROXY stay HOLD; unselected unresolved rows are excluded; NULL/absent states are never defaulted"
+}

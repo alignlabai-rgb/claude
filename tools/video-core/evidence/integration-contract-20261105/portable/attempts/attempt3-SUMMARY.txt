@@ -1,0 +1,24 @@
+portable contract harness portable-contract-harness/1 on Python 3.13.18 (linux)
+library pin: PINNED_EXACT (package and all files byte-identical to the pin)
+cases: {"FAIL": 1, "PASS": 17}  children=422  wall=41.6s  exit=1
+check outcomes: {"CONTROL_FAILED": 3, "CONTROL_OK": 39, "GUARD_OK": 6, "OBSERVED_OPEN_GAP": 16, "PASS": 60}
+layers: {"CALLER_GUARD_DEMO": {"GUARD_OK": 6}, "HARNESS_CONTROL": {"CONTROL_FAILED": 3, "CONTROL_OK": 39}, "LIBRARY_ENFORCED": {"PASS": 60}, "LIBRARY_PERMISSIVE": {"OBSERVED_OPEN_GAP": 16}}
+mutation MU1_hold_to_ready: DETECTED (1 failing checks)
+mutation MU2_omitted_zero_fill_warning: DETECTED (3 failing checks)
+mutation MU3_wrong_boundary_rounding: DETECTED (3 failing checks)
+mutation MU4_attempted_external_launch: DETECTED (2 failing checks)
+mutation MU5_plan_creates_output_directory: DETECTED (3 failing checks)
+mutation MU7_gap_closed_receipt_required: NOT_DETECTED (0 failing checks)
+mutation MU6_srt_crlf: DETECTED (3 failing checks)
+CASE MS07_reviewed_profile_end_to_end: FAIL
+   CONTROL_FAILED: without a profile the closed gap is REVIEW_REQUIRED (case status REVIEW_REQUIRED, never PASS)
+      expected=["REVIEW_REQUIRED", 1]
+      observed=["FAIL", 0]
+   CONTROL_FAILED: with a reviewed profile whose source pin matches the copy: REVIEWED_CHANGE (case PASS_WITH_REVIEWED_CHANGES; neither a plain PASS nor FAIL)
+      expected=["PASS_WITH_REVIEWED_CHANGES", ["REVIEWED_CHANGE"]]
+      observed=["FAIL", []]
+   CONTROL_FAILED: with the same reviewed entries but a NON-matching source pin: ignored -> REVIEW_REQUIRED again
+      expected="REVIEW_REQUIRED"
+      observed="FAIL"
+FINDINGS: FAIL: at least one case failed; FAIL: a mutation was NOT detected: MU7_gap_closed_receipt_required
+REVIEW: none

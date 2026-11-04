@@ -1,0 +1,194 @@
+{
+  "mode": "plan",
+  "observations": {
+    "argv_budget": {
+      "basis": "estimate: known roots/tool path, else 260 characters each; render re-checks the real argv",
+      "estimated_argv_bytes": 1075,
+      "estimated_windows_cmdline_utf16_units": 1074,
+      "fits_windows_limit": true,
+      "ill_formed_utf16": false,
+      "windows_hard_limit_utf16_units": 32766,
+      "windows_limit_utf16_units": 32000
+    },
+    "assets": [],
+    "input": {
+      "episode_bytes": 439,
+      "episode_sha256": "a007554ef66b6acd97342174ba67bff0feef905db53d7beffe3587d83db8c83b"
+    },
+    "limits": {
+      "inspect_timeout_seconds": 120.0,
+      "max_argv_bytes": 100000,
+      "max_caption_chars": 512,
+      "max_captions": 512,
+      "max_clips": 256,
+      "max_diag_bytes": 16384,
+      "max_dimension": 7680,
+      "max_drain_bytes": 67108864,
+      "max_duration_seconds": 3600,
+      "max_font_bytes": 33554432,
+      "max_fps": 120,
+      "max_frames": 18000,
+      "max_input_bytes": 4194304,
+      "max_output_bytes": 2147483648,
+      "max_pixel_volume": 37324800000,
+      "max_runtime_seconds": 600.0,
+      "max_source_bytes": 4294967296,
+      "max_windows_cmdline_chars": 32000,
+      "probe_timeout_seconds": 30.0
+    },
+    "output": null,
+    "side_effects": "none (no files created, no process launched by plan)",
+    "tools_located": {
+      "ffmpeg": {
+        "discovery": "PATH",
+        "path": null
+      },
+      "ffprobe": {
+        "discovery": "PATH",
+        "path": null
+      }
+    }
+  },
+  "plan": {
+    "burn_in": null,
+    "captions": [
+      {
+        "end_frame": 60,
+        "end_seconds": "1001/500",
+        "id": "k1",
+        "srt_end": "00:00:02,002",
+        "srt_start": "00:00:01,001",
+        "start_frame": 30,
+        "start_seconds": "1001/1000",
+        "text": "ok"
+      }
+    ],
+    "clips": [
+      {
+        "duration_frames": 60,
+        "end_frame": 60,
+        "end_seconds": "1001/500",
+        "id": "c1",
+        "source": {
+          "kind": "color",
+          "value": "#30506a"
+        },
+        "start_frame": 0,
+        "start_seconds": "0/1"
+      }
+    ],
+    "episode": {
+      "canvas": {
+        "height": 180,
+        "width": 320
+      },
+      "duration_seconds": "1001/500",
+      "fps": {
+        "d": 1001,
+        "n": 30000,
+        "rational": "30000/1001"
+      },
+      "total_frames": 60
+    },
+    "expected_readback": {
+      "codec": "h264",
+      "duration_seconds": "1001/500",
+      "fps": "30000/1001",
+      "frames": 60,
+      "height": 180,
+      "pix_fmt": "yuv420p",
+      "streams": "1 video, 0 other",
+      "width": 320
+    },
+    "ffmpeg": {
+      "argv": [
+        "ffmpeg",
+        "-nostdin",
+        "-hide_banner",
+        "-loglevel",
+        "warning",
+        "-nostats",
+        "-n",
+        "-filter_complex",
+        "color=c=0x30506a:s=320x180:r=30000/1001,trim=end_frame=60,setpts=PTS-STARTPTS,scale=out_color_matrix=bt709:out_range=tv,setsar=1,format=yuv420p[v0];[v0]concat=n=1:v=1:a=0[vout]",
+        "-map",
+        "[vout]",
+        "-an",
+        "-sn",
+        "-dn",
+        "-c:v",
+        "libx264",
+        "-preset",
+        "medium",
+        "-crf",
+        "18",
+        "-pix_fmt",
+        "yuv420p",
+        "-fps_mode",
+        "cfr",
+        "-r",
+        "30000/1001",
+        "-frames:v",
+        "60",
+        "-colorspace",
+        "bt709",
+        "-color_primaries",
+        "bt709",
+        "-color_trc",
+        "bt709",
+        "-color_range",
+        "tv",
+        "-map_metadata",
+        "-1",
+        "-fflags",
+        "+bitexact",
+        "-flags:v",
+        "+bitexact",
+        "-movflags",
+        "+faststart",
+        "-fs",
+        "2147483648",
+        "-f",
+        "mp4",
+        {
+          "run_file": "output.mp4.partial"
+        }
+      ],
+      "cwd": "tmp",
+      "output": {
+        "final": "output.mp4",
+        "partial": "output.mp4.partial"
+      }
+    },
+    "outputs": {
+      "ffprobe": "ffprobe.json",
+      "plan": "plan.canonical.json",
+      "receipt": "receipt.json",
+      "srt": "captions.srt",
+      "video": "output.mp4"
+    },
+    "requirements": {
+      "demuxers": [],
+      "encoders": [
+        "libx264"
+      ],
+      "filters": [
+        "color",
+        "concat",
+        "format",
+        "scale",
+        "setpts",
+        "setsar",
+        "trim"
+      ]
+    },
+    "schema": "video_core.plan/1",
+    "srt": {
+      "bytes": 35,
+      "end_is_exclusive": true,
+      "file": "captions.srt",
+      "sha256": "3ed50660750cc0565258f773df159f149f6ce37854e0e0a0faa135faec06d975"
+    }
+  },
+  "plan_sha256": "fef7361ef24801b3dc478ad2153f12460682c0d0d5aca5234aa63294e3e173ea"
+}

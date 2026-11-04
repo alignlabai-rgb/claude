@@ -1,0 +1,1 @@
+Raw bounded stdout/stderr/status for the py3.13 default run, groups 'contract' and 'mechanism' only (186 invocations). The 247 invocations of groups 'mutation:*' and 'mechanism:ms07' are omitted for repository size; their outcomes are in run.json (mutation_controls) and cases/. Paths are normalised (stored_text_normalized=true); raw hashes are in each status.json.

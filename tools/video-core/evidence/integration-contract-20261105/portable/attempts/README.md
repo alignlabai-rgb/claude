@@ -1,0 +1,11 @@
+# Preserved failed first attempts (development of this harness; none is a library change)
+
+Files are the harness's own outputs from those runs (Linux, Python 3.13.18). Library behaviour was never altered to make a test pass.
+
+| # | Files | What failed | Cause | Correction |
+|---|---|---|---|---|
+| 0 | (console only, no result files) | `TypeError: Object of type bytes is not JSON serializable` while writing `cases/*.json` at the end of the first complete run | a mechanism check recorded a `bytes` value (`b"1"`) | `OutDir.write_json` now has a `default=` handler (bytes -> `{"__bytes_hex__": ...}`); also: results are written only after the run, so such a failure would lose them - the handler removes that class of failure |
+| 1 | `attempt1-SUMMARY.txt`, `attempt1-PC07.json` | `PC07` FAIL: output name `-x` expected `output_name_invalid`, observed `exit 2, []` | harness bug: argparse read the separate argument `-x` as an option and exited 2 before the library saw the name | the case now passes `--output-name=-x` (the `=` form), so the library's own name rule is what is tested |
+| 2 | `attempt2-SUMMARY.txt`, `attempt2-MS03.json`, `attempt2-run.json` | `MS03` CONTROL_FAILED: an 8 MiB stdout flood ended as status `OK` with 8 MiB read instead of `FLOOD_KILLED` | **real defect in my driver**: the flood check ran in a 50 ms polling loop; a fast flooder finished first, so the limit was not enforced | the *reader thread* kills the child the moment the limit is crossed, and the status is `FLOOD_KILLED` whenever the flood flag was set |
+| 3 | `attempt3-SUMMARY.txt`, `attempt3-MS07.json`, `attempt3-run.json` | `MU7_gap_closed_receipt_required` NOT_DETECTED and `MS07` CONTROL_FAILED: the case ended as ERROR instead of REVIEW_REQUIRED | harness robustness: when a candidate closes a gap (exit 1 + error JSON) expressions such as `r.json["plan"][...]` raised `KeyError`, aborting the case | open-gap observations are evaluated lazily (`ctx.observe`); a changed output shape is recorded as an observation error, which is `REVIEW_REQUIRED`, never a crash |
+| 4 | (not a failure) | the first stored stderr of the GAP-14 crash contained the absolute library path | the normaliser covered world/scratch/out only | `--normalize-stored-paths` also maps the library root to `<LIBRARY>`; all evidence in `results/` was regenerated after this change |

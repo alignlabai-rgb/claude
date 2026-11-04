@@ -1,0 +1,315 @@
+{
+  "bounds": {
+    "children_started": 454,
+    "flood_kill_bytes": 1048576,
+    "max_children": 700,
+    "per_child_timeout_s": 10.0,
+    "retained_per_child_bytes_max": 262144,
+    "serial": true,
+    "stream_cap_bytes": 131072,
+    "total_budget_s": 420.0
+  },
+  "check_outcomes": {
+    "CONTROL_OK": 42,
+    "GUARD_OK": 6,
+    "OBSERVED_OPEN_GAP": 16,
+    "PASS": 60
+  },
+  "claims": "Executed only on the machine that produced this file. Windows behaviour is claimed only if python.platform is 'win32' in this file.",
+  "driver_accounting": {
+    "children_started": 454,
+    "launches_by_group": {
+      "contract": 186,
+      "mechanism": 20,
+      "mechanism:ms07": 108,
+      "mutation:MU1_hold_to_ready": 29,
+      "mutation:MU2_omitted_zero_fill_warning": 7,
+      "mutation:MU3_wrong_boundary_rounding": 27,
+      "mutation:MU4_attempted_external_launch": 4,
+      "mutation:MU5_plan_creates_output_directory": 33,
+      "mutation:MU6_srt_crlf": 3,
+      "mutation:MU7_gap_closed_receipt_required": 36
+    },
+    "refused_before_launch": []
+  },
+  "exit_code": 0,
+  "findings": [],
+  "harness": "portable-contract-harness/1",
+  "harness_files_sha256": {
+    "child_runner.py": "5bafcd6332b6d43b470d72fa20f05cf552c64d5348bd02ca33409716915ae46c",
+    "portable_cases.py": "1aa3a93a2b2ad4670c96314f02df39eccb198ac6792e3482941b9786cf7d71ec",
+    "portable_core.py": "c54be59de6986eac29cc1ecbe687ca60f0f0a699137ef5565e87853854b57d5e",
+    "portable_harness.py": "645b3987aecc6ff1e016b939d58584ced8c06db17f198bafbc56f6b0b967d636",
+    "portable_selftest.py": "90d2939c796a0e39444c336f8b4f5e80c4e2a38076831eeb76ec125ed692e60c"
+  },
+  "inputs": {
+    "library_root_basename": "video-core",
+    "normalize_stored_paths": true,
+    "only": null,
+    "profile": "pinned_original_b4ca4a3.json",
+    "profile_sha256": "dd1f012742d88314346a3a00543ed8cd01c1c588cf43f442ad6ef38f2a5d24cc",
+    "strict": false
+  },
+  "mutation_controls": [
+    {
+      "cases": [
+        "PC03_unresolved_hold_and_selection"
+      ],
+      "detected_by": [
+        [
+          "PC03_unresolved_hold_and_selection",
+          "selected MISSING/UNKNOWN/PROXY -> exit 5, HOLD, SELECTED_UNRESOLVED with the state",
+          "FAIL"
+        ]
+      ],
+      "expected_outcome_class": "BAD (FAIL/ERROR/...)",
+      "failing_check_count": 1,
+      "file": "video_core/audiomix/plan.py",
+      "id": "MU1_hold_to_ready",
+      "means": "a selected UNKNOWN/MISSING/PROXY row no longer produces HOLD",
+      "mutated_case_statuses": {
+        "PC03_unresolved_hold_and_selection": "FAIL"
+      },
+      "mutated_copy_differs": true,
+      "status": "DETECTED"
+    },
+    {
+      "cases": [
+        "PC04_silence_omit_zero_fill_warnings"
+      ],
+      "detected_by": [
+        [
+          "PC04_silence_omit_zero_fill_warnings",
+          "zero-fill is reported: warning code and the exact filled gap",
+          "FAIL"
+        ],
+        [
+          "PC04_silence_omit_zero_fill_warnings",
+          "owner reading: any warning means HOLD",
+          "GUARD_MISMATCH"
+        ],
+        [
+          "PC04_silence_omit_zero_fill_warnings",
+          "no audio selected at all is warned about",
+          "FAIL"
+        ]
+      ],
+      "expected_outcome_class": "BAD (FAIL/ERROR/...)",
+      "failing_check_count": 3,
+      "file": "video_core/audiomix/plan.py",
+      "id": "MU2_omitted_zero_fill_warning",
+      "means": "ZERO_FILL_APPLIED is no longer reported",
+      "mutated_case_statuses": {
+        "PC04_silence_omit_zero_fill_warnings": "FAIL"
+      },
+      "mutated_copy_differs": true,
+      "status": "DETECTED"
+    },
+    {
+      "cases": [
+        "PC05_half_open_rational_boundaries"
+      ],
+      "detected_by": [
+        [
+          "PC05_half_open_rational_boundaries",
+          "every range: oracle samples accepted at exactly start..end, +-1 sample refused",
+          "FAIL"
+        ],
+        [
+          "PC05_half_open_rational_boundaries",
+          "total samples equal the exact-rational oracle for 8 rates incl. 10000 frames @ 30000/1001 = 16,016,000 (per-frame rounding would be 16,020,000)",
+          "FAIL"
+        ],
+        [
+          "PC05_half_open_rational_boundaries",
+          "case raised",
+          "ERROR"
+        ]
+      ],
+      "expected_outcome_class": "BAD (FAIL/ERROR/...)",
+      "failing_check_count": 3,
+      "file": "video_core/audiomix/plan.py",
+      "id": "MU3_wrong_boundary_rounding",
+      "means": "frame->sample boundaries floor instead of round-half-up",
+      "mutated_case_statuses": {
+        "PC05_half_open_rational_boundaries": "FAIL"
+      },
+      "mutated_copy_differs": true,
+      "status": "DETECTED"
+    },
+    {
+      "cases": [
+        "PC01_validation_vs_execution"
+      ],
+      "detected_by": [
+        [
+          "PC01_validation_vs_execution",
+          "[video plan] library attempted nothing forbidden (process/network/write/env)",
+          "FAIL"
+        ],
+        [
+          "PC01_validation_vs_execution",
+          "case raised",
+          "ERROR"
+        ]
+      ],
+      "expected_outcome_class": "BAD (FAIL/ERROR/...)",
+      "failing_check_count": 2,
+      "file": "video_core/tools.py",
+      "id": "MU4_attempted_external_launch",
+      "means": "a plan path tries to launch the located media tool (denied before any side effect by the hook)",
+      "mutated_case_statuses": {
+        "PC01_validation_vs_execution": "FAIL"
+      },
+      "mutated_copy_differs": true,
+      "status": "DETECTED"
+    },
+    {
+      "cases": [
+        "PC07_plan_hash_pins_output_namespace"
+      ],
+      "detected_by": [
+        [
+          "PC07_plan_hash_pins_output_namespace",
+          "[avmux plan, output fresh] library attempted nothing forbidden (process/network/write/env)",
+          "FAIL"
+        ],
+        [
+          "PC07_plan_hash_pins_output_namespace",
+          "[avmux plan, output case_twin] library attempted nothing forbidden (process/network/write/env)",
+          "FAIL"
+        ],
+        [
+          "PC07_plan_hash_pins_output_namespace",
+          "output namespace matrix for all three stages (case-twin expectation from a filesystem probe: case-insensitive=False)",
+          "FAIL"
+        ]
+      ],
+      "expected_outcome_class": "BAD (FAIL/ERROR/...)",
+      "failing_check_count": 3,
+      "file": "video_core/avmux/plan.py",
+      "id": "MU5_plan_creates_output_directory",
+      "means": "an avmux plan creates its output directory (denied by the hook before the mkdir)",
+      "mutated_case_statuses": {
+        "PC07_plan_hash_pins_output_namespace": "FAIL"
+      },
+      "mutated_copy_differs": true,
+      "status": "DETECTED"
+    },
+    {
+      "cases": [
+        "PC08_receipts_malformed_and_shallow"
+      ],
+      "detected_by": [
+        [
+          "PC08_receipts_malformed_and_shallow",
+          "no receipt: the stem is accepted by path+sha256 alone",
+          "REVIEW_REQUIRED"
+        ]
+      ],
+      "expected_outcome_class": [
+        "REVIEW_REQUIRED"
+      ],
+      "failing_check_count": 1,
+      "file": "video_core/avmux/plan.py",
+      "id": "MU7_gap_closed_receipt_required",
+      "means": "an OPEN GAP is closed in a candidate: it must surface as REVIEW_REQUIRED (not PASS, not auto-adopted)",
+      "mutated_case_statuses": {
+        "PC08_receipts_malformed_and_shallow": "REVIEW_REQUIRED"
+      },
+      "mutated_copy_differs": true,
+      "status": "DETECTED"
+    },
+    {
+      "cases": [
+        "PC06_srt_and_utf8_bytes"
+      ],
+      "detected_by": [
+        [
+          "PC06_srt_and_utf8_bytes",
+          "SRT bytes equal the independently assembled oracle (sha256 + length)",
+          "FAIL"
+        ],
+        [
+          "PC06_srt_and_utf8_bytes",
+          "no BOM, no CR byte, ends with one LF, valid UTF-8",
+          "FAIL"
+        ],
+        [
+          "PC06_srt_and_utf8_bytes",
+          "plan SRT section hashes the same bytes",
+          "FAIL"
+        ]
+      ],
+      "expected_outcome_class": "BAD (FAIL/ERROR/...)",
+      "failing_check_count": 3,
+      "file": "video_core/srt.py",
+      "id": "MU6_srt_crlf",
+      "means": "SRT cues use CRLF (a Windows newline-translation style defect)",
+      "mutated_case_statuses": {
+        "PC06_srt_and_utf8_bytes": "FAIL"
+      },
+      "mutated_copy_differs": true,
+      "status": "DETECTED"
+    }
+  ],
+  "python": {
+    "executable_basename": "python3.11",
+    "implementation": "cpython",
+    "os_name": "posix",
+    "platform": "linux",
+    "version": "3.11.18"
+  },
+  "reading_guide": {
+    "CONTROL_OK": "a harness mechanism control",
+    "GUARD_OK": "an illustrative owner-side guard (never a library result)",
+    "OBSERVED_OPEN_GAP": "LIBRARY_PERMISSIVE matched the pinned gap (the library accepted/omitted what an owner must guard): NOT a pass, NOT a fix",
+    "PASS": "LIBRARY_ENFORCED matched its independent expectation",
+    "REVIEWED_CHANGE": "differs from the default expectation but matches a reviewed profile entry",
+    "REVIEW_REQUIRED": "an open-gap observation changed: needs an explicit reviewed expectation in a profile with a matching source pin",
+    "SKIPPED": "not run, with the reason recorded"
+  },
+  "review_required": [],
+  "scratch_cleaned": true,
+  "source": {
+    "all_digest_eol": "012eea8a1399b643355dd70d39fdb01a19ba8d40402a26336d3da1b9ff500e3a",
+    "all_digest_raw": "012eea8a1399b643355dd70d39fdb01a19ba8d40402a26336d3da1b9ff500e3a",
+    "excluded": [
+      "evidence"
+    ],
+    "file_count": 90,
+    "package_digest_eol": "b417da80b9c7bf7efa9030a001505cff0e4ed8ec66e6b6aca335cb1bd8e52b99",
+    "package_digest_raw": "b417da80b9c7bf7efa9030a001505cff0e4ed8ec66e6b6aca335cb1bd8e52b99",
+    "package_file_count": 35,
+    "pin": {
+      "detail": "package and all files byte-identical to the pin",
+      "status": "PINNED_EXACT"
+    },
+    "profile_applicable": true,
+    "reviewed_expectations_ignored_for_pin_mismatch": [],
+    "skipped": [],
+    "unchanged_during_run": true
+  },
+  "started_utc": "2026-11-04T23:47:51Z",
+  "summary": {
+    "cases_by_status": {
+      "PASS": 18
+    },
+    "cases_total": 18,
+    "checks_by_layer_and_outcome": {
+      "CALLER_GUARD_DEMO": {
+        "GUARD_OK": 6
+      },
+      "HARNESS_CONTROL": {
+        "CONTROL_OK": 42
+      },
+      "LIBRARY_ENFORCED": {
+        "PASS": 60
+      },
+      "LIBRARY_PERMISSIVE": {
+        "OBSERVED_OPEN_GAP": 16
+      }
+    }
+  },
+  "wall_seconds": 39.74
+}

@@ -1,0 +1,244 @@
+{
+  "mode": "plan",
+  "observations": {
+    "assets_verified": {
+      "asset_a": {
+        "bytes": 12044,
+        "channels": 1,
+        "sample_count": 6000,
+        "sha256": "fa641090914cd7eb1838c839b5b3c854db91e9d559376c915f1fbbc3efd09f18"
+      }
+    },
+    "input": {
+      "manifest_bytes": 2051,
+      "manifest_sha256": "6f46b760bd17a56b11a2c0f68d5ad5babb03697c5fa2390300e01bd5c19e32ff"
+    },
+    "limits": {
+      "chunk_samples": 48000,
+      "max_assets": 256,
+      "max_concurrent": 8,
+      "max_events": 1024,
+      "max_frames": 18000,
+      "max_input_bytes": 4194304,
+      "max_mix_work": 200000000,
+      "max_output_samples": 28800000,
+      "max_runtime_seconds": 300.0,
+      "max_source_bytes": 536870912,
+      "max_total_source_bytes": 2147483648,
+      "max_wav_chunks": 64,
+      "max_wav_header_bytes": 4096
+    },
+    "output": null,
+    "side_effects": "none (no file created, no process launched)"
+  },
+  "plan": {
+    "assets": [
+      {
+        "bytes": 12044,
+        "channels": 1,
+        "id": "asset_a",
+        "path": "seg_a.wav",
+        "sample_count": 6000,
+        "sha256": "fa641090914cd7eb1838c839b5b3c854db91e9d559376c915f1fbbc3efd09f18",
+        "verified": true
+      },
+      {
+        "id": "asset_unselected",
+        "path": "seg_unselected.wav",
+        "reason": "not verified: no selected USE event is bound to it",
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "verified": false
+      }
+    ],
+    "caller_assertions": "source_id, role, decision_ref and provenance_ref are opaque caller assertions, preserved verbatim; they are not authenticated and are not evidence of human adoption or creative approval",
+    "coverage": {
+      "covered_samples": 1602,
+      "gap_count": 1,
+      "gaps": [
+        {
+          "sample_end": 3203,
+          "sample_start": 0
+        }
+      ],
+      "gaps_truncated": false
+    },
+    "events": [
+      {
+        "asset": "asset_a",
+        "channel_rule": "COPY",
+        "decision_ref": "owner-binding/synthetic-001",
+        "disposition": "MIX",
+        "end_frame": 3,
+        "gain": {
+          "den": 1,
+          "num": 1
+        },
+        "id": "ev_vo_1",
+        "role": "vo",
+        "sample_end": 4805,
+        "sample_start": 3203,
+        "samples": 1602,
+        "selected": true,
+        "source_id": "src_syn_1",
+        "source_in_sample": 0,
+        "source_out_sample": 1602,
+        "start_frame": 2,
+        "state": "USE"
+      },
+      {
+        "decision_ref": "owner-decision/silence-001",
+        "disposition": "NOT_SELECTED",
+        "end_frame": 2,
+        "id": "ev_sil_2",
+        "sample_end": 3203,
+        "sample_start": 1602,
+        "samples": 1601,
+        "selected": false,
+        "source_id": "src_syn_2",
+        "start_frame": 1,
+        "state": "INTENTIONAL_SILENCE"
+      },
+      {
+        "asset": "asset_a",
+        "decision_ref": "owner-binding/synthetic-003",
+        "disposition": "NOT_SELECTED",
+        "end_frame": 3,
+        "gain": {
+          "den": 1,
+          "num": 1
+        },
+        "id": "ev_vo_3",
+        "role": "vo",
+        "sample_end": 4805,
+        "sample_start": 3203,
+        "samples": 1602,
+        "selected": false,
+        "source_id": "src_syn_3",
+        "source_in_sample": 4000,
+        "source_out_sample": 5602,
+        "start_frame": 2,
+        "state": "USE"
+      },
+      {
+        "disposition": "UNRESOLVED_NOT_SELECTED",
+        "id": "ev_x_missing",
+        "selected": false,
+        "source_id": "src_syn_x1",
+        "state": "MISSING"
+      },
+      {
+        "disposition": "UNRESOLVED_NOT_SELECTED",
+        "id": "ev_x_unknown",
+        "selected": false,
+        "source_id": "src_syn_x2",
+        "state": "UNKNOWN"
+      },
+      {
+        "disposition": "UNRESOLVED_NOT_SELECTED",
+        "id": "ev_x_proxy",
+        "selected": false,
+        "source_id": "src_syn_x3",
+        "state": "PROXY"
+      },
+      {
+        "asset": "asset_unselected",
+        "disposition": "NOT_SELECTED",
+        "end_frame": 1,
+        "gain": {
+          "den": 1,
+          "num": 1
+        },
+        "id": "ev_x_use_unselected",
+        "sample_end": 1602,
+        "sample_start": 0,
+        "samples": 1602,
+        "selected": false,
+        "source_id": "src_syn_x4",
+        "source_in_sample": 0,
+        "source_out_sample": 1602,
+        "start_frame": 0,
+        "state": "USE"
+      }
+    ],
+    "hold": [
+      {
+        "code": "INCOMPLETE_SELECTED_INPUT",
+        "detail": "policy.gap is REQUIRE_FULL_COVERAGE but 1 gap(s) / 3203 sample(s) are not covered by selected USE or INTENTIONAL_SILENCE events",
+        "event_id": null,
+        "state": null
+      }
+    ],
+    "mix": {
+      "events": 1,
+      "peak_concurrent": 1,
+      "work_sample_channels": 1602
+    },
+    "mux_interface": {
+      "bits": 16,
+      "channels": 1,
+      "container": "RIFF/WAVE PCM",
+      "duration_samples": 4805,
+      "duration_seconds": "961/9600",
+      "note": "no mux is performed by this component; a later, separately validated mux stage may consume the stem",
+      "sample_rate": 48000,
+      "start_offset_samples": 0,
+      "stem": "stem.wav",
+      "timeline_fps": "30000/1001",
+      "timeline_frames": 3
+    },
+    "output": {
+      "bits": 16,
+      "bytes": 9654,
+      "channels": 1,
+      "file": "stem.wav",
+      "sample_rate": 48000,
+      "samples": 4805
+    },
+    "policy": {
+      "clipping": "REJECT",
+      "gain": "integer rational num/den; per-event sample = round-half-away-from-zero(sample*num/den); no automatic normalization",
+      "gap": "REQUIRE_FULL_COVERAGE",
+      "overlap": "REJECT",
+      "resampling": "none",
+      "stretching": "none"
+    },
+    "schema": "video_core.audio_plan/1",
+    "scope": [
+      "ev_vo_1"
+    ],
+    "status": "HOLD",
+    "timeline": {
+      "fps": {
+        "d": 1001,
+        "n": 30000,
+        "rational": "30000/1001"
+      },
+      "frame_to_sample": "floor((2*frame*fps_d*48000 + fps_n) / (2*fps_n)); exact integers, round half up, applied to each absolute boundary",
+      "total_frames": 3,
+      "total_samples": 4805
+    },
+    "unresolved": [
+      {
+        "event_id": "ev_x_missing",
+        "selected": false,
+        "source_id": "src_syn_x1",
+        "state": "MISSING"
+      },
+      {
+        "event_id": "ev_x_unknown",
+        "selected": false,
+        "source_id": "src_syn_x2",
+        "state": "UNKNOWN"
+      },
+      {
+        "event_id": "ev_x_proxy",
+        "selected": false,
+        "source_id": "src_syn_x3",
+        "state": "PROXY"
+      }
+    ],
+    "warnings": []
+  },
+  "plan_sha256": "01ff4cbf1c290e1de5f15ad6dbfd3959628f0349548b2f695cba572b96c84e8c",
+  "status": "HOLD"
+}

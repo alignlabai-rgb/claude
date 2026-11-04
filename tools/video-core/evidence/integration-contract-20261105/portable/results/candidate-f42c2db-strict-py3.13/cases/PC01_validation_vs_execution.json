@@ -1,0 +1,399 @@
+{
+  "case": "PC01_validation_vs_execution",
+  "checks": [
+    {
+      "expected": [
+        0,
+        true,
+        0,
+        1
+      ],
+      "key": "PC01_validation_vs_execution::video validate without --asset-root resolves no file: ok, 0 resolved, 1 unresolved",
+      "layer": "LIBRARY_ENFORCED",
+      "name": "video validate without --asset-root resolves no file: ok, 0 resolved, 1 unresolved",
+      "observed": [
+        0,
+        true,
+        0,
+        1
+      ],
+      "outcome": "PASS"
+    },
+    {
+      "expected": [
+        1,
+        [
+          "asset_missing"
+        ]
+      ],
+      "key": "PC01_validation_vs_execution::video validate with an asset root and the file absent is rejected",
+      "layer": "LIBRARY_ENFORCED",
+      "name": "video validate with an asset root and the file absent is rejected",
+      "observed": [
+        1,
+        [
+          "asset_missing"
+        ]
+      ],
+      "outcome": "PASS"
+    },
+    {
+      "expected": [
+        0,
+        1
+      ],
+      "key": "PC01_validation_vs_execution::video validate with the file present resolves it",
+      "layer": "LIBRARY_ENFORCED",
+      "name": "video validate with the file present resolves it",
+      "observed": [
+        0,
+        1
+      ],
+      "outcome": "PASS"
+    },
+    {
+      "expected": [
+        0,
+        "plan",
+        true
+      ],
+      "key": "PC01_validation_vs_execution::video plan reports itself side-effect free",
+      "layer": "LIBRARY_ENFORCED",
+      "name": "video plan reports itself side-effect free",
+      "observed": [
+        0,
+        "plan",
+        true
+      ],
+      "outcome": "PASS"
+    },
+    {
+      "expected": [
+        0,
+        "dry_run"
+      ],
+      "key": "PC01_validation_vs_execution::render without the explicit flag is a dry run",
+      "layer": "LIBRARY_ENFORCED",
+      "name": "render without the explicit flag is a dry run",
+      "observed": [
+        0,
+        "dry_run"
+      ],
+      "outcome": "PASS"
+    },
+    {
+      "expected": {
+        "assets": {
+          "clip_a.mp4": "85437991e3fe7d4d58c89ac39bd36eb92d43e3835cef5e07caf535a332d49fd5"
+        },
+        "docs": {
+          "ep.json": "3a3ff296f6e2c3863872800707670e057eacd359de1e6b291604ed19d1947377"
+        },
+        "out": {}
+      },
+      "key": "PC01_validation_vs_execution::plan/validate/dry-run paths created, changed and removed nothing",
+      "layer": "LIBRARY_ENFORCED",
+      "name": "plan/validate/dry-run paths created, changed and removed nothing",
+      "observed": {
+        "assets": {
+          "clip_a.mp4": "85437991e3fe7d4d58c89ac39bd36eb92d43e3835cef5e07caf535a332d49fd5"
+        },
+        "docs": {
+          "ep.json": "3a3ff296f6e2c3863872800707670e057eacd359de1e6b291604ed19d1947377"
+        },
+        "out": {}
+      },
+      "outcome": "PASS"
+    },
+    {
+      "expected": [
+        0,
+        true
+      ],
+      "key": "PC01_validation_vs_execution::audio validate reads no asset: ok with every asset file absent",
+      "layer": "LIBRARY_ENFORCED",
+      "name": "audio validate reads no asset: ok with every asset file absent",
+      "observed": [
+        0,
+        true
+      ],
+      "outcome": "PASS"
+    },
+    {
+      "expected": [
+        5,
+        "HOLD",
+        [
+          "ASSET_FILE_MISSING"
+        ]
+      ],
+      "key": "PC01_validation_vs_execution::audio plan with the selected asset absent is HOLD ASSET_FILE_MISSING (not a rejection, not silence)",
+      "layer": "LIBRARY_ENFORCED",
+      "name": "audio plan with the selected asset absent is HOLD ASSET_FILE_MISSING (not a rejection, not silence)",
+      "observed": [
+        5,
+        "HOLD",
+        [
+          "ASSET_FILE_MISSING"
+        ]
+      ],
+      "outcome": "PASS"
+    },
+    {
+      "expected": [
+        [
+          0,
+          true
+        ],
+        [
+          1,
+          [
+            "asset_sha256_mismatch"
+          ]
+        ]
+      ],
+      "key": "PC01_validation_vs_execution::same manifest: validate ok but plan rejects the changed source (sha256 pin)",
+      "layer": "LIBRARY_ENFORCED",
+      "name": "same manifest: validate ok but plan rejects the changed source (sha256 pin)",
+      "observed": [
+        [
+          0,
+          true
+        ],
+        [
+          1,
+          [
+            "asset_sha256_mismatch"
+          ]
+        ]
+      ],
+      "outcome": "PASS"
+    },
+    {
+      "expected": [
+        0,
+        "dry_run",
+        "READY"
+      ],
+      "key": "PC01_validation_vs_execution::mix without the explicit flag is a dry run on a READY plan",
+      "layer": "LIBRARY_ENFORCED",
+      "name": "mix without the explicit flag is a dry run on a READY plan",
+      "observed": [
+        0,
+        "dry_run",
+        "READY"
+      ],
+      "outcome": "PASS"
+    },
+    {
+      "expected": {
+        "assets": {
+          "seg_a.wav": "fa641090914cd7eb1838c839b5b3c854db91e9d559376c915f1fbbc3efd09f18"
+        },
+        "docs": {
+          "am.json": "8a42004d3a780d119a3913b4be28378a954b1514c9cbea4ced6205712c499ca0"
+        },
+        "out": {}
+      },
+      "key": "PC01_validation_vs_execution::plan/validate/dry-run paths created, changed and removed nothing",
+      "layer": "LIBRARY_ENFORCED",
+      "name": "plan/validate/dry-run paths created, changed and removed nothing",
+      "observed": {
+        "assets": {
+          "seg_a.wav": "fa641090914cd7eb1838c839b5b3c854db91e9d559376c915f1fbbc3efd09f18"
+        },
+        "docs": {
+          "am.json": "8a42004d3a780d119a3913b4be28378a954b1514c9cbea4ced6205712c499ca0"
+        },
+        "out": {}
+      },
+      "outcome": "PASS"
+    },
+    {
+      "expected": [
+        0,
+        true
+      ],
+      "key": "PC01_validation_vs_execution::avmux validate reads nothing but the manifest",
+      "layer": "LIBRARY_ENFORCED",
+      "name": "avmux validate reads nothing but the manifest",
+      "observed": [
+        0,
+        true
+      ],
+      "outcome": "PASS"
+    },
+    {
+      "expected": [
+        1,
+        [
+          "asset_missing"
+        ]
+      ],
+      "key": "PC01_validation_vs_execution::avmux plan with files absent is a rejection",
+      "layer": "LIBRARY_ENFORCED",
+      "name": "avmux plan with files absent is a rejection",
+      "observed": [
+        1,
+        [
+          "asset_missing"
+        ]
+      ],
+      "outcome": "PASS"
+    },
+    {
+      "expected": [
+        0,
+        "dry_run"
+      ],
+      "key": "PC01_validation_vs_execution::mux without the explicit flag is a dry run",
+      "layer": "LIBRARY_ENFORCED",
+      "name": "mux without the explicit flag is a dry run",
+      "observed": [
+        0,
+        "dry_run"
+      ],
+      "outcome": "PASS"
+    },
+    {
+      "expected": {
+        "assets": {
+          "audio_receipt.json": "fbc5e0ecd250e782e77f3d479f426196cc342fbbfa0e157cb0cc71eeb27f095e",
+          "clip_a.mp4": "85437991e3fe7d4d58c89ac39bd36eb92d43e3835cef5e07caf535a332d49fd5",
+          "clip_a_v2.mp4": "16e742689cecbbaecf77e82c22400d75f32e7f202a74640c90e47b9899f84850",
+          "proxy_clip_a.mp4": "863b2efee8caf7fbb08a03c7f661505f79295759cdd59f9f2ae794c774350f44",
+          "seg_a.wav": "fa641090914cd7eb1838c839b5b3c854db91e9d559376c915f1fbbc3efd09f18",
+          "stem.wav": "786149c43e22082b5877d64b72a9bb1eb8bd1c62b76d5c33c8fe97001edf643f",
+          "stem_silent.wav": "5923df918b3aba312a2ffd22eb1da9032dbe4dd1ba06b29432dda3acc2c6e9e2",
+          "video_ok.mp4": "8f2d3620c5bd5b75955f8985b09621d6a8d01bc8588ab92c7a5c122cd75dc642"
+        },
+        "docs": {
+          "av.json": "06d66ffedbf7446f83816f20f441083eed2abe1a994d638b641a76020d78d8b8"
+        },
+        "out": {}
+      },
+      "key": "PC01_validation_vs_execution::plan/validate/dry-run paths created, changed and removed nothing",
+      "layer": "LIBRARY_ENFORCED",
+      "name": "plan/validate/dry-run paths created, changed and removed nothing",
+      "observed": {
+        "assets": {
+          "audio_receipt.json": "fbc5e0ecd250e782e77f3d479f426196cc342fbbfa0e157cb0cc71eeb27f095e",
+          "clip_a.mp4": "85437991e3fe7d4d58c89ac39bd36eb92d43e3835cef5e07caf535a332d49fd5",
+          "clip_a_v2.mp4": "16e742689cecbbaecf77e82c22400d75f32e7f202a74640c90e47b9899f84850",
+          "proxy_clip_a.mp4": "863b2efee8caf7fbb08a03c7f661505f79295759cdd59f9f2ae794c774350f44",
+          "seg_a.wav": "fa641090914cd7eb1838c839b5b3c854db91e9d559376c915f1fbbc3efd09f18",
+          "stem.wav": "786149c43e22082b5877d64b72a9bb1eb8bd1c62b76d5c33c8fe97001edf643f",
+          "stem_silent.wav": "5923df918b3aba312a2ffd22eb1da9032dbe4dd1ba06b29432dda3acc2c6e9e2",
+          "video_ok.mp4": "8f2d3620c5bd5b75955f8985b09621d6a8d01bc8588ab92c7a5c122cd75dc642"
+        },
+        "docs": {
+          "av.json": "06d66ffedbf7446f83816f20f441083eed2abe1a994d638b641a76020d78d8b8"
+        },
+        "out": {}
+      },
+      "outcome": "PASS"
+    }
+  ],
+  "elapsed_seconds": 1.314,
+  "gaps": [],
+  "invocations": [
+    {
+      "denied_attempts": 0,
+      "exit_code": 0,
+      "label": "video validate, no asset root",
+      "no": 1,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 1,
+      "label": "video validate, asset root, file absent",
+      "no": 2,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 0,
+      "label": "video validate, file present",
+      "no": 3,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 0,
+      "label": "video plan",
+      "no": 4,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 0,
+      "label": "video render WITHOUT --render",
+      "no": 5,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 0,
+      "label": "audio validate, no asset files at all",
+      "no": 6,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 5,
+      "label": "audio plan, asset files absent",
+      "no": 7,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 0,
+      "label": "audio validate, wrong bytes present",
+      "no": 8,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 1,
+      "label": "audio plan, wrong bytes present",
+      "no": 9,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 0,
+      "label": "audio mix WITHOUT --mix",
+      "no": 10,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 0,
+      "label": "avmux validate, no files at all",
+      "no": 11,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 1,
+      "label": "avmux plan, files absent",
+      "no": 12,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 0,
+      "label": "avmux mux WITHOUT --mux",
+      "no": 13,
+      "status": "OK"
+    }
+  ],
+  "source_refs": [
+    "video_core/cli.py:_cmd_validate",
+    "video_core/audiomix/cli.py:_cmd_validate",
+    "video_core/avmux/cli.py:_cmd_validate"
+  ],
+  "status": "PASS",
+  "title": "validate reads no media; plan checks what it can read; dry-runs (no execution flag) create nothing"
+}
