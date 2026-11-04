@@ -268,27 +268,38 @@ class SourceProtection(World):
 
 
 class AudioReceiptQualification(World):
+    """The qualifying receipt is a genuine one written by the real audio mixer (tests/receipt_fixtures.py); each case changes one thing in it.
+    The adversarial/inconsistent receipt matrix lives in tests/test_input_contract.py."""
+
+    def setUp(self):
+        super().setUp()
+        from tests.receipt_fixtures import genuine_receipt
+        self.wav, self.genuine = genuine_receipt(self.mkdir("receipt-work"))
+        write(os.path.join(self.assets, "stem.wav"), self.wav)
+
     def receipt(self, **over):
-        rec = {"status": "MIXED_VERIFIED", "plan_sha256": "ab" * 32, "outputs": [{"role": "stem", "name": "stem.wav", "sha256": sha(self.wav)}],
-               "readback": {"wav": {"sample_count": 4800}}}
+        rec = json.loads(json.dumps(self.genuine))
         rec.update(over)
         data = json.dumps(rec).encode()
         write(os.path.join(self.assets, "audio-receipt.json"), data)
         return {"path": "audio-receipt.json", "sha256": sha(data)}
 
     def doc(self, ref):
-        return mut(lambda d: d["audio"].update(receipt=ref))
+        return mut(lambda d: d["audio"].update(receipt=ref), av_manifest(wav=self.wav))
 
     def test_a_verified_audio_receipt_qualifies_the_stem(self):
         c = self.plan(self.doc(self.receipt())).canonical["audio"]["receipt"]
-        self.assertEqual((c["status"], c["plan_sha256"]), ("MIXED_VERIFIED", "ab" * 32))
+        self.assertEqual((c["status"], c["plan_sha256"]), ("MIXED_VERIFIED", self.genuine["plan_sha256"]))
 
     def test_unverified_clamped_rejected_or_mismatching_receipts_are_refused(self):
         for status in ("MIXED_WITH_CLAMPING", "CLIPPING_REJECTED", "HOLD", "UNKNOWN", "TIMEOUT", "CANCELLED", "READBACK_MISMATCH", "IN_PROGRESS"):
             self.assertEqual(rejected(lambda: self.plan(self.doc(self.receipt(status=status)))), {"audio_receipt_not_verified"}, status)
-        self.assertEqual(rejected(lambda: self.plan(self.doc(self.receipt(outputs=[{"role": "stem", "sha256": "0" * 64}])))), {"audio_receipt_stem_mismatch"})
+        other = [dict(o, sha256="0" * 64) if o["role"] == "stem" else o for o in self.genuine["outputs"]]
+        self.assertEqual(rejected(lambda: self.plan(self.doc(self.receipt(outputs=other)))), {"audio_receipt_stem_mismatch"})
         self.assertEqual(rejected(lambda: self.plan(self.doc(self.receipt(outputs=[])))), {"audio_receipt_stem_mismatch"})
-        self.assertEqual(rejected(lambda: self.plan(self.doc(self.receipt(readback={"wav": {"sample_count": 4799}})))), {"audio_receipt_sample_mismatch"})
+        short = json.loads(json.dumps(self.genuine["readback"]))
+        short["wav"]["sample_count"] = 4799
+        self.assertEqual(rejected(lambda: self.plan(self.doc(self.receipt(readback=short)))), {"audio_receipt_sample_mismatch"})
         ref = self.receipt()
         ref["sha256"] = "1" * 64
         self.assertEqual(rejected(lambda: self.plan(self.doc(ref))), {"audio_receipt_sha256_mismatch"})

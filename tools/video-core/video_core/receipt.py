@@ -46,7 +46,18 @@ def platform_facts() -> dict:
 
 
 def dumps(obj) -> bytes:
-    return (json.dumps(obj, indent=2, ensure_ascii=False, sort_keys=True) + "\n").encode("utf-8")
+    """Serialize a receipt or a CLI diagnostic document as UTF-8 JSON.
+
+    Text that UTF-8 can encode is written literally, byte-for-byte as before (Japanese stays Japanese). A string that cannot be encoded
+    (a lone surrogate, e.g. from a JSON key written as "\\ud800" or from a POSIX name carrying a raw non-UTF-8 byte decoded with
+    surrogateescape) is written as the JSON escape for that exact code point, so the document stays valid JSON, a JSON decode returns
+    the identical str, nothing is replaced or normalised, and reporting an error can never itself raise UnicodeEncodeError and strand
+    a run.
+
+    This helper is for receipts and diagnostics only. Canonical plan bytes (the hashed `canonical_bytes` functions) deliberately keep
+    their strict UTF-8 encoding: a plan that cannot be encoded exactly must fail, never be escaped into a different hash.
+    """
+    return (json.dumps(obj, indent=2, ensure_ascii=False, sort_keys=True) + "\n").encode("utf-8", "backslashreplace")
 
 
 def write_new(path: str, data: bytes) -> None:

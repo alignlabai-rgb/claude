@@ -109,7 +109,11 @@ def analyze(m: AudioManifest, limits: AudioLimits) -> dict:  # noqa: C901
         if e.start_frame is not None:
             info["s0"] = frame_to_sample(e.start_frame, m.fps_n, m.fps_d)
             info["s1"] = frame_to_sample(e.end_frame, m.fps_n, m.fps_d)
-            if info["s1"] <= info["s0"]:
+            # Only an event that is actually consumed (or that decides HOLD) needs a non-empty span. At frame rates above 48 kHz a
+            # one-frame range can legitimately span zero samples; AUDIO_SPEC says unselected events are never verified and never block a
+            # valid selected scope, and OMIT consumes nothing. Selected USE / INTENTIONAL_SILENCE (and selected unresolved) events
+            # with an empty span are still rejected, exactly as before.
+            if info["s1"] <= info["s0"] and sel and e.state != "OMIT":
                 _reject("event_zero_samples", f"/events/{idx}", "event spans less than one sample at this frame rate")
         if e.state in UNRESOLVED:
             info["disposition"] = "UNRESOLVED_SELECTED" if sel else "UNRESOLVED_NOT_SELECTED"

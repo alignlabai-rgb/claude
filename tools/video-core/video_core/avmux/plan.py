@@ -19,12 +19,14 @@ from fractions import Fraction
 from ..audiomix import wav
 from ..audiomix.limits import AudioLimits
 from ..audiomix.plan import frame_to_sample
+from ..episode import parse_json_bytes
 from ..errors import Issue, UnsafePath, ValidationFailed
 from ..limits import WIN_CMDLINE_HARD_LIMIT, Limits, check_argv_budget
 from ..paths import check_output_location, resolve_asset
 from ..plan import estimate_argv
 from ..tools import locate, sha256_file
 from .manifest import VIDEO_EXT, AvManifest, load_manifest
+from .receipt_check import qualify_audio_receipt
 
 PLAN_SCHEMA = "video_core.avmux_plan/1"
 AAC_FRAME_SAMPLES = 1024
@@ -92,25 +94,22 @@ class AvPlan:
         return {"mode": "plan", "plan_sha256": self.sha256, "readiness": self.canonical["readiness"], "plan": self.canonical, "observations": self.observations}
 
 
-def _check_audio_receipt(m: AvManifest, asset_root: str, limits: Limits) -> dict:
+def _check_audio_receipt(m: AvManifest, asset_root: str, limits: Limits, *, stem_bytes: int, stem_channels: int) -> dict:
+    """Read the pinned receipt with the strict JSON loader and qualify it mechanically (see receipt_check). Unauthenticated: the file is
+    pinned by the SHA-256 in the same manifest, which proves which bytes were read and nothing about who wrote or approved them."""
     rf = resolve_asset(asset_root, m.receipt_path, ptr="/audio/receipt/path", allowed_ext=(".json",), max_bytes=limits.max_input_bytes)
     actual = sha256_file(rf.abspath, limits.max_input_bytes)
     if actual != m.receipt_sha256:
         _reject("audio_receipt_sha256_mismatch", "/audio/receipt/sha256", f"receipt sha256 {m.receipt_sha256} but the file hashes to {actual}")
+    with open(rf.abspath, "rb") as fh:
+        raw = fh.read(limits.max_input_bytes + 1)
     try:
-        with open(rf.abspath, "rb") as fh:
-            rec = json.loads(fh.read(limits.max_input_bytes + 1).decode("utf-8"))
-    except (ValueError, UnicodeDecodeError):
-        _reject("audio_receipt_unreadable", "/audio/receipt/path", "audio receipt is not valid JSON")
-    if rec.get("status") != "MIXED_VERIFIED":
-        _reject("audio_receipt_not_verified", "/audio/receipt", f"audio receipt status is {rec.get('status')!r}; only MIXED_VERIFIED qualifies a stem (HOLD, clamped, rejected or unknown stems are refused)")
-    stem = [o for o in rec.get("outputs", []) if o.get("role") == "stem"]
-    if len(stem) != 1 or stem[0].get("sha256") != m.audio_sha256:
-        _reject("audio_receipt_stem_mismatch", "/audio/receipt", "the receipt does not describe a stem with this audio sha256")
-    count = (rec.get("readback") or {}).get("wav", {}).get("sample_count")
-    if count != m.audio_samples:
-        _reject("audio_receipt_sample_mismatch", "/audio/receipt", f"receipt says {count} samples, manifest declares {m.audio_samples}")
-    return {"path": m.receipt_path, "sha256": actual, "status": rec["status"], "plan_sha256": rec.get("plan_sha256")}
+        rec = parse_json_bytes(raw, limits)  # duplicate keys, NaN/Infinity, BOM, bad UTF-8, runaway nesting, huge integers -> ValidationFailed
+    except ValidationFailed as exc:
+        why = exc.issues[0].code if exc.issues else "json_invalid"
+        _reject("audio_receipt_unreadable", "/audio/receipt/path", f"audio receipt is not strict JSON ({why})")
+    facts = qualify_audio_receipt(rec, stem_sha256=m.audio_sha256, stem_bytes=stem_bytes, samples=m.audio_samples, channels=stem_channels)
+    return {"path": m.receipt_path, "sha256": actual, **facts}
 
 
 def prepare_plan(manifest_bytes: bytes, *, limits: Limits = Limits(), asset_root: str | None = None, output_root: str | None = None,
@@ -143,7 +142,7 @@ def prepare_plan(manifest_bytes: bytes, *, limits: Limits = Limits(), asset_root
         _reject("audio_channels_mismatch", "/audio/declared/channels", f"declared {m.audio_channels} channel(s) but the WAV has {info.channels}")
     if info.sample_count != m.audio_samples:
         _reject("audio_sample_count_mismatch", "/audio/declared/sample_count", f"declared {m.audio_samples} samples but the WAV really has {info.sample_count}")
-    receipt = _check_audio_receipt(m, asset_root, limits) if m.receipt_path else None
+    receipt = _check_audio_receipt(m, asset_root, limits, stem_bytes=af.size, stem_channels=info.channels) if m.receipt_path else None
     pcm_hash = pcm_sha256(af.abspath, info)
 
     location = None

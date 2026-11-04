@@ -1,0 +1,26 @@
+# python3.11, ADV_STRICT=1, audit commit 47d9c061 test files against this branch's video_core (audit files copied, unmodified)
+test_control_a_receipt_written_by_the_real_audio_mixer_is_accepted (test_adv_lane1_parsers.AudioReceiptInput.test_control_a_receipt_written_by_the_real_audio_mixer_is_accepted)
+The stem is a < 10 KB synthetic fixture written to this test's temp dir by the mixer API and deleted with it. ... ok
+test_inconsistent_or_schema_less_receipts_do_not_qualify_a_stem (test_adv_lane1_parsers.AudioReceiptInput.test_inconsistent_or_schema_less_receipts_do_not_qualify_a_stem) ... ok
+test_malformed_receipt_content_is_a_typed_rejection (test_adv_lane1_parsers.AudioReceiptInput.test_malformed_receipt_content_is_a_typed_rejection) ... ERROR
+test_cli_error_output_survives_a_lone_surrogate_in_a_rejected_input (test_adv_lane1_parsers.ParserDefects.test_cli_error_output_survives_a_lone_surrogate_in_a_rejected_input)
+A JSON key written as "\ud800" is a lone surrogate. The unknown-field issue embeds it in `path`; the CLI then fails to encode ... ok
+test_zero_sample_range_of_unselected_or_omitted_event_must_not_reject_the_manifest (test_adv_lane1_parsers.ParserDefects.test_zero_sample_range_of_unselected_or_omitted_event_must_not_reject_the_manifest)
+AUDIO_SPEC: unselected events are never verified and never block a valid selected scope; OMIT consumes nothing. ... ok
+test_caller_chosen_root_with_a_non_utf8_byte_never_strands_an_in_progress_receipt (test_adv_lane4_exec.NonUtf8Roots.test_caller_chosen_root_with_a_non_utf8_byte_never_strands_an_in_progress_receipt)
+A directory name containing byte 0xE9 is legal on Linux (Python decodes it with surrogateescape). Receipts embed argv paths and are ... ok
+
+======================================================================
+ERROR: test_malformed_receipt_content_is_a_typed_rejection (test_adv_lane1_parsers.AudioReceiptInput.test_malformed_receipt_content_is_a_typed_rejection)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>/mine/tools/video-core/evidence/adversarial-review-20261105/test_adv_lane1_parsers.py", line 659, in test_malformed_receipt_content_is_a_typed_rejection
+    self.harness_check(self._plan(json.dumps(self.good).encode()) == "ACCEPTED", "control: the minimal well-formed receipt must plan")
+  File "<scratch>/mine/tools/video-core/evidence/adversarial-review-20261105/adv_support.py", line 170, in harness_check
+    raise HarnessError(msg)
+adv_support.HarnessError: control: the minimal well-formed receipt must plan
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.324s
+
+FAILED (errors=1)

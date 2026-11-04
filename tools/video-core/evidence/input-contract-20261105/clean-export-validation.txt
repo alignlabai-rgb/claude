@@ -1,0 +1,19 @@
+Clean-export validation of the exact staged tree (before the commit that adds this note)
+=======================================================================================
+tree aae52b239b2c8efbe427e6bd7b7c5383142f08ce  (git write-tree of the index; `git archive <tree> tools/video-core` into an empty directory, no __pycache__,
+PYTHONDONTWRITEBYTECODE=1, suites run one at a time, nothing else running)
+
+full suite, unchanged discovery (python -m unittest discover -s tests -t .), 587 tests each:
+  python3.12  : OK, 587 run, 578 pass, 9 skipped, 0 fail
+  python3.11  : OK, 587 run, 578 pass, 9 skipped, 0 fail
+  python3.13  : run 1 FAILED (1 failure), run 2 FAILED (same 1 failure), run 3 OK (578 pass, 9 skipped, 0 fail)
+                the one failing test both times: tests.test_containment.ParentHandshakeWithStubWorker.test_every_kind_of_bad_hello_is_refused_and_no_go_is_ever_sent
+                ('hello_unreadable' observed where 'hello_too_large' expected)
+repro_contract.py in the export (python3.13): 0 tracebacks, 0 leaks, same results as after.python3.13.json.
+
+About the one failing containment test (not touched by this change; containment/ belongs to the other implementation session):
+  the test's stub worker creates hello.json with open(path, "w") and then writes 200000 bytes; the parent polls os.path.exists() and may read the file
+  while it is still empty or partial -> JSON decode error -> 'hello_unreadable'. That is a scheduling race in the stub/handshake, independent of this change.
+  Evidence it is pre-existing: the unmodified base f42c2db exported the same way failed it 3 times in 25 isolated runs while 4 busy-loop processes
+  loaded the 4 CPUs (22 pass / 3 fail), and passed 20/20 isolated runs on an idle machine, both on the base and on this tree.
+  The same suite passed on py3.13 in the working tree and in the third export run. It is reported, not hidden and not "fixed" here.

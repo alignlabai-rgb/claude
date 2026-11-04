@@ -110,14 +110,38 @@ class ResolvedFile:
     ext: str
 
 
+def _utf8_encodable(text: str) -> bool:
+    try:
+        text.encode("utf-8")
+    except UnicodeEncodeError:
+        return False
+    return True
+
+
+def _root_not_utf8(what: str) -> UnsafePath:
+    msg = (f"{what} contains a name that cannot be represented as UTF-8 (for example a raw non-UTF-8 byte in a POSIX directory name); "
+           "plans and receipts are UTF-8 documents, so such a root is refused before anything is created. Use a UTF-8 directory name")
+    return UnsafePath(msg, [Issue("root_invalid", what, msg)])
+
+
 def real_directory(path: str, what: str) -> str:
-    """Caller-chosen root: must be an existing directory. Returns its realpath."""
+    """Caller-chosen root: must be an existing directory. Returns its realpath.
+
+    The path (as given and after resolution, so a symlinked parent counts too) must be encodable as UTF-8: every plan and receipt is a UTF-8
+    document that carries these roots, and a name that cannot be encoded (a raw byte such as 0xE9 in a POSIX name decodes to a lone
+    surrogate) would otherwise only fail late, after files exist. Valid non-ASCII names such as Japanese ones are unaffected. The
+    rejection message never echoes the offending text.
+    """
     if not isinstance(path, str) or not path or "\x00" in path:
         raise UnsafePath(f"{what} is not a usable path", [Issue("root_invalid", what, f"{what} is not a usable path")])
+    if not _utf8_encodable(path):
+        raise _root_not_utf8(what)
     try:
         real = os.path.realpath(os.path.abspath(path), strict=True)
     except (OSError, ValueError):
         raise UnsafePath(f"{what} does not exist", [Issue("root_missing", what, f"{what} does not exist")]) from None
+    if not _utf8_encodable(real):
+        raise _root_not_utf8(what)
     if not os.path.isdir(real):
         raise UnsafePath(f"{what} is not a directory", [Issue("root_not_directory", what, f"{what} is not a directory")])
     return real
