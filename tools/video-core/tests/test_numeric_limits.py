@@ -13,6 +13,7 @@ import unittest
 from tests.audio_fixtures import asset, dumps, event_use, manifest, tone, wav_bytes, write
 from tests.helpers import EXAMPLE_EPISODE, POSIX, ROOT, TmpCase, fake_calls, make_fake_tools, no_process, tree_snapshot
 from video_core import Limits, numeric, runner
+from video_core.containment import ResourceEnvelope, run_contained
 from video_core.audiomix.limits import AudioLimits
 
 NAN, INF = float("nan"), float("inf")
@@ -224,3 +225,161 @@ class Cli(TmpCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+# ---------------------------------------------------------------------------------------------------------------------------------------------------------------
+# Huge integers (found by independent Windows testing): finite_seconds('probe', 10**400) raised OverflowError because the ERROR MESSAGE formatted the raw int with
+# `{value:g}` (int -> float conversion); positive_int/non_negative_int raised a misleading digit-limit ValueError for ints with more than 4300 digits.
+# Contract: every rejection is a plain ValueError with a short, bounded message, raised before anything is created or launched.
+# ---------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+HUGE = [10**400, -(10**400), 10**4300, 10**4301, 10**5000, -(10**5000), 2**64, -(2**64), 2**63, 2**1024, 2**1030]
+
+
+def raised(fn):
+    try:
+        fn()
+    except BaseException as exc:  # noqa: B902 - the point is to see exactly what escapes
+        return exc
+    return None
+
+
+class HugeIntegerBoundary(unittest.TestCase):
+    def assert_plain_value_error(self, exc, label):
+        self.assertIsNotNone(exc, f"{label}: accepted")
+        self.assertIs(type(exc), ValueError, f"{label}: {type(exc).__name__}: {str(exc)[:80]}")
+        self.assertNotIsInstance(exc, ArithmeticError)
+        self.assertLess(len(str(exc)), 220, label)
+        import re
+        self.assertIsNone(re.search(r"\d{25}", str(exc)), f"{label}: the raw giant number must not be echoed")
+
+    def test_the_reported_reproduction(self):
+        exc = raised(lambda: numeric.finite_seconds("probe", 10**400))
+        self.assert_plain_value_error(exc, "finite_seconds('probe', 10**400)")
+        self.assertIn("1329 bits", str(exc))
+        self.assertIn("probe", str(exc))
+
+    def test_every_numeric_helper_rejects_every_huge_int_with_a_plain_value_error(self):
+        for v in HUGE:
+            for label, fn in (("finite_seconds", lambda v=v: numeric.finite_seconds("x", v)),
+                              ("finite_seconds/grace", lambda v=v: numeric.finite_seconds("x", v, numeric.GRACE_CEILING_SECONDS)),
+                              ("positive_int", lambda v=v: numeric.positive_int("x", v)),
+                              ("positive_int/ceiling", lambda v=v: numeric.positive_int("x", v, 10)),
+                              ("non_negative_int", lambda v=v: numeric.non_negative_int("x", v)),
+                              ("non_negative_int/ceiling", lambda v=v: numeric.non_negative_int("x", v, 10))):
+                self.assert_plain_value_error(raised(fn), f"{label}({v.bit_length()}-bit {'neg' if v < 0 else 'pos'})")
+
+    def test_messages_describe_size_not_value_and_negative_wording_is_sane(self):
+        self.assertIn("a negative integer of", str(raised(lambda: numeric.finite_seconds("x", -(10**400)))))
+        self.assertIn("an integer of", str(raised(lambda: numeric.positive_int("x", 10**5000))))
+        self.assertIn("got 5", str(raised(lambda: numeric.positive_int("x", 5, 4))), "small ints are still shown exactly")
+        self.assertIn("got -3", str(raised(lambda: numeric.finite_seconds("x", -3))))
+        self.assertEqual(numeric._show(2**64 - 1), str(2**64 - 1), "an integer that fits 64 bits is shown exactly")
+        self.assertEqual(numeric._show(2**64), "an integer of 65 bits")
+
+    def test_a_hostile_repr_cannot_turn_a_rejection_into_a_crash(self):
+        class Bad:
+            def __repr__(self):
+                raise RuntimeError("boom")
+        for fn in (numeric.finite_seconds, numeric.positive_int, numeric.non_negative_int):
+            exc = raised(lambda fn=fn: fn("x", Bad()))
+            self.assertIs(type(exc), ValueError)
+            self.assertIn("Bad", str(exc))
+
+    def test_valid_values_are_untouched_fractions_ints_and_the_exact_ceiling(self):
+        for v in (0.25, 0.001, 5e-324, 1e-9, 1, 10, 3599.999, 86_399.99999, 86_400, 86_400.0):
+            self.assertEqual(numeric.finite_seconds("x", v), v)
+            self.assertIs(type(numeric.finite_seconds("x", v)), type(v), "the value is returned as given, not converted")
+        self.assertEqual(numeric.finite_seconds("x", 3600, numeric.GRACE_CEILING_SECONDS), 3600)
+        for bad in (86_400.0000001, 86_401, 1e308, NAN, INF, -INF, 0, -0.0, -1, True, False, "5", None, [1], 10**400):
+            self.assertTrue(rejects(lambda b=bad: numeric.finite_seconds("x", b)), repr(bad)[:30])
+        self.assertEqual((numeric.positive_int("x", 7), numeric.non_negative_int("x", 0), numeric.positive_int("x", numeric.INT_MAX)), (7, 0, numeric.INT_MAX))
+        for bad in (numeric.INT_MAX + 1, True, 5.0, "5", None, 0, -1):
+            self.assertTrue(rejects(lambda b=bad: numeric.positive_int("x", b)))
+
+    def test_int_vs_float_comparison_is_exact_so_the_ceiling_is_decided_correctly_for_ints(self):
+        self.assertEqual(numeric.finite_seconds("x", 86_400), 86_400)
+        self.assertTrue(rejects(lambda: numeric.finite_seconds("x", 86_401)))
+        self.assertTrue(rejects(lambda: numeric.finite_seconds("x", 2**53 + 1, 2.0**53)), "just above a float-representable ceiling is still rejected exactly")
+
+    def test_limits_audio_limits_and_envelope_reject_huge_ints_in_every_field(self):
+        from video_core import Limits
+        from video_core.audiomix.limits import AudioLimits
+        for v in HUGE:
+            for cls in (Limits, AudioLimits):
+                for name in cls.__dataclass_fields__:
+                    self.assert_plain_value_error(raised(lambda cls=cls, name=name, v=v: cls(**{name: v})), f"{cls.__name__}.{name}")
+            for name in ("cpu_seconds", "tree_cpu_seconds", "memory_bytes", "tree_memory_bytes", "max_file_bytes", "max_processes"):
+                self.assert_plain_value_error(raised(lambda name=name, v=v: ResourceEnvelope(**{name: v})), f"ResourceEnvelope.{name}")
+            self.assert_plain_value_error(raised(lambda v=v: ResourceEnvelope(cpu_seconds=1, handshake_timeout_seconds=v)), "ResourceEnvelope.handshake_timeout_seconds")
+        self.assert_plain_value_error(raised(lambda: Limits().replace(max_runtime_seconds=10**400)), "Limits.replace")
+        self.assert_plain_value_error(raised(lambda: AudioLimits().replace(max_runtime_seconds=10**400)), "AudioLimits.replace")
+
+    def test_the_reported_envelope_construction(self):
+        exc = raised(lambda: ResourceEnvelope(cpu_seconds=1, handshake_timeout_seconds=10**400))
+        self.assert_plain_value_error(exc, "ResourceEnvelope(cpu_seconds=1, handshake_timeout_seconds=10**400)")
+        self.assertIn("handshake_timeout_seconds", str(exc))
+        self.assertEqual(ResourceEnvelope(cpu_seconds=1, handshake_timeout_seconds=0.25).handshake_timeout_seconds, 0.25)
+
+    def test_run_bounded_and_run_contained_reject_huge_ints_before_any_process_is_launched(self):
+        argv = [sys.executable, "-c", "pass"]
+        env = ResourceEnvelope(cpu_seconds=5)
+        with no_process():  # a launch would raise AssertionError, which is neither ValueError nor OverflowError
+            for v in HUGE:
+                for kw in ({"timeout_s": v}, {"timeout_s": 5, "grace_s": v}, {"timeout_s": 5, "drain_timeout_s": v}, {"timeout_s": 5, "max_drain_bytes": v},
+                           {"timeout_s": 5, "stdout_limits": (v, 0)}, {"timeout_s": 5, "stdout_limits": (0, v)}, {"timeout_s": 5, "stderr_limits": (v, 0)}, {"timeout_s": 5, "stderr_limits": (0, v)}):
+                    self.assert_plain_value_error(raised(lambda kw=kw: runner.run_bounded(argv, phase="t", **kw)), f"run_bounded {sorted(kw)[0]}")
+                self.assert_plain_value_error(raised(lambda v=v: run_contained(argv, env, phase="t", timeout_s=v)), "run_contained timeout_s")
+                for kw in ({"grace_s": v}, {"drain_timeout_s": v}, {"max_drain_bytes": v}):
+                    self.assert_plain_value_error(raised(lambda kw=kw: run_contained(argv, env, phase="t", timeout_s=5, **kw)), f"run_contained {sorted(kw)[0]}")
+
+    def test_the_exact_reported_run_bounded_call(self):
+        with no_process():
+            exc = raised(lambda: runner.run_bounded([sys.executable, "-c", "pass"], phase="t", timeout_s=10**400))
+        self.assert_plain_value_error(exc, "run_bounded(timeout_s=10**400)")
+
+    def test_a_valid_call_right_after_a_rejected_huge_one_still_runs(self):
+        self.assertTrue(rejects(lambda: runner.run_bounded([sys.executable, "-c", "pass"], phase="t", timeout_s=10**400)))
+        self.assertTrue(runner.run_bounded([sys.executable, "-c", "pass"], phase="t", timeout_s=0.5 + 9.5).ok)
+
+    def test_defaults_and_the_baseline_plan_hash_are_unchanged(self):
+        from tests.helpers import sample_bytes
+        from video_core import Limits, prepare
+        d = Limits()
+        self.assertEqual((d.max_runtime_seconds, d.probe_timeout_seconds, d.inspect_timeout_seconds, d.max_drain_bytes, d.max_frames), (600.0, 30.0, 120.0, 64 * 1024 * 1024, 18_000))
+        self.assertEqual(prepare(sample_bytes()).sha256, "4bc20b3fd703f46651c868c1929efd3d9df3fc3c0a99f86607502ca92d5d9f21")
+
+
+class HugeIntegersAtTheCommandLine(TmpCase):
+    """Command-line spellings of the same bug; each must be a usage error (exit 2) with nothing written and no tool launched."""
+
+    def cli(self, module, *a):
+        return subprocess.run([sys.executable, "-m", module, *a], capture_output=True, cwd=self.tmp, env={"PATH": os.environ.get("PATH", ""), "PYTHONPATH": ROOT}, timeout=60)
+
+    def test_huge_integer_flags_exit_2_without_a_traceback(self):
+        before = set(os.listdir(self.tmp))
+        for digits in (400, 5000):
+            big = "9" * digits
+            for flag in ("--max-frames", "--max-diag-bytes", "--max-source-bytes", "--max-drain-bytes", "--max-windows-cmdline-chars"):
+                r = self.cli("video_core", "plan", EXAMPLE_EPISODE, f"{flag}={big}")
+                self.assertEqual(r.returncode, 2, (flag, digits, r.stderr[-200:]))
+                self.assertNotIn(b"Traceback", r.stderr)
+                self.assertEqual(r.stdout, b"")
+        self.assertEqual(set(os.listdir(self.tmp)), before)
+
+    def test_huge_time_values_exit_2(self):
+        for spelling in ("1" + "0" * 400, "1e400", "9" * 5000):
+            r = self.cli("video_core", "plan", EXAMPLE_EPISODE, f"--max-runtime-seconds={spelling}")
+            self.assertEqual(r.returncode, 2, (spelling[:12], r.stderr[-200:]))
+            self.assertNotIn(b"Traceback", r.stderr)
+
+    def test_envelope_and_the_other_clis_reject_huge_values_the_same_way(self):
+        big = "9" * 400
+        r = self.cli("video_core", "render", EXAMPLE_EPISODE, "--output-root", self.tmp, "--output-name", "x", f"--envelope-cpu-seconds={big}")
+        self.assertEqual(r.returncode, 2, r.stderr[-200:])
+        r = self.cli("video_core", "render", EXAMPLE_EPISODE, "--output-root", self.tmp, "--output-name", "x", "--envelope-cpu-seconds=5", f"--envelope-handshake-timeout-seconds=1{'0' * 400}")
+        self.assertEqual(r.returncode, 2, r.stderr[-200:])
+        for module, sub in (("video_core.audiomix", "plan"), ("video_core.avmux", "plan")):
+            r = self.cli(module, sub, EXAMPLE_EPISODE, f"--max-runtime-seconds=1{'0' * 400}")
+            self.assertEqual(r.returncode, 2, (module, r.stderr[-200:]))
+            self.assertNotIn(b"Traceback", r.stderr)

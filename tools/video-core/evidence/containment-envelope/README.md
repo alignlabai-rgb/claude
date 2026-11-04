@@ -44,3 +44,18 @@ Windows behaviour; macOS; cgroups; tree-wide POSIX accounting; limits applied to
 * The coordinator supplied readbacks of the official Microsoft pages (fetched outside the cloud host on 2026-11-04 UTC; see `CONTAINMENT.md`). They are not proof of any Windows execution, which remains untested by the author.
 * **Native containment evidence in this directory = the owned small Python fixtures** (all caps ≤ 256 MiB, each probe ≤ 10 s). Tests that use a fake ffmpeg script under the real worker are wiring tests, not FFmpeg runs.
 * **The one real FFmpeg run** above used a 3 GiB address-space cap, which exceeds the later ≤ 256 MiB guidance for cloud native tests; FFmpeg cannot fit 256 MiB here (sampled `VmPeak` ≈ 604 MB lower bound). It was not repeated, no cap was raised, and no 256 MiB attempt was made. It is evidence that the mechanism works with real FFmpeg and generous limits only.
+
+## Addendum 2 (numeric-boundary fix commit): the real run's actual caps vs the later ≤ 256 MiB / ≤ 10 s guidance
+
+Stated plainly, from the preserved, unmodified `render.receipt.json` (`containment.requested` = `containment.applied`, read back by the worker):
+
+| Cap | Used in the one real FFmpeg encode (started 2026-11-04T21:59:54Z per receipt) | Later guidance for resource probes |
+|---|---|---|
+| `memory_bytes` (RLIMIT_AS) | **3 221 225 472** (3 GiB) | ≤ 256 MiB |
+| `cpu_seconds` (RLIMIT_CPU) | **60** | ≤ 10 s |
+| `max_file_bytes` (RLIMIT_FSIZE) | 67 108 864 (64 MiB) | (no stated bound) |
+
+* The tighter probe bounds (≤ 256 MiB, ≤ 10 s) were **not** used for this real encode. This was my own interpretation at the time that the single, already-approved tiny encode was separate from "resource probes"; it was not a stated exception, and the guidance did not say so. The 256 MiB part could not have been met with FFmpeg here (sampled `VmPeak` ≈ 604 MB, a lower bound, so the encode would fail to start). The 60 s CPU cap was a choice, not a necessity: the run's actual measured times are tiny (the render execution `wall_seconds` is 0.133 in the receipt; the whole case finished inside the same second), so a ≤ 10 s CPU cap would very probably have sufficed, but that was **not tested**.
+* The run was **not repeated** and nothing here was regenerated. The original receipt, `output.mp4` (1889 bytes, SHA-256 `fa3cce3d…0da4`, delivered again as an unmodified attachment from the scratch directory) and all other evidence files are unchanged.
+* What the run still shows: with the real ffmpeg, the envelope was applied and read back, and the output decoded; it does **not** show behaviour near either limit. Native limit-hit evidence remains the owned small Python fixtures only (all caps ≤ 256 MiB, each probe ≤ 10 s).
+* The requester independently reported running commit `069e645` on Windows (acceptance results are theirs; I did not run Windows). That report also found the defect fixed in this commit: `numeric.finite_seconds('probe', 10**400)`, `ResourceEnvelope(cpu_seconds=1, handshake_timeout_seconds=10**400)` and `run_bounded(..., timeout_s=10**400)` raised `OverflowError`. Root cause: the *error message* formatted the rejected int with `{value:g}` (int → float conversion overflows); separately, ints over 4300 digits made the `{value}` messages of `positive_int`/`non_negative_int` fail with Python's digit-limit `ValueError`. Fix: messages now describe huge integers by bit length and never convert or print them; the accepted set, return values and defaults are unchanged (baseline plan hash `4bc20b3f…9f21` re-checked by a test).

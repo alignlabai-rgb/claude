@@ -106,3 +106,7 @@ The coordinator supplied readbacks of the official Microsoft pages (fetched outs
 user-mode periodic CPU accounting in 100 ns units, committed-memory limits, kill-on-close after the last handle). They confirm four of the six flag constants; `PROCESS_TIME` 0x2 and `PROCESS_MEMORY` 0x100 remain unconfirmed and need the reviewer's check.
 **Correction:** the earlier claim that read-back would catch a wrongly numbered flag constant was wrong; read-back catches an OS that ignores/clamps/rejects a request, not a mis-numbered constant. Windows CPU limits are user-mode only and periodic, memory limits are committed (not resident) memory.
 The single real FFmpeg contained run used a 3 GiB cap, not the later ≤ 256 MiB guidance, which FFmpeg cannot fit on this host (≈ 600 MB address space measured); it was not repeated and no cap was raised. Windows tests remain unrun by the author.
+
+## Addendum: real contained FFmpeg run used wider caps than the later probe guidance
+
+The single real contained encode (`evidence/containment-envelope/`) used `memory_bytes=3221225472`, `cpu_seconds=60`, `max_file_bytes=67108864`, i.e. wider than the later ≤ 256 MiB / ≤ 10 s guidance for resource probes. It was not repeated with tighter caps. See `evidence/containment-envelope/README.md`, Addendum 2. Windows containment remains untested by the author; the requester's Windows results are theirs.
