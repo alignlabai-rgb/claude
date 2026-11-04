@@ -329,10 +329,15 @@ def _policy_check(module: str, args: list) -> None:
         raise PolicyViolation(f"subcommand {args[0]!r} launches ffprobe: refused by the harness")
 
 
+# The plans estimate their own argv size from the REAL asset/output paths, so these two numbers depend on the length of the temp directory the
+# harness happened to get. They are replaced by a placeholder so that recorded hashes are reproducible from any scratch location.
+_PATH_LENGTH_DEPENDENT = re.compile(r'("estimated_(?:argv_bytes|windows_cmdline_utf16_units)":\s*)\d+')
+
+
 class CliResult:
     def __init__(self, module, args, exit_code, stdout, stderr, log, world):
         self.module, self.args, self.exit_code, self.stderr = module, args, exit_code, stderr
-        self.stdout = world.norm(stdout)
+        self.stdout = _PATH_LENGTH_DEPENDENT.sub(r'\1"<temp-path-length dependent>"', world.norm(stdout))
         self.log = log
         try:
             self.json = json.loads(self.stdout) if self.stdout.strip() else None

@@ -20,12 +20,12 @@ Branch `codex/video-core-integration-20261105`, base `b4ca4a3b031351a631c0fbe1eb
 | Run | total | passed | skipped | failed | errors |
 |---|---|---|---|---|---|
 | **Untouched default suite** `python3.11 / 3.12 / 3.13 -m unittest discover -s tests -t .` (`logs/default-suite-py*.log`) | 454 | 451 | 3 (opt-in real-ffmpeg integration tests, off by default) | 0 | 0 |
-| **Contract suite** on 3.11 / 3.12 / 3.13 (`logs/contract-suite-py*.log`) | 39 | 39 | 0 | 0 | 0 |
+| **Contract suite** on 3.11 / 3.12 / 3.13 (`logs/contract-suite-py*.log`) | 40 | 40 | 0 | 0 | 0 |
 
-Contract suite: 154 checks (LIBRARY_ENFORCED 83 · LIBRARY_PERMISSIVE 23 · CALLER_GUARD_DEMO 21 · INSTRUMENT 9 · FIXTURE 7 · ROLLBACK 11), all ok; 255 library CLI invocations + 1 instrument positive control; ≈17 s per run (limit: 10 s per case, 270 s per run, enforced); the `cases_digest` of observed behaviour is **identical on all three Python versions**.
+Contract suite: 157 checks (LIBRARY_ENFORCED 83 · LIBRARY_PERMISSIVE 23 · CALLER_GUARD_DEMO 21 · INSTRUMENT 9 · FIXTURE 10 · ROLLBACK 11), all ok; 259 library CLI runs (255 recorded per case + 4 in the temp-path-length test) + 1 instrument positive control; ≈17 s per run (limit: 10 s per case, 270 s per run, enforced); the `cases_digest` of observed behaviour is **identical on all three Python versions and from scratch directories of different path length** (an earlier pushed commit, `9f19846`, lacked the path-length normalisation; see `HARNESS_CORRECTIONS.md` #10).
 The default suite itself launches its own *fake* ffmpeg/ffprobe Python stubs (that is how it was written); its 3 skips are the real-ffmpeg opt-ins. It was run unmodified.
 
-Process accounting (`EXPECTED_VS_OBSERVED.json → process_accounting`): 256 harness-owned Python launches (255 CLI runs + 1 positive control, all through `harness_runner.py`); **0** external process launches, **0** network events, **0** filesystem mutations and **0** reads outside world/library/stdlib inside the library CLIs; media-tool sentinel hit by library CLIs: 0 (the positive control hits it once, on purpose); children saw only a PATH of harness-owned directories.
+Process accounting (`EXPECTED_VS_OBSERVED.json → process_accounting`): 260 harness-owned Python launches (259 CLI runs + 1 positive control, all through `harness_runner.py`); **0** external process launches, **0** network events, **0** filesystem mutations and **0** reads outside world/library/stdlib inside the library CLIs; media-tool sentinel hit by library CLIs: 0 (the positive control hits it once, on purpose); children saw only a PATH of harness-owned directories.
 
 ## Three layers, never mixed
 `LIBRARY_ENFORCED` (the library itself refused/held/computed) · `LIBRARY_PERMISSIVE` (the library accepted what an owner must guard — pinned, so closing the gap fails the test and forces a contract update) · `CALLER_GUARD_DEMO` (an illustrative owner-side guard in `reference_guards.py`; never the reason a test passes; not a validator). A test passes only on what the library itself did.
@@ -42,7 +42,7 @@ sh clean_export_check.sh <commit> /some/scratch                 # git archive ex
 Python 3.11+ standard library only; POSIX only (the suite exits 3 elsewhere). Temp worlds are created under `VCC_TMP` (default: system temp) and deleted.
 
 ## Inventory
-`contract_suite.py` (39 cases) · `contract_lib.py` (fixtures, isolated world, the only launch point, source references) · `harness_runner.py` (audit-hook runner executing one real CLI in-process) · `harness_positive_control.py` · `reference_guards.py` ·
+`contract_suite.py` (40 cases) · `contract_lib.py` (fixtures, isolated world, the only launch point, source references) · `harness_runner.py` (audit-hook runner executing one real CLI in-process) · `harness_positive_control.py` · `reference_guards.py` ·
 `fixtures/` (7 JSON fixtures + `FIXTURES_INDEX.json`; media-like bytes are regenerated deterministically and pinned by sha256 — **no media file is committed**) · `build_expected_vs_observed.py` · `mutation_self_check.py` · `verify_unchanged.py` · `clean_export_check.sh` · `run_all.sh` · `logs/` · `results/` · `rollback/` · `SOURCE_UNCHANGED.json`.
 
 ## Honest limits

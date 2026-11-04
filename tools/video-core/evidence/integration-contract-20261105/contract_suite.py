@@ -194,6 +194,33 @@ class T00_Fixtures_And_Instrument(Base):
         self.check("FIXTURE", "regeneration is deterministic", c.build_fixture_json()["_index_bytes"], c.build_fixture_json()["_index_bytes"])
         self.check("FIXTURE", "the 'videos' are plain non-media bytes", True, all(v.startswith(b"SYNTHETIC-PLACEHOLDER-NOT-MEDIA") for k, v in c.fixture_bytes().items() if k.endswith(".mp4")))
 
+    def test_00b_recorded_hashes_do_not_depend_on_the_temp_path_length(self):
+        """The same plan run from a short and from a long scratch path records the same normalised stdout hash (reproducibility of EXPECTED_VS_OBSERVED)."""
+        import tempfile
+        parent1 = os.path.realpath(tempfile.mkdtemp(prefix="vcc-len-", dir=TMP))
+        parent2 = os.path.join(parent1, "a-much-longer-intermediate-directory-name-for-this-world")
+        os.mkdir(parent2)
+        hashes, raw_lengths = [], []
+        try:
+            for parent in (parent1, parent2):
+                w = World(tmp_parent=parent, label="len")
+                try:
+                    w.put_fixtures()
+                    w.put_json("ep.json", load_fixture("episode.video_only.selected_subset.json"))
+                    w.put_json("am.json", load_fixture("audio_manifest.selected_subset.json"))
+                    for mod, args in ((VID, ["plan", "{docs}/ep.json", "--asset-root", "{assets}"]), (AUD, ["plan", "{docs}/am.json", "--asset-root", "{assets}"])):
+                        r = run_cli(w, mod, args)
+                        self._cli_count += 1
+                        hashes.append(r.record()["stdout_sha256"])
+                        raw_lengths.append(len(w.root))
+                finally:
+                    w.cleanup()
+        finally:
+            shutil.rmtree(parent1, ignore_errors=True)
+        self.check("FIXTURE", "the two scratch paths really differ in length", True, raw_lengths[0] != raw_lengths[2])
+        self.check("FIXTURE", "video plan: same recorded hash from both locations", hashes[0], hashes[2])
+        self.check("FIXTURE", "audio plan: same recorded hash from both locations", hashes[1], hashes[3])
+
     def test_01_instrument_positive_control(self):
         """The audit-hook + sentinel instrument detects a launch, a mkdir and a write (so 'zero events' is meaningful)."""
         self._allow_process = True
