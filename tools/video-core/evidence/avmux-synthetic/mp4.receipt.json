@@ -1,0 +1,1153 @@
+{
+  "argv_budget": {
+    "argv_bytes": 604,
+    "ill_formed_utf16": false,
+    "windows_cmdline_utf16_units": 603
+  },
+  "checks": [
+    {
+      "expected": [
+        "audio",
+        "video"
+      ],
+      "name": "output_streams",
+      "observed": [
+        "audio",
+        "video"
+      ],
+      "ok": true
+    },
+    {
+      "expected": 1,
+      "name": "output_video_stream_count",
+      "observed": 1,
+      "ok": true
+    },
+    {
+      "expected": "h264",
+      "name": "output_video_codec",
+      "observed": "h264",
+      "ok": true
+    },
+    {
+      "expected": 160,
+      "name": "output_video_width",
+      "observed": 160,
+      "ok": true
+    },
+    {
+      "expected": 90,
+      "name": "output_video_height",
+      "observed": 90,
+      "ok": true
+    },
+    {
+      "expected": "30/1",
+      "name": "output_video_r_frame_rate",
+      "observed": "30/1",
+      "ok": true
+    },
+    {
+      "expected": "30/1",
+      "name": "output_video_avg_frame_rate",
+      "observed": "30/1",
+      "ok": true
+    },
+    {
+      "expected": 3,
+      "name": "output_video_frames",
+      "observed": "3",
+      "ok": true
+    },
+    {
+      "expected": {
+        "start_pts": 0,
+        "start_time": "0"
+      },
+      "name": "output_video_start",
+      "observed": {
+        "format_start_time": "0.000000",
+        "start_pts": 0,
+        "start_time": "0.000000"
+      },
+      "ok": true
+    },
+    {
+      "expected": "aac",
+      "name": "output_audio_codec",
+      "observed": "aac",
+      "ok": true
+    },
+    {
+      "expected": 48000,
+      "name": "output_audio_sample_rate",
+      "observed": "48000",
+      "ok": true
+    },
+    {
+      "expected": 1,
+      "name": "output_audio_channels",
+      "observed": 1,
+      "ok": true
+    },
+    {
+      "expected": {
+        "abs_seconds_at_most": "8/375"
+      },
+      "name": "output_audio_start_within_tolerance",
+      "observed": "0.000000",
+      "ok": true
+    },
+    {
+      "expected": {
+        "frames": 3,
+        "hashes": "equal to source"
+      },
+      "name": "decoded_video_frames_equal",
+      "observed": {
+        "equal": true,
+        "output_frames": 3,
+        "source_frames": 3
+      },
+      "ok": true
+    },
+    {
+      "expected": 0,
+      "name": "readback_decoded_source_no_decode_errors",
+      "observed": 0,
+      "ok": true
+    },
+    {
+      "expected": 0,
+      "name": "readback_decoded_output_no_decode_errors",
+      "observed": 0,
+      "ok": true
+    },
+    {
+      "expected": {
+        "frames": 3,
+        "hashes": "equal to source"
+      },
+      "name": "copied_video_packets_equal",
+      "observed": {
+        "equal": true,
+        "output_frames": 3,
+        "source_frames": 3
+      },
+      "ok": true
+    },
+    {
+      "expected": 0,
+      "name": "readback_packets_source_no_decode_errors",
+      "observed": 0,
+      "ok": true
+    },
+    {
+      "expected": 0,
+      "name": "readback_packets_output_no_decode_errors",
+      "observed": 0,
+      "ok": true
+    },
+    {
+      "expected": 0,
+      "name": "audio_decode_no_errors",
+      "observed": 0,
+      "ok": true
+    },
+    {
+      "expected": {
+        "expected": 4800,
+        "tolerance_samples": 1024
+      },
+      "name": "aac_decoded_samples_within_tolerance",
+      "observed": {
+        "decoded": 5120,
+        "delta": 320
+      },
+      "ok": true
+    }
+  ],
+  "contract": {
+    "id": "MP4_AAC:lossy_within_tolerance",
+    "never_claimed": [
+      "sample-exact or bit-exact audio",
+      "perceptual sync or audio quality"
+    ],
+    "observed_not_hidden": [
+      "encoder delay / start offset",
+      "packet skip-samples and discard-padding side data when ffprobe reports it",
+      "decoded vs declared sample counts"
+    ],
+    "requires": [
+      "decoded video frame hashes equal the source's",
+      "copied video packet hashes equal the source's",
+      "decoded AAC sample count within 1024 samples of the declared count (exact match is reported, never assumed)",
+      "audio stream start within 1024 samples of 0",
+      "exactly one video and one audio stream"
+    ],
+    "sample_exact": false,
+    "tolerance_samples": 1024
+  },
+  "creative_acceptance": "NOT_EVALUATED",
+  "executions": [
+    {
+      "argv": [
+        "/usr/bin/ffmpeg",
+        "-hide_banner",
+        "-version"
+      ],
+      "drain_complete": true,
+      "exit_code": 0,
+      "kill_reason": null,
+      "launch_error": null,
+      "orphan_group_killed": false,
+      "outcome": "EXITED_ZERO",
+      "phase": "probe_version:ffmpeg",
+      "signal": null,
+      "stderr": {
+        "dropped_bytes": 0,
+        "kept_bytes": 0,
+        "sha256_full_stream": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "text": "",
+        "total_bytes": 0,
+        "truncated": false
+      },
+      "stdout": {
+        "dropped_bytes": 0,
+        "kept_bytes": 1838,
+        "sha256_full_stream": "5b320c97f515e79171f10a2147d875ffb6b14bd2b25681047b73c46fe0a527ee",
+        "total_bytes": 1838,
+        "truncated": false
+      },
+      "timed_out": false,
+      "timeout_seconds": 30.0,
+      "wall_seconds": 0.084
+    },
+    {
+      "argv": [
+        "/usr/bin/ffprobe",
+        "-hide_banner",
+        "-version"
+      ],
+      "drain_complete": true,
+      "exit_code": 0,
+      "kill_reason": null,
+      "launch_error": null,
+      "orphan_group_killed": false,
+      "outcome": "EXITED_ZERO",
+      "phase": "probe_version:ffprobe",
+      "signal": null,
+      "stderr": {
+        "dropped_bytes": 0,
+        "kept_bytes": 0,
+        "sha256_full_stream": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "text": "",
+        "total_bytes": 0,
+        "truncated": false
+      },
+      "stdout": {
+        "dropped_bytes": 0,
+        "kept_bytes": 1839,
+        "sha256_full_stream": "1b6410f756d8b5ef5308d712b51d2543bf8c8e6bc5796b7ede9570d099131e0b",
+        "total_bytes": 1839,
+        "truncated": false
+      },
+      "timed_out": false,
+      "timeout_seconds": 30.0,
+      "wall_seconds": 0.067
+    },
+    {
+      "argv": [
+        "/usr/bin/ffmpeg",
+        "-hide_banner",
+        "-encoders"
+      ],
+      "drain_complete": true,
+      "exit_code": 0,
+      "kill_reason": null,
+      "launch_error": null,
+      "orphan_group_killed": false,
+      "outcome": "EXITED_ZERO",
+      "phase": "probe_capability:-encoders",
+      "signal": null,
+      "stderr": {
+        "dropped_bytes": 0,
+        "kept_bytes": 0,
+        "sha256_full_stream": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "text": "",
+        "total_bytes": 0,
+        "truncated": false
+      },
+      "stdout": {
+        "dropped_bytes": 0,
+        "kept_bytes": 13199,
+        "sha256_full_stream": "a713d6fa85b46256874a86dc4bd185d5b7b3865193b0b32a1b446ae566e35dbf",
+        "total_bytes": 13199,
+        "truncated": false
+      },
+      "timed_out": false,
+      "timeout_seconds": 30.0,
+      "wall_seconds": 0.067
+    },
+    {
+      "argv": [
+        "/usr/bin/ffmpeg",
+        "-hide_banner",
+        "-demuxers"
+      ],
+      "drain_complete": true,
+      "exit_code": 0,
+      "kill_reason": null,
+      "launch_error": null,
+      "orphan_group_killed": false,
+      "outcome": "EXITED_ZERO",
+      "phase": "probe_capability:-demuxers",
+      "signal": null,
+      "stderr": {
+        "dropped_bytes": 0,
+        "kept_bytes": 0,
+        "sha256_full_stream": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "text": "",
+        "total_bytes": 0,
+        "truncated": false
+      },
+      "stdout": {
+        "dropped_bytes": 0,
+        "kept_bytes": 14572,
+        "sha256_full_stream": "b29bda4171942c7eb83c051902da75be9d698817a69dd65f4866f88489e4c46d",
+        "total_bytes": 14572,
+        "truncated": false
+      },
+      "timed_out": false,
+      "timeout_seconds": 30.0,
+      "wall_seconds": 0.067
+    },
+    {
+      "argv": [
+        "/usr/bin/ffmpeg",
+        "-hide_banner",
+        "-muxers"
+      ],
+      "drain_complete": true,
+      "exit_code": 0,
+      "kill_reason": null,
+      "launch_error": null,
+      "orphan_group_killed": false,
+      "outcome": "EXITED_ZERO",
+      "phase": "probe_capability:-muxers",
+      "signal": null,
+      "stderr": {
+        "dropped_bytes": 0,
+        "kept_bytes": 0,
+        "sha256_full_stream": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "text": "",
+        "total_bytes": 0,
+        "truncated": false
+      },
+      "stdout": {
+        "dropped_bytes": 0,
+        "kept_bytes": 7761,
+        "sha256_full_stream": "67c3ccdef5a43c7bd3fb7ae940e127d2aa3fcaa433e654b6912e236b4390dd75",
+        "total_bytes": 7761,
+        "truncated": false
+      },
+      "timed_out": false,
+      "timeout_seconds": 30.0,
+      "wall_seconds": 0.067
+    },
+    {
+      "argv": [
+        "/usr/bin/ffmpeg",
+        "-hide_banner",
+        "-decoders"
+      ],
+      "drain_complete": true,
+      "exit_code": 0,
+      "kill_reason": null,
+      "launch_error": null,
+      "orphan_group_killed": false,
+      "outcome": "EXITED_ZERO",
+      "phase": "probe_capability:-decoders",
+      "signal": null,
+      "stderr": {
+        "dropped_bytes": 0,
+        "kept_bytes": 0,
+        "sha256_full_stream": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "text": "",
+        "total_bytes": 0,
+        "truncated": false
+      },
+      "stdout": {
+        "dropped_bytes": 0,
+        "kept_bytes": 29820,
+        "sha256_full_stream": "dd8d4cb55ee9b2504162af8b1abf761c806efe0a852af016b12f546519d028d8",
+        "total_bytes": 29820,
+        "truncated": false
+      },
+      "timed_out": false,
+      "timeout_seconds": 30.0,
+      "wall_seconds": 0.083
+    },
+    {
+      "argv": [
+        "/usr/bin/ffprobe",
+        "-v",
+        "error",
+        "-hide_banner",
+        "-protocol_whitelist",
+        "file",
+        "-f",
+        "mov",
+        "-count_frames",
+        "-show_format",
+        "-show_streams",
+        "-of",
+        "json",
+        "-i",
+        "/tmp/claude-0/-home-user-claude/36e8198e-4b0f-5797-ac43-e92a3ca54467/scratchpad/avmux-demo/assets/clip.mp4"
+      ],
+      "drain_complete": true,
+      "exit_code": 0,
+      "kill_reason": null,
+      "launch_error": null,
+      "orphan_group_killed": false,
+      "outcome": "EXITED_ZERO",
+      "phase": "preflight_probe_video",
+      "signal": null,
+      "stderr": {
+        "dropped_bytes": 0,
+        "kept_bytes": 0,
+        "sha256_full_stream": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "text": "",
+        "total_bytes": 0,
+        "truncated": false
+      },
+      "stdout": {
+        "dropped_bytes": 0,
+        "kept_bytes": 2731,
+        "sha256_full_stream": "ed2c639a8cc73c5f2069958d5a4281fec5af1e6c8c28b04af7af249e5d8fa5db",
+        "total_bytes": 2731,
+        "truncated": false
+      },
+      "timed_out": false,
+      "timeout_seconds": 120.0,
+      "wall_seconds": 0.083
+    },
+    {
+      "argv": [
+        "/usr/bin/ffprobe",
+        "-v",
+        "error",
+        "-hide_banner",
+        "-protocol_whitelist",
+        "file",
+        "-f",
+        "wav",
+        "-count_frames",
+        "-show_format",
+        "-show_streams",
+        "-of",
+        "json",
+        "-i",
+        "/tmp/claude-0/-home-user-claude/36e8198e-4b0f-5797-ac43-e92a3ca54467/scratchpad/avmux-demo/assets/stem.wav"
+      ],
+      "drain_complete": true,
+      "exit_code": 0,
+      "kill_reason": null,
+      "launch_error": null,
+      "orphan_group_killed": false,
+      "outcome": "EXITED_ZERO",
+      "phase": "preflight_probe_audio",
+      "signal": null,
+      "stderr": {
+        "dropped_bytes": 0,
+        "kept_bytes": 0,
+        "sha256_full_stream": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "text": "",
+        "total_bytes": 0,
+        "truncated": false
+      },
+      "stdout": {
+        "dropped_bytes": 0,
+        "kept_bytes": 1741,
+        "sha256_full_stream": "33ca9793676720a48e01af0c4d94a1907f1380348d20b9d695e2bf17ee78575a",
+        "total_bytes": 1741,
+        "truncated": false
+      },
+      "timed_out": false,
+      "timeout_seconds": 120.0,
+      "wall_seconds": 0.067
+    },
+    {
+      "argv": [
+        "/usr/bin/ffmpeg",
+        "-nostdin",
+        "-hide_banner",
+        "-loglevel",
+        "warning",
+        "-nostats",
+        "-n",
+        "-protocol_whitelist",
+        "file",
+        "-f",
+        "mov",
+        "-i",
+        "/tmp/claude-0/-home-user-claude/36e8198e-4b0f-5797-ac43-e92a3ca54467/scratchpad/avmux-demo/assets/clip.mp4",
+        "-protocol_whitelist",
+        "file",
+        "-f",
+        "wav",
+        "-i",
+        "/tmp/claude-0/-home-user-claude/36e8198e-4b0f-5797-ac43-e92a3ca54467/scratchpad/avmux-demo/assets/stem.wav",
+        "-map",
+        "0:v:0",
+        "-map",
+        "1:a:0",
+        "-c:v",
+        "copy",
+        "-c:a",
+        "aac",
+        "-b:a",
+        "128k",
+        "-map_metadata",
+        "-1",
+        "-fflags",
+        "+bitexact",
+        "-movflags",
+        "+faststart",
+        "-fs",
+        "2147483648",
+        "-f",
+        "mp4",
+        "/tmp/claude-0/-home-user-claude/36e8198e-4b0f-5797-ac43-e92a3ca54467/scratchpad/avmux-demo/out/mp4-demo/output.mp4.partial"
+      ],
+      "drain_complete": true,
+      "exit_code": 0,
+      "kill_reason": null,
+      "launch_error": null,
+      "orphan_group_killed": false,
+      "outcome": "EXITED_ZERO",
+      "phase": "mux",
+      "signal": null,
+      "stderr": {
+        "dropped_bytes": 0,
+        "kept_bytes": 67,
+        "sha256_full_stream": "06356e05fbf87ecd763ddb9dbb8ead5845f2501962037de5edf7b5c5025fe216",
+        "text": "[aist#1:0/pcm_s16le @ 0x55f75c02df80] Guessed Channel Layout: mono\n",
+        "total_bytes": 67,
+        "truncated": false
+      },
+      "stdout": {
+        "dropped_bytes": 0,
+        "kept_bytes": 0,
+        "sha256_full_stream": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "total_bytes": 0,
+        "truncated": false
+      },
+      "timed_out": false,
+      "timeout_seconds": 600.0,
+      "wall_seconds": 0.083
+    },
+    {
+      "argv": [
+        "/usr/bin/ffprobe",
+        "-v",
+        "error",
+        "-hide_banner",
+        "-protocol_whitelist",
+        "file",
+        "-f",
+        "mov",
+        "-count_frames",
+        "-show_format",
+        "-show_streams",
+        "-of",
+        "json",
+        "-i",
+        "/tmp/claude-0/-home-user-claude/36e8198e-4b0f-5797-ac43-e92a3ca54467/scratchpad/avmux-demo/out/mp4-demo/output.mp4.partial"
+      ],
+      "drain_complete": true,
+      "exit_code": 0,
+      "kill_reason": null,
+      "launch_error": null,
+      "orphan_group_killed": false,
+      "outcome": "EXITED_ZERO",
+      "phase": "readback_probe_output",
+      "signal": null,
+      "stderr": {
+        "dropped_bytes": 0,
+        "kept_bytes": 0,
+        "sha256_full_stream": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "text": "",
+        "total_bytes": 0,
+        "truncated": false
+      },
+      "stdout": {
+        "dropped_bytes": 0,
+        "kept_bytes": 4386,
+        "sha256_full_stream": "8c3936f9cd74f65c4c32bddf89bbc654f4b7e27649cd420dce3e840d687ff77f",
+        "total_bytes": 4386,
+        "truncated": false
+      },
+      "timed_out": false,
+      "timeout_seconds": 120.0,
+      "wall_seconds": 0.083
+    },
+    {
+      "argv": [
+        "/usr/bin/ffmpeg",
+        "-v",
+        "error",
+        "-nostdin",
+        "-protocol_whitelist",
+        "file",
+        "-f",
+        "mov",
+        "-i",
+        "/tmp/claude-0/-home-user-claude/36e8198e-4b0f-5797-ac43-e92a3ca54467/scratchpad/avmux-demo/assets/clip.mp4",
+        "-map",
+        "0:v:0",
+        "-f",
+        "framemd5",
+        "-"
+      ],
+      "drain_complete": true,
+      "exit_code": 0,
+      "kill_reason": null,
+      "launch_error": null,
+      "orphan_group_killed": false,
+      "outcome": "EXITED_ZERO",
+      "phase": "readback_decoded_source",
+      "signal": null,
+      "stderr": {
+        "dropped_bytes": 0,
+        "kept_bytes": 0,
+        "sha256_full_stream": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "text": "",
+        "total_bytes": 0,
+        "truncated": false
+      },
+      "stdout": {
+        "dropped_bytes": 0,
+        "kept_bytes": 454,
+        "sha256_full_stream": "c14a0e0645a95bacea46c6a628bf7506868a804695dc575e7ea2bf0b1c036720",
+        "total_bytes": 454,
+        "truncated": false
+      },
+      "timed_out": false,
+      "timeout_seconds": 120.0,
+      "wall_seconds": 0.083
+    },
+    {
+      "argv": [
+        "/usr/bin/ffmpeg",
+        "-v",
+        "error",
+        "-nostdin",
+        "-protocol_whitelist",
+        "file",
+        "-f",
+        "mov",
+        "-i",
+        "/tmp/claude-0/-home-user-claude/36e8198e-4b0f-5797-ac43-e92a3ca54467/scratchpad/avmux-demo/out/mp4-demo/output.mp4.partial",
+        "-map",
+        "0:v:0",
+        "-f",
+        "framemd5",
+        "-"
+      ],
+      "drain_complete": true,
+      "exit_code": 0,
+      "kill_reason": null,
+      "launch_error": null,
+      "orphan_group_killed": false,
+      "outcome": "EXITED_ZERO",
+      "phase": "readback_decoded_output",
+      "signal": null,
+      "stderr": {
+        "dropped_bytes": 0,
+        "kept_bytes": 0,
+        "sha256_full_stream": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "text": "",
+        "total_bytes": 0,
+        "truncated": false
+      },
+      "stdout": {
+        "dropped_bytes": 0,
+        "kept_bytes": 454,
+        "sha256_full_stream": "c14a0e0645a95bacea46c6a628bf7506868a804695dc575e7ea2bf0b1c036720",
+        "total_bytes": 454,
+        "truncated": false
+      },
+      "timed_out": false,
+      "timeout_seconds": 120.0,
+      "wall_seconds": 0.083
+    },
+    {
+      "argv": [
+        "/usr/bin/ffmpeg",
+        "-v",
+        "error",
+        "-nostdin",
+        "-protocol_whitelist",
+        "file",
+        "-f",
+        "mov",
+        "-i",
+        "/tmp/claude-0/-home-user-claude/36e8198e-4b0f-5797-ac43-e92a3ca54467/scratchpad/avmux-demo/assets/clip.mp4",
+        "-map",
+        "0:v:0",
+        "-c:v",
+        "copy",
+        "-f",
+        "framehash",
+        "-hash",
+        "sha256",
+        "-"
+      ],
+      "drain_complete": true,
+      "exit_code": 0,
+      "kill_reason": null,
+      "launch_error": null,
+      "orphan_group_killed": false,
+      "outcome": "EXITED_ZERO",
+      "phase": "readback_packets_source",
+      "signal": null,
+      "stderr": {
+        "dropped_bytes": 0,
+        "kept_bytes": 0,
+        "sha256_full_stream": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "text": "",
+        "total_bytes": 0,
+        "truncated": false
+      },
+      "stdout": {
+        "dropped_bytes": 0,
+        "kept_bytes": 664,
+        "sha256_full_stream": "98197b622a1901c12213a3fd5fdf45738232bc50fecd54373db6c41517459c5e",
+        "total_bytes": 664,
+        "truncated": false
+      },
+      "timed_out": false,
+      "timeout_seconds": 120.0,
+      "wall_seconds": 0.101
+    },
+    {
+      "argv": [
+        "/usr/bin/ffmpeg",
+        "-v",
+        "error",
+        "-nostdin",
+        "-protocol_whitelist",
+        "file",
+        "-f",
+        "mov",
+        "-i",
+        "/tmp/claude-0/-home-user-claude/36e8198e-4b0f-5797-ac43-e92a3ca54467/scratchpad/avmux-demo/out/mp4-demo/output.mp4.partial",
+        "-map",
+        "0:v:0",
+        "-c:v",
+        "copy",
+        "-f",
+        "framehash",
+        "-hash",
+        "sha256",
+        "-"
+      ],
+      "drain_complete": true,
+      "exit_code": 0,
+      "kill_reason": null,
+      "launch_error": null,
+      "orphan_group_killed": false,
+      "outcome": "EXITED_ZERO",
+      "phase": "readback_packets_output",
+      "signal": null,
+      "stderr": {
+        "dropped_bytes": 0,
+        "kept_bytes": 0,
+        "sha256_full_stream": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "text": "",
+        "total_bytes": 0,
+        "truncated": false
+      },
+      "stdout": {
+        "dropped_bytes": 0,
+        "kept_bytes": 664,
+        "sha256_full_stream": "98197b622a1901c12213a3fd5fdf45738232bc50fecd54373db6c41517459c5e",
+        "total_bytes": 664,
+        "truncated": false
+      },
+      "timed_out": false,
+      "timeout_seconds": 120.0,
+      "wall_seconds": 0.117
+    },
+    {
+      "argv": [
+        "/usr/bin/ffmpeg",
+        "-v",
+        "error",
+        "-nostdin",
+        "-protocol_whitelist",
+        "file",
+        "-f",
+        "mov",
+        "-i",
+        "/tmp/claude-0/-home-user-claude/36e8198e-4b0f-5797-ac43-e92a3ca54467/scratchpad/avmux-demo/out/mp4-demo/output.mp4.partial",
+        "-map",
+        "0:a:0",
+        "-c:a",
+        "pcm_s16le",
+        "-f",
+        "s16le",
+        "-"
+      ],
+      "drain_complete": true,
+      "exit_code": 0,
+      "kill_reason": null,
+      "launch_error": null,
+      "orphan_group_killed": false,
+      "outcome": "EXITED_ZERO",
+      "phase": "readback_decode_audio_output",
+      "signal": null,
+      "stderr": {
+        "dropped_bytes": 0,
+        "kept_bytes": 0,
+        "sha256_full_stream": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "text": "",
+        "total_bytes": 0,
+        "truncated": false
+      },
+      "stdout": {
+        "dropped_bytes": 10240,
+        "kept_bytes": 0,
+        "sha256_full_stream": "bd10f85f61354680bdf3a8eddfcf3ca840d9d78b11c752665a6f06db6582217c",
+        "total_bytes": 10240,
+        "truncated": true
+      },
+      "timed_out": false,
+      "timeout_seconds": 120.0,
+      "wall_seconds": 0.083
+    },
+    {
+      "argv": [
+        "/usr/bin/ffprobe",
+        "-v",
+        "error",
+        "-protocol_whitelist",
+        "file",
+        "-f",
+        "mov",
+        "-select_streams",
+        "a:0",
+        "-show_packets",
+        "-of",
+        "json",
+        "-i",
+        "/tmp/claude-0/-home-user-claude/36e8198e-4b0f-5797-ac43-e92a3ca54467/scratchpad/avmux-demo/out/mp4-demo/output.mp4.partial"
+      ],
+      "drain_complete": true,
+      "exit_code": 0,
+      "kill_reason": null,
+      "launch_error": null,
+      "orphan_group_killed": false,
+      "outcome": "EXITED_ZERO",
+      "phase": "readback_audio_packets",
+      "signal": null,
+      "stderr": {
+        "dropped_bytes": 0,
+        "kept_bytes": 0,
+        "sha256_full_stream": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "text": "",
+        "total_bytes": 0,
+        "truncated": false
+      },
+      "stdout": {
+        "dropped_bytes": 0,
+        "kept_bytes": 2488,
+        "sha256_full_stream": "10b475eb3cdbd2bffd18bc57ff551650408e7b2c36a2b623b8d1724a3161c3b5",
+        "total_bytes": 2488,
+        "truncated": false
+      },
+      "timed_out": false,
+      "timeout_seconds": 120.0,
+      "wall_seconds": 0.067
+    }
+  ],
+  "finished_utc": "2026-11-04T21:25:44Z",
+  "input": {
+    "audio": {
+      "bytes": 9644,
+      "path": "stem.wav",
+      "pcm_sha256": "247e9f8e6a35a8eb7d27c5bcd56d2aad1607d83631a14cdb3c9094e05f11f794",
+      "sha256_after": "68f8180e0630509d8743c11c38de674481e3f711c54c12bffa996c0af1c8ba88",
+      "sha256_before": "68f8180e0630509d8743c11c38de674481e3f711c54c12bffa996c0af1c8ba88"
+    },
+    "inputs_unchanged": true,
+    "video": {
+      "bytes": 5134,
+      "path": "clip.mp4",
+      "sha256_after": "9f361c19b5b1a6355ba4a5b4f886d06440111978bea6b01f760e13dc81ae5ad2",
+      "sha256_before": "9f361c19b5b1a6355ba4a5b4f886d06440111978bea6b01f760e13dc81ae5ad2"
+    }
+  },
+  "limits": {
+    "inspect_timeout_seconds": 120.0,
+    "max_argv_bytes": 100000,
+    "max_caption_chars": 512,
+    "max_captions": 512,
+    "max_clips": 256,
+    "max_diag_bytes": 16384,
+    "max_dimension": 7680,
+    "max_drain_bytes": 67108864,
+    "max_duration_seconds": 3600,
+    "max_font_bytes": 33554432,
+    "max_fps": 120,
+    "max_frames": 18000,
+    "max_input_bytes": 4194304,
+    "max_output_bytes": 2147483648,
+    "max_pixel_volume": 37324800000,
+    "max_runtime_seconds": 600.0,
+    "max_source_bytes": 4294967296,
+    "max_windows_cmdline_chars": 32000,
+    "probe_timeout_seconds": 30.0
+  },
+  "note": "Technical verdict only (container/stream properties, decoded frame/packet hashes, decoded audio counts). No audio, visual, sync-perception or creative quality was evaluated and nothing here is creative acceptance.",
+  "observations": {
+    "aac_observations": {
+      "audio_minus_video_duration_seconds_from_container": "0",
+      "decoded_pcm_sha256": "bd10f85f61354680bdf3a8eddfcf3ca840d9d78b11c752665a6f06db6582217c",
+      "decoded_samples": 5120,
+      "delta_samples": 320,
+      "exact_sample_count": false,
+      "expected_samples": 4800,
+      "note": "AAC is lossy and carries encoder delay/padding; counts are observations against the documented tolerance, not a sample-exact claim",
+      "perceptual_sync_evaluated": false,
+      "sample_exact_claimed": false
+    },
+    "audio_packets": {
+      "discard_padding": null,
+      "first_packet": {
+        "dts": -1024,
+        "duration": 1024,
+        "pts": -1024,
+        "size": "414"
+      },
+      "last_packet": {
+        "dts": 4096,
+        "duration": 704,
+        "pts": 4096,
+        "size": "292"
+      },
+      "note": "skip/padding values are reported only if ffprobe exposes them as packet side data; absence is not evidence of zero",
+      "packet_count": 6,
+      "skip_samples": 1024,
+      "skip_samples_side_data_seen": true
+    },
+    "decoded_audio": {
+      "bytes": 10240,
+      "samples": 5120,
+      "sha256": "bd10f85f61354680bdf3a8eddfcf3ca840d9d78b11c752665a6f06db6582217c"
+    },
+    "output_audio_stream": {
+      "bit_rate": "133384",
+      "duration": "0.100000",
+      "duration_samples_from_container": 4800.0,
+      "duration_ts": 4800,
+      "nb_frames": "6",
+      "profile": "LC",
+      "start_pts": 0,
+      "start_time": "0.000000",
+      "time_base": "1/48000"
+    }
+  },
+  "outputs": [
+    {
+      "bytes": 7782,
+      "name": "output.mp4",
+      "partial": false,
+      "role": "media",
+      "sha256": "543a712284260b5957eab1079e757fce602e221f4b435a5c7ffc2b2c72b36b90"
+    },
+    {
+      "bytes": 2976,
+      "name": "plan.canonical.json",
+      "partial": false,
+      "role": "plan",
+      "sha256": "659e920fc532160e33e7f76fb61317de6f34b65f6ed71a3ac3aee1a23dd6dc55"
+    },
+    {
+      "bytes": 4386,
+      "name": "ffprobe.output.json",
+      "partial": false,
+      "role": "ffprobe_output",
+      "sha256": "8c3936f9cd74f65c4c32bddf89bbc654f4b7e27649cd420dce3e840d687ff77f"
+    }
+  ],
+  "plan_sha256": "659e920fc532160e33e7f76fb61317de6f34b65f6ed71a3ac3aee1a23dd6dc55",
+  "platform": {
+    "machine": "x86_64",
+    "python": "3.13.18",
+    "release": "6.18.44-fc-v233",
+    "system": "Linux",
+    "video_core": "0.1.0"
+  },
+  "preflight": {
+    "source_checks": [
+      {
+        "expected": 1,
+        "name": "video_stream_count",
+        "observed": 1,
+        "ok": true
+      },
+      {
+        "expected": 1,
+        "name": "source_total_streams",
+        "observed": 1,
+        "ok": true
+      },
+      {
+        "expected": 1,
+        "name": "video_stream_count",
+        "observed": 1,
+        "ok": true
+      },
+      {
+        "expected": "h264",
+        "name": "video_codec",
+        "observed": "h264",
+        "ok": true
+      },
+      {
+        "expected": 160,
+        "name": "video_width",
+        "observed": 160,
+        "ok": true
+      },
+      {
+        "expected": 90,
+        "name": "video_height",
+        "observed": 90,
+        "ok": true
+      },
+      {
+        "expected": "30/1",
+        "name": "video_r_frame_rate",
+        "observed": "30/1",
+        "ok": true
+      },
+      {
+        "expected": "30/1",
+        "name": "video_avg_frame_rate",
+        "observed": "30/1",
+        "ok": true
+      },
+      {
+        "expected": 3,
+        "name": "video_frames",
+        "observed": "3",
+        "ok": true
+      },
+      {
+        "expected": {
+          "start_pts": 0,
+          "start_time": "0"
+        },
+        "name": "video_start",
+        "observed": {
+          "format_start_time": "0.000000",
+          "start_pts": 0,
+          "start_time": "0.000000"
+        },
+        "ok": true
+      },
+      {
+        "expected": 1,
+        "name": "audio_stream_count",
+        "observed": 1,
+        "ok": true
+      },
+      {
+        "expected": "pcm_s16le",
+        "name": "audio_codec",
+        "observed": "pcm_s16le",
+        "ok": true
+      },
+      {
+        "expected": 48000,
+        "name": "audio_sample_rate",
+        "observed": "48000",
+        "ok": true
+      },
+      {
+        "expected": 1,
+        "name": "audio_channels",
+        "observed": 1,
+        "ok": true
+      },
+      {
+        "expected": 4800,
+        "name": "audio_duration_samples",
+        "observed": {
+          "duration_ts": 4800,
+          "time_base": "1/48000"
+        },
+        "ok": true
+      },
+      {
+        "expected": {
+          "start": "0 or not reported (plain WAV)"
+        },
+        "name": "audio_start",
+        "observed": {
+          "start_pts": null,
+          "start_time": null
+        },
+        "ok": true
+      }
+    ],
+    "video_properties_basis": "MEASURED_BY_FFPROBE_AT_PREFLIGHT"
+  },
+  "quality_evaluated": false,
+  "route": "MP4_AAC",
+  "schema": "video_core.avmux_receipt/1",
+  "selection": {
+    "note": "selection.ref and every declared value are caller assertions: preserved verbatim, not authenticated, not evidence of creative adoption",
+    "ref": "synthetic-avmux-demo/selection-001"
+  },
+  "stage": "complete",
+  "started_utc": "2026-11-04T21:25:44Z",
+  "status": "MUXED_TECHNICAL_WITHIN_TOLERANCE",
+  "technical_verdict": {
+    "contract": "MP4_AAC:lossy_within_tolerance",
+    "creative_acceptance": "NOT_EVALUATED",
+    "met": true,
+    "perceptual_sync_evaluated": false,
+    "quality_evaluated": false,
+    "sample_exact": false,
+    "tolerance": {
+      "samples": 1024
+    }
+  },
+  "tmp_cleanup": "removed",
+  "tools": {
+    "ffmpeg": {
+      "discovery": "PATH",
+      "executable_sha256": "ed16af623947494a72e284b6eb8ff225f2da22b38b5d5069c2fd4b4ba3384e41",
+      "name": "ffmpeg",
+      "path": "/usr/bin/ffmpeg",
+      "problem": null,
+      "version": "6.1.1-3ubuntu5",
+      "version_line": "ffmpeg version 6.1.1-3ubuntu5 Copyright (c) 2000-2023 the FFmpeg developers"
+    },
+    "ffprobe": {
+      "discovery": "PATH",
+      "executable_sha256": "272f6ebc634a63d9c8b4ca68e964119d980f25154e5aa2c35e5487da48e9a58f",
+      "name": "ffprobe",
+      "path": "/usr/bin/ffprobe",
+      "problem": null,
+      "version": "6.1.1-3ubuntu5",
+      "version_line": "ffprobe version 6.1.1-3ubuntu5 Copyright (c) 2007-2023 the FFmpeg developers"
+    }
+  },
+  "written": true
+}

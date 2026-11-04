@@ -123,14 +123,14 @@ def _listing(path: str, flag: str, limits: Limits, cwd: str):
 
 
 def missing_capabilities(path: str, requirements: dict, limits: Limits, cwd: str) -> tuple[dict, list]:
-    """Check requirements {'encoders': [...], 'filters': [...], 'demuxers': [...]}. Fail-closed.
+    """Check requirements {'encoders'|'filters'|'demuxers'|'muxers'|'decoders': [...]}. Fail-closed.
 
     Returns ({'missing': {kind: [names]}, 'probe_failed': [flags], 'details': {flag: {...}}}, run results).
     * missing      -- the listing was understood and the name is truly absent
     * probe_failed -- the listing could not be obtained or understood (non-zero exit, truncated output,
                       or exit 0 but zero recognisable entries, i.e. an unknown layout). Never treated as success.
     """
-    flags = {"encoders": "-encoders", "filters": "-filters", "demuxers": "-demuxers"}
+    flags = {"encoders": "-encoders", "filters": "-filters", "demuxers": "-demuxers", "muxers": "-muxers", "decoders": "-decoders"}
     runs, missing, failed, details = [], {}, [], {}
     for key, flag in flags.items():
         wanted = requirements.get(key) or []

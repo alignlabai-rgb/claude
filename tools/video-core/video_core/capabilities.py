@@ -32,6 +32,10 @@ _ENCODER = re.compile(r"^\s*[VAS][FSXBD.]{5}\s+(?P<name>[A-Za-z0-9_.+\-]+)(?:\s.
 _DEMUXER = re.compile(r"^\s*D[E ]?\s+(?P<name>[A-Za-z0-9_.+\-]+(?:,[A-Za-z0-9_.+\-]+)*)(?:\s.*)?$")
 
 
+# `-muxers`: `<flags> <name> [description]`, flags ` E` (FFmpeg 6.1.1 observed: two leading spaces then E; a muxer that can also demux shows `DE`)
+_MUXER = re.compile(r"^\s*[D ]?E\s+(?P<name>[A-Za-z0-9_.+\-]+(?:,[A-Za-z0-9_.+\-]+)*)(?:\s.*)?$")
+
+
 @dataclass
 class Listing:
     names: set = field(default_factory=set)
@@ -72,4 +76,13 @@ def parse_demuxers(text: str) -> Listing:
     return _parse(text, _DEMUXER, True)
 
 
-PARSERS = {"-filters": parse_filters, "-encoders": parse_encoders, "-demuxers": parse_demuxers}
+def parse_muxers(text: str) -> Listing:
+    return _parse(text, _MUXER, True)
+
+
+def parse_decoders(text: str) -> Listing:
+    """`-decoders` uses the same six-character flag layout as `-encoders` (e.g. ` VFS..D h264`, ` A....D aac`)."""
+    return _parse(text, _ENCODER, False)
+
+
+PARSERS = {"-filters": parse_filters, "-encoders": parse_encoders, "-demuxers": parse_demuxers, "-muxers": parse_muxers, "-decoders": parse_decoders}

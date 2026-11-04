@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Offline AV mux manifest v1 (video_core.avmux)",
+  "description": "The caller's explicit selection of ONE local H.264 video and ONE qualified 48 kHz signed 16-bit PCM WAV stem, bound by SHA-256 and declared properties. Everything declared is a caller assertion; the planner verifies hashes and the WAV itself, and video properties are measured only by the explicit --mux preflight. Rules the schema cannot express (declared audio sample count equals the timeline's sample count under the audiomix boundary policy, real WAV matches) are in AVMUX_SPEC.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["avmux_version", "route", "selection", "video", "audio"],
+  "properties": {
+    "avmux_version": {"const": 1},
+    "route": {"enum": ["MOV_PCM_S16LE", "MP4_AAC"]},
+    "selection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ref"],
+      "properties": {"ref": {"type": "string", "minLength": 1, "maxLength": 128, "description": "opaque caller reference for the explicit selection; not authenticated"}}
+    },
+    "video": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "path", "sha256", "declared"],
+      "properties": {
+        "state": {"enum": ["USE", "MISSING", "UNKNOWN", "PROXY", "HOLD"], "description": "only USE is accepted; every other state is rejected"},
+        "path": {"type": "string", "minLength": 1, "maxLength": 512, "description": "relative, '/'-separated, .mp4/.m4v/.mov; symlinks/junctions rejected"},
+        "sha256": {"type": "string", "pattern": "^[0-9a-fA-F]{64}$"},
+        "declared": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["codec", "width", "height", "fps", "total_frames"],
+          "properties": {
+            "codec": {"const": "h264"},
+            "width": {"type": "integer", "minimum": 16, "maximum": 7680},
+            "height": {"type": "integer", "minimum": 16, "maximum": 7680},
+            "fps": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["n", "d"],
+              "properties": {"n": {"type": "integer", "minimum": 1, "maximum": 60000}, "d": {"type": "integer", "minimum": 1, "maximum": 1001}}
+            },
+            "total_frames": {"type": "integer", "minimum": 1, "maximum": 18000}
+          }
+        }
+      }
+    },
+    "audio": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "path", "sha256", "declared"],
+      "properties": {
+        "state": {"enum": ["USE", "MISSING", "UNKNOWN", "PROXY", "HOLD"]},
+        "path": {"type": "string", "minLength": 1, "maxLength": 512, "description": "relative .wav"},
+        "sha256": {"type": "string", "pattern": "^[0-9a-fA-F]{64}$"},
+        "declared": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["sample_rate", "channels", "sample_count"],
+          "properties": {
+            "sample_rate": {"const": 48000},
+            "channels": {"type": "integer", "minimum": 1, "maximum": 2},
+            "sample_count": {"type": "integer", "minimum": 1}
+          }
+        },
+        "receipt": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["path", "sha256"],
+          "properties": {"path": {"type": "string", "minLength": 1, "maxLength": 512}, "sha256": {"type": "string", "pattern": "^[0-9a-fA-F]{64}$"}},
+          "description": "optional audio-planner receipt that qualifies the stem; must be MIXED_VERIFIED and describe this exact stem"
+        }
+      }
+    }
+  }
+}

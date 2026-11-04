@@ -97,6 +97,33 @@ class Demuxers(unittest.TestCase):
         self.assertEqual(cap.parse_demuxers(fx("demuxers.ffmpeg-6.1.1.observed.txt").replace("\n", "\r\n")).recognised, 6)
 
 
+class MuxersAndDecoders(unittest.TestCase):
+    """Parsers added for video_core.avmux: observed FFmpeg 6.1.1 layouts, exact names, noise rejected, CRLF."""
+
+    def test_observed_muxers(self):
+        got = cap.parse_muxers(fx("muxers.ffmpeg-6.1.1.observed.txt"))
+        self.assertEqual((got.recognised, got.ignored), (9, 4))
+        self.assertTrue({"mov", "mp4", "framemd5", "framehash", "hash", "s16le", "null", "mpegts"} <= got.names)
+        self.assertIn("3gp", got.names)
+        self.assertNotIn("mp", got.names)
+
+    def test_muxer_layout_variants_and_noise(self):
+        self.assertEqual(cap.parse_muxers("  E mov  QuickTime / MOV").names, {"mov"})
+        self.assertEqual(cap.parse_muxers(" DE mov,mp4  both").names, {"mov", "mp4"}, "a muxer that also demuxes, with aliases")
+        for bad in (" D. = Demuxing supported", " .E = Muxing supported", "File formats:", " --", " D  wav demux only", "  E ", "E", "Muxers:"):
+            self.assertEqual(cap.parse_muxers(bad).recognised, 0, bad)
+        self.assertEqual(cap.parse_muxers(fx("muxers.ffmpeg-6.1.1.observed.txt").replace("\n", "\r\n")).recognised, 9)
+
+    def test_observed_decoders_share_the_encoder_layout_and_names_are_exact(self):
+        got = cap.parse_decoders(fx("decoders.ffmpeg-6.1.1.observed.txt"))
+        self.assertEqual((got.recognised, got.ignored), (5, 10))
+        self.assertEqual(got.names, {"aac", "h264", "pcm_s16le", "pcm_f32le", "hevc"})
+        self.assertNotIn("pcm", got.names)
+        for bad in (" V..... = Video", " ------", "Decoders:", " V...D h264 x", " V.....D h264 x"):
+            self.assertEqual(cap.parse_decoders(bad).recognised, 0, bad)
+        self.assertEqual(cap.parse_decoders(fx("decoders.ffmpeg-6.1.1.observed.txt").replace("\n", "\r\n")).recognised, 5)
+
+
 @unittest.skipUnless(POSIX, "fake tools are POSIX scripts")
 class MissingCapabilitiesFailClosed(TmpCase):
     REQ = {"encoders": ["libx264"], "filters": sorted(REQUIRED_FILTERS | {"drawtext"}), "demuxers": ["mov", "image2"]}
@@ -148,7 +175,8 @@ class RealListings(unittest.TestCase):
         ff = shutil.which("ffmpeg")
         if not ff:
             self.skipTest("ffmpeg not on PATH")
-        req = {"encoders": ["libx264"], "filters": sorted(REQUIRED_FILTERS | {"fps", "pad"}), "demuxers": ["mov", "image2"]}
+        req = {"encoders": ["libx264", "aac", "pcm_s16le"], "filters": sorted(REQUIRED_FILTERS | {"fps", "pad"}), "demuxers": ["mov", "image2", "wav"],
+               "muxers": ["mov", "mp4", "framemd5", "framehash", "s16le"], "decoders": ["h264", "aac", "pcm_s16le"]}
         got, runs = tools.missing_capabilities(ff, req, Limits(), os.getcwd())
         self.assertEqual((got["missing"], got["probe_failed"]), ({}, []), got)
         for d in got["details"].values():

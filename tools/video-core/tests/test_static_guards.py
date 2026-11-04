@@ -12,7 +12,7 @@ FORBIDDEN = {"socket", "ssl", "urllib", "http", "ftplib", "smtplib", "telnetlib"
 
 
 def sources():
-    for sub in ("", "audiomix"):
+    for sub in ("", "audiomix", "avmux"):
         base = os.path.join(PKG, sub)
         for name in sorted(os.listdir(base)):
             if name.endswith(".py"):
@@ -73,6 +73,7 @@ class Guards(unittest.TestCase):
     def test_python_311_syntax_floor(self):
         names = [n for n in sorted(os.listdir(PKG)) if n.endswith(".py")]
         names += ["audiomix/" + n for n in sorted(os.listdir(os.path.join(PKG, "audiomix"))) if n.endswith(".py")]
+        names += ["avmux/" + n for n in sorted(os.listdir(os.path.join(PKG, "avmux"))) if n.endswith(".py")]
         names += ["../tests/" + n for n in sorted(os.listdir(os.path.join(ROOT, "tests"))) if n.endswith(".py")]
         for name in names:
             with open(os.path.join(PKG, name), encoding="utf-8") as fh:

@@ -107,6 +107,12 @@ mixer lives in `video_core/audiomix` and is run as `python -m video_core.audiomi
 `schemas/audio-manifest.schema.json`). It writes a verified WAV stem only — no mux, no speech/TTS, no resampling, no network.
 `video_core/audio.py` remains the typing-only adapter interface.
 
+## Muxing (optional, separate)
+
+`python -m video_core.avmux {validate,plan,mux}` muxes one explicitly selected local H.264 video (stream copy) with one qualified 48 kHz s16 PCM WAV stem into a fresh directory —
+route `MOV_PCM_S16LE` (sample-exact PCM, independently verified) or `MP4_AAC` (lossy review candidate; tolerance and observed delay/padding reported, never called sample-exact). See `AVMUX_SPEC.md`
+and `schemas/avmux-manifest.schema.json`. `validate`/`plan` launch no process and create no file (video metadata stays `CALLER_STATED_UNVERIFIED`); `mux --mux` runs a bounded ffprobe preflight and rejects mismatches before creating anything.
+
 ## Tests
 
 ```bash

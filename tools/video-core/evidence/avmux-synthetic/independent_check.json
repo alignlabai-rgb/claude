@@ -1,0 +1,278 @@
+{
+  "expected_samples": 4800,
+  "wav_pcm_sha256": "247e9f8e6a35a8eb7d27c5bcd56d2aad1607d83631a14cdb3c9094e05f11f794",
+  "routes": {
+    "MOV_PCM_S16LE": {
+      "file": "output.mov",
+      "audio_stream": {
+        "codec_name": "pcm_s16le",
+        "profile": null,
+        "sample_rate": "48000",
+        "channels": 1,
+        "start_pts": 0,
+        "start_time": "0.000000",
+        "time_base": "1/48000",
+        "duration_ts": 4800,
+        "duration": "0.100000",
+        "nb_frames": "4800",
+        "bit_rate": "768000"
+      },
+      "format": {
+        "format_name": "mov,mp4,m4a,3gp,3g2,mj2",
+        "start_time": "0.000000",
+        "duration": "0.100000",
+        "nb_streams": 2,
+        "size": "15186"
+      },
+      "checks": [
+        {
+          "name": "decoded_video_frames_equal_source",
+          "expected": {
+            "count": 3,
+            "equal_to_source": true
+          },
+          "observed": {
+            "exit": 0,
+            "count": 3,
+            "equal_to_source": true,
+            "stderr": ""
+          },
+          "ok": true
+        },
+        {
+          "name": "copied_video_packets_equal_source",
+          "expected": {
+            "count": 3,
+            "equal_to_source": true
+          },
+          "observed": {
+            "exit": 0,
+            "count": 3,
+            "equal_to_source": true,
+            "stderr": ""
+          },
+          "ok": true
+        },
+        {
+          "name": "two_streams_one_video_one_audio",
+          "expected": [
+            "audio",
+            "video"
+          ],
+          "observed": [
+            "audio",
+            "video"
+          ],
+          "ok": true
+        },
+        {
+          "name": "video_h264_160x90_30fps_3frames",
+          "expected": {
+            "codec": "h264",
+            "size": "160x90",
+            "fps": "30/1",
+            "frames": "3"
+          },
+          "observed": {
+            "codec": "h264",
+            "size": "160x90",
+            "fps": "30/1",
+            "frames": "3"
+          },
+          "ok": true
+        },
+        {
+          "name": "audio_codec_pcm_s16le",
+          "expected": "pcm_s16le",
+          "observed": "pcm_s16le",
+          "ok": true
+        },
+        {
+          "name": "audio_start_pts_zero_and_duration_4800_samples",
+          "expected": {
+            "start_pts": 0,
+            "duration_ts": 4800,
+            "time_base": "1/48000"
+          },
+          "observed": {
+            "start_pts": 0,
+            "duration_ts": 4800,
+            "time_base": "1/48000"
+          },
+          "ok": true
+        },
+        {
+          "name": "decoded_pcm_equals_wav_pcm_sample_for_sample",
+          "expected": {
+            "bytes": 9600,
+            "sha256": "247e9f8e6a35a8eb7d27c5bcd56d2aad1607d83631a14cdb3c9094e05f11f794"
+          },
+          "observed": {
+            "exit": 0,
+            "bytes": 9600,
+            "sha256": "247e9f8e6a35a8eb7d27c5bcd56d2aad1607d83631a14cdb3c9094e05f11f794",
+            "identical": true
+          },
+          "ok": true
+        }
+      ],
+      "all_ok": true
+    },
+    "MP4_AAC": {
+      "file": "output.mp4",
+      "audio_stream": {
+        "codec_name": "aac",
+        "profile": "LC",
+        "sample_rate": "48000",
+        "channels": 1,
+        "start_pts": 0,
+        "start_time": "0.000000",
+        "time_base": "1/48000",
+        "duration_ts": 4800,
+        "duration": "0.100000",
+        "nb_frames": "6",
+        "bit_rate": "133384"
+      },
+      "format": {
+        "format_name": "mov,mp4,m4a,3gp,3g2,mj2",
+        "start_time": "0.000000",
+        "duration": "0.100000",
+        "nb_streams": 2,
+        "size": "7782"
+      },
+      "aac_observations": {
+        "decoded_samples": 5120,
+        "delta_vs_expected": 320,
+        "exact_sample_count": false,
+        "sample_exact_claimed": false,
+        "packet_count": 6,
+        "packets_pts_duration_side_data": [
+          [
+            -1024,
+            1024,
+            [
+              {
+                "side_data_type": "Skip Samples",
+                "skip_samples": 1024,
+                "discard_padding": 0,
+                "skip_reason": 0,
+                "discard_reason": 0
+              }
+            ]
+          ],
+          [
+            0,
+            1024,
+            null
+          ],
+          [
+            1024,
+            1024,
+            null
+          ],
+          [
+            2048,
+            1024,
+            null
+          ],
+          [
+            3072,
+            1024,
+            null
+          ],
+          [
+            4096,
+            704,
+            null
+          ]
+        ],
+        "leading_samples_identical_to_wav_if_aligned_at_0": 0,
+        "note": "AAC is lossy: byte differences from the WAV are expected and are NOT a defect; counts, start and padding are reported as observed; no quality or perceptual-sync judgement"
+      },
+      "checks": [
+        {
+          "name": "decoded_video_frames_equal_source",
+          "expected": {
+            "count": 3,
+            "equal_to_source": true
+          },
+          "observed": {
+            "exit": 0,
+            "count": 3,
+            "equal_to_source": true,
+            "stderr": ""
+          },
+          "ok": true
+        },
+        {
+          "name": "copied_video_packets_equal_source",
+          "expected": {
+            "count": 3,
+            "equal_to_source": true
+          },
+          "observed": {
+            "exit": 0,
+            "count": 3,
+            "equal_to_source": true,
+            "stderr": ""
+          },
+          "ok": true
+        },
+        {
+          "name": "two_streams_one_video_one_audio",
+          "expected": [
+            "audio",
+            "video"
+          ],
+          "observed": [
+            "audio",
+            "video"
+          ],
+          "ok": true
+        },
+        {
+          "name": "video_h264_160x90_30fps_3frames",
+          "expected": {
+            "codec": "h264",
+            "size": "160x90",
+            "fps": "30/1",
+            "frames": "3"
+          },
+          "observed": {
+            "codec": "h264",
+            "size": "160x90",
+            "fps": "30/1",
+            "frames": "3"
+          },
+          "ok": true
+        },
+        {
+          "name": "audio_codec_aac",
+          "expected": "aac",
+          "observed": "aac",
+          "ok": true
+        },
+        {
+          "name": "decoded_sample_count_within_one_aac_frame_of_4800",
+          "expected": {
+            "expected": 4800,
+            "tolerance": 1024
+          },
+          "observed": {
+            "exit": 0,
+            "decoded": 5120,
+            "delta": 320
+          },
+          "ok": true
+        }
+      ],
+      "all_ok": true
+    }
+  },
+  "source_video": {
+    "frames_decoded": 3,
+    "packets": 3
+  },
+  "all_ok": true,
+  "note": "Technical measurement of a synthetic 3-frame case only; no audio/visual/creative quality judgement."
+}

@@ -74,3 +74,16 @@ validates every caller limit (`Limits`, `AudioLimits`, `.replace()`), every CLI 
 (`timeout_s`, `grace_s`, `drain_timeout_s`, `max_drain_bytes`, the capture-limit pairs). Rules: no bool; integer limits must be real ints (no `100.0`/`5.5`);
 time limits finite, > 0 and <= 86400 s (grace/drain waits <= 3600 s); sub-second positive timeouts remain valid. All rejections are `ValueError` raised before any process launch or file write;
 the CLIs turn them into exit code 2. Tested on Linux only (author); the requester's Windows retest should rerun the default suite. Existing ceilings, defaults and the baseline plan hash are unchanged.
+
+## AV mux (sixth commit): optional `video_core.avmux`
+
+Author checks are **Linux-only, FFmpeg/ffprobe 6.1.1-3ubuntu5 only**; no other FFmpeg version, macOS or Windows is claimed (the requester will run Windows). The real evidence is one 3-frame synthetic case (see `evidence/avmux-synthetic/`).
+
+* **Scope of support:** one already-H.264 video stream starting at 0 (stream copy) and 48 kHz s16 PCM mono/stereo WAV; MOV+`pcm_s16le` and MP4+native `aac` only. Other codecs, containers, A/V offsets, multiple streams, audio delay, `-shortest`-style policies, VFR, B-frame start offsets other than 0 are rejected, not handled.
+* **MP4/AAC is lossy.** Its contract is a *declared tolerance* (1024 samples = one AAC frame, a choice, not a standard) on the decoded sample count and the audio start. In the real case the container said 4800 samples while the decoder returned 5120 (+320, untrimmed end padding): within tolerance and reported, but it means decoded AAC is not sample-aligned to the WAV and the route must not be used where sample accuracy matters. No perceptual sync or quality was evaluated.
+* **Receipt imprecision (documented, not hidden):** `audio_packets.discard_padding`/`skip_samples` summarize the first non-zero values; ffprobe's raw per-packet side data (including `discard_padding: 0`) is only in the independent check output. A future change should record every side-data entry.
+* **Plan is deliberately weaker than mux:** without ffprobe, video codec/size/rate/frames/start are caller-stated (`CALLER_STATED_UNVERIFIED`); only the explicit `--mux` preflight measures them. Reusing a prior receipt bound by the same SHA-256 to avoid re-probing is not implemented.
+* **Decode checks cost time:** the readback decodes the whole video twice and the audio once with bounded timeouts (`inspect_timeout_seconds`); long videos need larger, still finite, limits. Per-frame hash text is capped at 4 MiB (≈ the schema's 18000 frames).
+* **Race window:** inputs are hashed at plan time and re-hashed after the mux (`inputs_unchanged`); a change in between is reported as `UNKNOWN`, not prevented.
+* **Tests use fake FFmpeg/ffprobe scripts** for orchestration (POSIX only; they skip on Windows); they are never mux evidence. Windows junction rejection is stub-tested on Linux.
+* **No integration:** nothing consumes this; the caller owns which video/stem to mux and every creative decision. Colour-conversion drift (baseline) is unchanged and still open.
