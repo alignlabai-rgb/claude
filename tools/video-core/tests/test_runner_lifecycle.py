@@ -144,14 +144,46 @@ class DrainBound(unittest.TestCase):
         self.assertFalse(r.ok)
         self.assertEqual((r.stdout.total, r.stderr.total), (LIMIT // 2 + 1, LIMIT // 2 + 1))
 
-    def test_raw_exit_signal_and_timeout_distinctions_survive_a_breach(self):
-        nz = self.run_writer(f"import sys; sys.stdout.buffer.write(b'x'*{BIG}); sys.exit(3)")
-        self.assertEqual((nz.outcome, nz.exit_code, nz.signal, nz.drain_limit_exceeded), (runner.NONZERO_EXIT, 3, None, True))
-        if POSIX:
-            sg = self.run_writer(f"import os, signal, sys; sys.stdout.buffer.write(b'x'*{BIG}); sys.stdout.flush(); os.kill(os.getpid(), signal.SIGKILL)")
-            self.assertEqual((sg.outcome, sg.exit_code, sg.signal, sg.drain_limit_exceeded, sg.kill_attempted), (runner.SIGNALED, None, signal.SIGKILL, True, False))
+    def barrier_run(self, code, **kw):
+        """Deterministic: the real child reaches its own end (exit status fixed by its code) BEFORE the runner's termination routine runs, so the natural status must survive."""
+        original = runner._terminate
+
+        def barrier(proc, grace):
+            proc.wait(timeout=5)
+            return original(proc, grace)
+        with mock.patch.object(runner, "_terminate", barrier):
+            return self.run_writer(code, **kw)
+
+    def test_natural_nonzero_exit_survives_a_breach_deterministically(self):
+        r = self.barrier_run(f"import sys,time; sys.stdout.buffer.write(b'x'*{BIG}); sys.stdout.flush(); time.sleep(0.2); sys.exit(3)")
+        self.assertEqual((r.outcome, r.exit_code, r.signal, r.kill_reason, r.drain_limit_exceeded), (runner.NONZERO_EXIT, 3, None, None, True))
+        self.assertEqual((r.kill_attempted, r.kill_delivered, r.ok), (False, False, False))
+        self.assertEqual({q["state"] for q in r.termination_requests}, {runner.ST_NOT_SENT})
+
+    @unittest.skipUnless(POSIX, "POSIX only: a child killing itself with SIGKILL; Windows has no signals (skipped on Windows, not Windows evidence)")
+    def test_natural_signal_death_survives_a_breach_deterministically(self):
+        r = self.barrier_run(f"import os, signal, sys, time; sys.stdout.buffer.write(b'x'*{BIG}); sys.stdout.flush(); time.sleep(0.2); os.kill(os.getpid(), signal.SIGKILL)")
+        self.assertEqual((r.outcome, r.exit_code, r.signal, r.kill_reason, r.drain_limit_exceeded, r.kill_attempted), (runner.SIGNALED, None, signal.SIGKILL, None, True, False))
+
+    def test_unbarriered_flooding_nonzero_child_is_either_its_own_exit_3_or_a_real_kill_never_a_mix(self):
+        """Scheduling decides which happens first (a child still flooding can be killed before its intended exit 3; Windows then reports exit code 1, POSIX signal SIGTERM).
+        The ACTUAL result is preserved and must be internally consistent."""
+        for _ in range(4):
+            r = self.run_writer(f"import sys; sys.stdout.buffer.write(b'x'*{BIG}); sys.exit(3)")
+            self.assertTrue(r.drain_limit_exceeded)
+            if r.outcome == runner.NONZERO_EXIT:
+                self.assertEqual((r.exit_code, r.signal, r.kill_reason), (3, None, None))
+            else:
+                self.assertEqual((r.outcome, r.kill_reason), (runner.FLOOD_KILLED, "flood"))
+                self.assertTrue(any(q["state"] == runner.ST_ACCEPTED and not q["leader_exited_before"] for q in r.termination_requests))
+                self.assertEqual((r.exit_code, r.signal), (None, signal.SIGTERM) if POSIX else (1, None))
+
+    def test_true_live_kill_and_timeout_controls_keep_their_distinct_semantics(self):
+        live = self.run_writer(f"import sys,time; sys.stdout.buffer.write(b'x'*{BIG}); sys.stdout.flush(); time.sleep(10)")
+        self.assertEqual((live.outcome, live.kill_reason, live.kill_delivered, live.drain_limit_exceeded), (runner.FLOOD_KILLED, "flood", True, True))
         to = self.run_writer("import time; time.sleep(30)", timeout_s=0.5)
         self.assertEqual((to.outcome, to.timed_out, to.drain_limit_exceeded, to.kill_attempted, to.kill_delivered), (runner.TIMEOUT, True, False, True, True))
+        self.assertEqual((to.exit_code, to.signal), (None, signal.SIGTERM) if POSIX else (1, None))
 
     def test_unbreached_runs_keep_their_old_shape(self):
         r = self.run_writer("import sys; sys.stdout.write('hello'); sys.stderr.write('warn')", stdout_limits=(64, 0), stderr_limits=(64, 0), max_drain_bytes=1 << 20)

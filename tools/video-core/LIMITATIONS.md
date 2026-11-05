@@ -142,3 +142,12 @@ Source: the adversarial audit's confirmed findings (checkpoint `c3d44872…`, fi
 ## Test-stub flake (found by the clean export of `b6b049e`)
 
 `ParentHandshakeWithStubWorker.test_every_kind_of_bad_hello_is_refused_and_no_go_is_ever_sent` failed intermittently (also on the parent `f42c2db`: 2 of 8 runs; 25 of 25 pass after the fix). Cause: the stub wrote its deliberately bad `hello.json` ("garbage", "huge") non-atomically, so the parent could poll a half-written 200 KB file and report `hello_unreadable` instead of `hello_too_large`. Test-only defect in the stub (the real worker and handshake writer are atomic); the stub now writes through a temp file + `os.replace`. No runtime change.
+
+## Scheduler-sensitive test on Windows b6b049e: natural exit 3 vs an actively flooding child
+
+`DrainBound.test_raw_exit_signal_and_timeout_distinctions_survive_a_breach` expected `(NONZERO_EXIT, 3, None, True)` for a child that floods 2 MB and then `sys.exit(3)`; Windows b6b049e actually gave
+`(FLOOD_KILLED, 1, None, True)`. That is a legitimate result, not a runtime fault: a child still flooding when the runner notices can be killed first (TerminateProcess forces exit code 1), and the actual
+result was preserved. The runtime is unchanged (`aab29b7` only touched a handshake test stub and did not address this). The test is split into: a deterministic barrier control where the real child reaches its
+own exit 3 (or a self-inflicted SIGKILL, POSIX only) before the termination routine runs, so the natural status must survive with `kill_attempted=false`; an unbarriered run that accepts either its own exit 3 or
+a real accepted kill, and checks the actual result is internally consistent (POSIX None/SIGTERM, Windows 1/None); and a true live-kill plus timeout control. Nothing is skipped on Windows except the POSIX-only
+signal-death case. Linux evidence only; not Windows execution.
