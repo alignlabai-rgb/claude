@@ -1,13 +1,21 @@
-# Verification log of the recovery transport (produced on Linux; scratch paths removed)
+# Verification log of the recovery transport (Linux; scratch paths replaced by <scratch>)
 # commit packed: 8cab6e44b7626924c9ad3a46814c7e57b575b5bc
 ## sha256
 4fc5e5325ab12d6cccb6f25283625dd3bf95fe43fd362d4890e33943bb21373c  portable-8cab6e4.zip
 0a8dafe4a6f77570a8629e48f7a4e95806b73d4b3923b3b8de6b92e35e188ada  portable-8cab6e4.zip.b64
 ## verify from zip, with git blob check
 members verified: 901/901  total bytes: 1829295  git-checked: True
+extracted 901 files to <scratch>/vl/a
+VERIFIED
 ## verify from base64, with git blob check
 members verified: 901/901  total bytes: 1829295  git-checked: True
-## independent comparison: extracted tree vs 'git archive 8cab6e4' (cmp, file by file): 901 files compared, 0 mismatches, identical file lists (see session record)
+extracted 901 files to <scratch>/vl/b
+VERIFIED
+## extraction onto an existing directory is refused
+REFUSED: <scratch>/vl/a already exists (extraction is create-only; choose a new directory)
+## independent comparison, extracted tree vs a fresh 'git archive 8cab6e4' export (cmp per file)
+file lists identical: 901 files
+zip-extracted vs git-archive vs base64-extracted: differing files = 0
 ## negative controls (tampered/unsafe archives must be rejected)
 control_good                       exit=0  members verified: 901/901  total bytes: 1829295  git-checked: False | VERIFIED
 zip_one_bit_flipped                exit=1  PROBLEMS: | zip sha256/size differs from the manifest

@@ -27,5 +27,8 @@ To run the harness from the restored tree: `py -3 -B C:\vcp\recovered-8cab6e4\po
 Zip and base64 both verify 901/901 against the manifest **and** against the committed git blobs; an independent `git archive 8cab6e4` export compared file by file with the extracted tree: 901 files, identical lists, 0 differing bytes; both extractions identical to each other. Negative controls all rejected: one bit flipped in the zip, one character changed in the base64, extra members named `../escape.txt`, `/abs/x.txt`, `a\b.txt`, `.git/config`, `portable/extra.txt`, a missing member, an altered member.
 Not verified: Windows (nothing was run there).
 
-## Preserved failed first attempt of the verifier
+## Preserved failed first attempts
+
+1. Verifier, first version:
 The first `verify_transport.py` rejected the tampered zip/base64 with exit 1 but via an uncaught `BadZipFile` traceback after recording the hash mismatch (`zip_one_bit_flipped`, `b64_one_char_changed`). It now stops cleanly as soon as the container hash disagrees with the manifest, and extraction onto an existing directory prints `REFUSED` instead of a `FileExistsError` traceback. The transport bytes themselves were not affected.
+2. The first committed `VERIFICATION_LOG.txt` (commit `020c362`, kept as `attempts/VERIFICATION_LOG.first-attempt.txt`) shows two uncaught `FileNotFoundError` tracebacks: my log run extracted into a scratch parent that did not exist and the verifier did not create missing parent directories. The verifier now creates missing parents (the target directory must still be new) and the log was regenerated. The archives and manifest were not changed by this.

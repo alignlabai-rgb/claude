@@ -108,6 +108,7 @@ def main():
     if ns.extract_to:
         root = os.path.abspath(ns.extract_to)
         try:
+            os.makedirs(os.path.dirname(root) or ".", exist_ok=True)      # missing PARENT directories are created; the target itself must be new
             os.mkdir(root)                               # create-only
         except FileExistsError:
             print(f"REFUSED: {root} already exists (extraction is create-only; choose a new directory)")
