@@ -1,0 +1,250 @@
+{
+  "case": "PC04_silence_omit_zero_fill_warnings",
+  "checks": [
+    {
+      "expected": {
+        "absent": [
+          5,
+          "HOLD",
+          [
+            "INCOMPLETE_SELECTED_INPUT"
+          ],
+          [
+            {
+              "sample_end": 3203,
+              "sample_start": 1602
+            }
+          ]
+        ],
+        "explicit_silence": [
+          0,
+          "READY",
+          [],
+          0
+        ],
+        "omit": [
+          5,
+          "HOLD",
+          [
+            "INCOMPLETE_SELECTED_INPUT"
+          ],
+          [
+            {
+              "sample_end": 3203,
+              "sample_start": 1602
+            }
+          ]
+        ],
+        "silence_without_decision_ref": [
+          1,
+          [
+            "missing_field"
+          ]
+        ]
+      },
+      "key": "PC04_silence_omit_zero_fill_warnings::explicit silence counts as coverage; missing decision_ref is rejected; OMIT and absent leave the exact gap [1602,3203) and HOLD",
+      "layer": "LIBRARY_ENFORCED",
+      "name": "explicit silence counts as coverage; missing decision_ref is rejected; OMIT and absent leave the exact gap [1602,3203) and HOLD",
+      "observed": {
+        "absent": [
+          5,
+          "HOLD",
+          [
+            "INCOMPLETE_SELECTED_INPUT"
+          ],
+          [
+            {
+              "sample_end": 3203,
+              "sample_start": 1602
+            }
+          ]
+        ],
+        "explicit_silence": [
+          0,
+          "READY",
+          [],
+          0
+        ],
+        "omit": [
+          5,
+          "HOLD",
+          [
+            "INCOMPLETE_SELECTED_INPUT"
+          ],
+          [
+            {
+              "sample_end": 3203,
+              "sample_start": 1602
+            }
+          ]
+        ],
+        "silence_without_decision_ref": [
+          1,
+          [
+            "missing_field"
+          ]
+        ]
+      },
+      "outcome": "PASS"
+    },
+    {
+      "expected": [
+        [
+          "ZERO_FILL_APPLIED"
+        ],
+        [
+          {
+            "sample_end": 3203,
+            "sample_start": 1602
+          }
+        ]
+      ],
+      "key": "PC04_silence_omit_zero_fill_warnings::zero-fill is reported: warning code and the exact filled gap",
+      "layer": "LIBRARY_ENFORCED",
+      "name": "zero-fill is reported: warning code and the exact filled gap",
+      "observed": [
+        [
+          "ZERO_FILL_APPLIED"
+        ],
+        [
+          {
+            "sample_end": 3203,
+            "sample_start": 1602
+          }
+        ]
+      ],
+      "outcome": "PASS"
+    },
+    {
+      "expected": [
+        0,
+        "READY"
+      ],
+      "gap": "GAP-09",
+      "intended_contract_hint": "absent audio must not become zeros without an explicit decision_ref",
+      "key": "PC04_silence_omit_zero_fill_warnings::ALLOW_ZERO_FILL makes absent audio READY (exit 0)",
+      "layer": "LIBRARY_PERMISSIVE",
+      "name": "ALLOW_ZERO_FILL makes absent audio READY (exit 0)",
+      "observed": [
+        0,
+        "READY"
+      ],
+      "outcome": "OBSERVED_OPEN_GAP"
+    },
+    {
+      "expected": "HOLD",
+      "key": "PC04_silence_omit_zero_fill_warnings::owner reading: any warning means HOLD",
+      "layer": "CALLER_GUARD_DEMO",
+      "name": "owner reading: any warning means HOLD",
+      "observed": "HOLD",
+      "outcome": "GUARD_OK"
+    },
+    {
+      "expected": [
+        "NO_AUDIO_EVENTS_SELECTED",
+        "ZERO_FILL_APPLIED"
+      ],
+      "key": "PC04_silence_omit_zero_fill_warnings::no audio selected at all is warned about",
+      "layer": "LIBRARY_ENFORCED",
+      "name": "no audio selected at all is warned about",
+      "observed": [
+        "NO_AUDIO_EVENTS_SELECTED",
+        "ZERO_FILL_APPLIED"
+      ],
+      "outcome": "PASS"
+    },
+    {
+      "expected": [
+        0,
+        "READY"
+      ],
+      "gap": "GAP-09",
+      "intended_contract_hint": "no audio selected should select the video-only (-an) path, not a silent WAV",
+      "key": "PC04_silence_omit_zero_fill_warnings::an all-absent scope is READY under ALLOW_ZERO_FILL (a silent stem would result)",
+      "layer": "LIBRARY_PERMISSIVE",
+      "name": "an all-absent scope is READY under ALLOW_ZERO_FILL (a silent stem would result)",
+      "observed": [
+        0,
+        "READY"
+      ],
+      "outcome": "OBSERVED_OPEN_GAP"
+    },
+    {
+      "expected": "PROCEED",
+      "key": "PC04_silence_omit_zero_fill_warnings::explicit INTENTIONAL_SILENCE with decision_ref passes the same owner reading",
+      "layer": "CALLER_GUARD_DEMO",
+      "name": "explicit INTENTIONAL_SILENCE with decision_ref passes the same owner reading",
+      "observed": "PROCEED",
+      "outcome": "GUARD_OK"
+    },
+    {
+      "expected": true,
+      "key": "PC04_silence_omit_zero_fill_warnings::zero-fill plan fixture is the one that was held",
+      "layer": "CALLER_GUARD_DEMO",
+      "name": "zero-fill plan fixture is the one that was held",
+      "observed": true,
+      "outcome": "GUARD_OK"
+    }
+  ],
+  "elapsed_seconds": 0.734,
+  "gaps": [
+    "GAP-09"
+  ],
+  "invocations": [
+    {
+      "denied_attempts": 0,
+      "exit_code": 0,
+      "label": "audio explicit silence",
+      "no": 68,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 1,
+      "label": "audio silence without decision_ref",
+      "no": 69,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 5,
+      "label": "audio OMIT instead of silence",
+      "no": 70,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 5,
+      "label": "audio silence row left out of scope",
+      "no": 71,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 0,
+      "label": "audio absent row + ALLOW_ZERO_FILL",
+      "no": 72,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 0,
+      "label": "audio only an OMIT row in scope + ALLOW_ZERO_FILL",
+      "no": 73,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 0,
+      "label": "audio explicit silence under REQUIRE_FULL_COVERAGE again",
+      "no": 74,
+      "status": "OK"
+    }
+  ],
+  "source_refs": [
+    "video_core/audiomix/plan.py:analyze",
+    "video_core/audiomix/manifest.py:_events"
+  ],
+  "status": "PASS",
+  "title": "Explicit silence vs OMIT vs absent vs ALLOW_ZERO_FILL; warnings are reported exactly"
+}

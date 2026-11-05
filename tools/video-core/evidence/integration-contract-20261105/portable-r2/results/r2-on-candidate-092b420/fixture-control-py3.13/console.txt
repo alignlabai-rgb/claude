@@ -1,0 +1,38 @@
+portable-r2 contract harness portable-contract-harness/2-r2 on Python 3.13.18 (linux)
+library pin: PINNED_EXACT (package and all files byte-identical to the pin)
+admission: MS01=PASS  children after admission=18
+cases: {"FAIL": 2, "PASS": 17}  children=397  wall=45.9s  exit=1
+check outcomes: {"CONTROL_OK": 48, "FAIL": 1, "GUARD_MISMATCH": 1, "GUARD_OK": 5, "OBSERVED_OPEN_GAP": 11, "PASS": 59, "REVIEW_REQUIRED": 5}
+layers: {"CALLER_GUARD_DEMO": {"GUARD_MISMATCH": 1, "GUARD_OK": 5}, "HARNESS_CONTROL": {"CONTROL_OK": 48}, "LIBRARY_ENFORCED": {"FAIL": 1, "PASS": 59}, "LIBRARY_PERMISSIVE": {"OBSERVED_OPEN_GAP": 11, "REVIEW_REQUIRED": 5}}
+mutation MU1_hold_to_ready: DETECTED (1 failing checks)
+mutation MU2_omitted_zero_fill_warning: DETECTED (3 failing checks)
+mutation MU3_wrong_boundary_rounding: DETECTED (3 failing checks)
+mutation MU4_attempted_external_launch: DETECTED (2 failing checks)
+mutation MU5_plan_creates_output_directory: DETECTED (3 failing checks)
+mutation MU7_gap_closed_receipt_required: NOT_APPLICABLE - the pattern occurs 0 times in this source (needs exactly 1): the mutation cannot be applied to this candidate
+mutation MU6_srt_crlf: DETECTED (3 failing checks)
+CASE PC02_status_distinctions_despite_exit0: FAIL
+   REVIEW_REQUIRED: avmux plan with a mis-shaped receipt: exit 1, empty stdout, uncaught AttributeError
+      expected=[1, true, true]
+      observed=[1, false, false]
+   GUARD_MISMATCH: owner-side reading of each outcome
+      expected={"ready": "READY", "hold": "HOLD", "dry_hold": "HOLD", "val_hold": "HOLD_IF_PLANNED", "zero_fill": "READY_WITH_WARNINGS", "reject": "REJECTED", "av_plan": "UNVERIFIED", "av_unstructured": "REJECTED_UNSTRUCTURED"}
+      observed={"ready": "READY", "hold": "HOLD", "dry_hold": "HOLD", "val_hold": "HOLD_IF_PLANNED", "zero_fill": "READY_WITH_WARNINGS", "reject": "REJECTED", "av_plan": "UNVERIFIED", "av_unstructured": "REJECTED"}
+CASE PC08_receipts_malformed_and_shallow: FAIL
+   FAIL: structurally wrong receipts that the library does read are refused with specific codes
+      expected={"not_json": [1, ["audio_receipt_unreadable"]], "no_outputs": [1, ["audio_receipt_stem_mismatch"]], "two_stems": [1, ["audio_receipt_stem_mismatch"]], "partial_only": [1, ["audio_receipt_stem_mismatch"]], "other_stem_sha": [1, ["audio_receipt_stem_mismatch"]], "sample_count_wrong": [1, ["audio_recei
+      observed={"not_json": [1, ["audio_receipt_unreadable"]], "no_outputs": [1, ["audio_receipt_stem_mismatch"]], "two_stems": [1, ["audio_receipt_stem_mismatch"]], "partial_only": [1, ["audio_receipt_stem_mismatch"]], "other_stem_sha": [1, ["audio_receipt_stem_mismatch"]], "sample_count_wrong": [1, ["audio_recei
+   REVIEW_REQUIRED: eight mis-shaped (valid JSON) receipts: exit 1, empty stdout, uncaught AttributeError, no issue code
+      expected={"array": [1, true, true, []], "string": [1, true, true, []], "null": [1, true, true, []], "number": [1, true, true, []], "outputs_is_string": [1, true, true, []], "outputs_list_of_strings": [1, true, true, []], "readback_is_string": [1, true, true, []], "wav_is_string": [1, true, true, []]}
+      observed={"array": [1, false, false, ["audio_receipt_shape"]], "string": [1, false, false, ["audio_receipt_shape"]], "null": [1, false, false, ["audio_receipt_shape"]], "number": [1, false, false, ["audio_receipt_shape"]], "outputs_is_string": [1, false, false, ["audio_receipt_schema"]], "outputs_list_of_str
+   REVIEW_REQUIRED: a hand-written three-field receipt is accepted
+      expected=[0, "MIXED_VERIFIED", null]
+      observed={"__observation_error__": "KeyError: 'plan'"}
+   REVIEW_REQUIRED: a receipt contradicting its own status (inputs_unchanged false, all_ok false, written false) is accepted
+      expected=[0, "MIXED_VERIFIED"]
+      observed={"__observation_error__": "KeyError: 'plan'"}
+   REVIEW_REQUIRED: the plan keeps only path/plan_sha256/sha256/status of the receipt - warnings and the unresolved report are dropped
+      expected=["path", "plan_sha256", "sha256", "status"]
+      observed={"__observation_error__": "KeyError: 'plan'"}
+FINDINGS: FAIL: at least one case failed
+REVIEW: none

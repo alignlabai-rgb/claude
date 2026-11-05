@@ -1,0 +1,207 @@
+{
+  "case": "MS05_classification_and_review_logic",
+  "checks": [
+    {
+      "expected": [
+        "PINNED_EXACT",
+        "PACKAGE_PINNED_OTHER_FILES_DIFFER",
+        "PINNED_MODULO_LINE_ENDINGS",
+        "UNPINNED",
+        "NO_PIN"
+      ],
+      "key": "MS05_classification_and_review_logic::pin statuses",
+      "layer": "HARNESS_CONTROL",
+      "name": "pin statuses",
+      "observed": [
+        "PINNED_EXACT",
+        "PACKAGE_PINNED_OTHER_FILES_DIFFER",
+        "PINNED_MODULO_LINE_ENDINGS",
+        "UNPINNED",
+        "NO_PIN"
+      ],
+      "outcome": "CONTROL_OK"
+    },
+    {
+      "expected": [
+        "PASS",
+        "FAIL",
+        "PASS"
+      ],
+      "key": "MS05_classification_and_review_logic::LIBRARY_ENFORCED: match=PASS, mismatch=FAIL; tuple and list are the same kind",
+      "layer": "HARNESS_CONTROL",
+      "name": "LIBRARY_ENFORCED: match=PASS, mismatch=FAIL; tuple and list are the same kind",
+      "observed": [
+        "PASS",
+        "FAIL",
+        "PASS"
+      ],
+      "outcome": "CONTROL_OK"
+    },
+    {
+      "expected": [
+        "FAIL",
+        "FAIL",
+        "FAIL",
+        "FAIL",
+        "FAIL",
+        "FAIL",
+        "FAIL",
+        "FAIL",
+        "FAIL"
+      ],
+      "key": "MS05_classification_and_review_logic::types are preserved: bool!=int, int!=float, str!=int, None!=False, order and length matter, [] != {} != None",
+      "layer": "HARNESS_CONTROL",
+      "name": "types are preserved: bool!=int, int!=float, str!=int, None!=False, order and length matter, [] != {} != None",
+      "observed": [
+        "FAIL",
+        "FAIL",
+        "FAIL",
+        "FAIL",
+        "FAIL",
+        "FAIL",
+        "FAIL",
+        "FAIL",
+        "FAIL"
+      ],
+      "outcome": "CONTROL_OK"
+    },
+    {
+      "expected": [
+        "ERROR",
+        "ERROR",
+        "ERROR",
+        "ERROR",
+        "ERROR",
+        "ERROR"
+      ],
+      "key": "MS05_classification_and_review_logic::unsupported / non-finite values are an ERROR on either side, never stringified",
+      "layer": "HARNESS_CONTROL",
+      "name": "unsupported / non-finite values are an ERROR on either side, never stringified",
+      "observed": [
+        "ERROR",
+        "ERROR",
+        "ERROR",
+        "ERROR",
+        "ERROR",
+        "ERROR"
+      ],
+      "outcome": "CONTROL_OK"
+    },
+    {
+      "expected": [
+        "OBSERVED_OPEN_GAP",
+        "REVIEW_REQUIRED"
+      ],
+      "key": "MS05_classification_and_review_logic::LIBRARY_PERMISSIVE: matching the pinned gap is OBSERVED_OPEN_GAP (never PASS); any change is REVIEW_REQUIRED (never adopted)",
+      "layer": "HARNESS_CONTROL",
+      "name": "LIBRARY_PERMISSIVE: matching the pinned gap is OBSERVED_OPEN_GAP (never PASS); any change is REVIEW_REQUIRED (never adopted)",
+      "observed": [
+        "OBSERVED_OPEN_GAP",
+        "REVIEW_REQUIRED"
+      ],
+      "outcome": "CONTROL_OK"
+    },
+    {
+      "expected": [
+        "REVIEWED_CHANGE",
+        "REVIEWED_CHANGE",
+        "FAIL",
+        "FAIL",
+        "REVIEW_REQUIRED"
+      ],
+      "key": "MS05_classification_and_review_logic::a reviewed entry (JSON form) matches the live tuple/int-key observation -> REVIEWED_CHANGE; a counterexample of any kind does not",
+      "layer": "HARNESS_CONTROL",
+      "name": "a reviewed entry (JSON form) matches the live tuple/int-key observation -> REVIEWED_CHANGE; a counterexample of any kind does not",
+      "observed": [
+        "REVIEWED_CHANGE",
+        "REVIEWED_CHANGE",
+        "FAIL",
+        "FAIL",
+        "REVIEW_REQUIRED"
+      ],
+      "outcome": "CONTROL_OK"
+    },
+    {
+      "expected": [
+        "FAIL",
+        "REVIEW_REQUIRED",
+        false
+      ],
+      "key": "MS05_classification_and_review_logic::a reviewed entry whose source pin does NOT match the library is ignored (no silent normalisation)",
+      "layer": "HARNESS_CONTROL",
+      "name": "a reviewed entry whose source pin does NOT match the library is ignored (no silent normalisation)",
+      "observed": [
+        "FAIL",
+        "REVIEW_REQUIRED",
+        false
+      ],
+      "outcome": "CONTROL_OK"
+    },
+    {
+      "expected": [
+        "GUARD_MISMATCH",
+        "GUARD_OK",
+        "CONTROL_FAILED",
+        "CONTROL_OK"
+      ],
+      "key": "MS05_classification_and_review_logic::guard demos and harness controls are NEVER rescued or failed by a profile (even with a matching reviewed entry)",
+      "layer": "HARNESS_CONTROL",
+      "name": "guard demos and harness controls are NEVER rescued or failed by a profile (even with a matching reviewed entry)",
+      "observed": [
+        "GUARD_MISMATCH",
+        "GUARD_OK",
+        "CONTROL_FAILED",
+        "CONTROL_OK"
+      ],
+      "outcome": "CONTROL_OK"
+    },
+    {
+      "expected": [
+        "REVIEWED_CHANGE",
+        "NOT_A_REVIEW",
+        [
+          "k::x"
+        ]
+      ],
+      "key": "MS05_classification_and_review_logic::a NOT-A-REVIEW entry applies as REVIEWED_CHANGE but is flagged (a dry run can never be a green run)",
+      "layer": "HARNESS_CONTROL",
+      "name": "a NOT-A-REVIEW entry applies as REVIEWED_CHANGE but is flagged (a dry run can never be a green run)",
+      "observed": [
+        "REVIEWED_CHANGE",
+        "NOT_A_REVIEW",
+        [
+          "k::x"
+        ]
+      ],
+      "outcome": "CONTROL_OK"
+    },
+    {
+      "expected": [
+        "BUDGET_EXHAUSTED",
+        "CONTROL_FAILED",
+        "ERROR",
+        "FAIL",
+        "GUARD_MISMATCH",
+        "POLICY_VIOLATION"
+      ],
+      "key": "MS05_classification_and_review_logic::BAD outcomes that fail a run",
+      "layer": "HARNESS_CONTROL",
+      "name": "BAD outcomes that fail a run",
+      "observed": [
+        "BUDGET_EXHAUSTED",
+        "CONTROL_FAILED",
+        "ERROR",
+        "FAIL",
+        "GUARD_MISMATCH",
+        "POLICY_VIOLATION"
+      ],
+      "outcome": "CONTROL_OK"
+    }
+  ],
+  "elapsed_seconds": 0.0,
+  "gaps": [],
+  "invocations": [],
+  "source_refs": [],
+  "status": "PASS",
+  "title": "r2 rule: tuple==list but bool!=int!=float; an OPEN GAP match is never PASS; reviewed entries need a matching pin; guards/controls/ERROR are never rescued"
+}

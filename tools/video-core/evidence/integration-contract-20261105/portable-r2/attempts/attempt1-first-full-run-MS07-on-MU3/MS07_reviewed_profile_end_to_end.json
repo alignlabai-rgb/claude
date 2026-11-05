@@ -1,0 +1,69 @@
+{
+  "case": "MS07_reviewed_profile_end_to_end",
+  "checks": [
+    {
+      "expected": [
+        "FAIL",
+        true
+      ],
+      "key": "MS07_reviewed_profile_end_to_end::without a profile the changed boundaries FAIL (never PASS, never adopted)",
+      "layer": "HARNESS_CONTROL",
+      "name": "without a profile the changed boundaries FAIL (never PASS, never adopted)",
+      "observed": [
+        "FAIL",
+        true
+      ],
+      "outcome": "CONTROL_OK"
+    },
+    {
+      "expected": [
+        true,
+        true,
+        2
+      ],
+      "key": "MS07_reviewed_profile_end_to_end::the changed live observations really have the H-1 shape (tuples and int-keyed dicts), and the written file round-trips through the strict loader",
+      "layer": "HARNESS_CONTROL",
+      "name": "the changed live observations really have the H-1 shape (tuples and int-keyed dicts), and the written file round-trips through the strict loader",
+      "observed": [
+        true,
+        true,
+        2
+      ],
+      "outcome": "CONTROL_OK"
+    },
+    {
+      "expected": [
+        "PASS_WITH_REVIEWED_CHANGES",
+        [
+          "REVIEWED_CHANGE"
+        ],
+        true
+      ],
+      "key": "MS07_reviewed_profile_end_to_end::with the disk profile whose pin matches: every changed check is REVIEWED_CHANGE (case PASS_WITH_REVIEWED_CHANGES), flagged as a self-test entry",
+      "layer": "HARNESS_CONTROL",
+      "name": "with the disk profile whose pin matches: every changed check is REVIEWED_CHANGE (case PASS_WITH_REVIEWED_CHANGES), flagged as a self-test entry",
+      "observed": [
+        "FAIL",
+        [
+          "REVIEWED_CHANGE"
+        ],
+        true
+      ],
+      "outcome": "CONTROL_FAILED"
+    },
+    {
+      "expected": "FAIL",
+      "key": "MS07_reviewed_profile_end_to_end::the same entries with a NON-matching source pin are ignored: FAIL again",
+      "layer": "HARNESS_CONTROL",
+      "name": "the same entries with a NON-matching source pin are ignored: FAIL again",
+      "observed": "FAIL",
+      "outcome": "CONTROL_OK"
+    }
+  ],
+  "elapsed_seconds": 8.813,
+  "gaps": [],
+  "invocations": [],
+  "source_refs": [],
+  "status": "FAIL",
+  "title": "On a disposable copy with a WRONG boundary rule: FAIL without a profile; REVIEWED_CHANGE with a profile WRITTEN TO AND READ FROM DISK (tuples, int-key dicts, nested arrays); FAIL again with a wrong pin"
+}

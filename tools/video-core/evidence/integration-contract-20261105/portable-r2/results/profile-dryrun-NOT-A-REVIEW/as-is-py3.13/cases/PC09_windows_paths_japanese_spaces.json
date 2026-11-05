@@ -1,0 +1,93 @@
+{
+  "case": "PC09_windows_paths_japanese_spaces",
+  "checks": [
+    {
+      "expected": [
+        true,
+        true
+      ],
+      "key": "PC09_windows_paths_japanese_spaces::the world root really contains Japanese and a space",
+      "layer": "HARNESS_CONTROL",
+      "name": "the world root really contains Japanese and a space",
+      "observed": [
+        true,
+        true
+      ],
+      "outcome": "CONTROL_OK"
+    },
+    {
+      "expected": [
+        0,
+        [
+          "素材 テスト.mp4"
+        ],
+        true
+      ],
+      "key": "PC09_windows_paths_japanese_spaces::video-only plan: exit 0, the file name is preserved, output location fresh",
+      "layer": "LIBRARY_ENFORCED",
+      "name": "video-only plan: exit 0, the file name is preserved, output location fresh",
+      "observed": [
+        0,
+        [
+          "素材 テスト.mp4"
+        ],
+        true
+      ],
+      "outcome": "PASS"
+    },
+    {
+      "expected": [
+        0,
+        "READY",
+        "音声 サンプル.wav"
+      ],
+      "key": "PC09_windows_paths_japanese_spaces::audiomix plan: READY with the Japanese+space asset verified",
+      "layer": "LIBRARY_ENFORCED",
+      "name": "audiomix plan: READY with the Japanese+space asset verified",
+      "observed": [
+        0,
+        "READY",
+        "音声 サンプル.wav"
+      ],
+      "outcome": "PASS"
+    },
+    {
+      "error": "Traceback (most recent call last):\n  File \"<REPO>/tools/video-core/evidence/integration-contract-20261105/portable-r2/portable_core.py\", line 742, in run_case\n    fn(ctx)\n    ~~^^^^^\n  File \"<REPO>/tools/video-core/evidence/integration-contract-20261105/portable-r2/portable_cases.py\", line 749, in pc09\n    ctx.enforced(\"avmux plan: exit 0, names preserved, readiness UNVERIFIED\", (0, names[\"av_video\"], names[\"av_stem\"], True), (r.exit_code, r.json[\"plan\"][\"video\"][\"path\"], r.json[\"plan\"][\"audio\"][\"path\"], r.json[\"readiness\"].startswith(\"UNVERIFIED\")))\n                                                                                                                                            ~~~~~~^^^^^^^^\nKeyError: 'plan'\n",
+      "key": "PC09_windows_paths_japanese_spaces::raised",
+      "layer": "HARNESS_CONTROL",
+      "name": "case raised",
+      "outcome": "ERROR"
+    }
+  ],
+  "elapsed_seconds": 0.378,
+  "gaps": [],
+  "invocations": [
+    {
+      "denied_attempts": 0,
+      "exit_code": 0,
+      "label": "video plan, Japanese+space root and file",
+      "no": 177,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 0,
+      "label": "audio plan, Japanese+space asset",
+      "no": 178,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 1,
+      "label": "avmux plan, Japanese+space files",
+      "no": 179,
+      "status": "OK"
+    }
+  ],
+  "source_refs": [
+    "video_core/paths.py:check_relative_path",
+    "video_core/paths.py:resolve_asset"
+  ],
+  "status": "FAIL",
+  "title": "Ordinary Japanese + space roots and file names work in all three planners; Windows path traps are refused by rule"
+}

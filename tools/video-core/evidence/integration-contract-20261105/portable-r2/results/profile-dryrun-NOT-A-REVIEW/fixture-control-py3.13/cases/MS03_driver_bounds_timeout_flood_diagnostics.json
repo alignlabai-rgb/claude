@@ -1,0 +1,99 @@
+{
+  "case": "MS03_driver_bounds_timeout_flood_diagnostics",
+  "checks": [
+    {
+      "expected": [
+        "TIMEOUT",
+        true,
+        true
+      ],
+      "key": "MS03_driver_bounds_timeout_flood_diagnostics::sleeping child: TIMEOUT, killed by the driver, returns promptly (< 8 s), non-zero exit",
+      "layer": "HARNESS_CONTROL",
+      "name": "sleeping child: TIMEOUT, killed by the driver, returns promptly (< 8 s), non-zero exit",
+      "observed": [
+        "TIMEOUT",
+        true,
+        true
+      ],
+      "outcome": "CONTROL_OK"
+    },
+    {
+      "expected": [
+        "FLOOD_KILLED",
+        true,
+        true,
+        true
+      ],
+      "key": "MS03_driver_bounds_timeout_flood_diagnostics::stdout flood: FLOOD_KILLED, retained <= 128 KiB, truncated flag set, total read bounded",
+      "layer": "HARNESS_CONTROL",
+      "name": "stdout flood: FLOOD_KILLED, retained <= 128 KiB, truncated flag set, total read bounded",
+      "observed": [
+        "FLOOD_KILLED",
+        true,
+        true,
+        true
+      ],
+      "outcome": "CONTROL_OK"
+    },
+    {
+      "expected": [
+        "OK",
+        131072,
+        true,
+        307200
+      ],
+      "key": "MS03_driver_bounds_timeout_flood_diagnostics::300 KiB on stderr (below the flood limit): child finishes OK, exactly 128 KiB retained, truncated, total counted",
+      "layer": "HARNESS_CONTROL",
+      "name": "300 KiB on stderr (below the flood limit): child finishes OK, exactly 128 KiB retained, truncated, total counted",
+      "observed": [
+        "OK",
+        131072,
+        true,
+        307200
+      ],
+      "outcome": "CONTROL_OK"
+    },
+    {
+      "expected": true,
+      "key": "MS03_driver_bounds_timeout_flood_diagnostics::retained diagnostics per child never exceed 256 KiB",
+      "layer": "HARNESS_CONTROL",
+      "name": "retained diagnostics per child never exceed 256 KiB",
+      "observed": true,
+      "outcome": "CONTROL_OK"
+    },
+    {
+      "expected": [
+        10.0,
+        131072,
+        1048576,
+        true,
+        900.0
+      ],
+      "key": "MS03_driver_bounds_timeout_flood_diagnostics::limits are finite and documented",
+      "layer": "HARNESS_CONTROL",
+      "name": "limits are finite and documented",
+      "observed": [
+        10.0,
+        131072,
+        1048576,
+        true,
+        900.0
+      ],
+      "outcome": "CONTROL_OK"
+    },
+    {
+      "expected": true,
+      "key": "MS03_driver_bounds_timeout_flood_diagnostics::serial execution: the driver never has two children (run_child waits for exit before returning)",
+      "layer": "HARNESS_CONTROL",
+      "name": "serial execution: the driver never has two children (run_child waits for exit before returning)",
+      "observed": true,
+      "outcome": "CONTROL_OK"
+    }
+  ],
+  "elapsed_seconds": 1.594,
+  "gaps": [],
+  "invocations": [],
+  "source_refs": [],
+  "status": "PASS",
+  "title": "The OUTER driver kills a sleeping child, kills a flooding child, and retains <= 256 KiB per child, without help from the child"
+}

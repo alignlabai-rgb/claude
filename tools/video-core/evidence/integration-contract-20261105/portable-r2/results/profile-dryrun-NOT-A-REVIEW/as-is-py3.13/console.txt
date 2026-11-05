@@ -1,0 +1,42 @@
+portable-r2 contract harness portable-contract-harness/2-r2 on Python 3.13.18 (linux)
+library pin: PINNED_EXACT (package and all files byte-identical to the pin)
+admission: MS01=PASS  children after admission=18
+cases: {"FAIL": 4, "PASS": 13, "PASS_WITH_REVIEWED_CHANGES": 2}  children=374  wall=43.4s  exit=1
+check outcomes: {"CONTROL_OK": 48, "ERROR": 3, "GUARD_MISMATCH": 2, "GUARD_OK": 4, "OBSERVED_OPEN_GAP": 9, "PASS": 50, "REVIEWED_CHANGE": 9}
+layers: {"CALLER_GUARD_DEMO": {"GUARD_MISMATCH": 2, "GUARD_OK": 4}, "HARNESS_CONTROL": {"CONTROL_OK": 48, "ERROR": 3}, "LIBRARY_ENFORCED": {"PASS": 50, "REVIEWED_CHANGE": 2}, "LIBRARY_PERMISSIVE": {"OBSERVED_OPEN_GAP": 9, "REVIEWED_CHANGE": 7}}
+mutation MU1_hold_to_ready: DETECTED (1 failing checks)
+mutation MU2_omitted_zero_fill_warning: DETECTED (3 failing checks)
+mutation MU3_wrong_boundary_rounding: DETECTED (3 failing checks)
+mutation MU4_attempted_external_launch: DETECTED (2 failing checks)
+mutation MU5_plan_creates_output_directory: DETECTED (1 failing checks)
+mutation MU7_gap_closed_receipt_required: NOT_APPLICABLE - the pattern occurs 0 times in this source (needs exactly 1): the mutation cannot be applied to this candidate
+mutation MU6_srt_crlf: DETECTED (3 failing checks)
+CASE PC01_validation_vs_execution: FAIL
+   ERROR: case raised Traceback (most recent call last):
+  File "<REPO>/tools/video-core/evidence/integration-contract-20261105/portable-r2/portable_core.py", line 742, in run_case
+    fn(ctx)
+    ~~^^^^^
+  File "<REPO>/tools/video-core/evidence/integration-contract-20261105/portable-r2/portable_cas
+CASE PC02_status_distinctions_despite_exit0: FAIL
+   GUARD_MISMATCH: owner-side reading of each outcome
+      expected={"ready": "READY", "hold": "HOLD", "dry_hold": "HOLD", "val_hold": "HOLD_IF_PLANNED", "zero_fill": "READY_WITH_WARNINGS", "reject": "REJECTED", "av_plan": "UNVERIFIED", "av_unstructured": "REJECTED_UNSTRUCTURED"}
+      observed={"ready": "READY", "hold": "HOLD", "dry_hold": "HOLD", "val_hold": "HOLD_IF_PLANNED", "zero_fill": "READY_WITH_WARNINGS", "reject": "REJECTED", "av_plan": "REJECTED", "av_unstructured": "REJECTED"}
+   GUARD_MISMATCH: exit code 0 alone covers five distinct readings (so it cannot be the signal)
+      expected=["HOLD", "HOLD_IF_PLANNED", "READY", "READY_WITH_WARNINGS", "UNVERIFIED"]
+      observed=["HOLD", "HOLD_IF_PLANNED", "READY", "READY_WITH_WARNINGS"]
+CASE PC05_half_open_rational_boundaries: FAIL
+   ERROR: case raised Traceback (most recent call last):
+  File "<REPO>/tools/video-core/evidence/integration-contract-20261105/portable-r2/portable_core.py", line 742, in run_case
+    fn(ctx)
+    ~~^^^^^
+  File "<REPO>/tools/video-core/evidence/integration-contract-20261105/portable-r2/portable_cas
+CASE PC07_plan_hash_pins_output_namespace: PASS_WITH_REVIEWED_CHANGES
+CASE PC08_receipts_malformed_and_shallow: PASS_WITH_REVIEWED_CHANGES
+CASE PC09_windows_paths_japanese_spaces: FAIL
+   ERROR: case raised Traceback (most recent call last):
+  File "<REPO>/tools/video-core/evidence/integration-contract-20261105/portable-r2/portable_core.py", line 742, in run_case
+    fn(ctx)
+    ~~^^^^^
+  File "<REPO>/tools/video-core/evidence/integration-contract-20261105/portable-r2/portable_cas
+FINDINGS: FAIL: at least one case failed
+REVIEW: the profile applied 9 entr(y/ies) marked NOT-A-REVIEW: a dry run, never a green run

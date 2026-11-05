@@ -1,0 +1,10 @@
+# Preserved failed attempts while building portable-r2 (none is a library change; no oracle was altered to pass)
+
+| # | Where | What failed | Cause | Correction |
+|---|---|---|---|---|
+| 1 | `attempt1-first-full-run-MS07-on-MU3/` | first complete r2 run: exit 1, `MS07` CONTROL_FAILED ("every changed check is REVIEWED_CHANGE" observed `FAIL`) | my new MS07 used the wrong-boundary mutation MU3; on it PC05 also **raises** (case ERROR), and an ERROR is by design never rescued by a profile, so the case could not become `PASS_WITH_REVIEWED_CHANGES`. The rule and the profile worked: every *reviewable* check had become REVIEWED_CHANGE | MS07 now uses MU1 (HOLD→READY) on PC03, which changes only reviewable checks with tuple-rich observations |
+| 2 | console only | MS07 then failed its first control: expected `>= 2` changed checks, MU1 changes exactly 1 | my expectation was wrong | expectation is `>= 1` |
+| 3 | console only | `tests/test_json_equiv.py::test_a_single_change_anywhere_is_detected_after_a_round_trip`: 1465 of 1500 mutations "undetected" | the **test's mutator** was wrong, not the rule: `1e300 + 1.0 == 1e300`, so it produced no change | the mutator really changes large floats (`v * 2`) |
+| 4 | console only | `python -I -m unittest discover -s tests -t .` → "Start directory is not importable" | isolated mode drops the working directory from `sys.path` | tests insert their own path; documented command is `python -m unittest discover -s tests` |
+| 5 | console only | first run of `test_admission.py`: 2 failures + 2 errors | (a) mechanism-control children were labelled `mechanism` even during admission and were **not stored** as invocations; (b) my placeholder NOT-A-REVIEW test did not exercise an applied entry | r2 `control_job` uses the current group and stores a bounded record for every control child (`record_control`); the NOT-A-REVIEW test now uses a disposable library copy and asserts exit 4 |
+| 6 | console only | stdlib `ResourceWarning: unclosed file` noise from my test helpers | `json.load(open(...))` | helper `jl()`; tests now pass with `-W error::ResourceWarning` |

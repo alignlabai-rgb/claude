@@ -1,0 +1,665 @@
+--- portable/portable_cases.py
++++ portable-r2/portable_cases.py
+@@ -213,9 +213,11 @@
+             ctx.control(f"{name}: wave module sees mono / 16-bit / 48000 Hz / {frames} frames", (1, 2, 48000, frames), (wf.getnchannels(), wf.getsampwidth(), wf.getframerate(), wf.getnframes()))
+     ctx.control("stem_silent.wav PCM is all zeros", True, FB["stem_silent.wav"][44:] == b"\x00" * (4805 * 2))
+     ctx.control("the 'videos' are plain non-media bytes", True, all(v.startswith(b"SYNTHETIC-PLACEHOLDER-NOT-MEDIA") for k, v in FB.items() if k.endswith(".mp4")))
+-    idx = os.path.join(ctx.run.library_root, "evidence", "integration-contract-20261105", "fixtures", "FIXTURES_INDEX.json")
+-    if not os.path.isfile(idx):
+-        idx = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "fixtures", "FIXTURES_INDEX.json")
++    here = os.path.dirname(os.path.abspath(__file__))
++    # r2: the index ships INSIDE portable-r2/fixtures (byte copy of the closed job's), so a runtime-only copy no longer skips this cross-check
++    idx = next((c for c in (os.path.join(here, "fixtures", "FIXTURES_INDEX.json"), os.path.join(os.path.dirname(here), "fixtures", "FIXTURES_INDEX.json"),
++                            os.path.join(ctx.run.library_root, "evidence", "integration-contract-20261105", "fixtures", "FIXTURES_INDEX.json")) if os.path.isfile(c)),
++               os.path.join(here, "fixtures", "FIXTURES_INDEX.json"))
+     if os.path.isfile(idx):
+         with open(idx, "rb") as fh:
+             pinned = json.loads(fh.read().decode("utf-8"))["bytes"]
+--- portable/portable_core.py
++++ portable-r2/portable_core.py
+@@ -1,4 +1,8 @@
+-"""Portable acceptance harness — core (Python 3.11+ stdlib only; no shell=True, no signals/setsid/fork, no chmod-executable, no global env changes).
++"""portable-r2 core. DIFFERENCES from ../portable/portable_core.py (see R2_CHANGES.md and the stored diff): (1) every comparison uses json_equiv.equivalent (precise JSON-compatible
++structural rule; tuple == list; bool != int != float; unsupported/non-finite values raise instead of being stringified); (2) profiles are loaded through a strict validating loader;
++(3) reviewed entries need a non-empty reviewed_by_ref and NOT-A-REVIEW entries can never produce a green run; (4) the result writer no longer stringifies unsupported values.
++
++Portable acceptance harness — core (Python 3.11+ stdlib only; no shell=True, no signals/setsid/fork, no chmod-executable, no global env changes).
+ 
+ Responsibilities kept OUTSIDE the library under test and outside the child wrapper:
+   * every child is started by THIS driver with a hard wall limit (<= 10 s), bounded capture (<= 128 KiB per stream retained = 256 KiB per child),
+@@ -19,9 +23,11 @@
+ import time
+ import traceback
+ 
++import json_equiv
++
+ HERE = os.path.dirname(os.path.abspath(__file__))
+ CHILD_RUNNER = os.path.join(HERE, "child_runner.py")
+-HARNESS_VERSION = "portable-contract-harness/1"
++HARNESS_VERSION = "portable-contract-harness/2-r2"
+ 
+ PER_CHILD_TIMEOUT = 10.0            # seconds, hard
+ STREAM_CAP = 128 * 1024             # bytes retained per stream -> <= 256 KiB per child
+@@ -152,6 +158,85 @@
+ 
+ # ---------------------------------------------------------------------------------------------------------------- profile + check classification
+ 
++NOT_A_REVIEW_MARKERS = ("NOT A REVIEW", "SELF-TEST ONLY")
++_HEX64 = re.compile(r"[0-9a-f]{64}")
++PIN_DIGESTS = ("package_digest_raw", "package_digest_eol", "all_digest_raw", "all_digest_eol")
++
++
++class ProfileError(ValueError):
++    """The profile file is not acceptable. Never repaired, never partially applied."""
++
++
++def _no_dup_pairs(pairs):
++    d = {}
++    for k, v in pairs:
++        if k in d:
++            raise ProfileError(f"duplicate key {k!r} in the profile")
++        d[k] = v
++    return d
++
++
++def _no_const(name):
++    raise ProfileError(f"non-finite number {name} in the profile")
++
++
++def validate_profile_doc(doc) -> dict:
++    """Strict validation of an already-parsed profile (raises ProfileError). Unknown extra top-level keys are allowed (descriptions, proposals); the three used parts are strict."""
++    if not isinstance(doc, dict):
++        raise ProfileError("profile must be a JSON object")
++    if type(doc.get("profile_version")) is not int or doc["profile_version"] != 1:
++        raise ProfileError("profile_version must be the integer 1")
++    pin = doc.get("source_pin")
++    if not isinstance(pin, dict):
++        raise ProfileError("source_pin must be an object")
++    for k in PIN_DIGESTS:
++        if not isinstance(pin.get(k), str) or not _HEX64.fullmatch(pin[k]):
++            raise ProfileError(f"source_pin.{k} must be a 64-digit lowercase hex digest")
++    rev = doc.get("reviewed_expectations")
++    if not isinstance(rev, dict):
++        raise ProfileError("reviewed_expectations must be an object (empty when nothing is reviewed)")
++    for key, ent in rev.items():
++        if not isinstance(key, str) or "::" not in key:
++            raise ProfileError(f"reviewed key {key!r} must look like '<case>::<check name>'")
++        if not isinstance(ent, dict) or "observed" not in ent:
++            raise ProfileError(f"reviewed entry {key!r} must be an object with an 'observed' value")
++        extra = set(ent) - {"observed", "reviewed_by_ref", "note"}
++        if extra:
++            raise ProfileError(f"reviewed entry {key!r} has unknown fields {sorted(extra)}")
++        ref = ent.get("reviewed_by_ref")
++        if not isinstance(ref, str) or not ref.strip():
++            raise ProfileError(f"reviewed entry {key!r} needs a non-empty reviewed_by_ref (who reviewed it); a missing reference is never assumed")
++        if "note" in ent and not isinstance(ent["note"], str):
++            raise ProfileError(f"reviewed entry {key!r}: note must be a string")
++        try:
++            json_equiv.canon(ent["observed"])
++        except json_equiv.UnsupportedValue as exc:
++            raise ProfileError(f"reviewed entry {key!r}: observed value is unsupported ({exc})") from None
++    return doc
++
++
++def parse_profile_bytes(data: bytes) -> dict:
++    if len(data) > 1_000_000:
++        raise ProfileError("profile larger than 1 MB")
++    if data.startswith(b"\xef\xbb\xbf"):
++        raise ProfileError("profile has a UTF-8 BOM")
++    try:
++        text = data.decode("utf-8")
++        doc = json.loads(text, object_pairs_hook=_no_dup_pairs, parse_constant=_no_const)
++    except UnicodeDecodeError:
++        raise ProfileError("profile is not valid UTF-8") from None
++    except json.JSONDecodeError as exc:
++        raise ProfileError(f"profile is not valid JSON: {exc}") from None
++    return validate_profile_doc(doc)
++
++
++def load_profile_file(path: str) -> tuple:
++    """-> (doc, raw_bytes). Reads at most 1 MB + 1 byte."""
++    with open(path, "rb") as fh:
++        raw = fh.read(1_000_001)
++    return parse_profile_bytes(raw), raw
++
++
+ class Profile:
+     def __init__(self, doc: dict | None, inv: dict):
+         self.doc = doc or {}
+@@ -159,28 +244,47 @@
+         self.applicable = self.pin["status"] in ("PINNED_EXACT", "PACKAGE_PINNED_OTHER_FILES_DIFFER", "PINNED_MODULO_LINE_ENDINGS")
+         self.reviewed = self.doc.get("reviewed_expectations", {}) if self.applicable else {}
+         self.reviewed_ignored = (self.doc.get("reviewed_expectations", {}) if not self.applicable else {})
++        self.applied_not_a_review = []          # keys whose applied entry carries a NOT-A-REVIEW marker (a dry run can never be a green run)
+ 
+     def reviewed_for(self, key: str):
+         return self.reviewed.get(key)
+ 
+ 
++def _is_not_a_review(ref) -> bool:
++    return isinstance(ref, str) and any(m in ref.upper() for m in NOT_A_REVIEW_MARKERS)
++
++
+ def classify_check(layer: str, key: str, expected, observed, profile: Profile | None) -> dict:
+-    """layer in {LIBRARY_ENFORCED, LIBRARY_PERMISSIVE, CALLER_GUARD_DEMO, HARNESS_CONTROL}.
+-    LIBRARY_PERMISSIVE: `expected` is the OBSERVED OPEN GAP of the pinned source. Matching it is OBSERVED_OPEN_GAP - never PASS. Any other value is REVIEW_REQUIRED (never auto-adopted)."""
+-    same = expected == observed
+-    rev = profile.reviewed_for(key) if profile else None
++    """layer in {LIBRARY_ENFORCED, LIBRARY_PERMISSIVE, CALLER_GUARD_DEMO, HARNESS_CONTROL}. Every comparison is json_equiv.equivalent.
++    An unsupported/non-finite value on either side is an ERROR (never stringified, never rescued). Reviewed expectations can only change a LIBRARY_* outcome; guard demos and
++    harness controls are never rescued or failed by a profile."""
++    try:
++        same = json_equiv.equivalent(expected, observed)
++    except json_equiv.UnsupportedValue as exc:
++        return {"outcome": "ERROR", "error": f"unsupported value in a comparison: {exc}"}
++
++    def reviewed_match():
++        rev = profile.reviewed_for(key) if profile else None
++        if rev is None:
++            return None
++        try:
++            if json_equiv.equivalent(rev.get("observed"), observed):
++                out = {"outcome": "REVIEWED_CHANGE", "reviewed_by_ref": rev.get("reviewed_by_ref"), "note": rev.get("note")}
++                if _is_not_a_review(rev.get("reviewed_by_ref")):
++                    out["review_marker"] = "NOT_A_REVIEW"
++                    profile.applied_not_a_review.append(key)
++                return out
++        except json_equiv.UnsupportedValue as exc:
++            return {"outcome": "ERROR", "error": f"unsupported value in a reviewed comparison: {exc}"}
++        return None
+     if layer == "LIBRARY_ENFORCED":
+         if same:
+             return {"outcome": "PASS"}
+-        if rev is not None and rev.get("observed") == observed:
+-            return {"outcome": "REVIEWED_CHANGE", "reviewed_by_ref": rev.get("reviewed_by_ref"), "note": rev.get("note")}
+-        return {"outcome": "FAIL"}
++        return reviewed_match() or {"outcome": "FAIL"}
+     if layer == "LIBRARY_PERMISSIVE":
+         if same:
+             return {"outcome": "OBSERVED_OPEN_GAP"}
+-        if rev is not None and rev.get("observed") == observed:
+-            return {"outcome": "REVIEWED_CHANGE", "reviewed_by_ref": rev.get("reviewed_by_ref"), "note": rev.get("note")}
+-        return {"outcome": "REVIEW_REQUIRED", "why": "observed behaviour differs from the pinned OPEN GAP; not adopted automatically"}
++        return reviewed_match() or {"outcome": "REVIEW_REQUIRED", "why": "observed behaviour differs from the pinned OPEN GAP; not adopted automatically"}
+     if layer == "CALLER_GUARD_DEMO":
+         return {"outcome": "GUARD_OK" if same else "GUARD_MISMATCH"}
+     if layer == "HARNESS_CONTROL":
+@@ -193,12 +297,6 @@
+ 
+ # ---------------------------------------------------------------------------------------------------------------- output directory (exclusive create)
+ 
+-def _json_default(o):
+-    if isinstance(o, (bytes, bytearray)):
+-        return {"__bytes_hex__": bytes(o).hex()}
+-    return repr(o)
+-
+-
+ class OutDir:
+     def __init__(self, path: str):
+         self.path = path
+@@ -225,7 +323,7 @@
+         return full
+ 
+     def write_json(self, rel: str, obj) -> str:
+-        return self.write(rel, (json.dumps(obj, indent=2, sort_keys=True, ensure_ascii=False, default=_json_default) + "\n").encode("utf-8"))
++        return self.write(rel, (json.dumps(obj, indent=2, sort_keys=True, ensure_ascii=False, allow_nan=False) + "\n").encode("utf-8"))      # strict: no default=, so nothing is stringified
+ 
+ 
+ def inside(path: str, parent: str) -> bool:
+@@ -541,6 +639,14 @@
+     run.out.write(d + "/stderr.bin", se)
+ 
+ 
++def record_control(run: Run, world: World, name: str, child: ChildResult) -> None:
++    """r2: store a mechanism-control child like any invocation (bounded stdout/stderr/status, denial log) and count it."""
++    norm_text, norm_obj = make_normalizer([(world.root, "<WORLD>")])
++    run.invocation_no += 1
++    res = Res(child, norm_text, norm_obj, run.invocation_no)
++    store_invocation(run, world, "control-" + name, "control " + name, "control:" + name, [], [], child, res, run.group)
++
++
+ # ---------------------------------------------------------------------------------------------------------------- case context
+ 
+ class CaseCtx:
+@@ -569,6 +675,8 @@
+         key = f"{self.case_id}::{name}"
+         out = classify_check(layer, key, expected, observed, self.run.profile)
+         entry = {"layer": layer, "name": name, "key": key, "expected": expected, "observed": observed, **out}
++        if out["outcome"] == "ERROR" and "unsupported value" in out.get("error", ""):
++            entry.pop("expected"), entry.pop("observed")       # the unsupported payload is not stored; the error names the path and type
+         if gap:
+             entry["gap"] = gap
+             if gap not in self.gaps:
+--- portable/portable_harness.py
++++ portable-r2/portable_harness.py
+@@ -1,5 +1,8 @@
+ #!/usr/bin/env python3
+-"""Portable, bounded CONTRACT ACCEPTANCE HARNESS for the public video_core / audiomix / avmux CLIs (Python 3.11+ stdlib only; Linux and Windows).
++"""portable-r2 DRIVER. Differences from ../portable/portable_harness.py: deny-first ADMISSION (MS01 runs before anything else; a failure STOPS the run with exit 5 before any contract case, other mechanism test
++or mutation control), --only accepts PC, MS and MU ids, strict validated profile loading, a profile with NOT-A-REVIEW entries can never give exit 0. See R2_CHANGES.md.
++
++Portable, bounded CONTRACT ACCEPTANCE HARNESS for the public video_core / audiomix / avmux CLIs (Python 3.11+ stdlib only; Linux and Windows).
+ 
+ Read-only: real `validate`, `plan`, `srt` and DRY-RUN (`render`/`mix`/`mux` WITHOUT their execution flag) behaviour. It never renders, mixes, muxes, probes or
+ downloads, never uses ffmpeg/ffprobe, never passes --render/--mix/--mux (or abbreviations) or `inspect`, never uses shell=True, and changes no global state.
+@@ -7,8 +10,9 @@
+   python portable_harness.py --library-root <dir containing video_core/> --scratch-root <existing dir> --out-dir <NEW dir>  [--strict] [--profile FILE]
+                              [--budget-seconds N] [--only ID[,ID]] [--skip-selftests] [--skip-mutation] [--normalize-stored-paths] [--list]
+ 
+-Exit codes: 0 all enforced checks pass, every OPEN GAP is exactly as pinned (and, with --strict, the source is pinned/reviewed) | 1 failure, error, budget exhausted
+-            2 usage / refusal (e.g. output directory exists) | 3 Python < 3.11 | 4 REVIEW_REQUIRED (an OPEN GAP changed, or --strict and the source is not pinned/reviewed)
++Exit codes (r2 adds 5): 0 all enforced checks pass, every OPEN GAP is exactly as pinned (and, with --strict, the source is pinned/reviewed) | 1 failure, error, budget exhausted
++            2 usage / refusal (e.g. output directory exists) | 3 Python < 3.11 | 4 REVIEW_REQUIRED (an OPEN GAP changed, --strict and the source is not pinned/reviewed, or the profile applied a NOT-A-REVIEW entry)
++            5 STOPPED: the deny-control admission (MS01) did not pass; nothing else was run
+ An OPEN GAP match is OBSERVED_OPEN_GAP: it is never counted as a pass and never as a fix.
+ """
+ from __future__ import annotations
+@@ -30,11 +34,11 @@
+ 
+ import portable_cases  # noqa: E402
+ import portable_selftest  # noqa: E402
+-from portable_core import (DEFAULT_BUDGET_S, HARNESS_VERSION, MAX_BUDGET_S, MAX_CHILDREN, PER_CHILD_TIMEOUT, STREAM_CAP, FLOOD_LIMIT, OutDir, Profile, Run, find_repo_root, inside,  # noqa: E402
+-                           inventory, run_case, sha256_bytes, summarize)
++from portable_core import (DEFAULT_BUDGET_S, HARNESS_VERSION, MAX_BUDGET_S, MAX_CHILDREN, PER_CHILD_TIMEOUT, STREAM_CAP, FLOOD_LIMIT, OutDir, Profile, ProfileError, Run, find_repo_root, inside,  # noqa: E402
++                           inventory, load_profile_file, run_case, sha256_bytes, summarize)
+ 
+ DEFAULT_PROFILE = os.path.join(HERE, "profiles", "pinned_original_b4ca4a3.json")
+-HARNESS_FILES = ("portable_harness.py", "portable_core.py", "portable_cases.py", "portable_selftest.py", "child_runner.py")
++HARNESS_FILES = ("portable_harness.py", "portable_core.py", "portable_cases.py", "portable_selftest.py", "child_runner.py", "json_equiv.py")
+ 
+ 
+ def parse_args(argv):
+@@ -45,18 +49,24 @@
+     ap.add_argument("--profile", default=DEFAULT_PROFILE, help="expectation profile (source pin + reviewed expectations); default: the pinned original b4ca4a3")
+     ap.add_argument("--strict", action="store_true", help="a library that is not pinned (or reviewed by a matching profile) is REVIEW_REQUIRED -> exit 4")
+     ap.add_argument("--budget-seconds", type=float, default=DEFAULT_BUDGET_S, help=f"total wall budget (default {DEFAULT_BUDGET_S:.0f}, max {MAX_BUDGET_S:.0f}); each child is limited to {PER_CHILD_TIMEOUT:.0f} s regardless")
+-    ap.add_argument("--only", help="comma-separated case ids (contract cases only)")
+-    ap.add_argument("--skip-selftests", action="store_true", help="skip mechanism self-tests (not recommended)")
++    ap.add_argument("--only", help="comma-separated ids of contract cases (PC*), mechanism tests (MS*) and mutation controls (MU*); the deny-control admission MS01 ALWAYS runs first")
++    ap.add_argument("--skip-selftests", action="store_true", help="skip the mechanism self-tests after the mandatory admission (not recommended)")
+     ap.add_argument("--skip-mutation", action="store_true", help="skip mutation controls on disposable copies")
+     ap.add_argument("--normalize-stored-paths", action="store_true", help="replace scratch/world/out paths by placeholders in STORED stdout/stderr (raw hashes are kept in status.json)")
+     ap.add_argument("--list", action="store_true", help="list case ids and exit")
+     return ap.parse_args(argv)
+ 
+ 
+-def main(argv=None) -> int:
++def admission_fn():
++    return next(f for f in portable_selftest.MS_CASES if f.case_id.startswith("MS01"))
++
++
++def main(argv=None, admission_cases=None) -> int:
++    """admission_cases: for TESTS only (Python API, not a CLI option): replaces the admission list, e.g. by a disposable, intentionally failing deny control."""
+     ns = parse_args(argv)
+     cases = list(portable_cases.CASES)
+     if ns.list:
++        print("[admission, always first]", admission_fn().case_id)
+         for fn in cases + portable_selftest.MS_CASES:
+             print(fn.case_id, "-", fn.title)
+         for m in portable_selftest.MUTATIONS:
+@@ -88,18 +98,16 @@
+         emit_err("refused: the output directory and the scratch root must be separate directories\n")
+         return 2
+     try:
+-        profile_bytes = open(ns.profile, "rb").read(1_000_001)
+-        if len(profile_bytes) > 1_000_000:
+-            raise ValueError("profile larger than 1 MB")
+-        profile_doc = json.loads(profile_bytes.decode("utf-8"))
+-    except (OSError, ValueError) as exc:
+-        emit_err(f"refused: cannot read profile {ns.profile}: {exc}\n")
+-        return 2
+-    only = set(ns.only.split(",")) if ns.only else None
+-    if only:
+-        unknown = only - {fn.case_id for fn in cases}
+-        if unknown:
+-            emit_err(f"usage: unknown case ids {sorted(unknown)}\n")
++        profile_doc, profile_bytes = load_profile_file(ns.profile)
++    except (OSError, ProfileError) as exc:
++        emit_err(f"refused: cannot use profile {ns.profile}: {exc}\n")
++        return 2
++    all_ids = {fn.case_id for fn in cases} | {fn.case_id for fn in portable_selftest.MS_CASES} | {m["id"] for m in portable_selftest.MUTATIONS}
++    only = set(x for x in ns.only.split(",") if x) if ns.only else None
++    if only is not None:
++        unknown = only - all_ids
++        if unknown or not only:
++            emit_err(f"usage: unknown or empty ids {sorted(unknown)}\n")
+             return 2
+     try:
+         out = OutDir.create_new(ns.out_dir, forbidden)
+@@ -110,22 +118,36 @@
+     profile = Profile(profile_doc, inv_before)
+     t_start = time.monotonic()
+     started_utc = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+-    results, mutation, cleanup_ok = [], [], None
++    results, mutation, cleanup_ok, admission_results, stopped = [], [], None, [], None
+     tmp = tempfile.TemporaryDirectory(dir=scratch_root, prefix="vcc-portable-", ignore_cleanup_errors=True)
+     scratch = os.path.realpath(tmp.name)
++    adm_list = list(admission_cases) if admission_cases is not None else [admission_fn()]
+     try:
+         run = Run(library_root=lib, scratch=scratch, out=out, budget_s=ns.budget_seconds, profile=profile, strict=ns.strict, normalize_stored=ns.normalize_stored_paths)
+-        for fn in cases:
+-            if only and fn.case_id not in only:
+-                continue
+-            results.append(run_case(run, fn))
+-        if not ns.skip_selftests and not only:
+-            for fn in portable_selftest.MS_CASES:
+-                run.group = "mechanism"
+-                results.append(run_case(run, fn))
++        # ---- ADMISSION: the deny controls must pass BEFORE anything else; a failure stops everything (no contract case, no other mechanism test, no mutation control)
++        run.group = "admission"
++        for fn in adm_list:
++            admission_results.append(run_case(run, fn))
++        bad_adm = [r["case"] for r in admission_results if r["status"] != "PASS"]
++        children_after_admission = run.children
++        if bad_adm:
++            stopped = {"stage": "admission", "failed": bad_adm, "children_started_when_stopped": run.children,
++                       "message": "STOP: a deny control did not pass; the prohibited-action protection is not demonstrated on this machine. No contract case, mechanism test or mutation control was run."}
++        else:
+             run.group = "contract"
+-            if not ns.skip_mutation:
+-                mutation = portable_selftest.run_mutation_controls(run, cases)
++            sel_ms = [fn for fn in portable_selftest.MS_CASES if not fn.case_id.startswith("MS01")]
++            for fn in cases:
++                if only is None or fn.case_id in only:
++                    results.append(run_case(run, fn))
++            if (only is None and not ns.skip_selftests) or (only is not None and any(fn.case_id in only for fn in sel_ms)):
++                for fn in sel_ms:
++                    if only is None or fn.case_id in only:
++                        run.group = "mechanism"
++                        results.append(run_case(run, fn))
++                run.group = "contract"
++            mu_ids = {m["id"] for m in portable_selftest.MUTATIONS}
++            if (only is None and not ns.skip_selftests and not ns.skip_mutation) or (only is not None and (only & mu_ids)):
++                mutation = portable_selftest.run_mutation_controls(run, cases, only=(only & mu_ids) if only is not None else None)
+                 run.group = "contract"
+     finally:
+         try:
+@@ -133,15 +155,18 @@
+             cleanup_ok = not os.path.exists(scratch)
+         except OSError:
+             cleanup_ok = False
++    all_results = admission_results + results
+     inv_after = inventory(lib)
+     unchanged = inv_before["all_digest_raw"] == inv_after["all_digest_raw"]
+-    summary = summarize(results)
++    summary = summarize(all_results)
+     outcomes = {}
+-    for cr in results:
++    for cr in all_results:
+         for c in cr["checks"]:
+             outcomes[c["outcome"]] = outcomes.get(c["outcome"], 0) + 1
+     mut_bad = [m for m in mutation if m["status"] == "NOT_DETECTED"]
+     findings = []
++    if stopped:
++        findings.append("STOPPED: " + stopped["message"])
+     if summary["cases_by_status"].get("FAIL"):
+         findings.append("FAIL: at least one case failed")
+     if mut_bad:
+@@ -155,7 +180,15 @@
+         review.append("an OPEN GAP changed relative to the pinned source: review the listed checks; nothing was adopted")
+     if ns.strict and not profile.applicable:
+         review.append(f"--strict: library source is {profile.pin['status']} and no matching reviewed profile was supplied")
+-    code = 1 if any(f.startswith("FAIL") for f in findings) or outcomes.get("ERROR") or outcomes.get("BUDGET_EXHAUSTED") or any(o in outcomes for o in ("GUARD_MISMATCH", "CONTROL_FAILED", "POLICY_VIOLATION")) else (4 if review else 0)
++    if profile.applied_not_a_review:
++        review.append(f"the profile applied {len(set(profile.applied_not_a_review))} entr(y/ies) marked NOT-A-REVIEW: a dry run, never a green run")
++    bad_set = ("GUARD_MISMATCH", "CONTROL_FAILED", "POLICY_VIOLATION", "ERROR", "BUDGET_EXHAUSTED")
++    if stopped:
++        code = 5
++    elif any(f.startswith("FAIL") for f in findings) or any(o in outcomes for o in bad_set):
++        code = 1
++    else:
++        code = 4 if review else 0
+     wall = time.monotonic() - t_start
+     doc = {
+         "harness": HARNESS_VERSION, "started_utc": started_utc, "wall_seconds": round(wall, 2), "exit_code": code,
+@@ -163,8 +196,10 @@
+         "claims": "Executed only on the machine that produced this file. Windows behaviour is claimed only if python.platform is 'win32' in this file.",
+         "bounds": {"per_child_timeout_s": PER_CHILD_TIMEOUT, "stream_cap_bytes": STREAM_CAP, "retained_per_child_bytes_max": 2 * STREAM_CAP, "flood_kill_bytes": FLOOD_LIMIT, "max_children": MAX_CHILDREN,
+                    "total_budget_s": ns.budget_seconds, "children_started": run.children, "serial": True},
+-        "inputs": {"library_root_basename": os.path.basename(lib), "profile": os.path.basename(ns.profile), "profile_sha256": sha256_bytes(profile_bytes), "strict": ns.strict, "only": sorted(only) if only else None,
+-                   "normalize_stored_paths": ns.normalize_stored_paths},
++        "admission": {"cases": [r["case"] for r in admission_results], "statuses": [r["status"] for r in admission_results], "children": children_after_admission, "stopped": stopped},
++        "inputs": {"library_root_basename": os.path.basename(lib), "profile": os.path.basename(ns.profile), "profile_sha256": sha256_bytes(profile_bytes), "profile_validated": True,
++                   "reviewed_entries_in_profile": len(profile_doc.get("reviewed_expectations", {})), "reviewed_entries_applied_not_a_review": sorted(set(profile.applied_not_a_review)),
++                   "strict": ns.strict, "only": sorted(only) if only else None, "normalize_stored_paths": ns.normalize_stored_paths},
+         "source": {"pin": profile.pin, "profile_applicable": profile.applicable, "reviewed_expectations_ignored_for_pin_mismatch": sorted(profile.reviewed_ignored), "unchanged_during_run": unchanged,
+                    "package_digest_raw": inv_before["package_digest_raw"], "package_digest_eol": inv_before["package_digest_eol"], "all_digest_raw": inv_before["all_digest_raw"], "all_digest_eol": inv_before["all_digest_eol"],
+                    "file_count": inv_before["file_count"], "package_file_count": inv_before["package_file_count"], "excluded": inv_before["excluded"], "skipped": inv_before["skipped"]},
+@@ -174,19 +209,21 @@
+         "driver_accounting": {"children_started": run.children, "refused_before_launch": run.refused, "launches_by_group": _count(run.launch_log, "group")},
+         "reading_guide": {"PASS": "LIBRARY_ENFORCED matched its independent expectation", "OBSERVED_OPEN_GAP": "LIBRARY_PERMISSIVE matched the pinned gap (the library accepted/omitted what an owner must guard): NOT a pass, NOT a fix",
+                           "REVIEW_REQUIRED": "an open-gap observation changed: needs an explicit reviewed expectation in a profile with a matching source pin", "REVIEWED_CHANGE": "differs from the default expectation but matches a reviewed profile entry",
+-                          "GUARD_OK": "an illustrative owner-side guard (never a library result)", "CONTROL_OK": "a harness mechanism control", "SKIPPED": "not run, with the reason recorded"},
++                          "GUARD_OK": "an illustrative owner-side guard (never a library result)", "CONTROL_OK": "a harness mechanism control", "SKIPPED": "not run, with the reason recorded",
++                          "ERROR": "an unsupported value was compared, or a case raised: never rescued by a profile"},
+     }
+     out.write_json("inventory.json", {"root_basename": os.path.basename(lib), **{k: v for k, v in inv_before.items() if k != "root_basename"}})
+-    for cr in results:
++    for cr in all_results:
+         out.write_json("cases/%s.json" % cr["case"], cr)
+     out.write_json("run.json", doc)
+-    lines = [f"portable contract harness {HARNESS_VERSION} on Python {doc['python']['version']} ({sys.platform})", f"library pin: {profile.pin['status']} ({profile.pin['detail']})",
++    lines = [f"portable-r2 contract harness {HARNESS_VERSION} on Python {doc['python']['version']} ({sys.platform})", f"library pin: {profile.pin['status']} ({profile.pin['detail']})",
++             f"admission: {', '.join(r['case'][:4] + '=' + r['status'] for r in admission_results)}  children after admission={children_after_admission}",
+              f"cases: {json.dumps(summary['cases_by_status'])}  children={run.children}  wall={wall:.1f}s  exit={code}",
+              "check outcomes: " + json.dumps(dict(sorted(outcomes.items()))),
+              "layers: " + json.dumps(summary["checks_by_layer_and_outcome"], sort_keys=True)]
+     for m in mutation:
+         lines.append(f"mutation {m['id']}: {m['status']}" + (f" ({m.get('failing_check_count')} failing checks)" if m["status"] != "NOT_APPLICABLE" else " - " + m["reason"]))
+-    for cr in results:
++    for cr in all_results:
+         if cr["status"] != "PASS":
+             lines.append(f"CASE {cr['case']}: {cr['status']}")
+             for c in cr["checks"]:
+@@ -195,6 +232,8 @@
+     lines += ["FINDINGS: " + "; ".join(findings) if findings else "FINDINGS: none", "REVIEW: " + "; ".join(review) if review else "REVIEW: none"]
+     text = "\n".join(lines) + "\n"
+     out.write("SUMMARY.txt", text.encode("utf-8"))
++    if stopped:
++        out.write("STOP.txt", (stopped["message"] + "\n").encode("utf-8"))
+     emit(text)
+     return code
+ 
+--- portable/portable_selftest.py
++++ portable-r2/portable_selftest.py
+@@ -1,4 +1,6 @@
+-"""Mechanism self-tests and mutation controls (Python 3.11+ stdlib only). They prove the harness's own safety envelope and detection power.
++"""portable-r2: MS05/MS07 now exercise the JSON-compatible rule and profiles written to / read from DISK (finding H-1); MS08 tests the strict profile loader; MS04 no longer records bytes.
++
++Mechanism self-tests and mutation controls (Python 3.11+ stdlib only). They prove the harness's own safety envelope and detection power.
+ Nothing here touches the library under test or historical evidence: mutations are applied to disposable COPIES under the owned scratch directory."""
+ from __future__ import annotations
+ 
+@@ -11,8 +13,8 @@
+ import time
+ 
+ import portable_cases as pcs
+-from portable_core import (BAD_OUTCOMES, FLOOD_LIMIT, MAX_BUDGET_S, MAX_CHILDREN, PER_CHILD_TIMEOUT, STREAM_CAP, BudgetExhausted, CaseCtx, OutDir, PolicyViolation, Profile, Run, World,
+-                           child_env, classify_check, inventory, pin_status, policy_check, run_case, run_child, sha256_bytes)
++from portable_core import (BAD_OUTCOMES, FLOOD_LIMIT, MAX_BUDGET_S, MAX_CHILDREN, PER_CHILD_TIMEOUT, STREAM_CAP, BudgetExhausted, CaseCtx, OutDir, PolicyViolation, Profile, ProfileError, Run, World,
++                           child_env, classify_check, inventory, load_profile_file, pin_status, policy_check, record_control, run_case, run_child, sha256_bytes)
+ 
+ MS_CASES: list = []
+ 
+@@ -26,12 +28,15 @@
+ 
+ 
+ def control_job(run: Run, w: World, name: str, marker: str | None, extra: dict | None = None, timeout: float = PER_CHILD_TIMEOUT):
++    """One bounded control child. r2: it is attributed to the CURRENT run group (so admission controls count as 'admission') and its bounded stdout/stderr/status are stored like any invocation."""
+     run.check_budget()
+     run.children += 1
+-    run.launch_log.append({"module": "control:" + name, "group": "mechanism", "case": "control"})
++    run.launch_log.append({"module": "control:" + name, "group": run.group, "case": "control"})
+     job = {"mode": "control", "control": name, "marker": marker, "library_root": run.library_root, "module": None, "args": [], "world_root": w.root}
+     job.update(extra or {})
+-    return run_child(job, cwd=w.root, env=child_env(w), log_dir=w.tmp, timeout=timeout)
++    child = run_child(job, cwd=w.root, env=child_env(w), log_dir=w.tmp, timeout=timeout)
++    record_control(run, w, name, child)
++    return child
+ 
+ 
+ @ms("MS01_deny_controls_prove_the_hook_is_active", "A forbidden action attempted INSIDE the hooked child is denied BEFORE its side effect (not merely 'zero events observed')")
+@@ -157,7 +162,7 @@
+         again = "overwrote"
+     except FileExistsError:
+         again = "refused"
+-    ctx.control("a fresh directory is created; writing the same file twice is refused", ("refused", b"1"), (again, open(os.path.join(parent, "fresh", "a", "b.txt"), "rb").read()))
++    ctx.control("a fresh directory is created; writing the same file twice is refused", ("refused", "1"), (again, open(os.path.join(parent, "fresh", "a", "b.txt"), "rb").read().decode("ascii")))
+     tiny = Run(library_root=run.library_root, scratch=run.scratch, out=None, budget_s=0.0, profile=run.profile, strict=False, normalize_stored=False)
+     time.sleep(0.01)
+     try:
+@@ -175,24 +180,39 @@
+     ctx.control("wall-budget and child-count limits stop further launches", (True, True), (hit, hit2))
+ 
+ 
+-@ms("MS05_classification_and_review_logic", "Layer classification: an OPEN GAP match is never PASS; deviations are REVIEW_REQUIRED; reviewed expectations need a matching source pin")
++@ms("MS05_classification_and_review_logic", "r2 rule: tuple==list but bool!=int!=float; an OPEN GAP match is never PASS; reviewed entries need a matching pin; guards/controls/ERROR are never rescued")
+ def ms05(ctx: CaseCtx):
+-    inv_a = {"package_digest_raw": "A", "package_digest_eol": "a", "all_digest_raw": "X", "all_digest_eol": "x"}
+-    pin = {"package_digest_raw": "A", "package_digest_eol": "a", "all_digest_raw": "X", "all_digest_eol": "x"}
++    h = lambda ch: ch * 64
++    inv_a = {"package_digest_raw": h("a"), "package_digest_eol": h("b"), "all_digest_raw": h("c"), "all_digest_eol": h("d")}
++    pin = dict(inv_a)
+     ctx.control("pin statuses", ("PINNED_EXACT", "PACKAGE_PINNED_OTHER_FILES_DIFFER", "PINNED_MODULO_LINE_ENDINGS", "UNPINNED", "NO_PIN"),
+-                (pin_status(inv_a, pin)["status"], pin_status(dict(inv_a, all_digest_raw="Y"), pin)["status"], pin_status(dict(inv_a, package_digest_raw="B"), pin)["status"],
+-                 pin_status(dict(inv_a, package_digest_raw="B", package_digest_eol="b"), pin)["status"], pin_status(inv_a, None)["status"]))
++                (pin_status(inv_a, pin)["status"], pin_status(dict(inv_a, all_digest_raw=h("e")), pin)["status"], pin_status(dict(inv_a, package_digest_raw=h("f")), pin)["status"],
++                 pin_status(dict(inv_a, package_digest_raw=h("f"), package_digest_eol=h("9")), pin)["status"], pin_status(inv_a, None)["status"]))
++    live = (1, [2, (3, 4)], {7: ("x", None)})                      # what a case observes: tuples, nested arrays, an int-keyed dict
++    on_disk = [1, [2, [3, 4]], {"7": ["x", None]}]                  # what a JSON profile holds
+     prof_none = Profile(None, inv_a)
+-    prof_ok = Profile({"source_pin": pin, "reviewed_expectations": {"k": {"observed": 7, "reviewed_by_ref": "owner-review/1", "note": "n"}}}, inv_a)
+-    prof_bad = Profile({"source_pin": dict(pin, package_digest_raw="Z", package_digest_eol="z"), "reviewed_expectations": {"k": {"observed": 7}}}, inv_a)
+-    c = lambda layer, exp, obs, prof=prof_none: classify_check(layer, "k", exp, obs, prof)["outcome"]
+-    ctx.control("LIBRARY_ENFORCED: match=PASS, mismatch=FAIL", ("PASS", "FAIL"), (c("LIBRARY_ENFORCED", 1, 1), c("LIBRARY_ENFORCED", 1, 2)))
++    mk = lambda reviewed, p=pin: Profile({"source_pin": p, "reviewed_expectations": reviewed}, inv_a)
++    ent = lambda v: {"observed": v, "reviewed_by_ref": "reviewer-ref-1", "note": "n"}
++    c = lambda layer, exp, obs, prof=prof_none, key="k::x": classify_check(layer, key, exp, obs, prof)["outcome"]
++    ctx.control("LIBRARY_ENFORCED: match=PASS, mismatch=FAIL; tuple and list are the same kind", ("PASS", "FAIL", "PASS"), (c("LIBRARY_ENFORCED", 1, 1), c("LIBRARY_ENFORCED", 1, 2), c("LIBRARY_ENFORCED", live, on_disk)))
++    ctx.control("types are preserved: bool!=int, int!=float, str!=int, None!=False, order and length matter, [] != {} != None",
++                ("FAIL",) * 9, tuple(c("LIBRARY_ENFORCED", a, b) for a, b in ((1, True), (True, 1), (1, 1.0), ("1", 1), (None, False), ([1, 2], [2, 1]), ([1], [1, 1]), ([], {}), (None, []))))
++    ctx.control("unsupported / non-finite values are an ERROR on either side, never stringified", ("ERROR",) * 6,
++                tuple(c("LIBRARY_ENFORCED", a, b) for a, b in ((b"x", b"x"), (float("nan"), float("nan")), (float("inf"), 1.0), ({1, 2}, [1, 2]), ({True: 1}, {"true": 1}), ({1: 1, "1": 1}, {"1": 1}))))
+     ctx.control("LIBRARY_PERMISSIVE: matching the pinned gap is OBSERVED_OPEN_GAP (never PASS); any change is REVIEW_REQUIRED (never adopted)", ("OBSERVED_OPEN_GAP", "REVIEW_REQUIRED"), (c("LIBRARY_PERMISSIVE", 1, 1), c("LIBRARY_PERMISSIVE", 1, 2)))
+-    ctx.control("a reviewed expectation with a MATCHING source pin yields REVIEWED_CHANGE (neither PASS nor FAIL); a non-matching value is still FAIL/REVIEW_REQUIRED", ("REVIEWED_CHANGE", "REVIEWED_CHANGE", "FAIL", "REVIEW_REQUIRED"),
+-                (c("LIBRARY_ENFORCED", 1, 7, prof_ok), c("LIBRARY_PERMISSIVE", 1, 7, prof_ok), c("LIBRARY_ENFORCED", 1, 8, prof_ok), c("LIBRARY_PERMISSIVE", 1, 8, prof_ok)))
+-    ctx.control("a reviewed expectation whose source pin does NOT match the library is ignored (no silent normalisation)", ("FAIL", "REVIEW_REQUIRED", False), (c("LIBRARY_ENFORCED", 1, 7, prof_bad), c("LIBRARY_PERMISSIVE", 1, 7, prof_bad), prof_bad.applicable))
+-    ctx.control("guard demos and controls never rescue or fail a library check by themselves", ("GUARD_OK", "GUARD_MISMATCH", "CONTROL_OK", "CONTROL_FAILED"),
+-                (c("CALLER_GUARD_DEMO", 1, 1), c("CALLER_GUARD_DEMO", 1, 2), c("HARNESS_CONTROL", 1, 1), c("HARNESS_CONTROL", 1, 2)))
++    ctx.control("a reviewed entry (JSON form) matches the live tuple/int-key observation -> REVIEWED_CHANGE; a counterexample of any kind does not", ("REVIEWED_CHANGE", "REVIEWED_CHANGE", "FAIL", "FAIL", "REVIEW_REQUIRED"),
++                (c("LIBRARY_ENFORCED", "other", live, mk({"k::x": ent(on_disk)})), c("LIBRARY_PERMISSIVE", "other", live, mk({"k::x": ent(on_disk)})),
++                 c("LIBRARY_ENFORCED", "other", live, mk({"k::x": ent([1, [2, [3, 4]], {"7": ["x", 0]}])})), c("LIBRARY_ENFORCED", "other", live, mk({"k::x": ent([1, [2, [3, 4.0]], {"7": ["x", None]}])})),
++                 c("LIBRARY_PERMISSIVE", "other", live, mk({"k::OTHER": ent(on_disk)}))))
++    ctx.control("a reviewed entry whose source pin does NOT match the library is ignored (no silent normalisation)", ("FAIL", "REVIEW_REQUIRED", False),
++                (c("LIBRARY_ENFORCED", 1, 7, mk({"k::x": ent(7)}, dict(pin, package_digest_raw=h("0"), package_digest_eol=h("0")))), c("LIBRARY_PERMISSIVE", 1, 7, mk({"k::x": ent(7)}, dict(pin, package_digest_raw=h("0"), package_digest_eol=h("0")))),
++                 mk({"k::x": ent(7)}, dict(pin, package_digest_raw=h("0"), package_digest_eol=h("0"))).applicable))
++    rv = mk({"k::x": ent(1), "k::g": ent(1), "k::c": ent(1)})
++    ctx.control("guard demos and harness controls are NEVER rescued or failed by a profile (even with a matching reviewed entry)", ("GUARD_MISMATCH", "GUARD_OK", "CONTROL_FAILED", "CONTROL_OK"),
++                (c("CALLER_GUARD_DEMO", 1, 2, rv, "k::g"), c("CALLER_GUARD_DEMO", 1, 1, rv, "k::g"), c("HARNESS_CONTROL", 1, 2, rv, "k::c"), c("HARNESS_CONTROL", 1, 1, rv, "k::c")))
++    nar = mk({"k::x": {"observed": 5, "reviewed_by_ref": "NOT A REVIEW: dry run"}})
++    r = classify_check("LIBRARY_ENFORCED", "k::x", 1, 5, nar)
++    ctx.control("a NOT-A-REVIEW entry applies as REVIEWED_CHANGE but is flagged (a dry run can never be a green run)", ("REVIEWED_CHANGE", "NOT_A_REVIEW", ["k::x"]), (r["outcome"], r.get("review_marker"), nar.applied_not_a_review))
+     ctx.control("BAD outcomes that fail a run", ["BUDGET_EXHAUSTED", "CONTROL_FAILED", "ERROR", "FAIL", "GUARD_MISMATCH", "POLICY_VIOLATION"], sorted(BAD_OUTCOMES))
+ 
+ 
+@@ -298,19 +318,19 @@
+     return results
+ 
+ 
+-@ms("MS07_reviewed_profile_end_to_end", "On a disposable copy with a CLOSED gap: REVIEW_REQUIRED without a profile; REVIEWED_CHANGE with a matching-pin reviewed profile; REVIEW_REQUIRED again with a wrong pin")
++@ms("MS07_reviewed_profile_end_to_end", "On a disposable copy where selected unresolved rows no longer HOLD: FAIL without a profile; REVIEWED_CHANGE with a profile WRITTEN TO AND READ FROM DISK (tuples inside dicts and arrays); FAIL again with a wrong pin")
+ def ms07(ctx: CaseCtx):
+     run = ctx.run
+-    mu = next(m for m in MUTATIONS if m["id"] == "MU7_gap_closed_receipt_required")
++    mu = next(m for m in MUTATIONS if m["id"] == "MU1_hold_to_ready")
+     copy_root = _copy_lib(run, "ms07")
+     path = os.path.join(copy_root, *mu["file"].split("/"))
+     src = open(path, "rb").read().decode("utf-8")
+     if src.count(mu["old"]) != 1:
+-        ctx.skip("reviewed-profile end-to-end", "the MU7 pattern is not present exactly once in this source (not applicable to this candidate)")
++        ctx.skip("reviewed-profile end-to-end", "the MU1 pattern is not present exactly once in this source (not applicable to this candidate)")
+         return
+     open(path, "wb").write(src.replace(mu["old"], mu["new"]).encode("utf-8"))
+     inv = inventory(copy_root)
+-    fn = next(f for f in portable_cases_list() if f.case_id == "PC08_receipts_malformed_and_shallow")
++    fn = next(f for f in portable_cases_list() if f.case_id == "PC03_unresolved_hold_and_selection")
+     saved = (run.library_root, run.profile, run.group)
+ 
+     def run_with(profile):
+@@ -320,17 +340,68 @@
+         finally:
+             run.library_root, run.profile, run.group = saved
+     r0 = run_with(Profile(None, inv))
+-    changed = [c for c in r0["checks"] if c["outcome"] == "REVIEW_REQUIRED"]
+-    ctx.control("without a profile the closed gap is REVIEW_REQUIRED (case status REVIEW_REQUIRED, never PASS)", ("REVIEW_REQUIRED", 1), (r0["status"], len(changed)))
++    changed = [c for c in r0["checks"] if c["outcome"] == "FAIL"]
++    ctx.control("without a profile the changed HOLD observation FAILs (never PASS, never adopted)", ("FAIL", True), (r0["status"], len(changed) >= 1))
+     pin = {k: inv[k] for k in ("package_digest_raw", "package_digest_eol", "all_digest_raw", "all_digest_eol")}
+-    reviewed = {c["key"]: {"observed": c["observed"], "reviewed_by_ref": "SELF-TEST ONLY: auto-generated on a disposable copy to exercise the mechanism; not a review", "note": "mechanism test"} for c in changed}
+-    r1 = run_with(Profile({"source_pin": pin, "reviewed_expectations": reviewed}, inv))
+-    ctx.control("with a reviewed profile whose source pin matches the copy: REVIEWED_CHANGE (case PASS_WITH_REVIEWED_CHANGES; neither a plain PASS nor FAIL)", ("PASS_WITH_REVIEWED_CHANGES", ["REVIEWED_CHANGE"]), (r1["status"], sorted({c["outcome"] for c in r1["checks"] if c["key"] in reviewed})))
+-    wrong = dict(pin, package_digest_raw="0" * 64, package_digest_eol="0" * 64)
+-    r2 = run_with(Profile({"source_pin": wrong, "reviewed_expectations": reviewed}, inv))
+-    ctx.control("with the same reviewed entries but a NON-matching source pin: ignored -> REVIEW_REQUIRED again", "REVIEW_REQUIRED", r2["status"])
++    reviewed = {c["key"]: {"observed": c["observed"], "reviewed_by_ref": "SELF-TEST ONLY: generated on a disposable copy to exercise the mechanism; not a review", "note": "mechanism test"} for c in changed}
++    ppath = os.path.join(run.scratch, "ms07-profile.json")
++    with open(ppath, "xb") as fh:                                           # a REAL profile file
++        fh.write((json.dumps({"profile_version": 1, "source_pin": pin, "reviewed_expectations": reviewed}, indent=2, sort_keys=True) + "\n").encode("utf-8"))
++    doc, _raw = load_profile_file(ppath)                                    # ... read back through the strict loader
++    def has_tuple(x):
++        return isinstance(x, tuple) or (isinstance(x, (list, tuple)) and any(has_tuple(v) for v in x)) or (isinstance(x, dict) and any(has_tuple(v) for v in x.values()))
++
++    ctx.control("the changed live observations really have the H-1 shape (tuples inside a dict), and the written file round-trips through the strict loader",
++                (True, len(reviewed)), (any(has_tuple(c["observed"]) for c in changed), len(doc["reviewed_expectations"])))
++    prof = Profile(doc, inv)
++    r1 = run_with(prof)
++    outc = sorted({c["outcome"] for c in r1["checks"] if c["key"] in reviewed})
++    ctx.control("with the disk profile whose pin matches: every changed check is REVIEWED_CHANGE (case PASS_WITH_REVIEWED_CHANGES), flagged as a self-test entry", ("PASS_WITH_REVIEWED_CHANGES", ["REVIEWED_CHANGE"], True),
++                (r1["status"], outc, len(set(prof.applied_not_a_review)) == len(reviewed)))
++    wrong = dict(doc, source_pin=dict(pin, package_digest_raw="0" * 64, package_digest_eol="0" * 64))
++    r2 = run_with(Profile(wrong, inv))
++    ctx.control("the same entries with a NON-matching source pin are ignored: FAIL again", "FAIL", r2["status"])
+     shutil.rmtree(copy_root, ignore_errors=True)
+ 
+ 
++@ms("MS08_profile_loader_rejects_unsafe_files", "The profile loader accepts a valid file and rejects BOM, duplicate keys, NaN/Infinity, missing/blank reviewed_by_ref, bad pins, unknown fields, wrong versions - never repairing")
++def ms08(ctx: CaseCtx):
++    run = ctx.run
++    d = os.path.join(run.scratch, "ms08")
++    os.makedirs(d)
++    good_pin = {k: "a" * 64 for k in ("package_digest_raw", "package_digest_eol", "all_digest_raw", "all_digest_eol")}
++    base = lambda **over: dict({"profile_version": 1, "source_pin": good_pin, "reviewed_expectations": {}}, **over)
++    ent = lambda **o: {"k::x": dict({"observed": [1, [2]], "reviewed_by_ref": "r1"}, **o)}
++    raw = lambda o: json.dumps(o).encode("utf-8")
++    variants = {
++        "valid_empty": raw(base()), "valid_with_entry_and_proposals": raw(base(reviewed_expectations=ent(), proposed_expectations={"k::y": {"observed": 1}}, description="x")),
++        "bom": b"\xef\xbb\xbf" + raw(base()), "not_utf8": b"\xff\xfe{}", "not_json": b"{nope", "top_level_array": b"[]",
++        "duplicate_key": b'{"profile_version": 1, "profile_version": 1, "source_pin": %s, "reviewed_expectations": {}}' % raw(good_pin),
++        "nan_value": raw(base()).replace(b'"reviewed_expectations": {}', b'"reviewed_expectations": {"k::x": {"observed": NaN, "reviewed_by_ref": "r"}}'),
++        "infinity_value": raw(base()).replace(b'"reviewed_expectations": {}', b'"reviewed_expectations": {"k::x": {"observed": Infinity, "reviewed_by_ref": "r"}}'),
++        "version_string": raw(base(profile_version="1")), "version_bool": raw(base(profile_version=True)), "version_2": raw(base(profile_version=2)),
++        "pin_short_digest": raw(base(source_pin=dict(good_pin, all_digest_raw="abc"))), "pin_uppercase": raw(base(source_pin=dict(good_pin, all_digest_raw="A" * 64))), "pin_missing_digest": raw(base(source_pin={k: v for k, v in good_pin.items() if k != "all_digest_eol"})),
++        "reviewed_not_object": raw(base(reviewed_expectations=[])), "key_without_separator": raw(base(reviewed_expectations={"nocase": {"observed": 1, "reviewed_by_ref": "r"}})),
++        "entry_without_observed": raw(base(reviewed_expectations={"k::x": {"reviewed_by_ref": "r"}})), "entry_without_ref": raw(base(reviewed_expectations={"k::x": {"observed": 1}})),
++        "entry_blank_ref": raw(base(reviewed_expectations=ent(reviewed_by_ref="   "))), "entry_ref_not_string": raw(base(reviewed_expectations=ent(reviewed_by_ref=7))),
++        "entry_unknown_field": raw(base(reviewed_expectations=ent(approved=True))), "entry_note_not_string": raw(base(reviewed_expectations=ent(note=3))),
++        "too_large": b'{"profile_version": 1, "pad": "' + b"x" * 1_000_100 + b'"}',
++    }
++    exp_ok = {"valid_empty", "valid_with_entry_and_proposals"}
++    got = {}
++    for name, data in variants.items():
++        pth = os.path.join(d, name + ".json")
++        with open(pth, "xb") as fh:
++            fh.write(data)
++        try:
++            doc, _ = load_profile_file(pth)
++            got[name] = "ACCEPTED"
++        except ProfileError:
++            got[name] = "REJECTED"
++    ctx.control("only the two valid profiles are accepted; every unsafe variant is rejected", {k: ("ACCEPTED" if k in exp_ok else "REJECTED") for k in variants}, got)
++    doc, _ = load_profile_file(os.path.join(d, "valid_with_entry_and_proposals.json"))
++    ctx.control("`proposed_expectations` is carried but never applied", (1, {"k::y": {"observed": 1}}), (len(doc["reviewed_expectations"]), doc["proposed_expectations"]))
++
++
+ def portable_cases_list():
+     return pcs.CASES
