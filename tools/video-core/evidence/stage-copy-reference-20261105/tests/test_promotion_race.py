@@ -73,5 +73,48 @@ class PromotionRace(unittest.TestCase):
             self.assertEqual(sorted(os.listdir(dst)), ["stem_copy.wav.partial"])
 
 
+def tamper_at_final_stat(action):
+    """Wrap os.stat: the first time it is asked about THIS call's final path (the helper's last size check) run `action(path)` and then the original stat."""
+    orig, done = os.stat, []
+
+    def wrapper(path, *a, **k):
+        if not done and os.path.basename(os.fspath(path)) == "stem_copy.wav":
+            done.append(1)
+            action(os.fspath(path))
+        return orig(path, *a, **k)
+    return wrapper, done
+
+
+class PostPromotionCheck(unittest.TestCase):
+    """The final size comparison already recorded MISMATCH but the outcome still said INTEGRITY_MATCH / completed=True.  A mismatch or unreadable final must never be reported as complete.
+    (Only the size boundary is covered; same-size rewrites after verification and authenticity are NOT claimed.)"""
+
+    def run_with(self, action):
+        wrapper, done = tamper_at_final_stat(action)
+        with base.world() as (_, src, dst), mock.patch.object(os, "stat", wrapper):
+            res = M.stage_copy(src, "stem.wav", PIN, dst, "stem_copy.wav", chunk_size=64)
+            self.assertEqual(done, [1], "the tamper wrapper must have run at the final size check")
+            return res, sorted(os.listdir(dst))
+
+    def test_final_truncated_after_promotion_is_not_success(self):
+        def truncate(path):
+            with open(path, "r+b") as fh:
+                fh.truncate(10)
+        res, listing = self.run_with(truncate)
+        last = res["checks"][-1]
+        self.assertEqual((last["name"], last["outcome"], last["expected"], last["observed"]), ("promoted_file_bytes_equal_pin", "MISMATCH", 1080, 10))
+        self.assertEqual((res["outcome"], res["reason"], res["completed"]), ("FAILED_VERIFICATION", "PROMOTED_FILE_MISMATCH", False))
+        self.assertIn("stem_copy.wav", listing)                       # this call's own final is left in place and recorded, not deleted or "repaired"
+        self.assertEqual(res["residue"]["final_exists"], True)
+
+    def test_final_removed_after_promotion_is_not_success(self):
+        res, listing = self.run_with(os.unlink)                       # the test removes the file this call created, to simulate its disappearance
+        last = res["checks"][-1]
+        self.assertEqual((last["name"], last["outcome"], last["observed"]), ("promoted_file_bytes_equal_pin", "MISMATCH", None))
+        self.assertEqual((res["outcome"], res["reason"], res["completed"]), ("FAILED_VERIFICATION", "PROMOTED_FILE_UNREADABLE", False))
+        self.assertNotIn("stem_copy.wav", listing)
+        self.assertEqual(res["residue"]["final_exists"], False)
+
+
 if __name__ == "__main__":
     unittest.main()

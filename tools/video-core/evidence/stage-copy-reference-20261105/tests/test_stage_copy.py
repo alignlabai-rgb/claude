@@ -328,7 +328,8 @@ class T(unittest.TestCase):
             bad = [e for e in events if e[1] == "forbidden" or not os.path.realpath(e[1]).startswith(root)]
             self.assertEqual(bad, [], bad)
             self.assertTrue(any(e[0] == ("os.link" if os.name == "posix" else "os.rename") for e in events))
-            self.assertEqual([e[1] for e in events if e[0] == "os.remove"], [os.path.join(dst, "stem_copy.wav.partial")])      # the only deletion is the helper's own partial name
+            # POSIX hard-link promotion removes the helper's own partial name (the only deletion allowed); Windows promotes by rename, so NO remove event is the correct expectation there
+            self.assertEqual([e[1] for e in events if e[0] == "os.remove"], [os.path.join(dst, "stem_copy.wav.partial")] if os.name == "posix" else [])
 
     def test_helper_imports_and_result_is_json_safe(self):
         import ast

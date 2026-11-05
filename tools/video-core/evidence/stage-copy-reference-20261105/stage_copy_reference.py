@@ -211,5 +211,6 @@ def stage_copy(source_root, source_name, pin, dest_root, dest_name, *, chunk_siz
         size_after = os.stat(final).st_size
     except OSError:
         size_after = None
-    r.check("promoted_file_bytes_equal_pin", pin["bytes"], size_after)
+    if not r.check("promoted_file_bytes_equal_pin", pin["bytes"], size_after):         # an observed mismatch or an unreadable/missing final is never success; the call's own final is left as found and recorded
+        return _finish(r, "FAILED_VERIFICATION", "PROMOTED_FILE_UNREADABLE" if size_after is None else "PROMOTED_FILE_MISMATCH", False, dest_root, final, partial)
     return _finish(r, "INTEGRITY_MATCH", "ALL_PINNED_COMPARISONS_EQUAL", True, dest_root, final, partial)
