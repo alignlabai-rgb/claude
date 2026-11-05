@@ -1,0 +1,45 @@
+VERIFICATION LOG - boundary-probe-recovery (Linux, Python 3.13.18)
+source commit e0af65bdb9bd3d7c1d166bf7918676d8853c6cee
+
+## verify_transport.py --parts-dir (with --git-commit)
+members verified: 1238/1238  total bytes: 6871248  zero-byte members: 305  git-checked: True
+extracted 1238 files to <SCRATCH>/fin1/x
+VERIFIED
+
+## verify_transport.py --zip (with --git-commit)
+members verified: 1238/1238  total bytes: 6871248  zero-byte members: 305  git-checked: True
+extracted 1238 files to <SCRATCH>/fin2/x
+VERIFIED
+
+## fresh git archive export vs extractions
+fin1: diff -r identical, 0 differing files
+fin1: files 1238, *.bin 506, zero-byte 305, bytes 6871248
+fin2: diff -r identical, 0 differing files
+fin2: files 1238, *.bin 506, zero-byte 305, bytes 6871248
+git tree at commit: files 1238
+
+## rebuild determinism
+rebuild byte-identical to the committed transport files
+
+## negative_controls.py
+ok   untouched zip: verify_transport exit 0 (must verify)
+ok   untouched parts: verify_transport exit 0 (must verify)
+ok   one bit flipped in the zip: verify_transport exit 1 (must be rejected)
+ok   one character changed in a chunk: verify_transport exit 1 (must be rejected)
+ok   a chunk missing: verify_transport exit 1 (must be rejected)
+ok   an extra chunk file: verify_transport exit 1 (must be rejected)
+ok   a non-ASCII byte appended to a chunk: verify_transport exit 1 (must be rejected)
+ok   chunks 1 and 2 swapped: verify_transport exit 1 (must be rejected)
+ok   extra member ../escape.txt: verify_transport exit 1 (must be rejected)
+ok   extra member /abs/x.txt: verify_transport exit 1 (must be rejected)
+ok   extra member with a backslash: verify_transport exit 1 (must be rejected)
+ok   extra member .git/config: verify_transport exit 1 (must be rejected)
+ok   extra member outside the scope: verify_transport exit 1 (must be rejected)
+ok   a member missing: verify_transport exit 1 (must be rejected)
+ok   a duplicate member name: verify_transport exit 1 (must be rejected)
+ok   casefold-colliding member: verify_transport exit 1 (must be rejected)
+ok   one stdout.bin altered (1 byte appended): verify_transport exit 1 (must be rejected)
+ok   one zero-byte file given content: verify_transport exit 1 (must be rejected)
+ok   one stdout.bin emptied: verify_transport exit 1 (must be rejected)
+ok   extraction target exists: verify_transport exit 2 (must be rejected)
+20/20 controls behaved as required
