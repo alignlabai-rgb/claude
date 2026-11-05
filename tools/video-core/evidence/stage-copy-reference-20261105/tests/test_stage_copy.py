@@ -311,9 +311,9 @@ class T(unittest.TestCase):
         def hook(event, args):
             if not armed:
                 return
-            if event.startswith(("subprocess", "socket", "os.system", "os.exec", "os.spawn", "urllib", "shutil", "os.putenv", "os.remove", "os.unlink", "os.rmdir", "os.symlink", "os.link")):
+            if event.startswith(("subprocess", "socket", "os.system", "os.exec", "os.spawn", "urllib", "shutil", "os.putenv", "os.rmdir", "os.symlink")):
                 events.append((event, "forbidden"))
-            elif event in ("open", "os.rename", "os.mkdir", "os.listdir", "os.scandir"):
+            elif event in ("open", "os.rename", "os.mkdir", "os.listdir", "os.scandir", "os.link", "os.remove"):
                 p = args[0]
                 events.append((event, os.fspath(p) if isinstance(p, (str, bytes, os.PathLike)) else repr(p)))
         sys.addaudithook(hook)
@@ -327,7 +327,8 @@ class T(unittest.TestCase):
             root = os.path.realpath(t)
             bad = [e for e in events if e[1] == "forbidden" or not os.path.realpath(e[1]).startswith(root)]
             self.assertEqual(bad, [], bad)
-            self.assertTrue(any(e[0] == "os.rename" for e in events))
+            self.assertTrue(any(e[0] == ("os.link" if os.name == "posix" else "os.rename") for e in events))
+            self.assertEqual([e[1] for e in events if e[0] == "os.remove"], [os.path.join(dst, "stem_copy.wav.partial")])      # the only deletion is the helper's own partial name
 
     def test_helper_imports_and_result_is_json_safe(self):
         import ast

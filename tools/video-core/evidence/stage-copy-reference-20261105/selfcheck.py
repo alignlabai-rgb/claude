@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Six one-line mutants of a COPY of stage_copy_reference.py (never the original): the unchanged tests must FAIL on each.  python selfcheck.py --out results/selfcheck-py3.13.json
+"""Seven one-line mutants of a COPY of stage_copy_reference.py (never the original): the unchanged tests must FAIL on each.  python selfcheck.py --out results/selfcheck-py3.13.json
 Stderr of the child suites is shown (-W always::ResourceWarning) and any 'Warning' line is counted."""
 import argparse
 import json
@@ -16,7 +16,8 @@ MUT = [("S1", "source re-hash after the copy skipped", "after = _digest(src)", "
        ("S3", "final-name freshness check dropped", '    if os.path.lexists(final):\n        r.check("destination_final_name_is_fresh", True, False)', '    if False:\n        r.check("destination_final_name_is_fresh", True, False)'),
        ("S4", "root relationship not enforced", 'if r.roots != "DISJOINT":', "if False:"),
        ("S5", "destination digest taken from the copy stream instead of the file", "dest = _digest(partial)", 'dest = {"bytes": n, "sha256": stream.hexdigest()}'),
-       ("S6", "partial promoted although verification failed", "    if not ok_src or not ok_dst:\n        return", "    if False:\n        return")]
+       ("S6", "partial promoted although verification failed", "    if not ok_src or not ok_dst:\n        return", "    if False:\n        return"),
+       ("S7", "promotion by plain os.rename again (replaces an existing final on POSIX)", "os.link(partial, final, follow_symlinks=False)", "os.rename(partial, final)")]
 ap = argparse.ArgumentParser()
 ap.add_argument("--out", required=True)
 ns = ap.parse_args()

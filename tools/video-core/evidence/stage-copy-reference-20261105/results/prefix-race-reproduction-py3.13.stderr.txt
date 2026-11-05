@@ -1,0 +1,73 @@
+test_hardlink_unavailable_holds_and_keeps_the_partial (test_promotion_race.PromotionRace.test_hardlink_unavailable_holds_and_keeps_the_partial) ... FAIL
+test_normal_promotion_removes_only_our_partial_and_leaves_one_name (test_promotion_race.PromotionRace.test_normal_promotion_removes_only_our_partial_and_leaves_one_name) ... ERROR
+test_other_writers_final_is_kept_and_the_run_is_not_complete (test_promotion_race.PromotionRace.test_other_writers_final_is_kept_and_the_run_is_not_complete) ... FAIL
+test_platform_without_a_known_safe_promotion_holds (test_promotion_race.PromotionRace.test_platform_without_a_known_safe_promotion_holds) ... ERROR
+test_c01_normal_and_zero_byte (test_stage_copy.T.test_c01_normal_and_zero_byte) ... ok
+test_c02_size_pin_mismatch (test_stage_copy.T.test_c02_size_pin_mismatch) ... ok
+test_c03_sha_pin_mismatch_same_size (test_stage_copy.T.test_c03_sha_pin_mismatch_same_size) ... ok
+test_c04_interrupted (test_stage_copy.T.test_c04_interrupted) ... ok
+test_c05_source_replaced_during_read (test_stage_copy.T.test_c05_source_replaced_during_read) ... ok
+test_c06_destination_corrupted (test_stage_copy.T.test_c06_destination_corrupted) ... ok
+test_c07_c08_existing_outputs_refused (test_stage_copy.T.test_c07_c08_existing_outputs_refused) ... ok
+test_c09_root_alias (test_stage_copy.T.test_c09_root_alias) ... ok
+test_c10_descendant_and_ancestor_are_distinguished_from_the_alias (test_stage_copy.T.test_c10_descendant_and_ancestor_are_distinguished_from_the_alias) ... ok
+test_c11_invalid_arguments_all_refused_before_any_filesystem_action (test_stage_copy.T.test_c11_invalid_arguments_all_refused_before_any_filesystem_action) ... ok
+test_c12_symlink_source (test_stage_copy.T.test_c12_symlink_source) ... ok
+test_helper_imports_and_result_is_json_safe (test_stage_copy.T.test_helper_imports_and_result_is_json_safe) ... ok
+test_only_owned_temp_paths_are_opened_and_nothing_else_happens (test_stage_copy.T.test_only_owned_temp_paths_are_opened_and_nothing_else_happens) ... ok
+test_pins_are_literals_matching_the_generator_not_the_destination (test_stage_copy.T.test_pins_are_literals_matching_the_generator_not_the_destination) ... ok
+
+======================================================================
+ERROR: test_normal_promotion_removes_only_our_partial_and_leaves_one_name (test_promotion_race.PromotionRace.test_normal_promotion_removes_only_our_partial_and_leaves_one_name)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/claude/tools/video-core/evidence/stage-copy-reference-20261105/tests/test_promotion_race.py", line 56, in test_normal_promotion_removes_only_our_partial_and_leaves_one_name
+    self.assertEqual(res["promotion"]["partial_removed"], True)
+                     ~~~^^^^^^^^^^^^^
+KeyError: 'promotion'
+
+======================================================================
+ERROR: test_platform_without_a_known_safe_promotion_holds (test_promotion_race.PromotionRace.test_platform_without_a_known_safe_promotion_holds)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/claude/tools/video-core/evidence/stage-copy-reference-20261105/tests/test_promotion_race.py", line 70, in test_platform_without_a_known_safe_promotion_holds
+    with base.world() as (_, src, dst), mock.patch.object(M, "_promotion_method", lambda: None):
+                                        ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.13/unittest/mock.py", line 1503, in __enter__
+    original, local = self.get_original()
+                      ~~~~~~~~~~~~~~~~~^^
+  File "/usr/local/lib/python3.13/unittest/mock.py", line 1473, in get_original
+    raise AttributeError(
+        "%s does not have the attribute %r" % (target, name)
+    )
+AttributeError: <module 'stage_copy_reference' from '/home/user/claude/tools/video-core/evidence/stage-copy-reference-20261105/stage_copy_reference.py'> does not have the attribute '_promotion_method'
+
+======================================================================
+FAIL: test_hardlink_unavailable_holds_and_keeps_the_partial (test_promotion_race.PromotionRace.test_hardlink_unavailable_holds_and_keeps_the_partial)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/claude/tools/video-core/evidence/stage-copy-reference-20261105/tests/test_promotion_race.py", line 65, in test_hardlink_unavailable_holds_and_keeps_the_partial
+    self.assertEqual((res["outcome"], res["reason"], res["completed"]), ("HOLD", "PROMOTION_UNAVAILABLE", False))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: ('INTEGRITY_MATCH', 'ALL_PINNED_COMPARISONS_EQUAL', True) != ('HOLD', 'PROMOTION_UNAVAILABLE', False)
+
+First differing element 0:
+'INTEGRITY_MATCH'
+'HOLD'
+
+- ('INTEGRITY_MATCH', 'ALL_PINNED_COMPARISONS_EQUAL', True)
++ ('HOLD', 'PROMOTION_UNAVAILABLE', False)
+
+======================================================================
+FAIL: test_other_writers_final_is_kept_and_the_run_is_not_complete (test_promotion_race.PromotionRace.test_other_writers_final_is_kept_and_the_run_is_not_complete)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/claude/tools/video-core/evidence/stage-copy-reference-20261105/tests/test_promotion_race.py", line 42, in test_other_writers_final_is_kept_and_the_run_is_not_complete
+    self.assertEqual(get(os.path.join(dst, "stem_copy.wav")), SENTINEL, "the other writer's final was overwritten")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b'SYNTHETIC-STAGE-COPY-DUMMY\nSYNTHETIC-STA[1075 chars]MY\n' != b'OTHER-WRITER-FINAL-SENTINEL' : the other writer's final was overwritten
+
+----------------------------------------------------------------------
+Ran 18 tests in 0.035s
+
+FAILED (failures=2, errors=2)

@@ -4,11 +4,15 @@
 by size + SHA-256, (1) the source before the copy, (2) the source after the copy and (3) the destination, against a PIN THE CALLER SUPPLIED IN ADVANCE ({"bytes", "sha256"}).  The pin is never derived
 from what was observed after the copy.  This mirrors public SIT-06 ("mux_inputs/: copy of stem + receipt + video, re-hashed after copy") and GAP-12 ("stem handoff geometry is nobody's job") at a0acfdaf.
 
+PROMOTION (changed after the first checkpoint, see README "Promotion boundary"): the verified partial gets its final name with a create-only step that cannot replace an existing file (POSIX hard link of a regular file, then removal of the helper's OWN partial name;
+Windows os.rename, which refuses an existing destination; other platforms: HOLD with the partial kept).  The verification-to-promotion window for rewriting the partial or the source is NOT closed.
+
 A match is an INTEGRITY COMPARISON only: not authenticity, qualification, adoption, readiness, execution permission, creative acceptance, atomicity or durability.
 Behaviour that is ENFORCED here: strict argument shapes; roots must be existing directories that are DISJOINT after realpath (same root / alias, destination inside source root and source inside destination root are
 refused and named); the source must be a regular file (a symlink or a Windows reparse point is refused; nothing is followed); the source must equal the pin BEFORE anything is created; the copy goes to
-`<name>.partial` created with exclusive create ('xb'), is verified, and is promoted to `<name>` only after the verification (rename after a "does the final name exist" check); an existing final or partial name
-is refused and never overwritten or deleted.  LIMITS (not solved, not invented): the check-then-rename is NOT atomic (a file created in between can be replaced by rename on POSIX); no OS permission, ACL,
+`<name>.partial` created with exclusive create ('xb'), is verified, and is promoted to `<name>` only after the verification, by a create-only step (see PROMOTION below); an existing final or partial name
+is refused and never overwritten or deleted.  LIMITS (not solved, not invented): promotion itself no longer replaces a file that appears at the final name in between (that earlier defect was reproduced and fixed), but the window between verification and promotion
+is not closed for a REWRITE of the partial or the source by another writer, and the whole run is not a transaction; no OS permission, ACL,
 read-only or link protection is added or tested; a failed run LEAVES its own `<name>.partial` in place (recorded exactly, never promoted, never deleted by this helper); fsync is a request, not a durability proof;
 realpath-based root comparison is only as good as the OS's path resolution (case folding, junctions and 8.3 names are not examined); files above MAX_BYTES are refused.
 """
@@ -34,6 +38,12 @@ def _name_ok(n):
 
 def _pin_ok(p):
     return (type(p) is dict and set(p) == {"bytes", "sha256"} and type(p["bytes"]) is int and 0 <= p["bytes"] <= MAX_BYTES and type(p["sha256"]) is str and _HEX.fullmatch(p["sha256"]) is not None)
+
+
+def _promotion_method():
+    """How a VERIFIED partial may be given its final name WITHOUT replacing an existing file.  POSIX: a regular-file hard link (link(2) fails if the final name exists = create-only), then the helper's own partial name is
+    removed.  Windows: os.rename, which refuses an existing destination (not exercised on real Windows by this evidence).  Anything else: None -> HOLD, the partial is kept."""
+    return "hardlink_create_only" if os.name == "posix" else "rename_no_overwrite" if os.name == "nt" else None
 
 
 def _norm(path):
@@ -72,6 +82,7 @@ class _R:
         self.checks, self.observed, self.pin = [], {}, pin
         self.roots = None
         self.created = False
+        self.promotion = None
 
     def check(self, name, expected, observed):
         ok = expected == observed
@@ -91,7 +102,7 @@ def _finish(r, outcome, reason, completed, dest_root=None, final=None, partial=N
                 pass
         residue["dest_root_listing"] = sorted(os.listdir(dest_root))[:50]
     return {"result_schema": SCHEMA, "outcome": outcome, "reason": reason, "completed": completed, "pin_supplied_in_advance": r.pin, "observed": r.observed, "checks": r.checks,
-            "root_relationship": r.roots, "residue": residue, "created_by_this_call": r.created, "not_asserted": list(NOT_ASSERTED)}
+            "root_relationship": r.roots, "promotion": r.promotion, "residue": residue, "created_by_this_call": r.created, "not_asserted": list(NOT_ASSERTED)}
 
 
 def stage_copy(source_root, source_name, pin, dest_root, dest_name, *, chunk_size=65536, hook=None) -> dict:
@@ -168,13 +179,37 @@ def stage_copy(source_root, source_name, pin, dest_root, dest_name, *, chunk_siz
     ok_dst = r.check("destination_bytes_equal_pin", pin["bytes"], dest["bytes"]) & r.check("destination_sha256_equal_pin", pin["sha256"], dest["sha256"])
     if not ok_src or not ok_dst:
         return _finish(r, "FAILED_VERIFICATION", "SOURCE_CHANGED_DURING_COPY" if not ok_src else "DESTINATION_MISMATCH", False, dest_root, final, partial)
+    method = _promotion_method()
+    r.promotion = {"method": method, "completed": False, "partial_removed": False}
+    if method is None:
+        return _finish(r, "HOLD", "PROMOTION_UNAVAILABLE", False, dest_root, final, partial)           # no known way to avoid replacing an existing file on this platform: keep the partial
     if os.path.lexists(final):
         r.check("destination_final_name_is_still_fresh_before_promotion", True, False)
         return _finish(r, "FAILED_VERIFICATION", "PROMOTION_BLOCKED", False, dest_root, final, partial)
     try:
-        os.rename(partial, final)
+        if method == "hardlink_create_only":
+            if not stat.S_ISREG(os.lstat(partial).st_mode):
+                return _finish(r, "HOLD", "PROMOTION_UNAVAILABLE", False, dest_root, final, partial)
+            os.link(partial, final, follow_symlinks=False)          # create-only: raises FileExistsError if ANY writer created the final name in the meantime; the other file is never touched
+        else:
+            os.rename(partial, final)                               # Windows: refuses an existing destination
+    except FileExistsError:
+        r.check("destination_final_name_is_still_fresh_at_promotion", True, False)
+        return _finish(r, "FAILED_VERIFICATION", "PROMOTION_BLOCKED", False, dest_root, final, partial)
+    except (OSError, NotImplementedError):
+        return _finish(r, "HOLD" if method == "hardlink_create_only" else "FAILED_VERIFICATION", "PROMOTION_UNAVAILABLE" if method == "hardlink_create_only" else "PROMOTION_ERROR", False, dest_root, final, partial)
+    r.promotion["completed"] = True
+    if method == "hardlink_create_only":
+        try:
+            os.unlink(partial)                                      # only the name this call created
+            r.promotion["partial_removed"] = True
+        except OSError:
+            pass                                                    # the verified final exists; the extra partial link is reported in the residue, not hidden
+    else:
+        r.promotion["partial_removed"] = True
+    try:
         size_after = os.stat(final).st_size
     except OSError:
-        return _finish(r, "FAILED_VERIFICATION", "PROMOTION_ERROR", False, dest_root, final, partial)
+        size_after = None
     r.check("promoted_file_bytes_equal_pin", pin["bytes"], size_after)
     return _finish(r, "INTEGRITY_MATCH", "ALL_PINNED_COMPARISONS_EQUAL", True, dest_root, final, partial)
