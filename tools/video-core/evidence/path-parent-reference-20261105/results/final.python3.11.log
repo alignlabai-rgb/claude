@@ -1,0 +1,22 @@
+test_01_japanese_and_spaced_regular_files_resolve_with_their_demuxer (__main__.ReferenceHelper.test_01_japanese_and_spaced_regular_files_resolve_with_their_demuxer) ... ok
+test_02_a_root_alias_is_the_callers_choice_but_a_link_below_the_root_is_not (__main__.ReferenceHelper.test_02_a_root_alias_is_the_callers_choice_but_a_link_below_the_root_is_not)
+Two DIFFERENT policies: real_directory resolves the caller-chosen root (alias accepted, even one pointing elsewhere in the owned world); resolve_asset rejects link-like descendants. ... ok
+test_03_a_leaf_symlink_is_rejected_even_when_it_points_inside_the_root (__main__.ReferenceHelper.test_03_a_leaf_symlink_is_rejected_even_when_it_points_inside_the_root) ... ok
+test_04_a_parent_symlink_is_rejected_by_the_helper_but_accepted_by_the_current_inspect_check (__main__.ReferenceHelper.test_04_a_parent_symlink_is_rejected_by_the_helper_but_accepted_by_the_current_inspect_check)
+CURRENT BEHAVIOUR, not a verdict: check_media_for_inspect lstat-s only the leaf, so a path through a symlinked parent passes. Whether that should change is an owner decision. ... ok
+test_05_windows_reparse_attributes_stat_stub_only_leaf_and_parent_components (__main__.ReferenceHelper.test_05_windows_reparse_attributes_stat_stub_only_leaf_and_parent_components)
+STAT-STUB EVIDENCE ONLY. A patched lstat result with FILE_ATTRIBUTE_REPARSE_POINT; NO real junction or Windows run. The helper checks every component; inspect only the leaf. ... ok
+test_06_syntax_escape_and_protocol_refusals_need_no_process_and_create_nothing (__main__.ReferenceHelper.test_06_syntax_escape_and_protocol_refusals_need_no_process_and_create_nothing) ... ok
+test_07_filesystem_refusals_extension_missing_directory_oversize_and_windows_unsafe_names (__main__.ReferenceHelper.test_07_filesystem_refusals_extension_missing_directory_oversize_and_windows_unsafe_names) ... ok
+test_08_the_root_policy_is_unchanged_missing_not_a_directory_nul_and_non_utf8_roots (__main__.ReferenceHelper.test_08_the_root_policy_is_unchanged_missing_not_a_directory_nul_and_non_utf8_roots) ... ok
+test_09_detection_is_not_atomic_a_file_swapped_after_resolution_is_followed_by_open (__main__.ReferenceHelper.test_09_detection_is_not_atomic_a_file_swapped_after_resolution_is_followed_by_open)
+LIMITATION DEMONSTRATED, deterministic and single-threaded: after the helper accepted a regular file, replacing it with a symlink makes a plain open() of the returned path read the ... ok
+test_10_what_each_current_read_route_does_with_a_leaf_symlink_and_a_parent_symlink (__main__.ReferenceHelper.test_10_what_each_current_read_route_does_with_a_leaf_symlink_and_a_parent_symlink)
+Pins the CURRENT behaviour behind the README table (source commit 019d059). 'accepted' means the route's own checks did not refuse it; it is not a defect claim. ... ok
+test_11_the_helper_is_a_pure_delegation_identical_results_and_rejections_to_resolve_asset (__main__.ReferenceHelper.test_11_the_helper_is_a_pure_delegation_identical_results_and_rejections_to_resolve_asset) ... ok
+test_12_this_reference_adds_no_policy_to_the_package_and_its_decisions_stay_open (__main__.ReferenceHelper.test_12_this_reference_adds_no_policy_to_the_package_and_its_decisions_stay_open) ... ok
+
+----------------------------------------------------------------------
+Ran 12 tests in 0.020s
+
+OK
