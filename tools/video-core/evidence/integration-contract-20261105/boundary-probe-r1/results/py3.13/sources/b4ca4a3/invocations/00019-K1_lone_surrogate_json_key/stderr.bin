@@ -1,0 +1,38 @@
+Traceback (most recent call last):
+  File "<LIBRARY>/video_core/cli.py", line 215, in main
+    return handler(ns, limits)
+  File "<LIBRARY>/video_core/cli.py", line 129, in _cmd_plan
+    p = planmod.prepare(data, output_root=ns.output_root, output_name=ns.output_name, **kw)
+  File "<LIBRARY>/video_core/plan.py", line 221, in prepare
+    ep = load_episode(episode_bytes, limits)
+  File "<LIBRARY>/video_core/episode.py", line 200, in load_episode
+    return validate_episode(parse_json_bytes(data, limits), limits)
+  File "<LIBRARY>/video_core/episode.py", line 195, in validate_episode
+    raise ValidationFailed(f"episode rejected ({len(c.issues)} issue(s))", c.issues)
+video_core.errors.ValidationFailed: episode rejected (1 issue(s))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/user/claude/tools/video-core/evidence/integration-contract-20261105/portable-r2/child_runner.py", line 238, in <module>
+    main()
+    ~~~~^^
+  File "/home/user/claude/tools/video-core/evidence/integration-contract-20261105/portable-r2/child_runner.py", line 209, in main
+    runpy.run_module(job["module"], run_name="__main__", alter_sys=True)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen runpy>", line 231, in run_module
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File "<LIBRARY>/video_core/__main__.py", line 6, in <module>
+    sys.exit(main())
+             ~~~~^^
+  File "<LIBRARY>/video_core/cli.py", line 220, in main
+    _emit({"ok": False, "error": exc.to_dict()})
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<LIBRARY>/video_core/cli.py", line 30, in _emit
+    sys.stdout.buffer.write(rc.dumps(obj))
+                            ~~~~~~~~^^^^^
+  File "<LIBRARY>/video_core/receipt.py", line 48, in dumps
+    return (json.dumps(obj, indent=2, ensure_ascii=False, sort_keys=True) + "\n").encode("utf-8")
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+UnicodeEncodeError: 'utf-8' codec can't encode character '\ud800' in position 136: surrogates not allowed

@@ -1,0 +1,37 @@
+Traceback (most recent call last):
+  File "<LIBRARY>/video_core/avmux/cli.py", line 138, in main
+    return {"validate": _cmd_validate, "plan": _cmd_plan, "mux": _cmd_mux}[ns.cmd](ns, limits)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "<LIBRARY>/video_core/avmux/cli.py", line 98, in _cmd_plan
+    p = prepare_plan(_read(ns.manifest, limits.max_input_bytes), output_root=ns.output_root, output_name=ns.output_name, **_kw(ns, limits))
+  File "<LIBRARY>/video_core/avmux/plan.py", line 118, in prepare_plan
+    m = load_manifest(manifest_bytes, limits)
+  File "<LIBRARY>/video_core/avmux/manifest.py", line 52, in load_manifest
+    raise ValidationFailed(f"avmux manifest rejected ({len(c.issues)} issue(s))", c.issues)
+video_core.errors.ValidationFailed: avmux manifest rejected (1 issue(s))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/user/claude/tools/video-core/evidence/integration-contract-20261105/portable-r2/child_runner.py", line 238, in <module>
+    main()
+    ~~~~^^
+  File "/home/user/claude/tools/video-core/evidence/integration-contract-20261105/portable-r2/child_runner.py", line 209, in main
+    runpy.run_module(job["module"], run_name="__main__", alter_sys=True)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen runpy>", line 231, in run_module
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File "<LIBRARY>/video_core/avmux/__main__.py", line 6, in <module>
+    sys.exit(main())
+             ~~~~^^
+  File "<LIBRARY>/video_core/avmux/cli.py", line 143, in main
+    _emit({"ok": False, "error": exc.to_dict()})
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<LIBRARY>/video_core/avmux/cli.py", line 31, in _emit
+    sys.stdout.buffer.write(rc.dumps(obj))
+                            ~~~~~~~~^^^^^
+  File "<LIBRARY>/video_core/receipt.py", line 48, in dumps
+    return (json.dumps(obj, indent=2, ensure_ascii=False, sort_keys=True) + "\n").encode("utf-8")
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+UnicodeEncodeError: 'utf-8' codec can't encode character '\ud800' in position 136: surrogates not allowed

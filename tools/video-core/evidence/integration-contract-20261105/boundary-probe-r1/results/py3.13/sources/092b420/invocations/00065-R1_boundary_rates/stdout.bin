@@ -1,0 +1,139 @@
+{
+  "mode": "plan",
+  "observations": {
+    "assets_verified": {
+      "asset_a": {
+        "bytes": 12044,
+        "channels": 1,
+        "sample_count": 6000,
+        "sha256": "fa641090914cd7eb1838c839b5b3c854db91e9d559376c915f1fbbc3efd09f18"
+      }
+    },
+    "input": {
+      "manifest_bytes": 982,
+      "manifest_sha256": "de23e334786567893b0a295cd9ebd5bee8f7af58d4e90c73a0dc273e9b2516ea"
+    },
+    "limits": {
+      "chunk_samples": 48000,
+      "max_assets": 256,
+      "max_concurrent": 8,
+      "max_events": 1024,
+      "max_frames": 18000,
+      "max_input_bytes": 4194304,
+      "max_mix_work": 200000000,
+      "max_output_samples": 28800000,
+      "max_runtime_seconds": 300.0,
+      "max_source_bytes": 536870912,
+      "max_total_source_bytes": 2147483648,
+      "max_wav_chunks": 64,
+      "max_wav_header_bytes": 4096
+    },
+    "output": null,
+    "side_effects": "none (no file created, no process launched)"
+  },
+  "plan": {
+    "assets": [
+      {
+        "bytes": 12044,
+        "channels": 1,
+        "id": "asset_a",
+        "path": "seg_a.wav",
+        "sample_count": 6000,
+        "sha256": "fa641090914cd7eb1838c839b5b3c854db91e9d559376c915f1fbbc3efd09f18",
+        "verified": true
+      },
+      {
+        "id": "asset_unselected",
+        "path": "seg_unselected.wav",
+        "reason": "not verified: no selected USE event is bound to it",
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "verified": false
+      }
+    ],
+    "caller_assertions": "source_id, role, decision_ref and provenance_ref are opaque caller assertions, preserved verbatim; they are not authenticated and are not evidence of human adoption or creative approval",
+    "coverage": {
+      "covered_samples": 1,
+      "gap_count": 0,
+      "gaps": [],
+      "gaps_truncated": false
+    },
+    "events": [
+      {
+        "asset": "asset_a",
+        "channel_rule": "COPY",
+        "decision_ref": "owner-binding/a",
+        "disposition": "MIX",
+        "end_frame": 1,
+        "gain": {
+          "den": 1,
+          "num": 1
+        },
+        "id": "ev_a",
+        "role": "vo",
+        "sample_end": 1,
+        "sample_start": 0,
+        "samples": 1,
+        "selected": true,
+        "source_id": "src_a",
+        "source_in_sample": 0,
+        "source_out_sample": 1,
+        "start_frame": 0,
+        "state": "USE"
+      }
+    ],
+    "hold": [],
+    "mix": {
+      "events": 1,
+      "peak_concurrent": 1,
+      "work_sample_channels": 1
+    },
+    "mux_interface": {
+      "bits": 16,
+      "channels": 1,
+      "container": "RIFF/WAVE PCM",
+      "duration_samples": 1,
+      "duration_seconds": "1/48000",
+      "note": "no mux is performed by this component; a later, separately validated mux stage may consume the stem",
+      "sample_rate": 48000,
+      "start_offset_samples": 0,
+      "stem": "stem.wav",
+      "timeline_fps": "48001/1",
+      "timeline_frames": 1
+    },
+    "output": {
+      "bits": 16,
+      "bytes": 46,
+      "channels": 1,
+      "file": "stem.wav",
+      "sample_rate": 48000,
+      "samples": 1
+    },
+    "policy": {
+      "clipping": "REJECT",
+      "gain": "integer rational num/den; per-event sample = round-half-away-from-zero(sample*num/den); no automatic normalization",
+      "gap": "REQUIRE_FULL_COVERAGE",
+      "overlap": "REJECT",
+      "resampling": "none",
+      "stretching": "none"
+    },
+    "schema": "video_core.audio_plan/1",
+    "scope": [
+      "ev_a"
+    ],
+    "status": "READY",
+    "timeline": {
+      "fps": {
+        "d": 1,
+        "n": 48001,
+        "rational": "48001/1"
+      },
+      "frame_to_sample": "floor((2*frame*fps_d*48000 + fps_n) / (2*fps_n)); exact integers, round half up, applied to each absolute boundary",
+      "total_frames": 1,
+      "total_samples": 1
+    },
+    "unresolved": [],
+    "warnings": []
+  },
+  "plan_sha256": "4c362bf5a19908778a41950ba40b9d293220ddebafdf25127008e4fcf49ecdbc",
+  "status": "READY"
+}

@@ -1,0 +1,919 @@
+#!/usr/bin/env python3
+"""boundary-probe-r1 - supplemental, READ-ONLY boundary probe for the public video_core / audiomix / avmux CLIs (Python 3.11+ stdlib only; Linux and Windows).
+
+It covers the three coverage gaps that portable-r2/R2_HANDOFF.md declared 'not covered':
+  F-CLI-1  lone-surrogate JSON keys and diagnostics            (receipt.dumps / unknown_field issue paths)
+  F-AUD-1  zero-sample ranges at high frame rates              (unselected or OMIT versus selected USE/UNKNOWN/...; boundary rates)
+  F-ENC-1  roots whose name is not UTF-8 encodable             (raw non-UTF-8 bytes on POSIX; the string-level guard everywhere)
+and runs the SAME bounded cases against several source-pinned library trees (original b4ca4a3, candidate 092b420, input 91ec2d4), each with its own pin profile and its own observations.
+
+  python boundary_probe.py --source b4ca4a3=<root> --source 092b420=<root> --source 91ec2d4=<root> --scratch-root <existing dir> --out-dir <NEW dir>
+                           [--profiles-dir DIR] [--harness-dir DIR] [--budget-seconds N] [--only ID[,ID]] [--list]
+
+It does NOT modify the closed harness: it imports portable_core / portable_selftest / child_runner.py from --harness-dir (default ../portable-r2) and reuses their audited mechanism
+(isolated child interpreter `-I -S -B -X utf8`, DENYING audit hook, bounded capture, serial children, finite budgets, exclusive-create output directory).
+DENY-FIRST: before any source is probed the deny-control admission MS01 must pass; a failure STOPS the whole run (exit 5) before any probe case.
+Every probe is a real public CLI `main(argv)` (via runpy, `python -m MODULE`) on `validate` / `plan` / `srt` or a DRY-RUN `render|mix|mux` WITHOUT its execution flag. Nothing is rendered, mixed, muxed, probed or downloaded.
+
+Outcomes of an input-contract expectation: MET | NOT_MET (an OBSERVED limitation of that source; never hidden, never a harness failure). Harness controls: CONTROL_OK | CONTROL_FAILED.
+A producer's READY/HOLD/rejection is documented as producer behaviour only; it is NOT promoted to a caller's readiness verdict, adoption or a quality judgement.
+Exit codes: 0 probe completed (NOT_MET observations are reported, not failures) | 1 harness failure / error / budget exhausted / a source tree changed | 2 usage or refusal | 3 Python < 3.11
+            4 a source tree does not match its pin profile (observations cannot be attributed to the labelled commit) | 5 STOPPED: deny admission failed, nothing else ran
+"""
+from __future__ import annotations
+
+import argparse
+import hashlib
+import importlib
+import json
+import os
+import re
+import sys
+import tempfile
+import time
+import traceback
+
+sys.dont_write_bytecode = True
+HERE = os.path.dirname(os.path.abspath(__file__))
+if HERE not in sys.path:
+    sys.path.insert(0, HERE)
+PROBE_VERSION = "boundary-probe/1"
+ALLOWED_SOURCES = ("b4ca4a3", "092b420", "91ec2d4")
+
+HX = None            # the loaded harness (set by load_harness)
+CASES: list = []
+
+FINDINGS = {
+    "F-CLI-1": {"title": "a lone-surrogate JSON key crashed the CLI's own error report", "contract_ref": "INPUT_CONTRACT.md 'F-CLI-1'",
+                "documented_fix": "receipt.dumps encodes with errors='backslashreplace' (a lone surrogate is written as the JSON escape of that exact code point)"},
+    "F-AUD-1": {"title": "a zero-sample range on an unselected or OMIT event rejected the whole manifest", "contract_ref": "INPUT_CONTRACT.md 'F-AUD-1' (table)",
+                "documented_fix": "audiomix/plan.py analyze: event_zero_samples applies only to events that are selected and not OMIT"},
+    "F-ENC-1": {"title": "a root containing a raw non-UTF-8 byte stranded a run", "contract_ref": "INPUT_CONTRACT.md 'F-ENC-1'",
+                "documented_fix": "paths.real_directory rejects (UnsafePath root_invalid) a root that is not UTF-8 encodable, before and after realpath; the message never echoes the text"},
+    "CONTROL": {"title": "positive / unchanged-behaviour control", "contract_ref": "documented behaviour that the three findings must not change", "documented_fix": "none expected"},
+}
+
+
+# ------------------------------------------------------------------------------------------------------------------------------- harness loading
+
+def find_harness_dir(argv) -> str:
+    for i, a in enumerate(argv):
+        if a == "--harness-dir" and i + 1 < len(argv):
+            return os.path.abspath(argv[i + 1])
+        if a.startswith("--harness-dir="):
+            return os.path.abspath(a.split("=", 1)[1])
+    return os.path.abspath(os.path.join(HERE, "..", "portable-r2"))
+
+
+class _HX:
+    pass
+
+
+def load_harness(hdir: str):
+    """Import the CLOSED portable-r2 modules from hdir (read-only import; no bytecode is written)."""
+    global HX
+    sys.path.insert(0, hdir)
+    hx = _HX()
+    hx.dir = hdir
+    for name, mod in (("pc", "portable_core"), ("pcs", "portable_cases"), ("ps", "portable_selftest"), ("je", "json_equiv"), ("cf", "candidate_fixtures")):
+        setattr(hx, name, importlib.import_module(mod))
+    HX = hx
+    return hx
+
+
+# ------------------------------------------------------------------------------------------------------------------------------- small helpers
+
+def asc(s):
+    """Lone surrogates -> visible \\udXXX text; everything else unchanged. Used for every STORED string so no stored value needs a lone surrogate."""
+    return s.encode("utf-8", "backslashreplace").decode("utf-8") if isinstance(s, str) else s
+
+
+def scrub(o):
+    if isinstance(o, str):
+        return asc(o)
+    if isinstance(o, list):
+        return [scrub(x) for x in o]
+    if isinstance(o, dict):
+        return {asc(k) if isinstance(k, str) else k: scrub(v) for k, v in o.items()}
+    return o
+
+
+def sha(b: bytes) -> str:
+    return hashlib.sha256(b).hexdigest()
+
+
+def snap_digest(w) -> str:
+    return sha(json.dumps(w.snapshot(), sort_keys=True).encode("ascii"))         # ensure_ascii: names with lone surrogates cannot break it
+
+
+def probe_case(case_id, title, finding, refs=None):
+    def deco(fn):
+        def wrapper(ctx):
+            return fn(ctx)
+        wrapper.__name__ = fn.__name__
+        wrapper.case_id, wrapper.title, wrapper.refs, wrapper.finding = case_id, title, refs or [], finding
+        CASES.append(wrapper)
+        return wrapper
+    return deco
+
+
+def contract(ctx, name, expected, observed, *, finding, note=None):
+    """An INPUT_CONTRACT expectation. MET / NOT_MET (an observed limitation of this source); a comparison that cannot be made is an ERROR (never rescued)."""
+    key = f"{ctx.case_id}::{name}"
+    try:
+        same = HX.je.equivalent(expected, observed)
+        outcome = "MET" if same else "NOT_MET"
+        entry = {"layer": "INPUT_CONTRACT_EXPECTATION", "name": name, "key": key, "expected": scrub(expected), "observed": scrub(observed), "outcome": outcome, "finding": finding}
+    except HX.je.UnsupportedValue as exc:
+        entry = {"layer": "INPUT_CONTRACT_EXPECTATION", "name": name, "key": key, "outcome": "ERROR", "error": str(exc)[:300], "finding": finding}
+    if note:
+        entry["note"] = note
+    ctx.checks.append(entry)
+    return entry["outcome"]
+
+
+def observe(ctx, name, value, *, finding, note=None):
+    """A recorded observation without an expectation (producer behaviour documented only)."""
+    entry = {"layer": "OBSERVATION", "name": name, "key": f"{ctx.case_id}::{name}", "observed": scrub(value), "outcome": "OBSERVED", "finding": finding}
+    if note:
+        entry["note"] = note
+    ctx.checks.append(entry)
+
+
+def not_applicable(ctx, name, reason, finding):
+    ctx.checks.append({"layer": "NOT_APPLICABLE", "name": name, "key": f"{ctx.case_id}::{name}", "outcome": "NOT_APPLICABLE", "reason": reason, "finding": finding})
+
+
+def skipped(ctx, name, reason, finding):
+    ctx.checks.append({"layer": "SKIPPED", "name": name, "key": f"{ctx.case_id}::{name}", "outcome": "SKIPPED", "reason": reason, "finding": finding})
+
+
+def pcall(ctx, w, module, args, label, timeout=None):
+    """Same steps as portable_core.cli(), except that STORED argv text is made printable (lone surrogates -> \\udXXX text) because the closed harness writes argv.json as strict UTF-8.
+    The CHILD receives the real arguments (JSON escapes -> the identical str, lone surrogates included)."""
+    pc = HX.pc
+    run = ctx.run
+    expanded = [w.expand(a) if isinstance(a, str) else a for a in args]
+    try:
+        pc.policy_check(module, expanded)
+    except pc.PolicyViolation:
+        run.refused.append({"module": module, "args": [asc(str(a)) for a in args][:8]})
+        raise
+    run.check_budget()
+    job = {"mode": "cli", "library_root": run.library_root, "module": module, "args": expanded, "world_root": w.root}
+    run.children += 1
+    run.launch_log.append({"module": module, "group": run.group, "case": ctx.case_id})
+    child = pc.run_child(job, cwd=w.root, env=pc.child_env(w), log_dir=w.tmp, timeout=timeout or pc.PER_CHILD_TIMEOUT)
+    child.log = scrub(child.log) if child.log is not None else None
+    norm_text, norm_obj = pc.make_normalizer([(w.root, "<WORLD>")])
+    run.invocation_no += 1
+    res = pc.Res(child, norm_text, norm_obj, run.invocation_no)
+    pc.store_invocation(run, w, ctx.case_id, label, module, scrub(list(args)), scrub(expanded), child, res, run.group)
+    ctx.invocations.append({"no": res.record_no, "label": label, "exit_code": child.exit_code, "status": child.status, "denied_attempts": len(child.denials),
+                            "stdout_bytes_total": child.stdout_total, "stderr_bytes_total": child.stderr_total, "stdout_sha256_normalized": sha(res.text.encode("utf-8"))})
+    ctx.control(f"[{label}] child finished normally (not killed, not truncated)", {"status": "OK", "stdout_truncated": False, "stderr_truncated": False},
+                {"status": child.status, "stdout_truncated": child.truncated["stdout"], "stderr_truncated": child.truncated["stderr"]})
+    return res
+
+
+def diag(res):
+    """Stable typed view of one CLI result (bytes -> strict UTF-8 -> JSON). Returns (summary, doc)."""
+    raw, err = res.child.stdout, res.child.stderr
+    d = {"exit_code": res.exit_code, "stdout_empty": raw == b"", "stderr_empty": err == b"", "traceback_in_stderr": b"Traceback (most recent call last)" in err}
+    doc = None
+    try:
+        text = raw.decode("utf-8")
+        d["stdout_strict_utf8"] = True
+        try:
+            doc = json.loads(text)
+        except ValueError:
+            doc = None
+    except UnicodeDecodeError:
+        d["stdout_strict_utf8"] = False
+    d["stdout_json_object"] = isinstance(doc, dict)
+    codes = []
+    if isinstance(doc, dict) and isinstance(doc.get("error"), dict) and isinstance(doc["error"].get("issues"), list):
+        codes = [i.get("code") for i in doc["error"]["issues"] if isinstance(i, dict)]
+    d["issue_codes"] = [c for c in codes if isinstance(c, str)]
+    d["typed_error"] = bool(isinstance(doc, dict) and doc.get("ok") is False and isinstance(doc.get("error"), dict) and isinstance(doc["error"].get("kind"), str)
+                            and isinstance(doc["error"].get("issues"), list) and all(isinstance(i, dict) and isinstance(i.get("code"), str) and isinstance(i.get("path"), str) for i in doc["error"]["issues"]))
+    d["error_kind"] = doc["error"]["kind"] if d["typed_error"] else None
+    return d, doc
+
+
+def side_effect_checks(ctx, label, res, before, after, finding):
+    contract(ctx, f"[{label}] no input/output side effects (owned world byte-identical)", True, before == after, finding=finding)
+    contract(ctx, f"[{label}] no process/network/write/env attempt (deny hook silent)", [], [(x["category"], x["event"]) for x in res.denials], finding=finding)
+
+
+def rejection(ctx, label, res, *, codes, finding, kind=None, exit_nonzero=True, exit_code=None, message_must_not_contain=None):
+    d, doc = diag(res)
+    if exit_code is not None:
+        contract(ctx, f"[{label}] exit code", exit_code, d["exit_code"], finding=finding)
+    else:
+        contract(ctx, f"[{label}] exit code is non-zero", True, d["exit_code"] not in (0, None), finding=finding)
+    contract(ctx, f"[{label}] stdout is a strict UTF-8 JSON object", True, d["stdout_json_object"], finding=finding)
+    contract(ctx, f"[{label}] typed rejection (ok:false, error.kind, issues[].code/path)", True, d["typed_error"], finding=finding)
+    if kind is not None:
+        contract(ctx, f"[{label}] error.kind", kind, d["error_kind"], finding=finding)
+    contract(ctx, f"[{label}] issue codes include", sorted(codes), sorted(set(codes) & set(d["issue_codes"])), finding=finding)
+    observe(ctx, f"[{label}] observed issue codes / exit code / error kind", {"issue_codes": d["issue_codes"], "exit_code": d["exit_code"], "error_kind": d["error_kind"]}, finding=finding)
+    contract(ctx, f"[{label}] stderr is empty and no traceback leaked", {"stderr_empty": True, "traceback": False}, {"stderr_empty": d["stderr_empty"], "traceback": d["traceback_in_stderr"]}, finding=finding)
+    if message_must_not_contain is not None:
+        text = res.child.stdout.decode("utf-8", "replace")
+        contract(ctx, f"[{label}] diagnostic does not echo {message_must_not_contain!r}", False, message_must_not_contain in text, finding=finding)
+    return d, doc
+
+
+def accepted_plan(ctx, label, res, finding):
+    d, doc = diag(res)
+    contract(ctx, f"[{label}] exit code 0", 0, d["exit_code"], finding=finding)
+    contract(ctx, f"[{label}] stdout is a strict UTF-8 JSON object", True, d["stdout_json_object"], finding=finding)
+    contract(ctx, f"[{label}] stderr is empty and no traceback leaked", {"stderr_empty": True, "traceback": False}, {"stderr_empty": d["stderr_empty"], "traceback": d["traceback_in_stderr"]}, finding=finding)
+    return d, doc
+
+
+# ------------------------------------------------------------------------------------------------------------------------------- fixtures and independent oracles
+
+def S(f, n, d):
+    return HX.pcs.o_sample(f, n, d)             # exact rational, round half up: floor(f*d*48000/n + 1/2); independent of the library
+
+
+def zero_sample_frames(n, d, limit=17998):
+    """Frames f (0 <= f < limit) whose one-frame range [f, f+1) spans ZERO samples under the documented policy. Exact integers, independent of the library."""
+    out = []
+    for f in range(0, limit):
+        if S(f + 1, n, d) == S(f, n, d):
+            out.append(f)
+            if len(out) >= 3:
+                break
+    return out
+
+
+def dumps_ascii(obj) -> bytes:
+    return (json.dumps(obj, indent=2, sort_keys=True, ensure_ascii=True) + "\n").encode("ascii")           # a lone surrogate becomes the escape text \udXXX in the DOCUMENT
+
+
+def dumps_utf8(obj) -> bytes:
+    return (json.dumps(obj, indent=2, sort_keys=True, ensure_ascii=False) + "\n").encode("utf-8")
+
+
+def mech_receipt_bytes() -> bytes:
+    """A SELF_CONSISTENT_FORGERY (portable-r2/candidate_fixtures.py, its _fixture_note says so): used ONLY so that an avmux plan reaches the root/path checks under test. It is not a producer receipt and proves nothing about provenance."""
+    return HX.cf.jbytes(HX.cf.forged_receipt(HX.pcs.FB["stem.wav"], samples=S(HX.pcs.FRAMES, HX.pcs.N, HX.pcs.D)))
+
+
+def avm_dict(route="MOV_PCM_S16LE", video="video_ok.mp4", audio="stem.wav", receipt_name="audio_receipt.json", receipt_bytes=None):
+    pcs = HX.pcs
+    man = {"avmux_version": 1, "route": route, "selection": {"ref": "synthetic-selection/0001"},
+           "video": {"state": "USE", "path": video, "sha256": pcs.H["video_ok.mp4"], "declared": {"codec": "h264", "width": 320, "height": 180, "fps": {"n": pcs.N, "d": pcs.D}, "total_frames": pcs.FRAMES}},
+           "audio": {"state": "USE", "path": audio, "sha256": pcs.H["stem.wav"], "declared": {"sample_rate": 48000, "channels": 1, "sample_count": S(pcs.FRAMES, pcs.N, pcs.D)}}}
+    if receipt_bytes is not None:
+        man["audio"]["receipt"] = {"path": receipt_name, "sha256": sha(receipt_bytes)}
+    return man
+
+
+def std_world(ctx, label, dirname=None):
+    """Owned world with the synthetic fixtures + the three standard documents (episode, audio manifest, avmux manifest + fabricated receipt)."""
+    pcs = HX.pcs
+    w = ctx.run.new_world(label, dirname)
+    pcs.put_fixtures(w)
+    w.put_json("ep.json", pcs.episode())
+    w.put_json("am.json", pcs.audio_manifest())
+    rb = mech_receipt_bytes()
+    w.put("audio_receipt.json", rb)
+    w.put_json("av.json", avm_dict(receipt_bytes=rb))
+    return w
+
+
+def zman(n, d, f0, state, selected_zero, *, scope=None, total=None, filler=None):
+    """Audio manifest with a zero-sample (or normal-span) event Z at the one-frame range [f0, f0+1) between two selected USE events.
+    A = USE [0,f0)  Z = <state> [f0,f0+1)  B = USE [f0+1,f0+3).  Source ranges are exact-rational oracle values."""
+    pcs = HX.pcs
+    A = {"id": "ev_a", "source_id": "src_a", "state": "USE", "role": "vo", "decision_ref": "owner-binding/a", "start_frame": 0, "end_frame": f0, "asset": "asset_a", "source_in_sample": 0, "source_out_sample": S(f0, n, d)}
+    b0 = 100
+    B = {"id": "ev_b", "source_id": "src_b", "state": "USE", "role": "vo", "decision_ref": "owner-binding/b", "start_frame": f0 + 1, "end_frame": f0 + 3, "asset": "asset_a",
+         "source_in_sample": b0, "source_out_sample": b0 + S(f0 + 3, n, d) - S(f0 + 1, n, d)}
+    Z = {"id": "ev_z", "source_id": "src_z", "state": state, "start_frame": f0, "end_frame": f0 + 1}
+    if state == "INTENTIONAL_SILENCE":
+        Z["decision_ref"] = "owner-decision/silence-z"
+    if state == "OMIT":
+        Z["decision_ref"] = "owner-decision/omit-z"           # the schema requires an opaque decision_ref for OMIT
+    if state == "USE":
+        # the schema needs source_out > source_in even when the timeline range spans zero samples; for a SELECTED zero-sample USE the library must reject the zero span (event_zero_samples)
+        Z.update(role="vo", decision_ref="owner-binding/z", asset="asset_a" if selected_zero else "asset_unselected", source_in_sample=500, source_out_sample=501)
+    zlen = S(f0 + 1, n, d) - S(f0, n, d)
+    events = [A, Z, B]
+    if filler is None:
+        filler = (not selected_zero) and zlen > 0           # a normal-span frame has samples: an unselected Z must not be the only thing covering them
+    if filler:
+        events.append({"id": "ev_c", "source_id": "src_c", "state": "USE", "role": "vo", "decision_ref": "owner-binding/c", "start_frame": f0, "end_frame": f0 + 1, "asset": "asset_a",
+                       "source_in_sample": 1000, "source_out_sample": 1000 + zlen})
+    sc = scope if scope is not None else (["ev_a", "ev_b"] + (["ev_c"] if filler else []) + (["ev_z"] if selected_zero else []))
+    return {"manifest_version": 1, "timeline": {"fps": {"n": n, "d": d}, "total_frames": total if total is not None else f0 + 3}, "output": {"sample_rate": 48000, "channels": 1, "bits": 16},
+            "scope": {"event_ids": sc}, "policy": {"gap": "REQUIRE_FULL_COVERAGE", "overlap": "REJECT", "clipping": "REJECT"},
+            "assets": [{"id": "asset_a", "path": "seg_a.wav", "sha256": pcs.H["seg_a.wav"]}, {"id": "asset_unselected", "path": "seg_unselected.wav", "sha256": "0" * 64}],
+            "events": events}
+
+
+# ------------------------------------------------------------------------------------------------------------------------------- F-CLI-1
+
+def key_cases(ctx, key_text, expect_path_text, finding, tag):
+    """validate + plan of the three CLIs on a document with ONE unknown top-level key `key_text` (the document is written with ensure_ascii=True so a lone surrogate is a \\udXXX ESCAPE in the file)."""
+    pcs = HX.pcs
+    w = ctx.run.new_world("k-" + tag)
+    pcs.put_fixtures(w)
+    ep, am = pcs.episode(), pcs.audio_manifest()
+    rb = mech_receipt_bytes()
+    av = avm_dict(receipt_bytes=rb)
+    for doc in (ep, am, av):
+        doc[key_text] = 1
+    w.put("ep.json", dumps_ascii(ep), "docs")
+    w.put("am.json", dumps_ascii(am), "docs")
+    w.put("audio_receipt.json", rb)
+    w.put("av.json", dumps_ascii(av), "docs")
+    ctx.control("the input document holds the key as an ASCII escape (file bytes are pure ASCII)", True, all(open(os.path.join(w.docs, n), "rb").read().isascii() for n in ("ep.json", "am.json", "av.json")))
+    obs = {}
+    for mod, verb, doc, extra in ((HX.pcs.VID, "validate", "ep.json", []), (HX.pcs.VID, "plan", "ep.json", ["--asset-root", "{assets}"]), (HX.pcs.AUD, "validate", "am.json", []),
+                                  (HX.pcs.AUD, "plan", "am.json", ["--asset-root", "{assets}"]), (HX.pcs.AVM, "validate", "av.json", []), (HX.pcs.AVM, "plan", "av.json", ["--asset-root", "{assets}"])):
+        label = f"{mod.split('.')[-1]} {verb}"
+        before = snap_digest(w)
+        res = pcall(ctx, w, mod, [verb, "{docs}/" + doc] + extra, label)
+        after = snap_digest(w)
+        d, parsed = rejection(ctx, label, res, codes=["unknown_field"], finding=finding, kind="validation_failed", exit_code=1)
+        paths = []
+        if isinstance(parsed, dict) and d["typed_error"]:
+            paths = [i["path"] for i in parsed["error"]["issues"] if i.get("code") == "unknown_field"]
+        contract(ctx, f"[{label}] the unknown_field path is the exact key (decoded stdout JSON equals '/' + key)", [asc("/" + expect_path_text)], [asc(p) for p in paths], finding=finding)
+        side_effect_checks(ctx, label, res, before, after, finding)
+        obs[label] = {"decoded_path": [asc(p) for p in paths], "stdout_contains_u_fffd": b"\xef\xbf\xbd" in res.child.stdout, "stdout_bytes": len(res.child.stdout)}
+        contract(ctx, f"[{label}] nothing replaced: no U+FFFD in stdout", False, b"\xef\xbf\xbd" in res.child.stdout, finding=finding)
+    return obs
+
+
+@probe_case("K1_lone_surrogate_json_key", "A JSON key that is a LONE SURROGATE (\\ud800 escape in the document) in all three CLIs", "F-CLI-1")
+def k1(ctx):
+    key_cases(ctx, "\ud800", "\ud800", "F-CLI-1", "lone")
+
+
+@probe_case("K2_literal_escape_text_key", "A JSON key that is the LITERAL 6-character text backslash-u-d-8-0-0 (valid UTF-8): must stay literal and differ from K1", "CONTROL")
+def k2(ctx):
+    obs = key_cases(ctx, "\\ud800", "\\ud800", "CONTROL", "literal")
+    observe(ctx, "decoded paths (literal escape text keeps its backslash: '/\\\\ud800' is 7 characters, never one surrogate)", {k: v["decoded_path"] for k, v in obs.items()}, finding="CONTROL")
+    contract(ctx, "literal text is not a surrogate: length of the decoded key is 6", 6, len("\\ud800"), finding="CONTROL", note="oracle sanity: the two inputs differ")
+
+
+@probe_case("K5_lone_vs_literal_contrast", "Contrast: a lone surrogate key and the literal escape text are DIFFERENT inputs and must produce different decoded diagnostics (nothing normalised or merged)", "F-CLI-1")
+def k5(ctx):
+    pcs = HX.pcs
+    w = ctx.run.new_world("k5")
+    decoded = {}
+    for tag, key in (("lone", "\ud800"), ("literal", "\\ud800")):
+        ep = pcs.episode()
+        ep[key] = 1
+        w.put(f"ep_{tag}.json", dumps_ascii(ep), "docs")
+        res = pcall(ctx, w, pcs.VID, ["validate", "{docs}/ep_%s.json" % tag], f"video validate, {tag} key")
+        d, doc = diag(res)
+        decoded[tag] = [i["path"] for i in doc["error"]["issues"] if i.get("code") == "unknown_field"] if d["typed_error"] else None
+    contract(ctx, "decoded unknown_field paths exist for both inputs and DIFFER ('/' + 1 surrogate vs '/' + 6 literal characters)", {"both_present": True, "differ": True, "lengths": [2, 7]},
+             {"both_present": decoded["lone"] is not None and decoded["literal"] is not None, "differ": decoded["lone"] != decoded["literal"],
+              "lengths": [len(decoded["lone"][0]) if decoded["lone"] else None, len(decoded["literal"][0]) if decoded["literal"] else None]}, finding="F-CLI-1")
+
+
+@probe_case("K3_value_level_surrogates", "A lone surrogate in a VALUE (caption text, decision_ref): already rejected with a typed code, never echoed", "F-CLI-1")
+def k3(ctx):
+    pcs = HX.pcs
+    w = ctx.run.new_world("k3")
+    pcs.put_fixtures(w)
+    ep = pcs.episode()
+    ep["captions"] = [{"id": "c1", "start_frame": 0, "end_frame": 2, "text": "ok \ud800 bad"}]
+    am = pcs.audio_manifest()
+    am["events"][0]["decision_ref"] = "ref-\ud800"
+    w.put("ep.json", dumps_ascii(ep), "docs")
+    w.put("am.json", dumps_ascii(am), "docs")
+    before = snap_digest(w)
+    res = pcall(ctx, w, pcs.VID, ["validate", "{docs}/ep.json"], "video validate, caption text with a lone surrogate")
+    rejection(ctx, "video caption value", res, codes=["text_invalid_unicode"], finding="F-CLI-1", kind="validation_failed", exit_code=1)
+    res2 = pcall(ctx, w, pcs.AUD, ["validate", "{docs}/am.json"], "audio validate, decision_ref with a lone surrogate")
+    rejection(ctx, "audio decision_ref value", res2, codes=["invalid_ref"], finding="F-CLI-1", kind="validation_failed", exit_code=1)
+    side_effect_checks(ctx, "both", res2, before, snap_digest(w), "F-CLI-1")
+
+
+@probe_case("K4_surrogate_in_argv_diagnostics", "A lone surrogate inside ARGV text (missing manifest path, output name): no traceback, typed or empty-by-design output", "F-CLI-1")
+def k4(ctx):
+    pcs = HX.pcs
+    w = std_world(ctx, "k4")
+    before = snap_digest(w)
+    bad_path = "{docs}/missing_\udcff.json"
+    res = pcall(ctx, w, pcs.VID, ["validate", bad_path], "video validate, manifest path with a lone surrogate (file absent)")
+    d, doc = diag(res)
+    contract(ctx, "[missing manifest path] no traceback leaked and stderr is empty or not a crash", {"traceback": False}, {"traceback": d["traceback_in_stderr"]}, finding="F-CLI-1")
+    contract(ctx, "[missing manifest path] non-zero exit", True, d["exit_code"] not in (0, None), finding="F-CLI-1")
+    contract(ctx, "[missing manifest path] stdout is empty or a strict UTF-8 JSON object", True, d["stdout_empty"] or d["stdout_json_object"], finding="F-CLI-1")
+    observe(ctx, "[missing manifest path] observed", {"exit_code": d["exit_code"], "stdout_bytes": len(res.child.stdout), "stderr_bytes": len(res.child.stderr), "typed_error": d["typed_error"], "issue_codes": d["issue_codes"]}, finding="F-CLI-1")
+    res2 = pcall(ctx, w, pcs.VID, ["render", "{docs}/ep.json", "--asset-root", "{assets}", "--output-root", "{out}", "--output-name=run-\udcff"], "video render DRY-RUN, output name with a lone surrogate")
+    d2, doc2 = diag(res2)
+    contract(ctx, "[output-name] no traceback leaked", {"traceback": False}, {"traceback": d2["traceback_in_stderr"]}, finding="F-CLI-1")
+    contract(ctx, "[output-name] stdout is empty or a strict UTF-8 JSON object", True, d2["stdout_empty"] or d2["stdout_json_object"], finding="F-CLI-1")
+    observe(ctx, "[output-name] observed", {"exit_code": d2["exit_code"], "typed_error": d2["typed_error"], "issue_codes": d2["issue_codes"], "stdout_bytes": len(res2.child.stdout)}, finding="F-CLI-1")
+    side_effect_checks(ctx, "argv cases", res2, before, snap_digest(w), "F-CLI-1")
+
+
+# ------------------------------------------------------------------------------------------------------------------------------- positive controls: Japanese and spaces
+
+@probe_case("J1_japanese_and_spaces", "Positive controls: ordinary Japanese and spaces in file names, roots and text work and stay literal UTF-8", "CONTROL")
+def j1(ctx):
+    pcs = HX.pcs
+    w = ctx.run.new_world("j1", "作業 場")
+    jp_assets, jp_out = "資産 フォルダ", "出力 先"
+    os.mkdir(os.path.join(w.assets, jp_assets))
+    os.mkdir(os.path.join(w.out, jp_out))
+    w.put(jp_assets + "/クリップ A.mp4", pcs.FB["clip_a.mp4"])
+    w.put(jp_assets + "/声 1.wav", pcs.FB["seg_a.wav"])
+    w.put(jp_assets + "/映像 1.mp4", pcs.FB["video_ok.mp4"])
+    w.put(jp_assets + "/音声 1.wav", pcs.FB["stem.wav"])
+    ep = pcs.episode("クリップ A.mp4")
+    caption_text = "こんにちは 世界\n二行目 です"
+    ep["captions"] = [{"id": "cap1", "start_frame": 0, "end_frame": 2, "text": caption_text}]
+    w.put("エピソード 1.json", dumps_utf8(ep), "docs")
+    am = pcs.audio_manifest(asset_path="声 1.wav")
+    am["events"][0]["decision_ref"] = "判断メモ/一"
+    w.put("音声 マニフェスト.json", dumps_utf8(am), "docs")
+    rb = mech_receipt_bytes()
+    w.put(jp_assets + "/受領 1.json", rb)
+    w.put("AV マニフェスト.json", dumps_utf8(avm_dict(video="映像 1.mp4", audio="音声 1.wav", receipt_name="受領 1.json", receipt_bytes=rb)), "docs")
+    before = snap_digest(w)
+    root = "{assets}/" + jp_assets
+    r = pcall(ctx, w, pcs.VID, ["srt", "{docs}/エピソード 1.json"], "video srt, Japanese caption and file name")
+    d, _ = diag(r)
+    contract(ctx, "[srt] exit 0 and the SRT bytes equal the independent oracle (UTF-8 literal Japanese, LF)", {"exit": 0, "bytes_equal": True, "sha256": sha(pcs.o_srt([(1, 0, 2, caption_text)], pcs.N, pcs.D))},
+             {"exit": d["exit_code"], "bytes_equal": r.child.stdout == pcs.o_srt([(1, 0, 2, caption_text)], pcs.N, pcs.D), "sha256": sha(r.child.stdout)}, finding="CONTROL")
+    r = pcall(ctx, w, pcs.VID, ["plan", "{docs}/エピソード 1.json", "--asset-root", root], "video plan, Japanese+space asset root and file name")
+    d, doc = accepted_plan(ctx, "video plan", r, "CONTROL")
+    contract(ctx, "[video plan] the Japanese file name is written as literal UTF-8 (not an escape)", True, "クリップ A.mp4".encode("utf-8") in r.child.stdout, finding="CONTROL")
+    r = pcall(ctx, w, pcs.AUD, ["plan", "{docs}/音声 マニフェスト.json", "--asset-root", root], "audio plan, Japanese+space asset root, asset name and decision_ref")
+    d, doc = accepted_plan(ctx, "audio plan", r, "CONTROL")
+    contract(ctx, "[audio plan] producer status READY and the Japanese decision_ref is preserved verbatim as literal UTF-8", {"status": "READY", "literal": True},
+             {"status": (doc or {}).get("status") if isinstance(doc, dict) else None, "literal": "判断メモ/一".encode("utf-8") in r.child.stdout}, finding="CONTROL", note="producer status only; not a caller readiness verdict")
+    r = pcall(ctx, w, pcs.AVM, ["plan", "{docs}/AV マニフェスト.json", "--asset-root", root], "avmux plan, Japanese+space names")
+    d, doc = accepted_plan(ctx, "avmux plan", r, "CONTROL")
+    observe(ctx, "[avmux plan] producer status", {"status": (doc or {}).get("status") if isinstance(doc, dict) else None}, finding="CONTROL")
+    r = pcall(ctx, w, pcs.VID, ["render", "{docs}/エピソード 1.json", "--asset-root", root, "--output-root", "{out}/" + jp_out, "--output-name", "run-j"], "video render DRY-RUN, Japanese+space output ROOT, ASCII name")
+    d, doc = accepted_plan(ctx, "video render dry-run", r, "CONTROL")
+    contract(ctx, "[video render dry-run] nothing created in the Japanese output root", True, os.listdir(os.path.join(w.out, jp_out)) == [], finding="CONTROL")
+    r2 = pcall(ctx, w, pcs.AUD, ["mix", "{docs}/音声 マニフェスト.json", "--asset-root", root, "--output-root", "{out}/" + jp_out, "--output-name", "run-j"], "audio mix DRY-RUN, Japanese+space output ROOT, ASCII name")
+    accepted_plan(ctx, "audio mix dry-run", r2, "CONTROL")
+    r3 = pcall(ctx, w, pcs.VID, ["render", "{docs}/エピソード 1.json", "--asset-root", root, "--output-root", "{out}/" + jp_out, "--output-name", "出力 テスト"], "video render DRY-RUN, Japanese output NAME (documented ASCII-only rule)")
+    rejection(ctx, "Japanese output name", r3, codes=["output_name_invalid"], finding="CONTROL", kind="unsafe_path")
+    side_effect_checks(ctx, "japanese cases", r2, before, snap_digest(w), "CONTROL")
+
+
+# ------------------------------------------------------------------------------------------------------------------------------- F-AUD-1
+
+Z_STATES = ("UNKNOWN", "MISSING", "PROXY", "OMIT", "INTENTIONAL_SILENCE", "USE")
+
+
+def audio_plan(ctx, w, name, manifest, label):
+    w.put_json(name, manifest)
+    before = snap_digest(w)
+    res = pcall(ctx, w, HX.pcs.AUD, ["plan", "{docs}/" + name, "--asset-root", "{assets}"], label)
+    return res, before
+
+
+def plan_facts(doc):
+    if not (isinstance(doc, dict) and isinstance(doc.get("plan"), dict)):
+        return None
+    p = doc["plan"]
+    ev = {e.get("id"): e for e in p.get("events", []) if isinstance(e, dict)}
+    z = ev.get("ev_z")
+    return {"status": doc.get("status"), "hold_event_ids": sorted(h.get("event_id") for h in p.get("hold", []) if isinstance(h, dict) and h.get("event_id")), "hold_codes": sorted(h.get("code") for h in p.get("hold", []) if isinstance(h, dict)), "gap_count": (p.get("coverage") or {}).get("gap_count"),
+            "covered_samples": (p.get("coverage") or {}).get("covered_samples"), "mix_events": (p.get("mix") or {}).get("events"),
+            "z": None if z is None else {"selected": z.get("selected"), "samples": z.get("samples"), "disposition": z.get("disposition")}}
+
+
+@probe_case("Z1_zero_sample_unselected_states", "60000/1: a zero-sample [2,3) event that is NOT in scope, for every state: must not block an otherwise valid selected scope", "F-AUD-1")
+def z1(ctx):
+    n, d_, f0 = 60000, 1, 2
+    ctx.control("oracle: at 60000/1 the frame range [2,3) spans zero samples while neighbours do not", {"S2": 2, "S3": 2, "S0": 0, "S5": 4, "first_zero_frames": [2, 7, 12]},
+                {"S2": S(2, n, d_), "S3": S(3, n, d_), "S0": S(0, n, d_), "S5": S(5, n, d_), "first_zero_frames": zero_sample_frames(n, d_)})
+    w = ctx.run.new_world("z1")
+    HX.pcs.put_fixtures(w)
+    for st in Z_STATES:
+        label = f"unselected {st}"
+        res, before = audio_plan(ctx, w, f"z1_{st}.json", zman(n, d_, f0, st, False), f"audio plan, zero-sample UNSELECTED {st}")
+        d, doc = diag(res)
+        contract(ctx, f"[{label}] producer accepts: exit 0 and a JSON plan document", {"exit_code": 0, "json": True}, {"exit_code": d["exit_code"], "json": d["stdout_json_object"]}, finding="F-AUD-1")
+        f = plan_facts(doc)
+        observe(ctx, f"[{label}] observed rejection codes", {"issue_codes": d["issue_codes"]}, finding="F-AUD-1")
+        contract(ctx, f"[{label}] the selected scope is unaffected (producer status READY, no gap, covered_samples = oracle S(5) = 4, no hold)",
+                 {"status": "READY", "gap_count": 0, "covered_samples": S(f0 + 3, n, d_), "hold_event_ids": []}, None if f is None else {k: f[k] for k in ("status", "gap_count", "covered_samples", "hold_event_ids")}, finding="F-AUD-1",
+                 note="producer behaviour; not a caller readiness verdict")
+        contract(ctx, f"[{label}] the unselected zero-sample event stays listed as not selected with 0 samples", {"selected": False, "samples": 0}, None if f is None or f["z"] is None else {k: f["z"][k] for k in ("selected", "samples")}, finding="F-AUD-1")
+        observe(ctx, f"[{label}] disposition of the unselected event", None if f is None else f["z"], finding="F-AUD-1")
+        contract(ctx, f"[{label}] stderr empty, no traceback", {"stderr_empty": True, "traceback": False}, {"stderr_empty": d["stderr_empty"], "traceback": d["traceback_in_stderr"]}, finding="F-AUD-1")
+        side_effect_checks(ctx, label, res, before, snap_digest(w), "F-AUD-1")
+
+
+@probe_case("Z2_zero_sample_selected_states", "60000/1: a zero-sample [2,3) event that IS in scope: USE / INTENTIONAL_SILENCE / MISSING / UNKNOWN / PROXY stay rejected (documented, including the remaining limit)", "F-AUD-1")
+def z2(ctx):
+    n, d_, f0 = 60000, 1, 2
+    w = ctx.run.new_world("z2")
+    HX.pcs.put_fixtures(w)
+    for st in ("USE", "INTENTIONAL_SILENCE", "MISSING", "UNKNOWN", "PROXY"):
+        label = f"selected {st}"
+        res, before = audio_plan(ctx, w, f"z2_{st}.json", zman(n, d_, f0, st, True), f"audio plan, zero-sample SELECTED {st}")
+        rejection(ctx, label, res, codes=["event_zero_samples"], finding="F-AUD-1", kind="validation_failed", exit_code=1)
+        side_effect_checks(ctx, label, res, before, snap_digest(w), "F-AUD-1")
+        if st in ("MISSING", "UNKNOWN", "PROXY"):
+            observe(ctx, f"[{label}] REMAINING LIMIT (documented): rejected instead of yielding HOLD", {"state": st, "exit_code": res.exit_code, "yields_hold": False}, finding="F-AUD-1",
+                    note="INPUT_CONTRACT 'Remaining limits': no HOLD convention was invented; a caller must not read this rejection as HOLD or READY")
+    ctx.checks.append({"layer": "NOTE", "name": "remaining limit", "key": f"{ctx.case_id}::remaining-limit", "outcome": "NOTE", "finding": "F-AUD-1",
+                       "note": "INPUT_CONTRACT 'Remaining limits': a selected MISSING/UNKNOWN/PROXY zero-sample event is still rejected instead of yielding HOLD; the contract invents no HOLD convention. These checks therefore expect rejection in every source."})
+
+
+@probe_case("Z3_selected_omit_and_effective_scope", "Selected OMIT consumes nothing and adds no coverage; combined unselected UNKNOWN + selected OMIT; empty effective scope is non-ready", "F-AUD-1")
+def z3(ctx):
+    n, d_, f0 = 60000, 1, 2
+    w = ctx.run.new_world("z3")
+    HX.pcs.put_fixtures(w)
+    # a) selected OMIT zero-sample, coverage provided by the two selected USE events
+    res, before = audio_plan(ctx, w, "z3a.json", zman(n, d_, f0, "OMIT", True), "audio plan, selected OMIT zero-sample + qualified USE around it")
+    d, doc = diag(res)
+    f = plan_facts(doc)
+    contract(ctx, "[selected OMIT] accepted: exit 0, consumes nothing (mix.events = 2 USE only), no extra coverage (covered_samples = oracle 4), no gap",
+             {"exit_code": 0, "mix_events": 2, "covered_samples": S(f0 + 3, n, d_), "gap_count": 0}, {"exit_code": d["exit_code"], "mix_events": None if f is None else f["mix_events"], "covered_samples": None if f is None else f["covered_samples"],
+                                                                                                   "gap_count": None if f is None else f["gap_count"]}, finding="F-AUD-1")
+    observe(ctx, "[selected OMIT] producer status and disposition", None if f is None else {"status": f["status"], "z": f["z"]}, finding="F-AUD-1", note="producer behaviour only")
+    side_effect_checks(ctx, "selected OMIT", res, before, snap_digest(w), "F-AUD-1")
+    # b) selected OMIT zero-sample but a REAL hole elsewhere: OMIT adds no coverage, so the producer must not report READY
+    res, before = audio_plan(ctx, w, "z3b.json", zman(n, d_, f0, "OMIT", True, scope=["ev_a", "ev_z"]), "audio plan, selected OMIT zero-sample + a real coverage hole")
+    d, doc = diag(res)
+    f = plan_facts(doc)
+    contract(ctx, "[OMIT + hole] accepted but NOT ready: producer HOLD (exit 5, AUDIO_SPEC), one gap (OMIT adds no coverage)", {"exit_code": 5, "status": "HOLD", "gap_count": 1},
+             {"exit_code": d["exit_code"], "status": None if f is None else f["status"], "gap_count": None if f is None else f["gap_count"]}, finding="F-AUD-1", note="producer behaviour; the caller still owns what a HOLD means")
+    side_effect_checks(ctx, "OMIT + hole", res, before, snap_digest(w), "F-AUD-1")
+    # c) EFFECTIVE scope consists only of a selected OMIT zero-sample event
+    res, before = audio_plan(ctx, w, "z3c.json", zman(n, d_, f0, "OMIT", True, scope=["ev_z"]), "audio plan, effective scope = only a selected OMIT zero-sample event")
+    d, doc = diag(res)
+    f = plan_facts(doc)
+    contract(ctx, "[only OMIT in scope] never ready: NOT (exit 0 and producer status READY)", False, bool(d["exit_code"] == 0 and f is not None and f["status"] == "READY"), finding="F-AUD-1")
+    observe(ctx, "[only OMIT in scope] observed", {"exit_code": d["exit_code"], "status": None if f is None else f["status"], "gap_count": None if f is None else f["gap_count"], "issue_codes": d["issue_codes"]}, finding="F-AUD-1")
+    side_effect_checks(ctx, "only OMIT", res, before, snap_digest(w), "F-AUD-1")
+    # d) EMPTY scope
+    res, before = audio_plan(ctx, w, "z3d.json", zman(n, d_, f0, "OMIT", False, scope=[]), "audio plan, empty scope.event_ids")
+    d, doc = diag(res)
+    f = plan_facts(doc)
+    contract(ctx, "[empty scope] never ready: NOT (exit 0 and producer status READY)", False, bool(d["exit_code"] == 0 and f is not None and f["status"] == "READY"), finding="F-AUD-1")
+    observe(ctx, "[empty scope] observed", {"exit_code": d["exit_code"], "status": None if f is None else f["status"], "issue_codes": d["issue_codes"]}, finding="F-AUD-1")
+    side_effect_checks(ctx, "empty scope", res, before, snap_digest(w), "F-AUD-1")
+    # e) qualified USE + UNSELECTED zero-sample UNKNOWN + SELECTED zero-sample OMIT together
+    m = zman(n, d_, f0, "OMIT", True)
+    m["events"].append({"id": "ev_u", "source_id": "src_u", "state": "UNKNOWN", "start_frame": f0, "end_frame": f0 + 1})
+    res, before = audio_plan(ctx, w, "z3e.json", m, "audio plan, qualified USE + unselected zero-sample UNKNOWN + selected zero-sample OMIT")
+    d, doc = diag(res)
+    f = plan_facts(doc)
+    contract(ctx, "[combined] accepted: exit 0, producer status READY, no hold, covered_samples 4", {"exit_code": 0, "status": "READY", "hold_event_ids": [], "covered_samples": 4},
+             {"exit_code": d["exit_code"], "status": None if f is None else f["status"], "hold_event_ids": None if f is None else f["hold_event_ids"], "covered_samples": None if f is None else f["covered_samples"]}, finding="F-AUD-1",
+             note="producer behaviour; it is not promoted to caller readiness (no receipt, ownership or quality is judged here)")
+    side_effect_checks(ctx, "combined", res, before, snap_digest(w), "F-AUD-1")
+
+
+RATES = ((48000, 1), (48001, 1), (50000, 1), (60000, 1), (60000, 1001))
+
+
+@probe_case("R1_boundary_rates", "Boundary rates: exact-rational oracle decides which frame ranges are zero-sample; unselected ones must be accepted, a one-sample selected USE must be accepted", "F-AUD-1")
+def r1(ctx):
+    w = ctx.run.new_world("r1")
+    HX.pcs.put_fixtures(w)
+    for n, d_ in RATES:
+        zs = zero_sample_frames(n, d_)
+        f0 = zs[0] if zs else 2
+        tag = f"{n}/{d_}"
+        observe(ctx, f"[{tag}] oracle: first zero-sample one-frame ranges within the 18000-frame cap", {"zero_frames": zs, "tested_frame": f0, "samples_per_frame_num_den": [d_ * 48000, n]}, finding="F-AUD-1")
+        res, before = audio_plan(ctx, w, f"r1_{n}_{d_}.json", zman(n, d_, f0, "UNKNOWN", False), f"audio plan, {tag}, unselected UNKNOWN at frame {f0} (oracle zero-sample={bool(zs)})")
+        d, doc = diag(res)
+        f = plan_facts(doc)
+        contract(ctx, f"[{tag}] unselected UNKNOWN at frame {f0} does not block: exit 0, producer status READY, covered_samples = oracle", {"exit_code": 0, "status": "READY", "covered_samples": S(f0 + 3, n, d_)},
+                 {"exit_code": d["exit_code"], "status": None if f is None else f["status"], "covered_samples": None if f is None else f["covered_samples"]}, finding="F-AUD-1")
+        observe(ctx, f"[{tag}] observed rejection codes", {"issue_codes": d["issue_codes"]}, finding="F-AUD-1")
+        side_effect_checks(ctx, f"{tag} unselected", res, before, snap_digest(w), "F-AUD-1")
+    for n, d_ in ((48000, 1), (48001, 1), (50000, 1), (60000, 1)):
+        tag = f"{n}/{d_}"
+        m = zman(n, d_, 2, "UNKNOWN", False, scope=["ev_a"], total=1)
+        m["events"] = [{"id": "ev_a", "source_id": "src_a", "state": "USE", "role": "vo", "decision_ref": "owner-binding/a", "start_frame": 0, "end_frame": 1, "asset": "asset_a", "source_in_sample": 0, "source_out_sample": S(1, n, d_) - S(0, n, d_)}]
+        observe(ctx, f"[{tag}] oracle: one frame = {S(1, n, d_) - S(0, n, d_)} sample(s)", {"samples": S(1, n, d_) - S(0, n, d_)}, finding="F-AUD-1")
+        res, before = audio_plan(ctx, w, f"r1_min_{n}_{d_}.json", m, f"audio plan, {tag}, selected USE over exactly one frame")
+        d, doc = diag(res)
+        f = plan_facts(doc)
+        contract(ctx, f"[{tag}] a selected one-frame USE with a positive sample span is accepted (unchanged boundary)", {"exit_code": 0, "covered_samples": S(1, n, d_)},
+                 {"exit_code": d["exit_code"], "covered_samples": None if f is None else f["covered_samples"]}, finding="CONTROL")
+        side_effect_checks(ctx, f"{tag} one-frame USE", res, before, snap_digest(w), "CONTROL")
+
+
+@probe_case("S1_selection_normal_span", "Normal-span selection at 30000/1001: qualified USE with an unselected UNKNOWN does not block; a selected UNKNOWN HOLDs (producer behaviour, not caller readiness)", "CONTROL")
+def s1(ctx):
+    n, d_, f0 = 30000, 1001, 2
+    w = ctx.run.new_world("s1")
+    HX.pcs.put_fixtures(w)
+    ctx.control("oracle: no zero-sample frame within the cap at 30000/1001", [], zero_sample_frames(n, d_))
+    res, before = audio_plan(ctx, w, "s1_unsel.json", zman(n, d_, f0, "UNKNOWN", False), "audio plan, qualified USE + unselected UNKNOWN (normal span)")
+    d, doc = diag(res)
+    f = plan_facts(doc)
+    contract(ctx, "[unselected UNKNOWN] exit 0, producer status READY, no hold (a selected USE fills the frame; the unselected row overlaps it, which is allowed)", {"exit_code": 0, "status": "READY", "hold_event_ids": []}, {"exit_code": d["exit_code"], "status": None if f is None else f["status"], "hold_event_ids": None if f is None else f["hold_event_ids"]}, finding="CONTROL")
+    side_effect_checks(ctx, "unselected UNKNOWN", res, before, snap_digest(w), "CONTROL")
+    res, before = audio_plan(ctx, w, "s1_sel.json", zman(n, d_, f0, "UNKNOWN", True), "audio plan, qualified USE + SELECTED UNKNOWN (normal span)")
+    d, doc = diag(res)
+    f = plan_facts(doc)
+    contract(ctx, "[selected UNKNOWN] producer HOLD (exit 5, AUDIO_SPEC) and the event is listed in hold", {"exit_code": 5, "status": "HOLD", "hold_event_ids": ["ev_z"]},
+             {"exit_code": d["exit_code"], "status": None if f is None else f["status"], "hold_event_ids": None if f is None else f["hold_event_ids"]}, finding="CONTROL")
+    side_effect_checks(ctx, "selected UNKNOWN", res, before, snap_digest(w), "CONTROL")
+
+
+# ------------------------------------------------------------------------------------------------------------------------------- F-ENC-1
+
+RAW_NAME = b"out_caf\xe9"
+RAW_ASSET = b"assets_caf\xe9"
+
+
+def root_commands(raw_asset_root, raw_out_root):
+    """Six read-only commands; the rooted argument is the one under test. Dry-run render|mix|mux have no --render/--mix/--mux, so nothing is created."""
+    V, A, M = HX.pcs.VID, HX.pcs.AUD, HX.pcs.AVM
+    return [("video plan, asset root", V, ["plan", "{docs}/ep.json", "--asset-root", raw_asset_root]),
+            ("video render DRY-RUN, output root", V, ["render", "{docs}/ep.json", "--asset-root", "{assets}", "--output-root", raw_out_root, "--output-name", "run-enc"]),
+            ("audio plan, asset root", A, ["plan", "{docs}/am.json", "--asset-root", raw_asset_root]),
+            ("audio mix DRY-RUN, output root", A, ["mix", "{docs}/am.json", "--asset-root", "{assets}", "--output-root", raw_out_root, "--output-name", "run-enc"]),
+            ("avmux plan, asset root", M, ["plan", "{docs}/av.json", "--asset-root", raw_asset_root]),
+            ("avmux mux DRY-RUN, output root", M, ["mux", "{docs}/av.json", "--asset-root", "{assets}", "--output-root", raw_out_root, "--output-name", "run-enc"])]
+
+
+def root_checks(ctx, w, cmds, tag):
+    for label, mod, args in cmds:
+        before = snap_digest(w)
+        res = pcall(ctx, w, mod, args, f"{tag}: {label}")
+        d, doc = rejection(ctx, f"{tag}: {label}", res, codes=["root_invalid"], finding="F-ENC-1", message_must_not_contain="out_caf")
+        side_effect_checks(ctx, f"{tag}: {label}", res, before, snap_digest(w), "F-ENC-1")
+
+
+@probe_case("E1_non_utf8_root_bytes_posix", "POSIX: a directory named b'out_caf\\xe9' / b'assets_caf\\xe9' (raw non-UTF-8 byte) as asset root and output root, in all three CLIs", "F-ENC-1")
+def e1(ctx):
+    if os.name == "nt":
+        for lab, _, _ in root_commands("", ""):
+            not_applicable(ctx, f"raw-byte root: {lab}", "Windows file names are UTF-16: an arbitrary raw non-UTF-8 byte directory cannot be created, so no OS evidence exists or is invented (the string-level guard is tested in E2)", "F-ENC-1")
+        return
+    if sys.getfilesystemencoding().lower().replace("-", "") != "utf8" or sys.getfilesystemencodeerrors() != "surrogateescape":
+        skipped(ctx, "raw-byte roots", f"driver filesystem encoding is {sys.getfilesystemencoding()}/{sys.getfilesystemencodeerrors()}, not utf-8/surrogateescape", "F-ENC-1")
+        return
+    w = std_world(ctx, "e1")
+    raw_out, raw_assets = os.path.join(os.fsencode(w.out), RAW_NAME), os.path.join(os.fsencode(w.assets), RAW_ASSET)
+    try:
+        os.mkdir(raw_out)
+        os.mkdir(raw_assets)
+        for name, data in (("clip_a.mp4", HX.pcs.FB["clip_a.mp4"]), ("seg_a.wav", HX.pcs.FB["seg_a.wav"]), ("video_ok.mp4", HX.pcs.FB["video_ok.mp4"]), ("stem.wav", HX.pcs.FB["stem.wav"]), ("audio_receipt.json", mech_receipt_bytes())):
+            with open(os.path.join(raw_assets, name.encode()), "wb") as fh:
+                fh.write(data)
+    except OSError as exc:
+        skipped(ctx, "raw-byte roots", f"this filesystem refuses a non-UTF-8 name ({type(exc).__name__}: errno {getattr(exc, 'errno', None)})", "F-ENC-1")
+        return
+    ctx.control("the raw-byte directories exist on disk with the exact non-UTF-8 byte", {"out_is_dir": True, "assets_is_dir": True, "out_listing_has_e9": True, "assets_listing_has_e9": True},
+                {"out_is_dir": os.path.isdir(raw_out), "assets_is_dir": os.path.isdir(raw_assets), "out_listing_has_e9": RAW_NAME in os.listdir(os.fsencode(w.out)), "assets_listing_has_e9": RAW_ASSET in os.listdir(os.fsencode(w.assets))})
+    cmds = root_commands("{assets}/" + os.fsdecode(RAW_ASSET), "{out}/" + os.fsdecode(RAW_NAME))          # tokens, so the stored argv is path-free; on POSIX this is the very str of the raw-byte path
+    root_checks(ctx, w, cmds, "raw bytes")
+    contract(ctx, "no run directory or receipt was created inside the raw output root", [], [asc(os.fsdecode(x)) for x in os.listdir(raw_out)], finding="F-ENC-1")
+
+
+@probe_case("E2_string_level_root_surrogate", "Every platform: a root ARGUMENT that is a str with a lone surrogate (nonexistent): string-level guard before any filesystem work", "F-ENC-1")
+def e2(ctx):
+    w = std_world(ctx, "e2")
+    cmds = root_commands("{assets}/assets_caf\udce9", "{out}/out_caf\udce9")
+    root_checks(ctx, w, cmds, "string level")
+
+
+@probe_case("E3_symlink_to_raw_root", "POSIX: an ASCII-named symlink that resolves into a raw-byte directory (post-realpath check); unprivileged on POSIX, skipped where it cannot be created", "F-ENC-1")
+def e3(ctx):
+    if os.name == "nt":
+        not_applicable(ctx, "symlink into raw-byte directory", "no raw-byte directory and no privilege-free symlink on Windows; nothing is attempted", "F-ENC-1")
+        return
+    w = std_world(ctx, "e3")
+    raw_out = os.path.join(os.fsencode(w.out), RAW_NAME)
+    try:
+        os.mkdir(raw_out)
+        os.symlink(raw_out, os.path.join(os.fsencode(w.out), b"ascii_link"))
+    except (OSError, NotImplementedError) as exc:
+        skipped(ctx, "symlink into raw-byte directory", f"cannot create the raw-byte directory or the symlink here ({type(exc).__name__})", "F-ENC-1")
+        return
+    cmds = [c for c in root_commands("{assets}", "{out}/ascii_link") if "output root" in c[0]]
+    root_checks(ctx, w, cmds, "symlink")
+
+
+# ------------------------------------------------------------------------------------------------------------------------------- one source
+
+def post_status(r):
+    """Case status: FAIL (harness-level) > CONTRACT_NOT_MET (observed limitation) > NOT_APPLICABLE-only > PASS."""
+    outs = [c["outcome"] for c in r["checks"]]
+    bad = {"FAIL", "ERROR", "CONTROL_FAILED", "BUDGET_EXHAUSTED", "POLICY_VIOLATION", "GUARD_MISMATCH"}
+    if r["status"] == "FAIL" or any(o in bad for o in outs):
+        return "FAIL"
+    if "NOT_MET" in outs:
+        return "CONTRACT_NOT_MET"
+    real = [o for o in outs if o in ("MET", "CONTROL_OK")]
+    if not real:
+        return "NOT_APPLICABLE_OR_SKIPPED"
+    return "PASS"
+
+
+def run_source(hx, label, lib, profile_path, out_sub, scratch_root, budget_s, only, admission_cases, python_info, normalize_stored=False):
+    pc = hx.pc
+    inv_before = pc.inventory(lib)
+    doc, raw = pc.load_profile_file(profile_path)
+    profile = pc.Profile(doc, inv_before)
+    pin = profile.pin
+    t0 = time.monotonic()
+    tmp = tempfile.TemporaryDirectory(dir=scratch_root, prefix="vcc-bprobe-", ignore_cleanup_errors=True)
+    scratch = os.path.realpath(tmp.name)
+    adm, results, stopped, cleanup_ok = [], [], None, None
+    try:
+        run = pc.Run(library_root=lib, scratch=scratch, out=out_sub, budget_s=budget_s, profile=profile, strict=False, normalize_stored=normalize_stored)
+        run.group = "admission"
+        adm_list = list(admission_cases) if admission_cases is not None else [next(f for f in hx.ps.MS_CASES if f.case_id.startswith("MS01"))]
+        for fn in adm_list:
+            adm.append(pc.run_case(run, fn))
+        bad = [r["case"] for r in adm if r["status"] != "PASS"]
+        children_after_admission = run.children
+        if bad:
+            stopped = {"stage": "admission", "source": label, "failed": bad, "children_started_when_stopped": run.children,
+                       "message": "STOP: a deny control did not pass; the prohibited-action protection is not demonstrated on this machine. No probe case was run."}
+        else:
+            run.group = "probe"
+            for fn in CASES:
+                if only is None or fn.case_id in only:
+                    r = pc.run_case(run, fn)
+                    r["status_raw_harness"] = r["status"]
+                    r["status"] = post_status(r)
+                    r["finding"] = fn.finding
+                    results.append(r)
+    finally:
+        try:
+            tmp.cleanup()
+            cleanup_ok = not os.path.exists(scratch)
+        except OSError:
+            cleanup_ok = False
+    inv_after = pc.inventory(lib)
+    unchanged = inv_before["all_digest_raw"] == inv_after["all_digest_raw"]
+    for r in adm + results:
+        out_sub.write_json("cases/%s.json" % r["case"], r)
+    out_sub.write_json("inventory.json", {"root_basename": os.path.basename(lib), **{k: v for k, v in inv_before.items() if k != "root_basename"}})
+    outcomes = {}
+    for r in adm + results:
+        for c in r["checks"]:
+            outcomes[c["outcome"]] = outcomes.get(c["outcome"], 0) + 1
+    statuses = {}
+    for r in results:
+        statuses[r["status"]] = statuses.get(r["status"], 0) + 1
+    doc_out = {"probe": PROBE_VERSION, "source_label": label, "source_role": (doc.get("source_pin") or {}).get("source_role"), "source_commit": (doc.get("source_pin") or {}).get("source_commit"),
+               "profile": os.path.basename(profile_path), "profile_sha256": sha(raw), "profile_review_status": doc.get("review_status"), "pin": pin, "profile_applicable": profile.applicable,
+               "source_unchanged_during_run": unchanged, "all_digest_raw_before": inv_before["all_digest_raw"], "all_digest_raw_after": inv_after["all_digest_raw"], "package_digest_raw": inv_before["package_digest_raw"], "all_digest_raw": inv_before["all_digest_raw"], "file_count": inv_before["file_count"],
+               "package_file_count": inv_before["package_file_count"], "admission": {"cases": [r["case"] for r in adm], "statuses": [r["status"] for r in adm], "children": children_after_admission, "stopped": stopped},
+               "cases": {r["case"]: r["status"] for r in results}, "case_status_counts": statuses, "check_outcomes": dict(sorted(outcomes.items())), "children_started": run.children,
+               "wall_seconds": round(time.monotonic() - t0, 2), "scratch_cleaned": cleanup_ok, "launches_refused_before_start": run.refused, "python": python_info}
+    out_sub.write_json("run.json", doc_out)
+    return doc_out, adm, results
+
+
+# ------------------------------------------------------------------------------------------------------------------------------- driver
+
+def emit(text, stream=None):
+    stream = stream or sys.stdout
+    enc = getattr(stream, "encoding", None) or "utf-8"
+    stream.write(text.encode(enc, errors="backslashreplace").decode(enc, errors="replace"))
+    stream.flush()
+
+
+def parse_args(argv):
+    ap = argparse.ArgumentParser(prog="boundary_probe.py", description=__doc__.split("\n\n")[0])
+    ap.add_argument("--source", action="append", default=[], metavar="LABEL=ROOT", help="source label (b4ca4a3 | 092b420 | 91ec2d4) = directory containing video_core/ (a `git archive` export of that commit); repeat for each source")
+    ap.add_argument("--scratch-root", help="existing directory under which an OWNED temporary directory is created and removed")
+    ap.add_argument("--out-dir", help="NEW directory for results (refused if it exists or lies inside the repository / a library root)")
+    ap.add_argument("--profiles-dir", default=os.path.join(HERE, "profiles"), help="directory with pin_<label>.json source-pin profiles")
+    ap.add_argument("--harness-dir", default=None, help="directory of the CLOSED portable-r2 harness modules (default ../portable-r2)")
+    ap.add_argument("--budget-seconds", type=float, default=420.0, help="TOTAL wall budget over all sources (default 420, max 900); each child is limited to 10 s regardless")
+    ap.add_argument("--only", help="comma-separated probe case ids (the deny admission always runs first)")
+    ap.add_argument("--normalize-stored-paths", action="store_true", help="in STORED stdout/stderr/argv replace scratch, world, output and library paths by placeholders (<WORLD> <SCRATCH> <OUT> <LIBRARY>); raw SHA-256 of the exact retained bytes stay in status.json. Default: exact raw bytes")
+    ap.add_argument("--list", action="store_true", help="list case ids and exit")
+    return ap.parse_args(argv)
+
+
+def main(argv=None, admission_cases=None) -> int:
+    """admission_cases: for TESTS only (Python API): replaces the admission list, e.g. by a disposable, intentionally failing deny control."""
+    argv = list(sys.argv[1:] if argv is None else argv)
+    if sys.version_info < (3, 11):
+        emit("boundary_probe requires Python 3.11 or newer\n", sys.stderr)
+        return 3
+    ns = parse_args(argv)
+    hx = load_harness(find_harness_dir(argv))
+    pc = hx.pc
+    if ns.list:
+        print("[admission, always first] MS01_deny_controls_prove_the_hook_is_active")
+        for fn in CASES:
+            print(fn.case_id, "-", fn.finding, "-", fn.title)
+        return 0
+    if not ns.source or not ns.scratch_root or not ns.out_dir:
+        emit("usage: --source LABEL=ROOT (at least one), --scratch-root and --out-dir are required\n", sys.stderr)
+        return 2
+    if not (0 < ns.budget_seconds <= pc.MAX_BUDGET_S):
+        emit(f"usage: --budget-seconds must be in (0, {pc.MAX_BUDGET_S:.0f}]\n", sys.stderr)
+        return 2
+    sources = []
+    for s in ns.source:
+        lab, sep, root = s.partition("=")
+        if not sep or lab not in ALLOWED_SOURCES or lab in [x[0] for x in sources]:
+            emit(f"usage: bad or repeated --source {s!r}; labels: {', '.join(ALLOWED_SOURCES)}\n", sys.stderr)
+            return 2
+        lib = os.path.realpath(root)
+        if not os.path.isfile(os.path.join(lib, "video_core", "__init__.py")):
+            emit(f"refused: {lib} does not contain video_core/__init__.py\n", sys.stderr)
+            return 2
+        prof = os.path.join(ns.profiles_dir, f"pin_{lab}.json")
+        if not os.path.isfile(prof):
+            emit(f"refused: pin profile {prof} not found\n", sys.stderr)
+            return 2
+        sources.append((lab, lib, prof))
+    scratch_root = os.path.realpath(ns.scratch_root)
+    if not os.path.isdir(scratch_root):
+        emit(f"refused: scratch root {scratch_root} is not an existing directory\n", sys.stderr)
+        return 2
+    repo = pc.find_repo_root(HERE)
+    forbidden = [p for p in [repo, HERE, hx.dir] + [x[1] for x in sources] if p]
+    for f in forbidden:
+        if pc.inside(scratch_root, f):
+            emit(f"refused: scratch root {scratch_root} is inside {f}; the probe never writes into the repository, the harness or a library under test\n", sys.stderr)
+            return 2
+    if pc.inside(os.path.abspath(ns.out_dir), scratch_root) or pc.inside(scratch_root, os.path.abspath(ns.out_dir)):
+        emit("refused: the output directory and the scratch root must be separate directories\n", sys.stderr)
+        return 2
+    only = set(x for x in ns.only.split(",") if x) if ns.only else None
+    if only is not None and (not only or only - {fn.case_id for fn in CASES}):
+        emit(f"usage: unknown or empty ids {sorted((only or set()) - {fn.case_id for fn in CASES})}\n", sys.stderr)
+        return 2
+    try:
+        out = pc.OutDir.create_new(ns.out_dir, forbidden)
+    except SystemExit as exc:
+        emit(str(exc) + "\n", sys.stderr)
+        return 2
+    py = {"version": sys.version.split()[0], "implementation": sys.implementation.name, "platform": sys.platform, "os_name": os.name,
+          "filesystem_encoding": [sys.getfilesystemencoding(), sys.getfilesystemencodeerrors()]}
+    started = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+    t_start = time.monotonic()
+    runs, stopped, hard_fail, pin_bad = [], None, [], []
+    for lab, lib, prof in sources:
+        left = ns.budget_seconds - (time.monotonic() - t_start)
+        if left <= 5:
+            hard_fail.append(f"total wall budget exhausted before source {lab}")
+            break
+        sub = pc.OutDir(os.path.join(out.path, "sources", lab))
+        os.makedirs(sub.path)
+        doc_out, adm, results = run_source(hx, lab, lib, prof, sub, scratch_root, left, only, admission_cases, py, ns.normalize_stored_paths)
+        runs.append(doc_out)
+        if doc_out["admission"]["stopped"]:
+            stopped = doc_out["admission"]["stopped"]
+            break
+        if doc_out["pin"]["status"] not in ("PINNED_EXACT", "PACKAGE_PINNED_OTHER_FILES_DIFFER", "PINNED_MODULO_LINE_ENDINGS"):
+            pin_bad.append(f"{lab}: {doc_out['pin']['status']}")
+        if not doc_out["source_unchanged_during_run"]:
+            hard_fail.append(f"source {lab} changed during the run")
+        for bad in ("FAIL", "ERROR", "CONTROL_FAILED", "BUDGET_EXHAUSTED", "POLICY_VIOLATION"):
+            if doc_out["check_outcomes"].get(bad):
+                hard_fail.append(f"{lab}: {doc_out['check_outcomes'][bad]} x {bad}")
+    code = 5 if stopped else (1 if hard_fail else (4 if pin_bad else 0))
+    top = {"probe": PROBE_VERSION, "started_utc": started, "wall_seconds": round(time.monotonic() - t_start, 2), "exit_code": code, "normalize_stored_paths": ns.normalize_stored_paths, "python": py, "harness_dir_basename": os.path.basename(hx.dir),
+           "harness_files_sha256": {f: sha(open(os.path.join(hx.dir, f), "rb").read()) for f in ("portable_core.py", "portable_cases.py", "portable_selftest.py", "child_runner.py", "json_equiv.py", "portable_harness.py")},
+           "probe_files_sha256": {f: sha(open(os.path.join(HERE, f), "rb").read()) for f in ("boundary_probe.py",)},
+           "bounds": {"per_child_timeout_s": pc.PER_CHILD_TIMEOUT, "stream_cap_bytes": pc.STREAM_CAP, "flood_kill_bytes": pc.FLOOD_LIMIT, "max_children_per_source": pc.MAX_CHILDREN, "total_budget_s": ns.budget_seconds, "serial": True},
+           "sources": runs, "stopped": stopped, "hard_failures": hard_fail, "pin_problems": pin_bad,
+           "claims": "Executed only on the machine that produced this file. Windows behaviour is claimed only if python.platform is 'win32' in this file. Producer READY/HOLD is behaviour of the library under test, never a caller readiness verdict, adoption or quality statement."}
+    import attribution
+    attr = attribution.attribute(runs, out.path) if (runs and not stopped) else None
+    if attr is not None:
+        out.write_json("ATTRIBUTION.json", attr)
+    out.write_json("run.json", top)
+    lines = [f"boundary-probe {PROBE_VERSION} on Python {py['version']} ({sys.platform})  exit={code}  wall={top['wall_seconds']}s"]
+    for r in runs:
+        lines.append(f"  source {r['source_label']} ({r['source_role']}): pin={r['pin']['status']} admission={'/'.join(r['admission']['statuses'])} children={r['children_started']} cases={json.dumps(r['case_status_counts'], sort_keys=True)} outcomes={json.dumps(r['check_outcomes'], sort_keys=True)}")
+    if attr is not None:
+        lines.append("  attribution: " + json.dumps(attr["summary"]["by_attribution"], sort_keys=True))
+        for fid, s in attr["summary"]["by_finding"].items():
+            lines.append(f"    {fid}: {json.dumps(s, sort_keys=True)}")
+    if stopped:
+        lines.append("STOPPED: " + stopped["message"])
+        out.write("STOP.txt", (stopped["message"] + "\n").encode("utf-8"))
+    if hard_fail:
+        lines.append("HARD FAILURES: " + "; ".join(hard_fail))
+    if pin_bad:
+        lines.append("PIN PROBLEMS: " + "; ".join(pin_bad))
+    text = "\n".join(lines) + "\n"
+    out.write("SUMMARY.txt", text.encode("utf-8"))
+    emit(text)
+    return code
+
+
+if __name__ == "__main__":
+    sys.exit(main())

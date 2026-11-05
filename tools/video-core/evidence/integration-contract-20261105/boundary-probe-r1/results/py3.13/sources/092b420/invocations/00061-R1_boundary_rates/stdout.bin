@@ -1,0 +1,181 @@
+{
+  "mode": "plan",
+  "observations": {
+    "assets_verified": {
+      "asset_a": {
+        "bytes": 12044,
+        "channels": 1,
+        "sample_count": 6000,
+        "sha256": "fa641090914cd7eb1838c839b5b3c854db91e9d559376c915f1fbbc3efd09f18"
+      }
+    },
+    "input": {
+      "manifest_bytes": 1413,
+      "manifest_sha256": "5a31ca69e5f13a378485f65ea8d4cd7d86aff7cb9ffcbd86c5ebbd28baaf128f"
+    },
+    "limits": {
+      "chunk_samples": 48000,
+      "max_assets": 256,
+      "max_concurrent": 8,
+      "max_events": 1024,
+      "max_frames": 18000,
+      "max_input_bytes": 4194304,
+      "max_mix_work": 200000000,
+      "max_output_samples": 28800000,
+      "max_runtime_seconds": 300.0,
+      "max_source_bytes": 536870912,
+      "max_total_source_bytes": 2147483648,
+      "max_wav_chunks": 64,
+      "max_wav_header_bytes": 4096
+    },
+    "output": null,
+    "side_effects": "none (no file created, no process launched)"
+  },
+  "plan": {
+    "assets": [
+      {
+        "bytes": 12044,
+        "channels": 1,
+        "id": "asset_a",
+        "path": "seg_a.wav",
+        "sample_count": 6000,
+        "sha256": "fa641090914cd7eb1838c839b5b3c854db91e9d559376c915f1fbbc3efd09f18",
+        "verified": true
+      },
+      {
+        "id": "asset_unselected",
+        "path": "seg_unselected.wav",
+        "reason": "not verified: no selected USE event is bound to it",
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "verified": false
+      }
+    ],
+    "caller_assertions": "source_id, role, decision_ref and provenance_ref are opaque caller assertions, preserved verbatim; they are not authenticated and are not evidence of human adoption or creative approval",
+    "coverage": {
+      "covered_samples": 14,
+      "gap_count": 0,
+      "gaps": [],
+      "gaps_truncated": false
+    },
+    "events": [
+      {
+        "asset": "asset_a",
+        "channel_rule": "COPY",
+        "decision_ref": "owner-binding/a",
+        "disposition": "MIX",
+        "end_frame": 12,
+        "gain": {
+          "den": 1,
+          "num": 1
+        },
+        "id": "ev_a",
+        "role": "vo",
+        "sample_end": 12,
+        "sample_start": 0,
+        "samples": 12,
+        "selected": true,
+        "source_id": "src_a",
+        "source_in_sample": 0,
+        "source_out_sample": 12,
+        "start_frame": 0,
+        "state": "USE"
+      },
+      {
+        "disposition": "UNRESOLVED_NOT_SELECTED",
+        "end_frame": 13,
+        "id": "ev_z",
+        "sample_end": 12,
+        "sample_start": 12,
+        "samples": 0,
+        "selected": false,
+        "source_id": "src_z",
+        "start_frame": 12,
+        "state": "UNKNOWN"
+      },
+      {
+        "asset": "asset_a",
+        "channel_rule": "COPY",
+        "decision_ref": "owner-binding/b",
+        "disposition": "MIX",
+        "end_frame": 15,
+        "gain": {
+          "den": 1,
+          "num": 1
+        },
+        "id": "ev_b",
+        "role": "vo",
+        "sample_end": 14,
+        "sample_start": 12,
+        "samples": 2,
+        "selected": true,
+        "source_id": "src_b",
+        "source_in_sample": 100,
+        "source_out_sample": 102,
+        "start_frame": 13,
+        "state": "USE"
+      }
+    ],
+    "hold": [],
+    "mix": {
+      "events": 2,
+      "peak_concurrent": 1,
+      "work_sample_channels": 14
+    },
+    "mux_interface": {
+      "bits": 16,
+      "channels": 1,
+      "container": "RIFF/WAVE PCM",
+      "duration_samples": 14,
+      "duration_seconds": "7/24000",
+      "note": "no mux is performed by this component; a later, separately validated mux stage may consume the stem",
+      "sample_rate": 48000,
+      "start_offset_samples": 0,
+      "stem": "stem.wav",
+      "timeline_fps": "50000/1",
+      "timeline_frames": 15
+    },
+    "output": {
+      "bits": 16,
+      "bytes": 72,
+      "channels": 1,
+      "file": "stem.wav",
+      "sample_rate": 48000,
+      "samples": 14
+    },
+    "policy": {
+      "clipping": "REJECT",
+      "gain": "integer rational num/den; per-event sample = round-half-away-from-zero(sample*num/den); no automatic normalization",
+      "gap": "REQUIRE_FULL_COVERAGE",
+      "overlap": "REJECT",
+      "resampling": "none",
+      "stretching": "none"
+    },
+    "schema": "video_core.audio_plan/1",
+    "scope": [
+      "ev_a",
+      "ev_b"
+    ],
+    "status": "READY",
+    "timeline": {
+      "fps": {
+        "d": 1,
+        "n": 50000,
+        "rational": "50000/1"
+      },
+      "frame_to_sample": "floor((2*frame*fps_d*48000 + fps_n) / (2*fps_n)); exact integers, round half up, applied to each absolute boundary",
+      "total_frames": 15,
+      "total_samples": 14
+    },
+    "unresolved": [
+      {
+        "event_id": "ev_z",
+        "selected": false,
+        "source_id": "src_z",
+        "state": "UNKNOWN"
+      }
+    ],
+    "warnings": []
+  },
+  "plan_sha256": "fed72af044b8c8849265e34610cc00008ad8429c63491b9183e61301864bb77c",
+  "status": "READY"
+}

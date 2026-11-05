@@ -1,0 +1,352 @@
+{
+  "case": "Z3_selected_omit_and_effective_scope",
+  "checks": [
+    {
+      "expected": {
+        "status": "OK",
+        "stderr_truncated": false,
+        "stdout_truncated": false
+      },
+      "key": "Z3_selected_omit_and_effective_scope::[audio plan, selected OMIT zero-sample + qualified USE around it] child finished normally (not killed, not truncated)",
+      "layer": "HARNESS_CONTROL",
+      "name": "[audio plan, selected OMIT zero-sample + qualified USE around it] child finished normally (not killed, not truncated)",
+      "observed": {
+        "status": "OK",
+        "stderr_truncated": false,
+        "stdout_truncated": false
+      },
+      "outcome": "CONTROL_OK"
+    },
+    {
+      "expected": {
+        "covered_samples": 4,
+        "exit_code": 0,
+        "gap_count": 0,
+        "mix_events": 2
+      },
+      "finding": "F-AUD-1",
+      "key": "Z3_selected_omit_and_effective_scope::[selected OMIT] accepted: exit 0, consumes nothing (mix.events = 2 USE only), no extra coverage (covered_samples = oracle 4), no gap",
+      "layer": "INPUT_CONTRACT_EXPECTATION",
+      "name": "[selected OMIT] accepted: exit 0, consumes nothing (mix.events = 2 USE only), no extra coverage (covered_samples = oracle 4), no gap",
+      "observed": {
+        "covered_samples": 4,
+        "exit_code": 0,
+        "gap_count": 0,
+        "mix_events": 2
+      },
+      "outcome": "MET"
+    },
+    {
+      "finding": "F-AUD-1",
+      "key": "Z3_selected_omit_and_effective_scope::[selected OMIT] producer status and disposition",
+      "layer": "OBSERVATION",
+      "name": "[selected OMIT] producer status and disposition",
+      "note": "producer behaviour only",
+      "observed": {
+        "status": "READY",
+        "z": {
+          "disposition": "OMITTED",
+          "samples": 0,
+          "selected": true
+        }
+      },
+      "outcome": "OBSERVED"
+    },
+    {
+      "expected": true,
+      "finding": "F-AUD-1",
+      "key": "Z3_selected_omit_and_effective_scope::[selected OMIT] no input/output side effects (owned world byte-identical)",
+      "layer": "INPUT_CONTRACT_EXPECTATION",
+      "name": "[selected OMIT] no input/output side effects (owned world byte-identical)",
+      "observed": true,
+      "outcome": "MET"
+    },
+    {
+      "expected": [],
+      "finding": "F-AUD-1",
+      "key": "Z3_selected_omit_and_effective_scope::[selected OMIT] no process/network/write/env attempt (deny hook silent)",
+      "layer": "INPUT_CONTRACT_EXPECTATION",
+      "name": "[selected OMIT] no process/network/write/env attempt (deny hook silent)",
+      "observed": [],
+      "outcome": "MET"
+    },
+    {
+      "expected": {
+        "status": "OK",
+        "stderr_truncated": false,
+        "stdout_truncated": false
+      },
+      "key": "Z3_selected_omit_and_effective_scope::[audio plan, selected OMIT zero-sample + a real coverage hole] child finished normally (not killed, not truncated)",
+      "layer": "HARNESS_CONTROL",
+      "name": "[audio plan, selected OMIT zero-sample + a real coverage hole] child finished normally (not killed, not truncated)",
+      "observed": {
+        "status": "OK",
+        "stderr_truncated": false,
+        "stdout_truncated": false
+      },
+      "outcome": "CONTROL_OK"
+    },
+    {
+      "expected": {
+        "exit_code": 5,
+        "gap_count": 1,
+        "status": "HOLD"
+      },
+      "finding": "F-AUD-1",
+      "key": "Z3_selected_omit_and_effective_scope::[OMIT + hole] accepted but NOT ready: producer HOLD (exit 5, AUDIO_SPEC), one gap (OMIT adds no coverage)",
+      "layer": "INPUT_CONTRACT_EXPECTATION",
+      "name": "[OMIT + hole] accepted but NOT ready: producer HOLD (exit 5, AUDIO_SPEC), one gap (OMIT adds no coverage)",
+      "note": "producer behaviour; the caller still owns what a HOLD means",
+      "observed": {
+        "exit_code": 5,
+        "gap_count": 1,
+        "status": "HOLD"
+      },
+      "outcome": "MET"
+    },
+    {
+      "expected": true,
+      "finding": "F-AUD-1",
+      "key": "Z3_selected_omit_and_effective_scope::[OMIT + hole] no input/output side effects (owned world byte-identical)",
+      "layer": "INPUT_CONTRACT_EXPECTATION",
+      "name": "[OMIT + hole] no input/output side effects (owned world byte-identical)",
+      "observed": true,
+      "outcome": "MET"
+    },
+    {
+      "expected": [],
+      "finding": "F-AUD-1",
+      "key": "Z3_selected_omit_and_effective_scope::[OMIT + hole] no process/network/write/env attempt (deny hook silent)",
+      "layer": "INPUT_CONTRACT_EXPECTATION",
+      "name": "[OMIT + hole] no process/network/write/env attempt (deny hook silent)",
+      "observed": [],
+      "outcome": "MET"
+    },
+    {
+      "expected": {
+        "status": "OK",
+        "stderr_truncated": false,
+        "stdout_truncated": false
+      },
+      "key": "Z3_selected_omit_and_effective_scope::[audio plan, effective scope = only a selected OMIT zero-sample event] child finished normally (not killed, not truncated)",
+      "layer": "HARNESS_CONTROL",
+      "name": "[audio plan, effective scope = only a selected OMIT zero-sample event] child finished normally (not killed, not truncated)",
+      "observed": {
+        "status": "OK",
+        "stderr_truncated": false,
+        "stdout_truncated": false
+      },
+      "outcome": "CONTROL_OK"
+    },
+    {
+      "expected": false,
+      "finding": "F-AUD-1",
+      "key": "Z3_selected_omit_and_effective_scope::[only OMIT in scope] never ready: NOT (exit 0 and producer status READY)",
+      "layer": "INPUT_CONTRACT_EXPECTATION",
+      "name": "[only OMIT in scope] never ready: NOT (exit 0 and producer status READY)",
+      "observed": false,
+      "outcome": "MET"
+    },
+    {
+      "finding": "F-AUD-1",
+      "key": "Z3_selected_omit_and_effective_scope::[only OMIT in scope] observed",
+      "layer": "OBSERVATION",
+      "name": "[only OMIT in scope] observed",
+      "observed": {
+        "exit_code": 5,
+        "gap_count": 1,
+        "issue_codes": [],
+        "status": "HOLD"
+      },
+      "outcome": "OBSERVED"
+    },
+    {
+      "expected": true,
+      "finding": "F-AUD-1",
+      "key": "Z3_selected_omit_and_effective_scope::[only OMIT] no input/output side effects (owned world byte-identical)",
+      "layer": "INPUT_CONTRACT_EXPECTATION",
+      "name": "[only OMIT] no input/output side effects (owned world byte-identical)",
+      "observed": true,
+      "outcome": "MET"
+    },
+    {
+      "expected": [],
+      "finding": "F-AUD-1",
+      "key": "Z3_selected_omit_and_effective_scope::[only OMIT] no process/network/write/env attempt (deny hook silent)",
+      "layer": "INPUT_CONTRACT_EXPECTATION",
+      "name": "[only OMIT] no process/network/write/env attempt (deny hook silent)",
+      "observed": [],
+      "outcome": "MET"
+    },
+    {
+      "expected": {
+        "status": "OK",
+        "stderr_truncated": false,
+        "stdout_truncated": false
+      },
+      "key": "Z3_selected_omit_and_effective_scope::[audio plan, empty scope.event_ids] child finished normally (not killed, not truncated)",
+      "layer": "HARNESS_CONTROL",
+      "name": "[audio plan, empty scope.event_ids] child finished normally (not killed, not truncated)",
+      "observed": {
+        "status": "OK",
+        "stderr_truncated": false,
+        "stdout_truncated": false
+      },
+      "outcome": "CONTROL_OK"
+    },
+    {
+      "expected": false,
+      "finding": "F-AUD-1",
+      "key": "Z3_selected_omit_and_effective_scope::[empty scope] never ready: NOT (exit 0 and producer status READY)",
+      "layer": "INPUT_CONTRACT_EXPECTATION",
+      "name": "[empty scope] never ready: NOT (exit 0 and producer status READY)",
+      "observed": false,
+      "outcome": "MET"
+    },
+    {
+      "finding": "F-AUD-1",
+      "key": "Z3_selected_omit_and_effective_scope::[empty scope] observed",
+      "layer": "OBSERVATION",
+      "name": "[empty scope] observed",
+      "observed": {
+        "exit_code": 1,
+        "issue_codes": [
+          "scope_empty"
+        ],
+        "status": null
+      },
+      "outcome": "OBSERVED"
+    },
+    {
+      "expected": true,
+      "finding": "F-AUD-1",
+      "key": "Z3_selected_omit_and_effective_scope::[empty scope] no input/output side effects (owned world byte-identical)",
+      "layer": "INPUT_CONTRACT_EXPECTATION",
+      "name": "[empty scope] no input/output side effects (owned world byte-identical)",
+      "observed": true,
+      "outcome": "MET"
+    },
+    {
+      "expected": [],
+      "finding": "F-AUD-1",
+      "key": "Z3_selected_omit_and_effective_scope::[empty scope] no process/network/write/env attempt (deny hook silent)",
+      "layer": "INPUT_CONTRACT_EXPECTATION",
+      "name": "[empty scope] no process/network/write/env attempt (deny hook silent)",
+      "observed": [],
+      "outcome": "MET"
+    },
+    {
+      "expected": {
+        "status": "OK",
+        "stderr_truncated": false,
+        "stdout_truncated": false
+      },
+      "key": "Z3_selected_omit_and_effective_scope::[audio plan, qualified USE + unselected zero-sample UNKNOWN + selected zero-sample OMIT] child finished normally (not killed, not truncated)",
+      "layer": "HARNESS_CONTROL",
+      "name": "[audio plan, qualified USE + unselected zero-sample UNKNOWN + selected zero-sample OMIT] child finished normally (not killed, not truncated)",
+      "observed": {
+        "status": "OK",
+        "stderr_truncated": false,
+        "stdout_truncated": false
+      },
+      "outcome": "CONTROL_OK"
+    },
+    {
+      "expected": {
+        "covered_samples": 4,
+        "exit_code": 0,
+        "hold_event_ids": [],
+        "status": "READY"
+      },
+      "finding": "F-AUD-1",
+      "key": "Z3_selected_omit_and_effective_scope::[combined] accepted: exit 0, producer status READY, no hold, covered_samples 4",
+      "layer": "INPUT_CONTRACT_EXPECTATION",
+      "name": "[combined] accepted: exit 0, producer status READY, no hold, covered_samples 4",
+      "note": "producer behaviour; it is not promoted to caller readiness (no receipt, ownership or quality is judged here)",
+      "observed": {
+        "covered_samples": 4,
+        "exit_code": 0,
+        "hold_event_ids": [],
+        "status": "READY"
+      },
+      "outcome": "MET"
+    },
+    {
+      "expected": true,
+      "finding": "F-AUD-1",
+      "key": "Z3_selected_omit_and_effective_scope::[combined] no input/output side effects (owned world byte-identical)",
+      "layer": "INPUT_CONTRACT_EXPECTATION",
+      "name": "[combined] no input/output side effects (owned world byte-identical)",
+      "observed": true,
+      "outcome": "MET"
+    },
+    {
+      "expected": [],
+      "finding": "F-AUD-1",
+      "key": "Z3_selected_omit_and_effective_scope::[combined] no process/network/write/env attempt (deny hook silent)",
+      "layer": "INPUT_CONTRACT_EXPECTATION",
+      "name": "[combined] no process/network/write/env attempt (deny hook silent)",
+      "observed": [],
+      "outcome": "MET"
+    }
+  ],
+  "elapsed_seconds": 0.536,
+  "finding": "F-AUD-1",
+  "gaps": [],
+  "invocations": [
+    {
+      "denied_attempts": 0,
+      "exit_code": 0,
+      "label": "audio plan, selected OMIT zero-sample + qualified USE around it",
+      "no": 54,
+      "status": "OK",
+      "stderr_bytes_total": 0,
+      "stdout_bytes_total": 4845,
+      "stdout_sha256_normalized": "7f1c949a7df1e74ade7a7031b2cf82fabc997f8b25627b20580ebae6847dfa3c"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 5,
+      "label": "audio plan, selected OMIT zero-sample + a real coverage hole",
+      "no": 55,
+      "status": "OK",
+      "stderr_bytes_total": 0,
+      "stdout_bytes_total": 5149,
+      "stdout_sha256_normalized": "e2811056048e2159e3d8d318c88284b4d9d21b3981846b346f2961804ac22e83"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 5,
+      "label": "audio plan, effective scope = only a selected OMIT zero-sample event",
+      "no": 56,
+      "status": "OK",
+      "stderr_bytes_total": 0,
+      "stdout_bytes_total": 5059,
+      "stdout_sha256_normalized": "6278d94dfd99c8b1e2e0532c4781c87f7aeb056ee2ed6d9fe5188a01ee9e6169"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 1,
+      "label": "audio plan, empty scope.event_ids",
+      "no": 57,
+      "status": "OK",
+      "stderr_bytes_total": 0,
+      "stdout_bytes_total": 328,
+      "stdout_sha256_normalized": "8e842bafa8bfc3908ae6102860a9877c9cbc20ab84df1ed43771710b05eb9c21"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 0,
+      "label": "audio plan, qualified USE + unselected zero-sample UNKNOWN + selected zero-sample OMIT",
+      "no": 58,
+      "status": "OK",
+      "stderr_bytes_total": 0,
+      "stdout_bytes_total": 5275,
+      "stdout_sha256_normalized": "753f4ab2a6cb3cd3a7f535261b277c5da2cf48cc972133d99ff47520e6eb9da7"
+    }
+  ],
+  "source_refs": [],
+  "status": "PASS",
+  "status_raw_harness": "PASS",
+  "title": "Selected OMIT consumes nothing and adds no coverage; combined unselected UNKNOWN + selected OMIT; empty effective scope is non-ready"
+}

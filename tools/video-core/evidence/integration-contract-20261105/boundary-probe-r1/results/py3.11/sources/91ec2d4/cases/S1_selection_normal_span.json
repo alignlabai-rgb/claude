@@ -1,0 +1,148 @@
+{
+  "case": "S1_selection_normal_span",
+  "checks": [
+    {
+      "expected": [],
+      "key": "S1_selection_normal_span::oracle: no zero-sample frame within the cap at 30000/1001",
+      "layer": "HARNESS_CONTROL",
+      "name": "oracle: no zero-sample frame within the cap at 30000/1001",
+      "observed": [],
+      "outcome": "CONTROL_OK"
+    },
+    {
+      "expected": {
+        "status": "OK",
+        "stderr_truncated": false,
+        "stdout_truncated": false
+      },
+      "key": "S1_selection_normal_span::[audio plan, qualified USE + unselected UNKNOWN (normal span)] child finished normally (not killed, not truncated)",
+      "layer": "HARNESS_CONTROL",
+      "name": "[audio plan, qualified USE + unselected UNKNOWN (normal span)] child finished normally (not killed, not truncated)",
+      "observed": {
+        "status": "OK",
+        "stderr_truncated": false,
+        "stdout_truncated": false
+      },
+      "outcome": "CONTROL_OK"
+    },
+    {
+      "expected": {
+        "exit_code": 0,
+        "hold_event_ids": [],
+        "status": "READY"
+      },
+      "finding": "CONTROL",
+      "key": "S1_selection_normal_span::[unselected UNKNOWN] exit 0, producer status READY, no hold (a selected USE fills the frame; the unselected row overlaps it, which is allowed)",
+      "layer": "INPUT_CONTRACT_EXPECTATION",
+      "name": "[unselected UNKNOWN] exit 0, producer status READY, no hold (a selected USE fills the frame; the unselected row overlaps it, which is allowed)",
+      "observed": {
+        "exit_code": 0,
+        "hold_event_ids": [],
+        "status": "READY"
+      },
+      "outcome": "MET"
+    },
+    {
+      "expected": true,
+      "finding": "CONTROL",
+      "key": "S1_selection_normal_span::[unselected UNKNOWN] no input/output side effects (owned world byte-identical)",
+      "layer": "INPUT_CONTRACT_EXPECTATION",
+      "name": "[unselected UNKNOWN] no input/output side effects (owned world byte-identical)",
+      "observed": true,
+      "outcome": "MET"
+    },
+    {
+      "expected": [],
+      "finding": "CONTROL",
+      "key": "S1_selection_normal_span::[unselected UNKNOWN] no process/network/write/env attempt (deny hook silent)",
+      "layer": "INPUT_CONTRACT_EXPECTATION",
+      "name": "[unselected UNKNOWN] no process/network/write/env attempt (deny hook silent)",
+      "observed": [],
+      "outcome": "MET"
+    },
+    {
+      "expected": {
+        "status": "OK",
+        "stderr_truncated": false,
+        "stdout_truncated": false
+      },
+      "key": "S1_selection_normal_span::[audio plan, qualified USE + SELECTED UNKNOWN (normal span)] child finished normally (not killed, not truncated)",
+      "layer": "HARNESS_CONTROL",
+      "name": "[audio plan, qualified USE + SELECTED UNKNOWN (normal span)] child finished normally (not killed, not truncated)",
+      "observed": {
+        "status": "OK",
+        "stderr_truncated": false,
+        "stdout_truncated": false
+      },
+      "outcome": "CONTROL_OK"
+    },
+    {
+      "expected": {
+        "exit_code": 5,
+        "hold_event_ids": [
+          "ev_z"
+        ],
+        "status": "HOLD"
+      },
+      "finding": "CONTROL",
+      "key": "S1_selection_normal_span::[selected UNKNOWN] producer HOLD (exit 5, AUDIO_SPEC) and the event is listed in hold",
+      "layer": "INPUT_CONTRACT_EXPECTATION",
+      "name": "[selected UNKNOWN] producer HOLD (exit 5, AUDIO_SPEC) and the event is listed in hold",
+      "observed": {
+        "exit_code": 5,
+        "hold_event_ids": [
+          "ev_z"
+        ],
+        "status": "HOLD"
+      },
+      "outcome": "MET"
+    },
+    {
+      "expected": true,
+      "finding": "CONTROL",
+      "key": "S1_selection_normal_span::[selected UNKNOWN] no input/output side effects (owned world byte-identical)",
+      "layer": "INPUT_CONTRACT_EXPECTATION",
+      "name": "[selected UNKNOWN] no input/output side effects (owned world byte-identical)",
+      "observed": true,
+      "outcome": "MET"
+    },
+    {
+      "expected": [],
+      "finding": "CONTROL",
+      "key": "S1_selection_normal_span::[selected UNKNOWN] no process/network/write/env attempt (deny hook silent)",
+      "layer": "INPUT_CONTRACT_EXPECTATION",
+      "name": "[selected UNKNOWN] no process/network/write/env attempt (deny hook silent)",
+      "observed": [],
+      "outcome": "MET"
+    }
+  ],
+  "elapsed_seconds": 0.305,
+  "finding": "CONTROL",
+  "gaps": [],
+  "invocations": [
+    {
+      "denied_attempts": 0,
+      "exit_code": 0,
+      "label": "audio plan, qualified USE + unselected UNKNOWN (normal span)",
+      "no": 68,
+      "status": "OK",
+      "stderr_bytes_total": 0,
+      "stdout_bytes_total": 5549,
+      "stdout_sha256_normalized": "82d0cb20df59cf080b91a35e188f9c653b090eb15e715abf6effe3f5fe529cbc"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 5,
+      "label": "audio plan, qualified USE + SELECTED UNKNOWN (normal span)",
+      "no": 69,
+      "status": "OK",
+      "stderr_bytes_total": 0,
+      "stdout_bytes_total": 5543,
+      "stdout_sha256_normalized": "9fd07a9b6d612c42396eeb01bed126709f7c6073a02b94d99efb559850bdebad"
+    }
+  ],
+  "source_refs": [],
+  "status": "PASS",
+  "status_raw_harness": "PASS",
+  "title": "Normal-span selection at 30000/1001: qualified USE with an unselected UNKNOWN does not block; a selected UNKNOWN HOLDs (producer behaviour, not caller readiness)"
+}
