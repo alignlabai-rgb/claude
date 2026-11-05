@@ -71,7 +71,8 @@ class DrainBound(unittest.TestCase):
             self.assertNotEqual(r.outcome, runner.FLOOD_KILLED, "an actual exit 0 is never reported as killed")
 
     def test_child_that_writes_beyond_the_bound_and_exits_at_once_is_never_a_clean_success(self):
-        full_sha = hashlib.sha256(b"x" * BIG).hexdigest()
+        """Provenance is the CAPTURED stream, not the intended payload: a child still writing when the runner notices the breach may be killed mid-write (Windows: 1,769,472 of 2,000,000 bytes
+        observed), so only the bytes actually read are counted and hashed. The completed-write / real-exit case with the full payload is test_exit_first_is_deterministic... below."""
         outcomes = set()
         for attempt in range(8):  # the original race depended on a 50 ms poll and, on Windows, on termination timing; every scheduling must satisfy the invariants
             r = self.run_writer(f"import sys; sys.stdout.buffer.write(b'x'*{BIG})")
@@ -79,8 +80,25 @@ class DrainBound(unittest.TestCase):
             outcomes.add(r.outcome)
             self.assertTrue(r.drain_complete)
             s = r.stdout.summary()
-            self.assertEqual((s["total_bytes"], s["sha256_full_stream"]), (BIG, full_sha), "bytes and hash of the full stream are unchanged")
+            self.assertGreater(s["total_bytes"], LIMIT, "the breach itself means more than the bound was really read")
+            self.assertLessEqual(s["total_bytes"], BIG)
+            self.assertEqual(s["sha256_full_stream"], hashlib.sha256(b"x" * s["total_bytes"]).hexdigest(), "the hash covers exactly the bytes that were captured (all 'x')")
+            if r.outcome == runner.EXITED_ZERO:
+                self.assertEqual(s["total_bytes"], BIG, "a child that finished and exited on its own delivered the whole payload")
+            self.assertEqual(r.stderr.total, 0)
         self.assertTrue(outcomes <= {runner.EXITED_ZERO, runner.FLOOD_KILLED})
+
+    def test_a_child_that_is_still_writing_is_killed_and_the_captured_bytes_and_hash_are_exactly_what_was_read(self):
+        """Deterministic still-writing control: 20 chunks of 100,000 bytes, 0.25 s apart (finite, <= 5 s); the runner must cut it off long before the end. Provenance: the
+        total/hash describe only what was actually captured - no claim about bytes the child never delivered."""
+        r = self.run_writer("import sys,time\nfor i in range(20):\n sys.stdout.buffer.write(b'x'*100000); sys.stdout.flush(); time.sleep(0.25)", timeout_s=8)
+        s = r.stdout.summary()
+        self.assertEqual((r.outcome, r.kill_reason, r.drain_limit_exceeded, r.ok), (runner.FLOOD_KILLED, "flood", True, False))
+        self.assertTrue(r.kill_attempted and r.kill_delivered)
+        self.assertGreater(s["total_bytes"], LIMIT)
+        self.assertLess(s["total_bytes"], 20 * 100000, "it was stopped before it finished writing")
+        self.assertEqual(s["sha256_full_stream"], hashlib.sha256(b"x" * s["total_bytes"]).hexdigest())
+        self.assertEqual((s["kept_bytes"] + s["dropped_bytes"], s["truncated"]), (s["total_bytes"], True))
 
     def test_exit_first_is_deterministic_when_the_child_has_provably_exited_before_any_termination_request(self):
         """The public-API race with only a scheduling barrier: the real child exits 0 BEFORE the original termination routine runs."""
@@ -133,13 +151,13 @@ class DrainBound(unittest.TestCase):
 
     def test_boundary_exactly_at_the_limit_is_fine_one_byte_over_is_not(self):
         at = self.run_writer(f"import sys; sys.stdout.buffer.write(b'y'*{LIMIT})")
-        over = self.run_writer(f"import sys; sys.stdout.buffer.write(b'y'*{LIMIT + 1})")
+        over = self.barrier_run(f"import sys,time; sys.stdout.buffer.write(b'y'*{LIMIT + 1}); sys.stdout.flush(); time.sleep(0.2)")  # barrier: exits on its own before any termination
         under = self.run_writer("import sys; sys.stdout.buffer.write(b'y'*10)")
         self.assertEqual([(r.ok, r.drain_limit_exceeded) for r in (under, at, over)], [(True, False), (True, False), (False, True)])
         self.assertEqual((over.outcome, over.exit_code), (runner.EXITED_ZERO, 0))
 
     def test_the_bound_is_shared_by_stdout_and_stderr(self):
-        r = self.run_writer(f"import sys; sys.stdout.write('a'*{LIMIT // 2 + 1}); sys.stdout.flush(); sys.stderr.write('b'*{LIMIT // 2 + 1})", stderr_limits=(8, 8))
+        r = self.barrier_run(f"import sys,time; sys.stdout.write('a'*{LIMIT // 2 + 1}); sys.stdout.flush(); sys.stderr.write('b'*{LIMIT // 2 + 1}); sys.stderr.flush(); time.sleep(0.2)", stderr_limits=(8, 8))
         self.assertTrue(r.drain_limit_exceeded)
         self.assertFalse(r.ok)
         self.assertEqual((r.stdout.total, r.stderr.total), (LIMIT // 2 + 1, LIMIT // 2 + 1))
@@ -194,7 +212,7 @@ class DrainBound(unittest.TestCase):
         self.assertIn("EXITED_ZERO", r.describe())
 
     def test_describe_and_reason_text_do_not_claim_a_kill_that_did_not_happen(self):
-        quick = self.run_writer(f"import sys; sys.stdout.buffer.write(b'x'*{BIG})")
+        quick = self.barrier_run(f"import sys,time; sys.stdout.buffer.write(b'x'*{BIG}); sys.stdout.flush(); time.sleep(0.2)")
         self.assertIn("exited on its own", quick.exit0_not_ok_reason("tool"))
         self.assertNotIn("killed", quick.describe())
         self.assertIn("no kill was needed or performed", quick.exit0_not_ok_reason("tool"))

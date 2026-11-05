@@ -151,3 +151,13 @@ result was preserved. The runtime is unchanged (`aab29b7` only touched a handsha
 own exit 3 (or a self-inflicted SIGKILL, POSIX only) before the termination routine runs, so the natural status must survive with `kill_attempted=false`; an unbarriered run that accepts either its own exit 3 or
 a real accepted kill, and checks the actual result is internally consistent (POSIX None/SIGTERM, Windows 1/None); and a true live-kill plus timeout control. Nothing is skipped on Windows except the POSIX-only
 signal-death case. Linux evidence only; not Windows execution.
+
+## Scheduler-sensitive test on Windows cee8288: captured stream vs intended payload
+
+`DrainBound.test_child_that_writes_beyond_the_bound_and_exits_at_once_is_never_a_clean_success` expected 2,000,000 bytes and the SHA of the full payload; Windows cee8288 actually captured
+1,769,472 bytes (SHA `a18b544d…`). A child still writing when the runner notices the breach can be killed mid-write, so the intended payload is not the provenance - the captured stream is.
+Runtime unchanged (drain enforcement is not weakened and no dropped-byte claim is invented: `total_bytes`/`sha256_full_stream` already describe exactly the bytes read).
+The test now asserts, for the unbarriered run: more than the bound was read, at most the payload, and the hash equals SHA-256 of exactly that many captured bytes (the payload is all `x`); the full 2,000,000 bytes
+only if the child finished and exited on its own. Completed-write / real-exit cases with the full payload use the deterministic barrier (the real child has finished and exited before the termination routine runs), including the
+boundary (limit + 1), shared stdout/stderr bound and describe-text tests, which previously relied on a fast child winning the race. A deterministic still-writing control (20 x 100,000-byte chunks, 0.25 s apart) checks the killed
+partial capture. Linux evidence only; not Windows execution. The tiny-env MP4 recovery was independently confirmed complete by the requester (SHA fa3cce3d…0da4; native ffprobe 192x108/10 frames, decode 0); no resend needed.
