@@ -1,0 +1,13 @@
+Clean-export validation of the exact staged tree (before the commit that adds this note)
+=======================================================================================
+tree 3562b79ea4905c43bca72fb4f4b2b7a391e50801  (git write-tree of the index; `git archive <tree> tools/video-core` into an empty directory, no __pycache__,
+PYTHONDONTWRITEBYTECODE=1, suites run one at a time)
+
+full suite, unchanged discovery (python -m unittest discover -s tests -t .), 612 tests each:
+  python3.13 : OK, 612 run, 603 pass, 9 skipped, 0 fail
+  python3.12 : OK, 612 run, 603 pass, 9 skipped, 0 fail
+  python3.11 : OK, 612 run, 603 pass, 9 skipped, 0 fail
+Previous commit 03ad6928: 598 run / 589 pass / 9 skip / 0 fail; new here: 14 tests (tests/test_reinspect_original_receipt.py).
+Failed attempts: none in the suites. During development one test label was off by one (a 16-level summary is exactly at the bound, so the rejection case needed 17 levels); fixed in
+the test. The load-dependent containment-handshake flake recorded in the 092b420 evidence did not occur in any of the working-tree or export runs of this follow-up; it is not
+fixed and not claimed fixed (containment/ and runner tests belong to the other session).

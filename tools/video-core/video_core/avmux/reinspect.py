@@ -18,6 +18,7 @@ from ..errors import Issue, UnsafePath, ValidationFailed
 from ..limits import Limits
 from ..paths import check_media_for_inspect, check_output_location
 from . import checks as ck
+from .original_receipt import read_original_receipt
 
 SCHEMA = "video_core.avmux_reinspection/1"
 _SHA = re.compile(r"[0-9a-fA-F]{64}")
@@ -89,19 +90,17 @@ def reinspect_audio_packets(media_path: str, *, expected_sha256: str, output_roo
         rp = os.path.abspath(original_receipt_path)
         if not os.path.isfile(rp) or os.path.islink(rp):
             _reject("original_receipt_unreadable", "original_receipt", "the original receipt is not a regular file", UnsafePath)
-        with open(rp, "rb") as fh:
-            blob = fh.read(limits.max_input_bytes + 1)
+        try:
+            with open(rp, "rb") as fh:
+                blob = fh.read(limits.max_input_bytes + 1)
+        except OSError as exc:
+            _reject("original_receipt_unreadable", "original_receipt", f"the original receipt cannot be read ({type(exc).__name__})", UnsafePath)
         if len(blob) > limits.max_input_bytes:
             _reject("limit_input_bytes", "original_receipt", "the original receipt is too large")
-        try:
-            doc = json.loads(blob.decode("utf-8"))
-        except (ValueError, UnicodeDecodeError):
-            _reject("original_receipt_unreadable", "original_receipt", "the original receipt is not valid JSON")
-        media_outputs = [o for o in doc.get("outputs", []) if o.get("role") == "media"]
-        if len(media_outputs) != 1 or media_outputs[0].get("sha256") != expected:
-            _reject("original_receipt_media_mismatch", "original_receipt", "the original receipt does not describe a media output with this sha256")
-        original = {"name": os.path.basename(rp), "sha256": tools.sha256_file(rp, limits.max_input_bytes + 1), "status": doc.get("status"), "route": doc.get("route"),
-                    "plan_sha256": doc.get("plan_sha256"), "claimed_audio_packets": (doc.get("observations") or {}).get("audio_packets")}
+        facts = read_original_receipt(blob, expected_sha256=expected, limits=limits)  # strict + typed; raises before any process or output exists
+        # the hash is of the exact bytes that were parsed (not of a second read of the file); it is byte integrity, not authenticity
+        original = {"name": os.path.basename(rp), "sha256": hashlib.sha256(blob).hexdigest(), **{k: facts[k] for k in ("schema", "status", "route", "plan_sha256")},
+                    "claimed_audio_packets": facts["claimed_audio_packets"], "authentication": facts["authentication"]}
 
     path, how = tools.locate("ffprobe", ffprobe)
     executions: list = []

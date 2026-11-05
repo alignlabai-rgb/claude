@@ -139,7 +139,32 @@ What the qualifier still does not, and cannot, establish:
 * Deleting or emptying `warnings` (e.g. dropping `ZERO_FILL_APPLIED`) is undetectable from the receipt alone, because the gap facts live in the audio *plan*, which the receipt names only by hash.
 * Unknown extra keys are ignored (forward compatibility).
 
-### Open observation (not changed here)
-`avmux reinspect --original-receipt FILE` parses the optional original receipt with plain `json.loads` and calls `.get` on the result: a file containing `[]` raises an untyped
-`AttributeError` (reproduced; it happens before any output directory is created, so nothing is stranded). It is the same class as F-REC-1 but a different module and command, outside this
-task's scope, so it is **OPEN**.
+### Open observation (resolved in the next follow-up)
+`avmux reinspect --original-receipt FILE` with `[]` raised an untyped `AttributeError` (see "Follow-up 2" below).
+
+## Follow-up 2: `avmux reinspect --original-receipt` (status: FIXED; evidence in `evidence/reinspect-original-receipt-20261105/`)
+
+* **Reproduced on `03ad6928`** (real CLI in an interpreter child, marker `--ffprobe`, plus owned fake tools): `[]`, `null`, `"x"`, `1`, `outputs:"x"|[1]|null`, `observations:"x"|[1]`,
+  100000 nested arrays → untyped `AttributeError`/`RecursionError` traceback (exit 1, empty stdout). Worse, `observations.audio_packets:"x"` got past parsing, ran the (fake) ffprobe three
+  times, **created the run directory** and then raised `AttributeError`, leaving an empty stranded directory. Duplicate keys, `NaN`/`Infinity`, `status` of any type or missing,
+  `route:5`, `plan_sha256:5`, a foreign `schema`, and a final `media` output with status `IN_PROGRESS`/`INTERRUPTED` were all silently accepted and the process went on to start ffprobe.
+* **Fix.** New pure module `video_core/avmux/original_receipt.py`; `reinspect.py` calls it where it used plain `json.loads`. The receipt is read with the strict loader
+  (`episode.parse_json_bytes`) and checked in the documented order → `original_receipt_unreadable` (not strict JSON), `limit_input_bytes`, `original_receipt_shape`, `original_receipt_schema`,
+  `original_receipt_inconsistent`, `original_receipt_media_mismatch`; an unreadable file (`OSError`) is a typed `UnsafePath` too. All of it happens before the tool probe, so no ffprobe/ffmpeg
+  is started and nothing is written; the CLI's existing `VideoCoreError` handler turns it into exit 1 plus `{"ok": false, "error": …}`. `raise_if_interrupted`, cancellation and run-directory
+  ownership code are not present in or touched by this module.
+* **Compatibility rule (exact).** Accepted: any strict-JSON object whose `status` is an upper-snake string, with exactly one `media` output whose sha256 is the media being re-inspected, whose
+  status is one of the two verified statuses, and whose optional fields are well-typed. `schema`, `route`, `plan_sha256`, `written`, `stage`, `quality_evaluated` are optional (so the small hand-written
+  receipts of earlier tests still work, recorded with `schema: null` rather than an invented schema) but must be right when present. **Excluded, with reason:** wrong-typed top level / `outputs` /
+  `observations` / `audio_packets` / `status` (they crashed); duplicate keys, `NaN`/`Infinity`, runaway nesting, 5000-digit integers (silently accepted or crashing; a duplicate key makes the meant
+  value a guess); a foreign `schema`; a receipt that lists a final `media` output while its status is not a verified mux (the muxer promotes `media` only for `MUXED_VERIFIED_SAMPLE_EXACT` /
+  `MUXED_TECHNICAL_WITHIN_TOLERANCE`, so that is not a receipt it wrote); a copied `audio_packets` summary deeper than 16 levels or larger than 1 MiB (a producer summary is ~1 KB, at most ~250 KB
+  with its 1000-record cap, tested). No receipt written by `video_core.avmux.mux`, including the committed `evidence/avmux-synthetic/*.receipt.json`, is excluded. Among inputs that were already rejected, the only code that changed is `{}` (`original_receipt_shape`
+  instead of `original_receipt_media_mismatch`); the exclusions listed above are the only inputs whose outcome changed from accepted/crashing to rejected.
+* **Status is never promoted.** HOLD, UNVERIFIED, IN_PROGRESS, FAILED/PROCESS_FAILED, INTERRUPTED, UNKNOWN, READBACK_MISMATCH, … are not rewritten or re-labelled: with a final media output they are
+  refused as inconsistent, without one they fail the media check. A verified status is copied verbatim, and the correction receipt keeps its own status (`REINSPECTED` / `UNKNOWN` /
+  `SKIPPED_TOOL_UNAVAILABLE`), which is never the original's.
+* **Hash ≠ authenticity.** `original_receipt.sha256` is now the SHA-256 of the exact bytes that were parsed (previously a second read of the file). It proves which bytes were read; it is not a signature,
+  and the recorded `original_receipt.authentication` says so. Nothing authenticates who wrote the receipt, and a self-consistent forged receipt for the same media passes by design.
+* **Remaining limits.** The packet summary inside the original receipt is copied as claimed (bounded, not verified); the new `original_receipt` block gained `schema` and `authentication` keys (old
+  correction receipts are untouched); `parse_json_bytes` error text for the underlying failure is reduced to its code; symlinked parent directories of the receipt/media paths are still not walked.
