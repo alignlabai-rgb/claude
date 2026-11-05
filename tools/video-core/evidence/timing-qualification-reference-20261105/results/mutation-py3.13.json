@@ -1,0 +1,117 @@
+{
+ "python": "3.13.18",
+ "mutants": [
+  {
+   "id": "MC1",
+   "what": "bool accepted as an integer",
+   "old": "return type(x) is int and lo <=",
+   "new": "return isinstance(x, int) and lo <=",
+   "killed": true,
+   "tests_run": 17,
+   "failing_tests": [
+    "test_malformed_shapes_are_rejected_before_any_row_comparison (test_carrier.Malformed.test_malformed_shapes_are_rejected_before_any_row_comparison) [bool revisio",
+    "test_malformed_shapes_are_rejected_before_any_row_comparison (test_carrier.Malformed.test_malformed_shapes_are_rejected_before_any_row_comparison) [bool snapsho"
+   ]
+  },
+  {
+   "id": "MC2",
+   "what": "timeline boundaries no longer pinned (duration-only comparison)",
+   "old": "PIN_FIELDS = (\"event_id\", \"binding_ref\", \"source_sha256\", \"sample_rate\", \"source_in_sample\", \"source_out_sample\", \"timeline_start_sample\", \"timeline_end_sample\")",
+   "new": "PIN_FIELDS = (\"event_id\", \"binding_ref\", \"source_sha256\", \"sample_rate\", \"source_in_sample\", \"source_out_sample\")",
+   "killed": true,
+   "tests_run": 17,
+   "failing_tests": [
+    "test_each_negative_reaches_its_intended_comparison_and_nothing_earlier (test_carrier.Negatives.test_each_negative_reaches_its_intended_comparison_and_nothing_ea",
+    "test_exact_match_is_consistent_assertions_only (test_carrier.Controls.test_exact_match_is_consistent_assertions_only)",
+    "test_shift_by_one_sample_changes_only_the_shifted_pins (test_carrier.Negatives.test_shift_by_one_sample_changes_only_the_shifted_pins)"
+   ]
+  },
+  {
+   "id": "MC3",
+   "what": "UNQUALIFIED / UNKNOWN status no longer holds",
+   "old": "if not q:  ",
+   "new": "if False:  ",
+   "killed": true,
+   "tests_run": 17,
+   "failing_tests": [
+    "test_each_negative_reaches_its_intended_comparison_and_nothing_earlier (test_carrier.Negatives.test_each_negative_reaches_its_intended_comparison_and_nothing_ea"
+   ]
+  },
+  {
+   "id": "MC4",
+   "what": "profile content pin not enforced",
+   "old": "same = psha == PINNED_PROFILE_SHA256 ",
+   "new": "same = True ",
+   "killed": true,
+   "tests_run": 17,
+   "failing_tests": [
+    "test_profile_relaxed_under_the_same_identity_is_rejected (test_carrier.Malformed.test_profile_relaxed_under_the_same_identity_is_rejected) [add a kind]",
+    "test_profile_relaxed_under_the_same_identity_is_rejected (test_carrier.Malformed.test_profile_relaxed_under_the_same_identity_is_rejected) [add a sample rate]",
+    "test_profile_relaxed_under_the_same_identity_is_rejected (test_carrier.Malformed.test_profile_relaxed_under_the_same_identity_is_rejected) [drop QUALIFIED requi",
+    "test_profile_relaxed_under_the_same_identity_is_rejected (test_carrier.Malformed.test_profile_relaxed_under_the_same_identity_is_rejected) [edit a rule]",
+    "test_profile_relaxed_under_the_same_identity_is_rejected (test_carrier.Malformed.test_profile_relaxed_under_the_same_identity_is_rejected) [raise limit]"
+   ]
+  },
+  {
+   "id": "MC5",
+   "what": "a missing selected-USE record no longer holds",
+   "old": "acc.reason(\"HOLD\", \"MISSING_RECORD\"",
+   "new": "acc.reason(\"NOTE\", \"MISSING_RECORD\"",
+   "killed": true,
+   "tests_run": 17,
+   "failing_tests": [
+    "test_each_negative_reaches_its_intended_comparison_and_nothing_earlier (test_carrier.Negatives.test_each_negative_reaches_its_intended_comparison_and_nothing_ea"
+   ]
+  },
+  {
+   "id": "MC6",
+   "what": "stale qualification_revision ignored",
+   "old": "if not fresh:  ",
+   "new": "if False:  ",
+   "killed": true,
+   "tests_run": 17,
+   "failing_tests": [
+    "test_each_negative_reaches_its_intended_comparison_and_nothing_earlier (test_carrier.Negatives.test_each_negative_reaches_its_intended_comparison_and_nothing_ea"
+   ]
+  },
+  {
+   "id": "MC7",
+   "what": "silence inferred from the absence of a decision",
+   "old": "acc.reason(\"HOLD\", \"MISSING_SILENCE_DECISION\"",
+   "new": "acc.reason(\"NOTE\", \"MISSING_SILENCE_DECISION\"",
+   "killed": true,
+   "tests_run": 17,
+   "failing_tests": [
+    "test_each_negative_reaches_its_intended_comparison_and_nothing_earlier (test_carrier.Negatives.test_each_negative_reaches_its_intended_comparison_and_nothing_ea"
+   ]
+  },
+  {
+   "id": "MC8",
+   "what": "empty effective scope no longer holds",
+   "old": "if not effective:  ",
+   "new": "if False:  ",
+   "killed": true,
+   "tests_run": 17,
+   "failing_tests": [
+    "test_each_negative_reaches_its_intended_comparison_and_nothing_earlier (test_carrier.Negatives.test_each_negative_reaches_its_intended_comparison_and_nothing_ea"
+   ]
+  },
+  {
+   "id": "MC9",
+   "what": "a record for a non-USE row tolerated",
+   "old": "elif not (row[\"selected\"] and row[\"state\"] == \"USE\"):",
+   "new": "elif False:",
+   "killed": true,
+   "tests_run": 17,
+   "failing_tests": [
+    "test_each_negative_reaches_its_intended_comparison_and_nothing_earlier (test_carrier.Negatives.test_each_negative_reaches_its_intended_comparison_and_nothing_ea"
+   ]
+  }
+ ],
+ "unmutated_copy": {
+  "exit": 0,
+  "tests_run": 17,
+  "failing": []
+ },
+ "all_killed": true
+}
