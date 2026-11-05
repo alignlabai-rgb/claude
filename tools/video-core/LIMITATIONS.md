@@ -161,3 +161,16 @@ The test now asserts, for the unbarriered run: more than the bound was read, at 
 only if the child finished and exited on its own. Completed-write / real-exit cases with the full payload use the deterministic barrier (the real child has finished and exited before the termination routine runs), including the
 boundary (limit + 1), shared stdout/stderr bound and describe-text tests, which previously relied on a fast child winning the race. A deterministic still-writing control (20 x 100,000-byte chunks, 0.25 s apart) checks the killed
 partial capture. Linux evidence only; not Windows execution. The tiny-env MP4 recovery was independently confirmed complete by the requester (SHA fa3cce3d…0da4; native ffprobe 192x108/10 frames, decode 0); no resend needed.
+
+## Portable lifecycle harness (test-only; additive to tests/test_lifecycle_orchestrators.py)
+
+`tests/portable_lifecycle.py` + `tests/test_lifecycle_portable.py` run the cancellation / finalization / drain-breach orchestrator scenarios on Windows as well as Linux. Production files and the existing POSIX tests/skips are unchanged.
+What each result rests on (keep these apart):
+
+* **Real:** every child is a tiny Python process started by the real `runner.run_bounded` (own session/process group, real pipes and deadlines, real termination/cleanup); `render` and `avmux.mux` run unmodified (receipts, hashing, inventories, tmp handling).
+* **Mapped tool argv:** the orchestrators receive paths to the existing FAKE ffmpeg/ffprobe scripts; for exactly those registered paths the adapter launches `[sys.executable, -c, driver, script, *args]` (no shebang or suffix assumption, nothing named like an executable that is not one) and passes every keyword to the real runner. Receipts therefore show the driver argv. This is not FFmpeg, not media and not acceptance of production executable-path handling.
+* **Text mode:** children write CRLF by default (emulating Windows text mode on Linux) so the parsers see it on both.
+* **Injected:** cancellation is `_thread.interrupt_main()` (simulated SIGINT for the main thread of the test process; no OS signal, no console event, no other process) or `RunInterrupted` raised at a named boundary (`readback_probe_output` / `inspect`). The existing `os.kill(getpid, SIGINT)` helper is deliberately NOT used: on Windows `os.kill` with a non-console signal terminates the target process.
+* **UNVERIFIED (not attempted):** real SIGTERM/Ctrl-C delivery to a CLI process on Windows (needs a console / process-group privilege); the CLI exit-130 scenarios stay POSIX-only. No liveness probing by pid is used (not portable). A skipped placeholder test records this.
+* Mutation check on Linux: with `raise_if_interrupted` disabled 12 of the 29 tests fail; with `finalize.inventory` disabled 9 fail.
+* Linux does not prove native Windows; the coordinator runs the module there.

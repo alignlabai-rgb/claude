@@ -28,3 +28,7 @@ Kept unchanged: the 59db31e results above. Windows reported (by the requester, 4
 `exit_code None` (Windows: TerminateProcess ⇒ exit code 1, no signal); (2) the fast-exit-flood test assumed `EXITED_ZERO`/no kill on every real scheduling (Windows saw actual exit 0 with `FLOOD_KILLED`),
 and a real provenance defect (`_signal_group` True after a no-op `terminate()`). Both tests are now platform-aware / invariant-based (not skipped), and the provenance is fixed in `runner._request`
 (see LIMITATIONS.md "Termination provenance"). Linux evidence only from this session; the Windows branch is covered with fakes (logic only).
+
+## Portable lifecycle harness (test-only)
+
+`tests/portable_lifecycle.py`, `tests/test_lifecycle_portable.py`: 29 tests, 1 explicit skip (UNVERIFIED real signal delivery), meant to run on Windows and Linux. See LIMITATIONS.md "Portable lifecycle harness" for the real / mapped / injected / unverified split.
