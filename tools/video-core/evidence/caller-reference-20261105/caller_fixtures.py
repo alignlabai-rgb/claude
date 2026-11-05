@@ -19,7 +19,7 @@ def H(label: str) -> str:
 
 PINS = {"manifest_sha256": H("manifest"), "plan_sha256": H("plan"), "receipt_sha256": H("audio-receipt"), "stem_sha256": H("stem"), "video_sha256": H("video")}
 IDENT = {"job_id": "job-001", "work_id": "work-A", "shot_id": "shot-07", "attempt_id": "attempt-0001", "selection_snapshot_ref": "selsnap-A"}
-STEM_BYTES = 44 + 9600 * 2
+STEM_BYTES = 44 + 9600 * 2  # default geometry (mono, 6 frames at 30/1)
 
 DEFAULT_ROWS = (
     {"id": "e1", "state": "USE", "selected": True, "binding": "bind-e1"},
@@ -61,23 +61,43 @@ def world(rows=DEFAULT_ROWS, *, warnings=(), gap_count=0, plan_status=None, plan
         events.append(ev)
     expected = {"snapshot_ref": "owner-snapshot-A", "identity": dict(IDENT), "pins_source": "owner_record", "pins": dict(pins), "rows": exp_rows}
 
-    plan = {"schema": "video_core.audio_plan/1", "timeline": {"total_frames": total_frames, "total_samples": total_samples},
+    gaps = [{"sample_start": total_samples - 100 * (i + 1), "sample_end": total_samples - 100 * i} for i in reversed(range(gap_count))] if gap_count else []
+    covered = total_samples - sum(g["sample_end"] - g["sample_start"] for g in gaps)
+    plan = {"schema": "video_core.audio_plan/1", "timeline": {"fps": {"n": 30, "d": 1, "rational": "30/1"}, "total_frames": total_frames, "total_samples": total_samples},
+            "output": {"file": "stem.wav", "sample_rate": 48000, "channels": 1, "bits": 16, "samples": total_samples, "bytes": 44 + total_samples * 2},
             "policy": {"gap": gap_policy, "overlap": "REJECT", "clipping": "REJECT"}, "scope": [r["id"] for r in rows if r["selected"]], "status": status,
             "hold": [dict(h) for h in hold], "warnings": [dict(w) for w in warnings], "events": events, "unresolved": unresolved,
-            "coverage": {"covered_samples": total_samples, "gap_count": gap_count, "gaps": [], "gaps_truncated": False},
+            "coverage": {"covered_samples": covered, "gap_count": gap_count, "gaps": gaps, "gaps_truncated": False},
             "caller_assertions": "opaque references are caller assertions"}
     plan_stage = {"identity": dict(IDENT), "exit_code": exit_plan,
                   "response": {"mode": "plan", "status": status, "plan_sha256": pins["plan_sha256"], "plan": plan, "observations": {"side_effects": "none"}}}
+    stem_bytes = 44 + total_samples * 2
     audio_receipt = {"schema": "video_core.audio_receipt/1", "status": "MIXED_VERIFIED", "written": True, "stage": "complete", "quality_evaluated": False,
                      "plan_sha256": pins["plan_sha256"], "input": {"manifest_sha256": pins["manifest_sha256"], "inputs_unchanged": True, "assets": []},
                      "warnings": [dict(w) for w in warnings], "unresolved_report": [dict(u) for u in unresolved],
-                     "outputs": [{"name": "stem.wav", "role": "stem", "bytes": STEM_BYTES, "sha256": pins["stem_sha256"], "partial": False},
-                                 {"name": "plan.canonical.json", "role": "plan", "bytes": 100, "sha256": H("plan-file"), "partial": False}],
+                     # the plan output file IS the canonical plan bytes, so its SHA-256 equals plan_sha256 (core: sha256(canonical_json) == plan.sha256)
+                     "outputs": [{"name": "stem.wav", "role": "stem", "bytes": stem_bytes, "sha256": pins["stem_sha256"], "partial": False},
+                                 {"name": "plan.canonical.json", "role": "plan", "bytes": 100, "sha256": pins["plan_sha256"], "partial": False}],
                      "mix": {"samples_written": total_samples, "clipped_samples": 0},
-                     "readback": {"all_ok": True, "wav": {"sample_count": total_samples}, "checks": []}}
-    video_receipt = {"schema": "video_core.receipt/1", "status": "READBACK_MATCH", "written": True, "stage": "complete", "quality_evaluated": False,
-                     "input": {"inputs_unchanged": True}, "outputs": [{"name": "output.mp4", "role": "video", "bytes": 1889, "sha256": pins["video_sha256"], "partial": False}],
-                     "readback": {"comparison": {"all_ok": True, "checks": [{"name": "decoded_frame_count", "expected": total_frames, "observed": str(total_frames), "ok": True}]}}}
+                     "readback": {"wav": {"sample_rate": 48000, "channels": 1, "bits": 16, "sample_count": total_samples, "file_bytes": stem_bytes},
+                                  "checks": [{"name": "channels", "expected": 1, "observed": 1, "ok": True}, {"name": "sample_rate", "expected": 48000, "observed": 48000, "ok": True},
+                                             {"name": "bits", "expected": 16, "observed": 16, "ok": True}, {"name": "sample_count", "expected": total_samples, "observed": total_samples, "ok": True},
+                                             {"name": "file_bytes", "expected": stem_bytes, "observed": stem_bytes, "ok": True}], "all_ok": True}}
+    # video readback: the producer's compare() records these checks; counts' `observed` is the ffprobe string (nb_read_frames), expected the plan's integer
+    vchecks = [{"name": "video_stream_count", "expected": 1, "observed": 1, "ok": True}, {"name": "non_video_stream_count", "expected": 0, "observed": 0, "ok": True},
+               {"name": "width", "expected": 192, "observed": 192, "ok": True}, {"name": "height", "expected": 108, "observed": 108, "ok": True},
+               {"name": "r_frame_rate", "expected": "30/1", "observed": "30/1", "ok": True}, {"name": "avg_frame_rate", "expected": "30/1", "observed": "30/1", "ok": True},
+               {"name": "decoded_frame_count", "expected": total_frames, "observed": str(total_frames), "ok": True},
+               {"name": "container_frame_count", "expected": total_frames, "observed": str(total_frames), "ok": True},
+               {"name": "format_duration", "expected": "0.200000", "observed": "0.200000", "ok": True}, {"name": "video_duration", "expected": "0.200000", "observed": "0.200000", "ok": True},
+               {"name": "codec_name", "expected": "h264", "observed": "h264", "ok": True}, {"name": "pix_fmt", "expected": "yuv420p", "observed": "yuv420p", "ok": True}]
+    video_receipt = {"schema": "video_core.receipt/1", "status": "READBACK_MATCH", "written": True, "stage": "complete", "quality_evaluated": False, "plan_sha256": H("video-plan"),
+                     "input": {"inputs_unchanged": True},
+                     "outputs": [{"name": "output.mp4", "role": "video", "bytes": 1889, "sha256": pins["video_sha256"], "partial": False},
+                                 {"name": "captions.srt", "role": "srt", "bytes": 10, "sha256": H("srt"), "partial": False},
+                                 {"name": "plan.canonical.json", "role": "plan", "bytes": 100, "sha256": H("video-plan"), "partial": False},
+                                 {"name": "ffprobe.json", "role": "ffprobe_json", "bytes": 500, "sha256": H("ffprobe-json"), "partial": False}],
+                     "readback": {"comparison": {"all_ok": True, "checks": vchecks}}}
     observed = {"stages": {
         "audio_plan": plan_stage,
         "audio_receipt": {"identity": dict(IDENT), "exit_code": 0, "receipt_sha256": pins["receipt_sha256"], "response": audio_receipt},

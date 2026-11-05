@@ -1,5 +1,7 @@
 # Caller-admission reference candidate (UNREVIEWED v0) — test-only, not an application
 
+> **Revision 2 (2026-11-05).** Independent validation found ten false READYs in the first version (`508d263`, whose 68 tests all passed). They are reproduced, kept as evidence, and repaired in `validation-2026-11-05/`. This README describes the repaired candidate; `508d263` remains reproducible from git and its `RESULTS.txt` / `default-suite.unchanged.log` are untouched. A passing test count or a mutation-kill count is **not** evidence of completeness; see "What the checks do and do not show".
+
 **Status:** a proposal and its tests. It is **not** an application, binder, executor or production integration; it adopts no schema or profile; nobody has reviewed it; ownership and adoption stay
 with the existing owners. It changes no library file and touches no other branch (no merge, no cherry-pick).
 
@@ -34,6 +36,7 @@ Silence-only has **no exception**: the producer's `NO_AUDIO_EVENTS_SELECTED` war
 
 ## Profile v0 (all values explicit; see `PROFILE_V0_UNREVIEWED`)
 
+**Exactly this value is honoured.** Same `profile_id` / `profile_version` with any changed, extra or malformed policy value is REJECTED (`PROFILE_POLICY_MODIFIED`); a missing field is HOLD; another id or version is REJECTED. A caller cannot treat a warning or drop a required receipt by editing the profile; future profiles are owner decisions with their own ids.
 Required stages and pins (all five); accepted statuses `READY` (plan), `MIXED_VERIFIED` (audio receipt), `READBACK_MATCH` (video receipt); accepted exit codes `[0]`; **no** warning code is treated; silence needs a `decision_ref`; USE rows need an owner binding; required gap policy `REQUIRE_FULL_COVERAGE`; pins must be declared as coming from an `owner_record`; known schemas `video_core.audio_plan/1`, `video_core.audio_receipt/1`, `video_core.receipt/1` (same family, other version → REJECTED; anything else → HOLD).
 
 ## Source-contract ambiguities (stated, not decided)
@@ -49,8 +52,9 @@ Required stages and pins (all five); accepted statuses `READY` (plan), `MIXED_VE
 
 ## Tests
 
-`test_caller_admission.py` — 68 unit / property tests on synthetic public values (positive control; warning-free explicit silence vs warned silence-only; unselected UNKNOWN + valid USE; selected OMIT + valid USE; selected / empty scope; single-field cross-job with identical hashes in every stage; every hash source and the owner pin; missing and incomplete receipts (4 patterns); status vs exit-code contradictions; partial, `all_ok=false`, float / bool counts; 6 malformed shapes; schema / profile handling; determinism, no mutation, no aliasing; static purity; the forgery boundary; and a property test that replaces every leaf of a conforming world with 15 hostile values: never an exception, never the safety-net code, and READY survives only on documented-ignored leaves).
-`mutation_check.py` — 28 single-defect mutants of the function; every one must make the tests fail (28 / 28 killed; two early survivors found two real test gaps, now covered). A real defect was also found by the property test during development (a receipt with a null `plan_sha256` could pass because another source satisfied the pin) and fixed in the candidate.
+`test_caller_admission.py` — 96 unit / property tests (the first version had 68) on synthetic public values (positive control; warning-free explicit silence vs warned silence-only; unselected UNKNOWN + valid USE; selected OMIT + valid USE; selected / empty scope; single-field cross-job with identical hashes in every stage; every hash source and the owner pin; missing and incomplete receipts (4 patterns); status vs exit-code contradictions; partial, `all_ok=false`, float / bool counts; 6 malformed shapes; schema / profile handling; determinism, no mutation, no aliasing; static purity; the forgery boundary; and a property test that replaces every leaf of a conforming world with 15 hostile values: never an exception, never the safety-net code, and READY survives only on documented-ignored leaves).
+`mutation_check.py` — 62 single-defect mutants plus 2 redundant-by-construction rules (shown to be equivalent mutants, reported separately); every counted mutant must make the tests fail. Mutation findings drove tests twice (first version: two survivors; this revision: five survivors).
+Two checks matter more than the kill count: (1) `test_every_leaf_of_the_conforming_world_is_decisive_unless_declared_not_checked` replaces every leaf of a conforming world with 15 hostile values and a different-but-valid value of the same type and requires a non-READY result, except for an **exact allowlist** (each entry tied to an id the result itself lists under `not_checked`; stale entries fail the test) — the first version's permissive substring allowlist is what hid the ten false READYs; (2) the reproduction of the externally reported cases, run against the old and the repaired code.
 
 ```bash
 cd tools/video-core
@@ -58,6 +62,10 @@ python3 -m unittest discover -s evidence/caller-reference-20261105 -p "test_*.py
 python3 evidence/caller-reference-20261105/mutation_check.py
 ```
 
+## What the checks do and do not show
+
+`checked` and `not_checked` are part of every result: a READY lists exactly what was compared and what was deliberately not (producer diagnostics; mixing detail beyond the selected USE row's own field shapes; per-asset hashes; video fps / duration tolerance semantics and `readback.summary`; side-output hashes and the sizes / names of outputs other than the stem; real-file existence; authenticity; timing qualification; the owner label `snapshot_ref`; unknown producer keys). Inputs are bounded JSON-only data (depth 16, 100 000 values, lists / strings 5 000 / 4 096, 64-bit integers, no NaN / infinity / lone surrogates / tuples / cycles); anything else is REJECTED before any interpretation, output is JSON-safe and independent of dict key order, and user-controlled keys are truncated in paths.
+
 ## Not claimed / unresolved
 
-No real file, story, voice or media was used. No integration with any executor exists or is proposed here. Whether the proposed profile, status vocabulary, identity envelope or pin model is right is for the existing owners to decide; this only shows that the comparison logic can be written as a small pure function whose behaviour is pinned by tests. Linux x86_64, Python 3.11 / 3.12 / 3.13 only; author's own checks, not an independent review.
+No real file, story, voice or media was used. No integration with any executor exists or is proposed here. Whether the proposed profile, status vocabulary, identity envelope or pin model is right is for the existing owners to decide; this only shows that the comparison logic can be written as a small pure function whose behaviour is pinned by tests. Remaining limits, stated plainly: the repair closes the ten reported cases and the further holes the exact-leaf test exposed, but completeness is not proven — leaves the fixtures do not contain, producer shapes that differ from the code-derived fixtures (no receipt schema is pinned), and combinations beyond the seeded composition fuzz are untested; video fps / duration semantics and mixing geometry are trusted from the producer; READY remains a statement about supplied values only. Linux x86_64, Python 3.11 / 3.12 / 3.13 only (the first version also passed on native Windows 3.13 per the requester); the author's own checks plus the independent validation that found the defects, not an independent review of this revision.
