@@ -1,0 +1,201 @@
+{
+  "mode": "plan",
+  "observations": {
+    "argv_budget": {
+      "estimated_argv_bytes": 596,
+      "estimated_windows_cmdline_utf16_units": 595,
+      "fits_windows_limit": true,
+      "ill_formed_utf16": false,
+      "windows_hard_limit_utf16_units": 32766,
+      "windows_limit_utf16_units": 32000
+    },
+    "input": {
+      "manifest_bytes": 745,
+      "manifest_sha256": "add442dec43fa73674bce4fd3cf84ce8833b1fdf4d9d28058c3a574ab77c4d23"
+    },
+    "limits": {
+      "inspect_timeout_seconds": 120.0,
+      "max_argv_bytes": 100000,
+      "max_caption_chars": 512,
+      "max_captions": 512,
+      "max_clips": 256,
+      "max_diag_bytes": 16384,
+      "max_dimension": 7680,
+      "max_drain_bytes": 67108864,
+      "max_duration_seconds": 3600,
+      "max_font_bytes": 33554432,
+      "max_fps": 120,
+      "max_frames": 18000,
+      "max_input_bytes": 4194304,
+      "max_output_bytes": 2147483648,
+      "max_pixel_volume": 37324800000,
+      "max_runtime_seconds": 600.0,
+      "max_source_bytes": 4294967296,
+      "max_windows_cmdline_chars": 32000,
+      "probe_timeout_seconds": 30.0
+    },
+    "output": null,
+    "side_effects": "none (no file created, no process launched; ffprobe is NOT run by plan)",
+    "tools_located": {
+      "ffmpeg": {
+        "discovery": "PATH",
+        "path": "/usr/bin/ffmpeg"
+      },
+      "ffprobe": {
+        "discovery": "PATH",
+        "path": "/usr/bin/ffprobe"
+      }
+    }
+  },
+  "plan": {
+    "audio": {
+      "bytes": 96044,
+      "path": "stem.wav",
+      "pcm_sha256": "38354d559113f1ae091d3db92b733fd2ef0f5219c820e6f7bd877581c70dd0c5",
+      "receipt": {
+        "path": "stem.receipt.json",
+        "plan_sha256": "a8963c3eebe6c7e7b89ee0c79c906e6f69a461198a71c6e0aac3efda2945ed18",
+        "sha256": "6adc619daded344ca02411d55478e03bab7a8fc733c61fe19a774f994063779c",
+        "status": "MIXED_VERIFIED"
+      },
+      "sha256": "95c3cb8e5ded7def13238652feeb9945435f6122614f08910d97ec4d6c68241c",
+      "stream_handling": "pcm_s16le copy-through",
+      "verified_from_file": {
+        "bits": 16,
+        "channels": 1,
+        "sample_count": 48000,
+        "sample_rate": 48000
+      }
+    },
+    "container": "mov",
+    "contract": {
+      "id": "MOV_PCM_S16LE:sample_exact_pcm",
+      "requires": [
+        "decoded video frame hashes equal the source's",
+        "copied video packet hashes equal the source's",
+        "decoded audio is byte-identical to the WAV PCM (sha256 and byte count)",
+        "audio stream starts at pts 0",
+        "exactly one video and one audio stream"
+      ],
+      "sample_exact": true
+    },
+    "ffmpeg": {
+      "argv": [
+        "ffmpeg",
+        "-nostdin",
+        "-hide_banner",
+        "-loglevel",
+        "warning",
+        "-nostats",
+        "-n",
+        "-protocol_whitelist",
+        "file",
+        "-f",
+        "mov",
+        "-i",
+        {
+          "asset": "clip.mp4"
+        },
+        "-protocol_whitelist",
+        "file",
+        "-f",
+        "wav",
+        "-i",
+        {
+          "asset": "stem.wav"
+        },
+        "-map",
+        "0:v:0",
+        "-map",
+        "1:a:0",
+        "-c:v",
+        "copy",
+        "-c:a",
+        "pcm_s16le",
+        "-map_metadata",
+        "-1",
+        "-fflags",
+        "+bitexact",
+        "-fs",
+        "2147483648",
+        "-f",
+        "mov",
+        {
+          "run_file": "output.mov.partial"
+        }
+      ],
+      "cwd": "tmp",
+      "output": {
+        "final": "output.mov",
+        "mismatch": "output.mov.mismatch",
+        "partial": "output.mov.partial"
+      }
+    },
+    "outputs": {
+      "media": "output.mov",
+      "output_probe": "ffprobe.output.json",
+      "plan": "plan.canonical.json",
+      "receipt": "receipt.json"
+    },
+    "readiness": "UNVERIFIED: video properties are caller-stated until the explicit --mux preflight measures them with ffprobe",
+    "requirements": {
+      "decoders": [
+        "h264",
+        "pcm_s16le"
+      ],
+      "demuxers": [
+        "mov",
+        "wav"
+      ],
+      "encoders": [
+        "pcm_s16le"
+      ],
+      "muxers": [
+        "framehash",
+        "framemd5",
+        "mov",
+        "s16le"
+      ]
+    },
+    "route": "MOV_PCM_S16LE",
+    "schema": "video_core.avmux_plan/1",
+    "selection": {
+      "note": "selection.ref and every declared value are caller assertions: preserved verbatim, not authenticated, not evidence of creative adoption",
+      "ref": "synthetic-same-job/selection-001"
+    },
+    "timeline": {
+      "audio_duration_seconds": "1/1",
+      "boundary_policy": "audiomix frame_to_sample: floor((2*frame*fps_d*48000 + fps_n)/(2*fps_n))",
+      "expected_audio_samples": 48000,
+      "fps": {
+        "d": 1,
+        "n": 30,
+        "rational": "30/1"
+      },
+      "total_frames": 30,
+      "video_duration_seconds": "1/1"
+    },
+    "verdicts": {
+      "creative_acceptance": "NOT_EVALUATED",
+      "quality_evaluated": false,
+      "technical": "decided only after a mux run (see receipt)"
+    },
+    "video": {
+      "bytes": 2441,
+      "declared": {
+        "codec": "h264",
+        "frames": 30,
+        "height": 90,
+        "start_pts": 0,
+        "width": 160
+      },
+      "demuxer": "mov",
+      "path": "clip.mp4",
+      "properties_basis": "CALLER_STATED_UNVERIFIED",
+      "sha256": "b72a847997937bc7f8f3d81f6c57dd976b3f9f13d8dfc600e41513dc4a61bce2",
+      "stream_handling": "copy (-c:v copy): no re-encode, no frame dropped or rescaled"
+    }
+  },
+  "plan_sha256": "3110a42d8f4c153189e40a49e30ccf005958033b541447d0292788aa612e7e67",
+  "readiness": "UNVERIFIED: video properties are caller-stated until the explicit --mux preflight measures them with ffprobe"
+}
