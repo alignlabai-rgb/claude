@@ -374,6 +374,9 @@ class AudioReceiptContract(TmpCase):
     def stem_out(self, d):
         return next(o for o in d["outputs"] if o["role"] == "stem")
 
+    def plan_out(self, d):
+        return next(o for o in d["outputs"] if o["role"] == "plan")
+
     def test_control_the_genuine_mixer_receipt_qualifies_and_records_only_mechanical_facts(self):
         raw = json.dumps(self.genuine).encode()
         c = self.plan_raw(raw).canonical["audio"]["receipt"]
@@ -479,9 +482,81 @@ class AudioReceiptContract(TmpCase):
             "clipped samples": (self.mod(lambda d: d["mix"].update(clipped_samples=1)), "audio_receipt_inconsistent"),
             "samples_written short": (self.mod(lambda d: d["mix"].update(samples_written=4799)), "audio_receipt_inconsistent"),
             "inputs changed": (self.mod(lambda d: d["input"].update(inputs_unchanged=False)), "audio_receipt_inconsistent"),
+            "plan output partial true": (self.mod(lambda d: self.plan_out(d).update(partial=True)), "audio_receipt_inconsistent"),
+            "plan output partial missing": (self.mod(lambda d: self.plan_out(d).pop("partial")), "audio_receipt_inconsistent"),
+            "plan output bytes string": (self.mod(lambda d: self.plan_out(d).update(bytes="2804")), "audio_receipt_inconsistent"),
+            "plan output bytes zero": (self.mod(lambda d: self.plan_out(d).update(bytes=0)), "audio_receipt_inconsistent"),
+            "wav data_bytes wrong": (self.mod(lambda d: d["readback"]["wav"].update(data_bytes=9598)), "audio_receipt_inconsistent"),
+            "wav data_bytes float": (self.mod(lambda d: d["readback"]["wav"].update(data_bytes=9600.0)), "audio_receipt_inconsistent"),
+            "wav data_offset wrong": (self.mod(lambda d: d["readback"]["wav"].update(data_offset=46)), "audio_receipt_inconsistent"),
+            "first_clipped_sample set": (self.mod(lambda d: d["mix"].update(first_clipped_sample=7)), "audio_receipt_inconsistent"),
         }
         got = {k: self.outcome(raw) for k, (raw, _code) in table.items()}
         self.assertEqual(got, {k: code for k, (_raw, code) in table.items()})
+
+    def test_single_field_mutation_sweep_over_a_producer_receipt_leaves_only_informational_fields_unchecked(self):
+        """Take the receipt the real mixer wrote and, one field at a time, delete it or replace it with each of 13 differently typed values (about 1450
+        mutations, all in-process, microseconds each). Every mutation must be a typed rejection or an acceptance of a field that is informational by design;
+        nothing may leak an untyped exception. The informational allow-list is explicit, so a newly unchecked contract field fails this test."""
+        from video_core.avmux.receipt_check import qualify_audio_receipt
+        informational = ("caller_assertions", "started_utc", "finished_utc", "note", "limits", "platform", "input/assets", "input/manifest_bytes", "input/manifest_sha256",
+                         "mix/chunk_samples", "mix/chunks", "mix/peak_before_clip", "mix/peak_output", "mix/peak_output_per_channel", "mix/wall_seconds",
+                         "mix/work_sample_channels_done", "unresolved_report")
+        plan_index = next(i for i, o in enumerate(self.genuine["outputs"]) if o["role"] == "plan")
+        informational += (f"outputs/{plan_index}/bytes",)  # a plan output only needs to be a positive integer, which a different positive integer still is
+        values = [None, "x", "", 0, 1, -1, 1.0, True, False, [], {}, [1], {"a": 1}]
+        facts = dict(stem_sha256=sha(self.stem), stem_bytes=len(self.stem), samples=4800, channels=1)
+
+        def verdict(rec):
+            try:
+                qualify_audio_receipt(rec, **facts)
+                return "ACCEPTED"
+            except VideoCoreError as exc:
+                return exc.issues[0].code
+
+        def walk(node, path=()):
+            yield path
+            for k, v in (node.items() if isinstance(node, dict) else enumerate(node) if isinstance(node, list) else ()):
+                yield from walk(v, path + (k,))
+
+        self.assertEqual(verdict(self.genuine), "ACCEPTED")
+        unexpected, total = [], 0
+        for path in [p for p in walk(self.genuine) if p]:
+            label = "/".join(map(str, path))
+            for kind in ["delete"] + list(range(len(values))):
+                rec = copy.deepcopy(self.genuine)
+                parent = rec
+                for step in path[:-1]:
+                    parent = parent[step]
+                if kind == "delete":
+                    parent.pop(path[-1]) if isinstance(parent, list) else parent.__delitem__(path[-1])
+                else:
+                    parent[path[-1]] = copy.deepcopy(values[kind])
+                    if parent[path[-1]] == self.genuine_at(path) and type(parent[path[-1]]) is type(self.genuine_at(path)):
+                        continue  # not a mutation
+                total += 1
+                if verdict(rec) == "ACCEPTED" and not any(label == a or label.startswith(a + "/") for a in informational):
+                    unexpected.append((label, kind if kind == "delete" else values[kind]))
+        self.assertGreater(total, 1000)
+        # the one equivalent mutation: first_clipped_sample is null in a verified receipt, so deleting it (reads as null) is the same document
+        unexpected = [u for u in unexpected if u != ("mix/first_clipped_sample", "delete")]
+        self.assertEqual(unexpected, [])
+
+    def genuine_at(self, path):
+        node = self.genuine
+        for step in path:
+            node = node[step]
+        return node
+
+    def test_a_hash_the_caller_supplies_is_byte_integrity_not_authenticity(self):
+        """The manifest pins the receipt by SHA-256 and the receipt pins the stem by SHA-256. A forger who can write the stem can write a matching, fully
+        self-consistent receipt, and it passes: the contract detects accident and inconsistency, not a deliberate fake. Stated here so nobody reads it as trust."""
+        stem2, rec2 = genuine_receipt(self.mkdir("work-forge"), samples=3200)
+        forged = copy.deepcopy(rec2)  # a receipt for a different stem, edited so every claim now points at THIS stem
+        self.assertNotEqual(self.outcome(json.dumps(forged).encode()), "ACCEPTED")
+        forged = copy.deepcopy(self.genuine)
+        forged["started_utc"], forged["platform"] = "1999-01-01T00:00:00Z", {"system": "Nowhere"}  # provenance fields are not authenticated either
+        self.assertEqual(self.outcome(json.dumps(forged).encode()), "ACCEPTED")
 
     def test_every_non_verified_status_is_refused_first(self):
         for status in ("MIXED_WITH_CLAMPING", "CLIPPING_REJECTED", "HOLD", "UNKNOWN", "TIMEOUT", "CANCELLED", "INTERRUPTED", "READBACK_MISMATCH", "IN_PROGRESS", "", None, 1):

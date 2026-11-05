@@ -107,6 +107,8 @@ def qualify_audio_receipt(rec, *, stem_sha256: str, stem_bytes: int, samples: in
     plans = [o for o in outputs if o.get("role") == "plan"]
     if len(plans) != 1 or plans[0].get("name") != PLAN_NAME or plans[0].get("sha256") != plan_sha:
         _fail("audio_receipt_plan_hash", "/outputs/plan", "plan_sha256 must equal the sha256 of the receipt's single plan output (plan.canonical.json)")
+    if plans[0].get("partial") is not False or not _int(plans[0].get("bytes")) or plans[0]["bytes"] <= 0:
+        _fail("audio_receipt_inconsistent", "/outputs/plan", "the plan output must be final (partial == false) with a positive integer byte count")
 
     rb = _obj(rec, "readback", "")
     if rb.get("all_ok") is not True:
@@ -119,6 +121,10 @@ def qualify_audio_receipt(rec, *, stem_sha256: str, stem_bytes: int, samples: in
             _fail("audio_receipt_format_mismatch", f"/readback/wav/{key}", f"receipt's WAV {key} is {_show(wav.get(key))}; the declared stem has {want}")
     if not _int(wav.get("file_bytes")) or wav["file_bytes"] != stem_bytes or wav.get("sha256") != stem_sha256:
         _fail("audio_receipt_stem_mismatch", "/readback/wav", "the receipt's WAV readback (file_bytes / sha256) is not this stem")
+    data_bytes, data_offset = wav.get("data_bytes"), wav.get("data_offset")
+    if not _int(data_bytes) or data_bytes != samples * channels * (BITS // 8) or not _int(data_offset) or data_offset + data_bytes != stem_bytes:
+        _fail("audio_receipt_inconsistent", "/readback/wav", "readback.wav.data_bytes / data_offset must be exact integers that describe this stem "
+              f"({samples} samples x {channels} channel(s) x {BITS // 8} bytes, ending at the last byte of the {stem_bytes}-byte file)")
 
     checks = _list(rb, "checks", "/readback")
     by_name = {}
@@ -137,6 +143,8 @@ def qualify_audio_receipt(rec, *, stem_sha256: str, stem_bytes: int, samples: in
     mix = _obj(rec, "mix", "")
     if not _int(mix.get("clipped_samples")) or mix["clipped_samples"] != 0:
         _fail("audio_receipt_inconsistent", "/mix/clipped_samples", "a MIXED_VERIFIED receipt cannot report clipped samples (that is MIXED_WITH_CLAMPING)")
+    if mix.get("first_clipped_sample") is not None:
+        _fail("audio_receipt_inconsistent", "/mix/first_clipped_sample", "a MIXED_VERIFIED receipt has no clipped sample: first_clipped_sample must be null")
     if not _int(mix.get("samples_written")) or mix["samples_written"] != samples:
         _fail("audio_receipt_inconsistent", "/mix/samples_written", "mix.samples_written must equal the declared sample count")
     if _obj(rec, "input", "").get("inputs_unchanged") is not True:

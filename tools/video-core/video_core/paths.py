@@ -235,8 +235,8 @@ def check_media_for_inspect(path: str) -> tuple[str, str]:
         st = os.lstat(absolute)
     except OSError:
         raise UnsafePath("media does not exist", [Issue("asset_missing", "media", "media file does not exist")]) from None
-    if stat.S_ISLNK(st.st_mode):
-        raise UnsafePath("symlink", [Issue("symlink_rejected", "media", "symlinked media is rejected")])
+    if is_link_like(st):  # same rule as resolve_asset: a symlink OR a Windows reparse point (junction, mount point, other link-like object)
+        raise UnsafePath("symlink", [Issue("symlink_rejected", "media", "symlinked or reparse-point media is rejected")])
     if not stat.S_ISREG(st.st_mode):
         raise UnsafePath("not a regular file", [Issue("not_regular_file", "media", "media is not a regular file")])
     return absolute, PROBE_EXTENSIONS[ext]

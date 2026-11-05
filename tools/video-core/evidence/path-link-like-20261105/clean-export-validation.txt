@@ -1,0 +1,12 @@
+Clean-export validation of the exact staged tree (before the commit that adds this note)
+=======================================================================================
+tree 38e7fcc611bf126b818f2f150e8c4ca6cd37c49c  (git write-tree of the index; `git archive <tree> tools/video-core` into an empty directory, no __pycache__,
+PYTHONDONTWRITEBYTECODE=1, suites run one at a time)
+
+full suite, unchanged discovery (python -m unittest discover -s tests -t .), 598 tests each:
+  python3.13 : OK, 598 run, 589 pass, 9 skipped, 0 fail
+  python3.12 : OK, 598 run, 589 pass, 9 skipped, 0 fail
+  python3.11 : OK, 598 run, 589 pass, 9 skipped, 0 fail
+Failed attempts in this follow-up: none in the suites. During development, the first draft of test_inspect_link_like had one test bug of mine (a full-width "．" is not a
+dot, so "ＡＢＣ．mp4" has no extension); fixed in the test, not in production code. The load-dependent containment-handshake flake recorded in the previous commit's
+evidence did not occur in these three runs; it is not fixed and is not claimed fixed (containment/ belongs to the other session).

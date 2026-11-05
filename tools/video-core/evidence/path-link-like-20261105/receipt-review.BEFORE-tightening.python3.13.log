@@ -1,0 +1,47 @@
+test_a_hash_the_caller_supplies_is_byte_integrity_not_authenticity (tests.test_input_contract.AudioReceiptContract.test_a_hash_the_caller_supplies_is_byte_integrity_not_authenticity)
+The manifest pins the receipt by SHA-256 and the receipt pins the stem by SHA-256. A forger who can write the stem can write a matching, fully ... ok
+test_a_pinned_receipt_is_documented_as_unauthenticated_in_the_plan (tests.test_input_contract.AudioReceiptContract.test_a_pinned_receipt_is_documented_as_unauthenticated_in_the_plan) ... ok
+test_a_plan_without_a_receipt_is_byte_for_byte_what_it_was (tests.test_input_contract.AudioReceiptContract.test_a_plan_without_a_receipt_is_byte_for_byte_what_it_was) ... ok
+test_a_receipt_for_another_stem_is_refused_whatever_else_it_says (tests.test_input_contract.AudioReceiptContract.test_a_receipt_for_another_stem_is_refused_whatever_else_it_says) ... ok
+test_control_the_genuine_mixer_receipt_qualifies_and_records_only_mechanical_facts (tests.test_input_contract.AudioReceiptContract.test_control_the_genuine_mixer_receipt_qualifies_and_records_only_mechanical_facts) ... ok
+test_each_inconsistency_is_refused_with_its_own_code (tests.test_input_contract.AudioReceiptContract.test_each_inconsistency_is_refused_with_its_own_code) ... FAIL
+test_every_non_verified_status_is_refused_first (tests.test_input_contract.AudioReceiptContract.test_every_non_verified_status_is_refused_first) ... ok
+test_malformed_receipt_content_is_a_typed_rejection_never_an_untyped_exception (tests.test_input_contract.AudioReceiptContract.test_malformed_receipt_content_is_a_typed_rejection_never_an_untyped_exception) ... ok
+test_single_field_mutation_sweep_over_a_producer_receipt_leaves_only_informational_fields_unchecked (tests.test_input_contract.AudioReceiptContract.test_single_field_mutation_sweep_over_a_producer_receipt_leaves_only_informational_fields_unchecked)
+Take the receipt the real mixer wrote and, one field at a time, delete it or replace it with each of 13 differently typed values (about 1450 ... FAIL
+test_the_committed_historical_mixer_receipt_also_qualifies_against_its_own_stem_facts (tests.test_input_contract.AudioReceiptContract.test_the_committed_historical_mixer_receipt_also_qualifies_against_its_own_stem_facts)
+A second, independent producer output (evidence/stage-b-audio-stem, written by an earlier run): the contract must not be tuned to one fixture. ... ok
+test_the_rejection_happens_before_any_output_or_process_and_cli_reports_it_structured (tests.test_input_contract.AudioReceiptContract.test_the_rejection_happens_before_any_output_or_process_and_cli_reports_it_structured) ... ok
+test_unreadable_receipts_get_audio_receipt_unreadable (tests.test_input_contract.AudioReceiptContract.test_unreadable_receipts_get_audio_receipt_unreadable) ... ok
+test_warnings_and_unresolved_events_of_the_receipt_are_retained_not_dropped (tests.test_input_contract.AudioReceiptContract.test_warnings_and_unresolved_events_of_the_receipt_are_retained_not_dropped) ... ok
+
+======================================================================
+FAIL: test_each_inconsistency_is_refused_with_its_own_code (tests.test_input_contract.AudioReceiptContract.test_each_inconsistency_is_refused_with_its_own_code)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/claude/tools/video-core/tests/test_input_contract.py", line 495, in test_each_inconsistency_is_refused_with_its_own_code
+    self.assertEqual(got, {k: code for k, (_raw, code) in table.items()})
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'sch[2002 chars]e': 'ACCEPTED', 'plan output partial missing':[234 chars]TED'} != {'sch[2002 chars]e': 'audio_receipt_inconsistent', 'plan output[378 chars]ent'}
+Diff is 2911 characters long. Set self.maxDiff to None to see it.
+
+======================================================================
+FAIL: test_single_field_mutation_sweep_over_a_producer_receipt_leaves_only_informational_fields_unchecked (tests.test_input_contract.AudioReceiptContract.test_single_field_mutation_sweep_over_a_producer_receipt_leaves_only_informational_fields_unchecked)
+Take the receipt the real mixer wrote and, one field at a time, delete it or replace it with each of 13 differently typed values (about 1450
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/claude/tools/video-core/tests/test_input_contract.py", line 543, in test_single_field_mutation_sweep_over_a_producer_receipt_leaves_only_informational_fields_unchecked
+    self.assertEqual(unexpected, [])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [('mix/first_clipped_sample', 'x'), ('mix/[1719 chars] 1})] != []
+
+First list contains 53 additional elements.
+First extra element 0:
+('mix/first_clipped_sample', 'x')
+
+Diff is 1930 characters long. Set self.maxDiff to None to see it.
+
+----------------------------------------------------------------------
+Ran 13 tests in 0.407s
+
+FAILED (failures=2)

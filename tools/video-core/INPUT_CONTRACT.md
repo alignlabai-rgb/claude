@@ -101,6 +101,45 @@ exporter, board or provider pathway. Original specs, schemas, examples and earli
   Non-Python JSON readers may treat lone-surrogate escapes differently (often as U+FFFD); Python's `json` round-trips them exactly.
 * The receipt check does not re-run the mix, does not open the plan the receipt names, and cannot detect a forged but self-consistent receipt (see above).
 * `stderr`, `argparse` usage text and `print()` diagnostics are not routed through `receipt.dumps`; Python's stderr already uses `backslashreplace`.
-* Not touched on purpose (other owners): `paths.check_media_for_inspect` (F-PATH-1, no native reparse-point claim from a stub), `runner.py` F-RUN-1/F-RUN-2,
-  F-INT-1, F-RCPT-1.
+* Not touched on purpose (other owners): `runner.py` F-RUN-1/F-RUN-2, F-INT-1, F-RCPT-1. (`check_media_for_inspect`, F-PATH-1, is addressed in the follow-up below.)
 * Windows, macOS: not run. The new tests are bounded and POSIX-neutral except the raw-byte and fake-tool cases, which skip elsewhere.
+
+## Follow-up (commit after `092b420`): F-PATH-1 and a receipt-qualifier review
+
+### F-PATH-1 — `check_media_for_inspect` link-like rule (status: FIXED at stub level; real Windows UNVERIFIED)
+* **Audit class.** `STATIC_CONCERN_STUB_ONLY`, LOW. `paths.check_media_for_inspect` rejected only `stat.S_ISLNK(st_mode)`, while `resolve_asset` uses
+  `is_link_like(st)` (symlink **or** `FILE_ATTRIBUTE_REPARSE_POINT`). A stubbed `os.lstat` result with a regular-file mode and the reparse attribute passed the
+  read-only inspect check — and, in the unfixed run, `video_core inspect` went on to try to launch ffprobe (the test's no-process guard tripped).
+* **Fix.** One line: `check_media_for_inspect` now calls `is_link_like(st)` on the named file, same predicate and same code (`symlink_rejected`) as `resolve_asset`.
+  Both callers (`video_core inspect`, `avmux reinspect`) refuse before any process or output directory exists. Nothing else changed: protocol, extension,
+  option-like (`-x.mp4`), empty-path and missing-file guards run first on the string/filesystem exactly as before; ordinary regular files — including Japanese and
+  space-containing names — are accepted; no new permission, no new path accepted.
+* **Evidence level — read this.** Every reparse case uses a stat-like stub (`tests/test_inspect_link_like.py`). It shows the code honours the attribute. It does **not**
+  show anything about a real NTFS junction, mount point, OneDrive/cloud placeholder or dedup file. No link was created, no privileged operation or developer-mode
+  change was attempted; the real-platform prerequisite (a Windows machine where an unprivileged junction/reparse file can be made) remains **UNVERIFIED**.
+* **Consequences to know.** Any file carrying a reparse tag is now rejected by `inspect`, as `resolve_asset` already does for sources — conservative, and it includes
+  non-link reparse objects such as cloud-sync placeholders. Only the named file is looked at (as before); symlinked *parent directories* of an inspect target are
+  not walked — unchanged and still open for `inspect` (the asset resolver does walk them).
+
+### Receipt qualifier review (status: four small consistency holes FIXED; the rest verified)
+Method: take the receipt the real mixer wrote and, one field at a time, delete it or replace it with 13 differently typed values (`None`, `"x"`, `""`, `0`, `1`, `-1`,
+`1.0`, `true`, `false`, `[]`, `{}`, `[1]`, `{"a":1}`): 1451 mutations on the plain receipt (1494 with a zero-fill warning), plus byte-level cases (empty, BOM, invalid UTF-8,
+truncated, `NaN`/`Infinity`, duplicate keys, 100000-deep arrays and objects, a 5000-digit integer). No mutation produced an untyped exception.
+Accepted mutations were only informational fields, **except** these genuinely unchecked claims, now rejected (`audio_receipt_inconsistent`):
+`outputs[plan].partial` (any value, including `true`) and `outputs[plan].bytes`; `readback.wav.data_bytes` / `data_offset` (must describe this stem: `samples × channels × 2` bytes
+ending at the file's last byte); `mix.first_clipped_sample` (must be null when nothing clipped). Producer acceptance is unchanged: the receipt written by the real mixer and
+the committed historical `stage-b-audio-stem` receipt still qualify; selected USE / HOLD / OMIT / gap semantics live in the audio planner and were not touched.
+`tests/test_input_contract.py` now contains the sweep with an explicit allow-list of informational fields, so a future unchecked contract field fails the test.
+
+What the qualifier still does not, and cannot, establish:
+* **A caller-supplied hash is byte integrity, not authenticity.** The manifest pins the receipt's bytes; the receipt names the stem's SHA-256. Both prove "these bytes are
+  what the manifest says" and "the receipt is consistent with this stem". Anyone able to write the stem can write a matching receipt, including forged `started_utc` / `platform` /
+  `limits`; those are never authenticated. There is no signature or key, and none was added. The plan records `authentication: NONE …` accordingly.
+* Informational fields (timestamps, platform, limits, note, caller_assertions, input asset list, mix timing/peak statistics, `unresolved_report` entries) are not validated.
+* Deleting or emptying `warnings` (e.g. dropping `ZERO_FILL_APPLIED`) is undetectable from the receipt alone, because the gap facts live in the audio *plan*, which the receipt names only by hash.
+* Unknown extra keys are ignored (forward compatibility).
+
+### Open observation (not changed here)
+`avmux reinspect --original-receipt FILE` parses the optional original receipt with plain `json.loads` and calls `.get` on the result: a file containing `[]` raises an untyped
+`AttributeError` (reproduced; it happens before any output directory is created, so nothing is stranded). It is the same class as F-REC-1 but a different module and command, outside this
+task's scope, so it is **OPEN**.
