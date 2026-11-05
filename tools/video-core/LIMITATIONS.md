@@ -138,3 +138,7 @@ Source: the adversarial audit's confirmed findings (checkpoint `c3d44872…`, fi
   signatures (the request log is thread-local, so a wrapper that does not return the original's value is still truthful). `kill_confirmed` can only be True on POSIX.
 * **Residual:** `accepted` means the OS accepted the request, not that the process died of it; a Windows child that exits 1 by itself cannot be distinguished from a killed one by exit code alone.
 * **Recovery transport:** `evidence/containment-envelope/recovery/` holds create-only ASCII base64 + manifest of the already-authorized 1889-byte tiny-env `output.mp4` (decoded SHA-256 verified); no re-render.
+
+## Test-stub flake (found by the clean export of `b6b049e`)
+
+`ParentHandshakeWithStubWorker.test_every_kind_of_bad_hello_is_refused_and_no_go_is_ever_sent` failed intermittently (also on the parent `f42c2db`: 2 of 8 runs; 25 of 25 pass after the fix). Cause: the stub wrote its deliberately bad `hello.json` ("garbage", "huge") non-atomically, so the parent could poll a half-written 200 KB file and report `hello_unreadable` instead of `hello_too_large`. Test-only defect in the stub (the real worker and handshake writer are atomic); the stub now writes through a temp file + `os.replace`. No runtime change.

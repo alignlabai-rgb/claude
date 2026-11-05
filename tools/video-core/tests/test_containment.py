@@ -386,16 +386,18 @@ STUB = r'''
 import json, os, sys, time
 cfg = json.loads(sys.argv[1]); d = cfg["dir"]; token = cfg["token"]; mode = os.environ_mode if False else "%MODE%"
 here = %HERE%
+def put(text):  # atomic like the real worker: a reader polling for hello.json must never see a half-written file (that made "huge" flaky: unreadable instead of too large)
+    tmp = os.path.join(d, "hello.json.tmp"); open(tmp, "w").write(text); os.replace(tmp, os.path.join(d, "hello.json"))
 def hello(**over):
     h = {"schema": "video_core.containment_hello/1", "token": token, "worker_pid": os.getpid(), "platform": "posix", "requested": cfg["limits"],
          "applied": dict(cfg["limits"]), "unsupported": [], "errors": []}
     h.update(over)
-    tmp = os.path.join(d, "hello.json.tmp"); open(tmp, "w").write(json.dumps(h)); os.replace(tmp, os.path.join(d, "hello.json"))
+    put(json.dumps(h))
 open(os.path.join(here, "mode_%s.dirmode" % oct(os.stat(d).st_mode & 0o777)[2:]), "w").write("x")
 if mode == "silent": time.sleep(30)
 elif mode == "exit": sys.exit(3)
-elif mode == "garbage": open(os.path.join(d, "hello.json"), "w").write("not json{{")
-elif mode == "huge": open(os.path.join(d, "hello.json"), "w").write("{" + " " * 200000 + "}")
+elif mode == "garbage": put("not json{{")
+elif mode == "huge": put("{" + " " * 200000 + "}")
 elif mode == "token": hello(token="wrong")
 elif mode == "echo": hello(requested={"cpu_seconds": 999})
 elif mode == "weaker": hello(applied={k: v * 2 for k, v in cfg["limits"].items()})
