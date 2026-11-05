@@ -367,7 +367,8 @@ class Purity(unittest.TestCase):
         self.assertEqual(json.dumps(a), json.dumps(compare(exp4, obs4)))
 
     def test_no_forbidden_imports_and_no_forbidden_runtime_events(self):
-        src = open(os.path.join(MOD_DIR, "timing_carrier_reference.py"), encoding="utf-8").read()
+        with open(os.path.join(MOD_DIR, "timing_carrier_reference.py"), encoding="utf-8") as fh:
+            src = fh.read()
         imported = {n.names[0].name.split(".")[0] if isinstance(n, ast.Import) else n.module.split(".")[0] for n in ast.walk(ast.parse(src)) if isinstance(n, (ast.Import, ast.ImportFrom))}
         self.assertEqual(imported, {"__future__", "hashlib", "json", "re"})
         names = {n.id for n in ast.walk(ast.parse(src)) if isinstance(n, ast.Name)} | {n.attr for n in ast.walk(ast.parse(src)) if isinstance(n, ast.Attribute)}

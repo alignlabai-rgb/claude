@@ -46,12 +46,22 @@ whether a UNQUALIFIED/UNKNOWN record may carry a real ref (allowed); whether a s
 * No coverage/overlap/gap check and no check that source or timeline boundaries are phrase boundaries; no hashing of media; the owner still re-hashes sources and the library's `REQUIRE_FULL_COVERAGE`/HOLD handling stays separate.
 * Synthetic values only (hex digests `aaaa...`, refs `snap-0001`, `owner-silence-1`); no real story, dialogue, voice, media or user path.
 
+## Counts (derived by running the suite: `count_cases.py`, `results/case-counts-py*.json`; identical on 3.11 / 3.12 / 3.13)
+
+17 test methods. Executed sub-cases: **35** in the negative table (12 expected HOLD + 23 expected REJECTED; this is the only "negative example" count - earlier mentions of 33 were a miscount), **40** malformed-shape cases, **5** profile relaxations under the same id/version,
+**11** structure/limit cases (subclass, cycle, depth, size, wrong container types) - 91 sub-cases in total. `test_missing_and_extra_keys` loops over 11 key mutations without sub-tests (not in the 91), and the fuzz test crosses 14 x 14 odd values. 9 mutants, all killed.
+
 ## Run
 
 ```bash
 cd tools/video-core/evidence/timing-qualification-reference-20261105
-python3 -B -W error::ResourceWarning -m unittest discover -s tests          # 17 tests, ~0.05 s
-python3 -B mutation_controls.py --out /tmp/mutation.json                   # 9 targeted mutants of a COPY; the suite must fail on each
-python3 -B verify_scope.py                                                  # only this directory was added
+python3 -B -W error::ResourceWarning -m unittest discover -s tests -v 2>err.txt; echo "exit $?"; cat err.txt   # exit 0 is NOT proof of "no warning": an unclosed handle is an unraisable ResourceWarning on stderr; read err.txt
+python3 -B mutation_controls.py --out /tmp/mutation.json        # 9 targeted mutants of a COPY; the child suites run with -W always::ResourceWarning and any "Warning" line fails the run
+python3 -B count_cases.py --out /tmp/counts.json                # actual executed sub-case counts
+python3 -B verify_scope.py                                      # only this directory was added
 ```
-Files: `timing_carrier_reference.py`, `tests/test_carrier.py`, `mutation_controls.py`, `verify_scope.py`, `results/`.
+Files: `timing_carrier_reference.py`, `tests/test_carrier.py`, `mutation_controls.py`, `count_cases.py`, `verify_scope.py`, `results/`.
+
+## Results files (kept, never overwritten)
+`results/unittest-py*.txt`, `results/mutation-py*.{json,txt}` = the first run at 1775e9a (their runner had merged and tail-trimmed stderr). `results/prefix-warning-unittest-py*.{stdout,stderr}.txt` = the unclosed-handle `ResourceWarning`
+at `tests/test_carrier.py:370` (`open(...).read()`) reproduced BEFORE the fix, on all three interpreters. `results/*-fixed-py*` and `case-counts-py*.json` = after the fix, with stderr captured separately and empty of warnings.

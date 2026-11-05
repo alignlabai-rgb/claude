@@ -28,37 +28,42 @@ MUTANTS = [
 
 def run_tests(moddir):
     env = dict(os.environ, TCR_MODULE_DIR=moddir, PYTHONDONTWRITEBYTECODE="1")
-    p = subprocess.run([sys.executable, "-B", "-m", "unittest", "discover", "-s", os.path.join(HERE, "tests")], capture_output=True, text=True, env=env, cwd=HERE, timeout=300)
+    p = subprocess.run([sys.executable, "-B", "-W", "always::ResourceWarning", "-m", "unittest", "discover", "-s", os.path.join(HERE, "tests")], capture_output=True, text=True, env=env, cwd=HERE, timeout=300)
     failing = sorted(set(m[:160] for m in re.findall(r"^(?:FAIL|ERROR): (.+)$", p.stdout + p.stderr, re.M)))
     ran = re.search(r"Ran (\d+) tests?", p.stdout + p.stderr)
-    return p.returncode, failing, int(ran.group(1)) if ran else None
+    warn = [ln[:200] for ln in (p.stdout + p.stderr).splitlines() if "Warning" in ln]        # ResourceWarning is shown (-W always) so an unclosed handle in the suite cannot hide
+    return p.returncode, failing, int(ran.group(1)) if ran else None, warn
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", required=True)
     ns = ap.parse_args()
-    src = open(os.path.join(HERE, "timing_carrier_reference.py"), encoding="utf-8").read()
+    with open(os.path.join(HERE, "timing_carrier_reference.py"), encoding="utf-8") as fh:
+        src = fh.read()
     res = {"python": sys.version.split()[0], "mutants": []}
     with tempfile.TemporaryDirectory() as t0:
-        open(os.path.join(t0, "timing_carrier_reference.py"), "w", encoding="utf-8", newline="\n").write(src)
-        code, failing, ran = run_tests(t0)
-        res["unmutated_copy"] = {"exit": code, "tests_run": ran, "failing": failing}
+        with open(os.path.join(t0, "timing_carrier_reference.py"), "w", encoding="utf-8", newline="\n") as fh:
+            fh.write(src)
+        code, failing, ran, warn = run_tests(t0)
+        res["unmutated_copy"] = {"exit": code, "tests_run": ran, "failing": failing, "warning_lines": warn}
     for mid, what, old, new in MUTANTS:
         if src.count(old) != 1:
             res["mutants"].append({"id": mid, "what": what, "error": f"mutation text occurs {src.count(old)} times"})
             continue
         with tempfile.TemporaryDirectory() as t:
-            open(os.path.join(t, "timing_carrier_reference.py"), "w", encoding="utf-8", newline="\n").write(src.replace(old, new))
-            code, failing, ran = run_tests(t)
-        res["mutants"].append({"id": mid, "what": what, "old": old, "new": new, "killed": code != 0, "tests_run": ran, "failing_tests": failing})
+            with open(os.path.join(t, "timing_carrier_reference.py"), "w", encoding="utf-8", newline="\n") as fh:
+                fh.write(src.replace(old, new))
+            code, failing, ran, warn = run_tests(t)
+        res["mutants"].append({"id": mid, "what": what, "old": old, "new": new, "killed": code != 0, "tests_run": ran, "failing_tests": failing, "warning_lines": warn})
     res["all_killed"] = all(m.get("killed") for m in res["mutants"]) and res["unmutated_copy"]["exit"] == 0
+    res["warning_lines_total"] = len(res["unmutated_copy"]["warning_lines"]) + sum(len(m.get("warning_lines", [])) for m in res["mutants"])
     with open(ns.out, "x", encoding="utf-8", newline="\n") as fh:
         fh.write(json.dumps(res, indent=1, ensure_ascii=False) + "\n")
     for m in res["mutants"]:
         print(m["id"], "KILLED" if m.get("killed") else "SURVIVED/ERROR", (len(m["failing_tests"]), "failing test case(s), e.g.", m["failing_tests"][0][:110]) if m.get("failing_tests") else m.get("error"))
-    print("unmutated copy: exit", res["unmutated_copy"]["exit"], "| all killed:", res["all_killed"])
-    return 0 if res["all_killed"] else 1
+    print("unmutated copy: exit", res["unmutated_copy"]["exit"], "| all killed:", res["all_killed"], "| warning lines in all child runs:", res["warning_lines_total"])
+    return 0 if res["all_killed"] and res["warning_lines_total"] == 0 else 1
 
 
 if __name__ == "__main__":
