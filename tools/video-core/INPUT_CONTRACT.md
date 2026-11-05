@@ -198,3 +198,10 @@ What the qualifier still does not, and cannot, establish:
   `authentication` note is unchanged (caller hash = byte integrity). A self-consistent forged receipt for the same media is accepted by design (tested as a documented limit).
 * **Remaining limits.** Native Windows execution of the repaired tests, of `mux()` through the adapter, and of the real runner on Windows are UNVERIFIED by this session; the adapter is not a substitute
   for real ffprobe; symlinked parent directories of the receipt/media paths are not walked; `bytes`/`partial`/`name` of the *other* output roles (`ffprobe_output`, `media_partial`, …) are not examined.
+
+## Follow-up 4: the recurring containment-handshake test failure (test-only; evidence in `evidence/containment-handshake-flake-20261105/`)
+The test failure repeatedly recorded in earlier clean-export notes (`ParentHandshakeWithStubWorker.test_every_kind_of_bad_hello_is_refused_and_no_go_is_ever_sent`, `hello_unreadable` where
+`hello_too_large` was expected) was isolated to the test stub, not to production: the stub's `huge`/`garbage` modes published `hello.json` non-atomically (a visible, still-empty file), while the real
+worker publishes atomically; the parent refused every time (no GO, target never started) and only the refusal reason varied. The stub now uses the worker's temp-file + `os.replace` protocol, torn
+publication is a deliberate deterministic test with an event barrier, and negative controls show the matrix assertions fail if refusal or no-GO detection is lost. No production file changed; nothing
+is OPEN in production; the affected tests are POSIX-only (skipped on Windows), so there is no Windows evidence.

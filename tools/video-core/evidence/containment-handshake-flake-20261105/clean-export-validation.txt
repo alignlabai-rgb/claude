@@ -1,0 +1,16 @@
+Clean-export validation of the exact staged tree (before the commit that adds this note)
+=======================================================================================
+tree 5cfc7515711ac3cfb119b6800ea96b022be84b00  (git write-tree of the index; `git archive <tree> tools/video-core` into an empty directory, no __pycache__,
+PYTHONDONTWRITEBYTECODE=1, one interpreter at a time, nothing else running)
+
+full suite, unchanged discovery (python -m unittest discover -s tests -t .), 622 tests each - every attempt listed, none discarded:
+  python3.13 : run 1 OK - 622 run, 613 pass, 9 skipped, 0 fail
+  python3.12 : run 1 OK - 622 run, 613 pass, 9 skipped, 0 fail
+  python3.11 : run 1 OK - 622 run, 613 pass, 9 skipped, 0 fail
+Previous commit ddd405b: 620 / 611 / 9 / 0. New here: +2 tests (torn-hello test, negative-control test).
+Working-tree full suites (full-suite.AFTER.python*.log): the same 622 / 613 / 9 / 0 on each interpreter, one run each.
+
+Earlier failed attempts (the reason for this commit) are kept verbatim in failed-attempts-as-recorded/: 4 failures of the same test in clean exports of 092b420's and ddd405b's trees. They are NOT closed by a
+green clean export alone: closure rests on (a) the isolated mechanism (non-atomic stub publication; diagnosis.* files), (b) the before/after repeated matrix in matrix/ (before: 20 failures / 360 runs, all
+the identical assertion; after: 0 / 600 including 300 under 4 busy loops) and (c) the deterministic torn-hello test plus negative controls.
+Limit: the affected tests are POSIX-only and skipped on Windows; a green clean export on Linux says nothing about Windows.

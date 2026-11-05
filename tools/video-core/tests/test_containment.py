@@ -384,16 +384,39 @@ STUB = r'''
 import json, os, sys, time
 cfg = json.loads(sys.argv[1]); d = cfg["dir"]; token = cfg["token"]; mode = os.environ_mode if False else "%MODE%"
 here = %HERE%
-def hello(**over):
+hello_path = os.path.join(d, "hello.json")
+def hello_text(**over):
     h = {"schema": "video_core.containment_hello/1", "token": token, "worker_pid": os.getpid(), "platform": "posix", "requested": cfg["limits"],
          "applied": dict(cfg["limits"]), "unsupported": [], "errors": []}
     h.update(over)
-    tmp = os.path.join(d, "hello.json.tmp"); open(tmp, "w").write(json.dumps(h)); os.replace(tmp, os.path.join(d, "hello.json"))
+    return json.dumps(h)
+def publish(text):
+    # SAME PROTOCOL AS THE REAL WORKER (_worker.write_atomic): write a temp file, then os.replace, so a reader never sees a torn hello.json.
+    # (Until this was done for 'garbage' and 'huge' too, those two modes did open(hello_path, "w").write(...): the file existed EMPTY for a moment and the
+    # parent's single read could get 0 bytes -> hello_unreadable where hello_too_large was expected. See evidence/containment-handshake-flake-20261105/.)
+    tmp = os.path.join(d, "hello.json.tmp"); open(tmp, "w").write(text); os.replace(tmp, hello_path)
+def hello(**over):
+    publish(hello_text(**over))
+def hold_until_parent_decides(limit=5.0):
+    # test-owned barrier for the TORN modes: stay in the torn state until the parent has acted (it writes `abort` on refusal, `go` on acceptance). Event driven, not a sleep
+    # guess; `limit` only bounds a broken run.
+    end = time.monotonic() + limit
+    while time.monotonic() < end and not (os.path.exists(os.path.join(d, "go")) or os.path.exists(os.path.join(d, "abort"))):
+        time.sleep(0.005)
+def torn(first, rest):
+    # make a hello.json that is VISIBLE ATOMICALLY but INCOMPLETE (exactly `first`), hold it there until the parent has decided, then complete it in place
+    publish(first)
+    hold_until_parent_decides()
+    with open(hello_path, "a") as fh:
+        fh.write(rest)
 open(os.path.join(here, "mode_%s.dirmode" % oct(os.stat(d).st_mode & 0o777)[2:]), "w").write("x")
 if mode == "silent": time.sleep(30)
 elif mode == "exit": sys.exit(3)
-elif mode == "garbage": open(os.path.join(d, "hello.json"), "w").write("not json{{")
-elif mode == "huge": open(os.path.join(d, "hello.json"), "w").write("{" + " " * 200000 + "}")
+elif mode == "garbage": publish("not json{{")
+elif mode == "huge": publish("{" + " " * 200000 + "}")
+elif mode == "torn_empty": torn("", hello_text())
+elif mode == "torn_partial": torn(hello_text()[:40], hello_text()[40:])
+elif mode == "torn_huge": torn("{" + " " * 70000, "}")
 elif mode == "token": hello(token="wrong")
 elif mode == "echo": hello(requested={"cpu_seconds": 999})
 elif mode == "weaker": hello(applied={k: v * 2 for k, v in cfg["limits"].items()})
@@ -430,6 +453,7 @@ class ParentHandshakeWithStubWorker(TmpCase):
             return r, time.monotonic() - t0
 
     def assert_refused(self, r, reason):
+        self.assertIsNotNone(r.containment["refusal"], f"no refusal was recorded (outcome {r.outcome}, go_sent {r.containment['go_sent']}); expected {reason}")
         self.assertEqual((r.outcome, r.containment["refusal"]["reason"], r.containment["go_sent"], r.containment["target_may_have_started"]), (runner.CONTAINMENT_REFUSED, reason, False, False))
         self.assertFalse(os.path.exists(os.path.join(self.tmp, "target-ran")))
         self.assertFalse(os.path.exists(os.path.join(self.tmp, "saw_go")), "the worker never saw a go signal")
@@ -456,6 +480,49 @@ class ParentHandshakeWithStubWorker(TmpCase):
             r, _ = self.go(mode)
             self.assert_refused(r, reason)
             self.assertTrue(r.containment["refusal"]["detail"] or reason in ("hello_unreadable", "hello_too_large"), mode)
+
+    def test_a_torn_hello_is_refused_fail_closed_with_the_reason_of_what_was_visible_and_a_late_valid_one_gets_no_go(self):
+        """The parent reads hello.json ONCE, as soon as it exists. The real worker publishes atomically, so a torn file is outside the protocol - but a worker (or stub) that
+        publishes non-atomically must still be refused, fail closed, with no GO and no target start, whatever it completes later. Deterministic: the stub holds the torn state
+        (atomically visible, exactly `first`) until the parent has acted, then completes the file with a hello that would have been VALID. This is the exact response the old
+        flaky 'huge' fixture sometimes produced (0 bytes read -> hello_unreadable) - now pinned as the intended outcome instead of a race."""
+        for mode, reason in (("torn_empty", "hello_unreadable"), ("torn_partial", "hello_unreadable"), ("torn_huge", "hello_too_large")):
+            for f in ("target-ran", "saw_go", "saw_abort"):
+                try:
+                    os.remove(os.path.join(self.tmp, f))
+                except OSError:
+                    pass
+            with self.subTest(mode):
+                r, took = self.go(mode)
+                self.assert_refused(r, reason)
+                self.assertFalse(r.containment["go_sent"], "a hello that completes after the refusal never earns a GO")
+                self.assertLess(took, 5, "refused promptly: the parent did not wait for the torn file to be completed")
+
+    def test_the_matrix_assertions_have_teeth_a_parent_that_loses_refusal_or_no_go_detection_fails_them(self):
+        """NEGATIVE CONTROLS. The production symbols are mutated only inside this test (mock.patch, restored on exit; no production file is touched). Each mutation models a real
+        loss of detection, and the very assertions the matrix uses must then FAIL - so the matrix cannot pass vacuously or because refusals were hidden by a loose expectation."""
+        def mutated_fails(mode, reason, patch):
+            for f in ("target-ran", "saw_go", "saw_abort"):
+                try:
+                    os.remove(os.path.join(self.tmp, f))
+                except OSError:
+                    pass
+            with patch:
+                r, _ = self.go(mode)
+            with self.assertRaises(AssertionError):
+                self.assert_refused(r, reason)
+            return r
+
+        # 1. identity/limits verification lost: a wrong-token hello is accepted -> GO is sent (and the stub sees it)
+        r = mutated_fails("token", "limits_not_applied", mock.patch.object(contained, "validate_hello", lambda hello, token, requested: (True, "")))
+        self.assertTrue(r.containment["go_sent"])
+        self.assertTrue(os.path.exists(os.path.join(self.tmp, "saw_go")))
+        # 2. the hello size bound lost: an oversized hello is no longer 'hello_too_large' (it is judged on content instead) -> the expected reason is not reported
+        r = mutated_fails("huge", "hello_too_large", mock.patch.object(contained, "MAX_HELLO_BYTES", 10 ** 8))
+        self.assertNotEqual(r.containment["refusal"]["reason"], "hello_too_large")
+        # 3. weaker-limit verification lost: a hello that applies LOOSER limits than requested is accepted -> GO
+        r = mutated_fails("weaker", "limits_not_applied", mock.patch.object(contained, "validate_hello", lambda hello, token, requested: (True, "")))
+        self.assertTrue(r.containment["go_sent"])
 
     def test_the_handshake_directory_is_private(self):
         self.go("ok", cpu_seconds=5)
