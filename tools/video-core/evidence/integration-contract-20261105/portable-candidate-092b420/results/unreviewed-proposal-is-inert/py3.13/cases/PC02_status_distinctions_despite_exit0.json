@@ -1,0 +1,265 @@
+{
+  "case": "PC02_status_distinctions_despite_exit0",
+  "checks": [
+    {
+      "expected": [
+        0,
+        "READY",
+        []
+      ],
+      "key": "PC02_status_distinctions_despite_exit0::audio plan READY is exit 0 / READY / no warnings",
+      "layer": "LIBRARY_ENFORCED",
+      "name": "audio plan READY is exit 0 / READY / no warnings",
+      "observed": [
+        0,
+        "READY",
+        []
+      ],
+      "outcome": "PASS"
+    },
+    {
+      "expected": [
+        5,
+        "HOLD"
+      ],
+      "key": "PC02_status_distinctions_despite_exit0::audio plan with a selected UNKNOWN is exit 5 / HOLD",
+      "layer": "LIBRARY_ENFORCED",
+      "name": "audio plan with a selected UNKNOWN is exit 5 / HOLD",
+      "observed": [
+        5,
+        "HOLD"
+      ],
+      "outcome": "PASS"
+    },
+    {
+      "expected": [
+        1,
+        [
+          "unknown_field"
+        ],
+        false
+      ],
+      "key": "PC02_status_distinctions_despite_exit0::audio plan with an unknown manifest field is exit 1 and a structured rejection",
+      "layer": "LIBRARY_ENFORCED",
+      "name": "audio plan with an unknown manifest field is exit 1 and a structured rejection",
+      "observed": [
+        1,
+        [
+          "unknown_field"
+        ],
+        false
+      ],
+      "outcome": "PASS"
+    },
+    {
+      "expected": [
+        0,
+        "HOLD",
+        "dry_run"
+      ],
+      "gap": "GAP-08",
+      "intended_contract_hint": "a non-ready dry-run should be distinguishable without parsing the payload",
+      "key": "PC02_status_distinctions_despite_exit0::mix dry-run of a HOLD plan exits 0 while the payload says HOLD",
+      "layer": "LIBRARY_PERMISSIVE",
+      "name": "mix dry-run of a HOLD plan exits 0 while the payload says HOLD",
+      "observed": [
+        0,
+        "HOLD",
+        "dry_run"
+      ],
+      "outcome": "OBSERVED_OPEN_GAP"
+    },
+    {
+      "expected": [
+        0,
+        [
+          "SELECTED_UNRESOLVED"
+        ]
+      ],
+      "gap": "GAP-08",
+      "intended_contract_hint": "validate should surface that the plan would be HOLD in its status/exit",
+      "key": "PC02_status_distinctions_despite_exit0::audio validate with hold_if_planned exits 0",
+      "layer": "LIBRARY_PERMISSIVE",
+      "name": "audio validate with hold_if_planned exits 0",
+      "observed": [
+        0,
+        [
+          "SELECTED_UNRESOLVED"
+        ]
+      ],
+      "outcome": "OBSERVED_OPEN_GAP"
+    },
+    {
+      "expected": [
+        0,
+        "READY",
+        [
+          "ZERO_FILL_APPLIED"
+        ]
+      ],
+      "gap": "GAP-09/08",
+      "intended_contract_hint": "absent audio converted to zeros should not be READY without an explicit decision",
+      "key": "PC02_status_distinctions_despite_exit0::READY with a zero-fill warning exits 0",
+      "layer": "LIBRARY_PERMISSIVE",
+      "name": "READY with a zero-fill warning exits 0",
+      "observed": [
+        0,
+        "READY",
+        [
+          "ZERO_FILL_APPLIED"
+        ]
+      ],
+      "outcome": "OBSERVED_OPEN_GAP"
+    },
+    {
+      "expected": [
+        0,
+        true
+      ],
+      "gap": "GAP-08",
+      "intended_contract_hint": "an unverified plan should not look like a verified one by exit code",
+      "key": "PC02_status_distinctions_despite_exit0::avmux plan exits 0 and says UNVERIFIED",
+      "layer": "LIBRARY_PERMISSIVE",
+      "name": "avmux plan exits 0 and says UNVERIFIED",
+      "observed": {
+        "__observation_error__": "KeyError: 'readiness'"
+      },
+      "outcome": "REVIEW_REQUIRED",
+      "why": "observed behaviour differs from the pinned OPEN GAP; not adopted automatically"
+    },
+    {
+      "expected": [
+        1,
+        true,
+        true
+      ],
+      "gap": "GAP-14",
+      "intended_contract_hint": "a structured audio_receipt_* rejection instead of a crash",
+      "key": "PC02_status_distinctions_despite_exit0::avmux plan with a mis-shaped receipt: exit 1, empty stdout, uncaught AttributeError",
+      "layer": "LIBRARY_PERMISSIVE",
+      "name": "avmux plan with a mis-shaped receipt: exit 1, empty stdout, uncaught AttributeError",
+      "observed": [
+        1,
+        false,
+        false
+      ],
+      "outcome": "REVIEW_REQUIRED",
+      "why": "observed behaviour differs from the pinned OPEN GAP; not adopted automatically"
+    },
+    {
+      "expected": {
+        "av_plan": "UNVERIFIED",
+        "av_unstructured": "REJECTED_UNSTRUCTURED",
+        "dry_hold": "HOLD",
+        "hold": "HOLD",
+        "ready": "READY",
+        "reject": "REJECTED",
+        "val_hold": "HOLD_IF_PLANNED",
+        "zero_fill": "READY_WITH_WARNINGS"
+      },
+      "key": "PC02_status_distinctions_despite_exit0::owner-side reading of each outcome",
+      "layer": "CALLER_GUARD_DEMO",
+      "name": "owner-side reading of each outcome",
+      "observed": {
+        "av_plan": "REJECTED",
+        "av_unstructured": "REJECTED",
+        "dry_hold": "HOLD",
+        "hold": "HOLD",
+        "ready": "READY",
+        "reject": "REJECTED",
+        "val_hold": "HOLD_IF_PLANNED",
+        "zero_fill": "READY_WITH_WARNINGS"
+      },
+      "outcome": "GUARD_MISMATCH"
+    },
+    {
+      "expected": [
+        "HOLD",
+        "HOLD_IF_PLANNED",
+        "READY",
+        "READY_WITH_WARNINGS",
+        "UNVERIFIED"
+      ],
+      "key": "PC02_status_distinctions_despite_exit0::exit code 0 alone covers five distinct readings (so it cannot be the signal)",
+      "layer": "CALLER_GUARD_DEMO",
+      "name": "exit code 0 alone covers five distinct readings (so it cannot be the signal)",
+      "observed": [
+        "HOLD",
+        "HOLD_IF_PLANNED",
+        "READY",
+        "READY_WITH_WARNINGS"
+      ],
+      "outcome": "GUARD_MISMATCH"
+    }
+  ],
+  "elapsed_seconds": 0.956,
+  "gaps": [
+    "GAP-08",
+    "GAP-09/08",
+    "GAP-14"
+  ],
+  "invocations": [
+    {
+      "denied_attempts": 0,
+      "exit_code": 0,
+      "label": "audio plan READY",
+      "no": 14,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 5,
+      "label": "audio plan HOLD",
+      "no": 15,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 0,
+      "label": "audio mix dry-run of the HOLD manifest",
+      "no": 16,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 0,
+      "label": "audio validate of the HOLD manifest",
+      "no": 17,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 0,
+      "label": "audio plan READY with zero-fill warning",
+      "no": 18,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 1,
+      "label": "audio plan REJECTED (unknown field)",
+      "no": 19,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 1,
+      "label": "avmux plan",
+      "no": 20,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 1,
+      "label": "avmux plan with a mis-shaped receipt",
+      "no": 21,
+      "status": "OK"
+    }
+  ],
+  "source_refs": [
+    "video_core/audiomix/cli.py:_cmd_mix",
+    "video_core/avmux/plan.py:prepare_plan"
+  ],
+  "status": "FAIL",
+  "title": "READY / HOLD / UNVERIFIED / REJECTED / REJECTED_UNSTRUCTURED are separable only from the payload; exit 0 covers five of them"
+}

@@ -1,0 +1,19 @@
+portable contract harness portable-contract-harness/1 on Python 3.13.18 (linux)
+library pin: PINNED_EXACT (package and all files byte-identical to the pin)
+cases: {"FAIL": 1, "PASS": 16, "PASS_WITH_REVIEWED_CHANGES": 1}  children=310  wall=35.6s  exit=1
+check outcomes: {"CONTROL_OK": 39, "GUARD_MISMATCH": 1, "GUARD_OK": 5, "OBSERVED_OPEN_GAP": 11, "PASS": 59, "REVIEWED_CHANGE": 6, "SKIPPED": 1}
+layers: {"CALLER_GUARD_DEMO": {"GUARD_MISMATCH": 1, "GUARD_OK": 5}, "HARNESS_CONTROL": {"CONTROL_OK": 39}, "LIBRARY_ENFORCED": {"PASS": 59, "REVIEWED_CHANGE": 1}, "LIBRARY_PERMISSIVE": {"OBSERVED_OPEN_GAP": 11, "REVIEWED_CHANGE": 5}, "SKIPPED": {"SKIPPED": 1}}
+mutation MU1_hold_to_ready: DETECTED (1 failing checks)
+mutation MU2_omitted_zero_fill_warning: DETECTED (3 failing checks)
+mutation MU3_wrong_boundary_rounding: DETECTED (3 failing checks)
+mutation MU4_attempted_external_launch: DETECTED (2 failing checks)
+mutation MU5_plan_creates_output_directory: DETECTED (3 failing checks)
+mutation MU7_gap_closed_receipt_required: NOT_APPLICABLE - the pattern occurs 0 times in this source (needs exactly 1): the mutation cannot be applied to this candidate
+mutation MU6_srt_crlf: DETECTED (3 failing checks)
+CASE PC02_status_distinctions_despite_exit0: FAIL
+   GUARD_MISMATCH: owner-side reading of each outcome
+      expected={"ready": "READY", "hold": "HOLD", "dry_hold": "HOLD", "val_hold": "HOLD_IF_PLANNED", "zero_fill": "READY_WITH_WARNINGS", "reject": "REJECTED", "av_plan": "UNVERIFIED", "av_unstructured": "REJECTED_UNSTRUCTURED"}
+      observed={"ready": "READY", "hold": "HOLD", "dry_hold": "HOLD", "val_hold": "HOLD_IF_PLANNED", "zero_fill": "READY_WITH_WARNINGS", "reject": "REJECTED", "av_plan": "UNVERIFIED", "av_unstructured": "REJECTED"}
+CASE PC08_receipts_malformed_and_shallow: PASS_WITH_REVIEWED_CHANGES
+FINDINGS: FAIL: at least one case failed
+REVIEW: none

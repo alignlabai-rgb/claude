@@ -1,0 +1,173 @@
+{
+  "case": "PC06_srt_and_utf8_bytes",
+  "checks": [
+    {
+      "expected": [
+        0,
+        "c7b5d13d9e1dbc124edf0ae24668db1e954b80cee9118326d6907dd7308384a8",
+        255
+      ],
+      "key": "PC06_srt_and_utf8_bytes::SRT bytes equal the independently assembled oracle (sha256 + length)",
+      "layer": "LIBRARY_ENFORCED",
+      "name": "SRT bytes equal the independently assembled oracle (sha256 + length)",
+      "observed": [
+        0,
+        "c7b5d13d9e1dbc124edf0ae24668db1e954b80cee9118326d6907dd7308384a8",
+        255
+      ],
+      "outcome": "PASS"
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true,
+        true
+      ],
+      "key": "PC06_srt_and_utf8_bytes::no BOM, no CR byte, ends with one LF, valid UTF-8",
+      "layer": "LIBRARY_ENFORCED",
+      "name": "no BOM, no CR byte, ends with one LF, valid UTF-8",
+      "observed": [
+        false,
+        false,
+        true,
+        true
+      ],
+      "outcome": "PASS"
+    },
+    {
+      "expected": [
+        "00:00:01,001",
+        "00:00:02,002"
+      ],
+      "key": "PC06_srt_and_utf8_bytes::cue times: [0,30) -> 00:00:00,000 --> 00:00:01,001 ; end of [45,60) -> 00:00:02,002 (round-half-up of the exact rational)",
+      "layer": "LIBRARY_ENFORCED",
+      "name": "cue times: [0,30) -> 00:00:00,000 --> 00:00:01,001 ; end of [45,60) -> 00:00:02,002 (round-half-up of the exact rational)",
+      "observed": [
+        "00:00:01,001",
+        "00:00:02,002"
+      ],
+      "outcome": "PASS"
+    },
+    {
+      "expected": [
+        "後 Japanese テスト",
+        "ASCII: \"quote\" \\ back % --> arrow",
+        "emoji 🎬 é (NFD) é (NFC)\n二行目 line two",
+        "tie second 同時"
+      ],
+      "key": "PC06_srt_and_utf8_bytes::plan keeps caption text exactly as given (no Unicode normalisation, no escaping)",
+      "layer": "LIBRARY_ENFORCED",
+      "name": "plan keeps caption text exactly as given (no Unicode normalisation, no escaping)",
+      "observed": [
+        "後 Japanese テスト",
+        "ASCII: \"quote\" \\ back % --> arrow",
+        "emoji 🎬 é (NFD) é (NFC)\n二行目 line two",
+        "tie second 同時"
+      ],
+      "outcome": "PASS"
+    },
+    {
+      "expected": [
+        "c7b5d13d9e1dbc124edf0ae24668db1e954b80cee9118326d6907dd7308384a8",
+        255
+      ],
+      "key": "PC06_srt_and_utf8_bytes::plan SRT section hashes the same bytes",
+      "layer": "LIBRARY_ENFORCED",
+      "name": "plan SRT section hashes the same bytes",
+      "observed": [
+        "c7b5d13d9e1dbc124edf0ae24668db1e954b80cee9118326d6907dd7308384a8",
+        255
+      ],
+      "outcome": "PASS"
+    },
+    {
+      "expected": [
+        "1001/1000",
+        "0/1",
+        "3003/2000",
+        "0/1"
+      ],
+      "key": "PC06_srt_and_utf8_bytes::plan cue seconds are exact rationals (no float)",
+      "layer": "LIBRARY_ENFORCED",
+      "name": "plan cue seconds are exact rationals (no float)",
+      "observed": [
+        "1001/1000",
+        "0/1",
+        "3003/2000",
+        "0/1"
+      ],
+      "outcome": "PASS"
+    },
+    {
+      "expected": [
+        1,
+        [
+          "text_blank_line"
+        ]
+      ],
+      "key": "PC06_srt_and_utf8_bytes::a blank line (which would end an SRT cue) is rejected",
+      "layer": "LIBRARY_ENFORCED",
+      "name": "a blank line (which would end an SRT cue) is rejected",
+      "observed": [
+        1,
+        [
+          "text_blank_line"
+        ]
+      ],
+      "outcome": "PASS"
+    },
+    {
+      "expected": [
+        "401ac89079cc60d4f7a158eeba9b6c1e57edb664a3322c8d00c2de4ac6a01440",
+        "e16670605dc78395cc66a4f53ff31372fbe03f47cbf5c81fc6f07f680fcc21a1"
+      ],
+      "key": "PC06_srt_and_utf8_bytes::the original spec's example episode (pinned sha256) exports the spec's published SRT (pinned sha256)",
+      "layer": "LIBRARY_ENFORCED",
+      "name": "the original spec's example episode (pinned sha256) exports the spec's published SRT (pinned sha256)",
+      "observed": [
+        "401ac89079cc60d4f7a158eeba9b6c1e57edb664a3322c8d00c2de4ac6a01440",
+        "e16670605dc78395cc66a4f53ff31372fbe03f47cbf5c81fc6f07f680fcc21a1"
+      ],
+      "outcome": "PASS"
+    }
+  ],
+  "elapsed_seconds": 0.389,
+  "gaps": [],
+  "invocations": [
+    {
+      "denied_attempts": 0,
+      "exit_code": 0,
+      "label": "video srt",
+      "no": 96,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 0,
+      "label": "video plan (caption text)",
+      "no": 97,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 1,
+      "label": "video srt with a blank line in a cue",
+      "no": 98,
+      "status": "OK"
+    },
+    {
+      "denied_attempts": 0,
+      "exit_code": 0,
+      "label": "video srt of the original spec example",
+      "no": 99,
+      "status": "OK"
+    }
+  ],
+  "source_refs": [
+    "video_core/srt.py:export_srt",
+    "video_core/timebase.py:frame_to_srt"
+  ],
+  "status": "PASS",
+  "title": "SRT cue times from exact rationals, ordering, LF-only bytes and valid UTF-8 text (incl. non-BMP, combining marks, '-->') preserved byte for byte"
+}

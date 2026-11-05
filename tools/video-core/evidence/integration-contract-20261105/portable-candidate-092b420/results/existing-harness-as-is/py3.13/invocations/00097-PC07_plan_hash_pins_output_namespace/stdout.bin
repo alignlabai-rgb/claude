@@ -1,0 +1,218 @@
+{
+  "mode": "plan",
+  "observations": {
+    "argv_budget": {
+      "basis": "estimate: known roots/tool path, else 260 characters each; render re-checks the real argv",
+      "estimated_argv_bytes": 1389,
+      "estimated_windows_cmdline_utf16_units": 1388,
+      "fits_windows_limit": true,
+      "ill_formed_utf16": false,
+      "windows_hard_limit_utf16_units": 32766,
+      "windows_limit_utf16_units": 32000
+    },
+    "assets": [
+      {
+        "bytes": 168,
+        "path": "clip_a.mp4"
+      }
+    ],
+    "input": {
+      "episode_bytes": 507,
+      "episode_sha256": "3a3ff296f6e2c3863872800707670e057eacd359de1e6b291604ed19d1947377"
+    },
+    "limits": {
+      "inspect_timeout_seconds": 120.0,
+      "max_argv_bytes": 100000,
+      "max_caption_chars": 512,
+      "max_captions": 512,
+      "max_clips": 256,
+      "max_diag_bytes": 16384,
+      "max_dimension": 7680,
+      "max_drain_bytes": 67108864,
+      "max_duration_seconds": 3600,
+      "max_font_bytes": 33554432,
+      "max_fps": 120,
+      "max_frames": 18000,
+      "max_input_bytes": 4194304,
+      "max_output_bytes": 2147483648,
+      "max_pixel_volume": 37324800000,
+      "max_runtime_seconds": 600.0,
+      "max_source_bytes": 4294967296,
+      "max_windows_cmdline_chars": 32000,
+      "probe_timeout_seconds": 30.0
+    },
+    "output": {
+      "fresh": true,
+      "name": "n1",
+      "root": "<WORLD>/out"
+    },
+    "side_effects": "none (no files created, no process launched by plan)",
+    "tools_located": {
+      "ffmpeg": {
+        "discovery": "PATH",
+        "path": null
+      },
+      "ffprobe": {
+        "discovery": "PATH",
+        "path": null
+      }
+    }
+  },
+  "plan": {
+    "burn_in": null,
+    "captions": [],
+    "clips": [
+      {
+        "duration_frames": 2,
+        "end_frame": 2,
+        "end_seconds": "1001/15000",
+        "id": "clip_a",
+        "source": {
+          "demuxer": "mov",
+          "kind": "file",
+          "media": "video",
+          "path": "clip_a.mp4"
+        },
+        "start_frame": 0,
+        "start_seconds": "0/1"
+      },
+      {
+        "duration_frames": 1,
+        "end_frame": 3,
+        "end_seconds": "1001/10000",
+        "id": "clip_b",
+        "source": {
+          "kind": "color",
+          "value": "#30506a"
+        },
+        "start_frame": 2,
+        "start_seconds": "1001/15000"
+      }
+    ],
+    "episode": {
+      "canvas": {
+        "height": 180,
+        "width": 320
+      },
+      "duration_seconds": "1001/10000",
+      "fps": {
+        "d": 1001,
+        "n": 30000,
+        "rational": "30000/1001"
+      },
+      "total_frames": 3
+    },
+    "expected_readback": {
+      "codec": "h264",
+      "duration_seconds": "1001/10000",
+      "fps": "30000/1001",
+      "frames": 3,
+      "height": 180,
+      "pix_fmt": "yuv420p",
+      "streams": "1 video, 0 other",
+      "width": 320
+    },
+    "ffmpeg": {
+      "argv": [
+        "ffmpeg",
+        "-nostdin",
+        "-hide_banner",
+        "-loglevel",
+        "warning",
+        "-nostats",
+        "-n",
+        "-protocol_whitelist",
+        "file",
+        "-f",
+        "mov",
+        "-i",
+        {
+          "asset": "clip_a.mp4"
+        },
+        "-filter_complex",
+        "[0:v:0]fps=fps=30000/1001,trim=end_frame=2,setpts=PTS-STARTPTS,scale=320:180:force_original_aspect_ratio=decrease:force_divisible_by=2:out_color_matrix=bt709:out_range=tv,pad=320:180:(ow-iw)/2:(oh-ih)/2:color=black,setsar=1,format=yuv420p[v0];color=c=0x30506a:s=320x180:r=30000/1001,trim=end_frame=1,setpts=PTS-STARTPTS,scale=out_color_matrix=bt709:out_range=tv,setsar=1,format=yuv420p[v1];[v0][v1]concat=n=2:v=1:a=0[vout]",
+        "-map",
+        "[vout]",
+        "-an",
+        "-sn",
+        "-dn",
+        "-c:v",
+        "libx264",
+        "-preset",
+        "medium",
+        "-crf",
+        "18",
+        "-pix_fmt",
+        "yuv420p",
+        "-fps_mode",
+        "cfr",
+        "-r",
+        "30000/1001",
+        "-frames:v",
+        "3",
+        "-colorspace",
+        "bt709",
+        "-color_primaries",
+        "bt709",
+        "-color_trc",
+        "bt709",
+        "-color_range",
+        "tv",
+        "-map_metadata",
+        "-1",
+        "-fflags",
+        "+bitexact",
+        "-flags:v",
+        "+bitexact",
+        "-movflags",
+        "+faststart",
+        "-fs",
+        "2147483648",
+        "-f",
+        "mp4",
+        {
+          "run_file": "output.mp4.partial"
+        }
+      ],
+      "cwd": "tmp",
+      "output": {
+        "final": "output.mp4",
+        "partial": "output.mp4.partial"
+      }
+    },
+    "outputs": {
+      "ffprobe": "ffprobe.json",
+      "plan": "plan.canonical.json",
+      "receipt": "receipt.json",
+      "srt": "captions.srt",
+      "video": "output.mp4"
+    },
+    "requirements": {
+      "demuxers": [
+        "mov"
+      ],
+      "encoders": [
+        "libx264"
+      ],
+      "filters": [
+        "color",
+        "concat",
+        "format",
+        "fps",
+        "pad",
+        "scale",
+        "setpts",
+        "setsar",
+        "trim"
+      ]
+    },
+    "schema": "video_core.plan/1",
+    "srt": {
+      "bytes": 0,
+      "end_is_exclusive": true,
+      "file": "captions.srt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "plan_sha256": "f340e28734649c6deb0058f5ac75d48820c0d61aa76d202d437ba9478c065871"
+}

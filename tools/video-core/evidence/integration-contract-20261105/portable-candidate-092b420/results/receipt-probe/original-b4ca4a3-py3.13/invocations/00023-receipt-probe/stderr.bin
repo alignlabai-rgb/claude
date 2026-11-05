@@ -1,0 +1,25 @@
+Traceback (most recent call last):
+  File "<REPO>/tools/video-core/evidence/integration-contract-20261105/portable/child_runner.py", line 238, in <module>
+    main()
+    ~~~~^^
+  File "<REPO>/tools/video-core/evidence/integration-contract-20261105/portable/child_runner.py", line 209, in main
+    runpy.run_module(job["module"], run_name="__main__", alter_sys=True)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen runpy>", line 231, in run_module
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File "<LIBRARY>/video_core/avmux/__main__.py", line 6, in <module>
+    sys.exit(main())
+             ~~~~^^
+  File "<LIBRARY>/video_core/avmux/cli.py", line 138, in main
+    return {"validate": _cmd_validate, "plan": _cmd_plan, "mux": _cmd_mux}[ns.cmd](ns, limits)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "<LIBRARY>/video_core/avmux/cli.py", line 98, in _cmd_plan
+    p = prepare_plan(_read(ns.manifest, limits.max_input_bytes), output_root=ns.output_root, output_name=ns.output_name, **_kw(ns, limits))
+  File "<LIBRARY>/video_core/avmux/plan.py", line 146, in prepare_plan
+    receipt = _check_audio_receipt(m, asset_root, limits) if m.receipt_path else None
+              ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "<LIBRARY>/video_core/avmux/plan.py", line 110, in _check_audio_receipt
+    count = (rec.get("readback") or {}).get("wav", {}).get("sample_count")
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'get'

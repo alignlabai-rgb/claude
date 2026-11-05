@@ -1,0 +1,331 @@
+{
+  "description": "Proposed changed expectations for input-contract candidate 092b420, derived from one harness run. The harness reads only `reviewed_expectations`, which is EMPTY here.",
+  "how_to_review": "A human reads CANDIDATE_REVIEW.md and the cited invocation output, then moves chosen entries into `reviewed_expectations` as {\"observed\": <value>, \"reviewed_by_ref\": \"<who/when>\", \"note\": \"...\"} in a NEW file and re-runs with --profile.",
+  "mode": "forgery_control",
+  "not_resolvable_by_profile": [
+    {
+      "key": "MS07_reviewed_profile_end_to_end::reviewed-profile end-to-end",
+      "layer": "SKIPPED",
+      "outcome": "SKIPPED",
+      "why_a_profile_cannot_resolve_it": "not applicable to this source (reason recorded in the case file)"
+    },
+    {
+      "key": "PC02_status_distinctions_despite_exit0::owner-side reading of each outcome",
+      "layer": "CALLER_GUARD_DEMO",
+      "outcome": "GUARD_MISMATCH",
+      "why_a_profile_cannot_resolve_it": "caller-guard demos are never rescued or failed by reviewed expectations; the guard's expected reading belongs to the harness and needs a human-reviewed harness revision"
+    }
+  ],
+  "profile_version": 1,
+  "proposed_expectations": {
+    "PC02_status_distinctions_despite_exit0::avmux plan with a mis-shaped receipt: exit 1, empty stdout, uncaught AttributeError": {
+      "explanation": "Receipt read with the strict loader, then `qualify_audio_receipt`: \"typed, never AttributeError\" - structured rejection, JSON on stdout.",
+      "finding": "F-REC-1",
+      "gap": "GAP-14",
+      "kind": "intended_change",
+      "layer": "LIBRARY_PERMISSIVE",
+      "observed_on_candidate": [
+        1,
+        false,
+        false
+      ],
+      "outcome_today": "REVIEW_REQUIRED",
+      "pinned_original_expectation": [
+        1,
+        true,
+        true
+      ],
+      "review_status": "UNREVIEWED"
+    },
+    "PC08_receipts_malformed_and_shallow::a hand-written three-field receipt is accepted": {
+      "explanation": "\"the old tests' three-field receipt no longer qualifies (that IS F-REC-2)\": rejected with audio_receipt_schema (see probe S2). The harness observation records only that no plan exists.",
+      "finding": "F-REC-2",
+      "gap": "GAP-04",
+      "kind": "intended_change",
+      "layer": "LIBRARY_PERMISSIVE",
+      "observed_on_candidate": {
+        "__observation_error__": "KeyError: 'plan'"
+      },
+      "outcome_today": "REVIEW_REQUIRED",
+      "pinned_original_expectation": [
+        0,
+        "MIXED_VERIFIED",
+        null
+      ],
+      "review_status": "UNREVIEWED"
+    },
+    "PC08_receipts_malformed_and_shallow::a receipt contradicting its own status (inputs_unchanged false, all_ok false, written false) is accepted": {
+      "explanation": "written/stage/flags are checked: rejected with audio_receipt_inconsistent (see probe S3). The harness observation records only that no plan exists.",
+      "finding": "F-REC-2",
+      "gap": "GAP-04",
+      "kind": "intended_change",
+      "layer": "LIBRARY_PERMISSIVE",
+      "observed_on_candidate": {
+        "__observation_error__": "KeyError: 'plan'"
+      },
+      "outcome_today": "REVIEW_REQUIRED",
+      "pinned_original_expectation": [
+        0,
+        "MIXED_VERIFIED"
+      ],
+      "review_status": "UNREVIEWED"
+    },
+    "PC08_receipts_malformed_and_shallow::eight mis-shaped (valid JSON) receipts: exit 1, empty stdout, uncaught AttributeError, no issue code": {
+      "explanation": "`[]`, `null`, `\"x\"`, `1` -> audio_receipt_shape; objects lacking the producer's `schema` -> audio_receipt_schema (schema is checked right after status). No AttributeError any more.",
+      "finding": "F-REC-1",
+      "gap": "GAP-14",
+      "kind": "intended_change",
+      "layer": "LIBRARY_PERMISSIVE",
+      "observed_on_candidate": {
+        "array": [
+          1,
+          false,
+          false,
+          [
+            "audio_receipt_shape"
+          ]
+        ],
+        "null": [
+          1,
+          false,
+          false,
+          [
+            "audio_receipt_shape"
+          ]
+        ],
+        "number": [
+          1,
+          false,
+          false,
+          [
+            "audio_receipt_shape"
+          ]
+        ],
+        "outputs_is_string": [
+          1,
+          false,
+          false,
+          [
+            "audio_receipt_schema"
+          ]
+        ],
+        "outputs_list_of_strings": [
+          1,
+          false,
+          false,
+          [
+            "audio_receipt_schema"
+          ]
+        ],
+        "readback_is_string": [
+          1,
+          false,
+          false,
+          [
+            "audio_receipt_schema"
+          ]
+        ],
+        "string": [
+          1,
+          false,
+          false,
+          [
+            "audio_receipt_shape"
+          ]
+        ],
+        "wav_is_string": [
+          1,
+          false,
+          false,
+          [
+            "audio_receipt_schema"
+          ]
+        ]
+      },
+      "outcome_today": "REVIEW_REQUIRED",
+      "pinned_original_expectation": {
+        "array": [
+          1,
+          true,
+          true,
+          []
+        ],
+        "null": [
+          1,
+          true,
+          true,
+          []
+        ],
+        "number": [
+          1,
+          true,
+          true,
+          []
+        ],
+        "outputs_is_string": [
+          1,
+          true,
+          true,
+          []
+        ],
+        "outputs_list_of_strings": [
+          1,
+          true,
+          true,
+          []
+        ],
+        "readback_is_string": [
+          1,
+          true,
+          true,
+          []
+        ],
+        "string": [
+          1,
+          true,
+          true,
+          []
+        ],
+        "wav_is_string": [
+          1,
+          true,
+          true,
+          []
+        ]
+      },
+      "review_status": "UNREVIEWED"
+    },
+    "PC08_receipts_malformed_and_shallow::structurally wrong receipts that the library does read are refused with specific codes": {
+      "explanation": "More checks and a fixed order (status, schema, flags, plan hash, outputs, readback, counters): the same malformed input now fails at an earlier check than the old 'sample_count' rule.",
+      "finding": "F-REC-2",
+      "kind": "intended_change",
+      "layer": "LIBRARY_ENFORCED",
+      "observed_on_candidate": {
+        "no_outputs": [
+          1,
+          [
+            "audio_receipt_stem_mismatch"
+          ]
+        ],
+        "not_json": [
+          1,
+          [
+            "audio_receipt_unreadable"
+          ]
+        ],
+        "other_stem_sha": [
+          1,
+          [
+            "audio_receipt_stem_mismatch"
+          ]
+        ],
+        "partial_only": [
+          1,
+          [
+            "audio_receipt_stem_mismatch"
+          ]
+        ],
+        "readback_absent": [
+          1,
+          [
+            "audio_receipt_shape"
+          ]
+        ],
+        "sample_count_wrong": [
+          1,
+          [
+            "audio_receipt_inconsistent"
+          ]
+        ],
+        "two_stems": [
+          1,
+          [
+            "audio_receipt_stem_mismatch"
+          ]
+        ]
+      },
+      "outcome_today": "FAIL",
+      "pinned_original_expectation": {
+        "no_outputs": [
+          1,
+          [
+            "audio_receipt_stem_mismatch"
+          ]
+        ],
+        "not_json": [
+          1,
+          [
+            "audio_receipt_unreadable"
+          ]
+        ],
+        "other_stem_sha": [
+          1,
+          [
+            "audio_receipt_stem_mismatch"
+          ]
+        ],
+        "partial_only": [
+          1,
+          [
+            "audio_receipt_stem_mismatch"
+          ]
+        ],
+        "readback_absent": [
+          1,
+          [
+            "audio_receipt_sample_mismatch"
+          ]
+        ],
+        "sample_count_wrong": [
+          1,
+          [
+            "audio_receipt_sample_mismatch"
+          ]
+        ],
+        "two_stems": [
+          1,
+          [
+            "audio_receipt_stem_mismatch"
+          ]
+        ]
+      },
+      "review_status": "UNREVIEWED"
+    },
+    "PC08_receipts_malformed_and_shallow::the plan keeps only path/plan_sha256/sha256/status of the receipt - warnings and the unresolved report are dropped": {
+      "explanation": "\"Warnings are retained\": a qualifying receipt's plan entry now carries warnings, warnings_total, unresolved_events, mechanical_checks, authentication. This harness check feeds a CONTRADICTING receipt, which is rejected, so it cannot observe the retention; probe F2 does.",
+      "finding": "F-REC-1/2",
+      "gap": "GAP-05",
+      "kind": "intended_change",
+      "layer": "LIBRARY_PERMISSIVE",
+      "observed_on_candidate": {
+        "__observation_error__": "KeyError: 'plan'"
+      },
+      "outcome_today": "REVIEW_REQUIRED",
+      "pinned_original_expectation": [
+        "path",
+        "plan_sha256",
+        "sha256",
+        "status"
+      ],
+      "review_status": "UNREVIEWED"
+    }
+  },
+  "review_status": "UNREVIEWED_PROPOSAL - NOT A REVIEW, NOT PRODUCTION ADOPTION",
+  "reviewed_expectations": {},
+  "source_pin": {
+    "all_digest_eol": "d113fb5e836e94335b56066ce67eaec82330696579191f741f67f93b504b5081",
+    "all_digest_raw": "d113fb5e836e94335b56066ce67eaec82330696579191f741f67f93b504b5081",
+    "candidate_base": "f42c2db15e89d332a25cd2b305d9291539bb65e0",
+    "candidate_branch": "codex/video-core-input-contract-20261105",
+    "candidate_commit": "092b4200b11346753686579e37af2ff2bc9bbca8",
+    "computed_from": "git archive 092b420 tools/video-core (no working-tree files)",
+    "digest_definition": "sha256 over sorted lines 'posix-relative-path<TAB>file-sha256<LF>'; package = files under video_core/; all = every file not excluded",
+    "excluded": [
+      "evidence"
+    ],
+    "file_count": 103,
+    "package_digest_eol": "2de4d9f2ec7a52cf95ff2a5d3d0b3e53debc00ac7a89f0d0c7e7696a099f1ba9",
+    "package_digest_raw": "2de4d9f2ec7a52cf95ff2a5d3d0b3e53debc00ac7a89f0d0c7e7696a099f1ba9",
+    "package_file_count": 41
+  }
+}

@@ -1,0 +1,1 @@
+Raw bounded stdout/stderr/status of 163 invocations (groups ['contract', 'mechanism']); other groups of this run omitted for size - their outcomes are in run.json/cases. Container paths are redacted (see ../../REDACTIONS.json).

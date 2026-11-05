@@ -1,0 +1,803 @@
+{
+  "acceptance_by_class": {
+    "FABRICATED_STUB": {
+      "accepted": 0,
+      "crashed": 0,
+      "rejected": 3
+    },
+    "GENUINE": {
+      "accepted": 1,
+      "crashed": 0,
+      "rejected": 1
+    },
+    "MALFORMED": {
+      "accepted": 0,
+      "crashed": 0,
+      "rejected": 8
+    },
+    "NO_RECEIPT": {
+      "accepted": 1,
+      "crashed": 0,
+      "rejected": 0
+    },
+    "SELF_CONSISTENT_FORGERY": {
+      "accepted": 2,
+      "crashed": 0,
+      "rejected": 0
+    },
+    "TAMPERED_GENUINE": {
+      "accepted": 0,
+      "crashed": 0,
+      "rejected": 7
+    }
+  },
+  "children_started": 41,
+  "deny_controls": "PASS",
+  "genuine_receipt_found_and_pinned": true,
+  "genuine_receipt_pinned_sha256_lf": "f87030ea130a55805a400454b48c00fa7d88ab7ceb3313ff36a10df1a37c1711",
+  "genuine_stem_reproduced_hash_identical": true,
+  "library_pin": {
+    "all_digest_raw": "d113fb5e836e94335b56066ce67eaec82330696579191f741f67f93b504b5081",
+    "package_digest_raw": "2de4d9f2ec7a52cf95ff2a5d3d0b3e53debc00ac7a89f0d0c7e7696a099f1ba9"
+  },
+  "outcomes": {
+    "OBSERVED_OPEN_GAP": 2,
+    "PASS": 21
+  },
+  "probe": "receipt classes (supplementary, plan-only)",
+  "role": "candidate",
+  "rows": [
+    {
+      "description": "committed genuine receipt + stem proven hash-identical to the genuine stem",
+      "expected": {
+        "accepted": true,
+        "authentication_note_present": true,
+        "mechanical_checks": "PASSED",
+        "warnings_in_plan": []
+      },
+      "full_observation": {
+        "accepted": true,
+        "authentication_note_present": true,
+        "child_status": "OK",
+        "codes": [],
+        "denied_attempts": 0,
+        "exit": 0,
+        "mechanical_checks": "PASSED",
+        "plan_receipt_keys": [
+          "authentication",
+          "mechanical_checks",
+          "path",
+          "plan_sha256",
+          "schema",
+          "sha256",
+          "status",
+          "unresolved_events",
+          "warnings",
+          "warnings_total",
+          "warnings_truncated"
+        ],
+        "unresolved_events_in_plan": 1,
+        "unstructured_crash": false,
+        "warnings_in_plan": []
+      },
+      "id": "G1",
+      "layer": "LIBRARY_ENFORCED",
+      "observed": {
+        "accepted": true,
+        "authentication_note_present": true,
+        "mechanical_checks": "PASSED",
+        "warnings_in_plan": []
+      },
+      "outcome": "PASS",
+      "receipt_class": "GENUINE"
+    },
+    {
+      "description": "the genuine receipt presented for a DIFFERENT stem (hash binding)",
+      "expected": {
+        "accepted": false,
+        "codes": [
+          "audio_receipt_stem_mismatch"
+        ],
+        "unstructured_crash": false
+      },
+      "full_observation": {
+        "accepted": false,
+        "child_status": "OK",
+        "codes": [
+          "audio_receipt_stem_mismatch"
+        ],
+        "denied_attempts": 0,
+        "exit": 1,
+        "unstructured_crash": false
+      },
+      "id": "G2",
+      "layer": "LIBRARY_ENFORCED",
+      "observed": {
+        "accepted": false,
+        "codes": [
+          "audio_receipt_stem_mismatch"
+        ],
+        "unstructured_crash": false
+      },
+      "outcome": "PASS",
+      "receipt_class": "GENUINE"
+    },
+    {
+      "description": "genuine receipt with one field edited (all_ok_false), manifest re-pinned to the edited bytes",
+      "expected": {
+        "accepted": false,
+        "codes": [
+          "audio_receipt_inconsistent"
+        ],
+        "unstructured_crash": false
+      },
+      "full_observation": {
+        "accepted": false,
+        "child_status": "OK",
+        "codes": [
+          "audio_receipt_inconsistent"
+        ],
+        "denied_attempts": 0,
+        "exit": 1,
+        "unstructured_crash": false
+      },
+      "id": "A1",
+      "layer": "LIBRARY_ENFORCED",
+      "observed": {
+        "accepted": false,
+        "codes": [
+          "audio_receipt_inconsistent"
+        ],
+        "unstructured_crash": false
+      },
+      "outcome": "PASS",
+      "receipt_class": "TAMPERED_GENUINE"
+    },
+    {
+      "description": "genuine receipt with one field edited (stem_partial_true), manifest re-pinned to the edited bytes",
+      "expected": {
+        "accepted": false,
+        "codes": [
+          "audio_receipt_inconsistent"
+        ],
+        "unstructured_crash": false
+      },
+      "full_observation": {
+        "accepted": false,
+        "child_status": "OK",
+        "codes": [
+          "audio_receipt_inconsistent"
+        ],
+        "denied_attempts": 0,
+        "exit": 1,
+        "unstructured_crash": false
+      },
+      "id": "A2",
+      "layer": "LIBRARY_ENFORCED",
+      "observed": {
+        "accepted": false,
+        "codes": [
+          "audio_receipt_inconsistent"
+        ],
+        "unstructured_crash": false
+      },
+      "outcome": "PASS",
+      "receipt_class": "TAMPERED_GENUINE"
+    },
+    {
+      "description": "genuine receipt with one field edited (sample_count_float), manifest re-pinned to the edited bytes",
+      "expected": {
+        "accepted": false,
+        "codes": [
+          "audio_receipt_sample_mismatch"
+        ],
+        "unstructured_crash": false
+      },
+      "full_observation": {
+        "accepted": false,
+        "child_status": "OK",
+        "codes": [
+          "audio_receipt_sample_mismatch"
+        ],
+        "denied_attempts": 0,
+        "exit": 1,
+        "unstructured_crash": false
+      },
+      "id": "A3",
+      "layer": "LIBRARY_ENFORCED",
+      "observed": {
+        "accepted": false,
+        "codes": [
+          "audio_receipt_sample_mismatch"
+        ],
+        "unstructured_crash": false
+      },
+      "outcome": "PASS",
+      "receipt_class": "TAMPERED_GENUINE"
+    },
+    {
+      "description": "genuine receipt with one field edited (inputs_unchanged_false), manifest re-pinned to the edited bytes",
+      "expected": {
+        "accepted": false,
+        "codes": [
+          "audio_receipt_inconsistent"
+        ],
+        "unstructured_crash": false
+      },
+      "full_observation": {
+        "accepted": false,
+        "child_status": "OK",
+        "codes": [
+          "audio_receipt_inconsistent"
+        ],
+        "denied_attempts": 0,
+        "exit": 1,
+        "unstructured_crash": false
+      },
+      "id": "A4",
+      "layer": "LIBRARY_ENFORCED",
+      "observed": {
+        "accepted": false,
+        "codes": [
+          "audio_receipt_inconsistent"
+        ],
+        "unstructured_crash": false
+      },
+      "outcome": "PASS",
+      "receipt_class": "TAMPERED_GENUINE"
+    },
+    {
+      "description": "genuine receipt with one field edited (quality_evaluated_true), manifest re-pinned to the edited bytes",
+      "expected": {
+        "accepted": false,
+        "codes": [
+          "audio_receipt_inconsistent"
+        ],
+        "unstructured_crash": false
+      },
+      "full_observation": {
+        "accepted": false,
+        "child_status": "OK",
+        "codes": [
+          "audio_receipt_inconsistent"
+        ],
+        "denied_attempts": 0,
+        "exit": 1,
+        "unstructured_crash": false
+      },
+      "id": "A5",
+      "layer": "LIBRARY_ENFORCED",
+      "observed": {
+        "accepted": false,
+        "codes": [
+          "audio_receipt_inconsistent"
+        ],
+        "unstructured_crash": false
+      },
+      "outcome": "PASS",
+      "receipt_class": "TAMPERED_GENUINE"
+    },
+    {
+      "description": "duplicate key: first status UNKNOWN, last status MIXED_VERIFIED ('last wins' in a lenient parser)",
+      "expected": {
+        "accepted": false,
+        "codes": [
+          "audio_receipt_unreadable"
+        ],
+        "unstructured_crash": false
+      },
+      "full_observation": {
+        "accepted": false,
+        "child_status": "OK",
+        "codes": [
+          "audio_receipt_unreadable"
+        ],
+        "denied_attempts": 0,
+        "exit": 1,
+        "unstructured_crash": false
+      },
+      "id": "D1",
+      "layer": "LIBRARY_ENFORCED",
+      "observed": {
+        "accepted": false,
+        "codes": [
+          "audio_receipt_unreadable"
+        ],
+        "unstructured_crash": false
+      },
+      "outcome": "PASS",
+      "receipt_class": "TAMPERED_GENUINE"
+    },
+    {
+      "description": "a NaN literal inside the receipt",
+      "expected": {
+        "accepted": false,
+        "codes": [
+          "audio_receipt_unreadable"
+        ],
+        "unstructured_crash": false
+      },
+      "full_observation": {
+        "accepted": false,
+        "child_status": "OK",
+        "codes": [
+          "audio_receipt_unreadable"
+        ],
+        "denied_attempts": 0,
+        "exit": 1,
+        "unstructured_crash": false
+      },
+      "id": "N1",
+      "layer": "LIBRARY_ENFORCED",
+      "observed": {
+        "accepted": false,
+        "codes": [
+          "audio_receipt_unreadable"
+        ],
+        "unstructured_crash": false
+      },
+      "outcome": "PASS",
+      "receipt_class": "TAMPERED_GENUINE"
+    },
+    {
+      "description": "receipt omitted from the manifest (genuine stem)",
+      "expected": {
+        "accepted": true,
+        "plan_receipt_keys": null
+      },
+      "full_observation": {
+        "accepted": true,
+        "child_status": "OK",
+        "codes": [],
+        "denied_attempts": 0,
+        "exit": 0,
+        "plan_receipt_keys": null,
+        "unstructured_crash": false
+      },
+      "id": "O1",
+      "layer": "LIBRARY_PERMISSIVE",
+      "observed": {
+        "accepted": true,
+        "plan_receipt_keys": null
+      },
+      "outcome": "OBSERVED_OPEN_GAP",
+      "receipt_class": "NO_RECEIPT"
+    },
+    {
+      "description": "the closed harness's shape-faithful stub (no plan output, empty checks, no mix block)",
+      "expected": {
+        "accepted": false,
+        "codes": [
+          "audio_receipt_plan_hash"
+        ],
+        "unstructured_crash": false
+      },
+      "full_observation": {
+        "accepted": false,
+        "child_status": "OK",
+        "codes": [
+          "audio_receipt_plan_hash"
+        ],
+        "denied_attempts": 0,
+        "exit": 1,
+        "unstructured_crash": false
+      },
+      "id": "S1",
+      "layer": "LIBRARY_ENFORCED",
+      "observed": {
+        "accepted": false,
+        "codes": [
+          "audio_receipt_plan_hash"
+        ],
+        "unstructured_crash": false
+      },
+      "outcome": "PASS",
+      "receipt_class": "FABRICATED_STUB"
+    },
+    {
+      "description": "three-field hand-written receipt (status, stem sha256, sample count)",
+      "expected": {
+        "accepted": false,
+        "codes": [
+          "audio_receipt_schema"
+        ],
+        "unstructured_crash": false
+      },
+      "full_observation": {
+        "accepted": false,
+        "child_status": "OK",
+        "codes": [
+          "audio_receipt_schema"
+        ],
+        "denied_attempts": 0,
+        "exit": 1,
+        "unstructured_crash": false
+      },
+      "id": "S2",
+      "layer": "LIBRARY_ENFORCED",
+      "observed": {
+        "accepted": false,
+        "codes": [
+          "audio_receipt_schema"
+        ],
+        "unstructured_crash": false
+      },
+      "outcome": "PASS",
+      "receipt_class": "FABRICATED_STUB"
+    },
+    {
+      "description": "stub contradicting its own status (written false, inputs_unchanged false, all_ok false)",
+      "expected": {
+        "accepted": false,
+        "codes": [
+          "audio_receipt_inconsistent"
+        ],
+        "unstructured_crash": false
+      },
+      "full_observation": {
+        "accepted": false,
+        "child_status": "OK",
+        "codes": [
+          "audio_receipt_inconsistent"
+        ],
+        "denied_attempts": 0,
+        "exit": 1,
+        "unstructured_crash": false
+      },
+      "id": "S3",
+      "layer": "LIBRARY_ENFORCED",
+      "observed": {
+        "accepted": false,
+        "codes": [
+          "audio_receipt_inconsistent"
+        ],
+        "unstructured_crash": false
+      },
+      "outcome": "PASS",
+      "receipt_class": "FABRICATED_STUB"
+    },
+    {
+      "description": "hand-made receipt satisfying every mechanical check for the 4805-sample stem",
+      "expected": {
+        "accepted": true,
+        "authentication_note_present": true,
+        "mechanical_checks": "PASSED"
+      },
+      "full_observation": {
+        "accepted": true,
+        "authentication_note_present": true,
+        "child_status": "OK",
+        "codes": [],
+        "denied_attempts": 0,
+        "exit": 0,
+        "mechanical_checks": "PASSED",
+        "plan_receipt_keys": [
+          "authentication",
+          "mechanical_checks",
+          "path",
+          "plan_sha256",
+          "schema",
+          "sha256",
+          "status",
+          "unresolved_events",
+          "warnings",
+          "warnings_total",
+          "warnings_truncated"
+        ],
+        "unresolved_events_in_plan": 0,
+        "unstructured_crash": false,
+        "warnings_in_plan": []
+      },
+      "id": "F1",
+      "layer": "LIBRARY_PERMISSIVE",
+      "observed": {
+        "accepted": true,
+        "authentication_note_present": true,
+        "mechanical_checks": "PASSED"
+      },
+      "outcome": "OBSERVED_OPEN_GAP",
+      "receipt_class": "SELF_CONSISTENT_FORGERY"
+    },
+    {
+      "description": "forgery carrying two warnings and one unresolved event: does the plan keep them?",
+      "expected": {
+        "accepted": true,
+        "unresolved_events_in_plan": 1,
+        "warnings_in_plan": [
+          "ZERO_FILL_APPLIED",
+          "NO_AUDIO_EVENTS_SELECTED"
+        ]
+      },
+      "full_observation": {
+        "accepted": true,
+        "authentication_note_present": true,
+        "child_status": "OK",
+        "codes": [],
+        "denied_attempts": 0,
+        "exit": 0,
+        "mechanical_checks": "PASSED",
+        "plan_receipt_keys": [
+          "authentication",
+          "mechanical_checks",
+          "path",
+          "plan_sha256",
+          "schema",
+          "sha256",
+          "status",
+          "unresolved_events",
+          "warnings",
+          "warnings_total",
+          "warnings_truncated"
+        ],
+        "unresolved_events_in_plan": 1,
+        "unstructured_crash": false,
+        "warnings_in_plan": [
+          "ZERO_FILL_APPLIED",
+          "NO_AUDIO_EVENTS_SELECTED"
+        ]
+      },
+      "id": "F2",
+      "layer": "LIBRARY_ENFORCED",
+      "observed": {
+        "accepted": true,
+        "unresolved_events_in_plan": 1,
+        "warnings_in_plan": [
+          "ZERO_FILL_APPLIED",
+          "NO_AUDIO_EVENTS_SELECTED"
+        ]
+      },
+      "outcome": "PASS",
+      "receipt_class": "SELF_CONSISTENT_FORGERY"
+    },
+    {
+      "description": "valid JSON of an unexpected shape",
+      "expected": {
+        "accepted": false,
+        "codes": [
+          "audio_receipt_shape"
+        ],
+        "unstructured_crash": false
+      },
+      "full_observation": {
+        "accepted": false,
+        "child_status": "OK",
+        "codes": [
+          "audio_receipt_shape"
+        ],
+        "denied_attempts": 0,
+        "exit": 1,
+        "unstructured_crash": false
+      },
+      "id": "M1_array",
+      "layer": "LIBRARY_ENFORCED",
+      "observed": {
+        "accepted": false,
+        "codes": [
+          "audio_receipt_shape"
+        ],
+        "unstructured_crash": false
+      },
+      "outcome": "PASS",
+      "receipt_class": "MALFORMED"
+    },
+    {
+      "description": "valid JSON of an unexpected shape",
+      "expected": {
+        "accepted": false,
+        "codes": [
+          "audio_receipt_shape"
+        ],
+        "unstructured_crash": false
+      },
+      "full_observation": {
+        "accepted": false,
+        "child_status": "OK",
+        "codes": [
+          "audio_receipt_shape"
+        ],
+        "denied_attempts": 0,
+        "exit": 1,
+        "unstructured_crash": false
+      },
+      "id": "M2_string",
+      "layer": "LIBRARY_ENFORCED",
+      "observed": {
+        "accepted": false,
+        "codes": [
+          "audio_receipt_shape"
+        ],
+        "unstructured_crash": false
+      },
+      "outcome": "PASS",
+      "receipt_class": "MALFORMED"
+    },
+    {
+      "description": "valid JSON of an unexpected shape",
+      "expected": {
+        "accepted": false,
+        "codes": [
+          "audio_receipt_shape"
+        ],
+        "unstructured_crash": false
+      },
+      "full_observation": {
+        "accepted": false,
+        "child_status": "OK",
+        "codes": [
+          "audio_receipt_shape"
+        ],
+        "denied_attempts": 0,
+        "exit": 1,
+        "unstructured_crash": false
+      },
+      "id": "M3_null",
+      "layer": "LIBRARY_ENFORCED",
+      "observed": {
+        "accepted": false,
+        "codes": [
+          "audio_receipt_shape"
+        ],
+        "unstructured_crash": false
+      },
+      "outcome": "PASS",
+      "receipt_class": "MALFORMED"
+    },
+    {
+      "description": "valid JSON of an unexpected shape",
+      "expected": {
+        "accepted": false,
+        "codes": [
+          "audio_receipt_shape"
+        ],
+        "unstructured_crash": false
+      },
+      "full_observation": {
+        "accepted": false,
+        "child_status": "OK",
+        "codes": [
+          "audio_receipt_shape"
+        ],
+        "denied_attempts": 0,
+        "exit": 1,
+        "unstructured_crash": false
+      },
+      "id": "M4_number",
+      "layer": "LIBRARY_ENFORCED",
+      "observed": {
+        "accepted": false,
+        "codes": [
+          "audio_receipt_shape"
+        ],
+        "unstructured_crash": false
+      },
+      "outcome": "PASS",
+      "receipt_class": "MALFORMED"
+    },
+    {
+      "description": "valid JSON of an unexpected shape",
+      "expected": {
+        "accepted": false,
+        "codes": [
+          "audio_receipt_schema"
+        ],
+        "unstructured_crash": false
+      },
+      "full_observation": {
+        "accepted": false,
+        "child_status": "OK",
+        "codes": [
+          "audio_receipt_schema"
+        ],
+        "denied_attempts": 0,
+        "exit": 1,
+        "unstructured_crash": false
+      },
+      "id": "M5_outputs_is_string",
+      "layer": "LIBRARY_ENFORCED",
+      "observed": {
+        "accepted": false,
+        "codes": [
+          "audio_receipt_schema"
+        ],
+        "unstructured_crash": false
+      },
+      "outcome": "PASS",
+      "receipt_class": "MALFORMED"
+    },
+    {
+      "description": "valid JSON of an unexpected shape",
+      "expected": {
+        "accepted": false,
+        "codes": [
+          "audio_receipt_schema"
+        ],
+        "unstructured_crash": false
+      },
+      "full_observation": {
+        "accepted": false,
+        "child_status": "OK",
+        "codes": [
+          "audio_receipt_schema"
+        ],
+        "denied_attempts": 0,
+        "exit": 1,
+        "unstructured_crash": false
+      },
+      "id": "M6_outputs_list_of_strings",
+      "layer": "LIBRARY_ENFORCED",
+      "observed": {
+        "accepted": false,
+        "codes": [
+          "audio_receipt_schema"
+        ],
+        "unstructured_crash": false
+      },
+      "outcome": "PASS",
+      "receipt_class": "MALFORMED"
+    },
+    {
+      "description": "valid JSON of an unexpected shape",
+      "expected": {
+        "accepted": false,
+        "codes": [
+          "audio_receipt_schema"
+        ],
+        "unstructured_crash": false
+      },
+      "full_observation": {
+        "accepted": false,
+        "child_status": "OK",
+        "codes": [
+          "audio_receipt_schema"
+        ],
+        "denied_attempts": 0,
+        "exit": 1,
+        "unstructured_crash": false
+      },
+      "id": "M7_readback_is_string",
+      "layer": "LIBRARY_ENFORCED",
+      "observed": {
+        "accepted": false,
+        "codes": [
+          "audio_receipt_schema"
+        ],
+        "unstructured_crash": false
+      },
+      "outcome": "PASS",
+      "receipt_class": "MALFORMED"
+    },
+    {
+      "description": "valid JSON of an unexpected shape",
+      "expected": {
+        "accepted": false,
+        "codes": [
+          "audio_receipt_schema"
+        ],
+        "unstructured_crash": false
+      },
+      "full_observation": {
+        "accepted": false,
+        "child_status": "OK",
+        "codes": [
+          "audio_receipt_schema"
+        ],
+        "denied_attempts": 0,
+        "exit": 1,
+        "unstructured_crash": false
+      },
+      "id": "M8_wav_is_string",
+      "layer": "LIBRARY_ENFORCED",
+      "observed": {
+        "accepted": false,
+        "codes": [
+          "audio_receipt_schema"
+        ],
+        "unstructured_crash": false
+      },
+      "outcome": "PASS",
+      "receipt_class": "MALFORMED"
+    }
+  ],
+  "skipped": [],
+  "trust_statement": "Acceptance of ANY class is a mechanical consistency result only. Nothing here authenticates who produced or approved a receipt; GENUINE and SELF_CONSISTENT_FORGERY are indistinguishable to the library by design."
+}
