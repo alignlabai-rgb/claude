@@ -168,3 +168,33 @@ What the qualifier still does not, and cannot, establish:
   and the recorded `original_receipt.authentication` says so. Nothing authenticates who wrote the receipt, and a self-consistent forged receipt for the same media passes by design.
 * **Remaining limits.** The packet summary inside the original receipt is copied as claimed (bounded, not verified); the new `original_receipt` block gained `schema` and `authentication` keys (old
   correction receipts are untouched); `parse_json_bytes` error text for the underlying failure is reduced to its code; symlinked parent directories of the receipt/media paths are still not walked.
+
+## Follow-up 3: portability of the reinspect tests and the media-claim consistency rule (evidence in `evidence/reinspect-portability-20261105/`)
+
+* **Gap reported by the independent native-Windows run of `91ec2d4`** (`tests.test_reinspect_original_receipt`: 14 total, 2 pass, 11 skip, 1 fail). The fixture's fake ffprobe is a POSIX script with a
+  shebang; Windows cannot start it by path, so the one non-POSIX-skipped completion test ended `SKIPPED_TOOL_UNAVAILABLE` instead of `REINSPECTED`. The production validation was not at fault, and
+  the rejection behaviour was confirmed independently on Windows (8 malformed shapes through the real `main(argv)`, 0 launch attempts; exact-byte limit accepted, one byte over → `limit_input_bytes`).
+* **Test repair only (no production validation weakened).**
+  * Exact-byte-limit acceptance is now asserted at **parser** level (`read_original_receipt`, no tool); reinspect-level over-limit rejection is asserted under the no-Popen guard (no tool).
+  * Every malformed-receipt rejection (library and public `main(argv)`) runs under `tests.helpers.no_process` and is no longer POSIX-skipped; a real interpreter child with its own Popen replaced by a
+    raiser covers "no traceback, no launch" without any POSIX marker executable.
+  * Completion cases (REINSPECTED, receipt written by the real muxer, legacy/extra-field/surrogate/hash/statuses) use the test-only adapter `tests/portable_tools.py`: the fake scripts run as owned
+    **Python children through the real `runner.run_bounded`**. Scope label (also in the module docstring): evidence about orchestration and parsing only — **not** real ffprobe/ffmpeg, **not** Windows
+    executable-path/PATHEXT handling, **not** signal or resource-limit behaviour. The helper idea follows the test-only reference `tests/portable_lifecycle.py` on the separate branch c7da5ac9
+    (read only; nothing copied or merged; no runtime fix of that branch is assumed to exist here).
+  * A tool problem in a completion test **fails** it (`status` must be `REINSPECTED`); it is never counted as a skip. An adapter canary proves a child really ran and a test proves rejections never
+    start even the owned fake.
+  * Result on Linux: 21 tests, 0 skipped (previously 14 tests of which 11 were POSIX-skipped on Windows). A Linux simulation of the Windows symptom (`windows_like_exec_simulation.py`: fake tools created
+    non-executable, `os.access(X_OK)` true as on Windows) makes the old test fail exactly as reported (`'SKIPPED_TOOL_UNAVAILABLE' != 'REINSPECTED'`) and the new tests pass. **That is a simulation, not a
+    Windows run; the repaired file has not been run on native Windows by this session.**
+* **Media/plan output claims — assessment and consistency fix.** The Windows verification noted that `read_original_receipt` accepted `outputs[media].partial = true`, `bytes = float(correct size)` and
+  `bytes = -1`. Assessment against the stated compatibility rule ("optional, but present-and-wrong is rejected"): these were **neither deliberately ignored nor required** — they were an oversight in
+  applying that rule, since only `role` and `sha256` of the media entry were examined. A final media output with `partial: true`, or a byte count that is not an integer, is negative or differs
+  from the file on disk, contradicts the receipt itself (the muxer writes `partial: false` and an exact integer for `media`) or the media being re-inspected. Now: `partial` present → must be exactly `false`
+  (`original_receipt_inconsistent`); `bytes` present → plain non-negative integer (`original_receipt_shape`; float, boolean, string, negative rejected) and, for the media, equal to the real size
+  (`original_receipt_media_mismatch`); `name` present → string; the same `partial`/`bytes`/`name` rules apply to the `plan` output. **Absent stays allowed** (legacy hand-written receipts), and no
+  receipt written by the muxer (incl. the committed evidence receipts) is excluded. These are consistency checks, not authenticity: the SHA-256 match ties the receipt to the media.
+* **Still claims, still unverified.** The copied packet summary is recorded as `claimed_audio_packets` with a new `claimed_audio_packets_basis` of `CLAIMED_UNVERIFIED …`; the original receipt's
+  `authentication` note is unchanged (caller hash = byte integrity). A self-consistent forged receipt for the same media is accepted by design (tested as a documented limit).
+* **Remaining limits.** Native Windows execution of the repaired tests, of `mux()` through the adapter, and of the real runner on Windows are UNVERIFIED by this session; the adapter is not a substitute
+  for real ffprobe; symlinked parent directories of the receipt/media paths are not walked; `bytes`/`partial`/`name` of the *other* output roles (`ffprobe_output`, `media_partial`, …) are not examined.

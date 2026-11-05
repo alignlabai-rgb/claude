@@ -1,0 +1,96 @@
+test_a_receipt_over_the_input_limit_is_refused_and_the_limit_itself_is_accepted (tests.test_reinspect_original_receipt.LibraryRejections.test_a_receipt_over_the_input_limit_is_refused_and_the_limit_itself_is_accepted) ... FAIL
+test_every_bad_receipt_is_a_typed_rejection_before_any_process_or_output (tests.test_reinspect_original_receipt.LibraryRejections.test_every_bad_receipt_is_a_typed_rejection_before_any_process_or_output) ... ok
+test_not_a_regular_file_symlink_and_unreadable_are_typed_unsafe_path_errors (tests.test_reinspect_original_receipt.LibraryRejections.test_not_a_regular_file_symlink_and_unreadable_are_typed_unsafe_path_errors) ... ok
+test_a_real_interpreter_child_prints_no_traceback_and_starts_no_ffprobe (tests.test_reinspect_original_receipt.PublicCliRejections.test_a_real_interpreter_child_prints_no_traceback_and_starts_no_ffprobe) ... ok
+test_the_public_main_returns_exit_1_and_a_structured_error_with_no_popen_and_no_output (tests.test_reinspect_original_receipt.PublicCliRejections.test_the_public_main_returns_exit_1_and_a_structured_error_with_no_popen_and_no_output) ... ok
+test_an_incomplete_mux_cannot_present_a_final_media_output (tests.test_reinspect_original_receipt.StatusDistinctionsAreNotPromoted.test_an_incomplete_mux_cannot_present_a_final_media_output)
+The muxer promotes `media` only for the two verified statuses, so any other status with a final media output is not a receipt it wrote. ... ok
+test_both_verified_statuses_are_recorded_exactly_and_the_correction_status_is_its_own (tests.test_reinspect_original_receipt.StatusDistinctionsAreNotPromoted.test_both_verified_statuses_are_recorded_exactly_and_the_correction_status_is_its_own) ...
+  test_both_verified_statuses_are_recorded_exactly_and_the_correction_status_is_its_own (tests.test_reinspect_original_receipt.StatusDistinctionsAreNotPromoted.test_both_verified_statuses_are_recorded_exactly_and_the_correction_status_is_its_own) [MUXED_VERIFIED_SAMPLE_EXACT] ... ERROR
+  test_both_verified_statuses_are_recorded_exactly_and_the_correction_status_is_its_own (tests.test_reinspect_original_receipt.StatusDistinctionsAreNotPromoted.test_both_verified_statuses_are_recorded_exactly_and_the_correction_status_is_its_own) [MUXED_TECHNICAL_WITHIN_TOLERANCE] ... ERROR
+test_the_same_statuses_without_a_media_output_fail_the_media_check_not_a_success_path (tests.test_reinspect_original_receipt.StatusDistinctionsAreNotPromoted.test_the_same_statuses_without_a_media_output_fail_the_media_check_not_a_success_path) ... ok
+test_a_lone_surrogate_inside_the_copied_summary_is_written_losslessly (tests.test_reinspect_original_receipt.ValidReceiptsStayAccepted.test_a_lone_surrogate_inside_the_copied_summary_is_written_losslessly)
+Links the F-CLI-1 boundary: a summary value copied from the original receipt may be unencodable; the correction receipt must still be written and decode to it. ... ERROR
+test_a_receipt_written_by_the_real_muxer_is_accepted_and_its_status_is_kept_verbatim (tests.test_reinspect_original_receipt.ValidReceiptsStayAccepted.test_a_receipt_written_by_the_real_muxer_is_accepted_and_its_status_is_kept_verbatim)
+The original is produced by video_core.avmux.mux (owned fake ffmpeg/ffprobe), not hand-written; reinspected through the public CLI. ... FAIL
+test_legacy_hand_written_and_extra_field_receipts_remain_accepted_with_provenance_gaps_visible (tests.test_reinspect_original_receipt.ValidReceiptsStayAccepted.test_legacy_hand_written_and_extra_field_receipts_remain_accepted_with_provenance_gaps_visible) ... ERROR
+test_the_committed_producer_receipts_are_accepted (tests.test_reinspect_original_receipt.ValidReceiptsStayAccepted.test_the_committed_producer_receipts_are_accepted) ... ok
+test_the_hash_recorded_is_of_the_bytes_that_were_parsed (tests.test_reinspect_original_receipt.ValidReceiptsStayAccepted.test_the_hash_recorded_is_of_the_bytes_that_were_parsed) ... ERROR
+test_the_worst_case_producer_summary_is_inside_the_bound (tests.test_reinspect_original_receipt.ValidReceiptsStayAccepted.test_the_worst_case_producer_summary_is_inside_the_bound)
+packet_summary caps side_data_records at 1000; that largest producer-shaped summary must still be accepted (the bound may not exclude real receipts). ... ok
+
+======================================================================
+ERROR: test_both_verified_statuses_are_recorded_exactly_and_the_correction_status_is_its_own (tests.test_reinspect_original_receipt.StatusDistinctionsAreNotPromoted.test_both_verified_statuses_are_recorded_exactly_and_the_correction_status_is_its_own) [MUXED_VERIFIED_SAMPLE_EXACT]
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/claude-0/-home-user-claude/c5ff74d8-ee8d-54d9-9a28-1bde47d1d942/scratchpad/prev91/tools/video-core/tests/test_reinspect_original_receipt.py", line 309, in test_both_verified_statuses_are_recorded_exactly_and_the_correction_status_is_its_own
+    self.assertEqual((r["original_receipt"]["status"], r["status"], r["quality_evaluated"], r["regenerated_or_remuxed"]), (status, "REINSPECTED", False, False))
+                      ~^^^^^^^^^^^^^^^^^^^^
+KeyError: 'original_receipt'
+
+======================================================================
+ERROR: test_both_verified_statuses_are_recorded_exactly_and_the_correction_status_is_its_own (tests.test_reinspect_original_receipt.StatusDistinctionsAreNotPromoted.test_both_verified_statuses_are_recorded_exactly_and_the_correction_status_is_its_own) [MUXED_TECHNICAL_WITHIN_TOLERANCE]
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/claude-0/-home-user-claude/c5ff74d8-ee8d-54d9-9a28-1bde47d1d942/scratchpad/prev91/tools/video-core/tests/test_reinspect_original_receipt.py", line 309, in test_both_verified_statuses_are_recorded_exactly_and_the_correction_status_is_its_own
+    self.assertEqual((r["original_receipt"]["status"], r["status"], r["quality_evaluated"], r["regenerated_or_remuxed"]), (status, "REINSPECTED", False, False))
+                      ~^^^^^^^^^^^^^^^^^^^^
+KeyError: 'original_receipt'
+
+======================================================================
+ERROR: test_a_lone_surrogate_inside_the_copied_summary_is_written_losslessly (tests.test_reinspect_original_receipt.ValidReceiptsStayAccepted.test_a_lone_surrogate_inside_the_copied_summary_is_written_losslessly)
+Links the F-CLI-1 boundary: a summary value copied from the original receipt may be unencodable; the correction receipt must still be written and decode to it.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/claude-0/-home-user-claude/c5ff74d8-ee8d-54d9-9a28-1bde47d1d942/scratchpad/prev91/tools/video-core/tests/test_reinspect_original_receipt.py", line 277, in test_a_lone_surrogate_inside_the_copied_summary_is_written_losslessly
+    self.assertEqual(r["original_receipt"]["claimed_audio_packets"], {"note": "a\ud800b"})
+                     ~^^^^^^^^^^^^^^^^^^^^
+KeyError: 'original_receipt'
+
+======================================================================
+ERROR: test_legacy_hand_written_and_extra_field_receipts_remain_accepted_with_provenance_gaps_visible (tests.test_reinspect_original_receipt.ValidReceiptsStayAccepted.test_legacy_hand_written_and_extra_field_receipts_remain_accepted_with_provenance_gaps_visible)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/claude-0/-home-user-claude/c5ff74d8-ee8d-54d9-9a28-1bde47d1d942/scratchpad/prev91/tools/video-core/tests/test_reinspect_original_receipt.py", line 254, in test_legacy_hand_written_and_extra_field_receipts_remain_accepted_with_provenance_gaps_visible
+    self.assertEqual((r["status"], r["original_receipt"]["schema"]), ("REINSPECTED", None), "no schema is recorded as null, not invented")
+                                   ~^^^^^^^^^^^^^^^^^^^^
+KeyError: 'original_receipt'
+
+======================================================================
+ERROR: test_the_hash_recorded_is_of_the_bytes_that_were_parsed (tests.test_reinspect_original_receipt.ValidReceiptsStayAccepted.test_the_hash_recorded_is_of_the_bytes_that_were_parsed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/claude-0/-home-user-claude/c5ff74d8-ee8d-54d9-9a28-1bde47d1d942/scratchpad/prev91/tools/video-core/tests/test_reinspect_original_receipt.py", line 284, in test_the_hash_recorded_is_of_the_bytes_that_were_parsed
+    self.assertEqual(r["original_receipt"]["sha256"], hashlib.sha256(data).hexdigest())
+                     ~^^^^^^^^^^^^^^^^^^^^
+KeyError: 'original_receipt'
+
+======================================================================
+FAIL: test_a_receipt_over_the_input_limit_is_refused_and_the_limit_itself_is_accepted (tests.test_reinspect_original_receipt.LibraryRejections.test_a_receipt_over_the_input_limit_is_refused_and_the_limit_itself_is_accepted)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/claude-0/-home-user-claude/c5ff74d8-ee8d-54d9-9a28-1bde47d1d942/scratchpad/prev91/tools/video-core/tests/test_reinspect_original_receipt.py", line 156, in test_a_receipt_over_the_input_limit_is_refused_and_the_limit_itself_is_accepted
+    self.assertEqual(self.attempt(data, name="at-limit", limits=Limits(max_input_bytes=n))["status"], "REINSPECTED")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'SKIPPED_TOOL_UNAVAILABLE' != 'REINSPECTED'
+- SKIPPED_TOOL_UNAVAILABLE
++ REINSPECTED
+
+
+======================================================================
+FAIL: test_a_receipt_written_by_the_real_muxer_is_accepted_and_its_status_is_kept_verbatim (tests.test_reinspect_original_receipt.ValidReceiptsStayAccepted.test_a_receipt_written_by_the_real_muxer_is_accepted_and_its_status_is_kept_verbatim)
+The original is produced by video_core.avmux.mux (owned fake ffmpeg/ffprobe), not hand-written; reinspected through the public CLI.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/claude-0/-home-user-claude/c5ff74d8-ee8d-54d9-9a28-1bde47d1d942/scratchpad/prev91/tools/video-core/tests/test_reinspect_original_receipt.py", line 223, in test_a_receipt_written_by_the_real_muxer_is_accepted_and_its_status_is_kept_verbatim
+    self.assertEqual(r["status"], "MUXED_TECHNICAL_WITHIN_TOLERANCE")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'SKIPPED_TOOL_UNAVAILABLE' != 'MUXED_TECHNICAL_WITHIN_TOLERANCE'
+- SKIPPED_TOOL_UNAVAILABLE
++ MUXED_TECHNICAL_WITHIN_TOLERANCE
+
+
+----------------------------------------------------------------------
+Ran 14 tests in 1.286s
+
+FAILED (failures=2, errors=5)

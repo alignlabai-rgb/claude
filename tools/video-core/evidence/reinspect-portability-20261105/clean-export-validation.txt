@@ -1,0 +1,18 @@
+Clean-export validation of the exact staged tree (before the commit that adds this note)
+=======================================================================================
+tree b68864600178bddb0fe4e9ccda72872755d96691  (git write-tree of the index; `git archive <tree> tools/video-core` into an empty directory, no __pycache__,
+PYTHONDONTWRITEBYTECODE=1, suites run one at a time)
+
+full suite, unchanged discovery (python -m unittest discover -s tests -t .), 620 tests each:
+  python3.13 : run 1 OK  - 620 run, 611 pass, 9 skipped, 0 fail
+  python3.12 : run 1 FAILED (1 failure), run 2 OK - 620 run, 611 pass, 9 skipped, 0 fail
+  python3.11 : run 1 FAILED (1 failure), run 2 OK - 620 run, 611 pass, 9 skipped, 0 fail
+The one failing test in the two failed runs (both times the same):
+  tests.test_containment.ParentHandshakeWithStubWorker.test_every_kind_of_bad_hello_is_refused_and_no_go_is_ever_sent
+  ('hello_unreadable' observed where 'hello_too_large' expected).
+  It is the pre-existing, load-dependent race documented in evidence/input-contract-20261105/clean-export-validation.txt (the stub writes hello.json non-atomically and the parent can read it
+  half-written; reproduced there on the unmodified base f42c2db under CPU load). containment/ and the runner tests belong to the other session; it is neither fixed nor claimed fixed here,
+  and nothing in this commit touches it. Both failed runs are reported, not discarded.
+
+tests.test_reinspect_original_receipt on the export, native POSIX: 22 run, 0 skipped, OK on python3.11 / 3.12 / 3.13; under tests/.. windows_like_exec_simulation.py (python3.13): 22 run, OK.
+Previous commit 91ec2d4: 612 run / 603 pass / 9 skip / 0 fail; new here: +8 tests (the module went from 14 to 22), 611 pass.
