@@ -1,0 +1,909 @@
+{
+ "candidate": "evidence/caller-reference-20261105/caller_admission.py (UNREVIEWED v0)",
+ "cases": [
+  {
+   "checks": {
+    "AUDIO_PLAN": "PASS",
+    "AUDIO_RECEIPT": "PASS",
+    "BOUNDS": "PASS",
+    "EFFECTIVE_SCOPE": "PASS",
+    "EXPECTED": "PASS",
+    "IDENTITY": "PASS",
+    "MANIFEST_VIEW": "SKIPPED",
+    "OBSERVED": "FAIL",
+    "PINS": "FAIL",
+    "PROFILE": "PASS",
+    "SELECTION": "FAIL",
+    "VIDEO_RECEIPT": "SKIPPED"
+   },
+   "id": "A1",
+   "pins_compared": {
+    "manifest_sha256": 1,
+    "plan_sha256": 3,
+    "receipt_sha256": 1,
+    "stem_sha256": 1
+   },
+   "reasons": [
+    {
+     "code": "BINDING_UNRESOLVED",
+     "path": "observed.stages.audio_plan.response.plan.events[ev_square]",
+     "severity": "HOLD"
+    },
+    {
+     "code": "BINDING_UNRESOLVED",
+     "path": "observed.stages.audio_plan.response.plan.events[ev_triangle]",
+     "severity": "HOLD"
+    },
+    {
+     "code": "OBSERVED_PIN_MISSING",
+     "path": "pins.video_sha256",
+     "severity": "HOLD"
+    },
+    {
+     "code": "REQUIRED_RECEIPT_ABSENT",
+     "path": "observed.stages.video_receipt",
+     "severity": "HOLD"
+    },
+    {
+     "code": "REQUIRED_STAGE_ABSENT",
+     "path": "observed.stages.avmux_manifest_view",
+     "severity": "HOLD"
+    }
+   ],
+   "shows": "real plan and receipt shapes reach AUDIO_PLAN and AUDIO_RECEIPT and pass them; the plan carries no provenance_ref, so a v0 USE row has no binding (BINDING_UNRESOLVED); video receipt / manifest view are absent (HOLD)",
+   "sources_used": [
+    "audio_plan_stem",
+    "audio_manifest_stem",
+    "audio_stem_independent",
+    "audio_receipt_stem",
+    "avmux_manifest_mov"
+   ],
+   "status": "HOLD",
+   "synthetic_assertions": [
+    "identity envelope per stage packet (synthetic)",
+    "exit_code 0 for every stage (the committed files record no exit code)",
+    "pins_source=owner_record (declaration only)",
+    "audio_plan response envelope built mechanically around the unmodified committed canonical plan (status = plan.status, plan_sha256 = SHA-256 of the file bytes)",
+    "pins: manifest/plan/receipt from file bytes, stem from the independent verification record, video from the avmux manifest of the 3-frame clip"
+   ],
+   "title": "Stage-B audio plan + audio receipt (real shapes), owner binding not asserted",
+   "unselected_unresolved": [
+    {
+     "row_id": "ev_unresolved_not_selected",
+     "state": "MISSING"
+    }
+   ]
+  },
+  {
+   "checks": {
+    "AUDIO_PLAN": "PASS",
+    "AUDIO_RECEIPT": "PASS",
+    "BOUNDS": "PASS",
+    "EFFECTIVE_SCOPE": "PASS",
+    "EXPECTED": "PASS",
+    "IDENTITY": "PASS",
+    "MANIFEST_VIEW": "SKIPPED",
+    "OBSERVED": "FAIL",
+    "PINS": "FAIL",
+    "PROFILE": "PASS",
+    "SELECTION": "FAIL",
+    "VIDEO_RECEIPT": "SKIPPED"
+   },
+   "id": "A2",
+   "pins_compared": {
+    "manifest_sha256": 1,
+    "plan_sha256": 3,
+    "receipt_sha256": 1,
+    "stem_sha256": 1
+   },
+   "reasons": [
+    {
+     "code": "BINDING_UNPROVEN",
+     "path": "observed.stages.audio_plan.response.plan.events[ev_square]",
+     "severity": "HOLD"
+    },
+    {
+     "code": "BINDING_UNPROVEN",
+     "path": "observed.stages.audio_plan.response.plan.events[ev_triangle]",
+     "severity": "HOLD"
+    },
+    {
+     "code": "OBSERVED_PIN_MISSING",
+     "path": "pins.video_sha256",
+     "severity": "HOLD"
+    },
+    {
+     "code": "REQUIRED_RECEIPT_ABSENT",
+     "path": "observed.stages.video_receipt",
+     "severity": "HOLD"
+    },
+    {
+     "code": "REQUIRED_STAGE_ABSENT",
+     "path": "observed.stages.avmux_manifest_view",
+     "severity": "HOLD"
+    }
+   ],
+   "shows": "an asserted binding cannot be proven from the committed plan shape (BINDING_UNPROVEN): the v0 binding requirement is not satisfiable from this producer output; the profile is not relaxed",
+   "sources_used": [
+    "audio_plan_stem",
+    "audio_manifest_stem",
+    "audio_stem_independent",
+    "audio_receipt_stem",
+    "avmux_manifest_mov"
+   ],
+   "status": "HOLD",
+   "synthetic_assertions": [
+    "identity envelope per stage packet (synthetic)",
+    "exit_code 0 for every stage (the committed files record no exit code)",
+    "pins_source=owner_record (declaration only)",
+    "audio_plan response envelope built mechanically around the unmodified committed canonical plan (status = plan.status, plan_sha256 = SHA-256 of the file bytes)",
+    "binding_ref per selected USE row (owner assertion; the plan has no provenance_ref to match it)"
+   ],
+   "title": "same, with an owner binding_ref asserted for the two USE rows",
+   "unselected_unresolved": [
+    {
+     "row_id": "ev_unresolved_not_selected",
+     "state": "MISSING"
+    }
+   ]
+  },
+  {
+   "checks": {
+    "AUDIO_PLAN": "SKIPPED",
+    "AUDIO_RECEIPT": "SKIPPED",
+    "BOUNDS": "PASS",
+    "EFFECTIVE_SCOPE": "SKIPPED",
+    "EXPECTED": "PASS",
+    "IDENTITY": "PASS",
+    "MANIFEST_VIEW": "SKIPPED",
+    "OBSERVED": "FAIL",
+    "PINS": "FAIL",
+    "PROFILE": "PASS",
+    "SELECTION": "SKIPPED",
+    "VIDEO_RECEIPT": "PASS"
+   },
+   "id": "V1",
+   "pins_compared": {
+    "video_sha256": 1
+   },
+   "reasons": [
+    {
+     "code": "OBSERVED_PIN_MISSING",
+     "path": "pins.manifest_sha256",
+     "severity": "HOLD"
+    },
+    {
+     "code": "OBSERVED_PIN_MISSING",
+     "path": "pins.plan_sha256",
+     "severity": "HOLD"
+    },
+    {
+     "code": "OBSERVED_PIN_MISSING",
+     "path": "pins.stem_sha256",
+     "severity": "HOLD"
+    },
+    {
+     "code": "REQUIRED_RECEIPT_ABSENT",
+     "path": "observed.stages.audio_receipt",
+     "severity": "HOLD"
+    },
+    {
+     "code": "REQUIRED_STAGE_ABSENT",
+     "path": "observed.stages.audio_plan",
+     "severity": "HOLD"
+    },
+    {
+     "code": "REQUIRED_STAGE_ABSENT",
+     "path": "observed.stages.avmux_manifest_view",
+     "severity": "HOLD"
+    }
+   ],
+   "shows": "the real video receipt reaches VIDEO_RECEIPT and passes it (checks, flags, outputs, plan output sha == plan_sha256); everything else is absent (HOLD)",
+   "sources_used": [
+    "video_receipt_6s",
+    "video_plan_6s"
+   ],
+   "status": "HOLD",
+   "synthetic_assertions": [
+    "identity envelope per stage packet (synthetic)",
+    "exit_code 0 for every stage (the committed files record no exit code)",
+    "pins_source=owner_record (declaration only)",
+    "owner pins manifest / receipt / stem are placeholders (no such artefact in this job); video pin = the receipt's own output sha256 (receipt_own_value: no independent record is committed, so that comparison is a tautology)"
+   ],
+   "title": "6 s video render receipt (real shape) only",
+   "unselected_unresolved": null
+  },
+  {
+   "checks": {
+    "AUDIO_PLAN": "PASS",
+    "AUDIO_RECEIPT": "PASS",
+    "BOUNDS": "PASS",
+    "EFFECTIVE_SCOPE": "PASS",
+    "EXPECTED": "PASS",
+    "IDENTITY": "PASS",
+    "MANIFEST_VIEW": "PASS",
+    "OBSERVED": "FAIL",
+    "PINS": "PASS",
+    "PROFILE": "PASS",
+    "SELECTION": "FAIL",
+    "VIDEO_RECEIPT": "SKIPPED"
+   },
+   "id": "M1",
+   "pins_compared": {
+    "manifest_sha256": 1,
+    "plan_sha256": 3,
+    "receipt_sha256": 1,
+    "stem_sha256": 2,
+    "video_sha256": 1
+   },
+   "reasons": [
+    {
+     "code": "BINDING_UNRESOLVED",
+     "path": "observed.stages.audio_plan.response.plan.events[ev_square]",
+     "severity": "HOLD"
+    },
+    {
+     "code": "BINDING_UNRESOLVED",
+     "path": "observed.stages.audio_plan.response.plan.events[ev_triangle]",
+     "severity": "HOLD"
+    },
+    {
+     "code": "REQUIRED_RECEIPT_ABSENT",
+     "path": "observed.stages.video_receipt",
+     "severity": "HOLD"
+    }
+   ],
+   "shows": "MANIFEST_VIEW passes and the owner stem pin is compared with two observed sources (the receipt stem output and the manifest audio sha256); there is NO video render receipt for the 3-frame clip, so the job stays HOLD",
+   "sources_used": [
+    "avmux_manifest_mov",
+    "audio_plan_stem",
+    "audio_receipt_stem",
+    "audio_manifest_stem",
+    "audio_stem_independent"
+   ],
+   "status": "HOLD",
+   "synthetic_assertions": [
+    "identity envelope per stage packet (synthetic)",
+    "exit_code 0 for every stage (the committed files record no exit code)",
+    "pins_source=owner_record (declaration only)",
+    "audio_plan response envelope built mechanically around the unmodified committed canonical plan (status = plan.status, plan_sha256 = SHA-256 of the file bytes)",
+    "manifest view derived mechanically from mov.manifest.json: selection.ref, video.sha256, audio.sha256"
+   ],
+   "title": "avmux manifest view (committed mov.manifest.json) + Stage-B stem receipt/plan",
+   "unselected_unresolved": [
+    {
+     "row_id": "ev_unresolved_not_selected",
+     "state": "MISSING"
+    }
+   ]
+  },
+  {
+   "checks": {
+    "AUDIO_PLAN": "PASS",
+    "AUDIO_RECEIPT": "PASS",
+    "BOUNDS": "PASS",
+    "EFFECTIVE_SCOPE": "PASS",
+    "EXPECTED": "PASS",
+    "IDENTITY": "FAIL",
+    "MANIFEST_VIEW": "SKIPPED",
+    "OBSERVED": "FAIL",
+    "PINS": "FAIL",
+    "PROFILE": "PASS",
+    "SELECTION": "FAIL",
+    "VIDEO_RECEIPT": "FAIL"
+   },
+   "id": "X1",
+   "pins_compared": {
+    "manifest_sha256": 1,
+    "plan_sha256": 3,
+    "receipt_sha256": 1,
+    "stem_sha256": 1,
+    "video_sha256": 1
+   },
+   "reasons": [
+    {
+     "code": "COUNT_MISMATCH",
+     "path": "observed.stages.video_receipt.response.readback.comparison.checks[decoded_frame_count]",
+     "severity": "REJECT"
+    },
+    {
+     "code": "IDENTITY_MISMATCH",
+     "path": "observed.stages.video_receipt.identity.attempt_id",
+     "severity": "REJECT"
+    },
+    {
+     "code": "IDENTITY_MISMATCH",
+     "path": "observed.stages.video_receipt.identity.job_id",
+     "severity": "REJECT"
+    },
+    {
+     "code": "IDENTITY_MISMATCH",
+     "path": "observed.stages.video_receipt.identity.selection_snapshot_ref",
+     "severity": "REJECT"
+    },
+    {
+     "code": "IDENTITY_MISMATCH",
+     "path": "observed.stages.video_receipt.identity.shot_id",
+     "severity": "REJECT"
+    },
+    {
+     "code": "IDENTITY_MISMATCH",
+     "path": "observed.stages.video_receipt.identity.work_id",
+     "severity": "REJECT"
+    },
+    {
+     "code": "PIN_MISMATCH",
+     "path": "observed.stages.video_receipt.response.outputs[video].sha256",
+     "severity": "REJECT"
+    },
+    {
+     "code": "BINDING_UNRESOLVED",
+     "path": "observed.stages.audio_plan.response.plan.events[ev_square]",
+     "severity": "HOLD"
+    },
+    {
+     "code": "BINDING_UNRESOLVED",
+     "path": "observed.stages.audio_plan.response.plan.events[ev_triangle]",
+     "severity": "HOLD"
+    },
+    {
+     "code": "REQUIRED_STAGE_ABSENT",
+     "path": "observed.stages.avmux_manifest_view",
+     "severity": "HOLD"
+    }
+   ],
+   "shows": "the 6 s video packet cannot be attributed to the audio job: IDENTITY_MISMATCH",
+   "sources_used": [
+    "video_receipt_6s",
+    "audio_plan_stem",
+    "audio_receipt_stem"
+   ],
+   "status": "REJECTED",
+   "synthetic_assertions": [
+    "identity envelope per stage packet (synthetic)",
+    "exit_code 0 for every stage (the committed files record no exit code)",
+    "pins_source=owner_record (declaration only)",
+    "video packet identity = job B, audio packets identity = job A (they are different demonstrations)"
+   ],
+   "title": "6 s video receipt + Stage-B audio plan/receipt as DIFFERENT jobs (identities differ)",
+   "unselected_unresolved": [
+    {
+     "row_id": "ev_unresolved_not_selected",
+     "state": "MISSING"
+    }
+   ]
+  },
+  {
+   "checks": {
+    "AUDIO_PLAN": "PASS",
+    "AUDIO_RECEIPT": "PASS",
+    "BOUNDS": "PASS",
+    "EFFECTIVE_SCOPE": "PASS",
+    "EXPECTED": "PASS",
+    "IDENTITY": "PASS",
+    "MANIFEST_VIEW": "SKIPPED",
+    "OBSERVED": "FAIL",
+    "PINS": "FAIL",
+    "PROFILE": "PASS",
+    "SELECTION": "FAIL",
+    "VIDEO_RECEIPT": "FAIL"
+   },
+   "id": "X2",
+   "pins_compared": {
+    "manifest_sha256": 1,
+    "plan_sha256": 3,
+    "receipt_sha256": 1,
+    "stem_sha256": 1,
+    "video_sha256": 1
+   },
+   "reasons": [
+    {
+     "code": "COUNT_MISMATCH",
+     "path": "observed.stages.video_receipt.response.readback.comparison.checks[decoded_frame_count]",
+     "severity": "REJECT"
+    },
+    {
+     "code": "PIN_MISMATCH",
+     "path": "observed.stages.video_receipt.response.outputs[video].sha256",
+     "severity": "REJECT"
+    },
+    {
+     "code": "BINDING_UNRESOLVED",
+     "path": "observed.stages.audio_plan.response.plan.events[ev_square]",
+     "severity": "HOLD"
+    },
+    {
+     "code": "BINDING_UNRESOLVED",
+     "path": "observed.stages.audio_plan.response.plan.events[ev_triangle]",
+     "severity": "HOLD"
+    },
+    {
+     "code": "REQUIRED_STAGE_ABSENT",
+     "path": "observed.stages.avmux_manifest_view",
+     "severity": "HOLD"
+    }
+   ],
+   "shows": "even under a forged common identity the 180-frame video and the 3-frame audio timeline cannot be reconciled (COUNT_MISMATCH) and the video pin differs (PIN_MISMATCH)",
+   "sources_used": [
+    "video_receipt_6s",
+    "audio_plan_stem",
+    "audio_receipt_stem"
+   ],
+   "status": "REJECTED",
+   "synthetic_assertions": [
+    "identity envelope per stage packet (synthetic)",
+    "exit_code 0 for every stage (the committed files record no exit code)",
+    "pins_source=owner_record (declaration only)",
+    "a single identity asserted for all packets ONLY to show that the geometry still refuses the pairing; this is not a claim that they are one job"
+   ],
+   "title": "6 s video receipt + Stage-B audio forced under ONE asserted identity (negative control only)",
+   "unselected_unresolved": [
+    {
+     "row_id": "ev_unresolved_not_selected",
+     "state": "MISSING"
+    }
+   ]
+  },
+  {
+   "checks": {
+    "AUDIO_PLAN": "PASS",
+    "AUDIO_RECEIPT": "PASS",
+    "BOUNDS": "PASS",
+    "EFFECTIVE_SCOPE": "PASS",
+    "EXPECTED": "PASS",
+    "IDENTITY": "PASS",
+    "MANIFEST_VIEW": "PASS",
+    "OBSERVED": "FAIL",
+    "PINS": "PASS",
+    "PROFILE": "PASS",
+    "SELECTION": "FAIL",
+    "VIDEO_RECEIPT": "SKIPPED"
+   },
+   "id": "X3",
+   "pins_compared": {
+    "manifest_sha256": 1,
+    "plan_sha256": 3,
+    "receipt_sha256": 1,
+    "stem_sha256": 2,
+    "video_sha256": 1
+   },
+   "reasons": [
+    {
+     "code": "BINDING_UNRESOLVED",
+     "path": "observed.stages.audio_plan.response.plan.events[ev_square]",
+     "severity": "HOLD"
+    },
+    {
+     "code": "BINDING_UNRESOLVED",
+     "path": "observed.stages.audio_plan.response.plan.events[ev_triangle]",
+     "severity": "HOLD"
+    },
+    {
+     "code": "REQUIRED_RECEIPT_ABSENT",
+     "path": "observed.stages.video_receipt",
+     "severity": "HOLD"
+    }
+   ],
+   "shows": "the committed avmux evidence is an avmux receipt (a different schema); no `video_core.receipt/1` for the 3-frame clip exists, so REQUIRED_RECEIPT_ABSENT: HOLD stays HOLD",
+   "sources_used": [
+    "avmux_manifest_mov",
+    "avmux_receipt_mov",
+    "audio_plan_stem",
+    "audio_receipt_stem"
+   ],
+   "status": "HOLD",
+   "synthetic_assertions": [
+    "identity envelope per stage packet (synthetic)",
+    "exit_code 0 for every stage (the committed files record no exit code)",
+    "pins_source=owner_record (declaration only)",
+    "audio_plan response envelope built mechanically around the unmodified committed canonical plan (status = plan.status, plan_sha256 = SHA-256 of the file bytes)"
+   ],
+   "title": "avmux world as committed: Stage-B stem + 3-frame clip manifest, no video render receipt",
+   "unselected_unresolved": [
+    {
+     "row_id": "ev_unresolved_not_selected",
+     "state": "MISSING"
+    }
+   ]
+  },
+  {
+   "checks": {
+    "AUDIO_PLAN": "PASS",
+    "AUDIO_RECEIPT": "FAIL",
+    "BOUNDS": "PASS",
+    "EFFECTIVE_SCOPE": "PASS",
+    "EXPECTED": "PASS",
+    "IDENTITY": "PASS",
+    "MANIFEST_VIEW": "SKIPPED",
+    "OBSERVED": "FAIL",
+    "PINS": "FAIL",
+    "PROFILE": "PASS",
+    "SELECTION": "FAIL",
+    "VIDEO_RECEIPT": "SKIPPED"
+   },
+   "id": "S1",
+   "pins_compared": {
+    "plan_sha256": 3,
+    "receipt_sha256": 1
+   },
+   "reasons": [
+    {
+     "code": "PIN_MISMATCH",
+     "path": "observed.stages.audio_receipt.receipt_sha256",
+     "severity": "REJECT"
+    },
+    {
+     "code": "PIN_MISMATCH",
+     "path": "observed.stages.audio_receipt.response.outputs[plan].sha256",
+     "severity": "REJECT"
+    },
+    {
+     "code": "PIN_MISMATCH",
+     "path": "observed.stages.audio_receipt.response.plan_sha256",
+     "severity": "REJECT"
+    },
+    {
+     "code": "SHAPE_COUNT",
+     "path": "observed.stages.audio_receipt.response.mix.clipped_samples",
+     "severity": "REJECT"
+    },
+    {
+     "code": "SHAPE_COUNT",
+     "path": "observed.stages.audio_receipt.response.mix.samples_written",
+     "severity": "REJECT"
+    },
+    {
+     "code": "SHAPE_COUNT",
+     "path": "observed.stages.audio_receipt.response.readback.wav",
+     "severity": "REJECT"
+    },
+    {
+     "code": "SHAPE_UNRESOLVED",
+     "path": "observed.stages.audio_receipt.response.unresolved_report",
+     "severity": "REJECT"
+    },
+    {
+     "code": "SHAPE_WARNING",
+     "path": "observed.stages.audio_receipt.response.warnings",
+     "severity": "REJECT"
+    },
+    {
+     "code": "BINDING_UNRESOLVED",
+     "path": "observed.stages.audio_plan.response.plan.events[ev_square]",
+     "severity": "HOLD"
+    },
+    {
+     "code": "BINDING_UNRESOLVED",
+     "path": "observed.stages.audio_plan.response.plan.events[ev_triangle]",
+     "severity": "HOLD"
+    },
+    {
+     "code": "OBSERVED_PIN_MISSING",
+     "path": "pins.manifest_sha256",
+     "severity": "HOLD"
+    },
+    {
+     "code": "OBSERVED_PIN_MISSING",
+     "path": "pins.stem_sha256",
+     "severity": "HOLD"
+    },
+    {
+     "code": "OBSERVED_PIN_MISSING",
+     "path": "pins.video_sha256",
+     "severity": "HOLD"
+    },
+    {
+     "code": "OUTPUT_MISSING",
+     "path": "observed.stages.audio_receipt.response.outputs",
+     "severity": "HOLD"
+    },
+    {
+     "code": "OUTPUT_ROLE_UNKNOWN",
+     "path": "observed.stages.audio_receipt.response.outputs[0]",
+     "severity": "HOLD"
+    },
+    {
+     "code": "OUTPUT_ROLE_UNKNOWN",
+     "path": "observed.stages.audio_receipt.response.outputs[2]",
+     "severity": "HOLD"
+    },
+    {
+     "code": "READBACK_EVIDENCE_MISSING",
+     "path": "observed.stages.audio_receipt.response.readback.checks",
+     "severity": "HOLD"
+    },
+    {
+     "code": "RECEIPT_LINK_MISSING",
+     "path": "observed.stages.audio_receipt.response.input.manifest_sha256",
+     "severity": "HOLD"
+    },
+    {
+     "code": "REQUIRED_RECEIPT_ABSENT",
+     "path": "observed.stages.video_receipt",
+     "severity": "HOLD"
+    },
+    {
+     "code": "REQUIRED_STAGE_ABSENT",
+     "path": "observed.stages.avmux_manifest_view",
+     "severity": "HOLD"
+    },
+    {
+     "code": "SCHEMA_UNKNOWN",
+     "path": "observed.stages.audio_receipt.response.schema",
+     "severity": "HOLD"
+    },
+    {
+     "code": "STATUS_UNKNOWN",
+     "path": "observed.stages.audio_receipt.response.status",
+     "severity": "HOLD"
+    }
+   ],
+   "shows": "a `video_core.avmux_receipt/1` is not an audio receipt: unknown schema and missing audio-receipt fields; never READY",
+   "sources_used": [
+    "avmux_receipt_mov",
+    "audio_plan_stem"
+   ],
+   "status": "REJECTED",
+   "synthetic_assertions": [
+    "identity envelope per stage packet (synthetic)",
+    "exit_code 0 for every stage (the committed files record no exit code)",
+    "pins_source=owner_record (declaration only)",
+    "audio_plan response envelope built mechanically around the unmodified committed canonical plan (status = plan.status, plan_sha256 = SHA-256 of the file bytes)"
+   ],
+   "title": "avmux receipt substituted into the audio_receipt slot",
+   "unselected_unresolved": [
+    {
+     "row_id": "ev_unresolved_not_selected",
+     "state": "MISSING"
+    }
+   ]
+  },
+  {
+   "checks": {
+    "AUDIO_PLAN": "FAIL",
+    "AUDIO_RECEIPT": "PASS",
+    "BOUNDS": "PASS",
+    "EFFECTIVE_SCOPE": "SKIPPED",
+    "EXPECTED": "PASS",
+    "IDENTITY": "PASS",
+    "MANIFEST_VIEW": "SKIPPED",
+    "OBSERVED": "FAIL",
+    "PINS": "FAIL",
+    "PROFILE": "PASS",
+    "SELECTION": "SKIPPED",
+    "VIDEO_RECEIPT": "SKIPPED"
+   },
+   "id": "S2",
+   "pins_compared": {
+    "manifest_sha256": 1,
+    "plan_sha256": 2,
+    "receipt_sha256": 1,
+    "stem_sha256": 1
+   },
+   "reasons": [
+    {
+     "code": "SHAPE_COUNT",
+     "path": "observed.stages.audio_plan.response.plan.timeline.total_frames",
+     "severity": "REJECT"
+    },
+    {
+     "code": "SHAPE_COUNT",
+     "path": "observed.stages.audio_plan.response.plan.timeline.total_samples",
+     "severity": "REJECT"
+    },
+    {
+     "code": "SHAPE_PLAN",
+     "path": "observed.stages.audio_plan.response.plan.events",
+     "severity": "REJECT"
+    },
+    {
+     "code": "SHAPE_PLAN",
+     "path": "observed.stages.audio_plan.response.plan.hold",
+     "severity": "REJECT"
+    },
+    {
+     "code": "SHAPE_PLAN",
+     "path": "observed.stages.audio_plan.response.plan.scope",
+     "severity": "REJECT"
+    },
+    {
+     "code": "SHAPE_PLAN",
+     "path": "observed.stages.audio_plan.response.plan.unresolved",
+     "severity": "REJECT"
+    },
+    {
+     "code": "SHAPE_PLAN",
+     "path": "observed.stages.audio_plan.response.plan.warnings",
+     "severity": "REJECT"
+    },
+    {
+     "code": "SHAPE_STATUS",
+     "path": "observed.stages.audio_plan.response.status",
+     "severity": "REJECT"
+    },
+    {
+     "code": "OBSERVED_PIN_MISSING",
+     "path": "pins.video_sha256",
+     "severity": "HOLD"
+    },
+    {
+     "code": "REQUIRED_RECEIPT_ABSENT",
+     "path": "observed.stages.video_receipt",
+     "severity": "HOLD"
+    },
+    {
+     "code": "REQUIRED_STAGE_ABSENT",
+     "path": "observed.stages.avmux_manifest_view",
+     "severity": "HOLD"
+    },
+    {
+     "code": "SCHEMA_UNKNOWN",
+     "path": "observed.stages.audio_plan.response.plan.schema",
+     "severity": "HOLD"
+    }
+   ],
+   "shows": "a `video_core.plan/1` is not an audio plan: the audio-plan comparison is reached and fails on schema / status / shape",
+   "sources_used": [
+    "video_plan_6s",
+    "audio_receipt_stem"
+   ],
+   "status": "REJECTED",
+   "synthetic_assertions": [
+    "identity envelope per stage packet (synthetic)",
+    "exit_code 0 for every stage (the committed files record no exit code)",
+    "pins_source=owner_record (declaration only)",
+    "audio_plan response = {plan_sha256 of the file, plan} (the video plan has no status field to copy)"
+   ],
+   "title": "6 s video canonical plan substituted into the audio_plan slot",
+   "unselected_unresolved": null
+  },
+  {
+   "checks": {
+    "AUDIO_PLAN": "PASS",
+    "AUDIO_RECEIPT": "PASS",
+    "BOUNDS": "PASS",
+    "EFFECTIVE_SCOPE": "PASS",
+    "EXPECTED": "PASS",
+    "IDENTITY": "PASS",
+    "MANIFEST_VIEW": "SKIPPED",
+    "OBSERVED": "FAIL",
+    "PINS": "FAIL",
+    "PROFILE": "PASS",
+    "SELECTION": "FAIL",
+    "VIDEO_RECEIPT": "SKIPPED"
+   },
+   "id": "P1",
+   "pins_compared": {
+    "manifest_sha256": 1,
+    "plan_sha256": 3,
+    "receipt_sha256": 1,
+    "stem_sha256": 1
+   },
+   "reasons": [
+    {
+     "code": "PIN_MISMATCH",
+     "path": "observed.stages.audio_plan.response.plan_sha256",
+     "severity": "REJECT"
+    },
+    {
+     "code": "PIN_MISMATCH",
+     "path": "observed.stages.audio_receipt.response.outputs[plan].sha256",
+     "severity": "REJECT"
+    },
+    {
+     "code": "PIN_MISMATCH",
+     "path": "observed.stages.audio_receipt.response.plan_sha256",
+     "severity": "REJECT"
+    },
+    {
+     "code": "BINDING_UNRESOLVED",
+     "path": "observed.stages.audio_plan.response.plan.events[ev_square]",
+     "severity": "HOLD"
+    },
+    {
+     "code": "BINDING_UNRESOLVED",
+     "path": "observed.stages.audio_plan.response.plan.events[ev_triangle]",
+     "severity": "HOLD"
+    },
+    {
+     "code": "OBSERVED_PIN_MISSING",
+     "path": "pins.video_sha256",
+     "severity": "HOLD"
+    },
+    {
+     "code": "REQUIRED_RECEIPT_ABSENT",
+     "path": "observed.stages.video_receipt",
+     "severity": "HOLD"
+    },
+    {
+     "code": "REQUIRED_STAGE_ABSENT",
+     "path": "observed.stages.avmux_manifest_view",
+     "severity": "HOLD"
+    }
+   ],
+   "shows": "the real audio plan hash, the receipt's plan_sha256 and its plan output all disagree with that pin: PIN_MISMATCH at each source",
+   "sources_used": [
+    "audio_plan_stem",
+    "audio_receipt_stem",
+    "video_plan_6s"
+   ],
+   "status": "REJECTED",
+   "synthetic_assertions": [
+    "identity envelope per stage packet (synthetic)",
+    "exit_code 0 for every stage (the committed files record no exit code)",
+    "pins_source=owner_record (declaration only)",
+    "audio_plan response envelope built mechanically around the unmodified committed canonical plan (status = plan.status, plan_sha256 = SHA-256 of the file bytes)",
+    "owner plan pin = SHA-256 of the 6 s video plan file"
+   ],
+   "title": "Stage-B audio packets against an owner plan pin that is the 6 s video plan's hash",
+   "unselected_unresolved": [
+    {
+     "row_id": "ev_unresolved_not_selected",
+     "state": "MISSING"
+    }
+   ]
+  }
+ ],
+ "note": "no case is READY: the committed evidence contains no render receipt for the 3-frame clip, and the committed audio plan carries no binding reference; neither was invented",
+ "python": "3.13.18",
+ "ready_cases": [],
+ "schema": "producer_shape_compatibility/1",
+ "sources": [
+  {
+   "bytes": 12739,
+   "git_blob": "a31eed68bb40a3be7cb449cf9e3b7e24bc52bd34",
+   "name": "video_receipt_6s",
+   "path": "tools/video-core/evidence/receipt.synthetic-6s.json",
+   "sha256": "28a097f1da49d57492022215d9cfca9f331d7b1a81131d443b86643d21b49f59"
+  },
+  {
+   "bytes": 2306,
+   "git_blob": "125b8a477b04cd5b21a294d18784dd257ffa04fb",
+   "name": "video_plan_6s",
+   "path": "tools/video-core/evidence/plan.canonical.json",
+   "sha256": "4bc20b3fd703f46651c868c1929efd3d9df3fc3c0a99f86607502ca92d5d9f21"
+  },
+  {
+   "bytes": 3914,
+   "git_blob": "8ebca373ff483190eabfa98c25ba7977d5c150fd",
+   "name": "audio_receipt_stem",
+   "path": "tools/video-core/evidence/stage-b-audio-stem/receipt.stem-demo.json",
+   "sha256": "f87030ea130a55805a400454b48c00fa7d88ab7ceb3313ff36a10df1a37c1711"
+  },
+  {
+   "bytes": 2804,
+   "git_blob": "8f77425e1bde6cec2e535301ed422c3020235175",
+   "name": "audio_plan_stem",
+   "path": "tools/video-core/evidence/stage-b-audio-stem/plan.canonical.json",
+   "sha256": "a897549b8c56c5b474952420059db3adfda8aaf458093ee49373fd82eb90228e"
+  },
+  {
+   "bytes": 1602,
+   "git_blob": "9f42579833029ac8c44c55109fb360bdf0ef3509",
+   "name": "audio_manifest_stem",
+   "path": "tools/video-core/evidence/stage-b-audio-stem/manifest.synthetic.json",
+   "sha256": "d7b7a2b1dcc77681c3f4698763a2c570cb5e7fa2625bf9dbdd3c2aa6bc9dd737"
+  },
+  {
+   "bytes": 2642,
+   "git_blob": "8e187e33950fe745ffd681bc81f5d7492642c34e",
+   "name": "audio_stem_independent",
+   "path": "tools/video-core/evidence/stage-b-audio-stem/independent_verification.json",
+   "sha256": "af9eddba6984400d0cc9c1cb1eaf48f8f83645435b98d7b56663cef762f1eb1b"
+  },
+  {
+   "bytes": 678,
+   "git_blob": "a48de7e278bf188ef32bdcc1f8a5192fb26a5f0b",
+   "name": "avmux_manifest_mov",
+   "path": "tools/video-core/evidence/avmux-synthetic/mov.manifest.json",
+   "sha256": "8c10c1a1f4480b0062ba8eac09038adebb39039fdcf55b5698ed0e30bd2c29c6"
+  },
+  {
+   "bytes": 28259,
+   "git_blob": "b58923a018de96fb0a384c92a16f740341b0c73c",
+   "name": "avmux_receipt_mov",
+   "path": "tools/video-core/evidence/avmux-synthetic/mov.receipt.json",
+   "sha256": "f8d7795315ff5ad9e779de5d178f78758bfa0fc75630719f0fc74b94e831d5ed"
+  }
+ ]
+}
