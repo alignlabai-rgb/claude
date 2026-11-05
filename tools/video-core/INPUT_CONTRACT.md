@@ -205,3 +205,8 @@ The test failure repeatedly recorded in earlier clean-export notes (`ParentHands
 worker publishes atomically; the parent refused every time (no GO, target never started) and only the refusal reason varied. The stub now uses the worker's temp-file + `os.replace` protocol, torn
 publication is a deliberate deterministic test with an event barrier, and negative controls show the matrix assertions fail if refusal or no-GO detection is lost. No production file changed; nothing
 is OPEN in production; the affected tests are POSIX-only (skipped on Windows), so there is no Windows evidence.
+
+## Follow-up 5: `avmux reinspect` with media and output root on different Windows drives (evidence in `evidence/reinspect-cross-drive-20261105/`)
+The independent Windows run showed `ValueError: Paths don't have the same drive` (untyped) from the output-overlaps-media containment test when the media and the output root were on different drives. The test now uses
+`paths._inside`, which treats paths on different drives (or UNC shares) as not containing each other; the same-drive `output_overlaps_media` rejection is unchanged. No new path/root policy, parent-link rule, atomic open or API.
+The cross-drive arithmetic is covered by ntpath-based tests that run on any OS (simulation, not a Windows run); a real C:/D: run is for the independent verifier.

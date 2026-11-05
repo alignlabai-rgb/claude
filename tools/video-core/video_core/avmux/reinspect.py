@@ -16,7 +16,7 @@ from .. import receipt as rc
 from .. import runner, tools
 from ..errors import Issue, UnsafePath, ValidationFailed
 from ..limits import Limits
-from ..paths import check_media_for_inspect, check_output_location
+from ..paths import _inside, check_media_for_inspect, check_output_location
 from . import checks as ck
 from .original_receipt import read_original_receipt
 
@@ -78,7 +78,7 @@ def reinspect_audio_packets(media_path: str, *, expected_sha256: str, output_roo
     expected = expected_sha256.lower()
     media, demuxer = check_media_for_inspect(media_path)
     location = check_output_location(output_root, output_name, None)
-    if os.path.commonpath([os.path.dirname(media), location.run_dir]) == location.run_dir:
+    if _inside(location.run_dir, os.path.dirname(media)):  # run_dir contains the media's directory; paths on different drives cannot contain each other (no ValueError)
         _reject("output_overlaps_media", "output_name", "the output directory must not contain the media", UnsafePath)
     size = os.path.getsize(media)
     before = tools.sha256_file(media, max(limits.max_source_bytes, size))

@@ -147,9 +147,11 @@ def real_directory(path: str, what: str) -> str:
     return real
 
 
-def _inside(root: str, candidate: str) -> bool:
+def _inside(root: str, candidate: str, _path=os.path) -> bool:
+    """True if `candidate` is `root` or below it. Paths on different Windows drives cannot contain each other (commonpath raises ValueError for them): False.
+    `_path` is the path module (default: the platform's); it exists so tests can exercise ntpath semantics on any OS."""
     try:
-        return os.path.commonpath([root, candidate]) == root
+        return _path.commonpath([root, candidate]) == root
     except ValueError:  # different drives on Windows
         return False
 
