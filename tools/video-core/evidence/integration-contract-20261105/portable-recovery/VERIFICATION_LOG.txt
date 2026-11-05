@@ -1,0 +1,22 @@
+# Verification log of the recovery transport (produced on Linux; scratch paths removed)
+# commit packed: 8cab6e44b7626924c9ad3a46814c7e57b575b5bc
+## sha256
+4fc5e5325ab12d6cccb6f25283625dd3bf95fe43fd362d4890e33943bb21373c  portable-8cab6e4.zip
+0a8dafe4a6f77570a8629e48f7a4e95806b73d4b3923b3b8de6b92e35e188ada  portable-8cab6e4.zip.b64
+## verify from zip, with git blob check
+members verified: 901/901  total bytes: 1829295  git-checked: True
+## verify from base64, with git blob check
+members verified: 901/901  total bytes: 1829295  git-checked: True
+## independent comparison: extracted tree vs 'git archive 8cab6e4' (cmp, file by file): 901 files compared, 0 mismatches, identical file lists (see session record)
+## negative controls (tampered/unsafe archives must be rejected)
+control_good                       exit=0  members verified: 901/901  total bytes: 1829295  git-checked: False | VERIFIED
+zip_one_bit_flipped                exit=1  PROBLEMS: | zip sha256/size differs from the manifest
+b64_one_char_changed               exit=1  PROBLEMS: | base64 file sha256 differs from the manifest | zip sha256/size differs from the manifest
+extra_member_dotdot                exit=1  members verified: 901/901  total bytes: 1829295  git-checked: False | PROBLEMS: | unsafe member path: '../escape.txt' | member set differs: extra=['..
+extra_member_absolute              exit=1  members verified: 901/901  total bytes: 1829295  git-checked: False | PROBLEMS: | unsafe member path: '/abs/x.txt' | member set differs: extra=['/abs/
+extra_member_backslash             exit=1  members verified: 901/901  total bytes: 1829295  git-checked: False | PROBLEMS: | unsafe member path: 'a\\b.txt' | member set differs: extra=['a\\b.tx
+extra_member_dotgit                exit=1  members verified: 901/901  total bytes: 1829295  git-checked: False | PROBLEMS: | unsafe member path: '.git/config' | member set differs: extra=['.git
+extra_member_plain                 exit=1  members verified: 901/901  total bytes: 1829295  git-checked: False | PROBLEMS: | member set differs: extra=['portable/extra.txt'] missing=[]
+missing_member                     exit=1  members verified: 900/901  total bytes: 1813037  git-checked: False | PROBLEMS: | member set differs: extra=[] missing=['PORTABLE_HANDOFF.md']
+member_bytes_altered               exit=1  members verified: 900/901  total bytes: 1813037  git-checked: False | PROBLEMS: | size/sha256 mismatch: PORTABLE_HANDOFF.md
+all negative controls rejected and the control passed: True
