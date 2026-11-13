@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI News 2026年11月13日 | ALIGN Lab</title>
+<style>
+*,*::before,*::after{box-sizing:border-box}
+body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;margin:0;background:#0b1220;color:#edf2fb;line-height:1.8;padding:28px 18px 64px}
+.shell{max-width:860px;margin:auto;display:flex;flex-direction:column;gap:16px}
+a{color:#75d7c0}a:hover{text-decoration:underline}a:focus-visible{outline:3px solid #fcd34d;outline-offset:4px}
+.skip{position:absolute;left:-9999px}.skip:focus{position:static}
+.page-header,.news-card,.no-news,.footer-nav,.reading-note{background:#111a2b;border:1px solid #293548;border-radius:14px;padding:20px 24px}
+.breadcrumb,.page-sub,.news-meta,.template-note{font-size:.84rem;color:#a9bdd3}
+.page-date,.section-label{font-size:.8rem;color:#75d7c0;font-weight:700}
+.page-title{font-size:1.5rem;line-height:1.5;margin:0 0 8px}
+.page-sub{margin:0}.section-label{border-bottom:1px solid #293548;padding-bottom:8px}
+.badge{display:inline-block;font-size:.75rem;font-weight:700;padding:2px 8px;border-radius:5px;margin-right:6px}
+.badge-red{background:#47252d;color:#ffaaaa}.badge-orange{background:#443225;color:#ffd19f}
+.badge-teal{background:#153b3c;color:#93e7d8}.badge-blue{background:#203553;color:#acccff}.badge-gray{background:#343443;color:#d3d3e1}
+.news-card{margin-bottom:16px}.news-title{font-size:1.08rem;line-height:1.5;margin:0 0 9px}
+.news-body{color:#d2dceb;margin:0 0 10px}.news-meta span{margin-right:12px}
+.no-news{text-align:center;color:#c5d0e3}.footer-nav{display:flex;gap:16px;flex-wrap:wrap;font-size:.88rem}
+h2{font-size:1.08rem;margin:0 0 8px}p{margin-top:0}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">本文へ</a>
+<div class="shell">
+<header class="page-header">
+<nav class="breadcrumb"><a href="index.html">AI News</a> / <a href="../../index.html">Hub Top</a></nav>
+<p class="page-date">2026-11-13</p>
+<h1 class="page-title">AI News — 2026年11月13日</h1>
+<p class="page-sub">制作・エージェント・LLMの今日の信号。速報の価値と、まだ確かめていない範囲を一緒に伝えます。</p>
+</header>
+<section class="reading-note">
+<h2>この日のニュースの読み方</h2>
+<p>公式の発表、当事者の報告、第三者の観測、市場の話題は同じ証拠ではありません。記事では確認できた事実と出典を示し、解釈や未確認を分けます。X等の信号も調査の入口として価値がありますが、話題であることを製品仕様の確定へ読み替えません。</p>
+<p>発表日と記事の日付、APIとアプリ、重み配布とローカル動作を区別します。速報に訂正が必要になった場合は元の出来事を現在の仕様へ塗り替えず、訂正と現行の入口を示します。今日の仕様を選ぶには<a href="../../research/llm-tracker.html">LLMトラッカー</a>も確認してください。</p>
+</section>
+<!-- Output contract: research/ai-news/YYYY-MM-DD.html.
+     Keep DATE, DATE_JP and NEWS_ITEMS; links resolve from that generated path.
+     Existing news-card/news-title/news-body/news-meta and badge classes remain.
+     NEWS_ITEMS contains source links and fact/report/interpretation distinctions.
+     This template does not alter the schedule, publish command or account settings. -->
+<main id="main">
+<div class="section-label">🔴 Claude Code</div>
+<div class="news-card">
+<p class="news-title"><span class="badge badge-red">Claude Code</span>Claude Code v2.1.323（11/12 22:12 UTC＝JST 11/13朝・Latest）：実験的な Code Mode、プラグインのバージョン制約、Bash権限ルールの抜け穴修正</p>
+<p class="news-body">GitHub Releasesと公式ドキュメントで確認。<strong>Code Mode</strong>（実験・既定オフ）は、Claudeがツール（Bash/Read/Edit等）を1つずつ呼ぶ代わりにJavaScriptを書き、複数のツール呼び出しを1ステップで実行する機能。<code>CLAUDE_CODE_EXPERIMENTAL_CODE_MODE=1</code> で有効化し、v2.1.323以降・ネイティブ版・対話端末のみ対応（<code>-p</code>、Agent SDK、VS Code、Desktop、クラウドセッション、Bedrock/Foundry等の経路は対象外）。待機実行は10分で停止し、バックグラウンドは最大2時間。auto modeの分類器は各ツール呼び出しではなくコード全体を審査する点に注意。<br>そのほか、<code>plugin.json</code> の <code>engines["claude-code"]</code> で範囲外バージョンでのプラグイン導入・更新・読込を止められる／<code>claude plugin validate</code> がTypeScript製hooksモジュールを型検査／<code>claude -p</code>・SDKで長いhookが30秒ごとにheartbeatを出す。権限面の修正として、<code>Bash(ls*)</code> のようなワイルドカード付きallowルールがプロンプトを飛ばす場合があった問題、<code>sudo</code>・<code>env</code> 経由でdeny/askルールが効かない問題、<code>Read</code> denyの対象パスへWrite/Editで書ける問題を修正。権限ルールに依存して運用している場合は更新を検討したい。リリースノート本文は一部のみ取得（全文未読）。</p>
+<p class="news-meta"><span>Source: <a href="https://github.com/anthropics/claude-code/releases">Claude Code GitHub Releases</a>／<a href="https://code.claude.com/docs/en/code-mode">Code Mode docs</a></span></p>
+</div>
+<div class="section-label">🔴 Hermes Agent</div>
+<div class="news-card">
+<p class="news-title"><span class="badge badge-red">Hermes Agent</span>Hermes Agent canary v0.23.1+canary.20261113T064447Z（11/13）：Desktopビルド（macOS DMG／Windows MSIX）のsmoke test通過</p>
+<p class="news-body">GitHub Releasesで確認。自動生成のcanary版で、変更点の説明は無く、前回canaryとの比較リンクのみ。macOS（Apple Silicon）のDMG/ZIPとWindows x64・arm64のMSIXが添付され、smoke statusはいずれも Passed。Latestの安定版は11/9のv0.23.1のまま。canaryは試験配布なので、安定運用ではv0.23.1を使い、新機能の確認目的に限って試すのが妥当。</p>
+<p class="news-meta"><span>Source: <a href="https://github.com/NousResearch/hermes-agent/releases">Hermes Agent GitHub Releases</a></span></p>
+</div>
+<div class="section-label">🟠 Codex / OpenAI</div>
+<div class="news-card">
+<p class="news-title"><span class="badge badge-orange">Codex</span>Codex 0.168.0・0.169.0（11/13 UTC・stable）：side-chatタブ、モデルプロバイダ選択、<code>codex exec</code> の未信頼ディレクトリ保護</p>
+<p class="news-body">GitHub Releasesで確認。0.168.0（03:54 UTC）：モデルプロバイダを一覧して新規チャットの既定を設定／opt-inのside-chatペイン／音声対応モデル向け音声録音／アニメーションGIF生成／Ghostty・Kittyのtmuxで画像プレビュー。0.169.0（08:37 UTC・Latest）：side-chatを複数タブで利用／過去タスクの検索／ターン詳細の折りたたみ／カスタムモデルプロバイダをターミナルから編集／<code>Ctrl+S</code> で診断ZIPを保存。<code>codex exec</code> は未信頼ディレクトリではプロジェクト設定とMCPサーバーを無効のままにし、<code>--trust</code> 指定時のみ有効にする。CIやスクリプトで未信頼リポジトリに <code>codex exec</code> を使っている場合、これまで読み込まれていた設定・MCPが動かなくなる可能性があるので確認したい。0.170.0-alpha.2〜4、0.171.0-alpha.1〜4（pre-release・ノートなし）も公開。</p>
+<p class="news-meta"><span>Source: <a href="https://github.com/openai/codex/releases">Codex GitHub Releases</a></span></p>
+</div>
+<div class="section-label">🟠 中国系LLM</div>
+<div class="news-card">
+<p class="news-title"><span class="badge badge-orange">Qwen Code</span>Qwen Code v0.27.3（11/13 00:24・stable）：Web Shellのバックグラウンドタスク表示、DingTalk webhookチャネル</p>
+<p class="news-body">GitHub Releasesで確認（時刻のタイムゾーン表記はページに無し）。新機能はWeb Shellの入力欄上のバックグラウンドタスクchip、DingTalk webhookチャネル、サイドバーのセッション一覧を10件ずつ展開。修正はWeChat QRのタイムアウト延長、Docker/Podmanでのサンドボックスhomeディレクトリ処理。破壊的変更の記載なし。同梱のSDK TypeScript v0.1.33とDesktop v0.27.3も同日公開。前日のv1.0.0-preview.1（Qoder統合版）はpre-releaseのままで、安定版は0.27系が続いている。</p>
+<p class="news-meta"><span>Source: <a href="https://github.com/QwenLM/qwen-code/releases">Qwen Code GitHub Releases</a></span></p>
+</div>
+<p class="news-meta">巡回した一次ソース: Anthropic Newsroom（11/13付の新規なし。11/9 Claude Fable 5.2／Mythos 5.2は既出日の話題で再掲せず）・Claude Platform release notes（11/12のself-hosted Managed Agentsのみで既出）／Claude Code・Codex・OpenClaw（2026.11.5-beta.2のまま新規なし）・Hermes Agent・Qwen Code・Gemini CLI（v0.68.0のまま新規なし）の GitHub Releases・Code Modeドキュメント。openai.com はネットワーク許可外で取得できず、xAI・Google・動画生成・音楽生成・クリエイティブAI連携は未巡回／確認できず。日付はGitHub表示時刻（UTC）をJSTに換算して割り当て。確認できた分のみ掲載（4件）。</p>
+
+</main>
+<footer class="footer-nav">
+<a href="index.html">ニュース一覧</a>
+<a href="../../research/llm-tracker.html">現行LLMトラッカー</a>
+<a href="../../research/claude-recent-updates.html">Claude情報</a>
+<a href="../../workbench/knowledge/hermes-agent.html">Hermes Agent</a>
+<a href="../../research/openclaw-news/index.html">OpenClaw News</a>
+<a href="../../index.html">Hub Top</a>
+</footer>
+<p class="template-note">ひな型 最終更新: 2026-10-13。既存の日次出力形式を維持しています。実際の自動実行設定は今回変更していません。<a href="https://github.com/alignlabai-rgb/claude/blob/4535dd63a3b2acf62ec793c02c9f8dbffabeece5/_routines/news-template.html">刷新前の固定ひな型</a>。</p>
+</div>
+</body>
+</html>
